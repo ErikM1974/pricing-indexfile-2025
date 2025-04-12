@@ -196,7 +196,65 @@
 
         // --- Product Details Functions ---
         async function loadProductInfo(styleNumber, colorName) {
-             console.log(`ProductInfo: Loading details for Style: ${styleNumber}, Color: ${colorName || 'Default'}`); if (!productInfoArea) return; productInfoArea.innerHTML = '<div class="loading-message">Loading product details...</div>'; const detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`; try { const response = await fetch(detailApiUrl); if (!response.ok) { if (response.status === 404) throw new Error(`Details not found.`); else throw new Error(`API Error: ${response.statusText}`); } const details = await response.json(); const mainImageUrl = details.FRONT_MODEL || details.FRONT_FLAT || ''; const altText = `Product image for ${details.PRODUCT_TITLE || styleNumber}`; const thumb1 = details.FRONT_MODEL; const thumb2 = details.BACK_FLAT; const thumb3 = details.BACK_MODEL; const thumb4 = details.FRONT_FLAT; productInfoArea.innerHTML = `<div class="product-gallery-container-dp2"><div class="product-info-wrapper-dp2"><div class="product-image-area-dp2"><div class="main-image-wrapper-dp2"><img id="main-product-image-dp2" src="${mainImageUrl}" alt="${altText}" onerror="this.style.display='none';"></div><div class="additional-images-dp2">${createThumbnailHtml(thumb1, altText)}${createThumbnailHtml(thumb4, altText)}${createThumbnailHtml(thumb2, altText)}${createThumbnailHtml(thumb3, altText)}</div></div><div class="product-details-area-dp2"><h2>${details.PRODUCT_TITLE || ''}</h2><p class="style-number">Style: ${styleNumber}</p><p class="selected-color">Color: <span id="product-info-color-name">${colorName || 'Select Color'}</span></p><p class="product-description">${details.PRODUCT_DESCRIPTION || ''}</p></div></div></div>`; setupImageGallery(); } catch (error) { console.error("ProductInfo: Failed to load details:", error); if (productInfoArea) productInfoArea.innerHTML = `<div class="error-message">Error loading product details: ${error.message}</div>`; }
+             console.log(`ProductInfo: Loading details for Style: ${styleNumber}, Color: ${colorName || 'Default'}`);
+             if (!productInfoArea) return;
+             
+             productInfoArea.innerHTML = '<div class="loading-message">Loading product details...</div>';
+             
+             // Include both COLOR_NAME and CATALOG_COLOR parameters in the API call if provided
+             // The API endpoint supports both parameters for better color matching
+             const catalogColor = window.selectedCatalogColor || colorName; // Use catalogColor if available, otherwise use colorName
+             const detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}${
+                 colorName ? `&COLOR_NAME=${encodeURIComponent(colorName)}` : ''}${
+                 catalogColor ? `&CATALOG_COLOR=${encodeURIComponent(catalogColor)}` : ''}`;
+             
+             console.log(`ProductInfo: Fetching from URL: ${detailApiUrl}`);
+             console.log(`ProductInfo: Using COLOR_NAME=${colorName}, CATALOG_COLOR=${catalogColor}`);
+             
+             try {
+                 const response = await fetch(detailApiUrl);
+                 if (!response.ok) {
+                     if (response.status === 404) throw new Error(`Details not found.`);
+                     else throw new Error(`API Error: ${response.statusText}`);
+                 }
+                 
+                 const details = await response.json();
+                 console.log(`ProductInfo: Received color-specific data:`, details);
+                 
+                 const mainImageUrl = details.FRONT_MODEL || details.FRONT_FLAT || '';
+                 const altText = `Product image for ${details.PRODUCT_TITLE || styleNumber} - ${colorName || 'Default'}`;
+                 const thumb1 = details.FRONT_MODEL;
+                 const thumb2 = details.BACK_FLAT;
+                 const thumb3 = details.BACK_MODEL;
+                 const thumb4 = details.FRONT_FLAT;
+                 
+                 productInfoArea.innerHTML = `<div class="product-gallery-container-dp2">
+                     <div class="product-info-wrapper-dp2">
+                         <div class="product-image-area-dp2">
+                             <div class="main-image-wrapper-dp2">
+                                 <img id="main-product-image-dp2" src="${mainImageUrl}" alt="${altText}" onerror="this.style.display='none';">
+                             </div>
+                             <div class="additional-images-dp2">
+                                 ${createThumbnailHtml(thumb1, altText)}
+                                 ${createThumbnailHtml(thumb4, altText)}
+                                 ${createThumbnailHtml(thumb2, altText)}
+                                 ${createThumbnailHtml(thumb3, altText)}
+                             </div>
+                         </div>
+                         <div class="product-details-area-dp2">
+                             <h2>${details.PRODUCT_TITLE || ''}</h2>
+                             <p class="style-number">Style: ${styleNumber}</p>
+                             <p class="selected-color">Color: <span id="product-info-color-name">${colorName || 'Select Color'}</span></p>
+                             <p class="product-description">${details.PRODUCT_DESCRIPTION || ''}</p>
+                         </div>
+                     </div>
+                 </div>`;
+                 
+                 setupImageGallery();
+             } catch (error) {
+                 console.error("ProductInfo: Failed to load details:", error);
+                 if (productInfoArea) productInfoArea.innerHTML = `<div class="error-message">Error loading product details: ${error.message}</div>`;
+             }
          }
         function createThumbnailHtml(imageUrl, altText) { if (imageUrl && imageUrl.trim() !== '') { return `<img class="product-thumbnail-dp2" src="${imageUrl}" alt="${altText} thumbnail" onerror="this.style.display='none';">`; } return ''; }
         function setupImageGallery() { const imageArea = document.querySelector('.product-image-area-dp2'); if (!imageArea) return; const mainImage = imageArea.querySelector('#main-product-image-dp2'); const thumbnailContainer = imageArea.querySelector('.additional-images-dp2'); if (!mainImage || !thumbnailContainer) { console.log("ImageGallery: Missing elements."); return; } thumbnailContainer.removeEventListener('click', handleThumbnailClick); thumbnailContainer.addEventListener('click', handleThumbnailClick); const firstThumb = thumbnailContainer.querySelector('.product-thumbnail-dp2'); const allThumbs = thumbnailContainer.querySelectorAll('.product-thumbnail-dp2'); allThumbs.forEach(t => { t.classList.remove('active-thumbnail'); t.style.opacity='0.7'; t.style.border='1px solid #ccc';}); if (firstThumb) { firstThumb.classList.add('active-thumbnail'); firstThumb.style.opacity = '1.0'; firstThumb.style.border = '2px solid #007bff'; } console.log("ImageGallery: Setup complete."); }
@@ -205,16 +263,67 @@
         // --- Swatch Functions ---
         async function loadSwatches(styleNumber) {
              console.log(`Swatches: Loading for Style: ${styleNumber}`); if (!swatchArea) return; swatchArea.innerHTML = '<div class="loading-message">Loading swatches...</div>'; const swatchApiUrl = `${API_PROXY_BASE_URL}/api/color-swatches?styleNumber=${encodeURIComponent(styleNumber)}`; try { const response = await fetch(swatchApiUrl); if (!response.ok) throw new Error(`API Error: ${response.statusText}`); const swatches = await response.json(); console.log(`Swatches: Data received: ${swatches.length} records`); swatchArea.innerHTML = ''; if (!swatches || swatches.length === 0) { swatchArea.innerHTML = '<p>No color options found.</p>'; return; } const title = document.createElement('p'); title.textContent = 'Available Colors:'; swatchArea.appendChild(title); const container = document.createElement('div'); container.className = 'swatch-container'; swatchArea.appendChild(container);
-             // *** FIX: Iterate over original swatches array from API (after sorting) ***
-             const sortedSwatches = swatches.filter(s => s.COLOR_NAME && s.COLOR_SQUARE_IMAGE).sort((a, b) => a.COLOR_NAME.localeCompare(b.COLOR_NAME));
-             console.log(`Swatches: Displaying ${sortedSwatches.length} valid swatches.`);
-             sortedSwatches.forEach(swatch => { const swatchWrapper = document.createElement('div'); swatchWrapper.className = 'swatch-wrapper'; const swatchElement = document.createElement('div'); swatchElement.className = 'color-swatch-item'; swatchElement.title = swatch.COLOR_NAME; swatchElement.style.backgroundImage = `url('${swatch.COLOR_SQUARE_IMAGE}')`; swatchElement.dataset.colorName = swatch.COLOR_NAME; swatchElement.dataset.catalogColor = swatch.CATALOG_COLOR; swatchElement.addEventListener('click', handleSwatchClick); const colorNameElement = document.createElement('div'); colorNameElement.className = 'color-name'; colorNameElement.textContent = swatch.COLOR_NAME; swatchWrapper.appendChild(swatchElement); swatchWrapper.appendChild(colorNameElement); container.appendChild(swatchWrapper); });
+             // *** FIX: De-duplicate swatches by COLOR_NAME before creating elements ***
+             const uniqueSwatchesMap = new Map();
+             swatches.filter(s => s.COLOR_NAME && s.COLOR_SQUARE_IMAGE) // Ensure valid data
+                     .forEach(swatch => {
+                         if (!uniqueSwatchesMap.has(swatch.COLOR_NAME)) {
+                             uniqueSwatchesMap.set(swatch.COLOR_NAME, swatch);
+                         }
+                     });
+
+             const uniqueSortedSwatches = Array.from(uniqueSwatchesMap.values())
+                                              .sort((a, b) => a.COLOR_NAME.localeCompare(b.COLOR_NAME));
+
+             console.log(`Swatches: Displaying ${uniqueSortedSwatches.length} unique valid swatches.`);
+
+             uniqueSortedSwatches.forEach(swatch => { // Iterate over unique swatches
+                 const swatchWrapper = document.createElement('div');
+                 swatchWrapper.className = 'swatch-wrapper';
+                 const swatchElement = document.createElement('div');
+                 swatchElement.className = 'color-swatch-item';
+                 swatchElement.title = swatch.COLOR_NAME;
+                 swatchElement.style.backgroundImage = `url('${swatch.COLOR_SQUARE_IMAGE}')`;
+                 swatchElement.dataset.colorName = swatch.COLOR_NAME;
+                 swatchElement.dataset.catalogColor = swatch.CATALOG_COLOR;
+                 swatchElement.addEventListener('click', handleSwatchClick);
+                 const colorNameElement = document.createElement('div');
+                 colorNameElement.className = 'color-name';
+                 colorNameElement.textContent = swatch.COLOR_NAME;
+                 swatchWrapper.appendChild(swatchElement);
+                 swatchWrapper.appendChild(colorNameElement);
+                 container.appendChild(swatchWrapper);
+             });
              const firstSwatchElement = container.querySelector('.color-swatch-item'); if (firstSwatchElement) { firstSwatchElement.click(); } // Auto-click first swatch
              } catch (error) { console.error("Swatches: Failed to load:", error); if (swatchArea) swatchArea.innerHTML = `<div class="error-message">Error loading swatches: ${error.message}</div>`; }
          }
         function handleSwatchClick(event) {
-             const clickedSwatch = event.currentTarget; const colorName = clickedSwatch.dataset.colorName; const catalogColor = clickedSwatch.dataset.catalogColor; console.log(`Swatches: Clicked Color: ${colorName}, Code: ${catalogColor}`); window.selectedColorName = colorName; window.selectedCatalogColor = catalogColor; const colorNameSpan = document.getElementById('product-info-color-name'); if(colorNameSpan) colorNameSpan.textContent = colorName || 'N/A'; const allSwatches = document.querySelectorAll('#swatch-area .color-swatch-item'); allSwatches.forEach(sw => sw.classList.remove('active-swatch')); clickedSwatch.classList.add('active-swatch');
+             const clickedSwatch = event.currentTarget;
+             const colorName = clickedSwatch.dataset.colorName;
+             const catalogColor = clickedSwatch.dataset.catalogColor;
+             console.log(`Swatches: Clicked Color: ${colorName}, Code: ${catalogColor}`);
+             
+             // Update global variables
+             window.selectedColorName = colorName;
+             window.selectedCatalogColor = catalogColor;
+             
+             // Update color name in product info area
+             const colorNameSpan = document.getElementById('product-info-color-name');
+             if(colorNameSpan) colorNameSpan.textContent = colorName || 'N/A';
+             
+             // Update active swatch styling
+             const allSwatches = document.querySelectorAll('#swatch-area .color-swatch-item');
+             allSwatches.forEach(sw => sw.classList.remove('active-swatch'));
+             clickedSwatch.classList.add('active-swatch');
+             
              // --- Call functions to update other sections ---
+             // Update product images with color-specific images
+             // Pass both colorName and catalogColor to ensure we get the right images
+             window.selectedColorName = colorName;
+             window.selectedCatalogColor = catalogColor;
+             loadProductInfo(window.selectedStyleNumber, colorName); // Reload product info with the selected color
+             
+             // Update inventory and pricing
              loadInventory(window.selectedStyleNumber, catalogColor); // Update Inventory Table
              triggerPricingDataPageUpdates(window.selectedStyleNumber, catalogColor); // Update Pricing DPs
          }

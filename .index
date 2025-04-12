@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NWCA Pricing Tool - Tabbed</title>
+    <style>
+        /* --- General & Search CSS --- */
+        body { font-family: sans-serif; padding: 20px; font-size: 14px; }
+        hr { margin: 25px 0; border: 0; border-top: 1px solid #eee; }
+        .style-search-container { position: relative; margin-bottom: 20px; max-width: 350px; }
+        .style-search-container label { margin-right: 5px; font-weight: bold; font-size: 0.9em; }
+        #style-search-input { width: calc(100% - 24px); padding: 8px 12px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1em; }
+        #style-suggestions-list { position: absolute; border: 1px solid #ccc; border-top: none; z-index: 99; top: 100%; left: 0; right: 0; background-color: white; max-height: 200px; overflow-y: auto; }
+        .suggestions-hidden { display: none; }
+        .suggestions-visible { display: block; }
+        #style-suggestions-list div { padding: 8px 12px; cursor: pointer; background-color: #fff; border-bottom: 1px solid #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.95em; }
+        #style-suggestions-list div:last-child { border-bottom: none; }
+        #style-suggestions-list div:hover { background-color: #e9e9e9; }
+
+        /* --- Product Info & Gallery CSS --- */
+        .product-gallery-container-dp2 { padding: 10px 0; box-sizing: border-box; margin-top: 20px; }
+        .product-info-wrapper-dp2 { display: flex; flex-wrap: wrap; gap: 25px; align-items: flex-start; }
+        .product-image-area-dp2 { flex: 0 0 300px; max-width: 100%; min-width: 250px; box-sizing: border-box; display: flex; flex-direction: column; }
+        .main-image-wrapper-dp2 { width: 100%; margin-bottom: 15px; border: 1px solid #e0e0e0; min-height: 250px; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background-color: #f8f8f8; }
+        #main-product-image-dp2 { display: block; max-width: 100%; max-height: 400px; height: auto; background-color: #fff; }
+        .additional-images-dp2 { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding-top: 15px; border-top: 1px solid #eee; }
+        .product-thumbnail-dp2 { width: 70px; height: 70px; border: 1px solid #ccc; object-fit: cover; cursor: pointer; border-radius: 4px; opacity: 0.7; box-shadow: 0 1px 2px rgba(0,0,0,0.1); transition: opacity 0.2s, border-color 0.2s, box-shadow 0.2s; }
+        .product-thumbnail-dp2:hover { opacity: 1.0; border-color: #888; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .product-thumbnail-dp2.active-thumbnail { opacity: 1.0; border: 2px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .product-details-area-dp2 { flex: 1; min-width: 250px; box-sizing: border-box; }
+        .product-details-area-dp2 h2 { margin: 0 0 5px 0; font-size: 1.4em; line-height: 1.2; color: #333; font-weight: 600; }
+        .product-details-area-dp2 p { margin: 0 0 10px 0; font-size: 0.9em; color: #555; line-height: 1.5; }
+        .product-details-area-dp2 p.style-number { color: #777; }
+        .product-details-area-dp2 p.selected-color { font-weight: bold; color: #333; font-size: 1em; }
+        .product-details-area-dp2 p.product-description { color: #333; margin-top: 15px; }
+        @media (max-width: 600px) { /* Responsive */ .product-info-wrapper-dp2 { flex-direction: column; } .product-image-area-dp2 { order: 1; width: 100%; max-width: 350px; margin: 0 auto; } .product-details-area-dp2 { order: 2; width: 100%; } }
+        .loading-message, .error-message { padding: 20px; text-align: center; font-style: italic; color: #666; }
+        .error-message { color: #c00; font-weight: bold; }
+
+        /* --- Swatch Styles --- */
+         #swatch-area { margin-top: 15px; margin-bottom: 15px; padding-top: 15px; border-top: 1px solid #eee; clear: both; }
+         #swatch-area p { text-align: left; margin-bottom: 10px; font-weight: bold; font-size: 0.95em; color: #333; padding-left: 10px; }
+         .swatch-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: left; margin-bottom: 10px; padding-left: 10px; }
+         .color-swatch-item { width: 40px; height: 40px; border: 2px solid #ccc; border-radius: 4px; cursor: pointer; background-size: cover; background-position: center; transition: transform 0.1s ease-in-out, border-color 0.1s ease-in-out; display: inline-block; overflow: hidden; }
+         .color-swatch-item:hover { transform: scale(1.1); border-color: #555; }
+         .color-swatch-item.active-swatch { border-color: #007bff; transform: scale(1.1); box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); }
+
+        /* --- Tab Styles --- */
+        .tabs-container { margin-top: 30px; border: 1px solid #ccc; border-radius: 5px; overflow: hidden; }
+        .tab-nav { display: flex; flex-wrap: wrap; list-style: none; padding: 0; margin: 0; background-color: #f2f2f2; border-bottom: 1px solid #ccc; }
+        .tab-link { padding: 10px 15px; cursor: pointer; border-right: 1px solid #ccc; background-color: #eee; color: #333; text-decoration: none; font-size: 0.9em; text-align: center; flex-grow: 1; /* Distribute space */}
+        .tab-link:last-child { border-right: none; }
+        .tab-link:hover { background-color: #ddd; }
+        .tab-link.active { background-color: #5cb85c; /* Green active tab */ color: white; font-weight: bold; }
+        .tab-content-panel { display: none; /* Hide inactive panels */ padding: 20px; border-top: none; }
+        .tab-content-panel.active { display: block; /* Show active panel */ }
+
+        /* --- Embedded DP Styles --- */
+         #inventory-area, #pricing-area { margin-top: 0; border-top: none; padding-top: 0; } /* Reset top margin/border for panels */
+         /* Add spacing between pricing DPs inside the panel if needed */
+         #pricing-area > div[id^='dp'] { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;}
+         #pricing-area > div[id^='dp']:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+
+    </style>
+</head>
+<body>
+
+<h1>Product Search and Details</h1>
+
+<div class="style-search-container">
+  <label for="style-search-input">Search Style:</label>
+  <input type="text" id="style-search-input" placeholder="Enter Style (e.g., PC61)" autocomplete="off">
+  <div id="style-suggestions-list" class="suggestions-hidden"></div>
+</div>
+
+<hr>
+
+<div id="product-info-area"></div>
+<div id="swatch-area"></div>
+
+<hr>
+
+<div class="tabs-container">
+    <div class="tab-nav">
+        <a href="#" class="tab-link active" data-tab-target="#inventory-panel">Inventory</a>
+        <a href="#" class="tab-link" data-tab-target="#embroidery-panel">Embroidery</a>
+        <a href="#" class="tab-link" data-tab-target="#cap-emb-panel">Cap Embroidery</a>
+        <a href="#" class="tab-link" data-tab-target="#dtg-panel">DTG</a>
+        <a href="#" class="tab-link" data-tab-target="#screenprint-panel">Screen Print</a>
+        <a href="#" class="tab-link" data-tab-target="#dtf-panel">DTF</a>
+    </div>
+
+    <div class="tab-content">
+        <div id="inventory-panel" class="tab-content-panel active">
+            <h4>Inventory Levels</h4>
+            <div id="inventory-area">
+                 <p><i>Inventory loading...</i></p>
+                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000997264f87c774876b3fa/emb"></script>
+            </div>
+        </div>
+
+        <div id="embroidery-panel" class="tab-content-panel">
+            <div id="dp5-wrapper">
+                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150001c7143d027a54c439c01/emb"></script>
+            </div>
+        </div>
+
+        <div id="cap-emb-panel" class="tab-content-panel">
+             <div id="dp7-wrapper">
+                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150004ecd0739f853449c8d7f/emb"></script>
+            </div>
+        </div>
+
+        <div id="dtg-panel" class="tab-content-panel">
+            <div id="dp6-wrapper">
+                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150002eb9491a50104c1d99d7/emb"></script>
+            </div>
+        </div>
+
+        <div id="screenprint-panel" class="tab-content-panel">
+             <div id="dp8-wrapper">
+                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500026349f420e494800b43e/emb"></script>
+            </div>
+        </div>
+
+         <div id="dtf-panel" class="tab-content-panel">
+             <h4>DTF Pricing</h4>
+             <p>DTF pricing information coming soon.</p>
+             </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("DOM Loaded. Initializing scripts...");
+
+        // --- Global State ---
+        window.selectedStyleNumber = null;
+        window.selectedColorName = null;
+        window.selectedCatalogColor = null;
+
+        // --- API URL ---
+        const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        console.log("API Base URL:", API_PROXY_BASE_URL);
+
+        // --- DOM Element References ---
+        const styleSearchInput = document.getElementById('style-search-input');
+        const suggestionsList = document.getElementById('style-suggestions-list');
+        const productInfoArea = document.getElementById('product-info-area');
+        const swatchArea = document.getElementById('swatch-area');
+        // const inventoryArea = document.getElementById('inventory-area'); // Container for DP4
+        // const pricingArea = document.getElementById('pricing-area'); // No longer needed as separate container
+
+        // Tab Elements
+        const tabNav = document.querySelector('.tab-nav');
+        const tabLinks = document.querySelectorAll('.tab-link');
+        const tabContentPanels = document.querySelectorAll('.tab-content-panel');
+
+        // --- Initialize ---
+        if (!styleSearchInput) console.error("StyleSearch: Input element #style-search-input not found!");
+        if (!productInfoArea) console.error("ProductInfo: Area #product-info-area not found!");
+        if (!swatchArea) console.error("Swatches: Area #swatch-area not found!");
+        if (!tabNav) console.error("Tabs: Nav container .tab-nav not found!");
+
+
+        // --- Debounce Function ---
+        function debounce(func, wait) { let timeout; return function executedFunction(...args) { const later = () => { clearTimeout(timeout); func(...args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; }
+
+        // --- Autocomplete Functions ---
+        async function fetchStyleSuggestions(searchTerm) { /* ... fetch logic ... */
+             console.log("StyleSearch: fetchStyleSuggestions called with term:", searchTerm); if (!styleSearchInput || !suggestionsList) return; if (!searchTerm || searchTerm.length < 2) { clearSuggestions(); return; } console.log("StyleSearch: Fetching suggestions from API..."); const searchUrl = `${API_PROXY_BASE_URL}/api/stylesearch?term=${encodeURIComponent(searchTerm)}`; console.log("StyleSearch: API URL:", searchUrl); try { const response = await fetch(searchUrl); console.log("StyleSearch: API Response Status:", response.status); if (!response.ok) { const errorText = await response.text(); console.error("StyleSearch: API Response Text:", errorText); throw new Error(`API Error ${response.status}: ${response.statusText}`); } const suggestions = await response.json(); console.log("StyleSearch: Suggestions received from API:", suggestions); displaySuggestions(suggestions); } catch (error) { console.error("StyleSearch: Failed to fetch or parse suggestions:", error); clearSuggestions(); }
+        }
+        function displaySuggestions(suggestions) { /* ... display logic ... */
+             console.log("StyleSearch: displaySuggestions called with:", suggestions); if (!suggestionsList) return; clearSuggestions(); if (!suggestions || suggestions.length === 0) { console.log("StyleSearch: No suggestions to display."); suggestionsList.classList.replace('suggestions-visible', 'suggestions-hidden'); return; } suggestions.forEach(suggestion => { const div = document.createElement('div'); div.textContent = suggestion.label; div.dataset.styleNumber = suggestion.value; div.addEventListener('click', () => { handleSuggestionSelection(suggestion.value, suggestion.label); }); suggestionsList.appendChild(div); }); suggestionsList.classList.replace('suggestions-hidden', 'suggestions-visible'); console.log("StyleSearch: Suggestions displayed.");
+        }
+        function clearSuggestions() { /* ... clear logic ... */ if (suggestionsList) { suggestionsList.innerHTML = ''; suggestionsList.classList.replace('suggestions-visible', 'suggestions-hidden'); } }
+        function handleSuggestionSelection(selectedStyleNumber, selectedLabel) { /* ... selection logic ... */
+             console.log("StyleSearch: Style selected:", selectedStyleNumber); if (styleSearchInput) { styleSearchInput.value = selectedStyleNumber; } clearSuggestions();
+             updatePageForStyle(selectedStyleNumber); // Trigger updates
+        }
+
+        // --- Product Details Functions ---
+        async function loadProductInfo(styleNumber, colorName) { /* ... fetch and display logic ... */
+            console.log(`ProductInfo: Loading details for Style: ${styleNumber}, Color: ${colorName || 'Default'}`); if (!productInfoArea) return; productInfoArea.innerHTML = '<div class="loading-message">Loading product details...</div>'; const detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`; try { const response = await fetch(detailApiUrl); if (!response.ok) { if (response.status === 404) throw new Error(`Details not found.`); else throw new Error(`API Error: ${response.statusText}`); } const details = await response.json(); const mainImageUrl = details.FRONT_MODEL || details.FRONT_FLAT || ''; const altText = `Product image for ${details.PRODUCT_TITLE || styleNumber}`; const thumb1 = details.FRONT_MODEL; const thumb2 = details.BACK_FLAT; const thumb3 = details.BACK_MODEL; const thumb4 = details.FRONT_FLAT; productInfoArea.innerHTML = `<div class="product-gallery-container-dp2"><div class="product-info-wrapper-dp2"><div class="product-image-area-dp2"><div class="main-image-wrapper-dp2"><img id="main-product-image-dp2" src="${mainImageUrl}" alt="${altText}" onerror="this.style.display='none';"></div><div class="additional-images-dp2">${createThumbnailHtml(thumb1, altText)}${createThumbnailHtml(thumb4, altText)}${createThumbnailHtml(thumb2, altText)}${createThumbnailHtml(thumb3, altText)}</div></div><div class="product-details-area-dp2"><h2>${details.PRODUCT_TITLE || ''}</h2><p class="style-number">Style: ${styleNumber}</p><p class="selected-color">Color: <span id="product-info-color-name">${colorName || 'Select Color'}</span></p><p class="product-description">${details.PRODUCT_DESCRIPTION || ''}</p></div></div></div>`; setupImageGallery(); } catch (error) { console.error("ProductInfo: Failed to load details:", error); if (productInfoArea) productInfoArea.innerHTML = `<div class="error-message">Error loading product details: ${error.message}</div>`; }
+        }
+        function createThumbnailHtml(imageUrl, altText) { /* ... thumbnail HTML generation ... */ if (imageUrl && imageUrl.trim() !== '') { return `<img class="product-thumbnail-dp2" src="${imageUrl}" alt="${altText} thumbnail" onerror="this.style.display='none';">`; } return ''; }
+        function setupImageGallery() { /* ... gallery setup logic ... */ const imageArea = document.querySelector('.product-image-area-dp2'); if (!imageArea) return; const mainImage = imageArea.querySelector('#main-product-image-dp2'); const thumbnailContainer = imageArea.querySelector('.additional-images-dp2'); if (!mainImage || !thumbnailContainer) { console.log("ImageGallery: Missing elements."); return; } thumbnailContainer.removeEventListener('click', handleThumbnailClick); thumbnailContainer.addEventListener('click', handleThumbnailClick); const firstThumb = thumbnailContainer.querySelector('.product-thumbnail-dp2'); const allThumbs = thumbnailContainer.querySelectorAll('.product-thumbnail-dp2'); allThumbs.forEach(t => { t.classList.remove('active-thumbnail'); t.style.opacity='0.7'; t.style.border='1px solid #ccc';}); if (firstThumb) { firstThumb.classList.add('active-thumbnail'); firstThumb.style.opacity = '1.0'; firstThumb.style.border = '2px solid #007bff'; } console.log("ImageGallery: Setup complete."); }
+         function handleThumbnailClick(event) { /* ... thumbnail click logic ... */ if (!event.target.classList.contains('product-thumbnail-dp2')) return; const clickedThumb = event.target; const mainImage = document.getElementById('main-product-image-dp2'); const thumbnailContainer = clickedThumb.closest('.additional-images-dp2'); if (!mainImage || !thumbnailContainer) return; const newImageSrc = clickedThumb.getAttribute('src'); if (newImageSrc) { mainImage.setAttribute('src', newImageSrc); const allThumbnails = thumbnailContainer.querySelectorAll('.product-thumbnail-dp2'); allThumbnails.forEach(t => { t.classList.remove('active-thumbnail'); t.style.opacity = '0.7'; t.style.border = '1px solid #ccc'; }); clickedThumb.classList.add('active-thumbnail'); clickedThumb.style.opacity = '1.0'; clickedThumb.style.border = '2px solid #007bff'; console.log('ImageGallery: Main image updated.'); } }
+
+        // --- Swatch Functions ---
+        async function loadSwatches(styleNumber) { /* ... fetch and display logic ... */
+             console.log(`Swatches: Loading for Style: ${styleNumber}`); if (!swatchArea) return; swatchArea.innerHTML = '<div class="loading-message">Loading swatches...</div>'; const swatchApiUrl = `${API_PROXY_BASE_URL}/api/color-swatches?styleNumber=${encodeURIComponent(styleNumber)}`; try { const response = await fetch(swatchApiUrl); if (!response.ok) throw new Error(`API Error: ${response.statusText}`); const swatches = await response.json(); console.log("Swatches: Data received:", swatches); swatchArea.innerHTML = ''; if (!swatches || swatches.length === 0) { swatchArea.innerHTML = '<p>No color options found.</p>'; return; } const title = document.createElement('p'); title.textContent = 'Available Colors:'; swatchArea.appendChild(title); const container = document.createElement('div'); container.className = 'swatch-container'; swatchArea.appendChild(container); swatches.forEach(swatch => { const swatchElement = document.createElement('div'); swatchElement.className = 'color-swatch-item'; swatchElement.title = swatch.COLOR_NAME; swatchElement.style.backgroundImage = `url('${swatch.COLOR_SQUARE_IMAGE}')`; swatchElement.dataset.colorName = swatch.COLOR_NAME; swatchElement.dataset.catalogColor = swatch.CATALOG_COLOR; swatchElement.addEventListener('click', handleSwatchClick); container.appendChild(swatchElement); }); const firstSwatchElement = container.querySelector('.color-swatch-item'); if (firstSwatchElement) { firstSwatchElement.click(); } } catch (error) { console.error("Swatches: Failed to load:", error); if (swatchArea) swatchArea.innerHTML = `<div class="error-message">Error loading swatches: ${error.message}</div>`; }
+         }
+        function handleSwatchClick(event) { /* ... swatch click logic ... */
+             const clickedSwatch = event.currentTarget; const colorName = clickedSwatch.dataset.colorName; const catalogColor = clickedSwatch.dataset.catalogColor; console.log(`Swatches: Clicked Color: ${colorName}, Code: ${catalogColor}`); window.selectedColorName = colorName; window.selectedCatalogColor = catalogColor; const colorNameSpan = document.getElementById('product-info-color-name'); if(colorNameSpan) colorNameSpan.textContent = colorName || 'N/A'; const allSwatches = document.querySelectorAll('#swatch-area .color-swatch-item'); allSwatches.forEach(sw => sw.classList.remove('active-swatch')); clickedSwatch.classList.add('active-swatch'); loadInventory(window.selectedStyleNumber, catalogColor); loadPricingCalculators(window.selectedStyleNumber, catalogColor);
+         }
+
+        // --- Inventory Update Function ---
+         async function loadInventory(styleNumber, catalogColor) { /* DP4 update logic */
+              console.log(`Inventory: Trigger update for Style: ${styleNumber}, Color Code: ${catalogColor || 'ALL'}`);
+               const dp4AppKey = "a0e15000997264f87c774876b3fa"; // DP4 Key
+               // Check slightly later for Caspio's function
+               setTimeout(() => {
+                   if (typeof window.cbAJAXUpdate === 'function') {
+                       let params = `StyleNumber=${encodeURIComponent(styleNumber)}`; if (catalogColor) { params += `&COLOR=${encodeURIComponent(catalogColor)}`; }
+                       console.log(`Inventory: Calling cbAJAXUpdate for ${dp4AppKey} with params: ${params}`);
+                       try { window.cbAJAXUpdate(dp4AppKey, params); }
+                       catch(ajaxError) { console.error("Inventory: Error calling cbAJAXUpdate:", ajaxError); /* Handle error display */ }
+                   } else { console.warn("Inventory: cbAJAXUpdate function not found. Cannot update DP4."); /* Handle error display */ }
+               }, 150); // Slightly longer delay
+         }
+
+        // --- Pricing Calculators Update Function ---
+         function loadPricingCalculators(styleNumber, catalogColor) { /* DP5-DP8 update logic */
+              console.log(`Pricing: Triggering update for Style=${styleNumber}, Color=${catalogColor}`);
+                if (typeof initDp5ApiFetch === 'function') { initDp5ApiFetch(null); } else { console.warn("initDp5ApiFetch not found"); }
+                if (typeof initDp6ApiFetch === 'function') { initDp6ApiFetch(null); } else { console.warn("initDp6ApiFetch not found"); }
+                if (typeof initDp7ApiFetch === 'function') { initDp7ApiFetch(null); } else { console.warn("initDp7ApiFetch not found"); }
+                if (typeof initDp8ApiFetch === 'function') { initDp8ApiFetch(null); } else { console.warn("initDp8ApiFetch not found"); }
+          }
+
+        // --- Main Orchestration Function ---
+        async function updatePageForStyle(styleNumber) { /* ... Calls load functions ... */
+            console.log(`--- StyleSearch: Updating Page for Style: ${styleNumber} ---`); window.selectedStyleNumber = styleNumber; window.selectedColorName = null; window.selectedCatalogColor = null;
+            if (productInfoArea) productInfoArea.innerHTML = '<div class="loading-message">Loading product details...</div>'; if (swatchArea) swatchArea.innerHTML = '<div class="loading-message">Loading swatches...</div>';
+            if (inventoryArea) inventoryArea.innerHTML = '<p><i>Loading Inventory...</i></p>'; // Show loading for inventory too
+            if (pricingArea) { /* Clear pricing DPs if needed */ }
+            await loadProductInfo(styleNumber, null); await loadSwatches(styleNumber); // Auto-clicks first swatch, which triggers inventory/pricing updates
+            console.log("--- StyleSearch: Initial updates triggered for style", styleNumber);
+        }
+
+        // --- Tab Switching Logic ---
+        function setupTabs() {
+            if (!tabNav) return; // Exit if tab structure not found
+
+            tabNav.addEventListener('click', (e) => {
+                if (e.target && e.target.classList.contains('tab-link')) {
+                    e.preventDefault(); // Prevent default anchor link behavior
+
+                    const targetPanelSelector = e.target.getAttribute('data-tab-target');
+                    if (!targetPanelSelector) return;
+
+                    console.log("Tab clicked, target:", targetPanelSelector);
+
+                    // Remove active class from all links and panels
+                    tabLinks.forEach(link => link.classList.remove('active'));
+                    tabContentPanels.forEach(panel => panel.classList.remove('active'));
+
+                    // Add active class to clicked link and target panel
+                    e.target.classList.add('active');
+                    const targetPanel = document.querySelector(targetPanelSelector);
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                        console.log("Activated panel:", targetPanelSelector);
+                         // Optional: Trigger a refresh/re-init for the newly activated DataPage?
+                         // Might be needed if DPs don't display correctly when initially hidden.
+                         // Example: Trigger DP4's init logic if Inventory tab clicked.
+                         // if (targetPanelSelector === '#inventory-panel' && typeof loadInventory === 'function') {
+                         //    loadInventory(window.selectedStyleNumber, window.selectedCatalogColor);
+                         // }
+                         // Similar checks/calls for pricing DPs if needed when their tabs are clicked.
+                    } else {
+                        console.error("Tab target panel not found:", targetPanelSelector);
+                    }
+                }
+            });
+            console.log("Tab system initialized.");
+        }
+
+
+        // --- Initial Event Listeners Setup ---
+        if (styleSearchInput) {
+             styleSearchInput.addEventListener('input', debounce(async (e) => { await fetchStyleSuggestions(e.target.value); }, 300));
+         } else { console.error("StyleSearch: Input element #style-search-input not found at init!"); }
+         document.addEventListener('click', (e) => { if (styleSearchInput && suggestionsList && !styleSearchInput.contains(e.target) && !suggestionsList.contains(e.target)) { clearSuggestions(); } });
+
+         setupTabs(); // Initialize tab switching functionality
+
+         console.log("Page Initialization Complete.");
+
+    }); // End DOMContentLoaded listener
+</script>
+
+</body>
+</html>
