@@ -954,7 +954,7 @@
              triggerPricingDataPageUpdates(window.selectedStyleNumber, catalogColor); // Update Pricing DPs
          }
 
-        // --- Inventory Update Function (Using API + Pivot-Style Table) ---
+        // --- Inventory Update Function (Using New Tabular API) ---
          async function loadInventory(styleNumber, catalogColor) {
               console.log(`Inventory: Loading for Style: ${styleNumber}, Color Code: ${catalogColor || 'ALL'}`);
               if (!inventoryArea) {
@@ -964,7 +964,8 @@
               
               inventoryArea.innerHTML = '<div class="loading-message">Loading Inventory...</div>';
               
-              let inventoryApiUrl = `${API_PROXY_BASE_URL}/api/inventory?styleNumber=${encodeURIComponent(styleNumber)}`;
+              // Use the new endpoint that returns data in tabular format
+              let inventoryApiUrl = `${API_PROXY_BASE_URL}/api/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}`;
               if (catalogColor) {
                   inventoryApiUrl += `&color=${encodeURIComponent(catalogColor)}`;
               }
@@ -975,117 +976,62 @@
                    if (!response.ok) {
                        throw new Error(`API Error fetching inventory: ${response.statusText}`);
                    }
-                   const inventoryData = await response.json();
-                   console.log("Inventory data received:", inventoryData.length, "records");
                    
-                   const rulesResponse = await fetch(`${API_PROXY_BASE_URL}/api/pricing-rules?method=Inventory`);
-                   const rulesData = rulesResponse.ok ? await rulesResponse.json() : {};
-                   const rules = {
-                       threshold: parseInt(rulesData.LowStockThreshold, 10) || 24,
-                       noStockColor: rulesData.NoStockColor || '#E53935',
-                       lowStockColor: rulesData.LowStockColor || '#F57C00',
-                       goodStockColor: rulesData.GoodStockColor || '#388E3C',
-                       totalLabel: rulesData.TotalLabel || 'TOTAL INVENTORY'
-                   };
-
-                   // Process Data for Pivot Structure with improved deduplication
-                   const sizeNameNormalized = new Map(); // For canonicalizing size names
-                   const uniqueSizesMap = new Map();
-                   const uniqueWarehousesMap = new Map();
-                   const pivotData = {};
-                   const columnTotals = {};
+                   const data = await response.json();
+                   console.log("Inventory data received:", data);
                    
-                   // First pass - canonicalize size names to handle any duplicates with different casing
-                   inventoryData.forEach(item => {
-                       if (item.size) {
-                           // Normalize the size name to handle potential duplicates
-                           const normalizedName = item.size.toUpperCase().trim();
-                           if (!sizeNameNormalized.has(normalizedName)) {
-                               sizeNameNormalized.set(normalizedName, item.size); // Store canonical version
-                           }
-                       }
-                   });
-                   
-                   // Second pass - Use the canonical names for everything
-                   inventoryData.forEach(item => {
-                       if (item.size) {
-                           const normalizedName = item.size.toUpperCase().trim();
-                           const canonicalSize = sizeNameNormalized.get(normalizedName);
-                           
-                           if (!uniqueSizesMap.has(canonicalSize)) {
-                               uniqueSizesMap.set(canonicalSize, item.SizeSortOrder ?? 99);
-                           }
-                           
-                           if (item.WarehouseName) {
-                               if (!uniqueWarehousesMap.has(item.WarehouseName)) {
-                                   uniqueWarehousesMap.set(item.WarehouseName, item.WarehouseSort ?? 99);
-                               }
-                               
-                               if (!pivotData[item.WarehouseName]) {
-                                   pivotData[item.WarehouseName] = {};
-                               }
-                               
-                               const qty = item.quantity ?? 0;
-                               // Always use canonical size name
-                               pivotData[item.WarehouseName][canonicalSize] =
-                                   (pivotData[item.WarehouseName][canonicalSize] || 0) + qty;
-                               
-                               columnTotals[canonicalSize] = (columnTotals[canonicalSize] || 0) + qty;
-                           }
-                       }
-                   });
-                   
-                   // Get truly unique sizes and sort them logically
-                   const sortedUniqueSizes = sortSizesLogical([...uniqueSizesMap.keys()]);
-                   const sortedUniqueWarehouses = [...uniqueWarehousesMap.keys()]
-                       .sort((a, b) => (uniqueWarehousesMap.get(a) ?? 99) - (uniqueWarehousesMap.get(b) ?? 99));
-
-                   // Build HTML Table
-                   let tableHtml = `<h4>Inventory Levels ${catalogColor ? `(${window.selectedColorName || catalogColor})` : '(All Colors)'}</h4>`;
-                   
-                   if (!inventoryData || inventoryData.length === 0) {
-                       tableHtml += '<p>No inventory data found for this selection.</p>';
-                   } else {
-                       tableHtml += '<table id="inventory-table"><thead><tr><th>Warehouse</th>';
-                       
-                       // Create table headers with unique sizes
-                       sortedUniqueSizes.forEach(size => {
-                           tableHtml += `<th>${size}</th>`;
-                       });
-                       
-                       tableHtml += '</tr></thead><tbody>';
-                       
-                       // Create table rows for each warehouse
-                       sortedUniqueWarehouses.forEach(whName => {
-                           tableHtml += `<tr><td>${whName}</td>`;
-                           
-                           sortedUniqueSizes.forEach(size => {
-                               const qty = pivotData[whName]?.[size] ?? 0;
-                               let colorStyle = `color: ${rules.goodStockColor};`;
-                               
-                               if (qty <= 0) {
-                                   colorStyle = `color: ${rules.noStockColor};`;
-                               } else if (qty <= rules.threshold) {
-                                   colorStyle = `color: ${rules.lowStockColor}; font-weight: bold;`;
-                               }
-                               
-                               tableHtml += `<td style="text-align:center; ${colorStyle}">${qty}</td>`;
-                           });
-                           
-                           tableHtml += '</tr>';
-                       });
-                       
-                       // Add totals row
-                       tableHtml += '</tbody><tfoot><tr>';
-                       tableHtml += `<td>${rules.totalLabel}</td>`;
-                       
-                       sortedUniqueSizes.forEach(size => {
-                           const totalQty = columnTotals[size] || 0;
-                           tableHtml += `<td style="text-align:center; font-weight: bold;">${totalQty}</td>`;
-                       });
-                       
-                       tableHtml += '</tr></tfoot></table>';
+                   if (!data || !data.sizes || data.sizes.length === 0 || !data.warehouses || data.warehouses.length === 0) {
+                       inventoryArea.innerHTML = '<div class="info-message" style="padding: 15px; background-color: #f8f9fa; border-left: 4px solid #17a2b8; margin: 15px 0;"><p>No inventory data available for this style/color combination.</p></div>';
+                       return;
                    }
+                   
+                   // Extract data from the response
+                   const { style, color, sizes, warehouses, sizeTotals, grandTotal } = data;
+                   
+                   // Build the HTML for the inventory table
+                   let tableHtml = `<h4>Inventory Levels (${color})</h4>`;
+                   
+                   tableHtml += '<table id="inventory-table"><thead><tr><th>Warehouse</th>';
+                   
+                   // Create table headers with sizes
+                   sizes.forEach(size => {
+                       tableHtml += `<th>${size}</th>`;
+                   });
+                   
+                   tableHtml += '</tr></thead><tbody>';
+                   
+                   // Create table rows for each warehouse
+                   warehouses.forEach(warehouse => {
+                       tableHtml += `<tr><td>${warehouse.name}</td>`;
+                       
+                       // Add cells for each size's inventory quantity
+                       warehouse.inventory.forEach((quantity, index) => {
+                           // Color coding based on quantity
+                           let textColor;
+                           if (quantity <= 0) {
+                               textColor = '#E53935'; // Red for no stock
+                           } else if (quantity < 24) {
+                               textColor = '#F57C00'; // Orange for low stock
+                           } else {
+                               textColor = '#388E3C'; // Green for good stock
+                           }
+                           
+                           tableHtml += `<td style="text-align:center; color: ${textColor}; ${quantity < 24 && quantity > 0 ? 'font-weight: bold;' : ''}">${quantity}</td>`;
+                       });
+                       
+                       tableHtml += '</tr>';
+                   });
+                   
+                   // Add totals row
+                   tableHtml += '</tbody><tfoot><tr>';
+                   tableHtml += '<td>TOTAL INVENTORY</td>';
+                   
+                   // Add total cells for each size
+                   sizeTotals.forEach(total => {
+                       tableHtml += `<td style="text-align:center; font-weight: bold;">${total}</td>`;
+                   });
+                   
+                   tableHtml += '</tr></tfoot></table>';
                    
                    inventoryArea.innerHTML = tableHtml;
               } catch (error) {

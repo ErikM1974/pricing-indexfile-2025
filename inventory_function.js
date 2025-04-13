@@ -1,4 +1,4 @@
-// --- Inventory Update Function ---
+// --- Inventory Update Function Using New Tabular API ---
 async function loadInventory(styleNumber, catalogColor) {
     console.log(`Inventory: Loading data for Style: ${styleNumber}, Color Code: ${catalogColor || 'ALL'}`);
     
@@ -13,9 +13,9 @@ async function loadInventory(styleNumber, catalogColor) {
     inventoryArea.innerHTML = '<div class="loading-message">Loading inventory data...</div>';
     
     try {
-        // Construct the API URL with the correct endpoint
-        const inventoryUrl = `${API_PROXY_BASE_URL}/api/inventory?styleNumber=${encodeURIComponent(styleNumber)}${catalogColor ? '&color=' + encodeURIComponent(catalogColor) : ''}`;
-        console.log("Inventory: Fetching from API URL:", inventoryUrl);
+        // Construct the API URL with the new endpoint that returns tabular data
+        const inventoryUrl = `${API_PROXY_BASE_URL}/api/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}${catalogColor ? '&color=' + encodeURIComponent(catalogColor) : ''}`;
+        console.log("Inventory: Fetching from new tabular API URL:", inventoryUrl);
         
         // Fetch inventory data from the API
         const response = await fetch(inventoryUrl);
@@ -25,68 +25,19 @@ async function loadInventory(styleNumber, catalogColor) {
         }
         
         const data = await response.json();
-        console.log("Inventory: Data received:", data);
+        console.log("Inventory: Tabular data received:", data);
         
-        if (!data || data.length === 0) {
+        if (!data || !data.sizes || data.sizes.length === 0 || !data.warehouses || data.warehouses.length === 0) {
             inventoryArea.innerHTML = '<div class="info-message" style="padding: 15px; background-color: #f8f9fa; border-left: 4px solid #17a2b8; margin: 15px 0;"><p>No inventory data available for this style/color combination.</p></div>';
             return;
         }
         
-        // Define standard size order
-        const standardSizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
-        
-        // Group data by warehouse and size
-        const warehouseData = {};
-        const sizesFound = new Set();
-        
-        // Process the data to organize by warehouse and size
-        data.forEach(item => {
-            const warehouse = item.WarehouseName || 'Unknown';
-            const size = item.size || 'N/A';
-            const quantity = item.quantity || 0;
-            
-            // Add size to the set of found sizes
-            sizesFound.add(size);
-            
-            // Initialize warehouse if not exists
-            if (!warehouseData[warehouse]) {
-                warehouseData[warehouse] = {};
-            }
-            
-            // Add quantity for this size
-            warehouseData[warehouse][size] = quantity;
-        });
-        
-        // Convert sizesFound set to array and sort by standard size order
-        const sizes = Array.from(sizesFound).sort((a, b) => {
-            const indexA = standardSizes.indexOf(a);
-            const indexB = standardSizes.indexOf(b);
-            
-            // If both sizes are in the standard list, sort by that order
-            if (indexA >= 0 && indexB >= 0) {
-                return indexA - indexB;
-            }
-            
-            // If only one size is in the standard list, prioritize it
-            if (indexA >= 0) return -1;
-            if (indexB >= 0) return 1;
-            
-            // Otherwise, sort alphabetically
-            return a.localeCompare(b);
-        });
-        
-        // Calculate totals for each size
-        const totals = {};
-        sizes.forEach(size => {
-            totals[size] = 0;
-            Object.keys(warehouseData).forEach(warehouse => {
-                totals[size] += warehouseData[warehouse][size] || 0;
-            });
-        });
+        // Extract data from the response
+        const { style, color, sizes, warehouses, sizeTotals, grandTotal } = data;
         
         // Build the HTML for the inventory table
         let tableHtml = `
-            <h4>Inventory for ${styleNumber}${catalogColor ? ' - ' + catalogColor : ''}</h4>
+            <h4>Inventory Levels (${color})</h4>
             <div class="inventory-table-container" style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border: 1px solid #ddd;">
                     <thead>
@@ -105,19 +56,48 @@ async function loadInventory(styleNumber, catalogColor) {
                     <tbody>`;
         
         // Add rows for each warehouse
-        Object.keys(warehouseData).sort().forEach(warehouse => {
+        warehouses.forEach(warehouse => {
             tableHtml += `
                         <tr>
-                            <td style="padding: 8px; text-align: left; border: 1px solid #ddd; font-weight: bold;">${warehouse}</td>`;
+                            <td style="padding: 8px; text-align: left; border: 1px solid #ddd; font-weight: bold;">${warehouse.name}</td>`;
             
-            // Add cells for each size
-            sizes.forEach(size => {
-                const quantity = warehouseData[warehouse][size] || 0;
-                const cellColor = quantity > 0 ? (quantity < 100 ? '#FFF3CD' : '#D1E7DD') : '#F8D7DA';
+            // Add cells for each size's inventory quantity
+            warehouse.inventory.forEach((quantity, index) => {
+                // Color coding based on quantity
+                let cellColor;
+                if (quantity <= 0) {
+                    cellColor = '#F8D7DA'; // Red for no stock
+                } else if (quantity < 24) {
+                    cellColor = '#FFF3CD'; // Yellow for low stock
+                    // Use orange for very low stock (less than 10)
+                    if (quantity < 10) {
+                        cellColor = '#FFE0B2';
+                    }
+                } else {
+                    cellColor = '#D1E7DD'; // Green for good stock
+                }
+                
+                // Text color based on quantity
+                let textColor;
+                if (quantity <= 0) {
+                    textColor = '#721C24'; // Dark red for no stock
+                } else if (quantity < 24) {
+                    textColor = '#856404'; // Dark yellow/orange for low stock
+                    // Use darker orange for very low stock
+                    if (quantity < 10) {
+                        textColor = '#E65100';
+                    }
+                } else {
+                    textColor = '#155724'; // Dark green for good stock
+                }
                 
                 tableHtml += `
-                            <td style="padding: 8px; text-align: center; border: 1px solid #ddd; background-color: ${cellColor};">${quantity}</td>`;
+                            <td style="padding: 8px; text-align: center; border: 1px solid #ddd; background-color: ${cellColor}; color: ${textColor}; font-weight: ${quantity < 24 ? 'bold' : 'normal'};">${quantity}</td>`;
             });
+            
+            // Add warehouse total
+            tableHtml += `
+                            <td style="padding: 8px; text-align: center; border: 1px solid #ddd; background-color: #e9ecef; font-weight: bold;">${warehouse.total}</td>`;
             
             tableHtml += `
                         </tr>`;
@@ -129,10 +109,14 @@ async function loadInventory(styleNumber, catalogColor) {
                             <td style="padding: 8px; text-align: left; border: 1px solid #ddd;">TOTAL INVENTORY</td>`;
         
         // Add total cells for each size
-        sizes.forEach(size => {
+        sizeTotals.forEach(total => {
             tableHtml += `
-                            <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${totals[size]}</td>`;
+                            <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${total}</td>`;
         });
+        
+        // Add grand total
+        tableHtml += `
+                            <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${grandTotal}</td>`;
         
         tableHtml += `
                         </tr>
