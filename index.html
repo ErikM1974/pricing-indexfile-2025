@@ -5,53 +5,405 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NWCA Product Gallery</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            padding: 20px;
-            font-size: 14px;
-            color: #333;
-            line-height: 1.5;
-            background-color: #f8f8f8;
-            margin: 0;
+        /* --- CSS Variables for Theming --- */
+        /* Define consistent colors, spacing, fonts, etc. */
+        :root {
+            --primary-color: #0056b3;       /* Main blue color */
+            --primary-light: #e6f0ff;      /* Lighter blue for backgrounds/borders */
+            --secondary-color: #5cb85c;    /* Accent green color (example) */
+            --secondary-light: #eaffea;     /* Lighter green */
+            --text-color: #333;            /* Main text color (dark grey) */
+            --text-light: #666;            /* Lighter text color (medium grey) */
+            --border-color: #ddd;          /* Standard border color (light grey) */
+            --border-light: #eee;          /* Very light border/background */
+            --background-color: #fff;      /* White background */
+            --background-light: #f8f8f8;   /* Off-white/light grey background */
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.1);  /* Medium shadow */
+            --radius-sm: 4px;              /* Small rounded corners */
+            --radius-md: 8px;              /* Medium rounded corners */
+            --spacing-xs: 5px;             /* Extra small space */
+            --spacing-sm: 10px;            /* Small space */
+            --spacing-md: 20px;            /* Medium space */
+            --spacing-lg: 30px;            /* Large space */
+            --font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Font stack */
+            --transition-fast: 0.2s ease;    /* Fast animation speed */
+            --transition-normal: 0.3s ease;  /* Normal animation speed */
         }
-        
+
+        /* --- General Page Styling --- */
+        /* Applies basic styles to the page body */
+        /* Note: Be cautious if adding this globally, it might override site styles */
+        body {
+            font-family: var(--font-family);
+            padding: var(--spacing-md);
+            font-size: 14px;
+            color: var(--text-color);
+            line-height: 1.5;
+            background-color: var(--background-light);
+            margin: 0; /* Reset default body margin */
+        }
+
+        /* Styles a generic container - might affect other site elements */
+        /* Consider applying these styles directly to the Caspio container below if needed */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            padding: 20px;
-        }
-        
-        h1, h2 {
-            color: #0056b3;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e6f0ff;
-        }
-        
-        /* Style for the gallery items from Caspio */
-        a.gallery-item-link {
-            display: block;           /* Make the link behave like a block/box */
-            text-align: center;       /* Center the product title text */
-            text-decoration: none;    /* Remove underline from text */
-            color: #333333;          /* Set text color (dark grey) */
-            font-size: 0.9em;         /* Adjust font size */
-            line-height: 1.3;         /* Adjust line spacing */
-            padding: 5px;             /* Add a little padding inside the link area */
-            height: 100%;             /* Make link fill its container vertically */
-            box-sizing: border-box;   /* Include padding in height/width */
+            background-color: var(--background-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-md);
         }
 
-        /* Style the image specifically within this link */
+        /* Styles headings - might affect other site elements */
+        h1, h2 {
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        /* --- Back Button Styling --- */
+        /* Styles the container for a back button */
+        .back-button-container {
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Styles the back button link */
+        .back-to-gallery-btn {
+            display: inline-flex; /* Use flex for icon alignment */
+            align-items: center; /* Vertically align icon and text */
+            color: var(--primary-color); /* Use primary color */
+            text-decoration: none; /* Remove underline */
+            font-weight: 500; /* Medium font weight */
+            padding: var(--spacing-xs) var(--spacing-sm); /* Padding */
+            border-radius: var(--radius-sm); /* Rounded corners */
+            transition: background-color var(--transition-fast); /* Animate background */
+        }
+
+        /* Add hover effect for back button */
+        .back-to-gallery-btn:hover {
+            background-color: var(--primary-light); /* Light blue background on hover */
+        }
+
+
+        /* --- Caspio Gallery Container Styling --- */
+        /* Targets the specific Caspio outer container for results */
+        #cbOuterAjaxCtnr_6223e8ad4bff72 {
+            margin-top: var(--spacing-md); /* Add space above the results */
+        }
+
+        /* Target the specific Caspio section containing the gallery grid */
+        #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
+            display: grid; /* Use CSS Grid for layout */
+            /* Create columns that are at least 250px wide, filling available space */
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--spacing-md); /* Space between grid items */
+            padding-top: var(--spacing-md); /* Space above the grid */
+        }
+
+        /* Style the individual gallery item "cells" (boxes) */
+        .cbResultSetListViewTableOddCell, /* Targets alternating row styles from Caspio */
+        .cbResultSetListViewTableEvenCell {
+            border: 1px solid var(--border-color); /* Add border */
+            border-radius: var(--radius-sm);       /* Rounded corners */
+            padding: var(--spacing-sm);            /* Inner spacing */
+            background-color: var(--background-color); /* Background color */
+            box-shadow: var(--shadow-sm);          /* Add subtle shadow */
+            /* Animate changes to transform (movement) and shadow */
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+            display: flex; /* Use flexbox inside the cell */
+            flex-direction: column; /* Stack content vertically */
+            height: 100%; /* Ensure cells try to take full height */
+        }
+
+        /* Add hover effect: slight lift and more shadow */
+        .cbResultSetListViewTableOddCell:hover,
+        .cbResultSetListViewTableEvenCell:hover {
+            transform: translateY(-5px); /* Move item up slightly */
+            box-shadow: var(--shadow-md); /* Increase shadow */
+        }
+
+        /* Hide the default Caspio "STYLE#" label */
+        .cbResultSetListViewDataLabel {
+            display: none;
+        }
+
+        /* Style the style number (appears as the first data element <dd>) */
+        .cbResultSetData:first-of-type {
+            text-align: center; /* Center the text */
+            font-weight: bold; /* Make it bold */
+            margin-bottom: var(--spacing-sm); /* Space below the number */
+            color: var(--text-light); /* Use lighter text color */
+        }
+
+        /* Style the gallery item links (contains image and title) */
+        a.gallery-item-link {
+            display: block; /* Make link fill space */
+            text-align: center; /* Center text below image */
+            text-decoration: none; /* Remove underline */
+            color: var(--text-color); /* Set text color */
+            font-size: 0.9em; /* Slightly smaller font */
+            line-height: 1.3; /* Adjust line spacing */
+            padding: var(--spacing-xs); /* Small padding around text */
+            height: 100%; /* Try to fill vertical space */
+            box-sizing: border-box; /* Include padding in size */
+            transition: color var(--transition-fast); /* Animate color change */
+        }
+
+        /* Change link text color on hover */
+        a.gallery-item-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Style the images within the gallery links */
         a.gallery-item-link img {
-            display: block !important;            /* Make image a block */
-            margin: 0 auto 10px auto !important;  /* FORCE center image horizontally, add 10px space below */
-            max-width: 100% !important;           /* FORCE image to fit container width */
-            height: auto !important;              /* FORCE height to adjust automatically */
-            width: auto !important;               /* FORCE override of inline width */
-            border-radius: 3px;                   /* Optional: slightly rounded image corners */
+            display: block !important; /* Ensure image is block-level */
+            /* Center image horizontally, add space below */
+            margin: 0 auto var(--spacing-sm) auto !important;
+            max-width: 100% !important; /* Prevent image exceeding container width */
+            height: auto !important; /* Maintain aspect ratio */
+            width: auto !important; /* Let browser determine width based on height/max-width */
+            border-radius: var(--radius-sm); /* Slightly rounded corners */
+            transition: transform var(--transition-normal); /* Animate size change */
+            box-shadow: var(--shadow-sm); /* Add subtle shadow */
+        }
+
+        /* Make image slightly larger on hover */
+        a.gallery-item-link:hover img {
+            transform: scale(1.03); /* Enlarge image slightly */
+            box-shadow: var(--shadow-md); /* Increase shadow */
+        }
+
+        /* --- Search Form Styling --- */
+        /* Style the container section for the search form */
+        #cbTable_68216ca93352aa { /* Targets the specific Caspio search form table/section */
+            background-color: var(--background-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md); /* Space below search form */
+            /* Arrange fields horizontally */
+            display: flex;
+            flex-wrap: wrap; /* Allow fields to wrap to next line */
+            gap: var(--spacing-md); /* Space between fields */
+            align-items: flex-end; /* Align bottom of fields */
+        }
+
+        /* Style the container for each label/input pair */
+        /* These classes correspond to the blocks in Caspio's structure */
+        .cbFormBlock2_68216ca93352aa,
+        .cbFormBlock3_68216ca93352aa,
+        .cbFormBlock4_68216ca93352aa,
+        .cbFormBlock5_68216ca93352aa {
+            display: flex; /* Use flexbox */
+            flex-direction: column; /* Stack label above input */
+            flex: 1; /* Allow block to grow and shrink */
+            min-width: 180px; /* Minimum width before wrapping */
+        }
+
+        /* Style the form field labels */
+        .cbFormLabelCell label {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs); /* Space below label */
+            display: block; /* Ensure label is on its own line */
+            text-align: left; /* Align label text left */
+        }
+
+        /* Style the text input fields */
+        .cbFormTextField {
+            padding: 10px 15px; /* Inner padding */
+            border: 1px solid var(--border-color); /* Border */
+            border-radius: var(--radius-sm); /* Rounded corners */
+            width: 100%; /* Make input fill container width */
+            box-sizing: border-box; /* Include padding/border in width */
+            font-size: 1em; /* Standard font size */
+            transition: border-color var(--transition-fast); /* Animate border color change */
+        }
+
+        /* Add focus style to text inputs */
+        .cbFormTextField:focus {
+            outline: none; /* Remove default browser outline */
+            border-color: var(--primary-color); /* Change border color */
+            /* Add a subtle glow effect */
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        /* Style the select dropdowns */
+        .cbFormSelect {
+            padding: 10px 15px; /* Inner padding */
+            border: 1px solid var(--border-color); /* Border */
+            border-radius: var(--radius-sm); /* Rounded corners */
+            width: 100%; /* Make dropdown fill container width */
+            box-sizing: border-box; /* Include padding/border in width */
+            font-size: 1em; /* Standard font size */
+            background-color: var(--background-color); /* Background color */
+            transition: border-color var(--transition-fast); /* Animate border color change */
+            -webkit-appearance: none; /* Remove default OS styling (optional) */
+            -moz-appearance: none;    /* Remove default OS styling (optional) */
+            appearance: none;         /* Remove default OS styling (optional) */
+             /* Add custom dropdown arrow (optional) */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); /* Grey arrow */
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 10px auto;
+            padding-right: 30px; /* Make space for custom arrow */
+        }
+
+        /* Add focus style to dropdowns */
+        .cbFormSelect:focus {
+            outline: none; /* Remove default browser outline */
+            border-color: var(--primary-color); /* Change border color */
+            /* Add a subtle glow effect */
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        /* Style the container for the search button */
+        .cbSearchButtonContainer {
+             width: 100%; /* Make container take full width */
+             margin-top: var(--spacing-sm); /* Add space above */
+             text-align: center; /* Center the button inside */
+             padding-left: 0; /* Remove previous padding */
+        }
+
+
+        /* Style the search button */
+        .cbSearchButton {
+            padding: 10px 20px; /* Button padding */
+            background-color: var(--primary-color); /* Button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove border */
+            border-radius: var(--radius-sm); /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 1em; /* Standard font size */
+            transition: background-color var(--transition-fast); /* Animate background color */
+            /* Removed margin-top here, handled by container now */
+        }
+
+        /* Darken button on hover */
+        .cbSearchButton:hover {
+            background-color: #004494; /* Darker blue */
+        }
+
+        /* --- Navigation and Pagination Styling --- */
+        /* Style the container for pagination controls */
+        .cbResultSetNavigationTable {
+            margin-top: var(--spacing-md); /* Space above pagination */
+            padding: var(--spacing-sm); /* Inner padding */
+            background-color: var(--background-color); /* Background */
+            border-radius: var(--radius-sm); /* Rounded corners */
+            box-shadow: var(--shadow-sm); /* Subtle shadow */
+            display: flex; /* Use flexbox for alignment */
+            justify-content: center; /* Center pagination items */
+            align-items: center; /* Vertically align items */
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: var(--spacing-sm); /* Space between pagination elements */
+        }
+
+        /* Style pagination links (Prev, Next, page numbers) */
+        .cbResultSetNavigationLinks {
+            color: var(--primary-color); /* Link color */
+            text-decoration: none; /* Remove underline */
+            padding: var(--spacing-xs) var(--spacing-sm); /* Padding */
+            border-radius: var(--radius-sm); /* Rounded corners */
+            transition: background-color var(--transition-fast); /* Animate background */
+        }
+
+        /* Add background highlight on hover */
+        .cbResultSetNavigationLinks:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* Style the "Jump to page" input field */
+        .cbResultSetJumpToTextField {
+            padding: 5px; /* Padding */
+            border: 1px solid var(--border-color); /* Border */
+            border-radius: var(--radius-sm); /* Rounded corners */
+            width: 40px; /* Fixed width */
+            text-align: center; /* Center text */
+        }
+
+        /* Style the responsive "Jump to page" dropdown */
+        .cbResultSetNavigationDDown {
+            padding: 5px; /* Padding */
+            border: 1px solid var(--border-color); /* Border */
+            border-radius: var(--radius-sm); /* Rounded corners */
+            background-color: var(--background-color); /* Background */
+        }
+
+        /* --- Responsive Design Adjustments --- */
+        /* Tablet breakpoint */
+        @media (max-width: 1024px) {
+            /* Adjust gallery columns */
+            #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        /* Smaller tablet / Large phone breakpoint */
+        @media (max-width: 768px) {
+             /* Adjust gallery columns */
+            #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+
+            /* Stack search form elements vertically */
+            #cbTable_68216ca93352aa { /* Targets the main search container */
+                flex-direction: column; /* Stack children (field blocks) vertically */
+                align-items: stretch; /* Make items stretch full width */
+            }
+
+            /* Add space between stacked search form blocks */
+            /* Applies to the containers for each label/input pair */
+            .cbFormBlock2_68216ca93352aa,
+            .cbFormBlock3_68216ca93352aa,
+            .cbFormBlock4_68216ca93352aa,
+            .cbFormBlock5_68216ca93352aa {
+                margin-bottom: var(--spacing-sm);
+                min-width: unset; /* Remove min-width when stacked */
+            }
+
+             /* Adjust label alignment for stacked form */
+            .cbFormLabelCell label {
+               text-align: left; /* Align label text left */
+            }
+
+            /* Adjust button alignment for stacked form */
+             .cbSearchButtonContainer {
+                padding-left: 0; /* Ensure no left padding */
+                text-align: left; /* Align button left */
+                margin-top: 0; /* Reset margin as spacing is handled by gap/block margin */
+             }
+        }
+
+        /* Mobile breakpoint */
+        @media (max-width: 576px) {
+             /* Adjust gallery columns */
+            #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
+                /* Use 2 columns even on small screens, adjust minmax as needed */
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: var(--spacing-sm); /* Slightly reduce gap */
+            }
+
+            /* Reduce padding on main container */
+            .container { /* If using the generic .container */
+                padding: var(--spacing-sm);
+            }
+            #cbOuterAjaxCtnr_6223e8ad4bff72 { /* If styling Caspio container directly */
+                 padding: var(--spacing-sm);
+            }
+
+
+            /* Reduce heading size */
+            h1, h2 {
+                font-size: 1.5em;
+            }
+
+            /* Adjust search form padding */
+            #cbTable_68216ca93352aa {
+                padding: var(--spacing-sm);
+            }
         }
     </style>
 </head>

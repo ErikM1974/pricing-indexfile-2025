@@ -1,0 +1,331 @@
+/* --- CSS Variables for Theming --- */
+:root {
+    --primary-color: #0056b3;
+    --primary-light: #e6f0ff;
+    --secondary-color: #5cb85c;
+    --secondary-light: #eaffea;
+    --text-color: #333;
+    --text-light: #666;
+    --border-color: #ddd;
+    --border-light: #eee;
+    --background-color: #fff;
+    --background-light: #f8f8f8;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --spacing-xs: 5px;
+    --spacing-sm: 10px;
+    --spacing-md: 20px;
+    --spacing-lg: 30px;
+    --font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+}
+
+/* --- General Page Styling --- */
+body {
+    font-family: var(--font-family);
+    padding: var(--spacing-md);
+    font-size: 14px;
+    color: var(--text-color);
+    line-height: 1.5;
+    background-color: var(--background-light);
+    margin: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: var(--background-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-md);
+}
+
+h1, h2 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--primary-light);
+}
+
+/* --- Back Button Styling --- */
+.back-button-container {
+    margin-bottom: var(--spacing-md);
+}
+
+.back-to-gallery-btn {
+    display: inline-flex;
+    align-items: center;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.back-to-gallery-btn:hover {
+    background-color: var(--primary-light);
+}
+
+/* --- Caspio Gallery Container Styling --- */
+#gallery-container {
+    margin-top: var(--spacing-md);
+}
+
+/* Target the Caspio outer container */
+#cbOuterAjaxCtnr_6223e8ad4bff72 {
+    margin-top: var(--spacing-md);
+}
+
+/* Target the Caspio grid container */
+#GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-md);
+}
+
+/* Style the individual gallery item cells */
+.cbResultSetListViewTableOddCell,
+.cbResultSetListViewTableEvenCell {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    background-color: var(--background-color);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.cbResultSetListViewTableOddCell:hover,
+.cbResultSetListViewTableEvenCell:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Hide the "STYLE#" label */
+.cbResultSetListViewDataLabel {
+    display: none;
+}
+
+/* Style the style number */
+.cbResultSetData:first-of-type {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-light);
+}
+
+/* Style the gallery item links */
+a.gallery-item-link {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 0.9em;
+    line-height: 1.3;
+    padding: var(--spacing-xs);
+    height: 100%;
+    box-sizing: border-box;
+    transition: color var(--transition-fast);
+}
+
+a.gallery-item-link:hover {
+    color: var(--primary-color);
+}
+
+/* Style the images */
+a.gallery-item-link img {
+    display: block !important;
+    margin: 0 auto var(--spacing-sm) auto !important;
+    max-width: 100% !important;
+    height: auto !important;
+    width: auto !important;
+    border-radius: var(--radius-sm);
+    transition: transform var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+}
+
+a.gallery-item-link:hover img {
+    transform: scale(1.03);
+    box-shadow: var(--shadow-md);
+}
+
+/* --- Search Form Styling --- */
+/* Main search form container */
+.cbFormTable {
+    background-color: var(--background-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    width: 100%;
+}
+
+/* Search form layout */
+.cbFormSection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    align-items: flex-end;
+}
+
+/* Individual form blocks */
+.cbFormBlock {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Style the form labels */
+.cbFormLabelCell label {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-xs);
+    display: block;
+}
+
+/* Style the text inputs */
+.cbFormTextField {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color var(--transition-fast);
+}
+
+.cbFormTextField:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+/* Style the select dropdowns */
+.cbFormSelect {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1em;
+    background-color: var(--background-color);
+    transition: border-color var(--transition-fast);
+}
+
+.cbFormSelect:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+/* Style the search button */
+.cbSearchButton {
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color var(--transition-fast);
+    margin-top: 0;
+}
+
+.cbSearchButtonContainer {
+    display: flex;
+    align-items: flex-end;
+}
+
+.cbSearchButton:hover {
+    background-color: #004494;
+}
+
+/* --- Navigation and Pagination Styling --- */
+.cbResultSetNavigationTable {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background-color: var(--background-color);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+.cbResultSetNavigationLinks {
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.cbResultSetNavigationLinks:hover {
+    background-color: var(--primary-light);
+}
+
+.cbResultSetJumpToTextField {
+    padding: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    width: 40px;
+    text-align: center;
+}
+
+.cbResultSetNavigationDDown {
+    padding: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background-color: var(--background-color);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 1024px) {
+    #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+    
+    /* Adjust search form for mobile */
+    .cbFormSection {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .cbFormBlock {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    .cbSearchButtonContainer {
+        width: 100%;
+        margin-top: var(--spacing-sm);
+    }
+    
+    .cbSearchButton {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    .container {
+        padding: var(--spacing-sm);
+    }
+    
+    h1, h2 {
+        font-size: 1.5em;
+    }
+}
