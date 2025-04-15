@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NWCA Product Gallery</title>
+    <title>NW Custom Apparel Online Catalog 2025</title>
     <style>
         /* --- CSS Variables for Theming --- */
         /* Define consistent colors, spacing, fonts, etc. */
@@ -43,7 +43,36 @@
             background-color: var(--background-light);
             margin: 0; /* Reset default body margin */
         }
-
+        
+        /* --- Header Styling --- */
+        .site-header {
+            background: linear-gradient(to right, #003366, #0056b3);
+            color: white;
+            padding: var(--spacing-md) 0;
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+        
+        .site-header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .site-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+        
         /* --- Back Button Styling --- */
         /* Styles the container for a back button */
         .back-button-container {
@@ -462,8 +491,12 @@
     </style>
 </head>
 <body>
-    <!-- Removed the outer .container div as styles are now applied to #cbOuterAjaxCtnr_... -->
-    <h1>NWCA Product Gallery</h1>
+    <!-- Header with improved styling -->
+    <header class="site-header">
+        <div class="header-container">
+            <h1>NW Custom Apparel Online Catalog 2025</h1>
+        </div>
+    </header>
 
     <div id="gallery-container">
         <!-- Caspio Gallery Block -->
