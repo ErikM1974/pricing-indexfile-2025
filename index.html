@@ -100,7 +100,8 @@
         /* --- Caspio Gallery Container Styling --- */
         /* Apply container styles directly to the Caspio outer container */
         /* Roo: Verify this ID (#cbOuterAjaxCtnr_6223e8ad4bff72) on the live page */
-        #cbOuterAjaxCtnr_6223e8ad4bff72 {
+        #cbOuterAjaxCtnr_6223e8ad4bff72,
+        [id^="cbOuterAjaxCtnr_"] {
             margin-top: var(--spacing-md); /* Add space above the results */
             /* Styles previously applied to '.container' are moved here */
             max-width: 1200px; /* Or adjust as needed */
@@ -114,12 +115,15 @@
 
         /* Target the specific Caspio section containing the gallery grid */
         /* Roo: Verify this ID (#GridCtnr_6223e8ad4bff72) on the live page */
-        #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
+        #GridCtnr_6223e8ad4bff72 section.cbColumnarReport,
+        [id^="GridCtnr_"] section.cbColumnarReport {
             display: grid; /* Use CSS Grid for layout */
             /* Create columns that are at least 250px wide, filling available space */
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: var(--spacing-md); /* Space between grid items */
             padding-top: var(--spacing-md); /* Space above the grid */
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         /* Hide the default Caspio "STYLE#" label */
@@ -317,19 +321,27 @@
         }
 
         /* --- Custom Enhancements for Gallery and Search Form --- */
+        /* Add container for search form and center it */
+        #gallery-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+        
         /* Center and Space Search Fields */
         #cbTable_24144edcc4e22d,
         #cbTable_25dfddf748efdb,
         [id^="cbTable_"][class*="cbFormSection"] {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
+            justify-content: center;
             gap: 24px 20px;
-            margin-bottom: var(--spacing-lg);
+            margin: 0 auto var(--spacing-lg) auto;
             background: var(--background-color);
             border-radius: var(--radius-md);
             box-shadow: var(--shadow-sm);
             padding: var(--spacing-md);
+            max-width: 1000px;
         }
         
         /* Target all form blocks regardless of ID suffix */
@@ -357,6 +369,8 @@
             width: 100% !important;
             text-align: center !important;
             margin-top: 20px !important;
+            display: flex !important;
+            justify-content: center !important;
         }
         
         /* Style the search button */
