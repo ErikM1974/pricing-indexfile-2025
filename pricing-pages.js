@@ -101,41 +101,67 @@ function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
     // Get color parameter if available
     const colorCode = getUrlParameter('COLOR');
     
-    // Build the Caspio URL with parameters
-    let caspioUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}/emb?StyleNumber=${encodeURIComponent(styleNumber)}`;
-    
-    // Add color parameter if available
-    if (colorCode) {
-        caspioUrl += `&COLOR=${encodeURIComponent(colorCode)}`;
+    // Get the container element
+    const container = document.getElementById(containerId);
+    if (!container) {
+        console.error(`Container element with ID "${containerId}" not found.`);
+        return;
     }
     
-    // Create iframe element
-    const iframe = document.createElement('iframe');
-    iframe.src = caspioUrl;
-    iframe.width = "100%";
-    iframe.height = "600";
-    iframe.frameBorder = "0";
-    iframe.style.display = "block";
-    iframe.style.visibility = "visible";
-    iframe.style.border = "none";
-    iframe.scrolling = "auto";
+    // Show loading message
+    container.innerHTML = '<div class="loading-message">Loading pricing data...</div>';
     
-    // Add loading and error handling
-    iframe.onload = function() {
-        console.log("Iframe loaded successfully");
-        const loadingMsg = document.querySelector(`#${containerId} .loading-message`);
+    // For DTF, show coming soon message
+    if (caspioAppKey === 'dtf') {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px;">
+                <h3 style="color: #0056b3; margin-bottom: 20px;">DTF Pricing Coming Soon</h3>
+                <p style="color: #555; max-width: 600px; margin: 0 auto; line-height: 1.5;">
+                    We're currently working on adding Direct-to-Film (DTF) pricing to our catalog.
+                    DTF offers exceptional quality prints with vibrant colors and excellent durability.
+                    <br><br>
+                    Please check back soon for pricing information, or contact our sales team for custom quotes.
+                </p>
+                <div style="margin-top: 20px; font-size: 0.9em; color: #777;">
+                    Style: ${styleNumber || 'N/A'}
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Create a script element to load the Caspio DataPage
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    
+    // Build the Caspio URL with parameters
+    let caspioUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}/emb`;
+    
+    // Add parameters to the URL
+    const params = new URLSearchParams();
+    params.append('StyleNumber', styleNumber);
+    if (colorCode) {
+        params.append('COLOR', colorCode);
+    }
+    
+    // Set the script src with parameters
+    script.src = `${caspioUrl}?${params.toString()}`;
+    
+    // Add event listeners for script loading
+    script.onload = function() {
+        console.log(`${caspioAppKey} script loaded successfully`);
+        // Remove loading message when script is loaded
+        const loadingMsg = container.querySelector('.loading-message');
         if (loadingMsg) loadingMsg.style.display = 'none';
     };
     
-    iframe.onerror = function() {
-        console.error("Error loading iframe");
-        document.getElementById(containerId).innerHTML = '<div class="error-message">Error loading pricing calculator. Please try again later.</div>';
+    script.onerror = function() {
+        console.error(`Error loading ${caspioAppKey} script`);
+        container.innerHTML = '<div class="error-message">Error loading pricing calculator. Please try again later.</div>';
     };
     
-    // Clear the container and append the iframe
-    const container = document.getElementById(containerId);
-    container.innerHTML = '<div class="loading-message">Loading pricing data...</div>';
-    container.appendChild(iframe);
+    // Append the script to the container
+    container.appendChild(script);
 }
 
 // Initialize the page
@@ -157,22 +183,8 @@ function initPricingPage() {
     } else if (currentPage.includes('screen-print-pricing') || currentPage.includes('/pricing/screen-print')) {
         loadCaspioEmbed('pricing-calculator', 'a0e1500026349f420e494800b43e', styleNumber);
     } else if (currentPage.includes('dtf-pricing') || currentPage.includes('/pricing/dtf')) {
-        // For DTF, show coming soon message instead of Caspio embed
-        const container = document.getElementById('pricing-calculator');
-        container.innerHTML = `
-            <div style="text-align: center; padding: 40px 20px;">
-                <h3 style="color: #0056b3; margin-bottom: 20px;">DTF Pricing Coming Soon</h3>
-                <p style="color: #555; max-width: 600px; margin: 0 auto; line-height: 1.5;">
-                    We're currently working on adding Direct-to-Film (DTF) pricing to our catalog.
-                    DTF offers exceptional quality prints with vibrant colors and excellent durability.
-                    <br><br>
-                    Please check back soon for pricing information, or contact our sales team for custom quotes.
-                </p>
-                <div style="margin-top: 20px; font-size: 0.9em; color: #777;">
-                    Style: ${styleNumber || 'N/A'}
-                </div>
-            </div>
-        `;
+        // For DTF, use a special app key that will trigger the coming soon message
+        loadCaspioEmbed('pricing-calculator', 'dtf', styleNumber);
     }
 }
 
