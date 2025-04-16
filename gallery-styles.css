@@ -243,6 +243,11 @@ a.gallery-item-link:hover img {
     align-items: flex-end;
 }
 
+/* Explicitly hide the duplicate mobile search button container */
+.cbSearchButtonContainer.cbSearchButtonContainerM {
+    display: none !important;
+}
+
 .cbSearchButton:hover {
     background-color: #004494;
 }
