@@ -140,7 +140,7 @@
             color: var(--primary-color);
             margin-bottom: var(--spacing-xs); /* Space below label */
             display: block; /* Ensure label is on its own line */
-            text-align: left; /* Align label text left */
+            text-align: center; /* Center label text */
         }
 
         /* Style the text input fields */
@@ -198,6 +198,12 @@
              margin-top: var(--spacing-sm); /* Add space above */
              text-align: center; /* Center the button inside */
              padding-left: 0; /* Remove previous padding */
+        }
+        
+        /* Explicitly hide the duplicate mobile search button container - Target the exact class from the HTML */
+        .cbSearchButtonContainer.cbFormBlock6_2fce6a5f191ee5.cbSearchButtonContainerM,
+        .cbSearchButtonContainer.cbSearchButtonContainerM {
+            display: none !important;
         }
 
 
@@ -286,14 +292,16 @@
 
              /* Adjust label alignment for stacked form */
             .cbFormLabelCell label {
-               text-align: left; /* Align label text left */
+               text-align: center; /* Keep label text centered */
             }
 
             /* Adjust button alignment for stacked form */
              .cbSearchButtonContainer {
                 padding-left: 0; /* Ensure no left padding */
-                text-align: left; /* Align button left */
+                text-align: center; /* Keep button centered */
                 margin-top: 0; /* Reset margin as spacing is handled by gap/block margin */
+                display: flex;
+                justify-content: center;
              }
         }
 
@@ -326,51 +334,120 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 var(--spacing-md);
+            text-align: center; /* Center all content */
         }
         
-        /* Center and Space Search Fields */
-        #cbTable_24144edcc4e22d,
-        #cbTable_25dfddf748efdb,
+        /* Center the search form specifically */
+        section[id^="cbTable_"].cbFormSection {
+            margin: 0 auto !important;
+            text-align: center !important;
+        }
+        
+        /* Target the specific form container from the actual HTML */
+        section#cbTable_38b35e881a1aa2.cbFormSection_38b35e881a1aa2.cbSearchSpa,
+        [id^="cbTable_"][class*="cbFormSection"],
+        .cbFormSection {
+            margin: 0 auto !important; /* Center the block */
+            max-width: 1000px !important; /* Keep max-width constraint */
+            box-sizing: border-box !important; /* Keep box-sizing */
+            padding: 20px 30px !important; /* Keep padding */
+        }
+        
+        /* Add specific CSS to center the form */
+        .cbFormTable {
+            margin: 0 auto !important;
+            float: none !important;
+            display: table !important;
+            width: 100% !important;
+        }
+        
+        /* Center the form row */
+        .cbFormTable tr {
+            text-align: center !important;
+        }
+        
+        /* Ensure the form is centered */
+        [id^="cbForm_"] {
+            margin: 0 auto !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+        
+        /* Ensure equal padding on both sides */
+        .cbFormSection, .cbFormTable, [id^="cbForm_"] {
+            position: static; /* Remove positioning */
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        
+        /* Center and Space Search Fields - Target the exact ID from the HTML */
+        #cbTable_38b35e881a1aa2,
+        section#cbTable_38b35e881a1aa2,
         [id^="cbTable_"][class*="cbFormSection"] {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 24px 20px;
-            margin: 0 auto var(--spacing-lg) auto;
-            background: var(--background-color);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            padding: var(--spacing-md);
-            max-width: 1000px;
+            display: flex !important;
+            flex-wrap: nowrap !important; /* Keep fields on one line */
+            justify-content: center !important; /* Center items */
+            align-items: center !important;
+            gap: 15px !important; /* Reduce gap to fit all fields */
+            margin: 0 auto var(--spacing-lg) auto !important;
+            background: var(--background-color) !important;
+            border-radius: var(--radius-md) !important;
+            box-shadow: var(--shadow-sm) !important;
+            padding: 20px 30px !important; /* Match the padding shown in console (20px 30px) */
+            text-align: center !important;
+            box-sizing: border-box !important; /* Include padding in width calculation */
+            width: 100% !important;
+            max-width: 1000px !important;
+            position: relative !important;
+            overflow: visible !important;
         }
         
-        /* Target all form blocks regardless of ID suffix */
+        /* Target the specific form blocks from the HTML */
+        .cbFormBlock2_38b35e881a1aa2,
+        .cbFormBlock3_38b35e881a1aa2,
+        .cbFormBlock4_38b35e881a1aa2,
+        .cbFormBlock5_38b35e881a1aa2,
         [class*="cbFormBlock2_"],
         [class*="cbFormBlock3_"],
         [class*="cbFormBlock4_"],
         [class*="cbFormBlock5_"] {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            min-width: 250px;
-            flex: 1 1 250px;
-            margin-bottom: 0;
-            gap: 6px;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            min-width: 200px !important;
+            max-width: 220px !important;
+            flex: 0 0 200px !important; /* Don't grow or shrink, fixed basis */
+            padding: 0 5px !important;
+            gap: 6px !important;
+            text-align: center !important;
+            box-sizing: border-box !important;
+            margin: 0 !important; /* Ensure no margin */
         }
         /* Style for the STYLE# field container added via JS */
         .style-field-container {
-            min-width: 250px !important; /* Use !important to ensure override */
-            flex: 1 1 250px !important;
+            min-width: 200px !important; /* Match other fields */
+            max-width: 220px !important; /* Match other fields */
+            flex: 0 0 200px !important; /* Match other fields - don't grow or shrink */
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            padding: 0 5px !important;
+            gap: 6px !important;
+            text-align: center !important;
+            box-sizing: border-box !important;
         }
-        /* Style the search button container */
+        /* Style the search button container - Target the exact class from the HTML */
+        .cbSearchButtonContainer.cbFormBlock6_38b35e881a1aa2,
         .cbSearchButtonContainer,
         [class*="cbFormBlock6_"] {
-            flex-basis: 100% !important;
-            width: 100% !important;
-            text-align: center !important;
-            margin-top: 20px !important;
-            display: flex !important;
-            justify-content: center !important;
+            flex-basis: 100%; /* Takes full width row */
+            width: 100%;
+            text-align: center;
+            margin-top: 20px; /* Keep spacing */
+            display: flex;
+            justify-content: center; /* Center button within this container */
         }
         
         /* Style the search button */
@@ -503,6 +580,8 @@
             }
         }
     </style>
+    
+    <!-- No CSS needed - we'll use JavaScript to handle this -->
 </head>
 <body>
     <!-- Header with improved styling -->
@@ -544,13 +623,56 @@
                      console.log('Could not find STYLE# label.');
                 }
             }
+            
+            // Function to find the STYLE# field and apply styling
+            // We'll add a more targeted approach for the second search button after examining the page structure
 
             // Caspio might load content dynamically after DOMContentLoaded.
             // We'll try initially, and also use a MutationObserver as a fallback
             // in case the form loads later via AJAX.
 
             styleStyleField(); // Try immediately
-
+            
+            // Function to hide only the mobile search button container
+            function hideMobileSearchButton() {
+                // Find all mobile search button containers
+                const mobileContainers = Array.from(document.querySelectorAll('.cbSearchButtonContainerM, .cbSearchButtonContainer.cbSearchButtonContainerM'));
+                
+                // Log what we found
+                console.log(`Found ${mobileContainers.length} mobile search button containers`);
+                
+                // Hide each mobile container
+                mobileContainers.forEach((container, index) => {
+                    console.log(`Mobile container #${index}:`, {
+                        classes: container.className
+                    });
+                    
+                    // Hide the container
+                    container.style.display = 'none';
+                });
+                
+                // Also look for any buttons with IDs that might indicate they're mobile buttons
+                const allButtons = Array.from(document.querySelectorAll('input[type="submit"], input[type="button"], button, .cbSearchButton'));
+                
+                allButtons.forEach((button) => {
+                    // Check if the button is in a mobile container or has a mobile-related ID/class
+                    const isMobileButton =
+                        (button.id && button.id.toLowerCase().includes('mobile')) ||
+                        (button.className && button.className.toLowerCase().includes('mobile')) ||
+                        (button.closest('.cbSearchButtonContainerM') !== null);
+                    
+                    if (isMobileButton) {
+                        console.log('Found mobile button:', {
+                            id: button.id,
+                            classes: button.className
+                        });
+                        button.style.display = 'none';
+                    }
+                });
+                
+                return mobileContainers.length > 0;
+            }
+            
             // Observe the gallery container for changes, as Caspio might inject the form later
             const galleryContainer = document.getElementById('gallery-container');
             if (galleryContainer) {
@@ -560,16 +682,22 @@
                     if (targetLabel && !document.querySelector('.style-field-container')) {
                          console.log('Mutation detected, attempting to style STYLE# field again.');
                          styleStyleField();
-                         // Optional: Disconnect observer if we are sure the element is now styled
-                         // observer.disconnect();
                     }
+                    
+                    // Try to hide only the mobile search button
+                    hideMobileSearchButton();
                 });
 
                 observer.observe(galleryContainer, { childList: true, subtree: true });
-                 console.log('MutationObserver set up on gallery-container.');
+                console.log('MutationObserver set up on gallery-container.');
             } else {
-                 console.log('Could not find gallery-container to set up MutationObserver.');
+                console.log('Could not find gallery-container to set up MutationObserver.');
             }
+            
+            // Try to hide only the mobile search button after delays
+            setTimeout(hideMobileSearchButton, 1000);
+            setTimeout(hideMobileSearchButton, 2000);
+            setTimeout(hideMobileSearchButton, 3000);
         });
     </script>
 </body>
