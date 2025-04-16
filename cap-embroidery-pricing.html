@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Embroidery Pricing Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+        
+        /* Style the Title */
+        #matrix-title {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        /* Style the Product Info */
+        #matrix-product-info {
+            margin-bottom: 5px;
+            text-align: left;
+            padding-left: 16px;
+        }
+        
+        #matrix-product-info span {
+            font-size: 0.85em;
+            color: #555;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        /* Style the Generated Pricing Matrix Table */
+        #cap-embroidery-pricing-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            border: 1px solid #ccc;
+        }
+        
+        #cap-embroidery-pricing-matrix th {
+            border: 1px solid #ccc;
+            padding: 8px 10px;
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        #cap-embroidery-pricing-matrix th:first-child {
+            text-align: left;
+            padding-left: 16px;
+        }
+        
+        #cap-embroidery-pricing-matrix td {
+            border: 1px solid #ccc;
+            padding: 8px 10px;
+            text-align: center;
+        }
+        
+        #cap-embroidery-pricing-matrix td:first-child {
+            text-align: left;
+            font-weight: bold;
+            padding-left: 16px;
+        }
+        
+        #cap-embroidery-pricing-matrix tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        /* Style the note below the table */
+        #matrix-note {
+            font-size: 0.85em;
+            color: #555;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .loading-message {
+            padding: 20px;
+            text-align: center;
+            color: #555;
+        }
+        
+        .error-message {
+            padding: 15px;
+            background-color: #fff0f0;
+            border-left: 4px solid #c00;
+            margin: 15px 0;
+            color: #c00;
+        }
+    </style>
+</head>
+<body>
+    <h4 id="matrix-title">Cap Embroidery Pricing</h4>
+    <div id="matrix-product-info">
+        <span id="matrix-style-info"></span>
+        <span id="matrix-color-info"></span>
+    </div>
+    <table class="pricing-matrix-table" id="cap-embroidery-pricing-matrix">
+        <thead>
+            <tr id="matrix-size-header-row">
+                <th style="text-align: left; padding-left: 16px;">Quantity Tier</th>
+            </tr>
+        </thead>
+        <tbody id="matrix-price-body">
+            <tr>
+                <td colspan="5" class="loading-message">Loading pricing data...</td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="matrix-note"></div>
+
+    <script>
+        // Base API URL
+        const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        
+        // Global variables to hold data passed between functions
+        window.dp7ApiTierData = null;
+        window.dp7ApiEmbCostData = null;
+        window.dp7ApiRulesData = null;
+        window.dp7ApiSizeData = null;
+        window.dp7GroupedHeaders = null;
+        window.dp7GroupedPrices = null;
+        window.dp7UniqueSizes = null;
+        
+        // Initialize when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCapEmbroideryPricing();
+        });
+        
+        // Get URL parameters
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        
+        // Main initialization function
+        function initializeCapEmbroideryPricing() {
+            const styleNumber = getUrlParameter('StyleNumber');
+            const displayColor = getUrlParameter('COLOR');
+            
+            const tableBody = document.getElementById('matrix-price-body');
+            const noteDiv = document.getElementById('matrix-note');
+            const styleEl = document.getElementById('matrix-style-info');
+            const colorEl = document.getElementById('matrix-color-info');
+            
+            if (styleEl) styleEl.textContent = styleNumber ? `Style: ${styleNumber}` : 'Style: N/A';
+            if (colorEl) colorEl.textContent = displayColor ? `Color: ${decodeURIComponent(displayColor.replace(/\+/g, ' '))}` : '';
+            
+            if (!styleNumber) {
+                console.error("Cap Embroidery Pricing: styleNumber parameter missing from URL.");
+                if (noteDiv) noteDiv.innerHTML = '<div class="error-message">Error: Style number not provided.</div>';
+                if (tableBody) tableBody.innerHTML = '';
+                return;
+            }
+            
+            // Fetch data and build the pricing table
+            fetchAllData(styleNumber)
+                .then(success => {
+                    if (success) {
+                        calculatePrices();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error initializing cap embroidery pricing:", error);
+                    if (noteDiv) noteDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+                    if (tableBody) tableBody.innerHTML = '';
+                });
+        }
+        
+        // Fetch all necessary data from API endpoints
+        async function fetchAllData(styleNumber) {
+            console.log(`Fetching all data for style ${styleNumber}...`);
+            
+            // Reset global data holders
+            window.dp7ApiTierData = null;
+            window.dp7ApiEmbCostData = null;
+            window.dp7ApiRulesData = null;
+            window.dp7ApiSizeData = null;
+            
+            const apiBaseUrl = API_PROXY_BASE_URL;
+            
+            // API URLs
+            const tierApiUrl = `${apiBaseUrl}/api/pricing-tiers?method=EmbroideryHats`;
+            const costApiUrl = `${apiBaseUrl}/api/embroidery-costs?itemType=Hat&stitchCount=8000`;
+            const ruleApiUrl = `${apiBaseUrl}/api/pricing-rules?method=EmbroideryHats`;
+            const sizeDataApiUrl = `${apiBaseUrl}/api/max-prices-by-style?styleNumber=${encodeURIComponent(styleNumber)}`;
+            
+            try {
+                // Fetch all endpoints concurrently
+                const [tierResponse, costResponse, ruleResponse, sizeDataResponse] = await Promise.all([
+                    fetch(tierApiUrl),
+                    fetch(costApiUrl),
+                    fetch(ruleApiUrl),
+                    fetch(sizeDataApiUrl)
+                ]);
+                
+                // Check all responses
+                const errorMessages = [];
+                if (!tierResponse.ok) errorMessages.push(`Tiers: ${tierResponse.status} ${tierResponse.statusText}`);
+                if (!costResponse.ok) errorMessages.push(`Costs: ${costResponse.status} ${costResponse.statusText}`);
+                if (!ruleResponse.ok) errorMessages.push(`Rules: ${ruleResponse.status} ${ruleResponse.statusText}`);
+                if (!sizeDataResponse.ok) errorMessages.push(`SizeData: ${sizeDataResponse.status} ${sizeDataResponse.statusText}`);
+                
+                if (errorMessages.length > 0) {
+                    throw new Error(`API fetch errors: ${errorMessages.join('; ')}`);
+                }
+                
+                // Parse JSON for all responses
+                const tiersResult = await tierResponse.json();
+                const costsResult = await costResponse.json();
+                const rulesResult = await ruleResponse.json();
+                const sizeDataResult = await sizeDataResponse.json();
+                
+                // Store fetched data globally
+                window.dp7ApiTierData = {};
+                tiersResult.forEach(tier => {
+                    window.dp7ApiTierData[tier.TierLabel] = tier;
+                });
+                
+                window.dp7ApiEmbCostData = costsResult;
+                window.dp7ApiRulesData = rulesResult;
+                
+                // Store the 'sizes' array from the response
+                if (sizeDataResult && Array.isArray(sizeDataResult.sizes)) {
+                    window.dp7ApiSizeData = sizeDataResult.sizes;
+                } else {
+                    console.warn("Size data received from API is not in the expected format.", sizeDataResult);
+                    window.dp7ApiSizeData = [];
+                }
+                
+                // Validation after fetch
+                if (!window.dp7ApiTierData || Object.keys(window.dp7ApiTierData).length === 0) 
+                    throw new Error("No tier data loaded.");
+                if (!window.dp7ApiEmbCostData || Object.keys(window.dp7ApiEmbCostData).length === 0) 
+                    throw new Error("No embroidery cost data loaded.");
+                if (!window.dp7ApiRulesData || !window.dp7ApiRulesData['RoundingMethod']) 
+                    throw new Error("Rounding rule not loaded.");
+                if (!window.dp7ApiSizeData) 
+                    throw new Error("Size data array not loaded.");
+                
+                return true; // Indicate success
+            } catch (error) {
+                console.error('Error fetching API data:', error);
+                const noteDiv = document.getElementById('matrix-note');
+                if(noteDiv) {
+                    noteDiv.innerHTML = `<div class="error-message">Error loading config: ${error.message}</div>`;
+                }
+                return false; // Indicate failure
+            }
+        }
+        
+        // Calculate prices based on fetched data
+        function calculatePrices() {
+            window.dp7GroupedHeaders = null;
+            window.dp7GroupedPrices = null;
+            window.dp7UniqueSizes = null;
+            
+            const fetchedTiers = window.dp7ApiTierData;
+            const fetchedCosts = window.dp7ApiEmbCostData;
+            const fetchedRules = window.dp7ApiRulesData;
+            const fetchedSizeData = window.dp7ApiSizeData;
+            
+            const noteDiv = document.getElementById('matrix-note');
+            const tableBody = document.getElementById('matrix-price-body');
+            const headerRow = document.getElementById('matrix-size-header-row');
+            
+            if (!fetchedTiers || !fetchedCosts || !fetchedRules || !fetchedSizeData) {
+                console.error("Missing required fetched data.");
+                if(noteDiv) noteDiv.innerHTML = '<div class="error-message">Error: Pricing configuration incomplete.</div>';
+                if (tableBody) tableBody.innerHTML = '';
+                return;
+            }
+            
+            if (!Array.isArray(fetchedSizeData) || fetchedSizeData.length === 0) {
+                if (noteDiv) noteDiv.textContent = `No size/cost information found for this style.`;
+                if (tableBody) tableBody.innerHTML = '';
+                if (headerRow) while (headerRow.cells.length > 1) {
+                    headerRow.deleteCell(-1);
+                }
+                window.dp7GroupedHeaders = [];
+                window.dp7GroupedPrices = {};
+                buildPriceTable();
+                return;
+            }
+            
+            try {
+                // Sort size data by sort order
+                const sortedSizeData = [...fetchedSizeData];
+                sortedSizeData.sort((a, b) => {
+                    const orderA = a.sortOrder === null || a.sortOrder === undefined ? Infinity : a.sortOrder;
+                    const orderB = b.sortOrder === null || b.sortOrder === undefined ? Infinity : b.sortOrder;
+                    return orderA - orderB;
+                });
+                
+                // Create base item costs map and unique sizes array
+                const baseItemCosts = {};
+                const uniqueSizesArray = [];
+                const seenSizes = new Set();
+                
+                sortedSizeData.forEach(item => {
+                    if (item && item.size && item.price !== undefined && !isNaN(item.price)) {
+                        baseItemCosts[item.size] = item.price;
+                        if (!seenSizes.has(item.size)) {
+                            uniqueSizesArray.push(item.size);
+                            seenSizes.add(item.size);
+                        }
+                    }
+                });
+                
+                window.dp7UniqueSizes = uniqueSizesArray;
+                
+                if (uniqueSizesArray.length === 0) {
+                    if (noteDiv) noteDiv.textContent = `No valid size/cost information found for this style.`;
+                    if (tableBody) tableBody.innerHTML = '';
+                    if (headerRow) while (headerRow.cells.length > 1) {
+                        headerRow.deleteCell(-1);
+                    }
+                    window.dp7GroupedHeaders = [];
+                    window.dp7GroupedPrices = {};
+                    buildPriceTable();
+                    return;
+                }
+                
+                // Calculate price profiles for each size
+                const calculatedPriceProfiles = {};
+                const roundingMethod = fetchedRules['RoundingMethod'];
+                
+                uniqueSizesArray.forEach(size => {
+                    const maxCasePrice = baseItemCosts[size];
+                    if (maxCasePrice !== undefined && maxCasePrice !== null && !isNaN(maxCasePrice)) {
+                        calculatedPriceProfiles[size] = {};
+                        for (const tierLabel in fetchedTiers) {
+                            if (fetchedTiers.hasOwnProperty(tierLabel)) {
+                                const tierInfo = fetchedTiers[tierLabel];
+                                const embroideryCost = fetchedCosts[tierLabel] !== undefined ? fetchedCosts[tierLabel] : 0;
+                                const denominator = tierInfo.MarginDenominator;
+                                
+                                if (denominator && denominator !== 0) {
+                                    const baseSellPrice = maxCasePrice / denominator;
+                                    const finalPrice = baseSellPrice + embroideryCost;
+                                    let roundedUpPrice = Math.ceil(finalPrice); // Default to ceiling
+                                    
+                                    if (roundingMethod === 'CeilDollar') {
+                                        roundedUpPrice = Math.ceil(finalPrice);
+                                    }
+                                    
+                                    calculatedPriceProfiles[size][tierLabel] = roundedUpPrice;
+                                } else {
+                                    calculatedPriceProfiles[size][tierLabel] = null;
+                                }
+                            }
+                        }
+                    } else {
+                        calculatedPriceProfiles[size] = null;
+                    }
+                });
+                
+                // Group sizes with identical price profiles
+                const groupedHeaders = [];
+                const groupedPrices = {};
+                
+                if (uniqueSizesArray.length > 0) {
+                    let currentGroup = [];
+                    let currentProfileJson = null;
+                    
+                    uniqueSizesArray.forEach((size, i) => {
+                        const profile = calculatedPriceProfiles[size];
+                        const profileJson = profile ? JSON.stringify(profile) : null;
+                        
+                        if (i === 0) {
+                            currentGroup = [size];
+                            currentProfileJson = profileJson;
+                        } else if (profileJson !== null && profileJson === currentProfileJson) {
+                            currentGroup.push(size);
+                        } else {
+                            if (currentGroup.length > 0 && currentProfileJson !== null) {
+                                const groupLabel = currentGroup.length > 1 ? 
+                                    `${currentGroup[0]}-${currentGroup[currentGroup.length - 1]}` : 
+                                    currentGroup[0];
+                                groupedHeaders.push(groupLabel);
+                                groupedPrices[groupLabel] = JSON.parse(currentProfileJson);
+                            }
+                            
+                            currentGroup = [size];
+                            currentProfileJson = profileJson;
+                        }
+                    });
+                    
+                    // Handle the last group
+                    if (currentGroup.length > 0 && currentProfileJson !== null) {
+                        const groupLabel = currentGroup.length > 1 ? 
+                            `${currentGroup[0]}-${currentGroup[currentGroup.length - 1]}` : 
+                            currentGroup[0];
+                        groupedHeaders.push(groupLabel);
+                        groupedPrices[groupLabel] = JSON.parse(currentProfileJson);
+                    }
+                }
+                
+                window.dp7GroupedHeaders = groupedHeaders;
+                window.dp7GroupedPrices = groupedPrices;
+                
+                buildPriceTable();
+            } catch (error) {
+                console.error('Error calculating/grouping:', error);
+                if(noteDiv) {
+                    noteDiv.innerHTML = '<div class="error-message">Error calculating pricing data.</div>';
+                }
+                if (tableBody) tableBody.innerHTML = '';
+                window.dp7GroupedHeaders = [];
+                window.dp7GroupedPrices = {};
+            }
+        }
+        
+        // Build the HTML pricing table
+        function buildPriceTable() {
+            console.log('Building price table...');
+            
+            // Get data prepared by previous functions
+            const groupedHeaders = window.dp7GroupedHeaders;
+            const groupedPrices = window.dp7GroupedPrices;
+            const tierInfo = window.dp7ApiTierData;
+            
+            // Get HTML elements
+            const headerRow = document.getElementById('matrix-size-header-row');
+            const tableBody = document.getElementById('matrix-price-body');
+            const noteDiv = document.getElementById('matrix-note');
+            
+            // Validations
+            if (groupedHeaders === null || groupedPrices === null || tierInfo === null || !headerRow || !tableBody || !noteDiv) {
+                console.error('Missing required data or elements.');
+                if(noteDiv && !noteDiv.textContent) noteDiv.innerHTML = '<div class="error-message">Error: Cannot build pricing matrix structure.</div>';
+                return;
+            }
+            
+            // Clear loading/error messages
+            tableBody.innerHTML = '';
+            
+            // Get sorted tier labels
+            const sortedQuantityTiers = tierInfo ? 
+                Object.keys(tierInfo).sort((a, b) => tierInfo[a].MinQuantity - tierInfo[b].MinQuantity) : 
+                [];
+            
+            // Check if data allows building a table
+            if (groupedHeaders.length === 0) {
+                console.warn('No size groups to display.');
+                if(noteDiv && !noteDiv.textContent) noteDiv.textContent = 'No applicable sizes found for pricing.';
+                while (headerRow.cells.length > 1) {
+                    headerRow.deleteCell(-1);
+                }
+                return;
+            }
+            
+            if (sortedQuantityTiers.length === 0) {
+                console.warn('No tiers to display.');
+                if(noteDiv && !noteDiv.textContent) noteDiv.textContent = 'Pricing tiers not loaded.';
+                while (headerRow.cells.length > 1) {
+                    headerRow.deleteCell(-1);
+                }
+                return;
+            }
+            
+            try {
+                // Build Table Header
+                while (headerRow.cells.length > 1) {
+                    headerRow.deleteCell(-1);
+                }
+                
+                groupedHeaders.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.style.textAlign = 'center';
+                    headerRow.appendChild(th);
+                });
+                
+                // Build Table Body
+                sortedQuantityTiers.forEach(tierLabel => {
+                    const tr = tableBody.insertRow();
+                    const tdTier = tr.insertCell();
+                    
+                    const currentTierData = tierInfo[tierLabel];
+                    if (currentTierData && currentTierData.LTM_Fee && currentTierData.LTM_Fee > 0) {
+                        const feeText = currentTierData.LTM_Fee.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+                        tdTier.innerHTML = `${tierLabel}<br><span style="font-size:0.8em; font-weight:normal; color:red;">(+ ${feeText} Fee)</span>`;
+                        tdTier.style.lineHeight = '1.2';
+                    } else {
+                        tdTier.textContent = tierLabel;
+                    }
+                    
+                    tdTier.style.fontWeight = 'bold';
+                    tdTier.style.textAlign = 'left';
+                    tdTier.style.paddingLeft = '16px';
+                    
+                    // Add price cells for each size group
+                    groupedHeaders.forEach(headerText => {
+                        const tdPrice = tr.insertCell();
+                        let displayText = '-'; // Default display text
+                        
+                        const priceProfile = groupedPrices[headerText];
+                        if (priceProfile) {
+                            const finalPrice = priceProfile[tierLabel];
+                            if (finalPrice !== undefined && finalPrice !== null && !isNaN(finalPrice)) {
+                                displayText = '$' + finalPrice.toFixed(2);
+                            }
+                        }
+                        
+                        tdPrice.textContent = displayText;
+                        tdPrice.style.textAlign = 'center';
+                    });
+                });
+                
+                // Add Note
+                if (tableBody.rows.length > 0) {
+                    if(noteDiv) {
+                        let noteText = 'Prices shown are per piece. ';
+                        noteText += 'Includes standard cap embroidery (approx. 8,000 stitches).';
+                        
+                        const lowestTierLabel = sortedQuantityTiers[0];
+                        const lowestTier = tierInfo[lowestTierLabel];
+                        if (lowestTier && lowestTier.LTM_Fee && lowestTier.LTM_Fee > 0) {
+                            const feeText = lowestTier.LTM_Fee.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+                            noteText += `<br><strong>Note:</strong> Orders in the ${lowestTierLabel} tier incur an additional ${feeText} Less Than Minimum fee.`;
+                        }
+                        
+                        noteDiv.innerHTML = noteText;
+                    }
+                } else if (noteDiv && !noteDiv.textContent) {
+                    noteDiv.textContent = 'Pricing matrix could not be generated for this product.';
+                }
+                
+                console.log('Matrix generation complete.');
+            } catch(error) {
+                console.error('Error building table HTML:', error);
+                if(noteDiv) {
+                    noteDiv.innerHTML = '<div class="error-message">Error displaying pricing table.</div>';
+                }
+                tableBody.innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>
