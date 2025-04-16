@@ -21,6 +21,27 @@ app.get('/product', (req, res) => {
   res.sendFile(path.join(__dirname, 'product.html'));
 });
 
+// Serve pricing pages
+app.get('/pricing/embroidery', (req, res) => {
+  res.sendFile(path.join(__dirname, 'embroidery-pricing.html'));
+});
+
+app.get('/pricing/cap-embroidery', (req, res) => {
+  res.sendFile(path.join(__dirname, 'cap-embroidery-pricing.html'));
+});
+
+app.get('/pricing/dtg', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dtg-pricing.html'));
+});
+
+app.get('/pricing/screen-print', (req, res) => {
+  res.sendFile(path.join(__dirname, 'screen-print-pricing.html'));
+});
+
+app.get('/pricing/dtf', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dtf-pricing.html'));
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

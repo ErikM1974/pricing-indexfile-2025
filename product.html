@@ -805,11 +805,35 @@
     <div class="tabs-container">
         <div class="tab-nav">
             <a href="#" class="tab-link active" data-tab-target="#inventory-panel">Inventory</a>
-            <a href="#" class="tab-link" data-tab-target="#embroidery-panel">Embroidery</a>
-            <a href="#" class="tab-link" data-tab-target="#cap-emb-panel">Cap Embroidery</a>
-            <a href="#" class="tab-link" data-tab-target="#dtg-panel">DTG</a>
-            <a href="#" class="tab-link" data-tab-target="#screenprint-panel">Screen Print</a>
-            <a href="#" class="tab-link" data-tab-target="#dtf-panel">DTF</a>
+        </div>
+        
+        <!-- Pricing Options -->
+        <div class="pricing-options" style="padding: 20px; margin-top: 20px; border-top: 1px solid #ddd;">
+            <h3 style="margin-top: 0; color: var(--primary-color); font-size: 1.4em; margin-bottom: 15px;">Pricing Options</h3>
+            <p style="margin-bottom: 20px;">Click on any option below to view detailed pricing information:</p>
+            
+            <div class="pricing-links" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+                <a href="/pricing/embroidery?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-link" style="display: flex; flex-direction: column; align-items: center; width: 150px; padding: 20px; background-color: var(--background-light); border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.3s; border: 1px solid var(--border-color);">
+                    <div class="pricing-icon" style="font-size: 2em; margin-bottom: 10px;">🧵</div>
+                    <div class="pricing-name" style="font-weight: bold; text-align: center;">Embroidery</div>
+                </a>
+                <a href="/pricing/cap-embroidery?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-link" style="display: flex; flex-direction: column; align-items: center; width: 150px; padding: 20px; background-color: var(--background-light); border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.3s; border: 1px solid var(--border-color);">
+                    <div class="pricing-icon" style="font-size: 2em; margin-bottom: 10px;">🧢</div>
+                    <div class="pricing-name" style="font-weight: bold; text-align: center;">Cap Embroidery</div>
+                </a>
+                <a href="/pricing/dtg?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-link" style="display: flex; flex-direction: column; align-items: center; width: 150px; padding: 20px; background-color: var(--background-light); border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.3s; border: 1px solid var(--border-color);">
+                    <div class="pricing-icon" style="font-size: 2em; margin-bottom: 10px;">👕</div>
+                    <div class="pricing-name" style="font-weight: bold; text-align: center;">DTG</div>
+                </a>
+                <a href="/pricing/screen-print?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-link" style="display: flex; flex-direction: column; align-items: center; width: 150px; padding: 20px; background-color: var(--background-light); border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.3s; border: 1px solid var(--border-color);">
+                    <div class="pricing-icon" style="font-size: 2em; margin-bottom: 10px;">🖨️</div>
+                    <div class="pricing-name" style="font-weight: bold; text-align: center;">Screen Print</div>
+                </a>
+                <a href="/pricing/dtf?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-link" style="display: flex; flex-direction: column; align-items: center; width: 150px; padding: 20px; background-color: var(--background-light); border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.3s; border: 1px solid var(--border-color);">
+                    <div class="pricing-icon" style="font-size: 2em; margin-bottom: 10px;">🎨</div>
+                    <div class="pricing-name" style="font-weight: bold; text-align: center;">DTF</div>
+                </a>
+            </div>
         </div>
 
         <div class="tab-content">
@@ -1113,6 +1137,9 @@
                      // Update inventory and pricing
                      loadInventory(window.selectedStyleNumber, catalogColor); // Update Inventory Table
                      triggerPricingDataPageUpdates(window.selectedStyleNumber, catalogColor); // Update Pricing DPs
+                     
+                     // Update pricing links with the new color
+                     updatePricingLinks(window.selectedStyleNumber, catalogColor);
                  }
         
                 // --- Inventory Update Function (Using New Tabular API) ---
@@ -1240,9 +1267,42 @@
                           initDtfApiFetch(styleNumber);
                       }
                  }
-        
-                // --- Main Orchestration Function ---
-                async function updatePageForStyle(styleNumber) {
+                 
+                 // --- Update Pricing Links Function ---
+                 function updatePricingLinks(styleNumber, colorCode) {
+                     console.log(`Updating pricing links for Style=${styleNumber}, Color=${colorCode || 'N/A'}`);
+                     
+                     if (!styleNumber) {
+                         console.warn("Cannot update pricing links: No style number provided");
+                         return;
+                     }
+                     
+                     const pricingLinks = document.querySelectorAll('.pricing-link');
+                     pricingLinks.forEach(link => {
+                         let href = link.getAttribute('href');
+                         href = href.replace('{styleNumber}', encodeURIComponent(styleNumber));
+                         href = href.replace('{colorCode}', encodeURIComponent(colorCode || ''));
+                         link.setAttribute('href', href);
+                         
+                         // Add hover effect
+                         link.addEventListener('mouseover', function() {
+                             this.style.transform = 'translateY(-5px)';
+                             this.style.boxShadow = 'var(--shadow-md)';
+                             this.style.borderColor = 'var(--primary-color)';
+                         });
+                         
+                         link.addEventListener('mouseout', function() {
+                             this.style.transform = 'translateY(0)';
+                             this.style.boxShadow = 'var(--shadow-sm)';
+                             this.style.borderColor = 'var(--border-color)';
+                         });
+                     });
+                     
+                     console.log("Pricing links updated successfully");
+                 }
+         
+                 // --- Main Orchestration Function ---
+                 async function updatePageForStyle(styleNumber) {
                     console.log(`--- StyleSearch: Updating Page for Style: ${styleNumber} ---`);
                     
                     // Store the style number in global variables
@@ -1298,6 +1358,9 @@
                     // Now that product info is loaded, we can load swatches into the inline swatch area
                     console.log("Calling loadSwatches with styleNumber:", styleNumber);
                     await loadSwatches(styleNumber);
+                    
+                    // Update pricing links with the style number (no color yet)
+                    updatePricingLinks(styleNumber, null);
                     
                     console.log("--- StyleSearch: Initial updates triggered for style", styleNumber);
                 }
