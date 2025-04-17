@@ -302,7 +302,37 @@
         }
     </style>
     
-    <!-- No CSS needed - we'll use JavaScript to handle this -->
+    <!-- Hero Image Styling -->
+    <style>
+        /* Hero Section Styling */
+        #hero-section {
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top; /* Position from the top to ensure faces are visible */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .hero-container {
+                height: 200px; /* Shorter on mobile */
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header with improved styling -->
@@ -311,6 +341,14 @@
             <h1>NW Custom Apparel Online Catalog 2025</h1>
         </div>
     </header>
+
+    <!-- Hero Image Section -->
+    <section id="hero-section">
+        <div class="hero-container">
+            <!-- Hero image -->
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/TEAM%20NWCA%20HERO%20Image.png?ver=1" alt="NW Custom Apparel Team" class="hero-image">
+        </div>
+    </section>
 
     <div id="gallery-container">
         <!-- Caspio Gallery Block -->
