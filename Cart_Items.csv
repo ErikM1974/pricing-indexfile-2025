@@ -1,0 +1,10 @@
+Field Name,Data Type,Field Size,Required,Unique,Auto Increment,Default Value,Description
+CartItemID,AutoNumber,0,Yes,Yes,Yes,,Primary key for cart items
+SessionID,Text,50,Yes,No,No,,Session identifier for anonymous users
+ProductID,Text,50,Yes,No,No,,Product identifier from catalog
+StyleNumber,Text,50,Yes,No,No,,Style number of the product
+Color,Text,50,Yes,No,No,,Color of the product
+ImprintType,Text,20,Yes,No,No,,Type of imprint (Embroidery, Cap Embroidery, Screen Print, DTG, DTF)
+DateAdded,DateTime,0,Yes,No,No,NOW(),Date and time when item was added to cart
+CartStatus,Text,20,Yes,No,No,Active,Status of cart item (Active, Converted, Abandoned)
+OrderID,Number,0,No,No,No,,Foreign key to Orders table (when cart is converted to order)

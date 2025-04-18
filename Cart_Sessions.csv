@@ -1,0 +1,8 @@
+Field Name,Data Type,Field Size,Required,Unique,Auto Increment,Default Value,Description
+SessionID,Text,50,Yes,Yes,No,,Primary key - unique session identifier
+UserID,Number,0,No,No,No,,Foreign key to user account (if logged in)
+CreatedDate,DateTime,0,Yes,No,No,NOW(),Date when session was created
+LastActivity,DateTime,0,Yes,No,No,NOW(),Date of last activity in this session
+IPAddress,Text,50,No,No,No,,User's IP address
+UserAgent,Text,255,No,No,No,,User's browser/device information
+IsActive,Yes/No,0,Yes,No,No,Yes,Whether the session is still active
