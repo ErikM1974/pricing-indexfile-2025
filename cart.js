@@ -1008,6 +1008,12 @@ const NWCACart = (function() {
    * @returns {Array} - Cart items
    */
   function getCartItems(status) {
+    // Ensure cartState.items is an array
+    if (!cartState.items || !Array.isArray(cartState.items)) {
+      cartState.items = [];
+      saveToLocalStorage();
+    }
+    
     if (status) {
       return cartState.items.filter(item => item.CartStatus === status);
     }
@@ -1021,10 +1027,17 @@ const NWCACart = (function() {
   function getCartCount() {
     let count = 0;
     
+    // Ensure cartState.items is an array
+    if (!cartState.items || !Array.isArray(cartState.items)) {
+      cartState.items = [];
+      saveToLocalStorage();
+      return count;
+    }
+    
     cartState.items.forEach(item => {
-      if (item.CartStatus === 'Active') {
+      if (item.CartStatus === 'Active' && item.sizes && Array.isArray(item.sizes)) {
         item.sizes.forEach(size => {
-          count += size.Quantity;
+          count += size.Quantity || 0;
         });
       }
     });
@@ -1039,10 +1052,17 @@ const NWCACart = (function() {
   function getCartTotal() {
     let total = 0;
     
+    // Ensure cartState.items is an array
+    if (!cartState.items || !Array.isArray(cartState.items)) {
+      cartState.items = [];
+      saveToLocalStorage();
+      return total;
+    }
+    
     cartState.items.forEach(item => {
-      if (item.CartStatus === 'Active') {
+      if (item.CartStatus === 'Active' && item.sizes && Array.isArray(item.sizes)) {
         item.sizes.forEach(size => {
-          total += size.Quantity * size.UnitPrice;
+          total += (size.Quantity || 0) * (size.UnitPrice || 0);
         });
       }
     });
@@ -1056,7 +1076,14 @@ const NWCACart = (function() {
    * @returns {boolean} - True if cart has items with the specified embellishment type
    */
   function hasEmbellishmentType(embellishmentType) {
-    return cartState.items.some(item => 
+    // Ensure cartState.items is an array
+    if (!cartState.items || !Array.isArray(cartState.items)) {
+      cartState.items = [];
+      saveToLocalStorage();
+      return false;
+    }
+    
+    return cartState.items.some(item =>
       item.CartStatus === 'Active' && item.ImprintType === embellishmentType
     );
   }
@@ -1068,8 +1095,15 @@ const NWCACart = (function() {
   function getEmbellishmentTypes() {
     const types = new Set();
     
+    // Ensure cartState.items is an array
+    if (!cartState.items || !Array.isArray(cartState.items)) {
+      cartState.items = [];
+      saveToLocalStorage();
+      return [];
+    }
+    
     cartState.items.forEach(item => {
-      if (item.CartStatus === 'Active') {
+      if (item.CartStatus === 'Active' && item.ImprintType) {
         types.add(item.ImprintType);
       }
     });
