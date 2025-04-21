@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart.js Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .test-controls {
+            margin-bottom: 15px;
+        }
+        .test-controls button {
+            padding: 8px 15px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .test-controls button:hover {
+            background-color: #003d7e;
+        }
+        .result-area {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            min-height: 100px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+        input, select {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        label {
+            margin-right: 5px;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        #cart-display {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .cart-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cart.js Test</h1>
+    <p>This page tests the cart.js functionality to help diagnose issues with the cart.</p>
+    
+    <div class="test-section">
+        <h2>1. Cart State</h2>
+        <div class="test-controls">
+            <button id="get-cart-state-btn">Get Cart State</button>
+            <button id="clear-cart-state-btn">Clear Cart State</button>
+        </div>
+        <div id="cart-state-result" class="result-area">Results will appear here...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Add Test Item</h2>
+        <div class="input-group">
+            <label for="style-number">Style Number:</label>
+            <input type="text" id="style-number" value="TEST123">
+            
+            <label for="color">Color:</label>
+            <input type="text" id="color" value="Test Color">
+            
+            <label for="embellishment-type">Embellishment:</label>
+            <select id="embellishment-type">
+                <option value="embroidery">Embroidery</option>
+                <option value="dtg">DTG</option>
+                <option value="screen-print">Screen Print</option>
+                <option value="cap-embroidery">Cap Embroidery</option>
+                <option value="dtf">DTF</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="size">Size:</label>
+            <select id="size">
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L" selected>L</option>
+                <option value="XL">XL</option>
+                <option value="2XL">2XL</option>
+            </select>
+            
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" value="5" min="1">
+            
+            <label for="price">Unit Price:</label>
+            <input type="number" id="price" value="19.99" step="0.01">
+        </div>
+        <div class="test-controls">
+            <button id="add-test-item-btn">Add Test Item</button>
+        </div>
+        <div id="add-item-result" class="result-area">Results will appear here...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Cart Functions</h2>
+        <div class="test-controls">
+            <button id="get-cart-items-btn">Get Cart Items</button>
+            <button id="get-cart-count-btn">Get Cart Count</button>
+            <button id="get-cart-total-btn">Get Cart Total</button>
+            <button id="get-embellishment-types-btn">Get Embellishment Types</button>
+        </div>
+        <div id="cart-functions-result" class="result-area">Results will appear here...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Cart Display</h2>
+        <div class="test-controls">
+            <button id="render-cart-btn">Render Cart</button>
+            <button id="update-cart-ui-btn">Update Cart UI</button>
+        </div>
+        <div id="cart-display">
+            <div id="cart-items-container"></div>
+            <div id="empty-cart-message" style="display: none;">
+                <h3>Your shopping box is empty</h3>
+                <p>Add items to your cart to get started.</p>
+            </div>
+            <div id="cart-summary" style="display: none;">
+                <h3>Order Summary</h3>
+                <div>
+                    <span>Subtotal:</span>
+                    <span id="cart-subtotal">$0.00</span>
+                </div>
+                <div>
+                    <span>Total:</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Include cart.js -->
+    <script src="cart.js"></script>
+    
+    <script>
+        // DOM Elements
+        const cartStateResult = document.getElementById('cart-state-result');
+        const addItemResult = document.getElementById('add-item-result');
+        const cartFunctionsResult = document.getElementById('cart-functions-result');
+        
+        // Helper function to display results
+        function displayResult(element, data, isError = false) {
+            if (element) {
+                element.innerHTML = '';
+                
+                if (isError) {
+                    element.innerHTML = `<span class="error">ERROR: ${data}</span>`;
+                } else {
+                    if (typeof data === 'object') {
+                        element.innerHTML = `<span class="success">SUCCESS</span>\n${JSON.stringify(data, null, 2)}`;
+                    } else {
+                        element.innerHTML = `<span class="success">SUCCESS</span>\n${data}`;
+                    }
+                }
+            }
+        }
+        
+        // 1. Cart State Tests
+        document.getElementById('get-cart-state-btn').addEventListener('click', () => {
+            try {
+                // Access the internal cartState directly for testing
+                const cartState = window.NWCACart ? window.NWCACart.getCartState() : null;
+                
+                if (!cartState) {
+                    displayResult(cartStateResult, 'NWCACart not initialized or cartState not available', true);
+                    return;
+                }
+                
+                displayResult(cartStateResult, cartState);
+            } catch (error) {
+                displayResult(cartStateResult, error.message, true);
+            }
+        });
+        
+        document.getElementById('clear-cart-state-btn').addEventListener('click', () => {
+            try {
+                if (!window.NWCACart) {
+                    displayResult(cartStateResult, 'NWCACart not initialized', true);
+                    return;
+                }
+                
+                window.NWCACart.clearCart();
+                displayResult(cartStateResult, 'Cart state cleared');
+            } catch (error) {
+                displayResult(cartStateResult, error.message, true);
+            }
+        });
+        
+        // 2. Add Test Item
+        document.getElementById('add-test-item-btn').addEventListener('click', async () => {
+            try {
+                if (!window.NWCACart) {
+                    displayResult(addItemResult, 'NWCACart not initialized', true);
+                    return;
+                }
+                
+                const styleNumber = document.getElementById('style-number').value;
+                const color = document.getElementById('color').value;
+                const embellishmentType = document.getElementById('embellishment-type').value;
+                const size = document.getElementById('size').value;
+                const quantity = parseInt(document.getElementById('quantity').value);
+                const unitPrice = parseFloat(document.getElementById('price').value);
+                
+                // Create test item
+                const testItem = {
+                    styleNumber,
+                    color,
+                    embellishmentType,
+                    embellishmentOptions: {
+                        stitchCount: embellishmentType === 'embroidery' ? 8000 : undefined,
+                        location: embellishmentType === 'embroidery' ? 'left-chest' : 'front',
+                        colorCount: embellishmentType === 'screen-print' ? 1 : undefined,
+                        colorType: embellishmentType === 'dtg' ? 'full-color' : undefined
+                    },
+                    sizes: [{
+                        size,
+                        quantity,
+                        unitPrice
+                    }]
+                };
+                
+                // Add to cart
+                const result = await window.NWCACart.addToCart(testItem);
+                
+                if (result.success) {
+                    displayResult(addItemResult, {
+                        message: 'Item added to cart successfully',
+                        itemId: result.itemId,
+                        item: testItem
+                    });
+                } else {
+                    displayResult(addItemResult, result.error || 'Unknown error', true);
+                }
+            } catch (error) {
+                displayResult(addItemResult, error.message, true);
+            }
+        });
+        
+        // 3. Cart Functions Tests
+        document.getElementById('get-cart-items-btn').addEventListener('click', () => {
+            try {
+                if (!window.NWCACart) {
+                    displayResult(cartFunctionsResult, 'NWCACart not initialized', true);
+                    return;
+                }
+                
+                const items = window.NWCACart.getCartItems();
+                displayResult(cartFunctionsResult, {
+                    count: items.length,
+                    items
+                });
+            } catch (error) {
+                displayResult(cartFunctionsResult, error.message, true);
+            }
+        });
+        
+        document.getElementById('get-cart-count-btn').addEventListener('click', () => {
+            try {
+                if (!window.NWCACart) {
+                    displayResult(cartFunctionsResult, 'NWCACart not initialized', true);
+                    return;
+                }
+                
+                const count = window.NWCACart.getCartCount();
+                displayResult(cartFunctionsResult, {
+                    count,
+                    message: count > 0 ? 'Items found in cart' : 'No items in cart'
+                });
+            } catch (error) {
+                displayResult(cartFunctionsResult, error.message, true);
+            }
+        });
+        
+        document.getElementById('get-cart-total-btn').addEventListener('click', () => {
+            try {
+                if (!window.NWCACart) {
+                    displayResult(cartFunctionsResult, 'NWCACart not initialized', true);
+                    return;
+                }
+                
+                const total = window.NWCACart.getCartTotal();
+                displayResult(cartFunctionsResult, {
+                    total: `$${total.toFixed(2)}`,
+                    message: total > 0 ? 'Cart has value' : 'Cart is empty or has zero value'
+                });
+            } catch (error) {
+                displayResult(cartFunctionsResult, error.message, true);
+            }
+        });
+        
+        document.getElementById('get-embellishment-types-btn').addEventListener('click', () => {
+            try {
+                if (!window.NWCACart) {
+                    displayResult(cartFunctionsResult, 'NWCACart not initialized', true);
+                    return;
+                }
+                
+                const types = window.NWCACart.getEmbellishmentTypes();
+                displayResult(cartFunctionsResult, {
+                    count: types.length,
+                    types
+                });
+            } catch (error) {
+                displayResult(cartFunctionsResult, error.message, true);
+            }
+        });
+        
+        // 4. Cart Display Tests
+        document.getElementById('render-cart-btn').addEventListener('click', async () => {
+            try {
+                if (!window.NWCACart) {
+                    alert('NWCACart not initialized');
+                    return;
+                }
+                
+                const cartItemsContainer = document.getElementById('cart-items-container');
+                const emptyCartMessage = document.getElementById('empty-cart-message');
+                const cartSummary = document.getElementById('cart-summary');
+                
+                // Clear container
+                cartItemsContainer.innerHTML = '';
+                
+                // Get cart items
+                const items = window.NWCACart.getCartItems();
+                
+                if (!items || items.length === 0) {
+                    emptyCartMessage.style.display = 'block';
+                    cartSummary.style.display = 'none';
+                    return;
+                }
+                
+                emptyCartMessage.style.display = 'none';
+                
+                // Render items
+                items.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    
+                    let sizesHtml = '';
+                    let totalItemPrice = 0;
+                    
+                    if (item.sizes && Array.isArray(item.sizes)) {
+                        item.sizes.forEach(size => {
+                            const sizePrice = (size.quantity || 0) * (size.unitPrice || 0);
+                            totalItemPrice += sizePrice;
+                            
+                            sizesHtml += `
+                                <div>
+                                    <span>${size.size}: ${size.quantity} x $${size.unitPrice?.toFixed(2) || '0.00'}</span>
+                                    <span>$${sizePrice.toFixed(2)}</span>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    itemElement.innerHTML = `
+                        <h4>${item.styleNumber} - ${item.color}</h4>
+                        <p>Embellishment: ${item.embellishmentType}</p>
+                        <div>
+                            <h5>Sizes:</h5>
+                            ${sizesHtml}
+                        </div>
+                        <p>Item Total: $${totalItemPrice.toFixed(2)}</p>
+                    `;
+                    
+                    cartItemsContainer.appendChild(itemElement);
+                });
+                
+                // Update summary
+                const total = window.NWCACart.getCartTotal();
+                document.getElementById('cart-subtotal').textContent = `$${total.toFixed(2)}`;
+                document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+                cartSummary.style.display = 'block';
+            } catch (error) {
+                alert(`Error rendering cart: ${error.message}`);
+                console.error('Error rendering cart:', error);
+            }
+        });
+        
+        document.getElementById('update-cart-ui-btn').addEventListener('click', () => {
+            try {
+                if (!window.NWCACart) {
+                    alert('NWCACart not initialized');
+                    return;
+                }
+                
+                // This would normally be called by the cart.js updateCartUI function
+                // For testing, we'll call it directly
+                if (typeof window.NWCACart.updateCartUI === 'function') {
+                    window.NWCACart.updateCartUI();
+                    alert('Cart UI updated');
+                } else {
+                    alert('updateCartUI function not available');
+                }
+            } catch (error) {
+                alert(`Error updating cart UI: ${error.message}`);
+                console.error('Error updating cart UI:', error);
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if NWCACart is available
+            if (!window.NWCACart) {
+                alert('Warning: NWCACart not initialized. Make sure cart.js is loaded correctly.');
+            }
+        });
+    </script>
+</body>
+</html>

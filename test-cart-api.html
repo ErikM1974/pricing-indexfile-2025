@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .test-controls {
+            margin-bottom: 15px;
+        }
+        .test-controls button {
+            padding: 8px 15px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .test-controls button:hover {
+            background-color: #003d7e;
+        }
+        .result-area {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            min-height: 100px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+        input, select {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        label {
+            margin-right: 5px;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cart API Test</h1>
+    <p>This page tests the cart API endpoints to help diagnose issues with the cart functionality.</p>
+    
+    <div class="test-section">
+        <h2>1. Test Cart Session</h2>
+        <div class="test-controls">
+            <button id="get-session-btn">Get Session ID</button>
+            <button id="create-session-btn">Create New Session</button>
+            <button id="clear-session-btn">Clear Session</button>
+        </div>
+        <div id="session-result" class="result-area">Results will appear here...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test Cart Items</h2>
+        <div class="input-group">
+            <label for="session-id">Session ID:</label>
+            <input type="text" id="session-id" placeholder="Enter session ID">
+        </div>
+        <div class="test-controls">
+            <button id="get-items-btn">Get Cart Items</button>
+            <button id="add-test-item-btn">Add Test Item</button>
+            <button id="clear-items-btn">Clear Items</button>
+        </div>
+        <div id="items-result" class="result-area">Results will appear here...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test LocalStorage</h2>
+        <div class="test-controls">
+            <button id="view-storage-btn">View LocalStorage</button>
+            <button id="clear-storage-btn">Clear LocalStorage</button>
+        </div>
+        <div id="storage-result" class="result-area">Results will appear here...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Test Cart Count</h2>
+        <div class="test-controls">
+            <button id="get-count-btn">Get Cart Count</button>
+        </div>
+        <div id="count-result" class="result-area">Results will appear here...</div>
+    </div>
+    
+    <script>
+        // API Base URL
+        const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+        
+        // Storage keys
+        const STORAGE_KEYS = {
+            sessionId: 'nwca_cart_session_id',
+            cartItems: 'nwca_cart_items'
+        };
+        
+        // DOM Elements
+        const sessionResult = document.getElementById('session-result');
+        const itemsResult = document.getElementById('items-result');
+        const storageResult = document.getElementById('storage-result');
+        const countResult = document.getElementById('count-result');
+        const sessionIdInput = document.getElementById('session-id');
+        
+        // Helper function to display results
+        function displayResult(element, data, isError = false) {
+            if (element) {
+                element.innerHTML = '';
+                
+                if (isError) {
+                    element.innerHTML = `<span class="error">ERROR: ${data}</span>`;
+                } else {
+                    if (typeof data === 'object') {
+                        element.innerHTML = `<span class="success">SUCCESS</span>\n${JSON.stringify(data, null, 2)}`;
+                    } else {
+                        element.innerHTML = `<span class="success">SUCCESS</span>\n${data}`;
+                    }
+                }
+            }
+        }
+        
+        // 1. Session Tests
+        document.getElementById('get-session-btn').addEventListener('click', async () => {
+            try {
+                const sessionId = localStorage.getItem(STORAGE_KEYS.sessionId);
+                
+                if (!sessionId) {
+                    displayResult(sessionResult, 'No session ID found in localStorage', true);
+                    return;
+                }
+                
+                // Verify session exists on server
+                const response = await fetch(`${API_BASE_URL}/cart-sessions?sessionID=${sessionId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const sessions = await response.json();
+                
+                if (!sessions || sessions.length === 0) {
+                    displayResult(sessionResult, `Session ID ${sessionId} exists in localStorage but not on server`, true);
+                } else {
+                    displayResult(sessionResult, {
+                        sessionId,
+                        serverData: sessions
+                    });
+                }
+            } catch (error) {
+                displayResult(sessionResult, error.message, true);
+            }
+        });
+        
+        document.getElementById('create-session-btn').addEventListener('click', async () => {
+            try {
+                // Create a new session
+                const response = await fetch(`${API_BASE_URL}/cart-sessions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        IsActive: true,
+                        CreatedDate: new Date().toISOString()
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const session = await response.json();
+                
+                // Save to localStorage
+                localStorage.setItem(STORAGE_KEYS.sessionId, session.SessionID);
+                
+                // Initialize empty cart
+                const cartData = {
+                    sessionId: session.SessionID,
+                    items: [],
+                    created: new Date().toISOString()
+                };
+                localStorage.setItem(STORAGE_KEYS.cartItems, JSON.stringify(cartData));
+                
+                displayResult(sessionResult, {
+                    message: 'New session created and saved to localStorage',
+                    session
+                });
+                
+                // Update session ID input
+                sessionIdInput.value = session.SessionID;
+            } catch (error) {
+                displayResult(sessionResult, error.message, true);
+            }
+        });
+        
+        document.getElementById('clear-session-btn').addEventListener('click', () => {
+            localStorage.removeItem(STORAGE_KEYS.sessionId);
+            displayResult(sessionResult, 'Session ID cleared from localStorage');
+        });
+        
+        // 2. Cart Items Tests
+        document.getElementById('get-items-btn').addEventListener('click', async () => {
+            try {
+                const sessionId = sessionIdInput.value || localStorage.getItem(STORAGE_KEYS.sessionId);
+                
+                if (!sessionId) {
+                    displayResult(itemsResult, 'No session ID provided', true);
+                    return;
+                }
+                
+                // Get items from localStorage
+                let localItems = [];
+                try {
+                    const storedData = localStorage.getItem(STORAGE_KEYS.cartItems);
+                    if (storedData) {
+                        const cartData = JSON.parse(storedData);
+                        if (cartData && cartData.items && Array.isArray(cartData.items)) {
+                            localItems = cartData.items;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error parsing localStorage data:', e);
+                }
+                
+                // Get items from server
+                const response = await fetch(`${API_BASE_URL}/cart-items?sessionID=${sessionId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const serverItems = await response.json();
+                
+                // Get sizes for each server item
+                const serverItemsWithSizes = await Promise.all(serverItems.map(async (item) => {
+                    try {
+                        const sizesResponse = await fetch(`${API_BASE_URL}/cart-item-sizes?cartItemID=${item.CartItemID}`);
+                        
+                        if (sizesResponse.ok) {
+                            const sizes = await sizesResponse.json();
+                            return { ...item, sizes };
+                        }
+                        
+                        return item;
+                    } catch (error) {
+                        console.error(`Error fetching sizes for item ${item.CartItemID}:`, error);
+                        return item;
+                    }
+                }));
+                
+                displayResult(itemsResult, {
+                    localItems,
+                    serverItems: serverItemsWithSizes
+                });
+            } catch (error) {
+                displayResult(itemsResult, error.message, true);
+            }
+        });
+        
+        document.getElementById('add-test-item-btn').addEventListener('click', async () => {
+            try {
+                const sessionId = sessionIdInput.value || localStorage.getItem(STORAGE_KEYS.sessionId);
+                
+                if (!sessionId) {
+                    displayResult(itemsResult, 'No session ID provided', true);
+                    return;
+                }
+                
+                // Create test item data
+                const testItem = {
+                    StyleNumber: 'TEST123',
+                    Color: 'Test Color',
+                    ImprintType: 'embroidery',
+                    CartStatus: 'Active',
+                    SessionID: sessionId,
+                    DateAdded: new Date().toISOString()
+                };
+                
+                // Add to server
+                const response = await fetch(`${API_BASE_URL}/cart-items`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testItem)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const newItem = await response.json();
+                
+                // Add test size
+                const testSize = {
+                    CartItemID: newItem.CartItemID,
+                    Size: 'L',
+                    Quantity: 10,
+                    UnitPrice: 15.99
+                };
+                
+                const sizeResponse = await fetch(`${API_BASE_URL}/cart-item-sizes`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testSize)
+                });
+                
+                if (!sizeResponse.ok) {
+                    throw new Error(`API Error adding size: ${sizeResponse.status} ${sizeResponse.statusText}`);
+                }
+                
+                const newSize = await sizeResponse.json();
+                
+                // Add to localStorage
+                try {
+                    const storedData = localStorage.getItem(STORAGE_KEYS.cartItems);
+                    let cartData;
+                    
+                    if (storedData) {
+                        cartData = JSON.parse(storedData);
+                        if (!cartData.items || !Array.isArray(cartData.items)) {
+                            cartData.items = [];
+                        }
+                    } else {
+                        cartData = {
+                            sessionId,
+                            items: [],
+                            created: new Date().toISOString()
+                        };
+                    }
+                    
+                    // Create local item format
+                    const localItem = {
+                        id: `item_${Date.now()}`,
+                        styleNumber: testItem.StyleNumber,
+                        color: testItem.Color,
+                        embellishmentType: testItem.ImprintType,
+                        embellishmentOptions: { stitchCount: 8000, location: 'left-chest' },
+                        dateAdded: testItem.DateAdded,
+                        status: testItem.CartStatus,
+                        sizes: [{
+                            size: testSize.Size,
+                            quantity: testSize.Quantity,
+                            unitPrice: testSize.UnitPrice
+                        }]
+                    };
+                    
+                    cartData.items.push(localItem);
+                    localStorage.setItem(STORAGE_KEYS.cartItems, JSON.stringify(cartData));
+                } catch (e) {
+                    console.error('Error updating localStorage:', e);
+                }
+                
+                displayResult(itemsResult, {
+                    message: 'Test item added to cart',
+                    serverItem: { ...newItem, sizes: [newSize] }
+                });
+            } catch (error) {
+                displayResult(itemsResult, error.message, true);
+            }
+        });
+        
+        document.getElementById('clear-items-btn').addEventListener('click', async () => {
+            try {
+                const sessionId = sessionIdInput.value || localStorage.getItem(STORAGE_KEYS.sessionId);
+                
+                if (!sessionId) {
+                    displayResult(itemsResult, 'No session ID provided', true);
+                    return;
+                }
+                
+                // Clear items from localStorage
+                try {
+                    const storedData = localStorage.getItem(STORAGE_KEYS.cartItems);
+                    if (storedData) {
+                        const cartData = JSON.parse(storedData);
+                        cartData.items = [];
+                        localStorage.setItem(STORAGE_KEYS.cartItems, JSON.stringify(cartData));
+                    }
+                } catch (e) {
+                    console.error('Error updating localStorage:', e);
+                }
+                
+                // Get items from server
+                const response = await fetch(`${API_BASE_URL}/cart-items?sessionID=${sessionId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const serverItems = await response.json();
+                
+                // Delete each item
+                for (const item of serverItems) {
+                    const deleteResponse = await fetch(`${API_BASE_URL}/cart-items/${item.CartItemID}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (!deleteResponse.ok) {
+                        console.error(`Error deleting item ${item.CartItemID}:`, deleteResponse.statusText);
+                    }
+                }
+                
+                displayResult(itemsResult, 'All cart items cleared from localStorage and server');
+            } catch (error) {
+                displayResult(itemsResult, error.message, true);
+            }
+        });
+        
+        // 3. LocalStorage Tests
+        document.getElementById('view-storage-btn').addEventListener('click', () => {
+            try {
+                const sessionId = localStorage.getItem(STORAGE_KEYS.sessionId);
+                const cartItemsStr = localStorage.getItem(STORAGE_KEYS.cartItems);
+                let cartItems;
+                
+                try {
+                    cartItems = cartItemsStr ? JSON.parse(cartItemsStr) : null;
+                } catch (e) {
+                    cartItems = { error: 'Invalid JSON', raw: cartItemsStr };
+                }
+                
+                displayResult(storageResult, {
+                    sessionId,
+                    cartItems
+                });
+            } catch (error) {
+                displayResult(storageResult, error.message, true);
+            }
+        });
+        
+        document.getElementById('clear-storage-btn').addEventListener('click', () => {
+            localStorage.removeItem(STORAGE_KEYS.sessionId);
+            localStorage.removeItem(STORAGE_KEYS.cartItems);
+            displayResult(storageResult, 'LocalStorage cleared');
+        });
+        
+        // 4. Cart Count Test
+        document.getElementById('get-count-btn').addEventListener('click', () => {
+            try {
+                // Get count from localStorage
+                let count = 0;
+                
+                try {
+                    const storedData = localStorage.getItem(STORAGE_KEYS.cartItems);
+                    if (storedData) {
+                        const cartData = JSON.parse(storedData);
+                        
+                        if (cartData.items && Array.isArray(cartData.items)) {
+                            cartData.items.forEach(item => {
+                                if (item.sizes && Array.isArray(item.sizes)) {
+                                    item.sizes.forEach(size => {
+                                        count += size.quantity || 0;
+                                    });
+                                }
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error parsing localStorage data:', e);
+                }
+                
+                displayResult(countResult, {
+                    count,
+                    message: count > 0 ? 'Items found in cart' : 'No items in cart'
+                });
+            } catch (error) {
+                displayResult(countResult, error.message, true);
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set session ID input if available
+            const sessionId = localStorage.getItem(STORAGE_KEYS.sessionId);
+            if (sessionId) {
+                sessionIdInput.value = sessionId;
+            }
+        });
+    </script>
+</body>
+</html>
