@@ -156,8 +156,11 @@ const NWCACart = (function() {
     try {
       const userAgent = navigator.userAgent;
       
+      // Generate a unique session ID
+      const generatedSessionId = 'sess_' + Math.random().toString(36).substring(2, 10);
+      
       const sessionData = {
-        SessionID: 'sess_' + Math.random().toString(36).substring(2, 10),
+        SessionID: generatedSessionId,
         CreateDate: new Date().toISOString(),
         LastActivity: new Date().toISOString(),
         UserAgent: userAgent,
@@ -166,6 +169,8 @@ const NWCACart = (function() {
       };
       
       try {
+        console.log("Creating new session with data:", sessionData);
+        
         const response = await fetch(ENDPOINTS.cartSessions.create, {
           method: 'POST',
           headers: {
@@ -175,14 +180,22 @@ const NWCACart = (function() {
         });
         
         if (response.ok) {
-          const newSession = await response.json();
-          cartState.sessionId = newSession.SessionID || sessionData.SessionID;
+          const responseData = await response.json();
+          console.log("Session creation response:", responseData);
+          
+          // The API returns a success message but doesn't include the session ID
+          // Always use our generated ID since it's what we sent to the server
+          console.log("Using generated session ID:", generatedSessionId);
+          cartState.sessionId = generatedSessionId;
+          
           localStorage.setItem(STORAGE_KEYS.sessionId, cartState.sessionId);
           cartState.items = [];
           saveToLocalStorage();
           return cartState.sessionId;
         } else {
-          throw new Error('Failed to create a new session');
+          const errorText = await response.text();
+          console.error(`Failed to create session: ${response.status} ${errorText}`);
+          throw new Error(`Failed to create a new session: ${response.status}`);
         }
       } catch (apiError) {
         console.error('API error creating session, falling back to local session:', apiError);
@@ -658,7 +671,46 @@ const NWCACart = (function() {
         throw new Error(`Failed to add item to cart: ${response.status} ${errorText}`);
       }
       
-      const newCartItem = await response.json();
+      const newCartItemResponse = await response.json();
+      console.log("Cart item creation response:", newCartItemResponse);
+      
+      // The API doesn't return the cart item ID, we need to fetch it
+      let cartItemId;
+      
+      try {
+        // Get the cart items for this session to find the one we just created
+        const itemsResponse = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
+        
+        if (!itemsResponse.ok) {
+          throw new Error(`Failed to fetch cart items after creation: ${itemsResponse.status}`);
+        }
+        
+        const items = await itemsResponse.json();
+        console.log("Retrieved cart items after creation:", items);
+        
+        if (items && Array.isArray(items) && items.length > 0) {
+          // Find the item with matching style number and color that we just added
+          const matchingItems = items.filter(item =>
+            item.StyleNumber === productData.styleNumber &&
+            item.Color === productData.color &&
+            item.ImprintType === productData.embellishmentType
+          );
+          
+          if (matchingItems.length > 0) {
+            // Use the most recently added item (should be the one we just created)
+            const newItem = matchingItems[matchingItems.length - 1];
+            cartItemId = newItem.CartItemID;
+            console.log("Found cart item ID:", cartItemId);
+          } else {
+            throw new Error('No matching cart item found after creation');
+          }
+        } else {
+          throw new Error('No cart items found after creation');
+        }
+      } catch (fetchError) {
+        console.error('Error fetching cart item ID:', fetchError);
+        throw new Error('Failed to get cart item ID after creation');
+      }
       
       // Add sizes
       const sizes = [];
@@ -673,7 +725,7 @@ const NWCACart = (function() {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              CartItemID: newCartItem.CartItemID,
+              CartItemID: cartItemId,
               Size: sizeData.size,
               Quantity: sizeData.quantity,
               UnitPrice: sizeData.unitPrice,
@@ -695,18 +747,29 @@ const NWCACart = (function() {
       
       if (sizeErrors.length > 0) {
         // If there were errors adding sizes, delete the cart item
-        await fetch(ENDPOINTS.cartItems.delete(newCartItem.CartItemID), {
+        await fetch(ENDPOINTS.cartItems.delete(cartItemId), {
           method: 'DELETE'
         });
         
         throw new Error(`Failed to add sizes:\n${sizeErrors.join('\n')}`);
       }
       
-      // Add to local cart state
-      cartState.items.push({
-        ...newCartItem,
+      // Get the full item with sizes to add to local state
+      const itemWithSizes = {
+        CartItemID: cartItemId,
+        SessionID: cartState.sessionId,
+        ProductID: productData.productId || '',
+        StyleNumber: productData.styleNumber,
+        Color: productData.color,
+        ImprintType: productData.embellishmentType,
+        EmbellishmentOptions: JSON.stringify(productData.embellishmentOptions || {}),
+        DateAdded: new Date().toISOString(),
+        CartStatus: 'Active',
         sizes: sizes
-      });
+      };
+      
+      // Add to local cart state
+      cartState.items.push(itemWithSizes);
       
       // Save to localStorage
       saveToLocalStorage();
