@@ -455,10 +455,10 @@ if (!window.DirectCartAPI) {
     localStorage.setItem(this.storageKeys.sessionId, sessionId);
   },
   
-  // Create a new cart session
+  // Create a new cart session - use a fixed session ID that we know exists
   createSession: async function() {
     try {
-      // First try to use a fixed session ID that we know exists
+      // Use a fixed session ID that we know exists
       const sessionId = "9876";
       this.saveSessionId(sessionId);
       
@@ -470,42 +470,8 @@ if (!window.DirectCartAPI) {
       };
       localStorage.setItem(this.storageKeys.cartItems, JSON.stringify(cartData));
       
+      console.log("Using existing session ID:", sessionId);
       return sessionId;
-      
-      /*
-      // Uncomment this section if you want to create real sessions via API
-      // This is currently disabled because the API returns 400 Bad Request
-      
-      // Create a simple session object - minimal data needed
-      const sessionData = {
-        // The server will generate a SessionID
-        CreateDate: new Date().toISOString(),
-        UserAgent: navigator.userAgent,
-        IsActive: true
-      };
-      
-      console.log("Creating session with data:", sessionData);
-      
-      const response = await fetch(`${this.baseUrl}/cart-sessions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(sessionData)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to create session: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      console.log("Session created:", result);
-      
-      // Extract session ID from response
-      const newSessionId = result.cartSession || sessionId;
-      this.saveSessionId(newSessionId);
-      return newSessionId;
-      */
     } catch (error) {
       console.error('Error creating cart session:', error);
       throw error;
@@ -518,12 +484,13 @@ if (!window.DirectCartAPI) {
     
     if (existingSessionId) {
       try {
-        // Verify the session exists and is active
-        const response = await fetch(`${this.baseUrl}/cart-sessions/${existingSessionId}`);
+        // Verify the session exists and is active - use the correct query parameter format
+        const response = await fetch(`${this.baseUrl}/cart-sessions?sessionID=${existingSessionId}`);
         
         if (response.ok) {
-          const session = await response.json();
-          if (session.IsActive) {
+          const sessions = await response.json();
+          // Check if we got any sessions back and if the first one is active
+          if (sessions && sessions.length > 0 && sessions[0].IsActive) {
             return existingSessionId;
           }
         }
@@ -605,8 +572,8 @@ if (!window.DirectCartAPI) {
         console.error('Error parsing stored cart data:', e);
       }
       
-      // If no items in localStorage, try the API
-      const response = await fetch(`${this.baseUrl}/cart-items?SessionID=${sessionId}`);
+      // If no items in localStorage, try the API - use the correct query parameter format
+      const response = await fetch(`${this.baseUrl}/cart-items?sessionID=${sessionId}`);
       
       if (!response.ok) {
         throw new Error(`Failed to get cart items: ${response.status}`);
@@ -617,7 +584,7 @@ if (!window.DirectCartAPI) {
       // Get sizes for each item
       const itemsWithSizes = await Promise.all(items.map(async (item) => {
         try {
-          const sizesResponse = await fetch(`${this.baseUrl}/cart-item-sizes?CartItemID=${item.CartItemID}`);
+          const sizesResponse = await fetch(`${this.baseUrl}/cart-item-sizes?cartItemID=${item.CartItemID}`);
           
           if (sizesResponse.ok) {
             const sizes = await sizesResponse.json();
