@@ -164,10 +164,80 @@ function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
     container.appendChild(script);
 }
 
+// Load cart.js script
+function loadCartScript() {
+    return new Promise((resolve, reject) => {
+        // Check if NWCACart is already defined
+        if (window.NWCACart) {
+            console.log('NWCACart already loaded');
+            resolve();
+            return;
+        }
+        
+        // Create script element
+        const script = document.createElement('script');
+        script.src = '/cart.js';
+        script.async = true;
+        
+        // Add event listeners
+        script.onload = () => {
+            console.log('Cart script loaded successfully');
+            resolve();
+        };
+        
+        script.onerror = () => {
+            console.error('Error loading cart script');
+            reject(new Error('Failed to load cart script'));
+        };
+        
+        // Add to document
+        document.head.appendChild(script);
+    });
+}
+
+// Load cart integration script
+function loadCartIntegrationScript() {
+    return new Promise((resolve, reject) => {
+        // Check if already loaded
+        if (window.cartIntegrationInitialized) {
+            console.log('Cart integration already initialized');
+            resolve();
+            return;
+        }
+        
+        // Create script element
+        const script = document.createElement('script');
+        script.src = '/cart-integration.js';
+        script.async = true;
+        
+        // Add event listeners
+        script.onload = () => {
+            console.log('Cart integration script loaded successfully');
+            resolve();
+        };
+        
+        script.onerror = () => {
+            console.error('Error loading cart integration script');
+            reject(new Error('Failed to load cart integration script'));
+        };
+        
+        // Add to document
+        document.head.appendChild(script);
+    });
+}
+
 // Initialize the page
-function initPricingPage() {
+async function initPricingPage() {
     updateProductContext();
     updateTabNavigation();
+    
+    // Load cart scripts
+    try {
+        await loadCartScript();
+        await loadCartIntegrationScript();
+    } catch (error) {
+        console.error('Error loading cart scripts:', error);
+    }
     
     // Load the appropriate Caspio embed based on the page
     const styleNumber = getUrlParameter('StyleNumber');
