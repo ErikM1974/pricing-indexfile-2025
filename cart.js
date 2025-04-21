@@ -328,6 +328,7 @@ const NWCACart = (function() {
       cartState.loading = true;
       triggerEvent('cartUpdated');
       
+      let serverItems = [];
       try {
         // Get the latest cart items from the server
         const response = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
@@ -338,7 +339,7 @@ const NWCACart = (function() {
         }
         
         // The API returns items for the session
-        let serverItems = await response.json();
+        serverItems = await response.json();
         
         if (!serverItems || !Array.isArray(serverItems)) {
           console.warn('API returned non-array items:', serverItems);
@@ -375,6 +376,11 @@ const NWCACart = (function() {
         
         // Use the server items with sizes
         serverItems = serverItemsWithSizes;
+      } catch (apiError) {
+        console.warn('API error during sync, using localStorage only:', apiError);
+        // Continue using localStorage data
+        serverItems = [];
+      }
       
       // Simplified sync strategy:
       // 1. If server has items, use them
