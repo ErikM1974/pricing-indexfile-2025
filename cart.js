@@ -6,31 +6,31 @@
  */
 const NWCACart = (function() {
   // API endpoints
-  const API_BASE_URL = '/api';
+  const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
   const ENDPOINTS = {
     cartSessions: {
       getAll: `${API_BASE_URL}/cart-sessions`,
-      getById: (id) => `${API_BASE_URL}/cart-sessions/${id}`,
+      getById: (id) => `${API_BASE_URL}/cart-sessions?sessionID=${id}`,
       create: `${API_BASE_URL}/cart-sessions`,
       update: (id) => `${API_BASE_URL}/cart-sessions/${id}`,
       delete: (id) => `${API_BASE_URL}/cart-sessions/${id}`
     },
     cartItems: {
       getAll: `${API_BASE_URL}/cart-items`,
-      getBySession: (sessionId) => `${API_BASE_URL}/cart-items/session/${sessionId}`,
+      getBySession: (sessionId) => `${API_BASE_URL}/cart-items?sessionID=${sessionId}`,
       create: `${API_BASE_URL}/cart-items`,
       update: (id) => `${API_BASE_URL}/cart-items/${id}`,
       delete: (id) => `${API_BASE_URL}/cart-items/${id}`
     },
     cartItemSizes: {
       getAll: `${API_BASE_URL}/cart-item-sizes`,
-      getByCartItem: (cartItemId) => `${API_BASE_URL}/cart-item-sizes/cart-item/${cartItemId}`,
+      getByCartItem: (cartItemId) => `${API_BASE_URL}/cart-item-sizes?cartItemID=${cartItemId}`,
       create: `${API_BASE_URL}/cart-item-sizes`,
       update: (id) => `${API_BASE_URL}/cart-item-sizes/${id}`,
       delete: (id) => `${API_BASE_URL}/cart-item-sizes/${id}`
     },
     inventory: {
-      getByStyleAndColor: (styleNumber, color) => 
+      getByStyleAndColor: (styleNumber, color) =>
         `${API_BASE_URL}/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color)}`
     }
   };
@@ -64,6 +64,9 @@ const NWCACart = (function() {
     try {
       cartState.loading = true;
       
+      // Load items from localStorage first
+      loadFromLocalStorage();
+      
       // Check if we have a session ID in localStorage
       const storedSessionId = localStorage.getItem(STORAGE_KEYS.sessionId);
       
@@ -73,34 +76,35 @@ const NWCACart = (function() {
           const response = await fetch(ENDPOINTS.cartSessions.getById(storedSessionId));
           
           if (response.ok) {
-            const session = await response.json();
+            const sessions = await response.json();
             
-            // Check if the session is still active
-            if (session.IsActive) {
+            // Check if we got any sessions back and if the first one is active
+            if (sessions && sessions.length > 0 && sessions[0].IsActive) {
               cartState.sessionId = storedSessionId;
               await loadCartItems();
             } else {
               // Session is no longer active, create a new one
-              await createNewSession();
+              await createLocalSession();
             }
           } else {
             // Session not found or other error, create a new one
-            await createNewSession();
+            await createLocalSession();
           }
         } catch (error) {
           console.error('Error retrieving session:', error);
-          await createNewSession();
+          await createLocalSession();
         }
       } else {
         // No stored session ID, create a new one
-        await createNewSession();
+        await createLocalSession();
       }
       
-      // Load items from localStorage as a backup/cache
-      loadFromLocalStorage();
-      
-      // Sync with server (this will update the localStorage if needed)
-      await syncWithServer();
+      // Try to sync with server (this will update the localStorage if needed)
+      try {
+        await syncWithServer();
+      } catch (error) {
+        console.warn('Could not sync with server, using local storage only:', error);
+      }
       
       cartState.loading = false;
       triggerEvent('cartUpdated');
@@ -116,11 +120,44 @@ const NWCACart = (function() {
    * Create a new cart session
    * @returns {Promise<void>}
    */
+  /**
+   * Create a new session locally without API
+   * @returns {Promise<string>}
+   */
+  async function createLocalSession() {
+    try {
+      // Generate a random session ID
+      const sessionId = 'local_' + Math.random().toString(36).substring(2, 15) +
+                        Math.random().toString(36).substring(2, 15);
+      
+      cartState.sessionId = sessionId;
+      localStorage.setItem(STORAGE_KEYS.sessionId, sessionId);
+      
+      // Initialize empty cart if not already loaded
+      if (!cartState.items || !Array.isArray(cartState.items)) {
+        cartState.items = [];
+      }
+      
+      saveToLocalStorage();
+      console.log('Created local session:', sessionId);
+      return sessionId;
+    } catch (error) {
+      console.error('Error creating local session:', error);
+      cartState.error = 'Unable to create a shopping cart session';
+      throw error;
+    }
+  }
+
+  /**
+   * Create a new cart session via API
+   * @returns {Promise<string>}
+   */
   async function createNewSession() {
     try {
       const userAgent = navigator.userAgent;
       
       const sessionData = {
+        SessionID: 'sess_' + Math.random().toString(36).substring(2, 10),
         CreateDate: new Date().toISOString(),
         LastActivity: new Date().toISOString(),
         UserAgent: userAgent,
@@ -128,26 +165,33 @@ const NWCACart = (function() {
         IsActive: true
       };
       
-      const response = await fetch(ENDPOINTS.cartSessions.create, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(sessionData)
-      });
-      
-      if (response.ok) {
-        const newSession = await response.json();
-        cartState.sessionId = newSession.SessionID;
-        localStorage.setItem(STORAGE_KEYS.sessionId, newSession.SessionID);
-        cartState.items = [];
-        saveToLocalStorage();
-      } else {
-        throw new Error('Failed to create a new session');
+      try {
+        const response = await fetch(ENDPOINTS.cartSessions.create, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(sessionData)
+        });
+        
+        if (response.ok) {
+          const newSession = await response.json();
+          cartState.sessionId = newSession.SessionID || sessionData.SessionID;
+          localStorage.setItem(STORAGE_KEYS.sessionId, cartState.sessionId);
+          cartState.items = [];
+          saveToLocalStorage();
+          return cartState.sessionId;
+        } else {
+          throw new Error('Failed to create a new session');
+        }
+      } catch (apiError) {
+        console.error('API error creating session, falling back to local session:', apiError);
+        return await createLocalSession();
       }
     } catch (error) {
       console.error('Error creating new session:', error);
       cartState.error = 'Unable to create a shopping cart session';
+      throw error;
     }
   }
 
@@ -158,25 +202,68 @@ const NWCACart = (function() {
   async function loadCartItems() {
     if (!cartState.sessionId) return;
     
+    // If this is a local session, just use localStorage
+    if (cartState.sessionId.startsWith('local_')) {
+      console.log('Using local session, skipping API call for cart items');
+      return;
+    }
+    
     try {
       // Show loading state
       cartState.loading = true;
       triggerEvent('cartUpdated');
       
-      const response = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to load cart items: ${response.status} ${errorText}`);
+      try {
+        const response = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to load cart items: ${response.status} ${errorText}`);
+        }
+        
+        // The API returns items for the session
+        const items = await response.json();
+        
+        if (!items || !Array.isArray(items)) {
+          console.warn('API returned non-array items:', items);
+          return;
+        }
+        
+        // For each item, get its sizes
+        const itemsWithSizes = await Promise.all(items.map(async (item) => {
+          try {
+            const sizesResponse = await fetch(ENDPOINTS.cartItemSizes.getByCartItem(item.CartItemID));
+            
+            if (sizesResponse.ok) {
+              const sizes = await sizesResponse.json();
+              return {
+                ...item,
+                sizes: Array.isArray(sizes) ? sizes : []
+              };
+            }
+            
+            return {
+              ...item,
+              sizes: []
+            };
+          } catch (sizeError) {
+            console.error(`Error fetching sizes for item ${item.CartItemID}:`, sizeError);
+            return {
+              ...item,
+              sizes: []
+            };
+          }
+        }));
+        
+        cartState.items = itemsWithSizes;
+        cartState.error = null;
+        
+        // Save to localStorage
+        saveToLocalStorage();
+      } catch (apiError) {
+        console.warn('API error loading cart items, using localStorage:', apiError);
+        // Keep using the items from localStorage that were loaded in initializeCart
       }
-      
-      // The updated API now returns items with their sizes already included
-      const itemsWithSizes = await response.json();
-      cartState.items = itemsWithSizes;
-      cartState.error = null;
-      
-      // Save to localStorage
-      saveToLocalStorage();
     } catch (error) {
       console.error('Error loading cart items:', error);
       cartState.error = 'Unable to load your cart items. Please try again later.';
@@ -227,6 +314,12 @@ const NWCACart = (function() {
       return { success: false, error: 'No active session' };
     }
     
+    // If this is a local session, don't try to sync with server
+    if (cartState.sessionId.startsWith('local_')) {
+      console.log('Using local session, skipping server sync');
+      return { success: true, error: null };
+    }
+    
     // Reset error state
     cartState.error = null;
     
@@ -235,16 +328,53 @@ const NWCACart = (function() {
       cartState.loading = true;
       triggerEvent('cartUpdated');
       
-      // Get the latest cart items from the server
-      const response = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to sync with server: ${response.status} ${errorText}`);
-      }
-      
-      // The updated API now returns items with their sizes already included
-      const serverItems = await response.json();
+      try {
+        // Get the latest cart items from the server
+        const response = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to sync with server: ${response.status} ${errorText}`);
+        }
+        
+        // The API returns items for the session
+        let serverItems = await response.json();
+        
+        if (!serverItems || !Array.isArray(serverItems)) {
+          console.warn('API returned non-array items:', serverItems);
+          cartState.loading = false;
+          triggerEvent('cartUpdated');
+          return { success: false, error: 'Invalid server response' };
+        }
+        
+        // For each server item, get its sizes
+        const serverItemsWithSizes = await Promise.all(serverItems.map(async (item) => {
+          try {
+            const sizesResponse = await fetch(ENDPOINTS.cartItemSizes.getByCartItem(item.CartItemID));
+            
+            if (sizesResponse.ok) {
+              const sizes = await sizesResponse.json();
+              return {
+                ...item,
+                sizes: Array.isArray(sizes) ? sizes : []
+              };
+            }
+            
+            return {
+              ...item,
+              sizes: []
+            };
+          } catch (sizeError) {
+            console.error(`Error fetching sizes for item ${item.CartItemID}:`, sizeError);
+            return {
+              ...item,
+              sizes: []
+            };
+          }
+        }));
+        
+        // Use the server items with sizes
+        serverItems = serverItemsWithSizes;
       
       // Simplified sync strategy:
       // 1. If server has items, use them

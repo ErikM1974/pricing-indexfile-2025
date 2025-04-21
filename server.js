@@ -15,13 +15,12 @@ app.use(express.static(__dirname));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Caspio API configuration
-const CASPIO_API_BASE_URL = process.env.CASPIO_API_BASE_URL || 'https://c3eku948.caspio.com/rest/v2';
-const CASPIO_API_KEY = process.env.CASPIO_API_KEY || 'your-caspio-api-key';
+// API configuration
+const API_BASE_URL = process.env.API_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
 
-// Helper function to make authenticated requests to Caspio API
+// Helper function to make requests to the API
 async function makeApiRequest(endpoint, method = 'GET', body = null) {
-  const url = `${CASPIO_API_BASE_URL}${endpoint}`;
+  const url = `${API_BASE_URL}${endpoint}`;
   const options = {
     method,
     headers: {
@@ -34,6 +33,7 @@ async function makeApiRequest(endpoint, method = 'GET', body = null) {
   }
   
   try {
+    console.log(`Making ${method} request to: ${url}`);
     const response = await fetch(url, options);
     
     if (!response.ok) {
