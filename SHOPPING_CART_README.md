@@ -1,194 +1,204 @@
-# Shopping Cart Implementation for Northwest Custom Apparel
+# Northwest Custom Apparel Shopping Cart
 
-This document provides instructions for setting up and using the shopping cart feature for the Northwest Custom Apparel online catalog.
+This is a comprehensive shopping cart implementation for Northwest Custom Apparel that integrates with Caspio tables through the API proxy. The shopping cart allows customers to add products with different embellishment types, manage quantities, and submit quote requests.
 
-## Overview
+## Features
 
-The shopping cart implementation allows customers to:
+- **Session Management**: Maintains cart sessions across page visits
+- **Embellishment Types**: Supports multiple embellishment types:
+  - Embroidery
+  - Cap Embroidery
+  - DTG (Direct to Garment)
+  - Screen Print
+- **Inventory Validation**: Checks inventory before adding items to cart
+- **Save for Later**: Allows customers to save their cart for future use
+- **Multi-step Checkout**: Three-step checkout process (Cart → Ship → Review)
+- **Quote Generation**: Creates quote requests in Caspio
 
-1. Add products to their cart
-2. View and modify their cart contents
-3. Enter customer information
-4. Submit a quote request to Northwest Custom Apparel
+## Files
 
-The implementation uses:
-- Frontend: HTML, CSS, JavaScript
-- Backend: Node.js with Express
-- Data Storage: Caspio tables (Cart_Sessions, Cart_Items, Cart_Item_Sizes, Customer_Info, Orders)
+- **cart.js**: Core shopping cart functionality
+- **add-to-cart.js**: Reusable component for adding items to cart
+- **cart.html**: Shopping cart page with checkout process
+- **cart-styles.css**: Styling for the cart page
+- **server.js**: API endpoints for interacting with Caspio tables
 
-## Setup Instructions
+## Setup
 
-### 1. Install Dependencies
+### Prerequisites
 
-```bash
-npm install
-```
+- Node.js and npm installed
+- Caspio account with the required tables set up
 
-This will install the required dependencies:
-- express
-- node-fetch
-- body-parser
-- dotenv
+### Installation
 
-### 2. Configure Environment Variables
-
-Update the `.env` file with your Caspio API credentials:
-
-```
-CASPIO_API_BASE_URL=https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api
-CASPIO_API_KEY=your-caspio-api-key-here
-PORT=3000
-```
-
-Replace `your-caspio-api-key-here` with your actual Caspio API key.
-
-### 3. Start the Server
-
-```bash
-npm start
-```
-
-The server will start on port 3000 (or the port specified in your .env file).
-
-## Using the Shopping Cart
-
-### Adding "Add to Cart" Functionality to Product Pages
-
-1. Include the add-to-cart.js script in your product page:
-
-```html
-<script src="add-to-cart.js"></script>
-```
-
-2. Add a container for the "Add to Cart" button:
-
-```html
-<div id="add-to-cart-container"></div>
-```
-
-3. Create a function that returns the product data:
-
-```javascript
-function getProductData() {
-    // Get selected sizes and quantities
-    const sizes = [];
-    const sizeInputs = document.querySelectorAll('.size-input');
-    
-    sizeInputs.forEach(input => {
-        const size = input.dataset.size;
-        const quantity = parseInt(input.value) || 0;
-        
-        if (quantity > 0) {
-            sizes.push({
-                size: size,
-                quantity: quantity,
-                unitPrice: parseFloat(input.dataset.price)
-            });
-        }
-    });
-    
-    // Get product details
-    return {
-        productId: document.getElementById('product-id').value,
-        styleNumber: document.getElementById('style-number').textContent,
-        color: document.getElementById('selected-color').value,
-        imprintType: document.querySelector('input[name="imprint-type"]:checked').value,
-        sizes: sizes
-    };
-}
-```
-
-4. Initialize the "Add to Cart" button:
-
-```javascript
-document.addEventListener('DOMContentLoaded', function() {
-    window.addToCartModule.createAddToCartButton('add-to-cart-container', getProductData);
-});
-```
-
-### Adding Cart Icon to Navigation
-
-Add the following HTML to your navigation bar:
-
-```html
-<a href="cart.html" class="cart-icon">
-    🛒
-    <span class="cart-count" id="cart-count">0</span>
-</a>
-```
-
-### Customizing the Cart Page
-
-The cart.html page is already set up with the following features:
-- Cart item display
-- Quantity adjustment
-- Item removal
-- Customer information form
-- Order review
-- Quote submission
-
-You can customize the styling by modifying cart-styles.css.
+1. Clone the repository
+2. Install dependencies:
+   ```
+   npm install
+   ```
+3. Create a `.env` file with the following variables:
+   ```
+   CASPIO_API_BASE_URL=https://c3eku948.caspio.com/rest/v2
+   CASPIO_API_KEY=your-caspio-api-key-here
+   
+   PORT=3000
+   ```
+4. Start the server:
+   ```
+   npm start
+   ```
 
 ## API Endpoints
 
-The server provides the following API endpoints:
+The shopping cart interacts with the following API endpoints:
 
 ### Cart Sessions
-- GET /api/cart-sessions - Get all cart sessions
-- GET /api/cart-sessions/:id - Get a specific cart session
-- POST /api/cart-sessions - Create a new cart session
-- PUT /api/cart-sessions/:id - Update a cart session
-- DELETE /api/cart-sessions/:id - Delete a cart session
+
+- `GET /api/cart-sessions`: Get all cart sessions
+- `GET /api/cart-sessions/:id`: Get a specific cart session
+- `POST /api/cart-sessions`: Create a new cart session
+- `PUT /api/cart-sessions/:id`: Update a cart session
+- `DELETE /api/cart-sessions/:id`: Delete a cart session
 
 ### Cart Items
-- GET /api/cart-items - Get all cart items
-- GET /api/cart-items/session/:sessionId - Get cart items for a specific session
-- POST /api/cart-items - Create a new cart item
-- PUT /api/cart-items/:id - Update a cart item
-- DELETE /api/cart-items/:id - Delete a cart item
+
+- `GET /api/cart-items`: Get all cart items
+- `GET /api/cart-items/session/:sessionId`: Get cart items for a specific session
+- `POST /api/cart-items`: Create a new cart item
+- `PUT /api/cart-items/:id`: Update a cart item
+- `DELETE /api/cart-items/:id`: Delete a cart item
 
 ### Cart Item Sizes
-- GET /api/cart-item-sizes - Get all cart item sizes
-- GET /api/cart-item-sizes/cart-item/:cartItemId - Get sizes for a specific cart item
-- POST /api/cart-item-sizes - Create a new cart item size
-- PUT /api/cart-item-sizes/:id - Update a cart item size
-- DELETE /api/cart-item-sizes/:id - Delete a cart item size
+
+- `GET /api/cart-item-sizes`: Get all cart item sizes
+- `GET /api/cart-item-sizes/cart-item/:cartItemId`: Get sizes for a specific cart item
+- `POST /api/cart-item-sizes`: Create a new cart item size
+- `PUT /api/cart-item-sizes/:id`: Update a cart item size
+- `DELETE /api/cart-item-sizes/:id`: Delete a cart item size
 
 ### Customers
-- GET /api/customers - Get all customers
-- GET /api/customers/email/:email - Get a customer by email
-- POST /api/customers - Create a new customer
-- PUT /api/customers/:id - Update a customer
+
+- `GET /api/customers`: Get all customers
+- `GET /api/customers/email/:email`: Get a customer by email
+- `POST /api/customers`: Create a new customer
+- `PUT /api/customers/:id`: Update a customer
 
 ### Orders
-- POST /api/orders - Create a new order
 
-## Data Flow
+- `GET /api/orders`: Get all orders
+- `GET /api/orders/:id`: Get a specific order
+- `POST /api/orders`: Create a new order
+- `PUT /api/orders/:id`: Update an order
 
-1. When a user adds an item to the cart:
-   - A cart session is created (or an existing one is used)
-   - A cart item is created with the product details
-   - Cart item sizes are created with the selected sizes and quantities
+### Inventory
 
-2. When a user submits a quote request:
-   - Customer information is saved to the Customer_Info table
-   - An order is created in the Orders table
-   - Cart items are updated with the order ID and marked as "Converted"
-   - The cart session is marked as inactive
+- `GET /api/inventory?styleNumber=:styleNumber&color=:color`: Get inventory for a specific style and color
 
-## Troubleshooting
+## Usage
 
-### Cart Not Loading
-- Check that the Caspio API key is correct in the .env file
-- Verify that the Caspio tables are set up correctly
-- Check the browser console for any JavaScript errors
+### Adding the "Add to Cart" Button to Product Pages
 
-### Items Not Being Added to Cart
-- Verify that the product data is being collected correctly
-- Check that the API endpoints are working properly
-- Ensure that the session ID is being stored in localStorage
+1. Include the required scripts:
+   ```html
+   <script src="cart.js"></script>
+   <script src="add-to-cart.js"></script>
+   ```
 
-### Quote Submission Failing
-- Check that all required customer information is being provided
-- Verify that the Orders table is set up correctly
-- Check the server logs for any API errors
+2. Add the embellishment type selection:
+   ```html
+   <div class="embellishment-selection">
+     <h3>Select Embellishment Type:</h3>
+     <div class="embellishment-options">
+       <label><input type="radio" name="embellishment-type" value="embroidery" checked> Embroidery</label>
+       <label><input type="radio" name="embellishment-type" value="cap-embroidery"> Cap Embroidery</label>
+       <label><input type="radio" name="embellishment-type" value="dtg"> DTG</label>
+       <label><input type="radio" name="embellishment-type" value="screen-print"> Screen Print</label>
+     </div>
+   </div>
+   ```
+
+3. Add containers for embellishment options and the "Add to Cart" button:
+   ```html
+   <div id="embellishment-options-container"></div>
+   <div id="add-to-cart-container"></div>
+   ```
+
+4. Add size and quantity inputs to your inventory display:
+   ```html
+   <input type="number" class="qty-input" data-size="S" data-price="15.99" data-warehouse="Seattle, WA" min="0" max="100">
+   ```
+
+### Customizing the Shopping Cart
+
+The shopping cart can be customized by modifying the following files:
+
+- **cart-styles.css**: Change the appearance of the cart
+- **cart.html**: Modify the structure of the cart page
+- **cart.js**: Adjust the behavior of the cart
+
+## Embellishment Options
+
+Each embellishment type has specific options that are stored in the `EmbellishmentOptions` field of the Cart_Items table:
+
+### Embroidery
+```json
+{
+  "stitchCount": 8000,
+  "location": "left-chest"
+}
+```
+
+### Cap Embroidery
+```json
+{
+  "stitchCount": 8000,
+  "location": "front"
+}
+```
+
+### DTG
+```json
+{
+  "location": "FF",
+  "colorType": "full-color"
+}
+```
+
+### Screen Print
+```json
+{
+  "colorCount": 3,
+  "additionalLocations": [
+    {
+      "location": "back",
+      "colorCount": 1
+    }
+  ],
+  "requiresWhiteBase": true,
+  "specialInk": false
+}
+```
+
+## Session Synchronization
+
+The cart uses a hybrid approach for session storage:
+
+1. **localStorage**: Stores session ID and cart items for fast access
+2. **Caspio Database**: Stores complete cart details for persistence
+3. **Synchronization**: Syncs between localStorage and the database when:
+   - The cart is initialized
+   - Items are added, updated, or removed
+   - The user navigates to the cart page
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature-name`
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

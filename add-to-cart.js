@@ -1,137 +1,20 @@
-// Add to Cart functionality for product pages
+// add-to-cart.js - Reusable Add to Cart button component
 
 /**
- * Add a product to the cart
- * @param {Object} productData - Product data object
- * @param {string} productData.productId - Product ID
- * @param {string} productData.styleNumber - Style number
- * @param {string} productData.color - Color
- * @param {string} productData.imprintType - Imprint type (Embroidery, Cap Embroidery, Screen Print, DTG, DTF)
- * @param {Array} productData.sizes - Array of size objects with size, quantity, and unitPrice
- * @returns {Promise<boolean>} - True if successful, false otherwise
+ * Add to Cart Button Component
+ * Creates an "Add to Cart" button that can be added to product pages
  */
-async function addToCart(productData) {
-    try {
-        // Validate product data
-        if (!productData.productId || !productData.styleNumber || !productData.color || !productData.imprintType) {
-            console.error('Missing required product data');
-            return false;
-        }
-
-        if (!productData.sizes || !Array.isArray(productData.sizes) || productData.sizes.length === 0) {
-            console.error('No sizes specified');
-            return false;
-        }
-
-        // Check if any sizes have a quantity
-        const hasSizes = productData.sizes.some(size => size.quantity > 0);
-        if (!hasSizes) {
-            console.error('No quantities specified');
-            return false;
-        }
-
-        // Filter out sizes with zero quantity
-        const sizesWithQuantity = productData.sizes.filter(size => size.quantity > 0);
-        
-        // Create a modified product data object with only sizes that have quantity
-        const modifiedProductData = {
-            ...productData,
-            sizes: sizesWithQuantity
-        };
-
-        // If window.addToCart exists (from cart.js), use it
-        if (window.addToCart) {
-            return await window.addToCart(modifiedProductData);
-        } else {
-            // Otherwise, make a direct API call
-            // First, check if we have a session ID in localStorage
-            let sessionId = localStorage.getItem('nwca_cart_session_id');
-            
-            if (!sessionId) {
-                // Create a new session
-                const sessionResponse = await fetch('/api/cart-sessions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        CreateDate: new Date().toISOString(),
-                        LastActivity: new Date().toISOString(),
-                        UserAgent: navigator.userAgent,
-                        IsActive: true
-                    })
-                });
-                
-                if (!sessionResponse.ok) {
-                    throw new Error('Failed to create session');
-                }
-                
-                const sessionData = await sessionResponse.json();
-                sessionId = sessionData.SessionID;
-                localStorage.setItem('nwca_cart_session_id', sessionId);
-            }
-            
-            // Create cart item
-            const cartItemResponse = await fetch('/api/cart-items', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    SessionID: sessionId,
-                    ProductID: modifiedProductData.productId,
-                    StyleNumber: modifiedProductData.styleNumber,
-                    Color: modifiedProductData.color,
-                    ImprintType: modifiedProductData.imprintType,
-                    DateAdded: new Date().toISOString(),
-                    CartStatus: 'Active'
-                })
-            });
-            
-            if (!cartItemResponse.ok) {
-                throw new Error('Failed to create cart item');
-            }
-            
-            const cartItemData = await cartItemResponse.json();
-            
-            // Add sizes
-            for (const size of modifiedProductData.sizes) {
-                const sizeResponse = await fetch('/api/cart-item-sizes', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        CartItemID: cartItemData.CartItemID,
-                        Size: size.size,
-                        Quantity: size.quantity,
-                        UnitPrice: size.unitPrice
-                    })
-                });
-                
-                if (!sizeResponse.ok) {
-                    throw new Error('Failed to add size to cart item');
-                }
-            }
-            
-            return true;
-        }
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        return false;
-    }
-}
-
-/**
- * Create an "Add to Cart" button
- * @param {string} containerId - ID of the container element
- * @param {Function} getProductDataFn - Function that returns the product data
- */
-function createAddToCartButton(containerId, getProductDataFn) {
+const AddToCartButton = (function() {
+  /**
+   * Create an "Add to Cart" button
+   * @param {string} containerId - ID of the container element
+   * @param {Function} getProductDataFn - Function that returns the product data
+   */
+  function createButton(containerId, getProductDataFn) {
     const container = document.getElementById(containerId);
     if (!container) {
-        console.error(`Container element with ID "${containerId}" not found`);
-        return;
+      console.error(`Container element with ID "${containerId}" not found`);
+      return;
     }
     
     // Create the button
@@ -139,53 +22,436 @@ function createAddToCartButton(containerId, getProductDataFn) {
     button.className = 'add-to-cart-btn';
     button.innerHTML = 'Add to Cart';
     
+    // Create error message container
+    const errorContainer = document.createElement('div');
+    errorContainer.className = 'add-to-cart-error';
+    errorContainer.style.display = 'none';
+    errorContainer.style.color = '#dc3545';
+    errorContainer.style.marginTop = '10px';
+    errorContainer.style.fontSize = '14px';
+    
     // Add click event listener
     button.addEventListener('click', async () => {
-        // Show loading state
-        button.disabled = true;
-        button.innerHTML = 'Adding...';
+      // Clear previous errors
+      errorContainer.style.display = 'none';
+      errorContainer.textContent = '';
+      
+      // Show loading state
+      button.disabled = true;
+      button.innerHTML = 'Adding...';
+      
+      // Get product data
+      const productData = getProductDataFn();
+      
+      // Add to cart
+      const result = await NWCACart.addToCart(productData);
+      
+      // Reset button state
+      button.disabled = false;
+      
+      if (result.success) {
+        // Show success message
+        button.innerHTML = 'Added to Cart ✓';
+        setTimeout(() => {
+          button.innerHTML = 'Add to Cart';
+        }, 2000);
+      } else {
+        // Show error message
+        button.innerHTML = 'Error - Try Again';
         
-        // Get product data
-        const productData = getProductDataFn();
-        
-        // Add to cart
-        const success = await addToCart(productData);
-        
-        // Reset button state
-        button.disabled = false;
-        
-        if (success) {
-            // Show success message
-            button.innerHTML = 'Added to Cart ✓';
-            setTimeout(() => {
-                button.innerHTML = 'Add to Cart';
-            }, 2000);
-            
-            // Update cart count if it exists
-            const cartCountEl = document.getElementById('cart-count');
-            if (cartCountEl) {
-                const currentCount = parseInt(cartCountEl.textContent) || 0;
-                let totalQuantity = 0;
-                productData.sizes.forEach(size => {
-                    totalQuantity += size.quantity;
-                });
-                cartCountEl.textContent = currentCount + totalQuantity;
-            }
-        } else {
-            // Show error message
-            button.innerHTML = 'Error - Try Again';
-            setTimeout(() => {
-                button.innerHTML = 'Add to Cart';
-            }, 2000);
+        if (result.error) {
+          errorContainer.textContent = result.error;
+          errorContainer.style.display = 'block';
         }
+        
+        setTimeout(() => {
+          button.innerHTML = 'Add to Cart';
+        }, 2000);
+      }
     });
+    
+    // Add the error container after the button
+    container.appendChild(errorContainer);
     
     // Add the button to the container
     container.appendChild(button);
-}
+  }
+  
+  /**
+   * Get embellishment options based on type
+   * @param {string} embellishmentType - Embellishment type
+   * @param {Object} formData - Form data from embellishment options form
+   * @returns {Object} - Embellishment options
+   */
+  function getEmbellishmentOptions(embellishmentType, formData) {
+    switch (embellishmentType) {
+      case 'embroidery':
+        return {
+          stitchCount: parseInt(formData.stitchCount || 8000),
+          location: formData.location || 'left-chest'
+        };
+        
+      case 'cap-embroidery':
+        return {
+          stitchCount: parseInt(formData.stitchCount || 8000),
+          location: formData.location || 'front'
+        };
+        
+      case 'dtg':
+        return {
+          location: formData.location || 'FF',
+          colorType: formData.colorType || 'full-color'
+        };
+        
+      case 'screen-print':
+        const additionalLocations = [];
+        
+        if (formData.additionalLocations) {
+          for (const location of formData.additionalLocations) {
+            additionalLocations.push({
+              location: location.location,
+              colorCount: parseInt(location.colorCount || 1)
+            });
+          }
+        }
+        
+        return {
+          colorCount: parseInt(formData.colorCount || 1),
+          additionalLocations: additionalLocations,
+          requiresWhiteBase: formData.requiresWhiteBase === true || formData.requiresWhiteBase === 'true',
+          specialInk: formData.specialInk === true || formData.specialInk === 'true'
+        };
+        
+      default:
+        return {};
+    }
+  }
+  
+  /**
+   * Create embellishment options form
+   * @param {string} containerId - ID of the container element
+   * @param {string} embellishmentType - Embellishment type
+   * @returns {HTMLFormElement} - Form element
+   */
+  function createEmbellishmentOptionsForm(containerId, embellishmentType) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+      console.error(`Container element with ID "${containerId}" not found`);
+      return null;
+    }
+    
+    // Clear container
+    container.innerHTML = '';
+    
+    // Create form
+    const form = document.createElement('form');
+    form.className = 'embellishment-options-form';
+    form.id = 'embellishment-options-form';
+    
+    // Add form fields based on embellishment type
+    switch (embellishmentType) {
+      case 'embroidery':
+        form.innerHTML = `
+          <div class="form-group">
+            <label for="stitch-count">Stitch Count:</label>
+            <select id="stitch-count" name="stitchCount" class="form-control">
+              <option value="8000" selected>8,000 Stitches (Standard)</option>
+              <option value="5000">5,000 Stitches (Low)</option>
+              <option value="10000">10,000 Stitches (High)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="location">Location:</label>
+            <select id="location" name="location" class="form-control">
+              <option value="left-chest" selected>Left Chest</option>
+              <option value="right-chest">Right Chest</option>
+              <option value="full-back">Full Back</option>
+              <option value="left-sleeve">Left Sleeve</option>
+              <option value="right-sleeve">Right Sleeve</option>
+            </select>
+          </div>
+        `;
+        break;
+        
+      case 'cap-embroidery':
+        form.innerHTML = `
+          <div class="form-group">
+            <label for="stitch-count">Stitch Count:</label>
+            <select id="stitch-count" name="stitchCount" class="form-control">
+              <option value="8000" selected>8,000 Stitches (Standard)</option>
+              <option value="5000">5,000 Stitches (Low)</option>
+              <option value="10000">10,000 Stitches (High)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="location">Location:</label>
+            <select id="location" name="location" class="form-control">
+              <option value="front" selected>Front</option>
+              <option value="side">Side</option>
+              <option value="back">Back</option>
+            </select>
+          </div>
+        `;
+        break;
+        
+      case 'dtg':
+        form.innerHTML = `
+          <div class="form-group">
+            <label for="location">Print Location:</label>
+            <select id="location" name="location" class="form-control">
+              <option value="LC">Left Chest Only</option>
+              <option value="FF" selected>Full Front Only</option>
+              <option value="FB">Full Back Only</option>
+              <option value="JF">Jumbo Front Only</option>
+              <option value="JB">Jumbo Back Only</option>
+              <option value="LC_FB">Left Chest + Full Back</option>
+              <option value="FF_FB">Full Front + Full Back</option>
+              <option value="JF_JB">Jumbo Front + Jumbo Back</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="color-type">Color Type:</label>
+            <select id="color-type" name="colorType" class="form-control">
+              <option value="full-color" selected>Full Color</option>
+              <option value="white-only">White Only</option>
+            </select>
+          </div>
+        `;
+        break;
+        
+      case 'screen-print':
+        form.innerHTML = `
+          <div class="form-group">
+            <label for="color-count">Number of Colors:</label>
+            <select id="color-count" name="colorCount" class="form-control">
+              <option value="1" selected>1 Color</option>
+              <option value="2">2 Colors</option>
+              <option value="3">3 Colors</option>
+              <option value="4">4 Colors</option>
+              <option value="5">5 Colors</option>
+              <option value="6">6 Colors</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Additional Options:</label>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="requires-white-base" name="requiresWhiteBase">
+                Requires White Base Plate (for dark garments)
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="special-ink" name="specialInk">
+                Special Ink (Reflective, Metallic, etc.)
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Additional Locations:</label>
+            <div id="additional-locations-container">
+              <!-- Additional locations will be added here -->
+            </div>
+            <button type="button" id="add-location-btn" class="btn btn-sm btn-secondary">
+              Add Location
+            </button>
+          </div>
+        `;
+        
+        // Add event listener for "Add Location" button after form is added to DOM
+        setTimeout(() => {
+          const addLocationBtn = document.getElementById('add-location-btn');
+          const additionalLocationsContainer = document.getElementById('additional-locations-container');
+          
+          if (addLocationBtn && additionalLocationsContainer) {
+            addLocationBtn.addEventListener('click', () => {
+              const locationDiv = document.createElement('div');
+              locationDiv.className = 'additional-location';
+              locationDiv.innerHTML = `
+                <div class="row">
+                  <div class="col-md-5">
+                    <select name="additionalLocationName" class="form-control form-control-sm">
+                      <option value="back" selected>Back</option>
+                      <option value="left-sleeve">Left Sleeve</option>
+                      <option value="right-sleeve">Right Sleeve</option>
+                    </select>
+                  </div>
+                  <div class="col-md-5">
+                    <select name="additionalLocationColors" class="form-control form-control-sm">
+                      <option value="1" selected>1 Color</option>
+                      <option value="2">2 Colors</option>
+                      <option value="3">3 Colors</option>
+                      <option value="4">4 Colors</option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <button type="button" class="btn btn-sm btn-danger remove-location-btn">
+                      X
+                    </button>
+                  </div>
+                </div>
+              `;
+              
+              // Add event listener for remove button
+              const removeBtn = locationDiv.querySelector('.remove-location-btn');
+              removeBtn.addEventListener('click', () => {
+                locationDiv.remove();
+              });
+              
+              additionalLocationsContainer.appendChild(locationDiv);
+            });
+          }
+        }, 0);
+        break;
+        
+      default:
+        form.innerHTML = '<p>No options available for this embellishment type.</p>';
+    }
+    
+    // Add form to container
+    container.appendChild(form);
+    
+    return form;
+  }
+  
+  /**
+   * Get form data from embellishment options form
+   * @param {string} formId - ID of the form element
+   * @returns {Object} - Form data
+   */
+  function getFormData(formId) {
+    const form = document.getElementById(formId);
+    if (!form) {
+      console.error(`Form element with ID "${formId}" not found`);
+      return {};
+    }
+    
+    const formData = {};
+    
+    // Get all form elements
+    const elements = form.elements;
+    
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i];
+      
+      // Skip buttons and elements without a name
+      if (element.type === 'button' || !element.name) {
+        continue;
+      }
+      
+      // Handle checkboxes
+      if (element.type === 'checkbox') {
+        formData[element.name] = element.checked;
+      } 
+      // Handle select elements
+      else if (element.tagName === 'SELECT') {
+        formData[element.name] = element.value;
+      }
+      // Handle other input types
+      else {
+        formData[element.name] = element.value;
+      }
+    }
+    
+    // Handle additional locations for screen printing
+    if (form.querySelector('#additional-locations-container')) {
+      const additionalLocations = [];
+      const locationDivs = form.querySelectorAll('.additional-location');
+      
+      locationDivs.forEach(div => {
+        const locationSelect = div.querySelector('select[name="additionalLocationName"]');
+        const colorSelect = div.querySelector('select[name="additionalLocationColors"]');
+        
+        if (locationSelect && colorSelect) {
+          additionalLocations.push({
+            location: locationSelect.value,
+            colorCount: parseInt(colorSelect.value)
+          });
+        }
+      });
+      
+      formData.additionalLocations = additionalLocations;
+    }
+    
+    return formData;
+  }
+  
+  // Public API
+  return {
+    createButton,
+    createEmbellishmentOptionsForm,
+    getEmbellishmentOptions,
+    getFormData
+  };
+})();
 
-// Export functions
-window.addToCartModule = {
-    addToCart,
-    createAddToCartButton
-};
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if we're on a product page
+  const addToCartContainer = document.getElementById('add-to-cart-container');
+  const embellishmentOptionsContainer = document.getElementById('embellishment-options-container');
+  const embellishmentTypeRadios = document.querySelectorAll('input[name="embellishment-type"]');
+  
+  if (addToCartContainer && embellishmentOptionsContainer && embellishmentTypeRadios.length > 0) {
+    // Add event listeners to embellishment type radios
+    embellishmentTypeRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        const selectedType = document.querySelector('input[name="embellishment-type"]:checked').value;
+        AddToCartButton.createEmbellishmentOptionsForm('embellishment-options-container', selectedType);
+      });
+    });
+    
+    // Initialize with the default selected embellishment type
+    const defaultType = document.querySelector('input[name="embellishment-type"]:checked');
+    if (defaultType) {
+      AddToCartButton.createEmbellishmentOptionsForm('embellishment-options-container', defaultType.value);
+    } else {
+      embellishmentTypeRadios[0].checked = true;
+      AddToCartButton.createEmbellishmentOptionsForm('embellishment-options-container', embellishmentTypeRadios[0].value);
+    }
+    
+    // Create the "Add to Cart" button
+    AddToCartButton.createButton('add-to-cart-container', () => {
+      // Get the selected embellishment type
+      const selectedType = document.querySelector('input[name="embellishment-type"]:checked').value;
+      
+      // Get the form data
+      const formData = AddToCartButton.getFormData('embellishment-options-form');
+      
+      // Get the embellishment options
+      const embellishmentOptions = AddToCartButton.getEmbellishmentOptions(selectedType, formData);
+      
+      // Get the product data
+      const styleNumber = document.getElementById('style-number').textContent.trim();
+      const color = document.getElementById('selected-color').textContent.trim();
+      
+      // Get the sizes and quantities
+      const sizes = [];
+      const quantityInputs = document.querySelectorAll('.qty-input');
+      
+      quantityInputs.forEach(input => {
+        if (input.value && parseInt(input.value) > 0) {
+          const size = input.dataset.size;
+          const quantity = parseInt(input.value);
+          const unitPrice = parseFloat(input.dataset.price || 0);
+          const warehouseSource = input.dataset.warehouse || '';
+          
+          sizes.push({
+            size,
+            quantity,
+            unitPrice,
+            warehouseSource
+          });
+        }
+      });
+      
+      return {
+        styleNumber,
+        color,
+        embellishmentType: selectedType,
+        embellishmentOptions,
+        sizes
+      };
+    });
+  }
+});

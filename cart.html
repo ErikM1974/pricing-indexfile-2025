@@ -3,457 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart - NW Custom Apparel</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="shortcut icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="apple-touch-icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
-    
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="pricing-pages.css">
+    <title>Shopping Cart - Northwest Custom Apparel</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="cart-styles.css">
-    
-    <style>
-        /* --- CSS Variables for Theming --- */
-        :root {
-            --primary-color: #0056b3;       /* Main blue color */
-            --primary-light: #e6f0ff;      /* Lighter blue for backgrounds/borders */
-            --secondary-color: #5cb85c;    /* Accent green color (example) */
-            --secondary-light: #eaffea;     /* Lighter green */
-            --text-color: #333;            /* Main text color (dark grey) */
-            --text-light: #666;            /* Lighter text color (medium grey) */
-            --border-color: #ddd;          /* Standard border color (light grey) */
-            --border-light: #eee;          /* Very light border/background */
-            --background-color: #fff;      /* White background */
-            --background-light: #f8f8f8;   /* Off-white/light grey background */
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
-            --shadow-md: 0 4px 8px rgba(0,0,0,0.1);  /* Medium shadow */
-            --radius-sm: 4px;              /* Small rounded corners */
-            --radius-md: 8px;              /* Medium rounded corners */
-            --spacing-xs: 5px;             /* Extra small space */
-            --spacing-sm: 10px;            /* Small space */
-            --spacing-md: 20px;            /* Medium space */
-            --spacing-lg: 30px;            /* Large space */
-            --font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Font stack */
-            --transition-fast: 0.2s ease;    /* Fast animation speed */
-            --transition-normal: 0.3s ease;  /* Normal animation speed */
-        }
-
-        body {
-            font-family: var(--font-family);
-            font-size: 14px;
-            color: var(--text-color);
-            line-height: 1.5;
-            background-color: var(--background-light);
-            margin: 0;
-        }
-        
-        /* --- Header Styling --- */
-        .site-header {
-            background: linear-gradient(to right, #003366, #0056b3);
-            color: white;
-            padding: var(--spacing-md) 0;
-            margin-bottom: var(--spacing-lg);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-md);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .site-header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .cart-icon {
-            position: relative;
-            font-size: 1.5rem;
-            color: white;
-            text-decoration: none;
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: var(--secondary-color);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        /* Main container */
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: var(--spacing-md);
-            background-color: var(--background-color);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            margin-bottom: var(--spacing-lg);
-        }
-
-        /* Page title */
-        .page-title {
-            color: var(--primary-color);
-            margin-top: 0;
-            padding-bottom: var(--spacing-sm);
-            border-bottom: 2px solid var(--primary-light);
-            font-size: 1.8rem;
-            margin-bottom: var(--spacing-md);
-        }
-
-        /* Back to shopping link */
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-        .back-link svg {
-            margin-right: 5px;
-        }
-
-        /* Empty cart message */
-        .empty-cart {
-            text-align: center;
-            padding: var(--spacing-lg);
-            color: var(--text-light);
-        }
-
-        .empty-cart h3 {
-            font-size: 1.5rem;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .empty-cart p {
-            margin-bottom: var(--spacing-md);
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary:hover {
-            background-color: #004494;
-        }
-
-        /* Loading indicator */
-        .loading {
-            text-align: center;
-            padding: var(--spacing-lg);
-        }
-
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: var(--primary-color);
-            animation: spin 1s linear infinite;
-            margin: 0 auto var(--spacing-md);
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Footer */
-        .site-footer {
-            background-color: #003366;
-            color: white;
-            padding: var(--spacing-lg) 0;
-            margin-top: var(--spacing-lg);
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-md);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-
-        .footer-section {
-            flex: 1;
-            min-width: 200px;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .footer-section h3 {
-            margin-top: 0;
-            margin-bottom: var(--spacing-sm);
-            font-size: 1.2rem;
-        }
-
-        .footer-section p {
-            margin: 0 0 var(--spacing-xs);
-        }
-
-        .footer-section a {
-            color: white;
-            text-decoration: none;
-        }
-
-        .footer-section a:hover {
-            text-decoration: underline;
-        }
-
-        .copyright {
-            text-align: center;
-            padding-top: var(--spacing-md);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            margin-top: var(--spacing-md);
-            font-size: 0.9rem;
-            width: 100%;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .site-header h1 {
-                font-size: 1.5rem;
-            }
-
-            .footer-section {
-                flex: 100%;
-            }
-        }
-    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="site-header">
-        <div class="header-container">
-            <h1>NW Custom Apparel</h1>
-            <a href="cart.html" class="cart-icon">
-                🛒
-                <span class="cart-count" id="cart-count">0</span>
-            </a>
+    <div class="container">
+        <!-- Progress Indicator -->
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Shopping Box</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Ship</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Review & Submit</div>
+                </div>
+            </div>
         </div>
-    </header>
 
-    <!-- Main Content -->
-    <div class="main-container">
-        <a href="index.html" class="back-link">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-            </svg>
-            Continue Shopping
-        </a>
+        <h1 class="my-4">My Shopping Box</h1>
 
-        <h1 class="page-title">Your Shopping Cart</h1>
-
-        <!-- Cart content will be loaded here -->
-        <div id="cart-content">
-            <!-- Loading indicator -->
-            <div class="loading">
-                <div class="spinner"></div>
+        <!-- Cart Items -->
+        <div id="cart-items-container">
+            <div class="cart-loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
                 <p>Loading your cart...</p>
             </div>
         </div>
-    </div>
 
-    <!-- Multi-step checkout process -->
-    <div class="main-container" id="checkout-container" style="display: none;">
-        <h2 class="section-title">Checkout</h2>
-        
-        <!-- Checkout steps -->
-        <div class="checkout-steps">
-            <div class="step active" data-step="cart">
-                <span class="step-number">1</span>
-                <span class="step-name">Review Cart</span>
-            </div>
-            <div class="step" data-step="customer">
-                <span class="step-number">2</span>
-                <span class="step-name">Customer Info</span>
-            </div>
-            <div class="step" data-step="review">
-                <span class="step-number">3</span>
-                <span class="step-name">Review & Submit</span>
-            </div>
+        <!-- Empty Cart Message -->
+        <div id="empty-cart-message" class="text-center py-5" style="display: none;">
+            <h3>Your shopping box is empty</h3>
+            <p>Add items to your cart to get started.</p>
+            <a href="index.html" class="btn btn-primary mt-3">Continue Shopping</a>
         </div>
-        
-        <!-- Step content containers -->
-        <div class="step-content" id="step-cart">
-            <!-- Cart summary will be shown here -->
-        </div>
-        
-        <div class="step-content" id="step-customer" style="display: none;">
-            <form id="customer-form">
-                <div class="form-section">
-                    <h3>Contact Information</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="name">Full Name *</label>
-                            <input type="text" id="name" name="name" required>
+
+        <!-- Cart Summary -->
+        <div id="cart-summary" class="card mt-4" style="display: none;">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Order Summary</h4>
+                        <div class="d-flex justify-content-between">
+                            <span>Subtotal:</span>
+                            <span id="cart-subtotal">$0.00</span>
                         </div>
-                        <div class="form-group">
-                            <label for="email">Email Address *</label>
-                            <input type="email" id="email" name="email" required>
+                        <div class="d-flex justify-content-between ltm-fee-row" style="display: none !important;">
+                            <span>Less Than Minimum Fee:</span>
+                            <span id="ltm-fee">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between font-weight-bold mt-2">
+                            <span>Total:</span>
+                            <span id="cart-total">$0.00</span>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone">
-                        </div>
-                        <div class="form-group">
-                            <label for="company">Company Name</label>
-                            <input type="text" id="company" name="company">
+                    <div class="col-md-6 text-right">
+                        <div class="cart-actions">
+                            <a href="index.html" class="btn btn-outline-secondary">Continue Shopping</a>
+                            <button id="save-for-later-btn" class="btn btn-outline-primary">Save for Later</button>
+                            <button id="proceed-to-checkout-btn" class="btn btn-primary">Continue Checkout</button>
                         </div>
                     </div>
                 </div>
-                
-                <div class="form-section">
-                    <h3>Shipping Address</h3>
-                    <div class="form-group">
-                        <label for="address1">Address Line 1</label>
-                        <input type="text" id="address1" name="address1">
-                    </div>
-                    <div class="form-group">
-                        <label for="address2">Address Line 2</label>
-                        <input type="text" id="address2" name="address2">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="city">City</label>
-                            <input type="text" id="city" name="city">
-                        </div>
-                        <div class="form-group">
-                            <label for="state">State</label>
-                            <input type="text" id="state" name="state">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="zipcode">Zip Code</label>
-                            <input type="text" id="zipcode" name="zipcode">
-                        </div>
-                        <div class="form-group">
-                            <label for="country">Country</label>
-                            <input type="text" id="country" name="country" value="USA">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-section">
-                    <h3>Additional Information</h3>
-                    <div class="form-group">
-                        <label for="notes">Order Notes</label>
-                        <textarea id="notes" name="notes" rows="4" placeholder="Any special instructions or requirements for your order?"></textarea>
-                    </div>
-                </div>
-            </form>
-        </div>
-        
-        <div class="step-content" id="step-review" style="display: none;">
-            <!-- Order review will be shown here -->
-            <div class="review-section">
-                <h3>Order Summary</h3>
-                <div id="review-cart-summary"></div>
-            </div>
-            
-            <div class="review-section">
-                <h3>Customer Information</h3>
-                <div id="review-customer-info"></div>
-            </div>
-            
-            <div class="review-section">
-                <h3>Submit Your Quote Request</h3>
-                <p>By submitting this quote request, you are not placing a final order. Our team will review your request and contact you to confirm details and finalize your order.</p>
-                <div class="form-group">
-                    <input type="checkbox" id="terms-agree" name="terms-agree" required>
-                    <label for="terms-agree">I agree to be contacted by Northwest Custom Apparel regarding my quote request.</label>
-                </div>
             </div>
         </div>
-        
-        <!-- Navigation buttons -->
-        <div class="checkout-navigation">
-            <button type="button" id="prev-step" class="btn btn-secondary" style="display: none;">Previous</button>
-            <button type="button" id="next-step" class="btn btn-primary">Continue to Customer Information</button>
-            <button type="button" id="submit-order" class="btn btn-success" style="display: none;">Submit Quote Request</button>
+
+        <!-- Saved Items -->
+        <div id="saved-items-container" class="mt-5" style="display: none;">
+            <h2>Saved for Later</h2>
+            <div id="saved-items-list"></div>
         </div>
     </div>
 
-    <!-- Order confirmation (hidden initially) -->
-    <div class="main-container" id="confirmation-container" style="display: none;">
-        <div class="confirmation-message">
-            <h2>Thank You for Your Quote Request!</h2>
-            <p>Your quote request has been submitted successfully. Our team will review your request and contact you shortly.</p>
-            <p><strong>Quote Reference:</strong> <span id="quote-reference"></span></p>
-            <div class="confirmation-details">
-                <h3>What Happens Next?</h3>
-                <ol>
-                    <li>Our team will review your quote request within 1 business day.</li>
-                    <li>We'll contact you via email or phone to confirm details and discuss any customization options.</li>
-                    <li>Once confirmed, we'll send you a final quote for approval.</li>
-                    <li>After your approval, we'll process your order and provide you with production and delivery timelines.</li>
-                </ol>
+    <!-- Cart Item Template -->
+    <template id="cart-item-template">
+        <div class="cart-item card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <img src="" alt="" class="cart-item-image img-fluid">
+                    </div>
+                    <div class="col-md-4">
+                        <h5 class="cart-item-title"></h5>
+                        <p class="cart-item-style">Style #: <span></span></p>
+                        <p class="cart-item-color">Color: <span></span></p>
+                        <div class="cart-item-embellishment">
+                            <p class="cart-item-embellishment-type">Embellishment: <span></span></p>
+                            <div class="cart-item-embellishment-options"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Sizes & Quantities</h6>
+                        <div class="cart-item-sizes"></div>
+                    </div>
+                    <div class="col-md-2 text-right">
+                        <button class="btn btn-sm btn-danger remove-item-btn">Remove</button>
+                    </div>
+                </div>
             </div>
-            <p>If you have any questions, please contact us at <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a> or call <strong>253-922-5793</strong>.</p>
-            <a href="index.html" class="btn btn-primary">Return to Catalog</a>
+        </div>
+    </template>
+
+    <!-- Size Item Template -->
+    <template id="size-item-template">
+        <div class="size-item d-flex justify-content-between align-items-center mb-2">
+            <span class="size-label"></span>
+            <div class="quantity-control">
+                <button class="btn btn-sm btn-outline-secondary quantity-decrease">-</button>
+                <input type="number" class="form-control quantity-input" min="0" max="999">
+                <button class="btn btn-sm btn-outline-secondary quantity-increase">+</button>
+            </div>
+            <span class="size-price"></span>
+        </div>
+    </template>
+
+    <!-- Shipping Form (Step 2) -->
+    <div id="shipping-form-container" class="mt-4" style="display: none;">
+        <h2>Shipping Details</h2>
+        <form id="shipping-form">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Contact Information</h4>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="customer-name">Full Name *</label>
+                            <input type="text" id="customer-name" name="name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="customer-email">Email Address *</label>
+                            <input type="email" id="customer-email" name="email" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="customer-phone">Phone Number *</label>
+                            <input type="tel" id="customer-phone" name="phone" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="customer-company">Company</label>
+                            <input type="text" id="customer-company" name="company" class="form-control">
+                        </div>
+                    </div>
+
+                    <h4 class="mt-4">Shipping Address</h4>
+                    <div class="form-group">
+                        <label for="customer-address1">Address Line 1 *</label>
+                        <input type="text" id="customer-address1" name="address1" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-address2">Address Line 2</label>
+                        <input type="text" id="customer-address2" name="address2" class="form-control">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label for="customer-city">City *</label>
+                            <input type="text" id="customer-city" name="city" class="form-control" required>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="customer-state">State/Province *</label>
+                            <select id="customer-state" name="state" class="form-control" required>
+                                <option value="">Select State</option>
+                                <option value="AL">Alabama</option>
+                                <option value="AK">Alaska</option>
+                                <!-- Add all states here -->
+                                <option value="WA">Washington</option>
+                                <option value="WV">West Virginia</option>
+                                <option value="WI">Wisconsin</option>
+                                <option value="WY">Wyoming</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="customer-zip">Zip/Postal Code *</label>
+                            <input type="text" id="customer-zip" name="zipCode" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-country">Country *</label>
+                        <select id="customer-country" name="country" class="form-control" required>
+                            <option value="USA" selected>United States</option>
+                            <option value="CAN">Canada</option>
+                        </select>
+                    </div>
+
+                    <h4 class="mt-4">Additional Information</h4>
+                    <div class="form-group">
+                        <label for="customer-notes">Order Notes</label>
+                        <textarea id="customer-notes" name="notes" class="form-control" rows="3" placeholder="Special instructions or requirements for your order"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" id="back-to-cart-btn" class="btn btn-outline-secondary">Back to Cart</button>
+                <button type="submit" id="continue-to-review-btn" class="btn btn-primary">Continue to Review</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Review Order (Step 3) -->
+    <div id="review-order-container" class="mt-4" style="display: none;">
+        <h2>Review & Submit Your Order</h2>
+        <p>Take one more look at your order and make sure everything looks right before you submit it.</p>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Shipping Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="review-customer-info"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Order Total</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <span>Subtotal:</span>
+                            <span id="review-subtotal">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between ltm-fee-row" style="display: none !important;">
+                            <span>Less Than Minimum Fee:</span>
+                            <span id="review-ltm-fee">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between font-weight-bold mt-2">
+                            <span>Total:</span>
+                            <span id="review-total">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4 class="mb-0">Order Items</h4>
+            </div>
+            <div class="card-body">
+                <div id="review-items-list"></div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button type="button" id="back-to-shipping-btn" class="btn btn-outline-secondary">Back to Shipping</button>
+            <button type="button" id="submit-order-btn" class="btn btn-primary">Submit Quote Request</button>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>253-922-5793</p>
-                <p>sales@nwcustomapparel.com</p>
-                <p>Milton, WA</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <p><a href="index.html">Catalog</a></p>
-                <p><a href="cart.html">Shopping Cart</a></p>
-            </div>
-            <div class="footer-section">
-                <h3>Business Hours</h3>
-                <p>Monday - Friday</p>
-                <p>9:00 AM - 5:00 PM Pacific</p>
-            </div>
-            <div class="copyright">
-                &copy; 2025 Northwest Custom Apparel. All rights reserved.
+    <!-- Order Confirmation (After submission) -->
+    <div id="order-confirmation-container" class="mt-4 text-center" style="display: none;">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-success mb-4">Thank You for Your Quote Request!</h2>
+                <div class="confirmation-icon mb-4">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#28a745" stroke-width="2"/>
+                        <path d="M8 12L11 15L16 9" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h4>Your quote request has been received!</h4>
+                <p class="mb-4">Quote Reference: <strong id="quote-reference">Q12345678</strong></p>
+                <div class="next-steps mb-4">
+                    <h5>Next Steps:</h5>
+                    <p>Our team will review your quote request and get back to you within 24 hours with pricing and production details.</p>
+                </div>
+                <div class="contact-info mb-4">
+                    <h5>Questions?</h5>
+                    <p>Contact us at <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a> or call <a href="tel:2532299214">(253) 229-9214</a></p>
+                </div>
+                <a href="index.html" class="btn btn-primary">Return to Shopping</a>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="cart.js"></script>
+    <script src="cart-ui.js"></script>
 </body>
 </html>

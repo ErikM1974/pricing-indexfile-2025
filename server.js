@@ -1,63 +1,25 @@
-require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const fetch = require('node-fetch');
+const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
+
+// Load environment variables
+dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// Caspio API configuration
-const CASPIO_API_BASE_URL = process.env.CASPIO_API_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
-const CASPIO_API_KEY = process.env.CASPIO_API_KEY || 'your-caspio-api-key';
 
 // Middleware
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve index.html as the root route
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+// Caspio API configuration
+const CASPIO_API_BASE_URL = process.env.CASPIO_API_BASE_URL || 'https://c3eku948.caspio.com/rest/v2';
+const CASPIO_API_KEY = process.env.CASPIO_API_KEY || 'your-caspio-api-key';
 
-// Serve index.html for the root route (gallery page)
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Serve product.html for the /product route (product details page)
-app.get('/product', (req, res) => {
-  res.sendFile(path.join(__dirname, 'product.html'));
-});
-
-// Serve pricing pages
-app.get('/pricing/embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'embroidery-pricing.html'));
-});
-
-app.get('/pricing/cap-embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'cap-embroidery-pricing.html'));
-});
-
-app.get('/pricing/dtg', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dtg-pricing.html'));
-});
-
-app.get('/pricing/screen-print', (req, res) => {
-  res.sendFile(path.join(__dirname, 'screen-print-pricing.html'));
-});
-
-app.get('/pricing/dtf', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dtf-pricing.html'));
-});
-
-// Serve cart.html for the /cart route
-app.get('/cart', (req, res) => {
-  res.sendFile(path.join(__dirname, 'cart.html'));
-});
-
-// API Routes for Cart Functionality
-
-// Helper function to make requests to Caspio API
+// Helper function to make authenticated requests to Caspio API
 async function makeApiRequest(endpoint, method = 'GET', body = null) {
   const url = `${CASPIO_API_BASE_URL}${endpoint}`;
   const options = {
@@ -90,6 +52,42 @@ async function makeApiRequest(endpoint, method = 'GET', body = null) {
     throw error;
   }
 }
+
+// Serve index.html as the root route
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Serve product.html for the /product route (product details page)
+app.get('/product', (req, res) => {
+  res.sendFile(path.join(__dirname, 'product.html'));
+});
+
+// Serve cart.html for the /cart route (shopping cart page)
+app.get('/cart', (req, res) => {
+  res.sendFile(path.join(__dirname, 'cart.html'));
+});
+
+// Serve pricing pages
+app.get('/pricing/embroidery', (req, res) => {
+  res.sendFile(path.join(__dirname, 'embroidery-pricing.html'));
+});
+
+app.get('/pricing/cap-embroidery', (req, res) => {
+  res.sendFile(path.join(__dirname, 'cap-embroidery-pricing.html'));
+});
+
+app.get('/pricing/dtg', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dtg-pricing.html'));
+});
+
+app.get('/pricing/screen-print', (req, res) => {
+  res.sendFile(path.join(__dirname, 'screen-print-pricing.html'));
+});
+
+app.get('/pricing/dtf', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dtf-pricing.html'));
+});
 
 // Cart Sessions API
 app.get('/api/cart-sessions', async (req, res) => {
@@ -149,10 +147,39 @@ app.get('/api/cart-items', async (req, res) => {
 
 app.get('/api/cart-items/session/:sessionId', async (req, res) => {
   try {
-    const data = await makeApiRequest(`/cart-items/session/${req.params.sessionId}`);
-    res.json(data);
+    // Get cart items for the session
+    const itemsData = await makeApiRequest(`/cart-items?filter=SessionID='${req.params.sessionId}'`);
+    
+    // If no items, return empty array
+    if (!itemsData || !Array.isArray(itemsData) || itemsData.length === 0) {
+      return res.json([]);
+    }
+    
+    // For each item, get its sizes
+    const itemsWithSizes = await Promise.all(itemsData.map(async (item) => {
+      try {
+        const sizesData = await makeApiRequest(`/cart-item-sizes?filter=CartItemID=${item.CartItemID}`);
+        return {
+          ...item,
+          sizes: sizesData || []
+        };
+      } catch (error) {
+        console.error(`Error fetching sizes for item ${item.CartItemID}:`, error);
+        return {
+          ...item,
+          sizes: [],
+          sizesError: 'Failed to load sizes for this item'
+        };
+      }
+    }));
+    
+    res.json(itemsWithSizes);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch cart items for session' });
+    console.error('Error fetching cart items:', error);
+    res.status(500).json({
+      error: 'Failed to fetch cart items for session',
+      message: error.message
+    });
   }
 });
 
@@ -195,7 +222,7 @@ app.get('/api/cart-item-sizes', async (req, res) => {
 
 app.get('/api/cart-item-sizes/cart-item/:cartItemId', async (req, res) => {
   try {
-    const data = await makeApiRequest(`/cart-item-sizes/cart-item/${req.params.cartItemId}`);
+    const data = await makeApiRequest(`/cart-item-sizes?filter=CartItemID=${req.params.cartItemId}`);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch cart item sizes' });
@@ -241,7 +268,7 @@ app.get('/api/customers', async (req, res) => {
 
 app.get('/api/customers/email/:email', async (req, res) => {
   try {
-    const data = await makeApiRequest(`/customers/email/${req.params.email}`);
+    const data = await makeApiRequest(`/customers?filter=Email='${req.params.email}'`);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch customer by email' });
@@ -267,6 +294,24 @@ app.put('/api/customers/:id', async (req, res) => {
 });
 
 // Orders API
+app.get('/api/orders', async (req, res) => {
+  try {
+    const data = await makeApiRequest('/orders');
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
+app.get('/api/orders/:id', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/orders/${req.params.id}`);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch order' });
+  }
+});
+
 app.post('/api/orders', async (req, res) => {
   try {
     const data = await makeApiRequest('/orders', 'POST', req.body);
@@ -274,6 +319,38 @@ app.post('/api/orders', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Failed to create order' });
   }
+});
+
+app.put('/api/orders/:id', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/orders/${req.params.id}`, 'PUT', req.body);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update order' });
+  }
+});
+
+// Inventory API
+app.get('/api/inventory', async (req, res) => {
+  try {
+    const { styleNumber, color } = req.query;
+    
+    if (!styleNumber || !color) {
+      return res.status(400).json({ error: 'styleNumber and color parameters are required' });
+    }
+    
+    const data = await makeApiRequest(`/inventory?filter=catalog_no='${styleNumber}' AND catalog_color='${color}'`);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch inventory' });
+  }
+});
+
+// Serve cart-integration.js for Caspio DataPages
+app.get('/api/cart-integration.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Allow cross-origin access
+  res.sendFile(path.join(__dirname, 'cart-integration.js'));
 });
 
 // Start the server

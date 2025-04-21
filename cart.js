@@ -1,905 +1,1056 @@
-// Cart functionality for Northwest Custom Apparel
+// cart.js - Client-side shopping cart implementation
 
-// API endpoints
-const API_BASE_URL = '/api'; // This will be proxied to the Caspio API
-const ENDPOINTS = {
+/**
+ * Shopping Cart Module for Northwest Custom Apparel
+ * Handles cart operations and synchronization with Caspio database
+ */
+const NWCACart = (function() {
+  // API endpoints
+  const API_BASE_URL = '/api';
+  const ENDPOINTS = {
     cartSessions: {
-        getAll: `${API_BASE_URL}/cart-sessions`,
-        getById: (id) => `${API_BASE_URL}/cart-sessions/${id}`,
-        create: `${API_BASE_URL}/cart-sessions`,
-        update: (id) => `${API_BASE_URL}/cart-sessions/${id}`,
-        delete: (id) => `${API_BASE_URL}/cart-sessions/${id}`
+      getAll: `${API_BASE_URL}/cart-sessions`,
+      getById: (id) => `${API_BASE_URL}/cart-sessions/${id}`,
+      create: `${API_BASE_URL}/cart-sessions`,
+      update: (id) => `${API_BASE_URL}/cart-sessions/${id}`,
+      delete: (id) => `${API_BASE_URL}/cart-sessions/${id}`
     },
     cartItems: {
-        getAll: `${API_BASE_URL}/cart-items`,
-        getBySession: (sessionId) => `${API_BASE_URL}/cart-items/session/${sessionId}`,
-        create: `${API_BASE_URL}/cart-items`,
-        update: (id) => `${API_BASE_URL}/cart-items/${id}`,
-        delete: (id) => `${API_BASE_URL}/cart-items/${id}`
+      getAll: `${API_BASE_URL}/cart-items`,
+      getBySession: (sessionId) => `${API_BASE_URL}/cart-items/session/${sessionId}`,
+      create: `${API_BASE_URL}/cart-items`,
+      update: (id) => `${API_BASE_URL}/cart-items/${id}`,
+      delete: (id) => `${API_BASE_URL}/cart-items/${id}`
     },
     cartItemSizes: {
-        getAll: `${API_BASE_URL}/cart-item-sizes`,
-        getByCartItem: (cartItemId) => `${API_BASE_URL}/cart-item-sizes/cart-item/${cartItemId}`,
-        create: `${API_BASE_URL}/cart-item-sizes`,
-        update: (id) => `${API_BASE_URL}/cart-item-sizes/${id}`,
-        delete: (id) => `${API_BASE_URL}/cart-item-sizes/${id}`
+      getAll: `${API_BASE_URL}/cart-item-sizes`,
+      getByCartItem: (cartItemId) => `${API_BASE_URL}/cart-item-sizes/cart-item/${cartItemId}`,
+      create: `${API_BASE_URL}/cart-item-sizes`,
+      update: (id) => `${API_BASE_URL}/cart-item-sizes/${id}`,
+      delete: (id) => `${API_BASE_URL}/cart-item-sizes/${id}`
     },
-    customers: {
-        getAll: `${API_BASE_URL}/customers`,
-        getByEmail: (email) => `${API_BASE_URL}/customers/email/${email}`,
-        create: `${API_BASE_URL}/customers`,
-        update: (id) => `${API_BASE_URL}/customers/${id}`
+    inventory: {
+      getByStyleAndColor: (styleNumber, color) => 
+        `${API_BASE_URL}/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color)}`
     }
-};
+  };
 
-// Cart state
-let cartState = {
+  // Local storage keys
+  const STORAGE_KEYS = {
+    sessionId: 'nwca_cart_session_id',
+    cartItems: 'nwca_cart_items',
+    lastSync: 'nwca_cart_last_sync'
+  };
+
+  // Cart state
+  let cartState = {
     sessionId: null,
     items: [],
-    customer: null,
     loading: true,
-    error: null
-};
+    error: null,
+    lastSync: null
+  };
 
-// DOM elements
-const cartContentEl = document.getElementById('cart-content');
-const cartCountEl = document.getElementById('cart-count');
-const checkoutContainerEl = document.getElementById('checkout-container');
-const confirmationContainerEl = document.getElementById('confirmation-container');
+  // Event listeners
+  const eventListeners = {
+    cartUpdated: []
+  };
 
-// Step navigation elements
-const prevStepBtn = document.getElementById('prev-step');
-const nextStepBtn = document.getElementById('next-step');
-const submitOrderBtn = document.getElementById('submit-order');
-const stepElements = document.querySelectorAll('.step');
-const stepContentElements = document.querySelectorAll('.step-content');
-
-// Current checkout step
-let currentStep = 'cart';
-
-// Initialize the cart
-document.addEventListener('DOMContentLoaded', async () => {
+  /**
+   * Initialize the cart
+   * @returns {Promise<void>}
+   */
+  async function initializeCart() {
     try {
-        await initializeCart();
-        updateCartDisplay();
-    } catch (error) {
-        console.error('Error initializing cart:', error);
-        showError('There was an error loading your cart. Please try again later.');
-    }
-
-    // Set up checkout navigation
-    setupCheckoutNavigation();
-});
-
-// Initialize the cart - get or create a session
-async function initializeCart() {
-    cartState.loading = true;
-    
-    // Check if we have a session ID in localStorage
-    const storedSessionId = localStorage.getItem('nwca_cart_session_id');
-    
-    if (storedSessionId) {
+      cartState.loading = true;
+      
+      // Check if we have a session ID in localStorage
+      const storedSessionId = localStorage.getItem(STORAGE_KEYS.sessionId);
+      
+      if (storedSessionId) {
         try {
-            // Try to get the session from the API
-            const response = await fetch(ENDPOINTS.cartSessions.getById(storedSessionId));
+          // Try to get the session from the API
+          const response = await fetch(ENDPOINTS.cartSessions.getById(storedSessionId));
+          
+          if (response.ok) {
+            const session = await response.json();
             
-            if (response.ok) {
-                const session = await response.json();
-                
-                // Check if the session is still active
-                if (session.IsActive) {
-                    cartState.sessionId = storedSessionId;
-                    await loadCartItems();
-                } else {
-                    // Session is no longer active, create a new one
-                    await createNewSession();
-                }
+            // Check if the session is still active
+            if (session.IsActive) {
+              cartState.sessionId = storedSessionId;
+              await loadCartItems();
             } else {
-                // Session not found or other error, create a new one
-                await createNewSession();
+              // Session is no longer active, create a new one
+              await createNewSession();
             }
-        } catch (error) {
-            console.error('Error retrieving session:', error);
+          } else {
+            // Session not found or other error, create a new one
             await createNewSession();
+          }
+        } catch (error) {
+          console.error('Error retrieving session:', error);
+          await createNewSession();
         }
-    } else {
+      } else {
         // No stored session ID, create a new one
         await createNewSession();
+      }
+      
+      // Load items from localStorage as a backup/cache
+      loadFromLocalStorage();
+      
+      // Sync with server (this will update the localStorage if needed)
+      await syncWithServer();
+      
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+    } catch (error) {
+      console.error('Error initializing cart:', error);
+      cartState.error = 'Failed to initialize cart';
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+    }
+  }
+
+  /**
+   * Create a new cart session
+   * @returns {Promise<void>}
+   */
+  async function createNewSession() {
+    try {
+      const userAgent = navigator.userAgent;
+      
+      const sessionData = {
+        CreateDate: new Date().toISOString(),
+        LastActivity: new Date().toISOString(),
+        UserAgent: userAgent,
+        IPAddress: '', // This will be set by the server
+        IsActive: true
+      };
+      
+      const response = await fetch(ENDPOINTS.cartSessions.create, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(sessionData)
+      });
+      
+      if (response.ok) {
+        const newSession = await response.json();
+        cartState.sessionId = newSession.SessionID;
+        localStorage.setItem(STORAGE_KEYS.sessionId, newSession.SessionID);
+        cartState.items = [];
+        saveToLocalStorage();
+      } else {
+        throw new Error('Failed to create a new session');
+      }
+    } catch (error) {
+      console.error('Error creating new session:', error);
+      cartState.error = 'Unable to create a shopping cart session';
+    }
+  }
+
+  /**
+   * Load cart items from the server
+   * @returns {Promise<void>}
+   */
+  async function loadCartItems() {
+    if (!cartState.sessionId) return;
+    
+    try {
+      // Show loading state
+      cartState.loading = true;
+      triggerEvent('cartUpdated');
+      
+      const response = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to load cart items: ${response.status} ${errorText}`);
+      }
+      
+      // The updated API now returns items with their sizes already included
+      const itemsWithSizes = await response.json();
+      cartState.items = itemsWithSizes;
+      cartState.error = null;
+      
+      // Save to localStorage
+      saveToLocalStorage();
+    } catch (error) {
+      console.error('Error loading cart items:', error);
+      cartState.error = 'Unable to load your cart items. Please try again later.';
+    } finally {
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+    }
+  }
+
+  /**
+   * Save cart state to localStorage
+   */
+  function saveToLocalStorage() {
+    try {
+      localStorage.setItem(STORAGE_KEYS.cartItems, JSON.stringify(cartState.items));
+      localStorage.setItem(STORAGE_KEYS.lastSync, new Date().toISOString());
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  }
+
+  /**
+   * Load cart state from localStorage
+   */
+  function loadFromLocalStorage() {
+    try {
+      const storedItems = localStorage.getItem(STORAGE_KEYS.cartItems);
+      const lastSync = localStorage.getItem(STORAGE_KEYS.lastSync);
+      
+      if (storedItems) {
+        cartState.items = JSON.parse(storedItems);
+      }
+      
+      if (lastSync) {
+        cartState.lastSync = new Date(lastSync);
+      }
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+    }
+  }
+
+  /**
+   * Synchronize cart between localStorage and server
+   * @returns {Promise<{success: boolean, error: string|null}>} - Result with success status and error message
+   */
+  async function syncWithServer() {
+    if (!cartState.sessionId) {
+      return { success: false, error: 'No active session' };
     }
     
-    cartState.loading = false;
-}
-
-// Create a new cart session
-async function createNewSession() {
+    // Reset error state
+    cartState.error = null;
+    
     try {
-        const userAgent = navigator.userAgent;
+      // Show syncing state
+      cartState.loading = true;
+      triggerEvent('cartUpdated');
+      
+      // Get the latest cart items from the server
+      const response = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to sync with server: ${response.status} ${errorText}`);
+      }
+      
+      // The updated API now returns items with their sizes already included
+      const serverItems = await response.json();
+      
+      // Simplified sync strategy:
+      // 1. If server has items, use them
+      // 2. If server has no items but local has items, push local items to server
+      
+      if (serverItems.length > 0) {
+        // Server has items, use them
+        cartState.items = serverItems;
+        cartState.error = null;
+        saveToLocalStorage();
+      } else if (cartState.items.length > 0) {
+        // Server has no items but local has items, push local items to server
+        const localItemsWithoutIds = cartState.items.filter(item => !item.CartItemID);
         
-        const sessionData = {
-            CreateDate: new Date().toISOString(),
-            LastActivity: new Date().toISOString(),
-            UserAgent: userAgent,
-            IsActive: true
-        };
+        if (localItemsWithoutIds.length === 0) {
+          // No items to sync
+          cartState.error = null;
+          cartState.loading = false;
+          triggerEvent('cartUpdated');
+          return { success: true, error: null };
+        }
         
-        const response = await fetch(ENDPOINTS.cartSessions.create, {
-            method: 'POST',
-            headers: {
+        // Track sync errors
+        const syncErrors = [];
+        
+        // Process items in parallel for better performance
+        await Promise.all(localItemsWithoutIds.map(async (item) => {
+          try {
+            // Create the item on the server
+            const itemData = {
+              SessionID: cartState.sessionId,
+              ProductID: item.ProductID || '',
+              StyleNumber: item.StyleNumber,
+              Color: item.Color,
+              ImprintType: item.ImprintType,
+              EmbellishmentOptions: JSON.stringify(item.EmbellishmentOptions || {}),
+              DateAdded: item.DateAdded || new Date().toISOString(),
+              CartStatus: item.CartStatus || 'Active',
+              OrderID: item.OrderID || null
+            };
+            
+            const createResponse = await fetch(ENDPOINTS.cartItems.create, {
+              method: 'POST',
+              headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(sessionData)
-        });
-        
-        if (response.ok) {
-            const newSession = await response.json();
-            cartState.sessionId = newSession.SessionID;
-            localStorage.setItem('nwca_cart_session_id', newSession.SessionID);
-            cartState.items = [];
-        } else {
-            throw new Error('Failed to create a new session');
-        }
-    } catch (error) {
-        console.error('Error creating new session:', error);
-        cartState.error = 'Unable to create a shopping cart session. Please try again later.';
-    }
-}
-
-// Load cart items for the current session
-async function loadCartItems() {
-    try {
-        const response = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
-        
-        if (response.ok) {
-            const items = await response.json();
-            cartState.items = [];
-            
-            // For each cart item, load its sizes
-            for (const item of items) {
-                const sizesResponse = await fetch(ENDPOINTS.cartItemSizes.getByCartItem(item.CartItemID));
-                
-                if (sizesResponse.ok) {
-                    const sizes = await sizesResponse.json();
-                    cartState.items.push({
-                        ...item,
-                        sizes: sizes
-                    });
-                }
-            }
-        } else {
-            throw new Error('Failed to load cart items');
-        }
-    } catch (error) {
-        console.error('Error loading cart items:', error);
-        cartState.error = 'Unable to load your cart items. Please try again later.';
-    }
-}
-
-// Update the cart display
-function updateCartDisplay() {
-    // Update cart count
-    updateCartCount();
-    
-    // Clear the cart content
-    cartContentEl.innerHTML = '';
-    
-    // Show loading, error, or cart content
-    if (cartState.loading) {
-        showLoading();
-    } else if (cartState.error) {
-        showError(cartState.error);
-    } else if (cartState.items.length === 0) {
-        showEmptyCart();
-    } else {
-        showCartItems();
-        // Show the checkout container
-        checkoutContainerEl.style.display = 'block';
-    }
-}
-
-// Update the cart count in the header
-function updateCartCount() {
-    let totalItems = 0;
-    
-    cartState.items.forEach(item => {
-        item.sizes.forEach(size => {
-            totalItems += size.Quantity;
-        });
-    });
-    
-    cartCountEl.textContent = totalItems;
-}
-
-// Show loading indicator
-function showLoading() {
-    cartContentEl.innerHTML = `
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Loading your cart...</p>
-        </div>
-    `;
-}
-
-// Show error message
-function showError(message) {
-    cartContentEl.innerHTML = `
-        <div class="error-message">
-            <p>${message}</p>
-            <button class="btn btn-primary" onclick="location.reload()">Try Again</button>
-        </div>
-    `;
-}
-
-// Show empty cart message
-function showEmptyCart() {
-    cartContentEl.innerHTML = `
-        <div class="empty-cart">
-            <h3>Your cart is empty</h3>
-            <p>Looks like you haven't added any items to your cart yet.</p>
-            <a href="index.html" class="btn btn-primary">Browse Catalog</a>
-        </div>
-    `;
-    
-    // Hide the checkout container
-    checkoutContainerEl.style.display = 'none';
-}
-
-// Show cart items
-function showCartItems() {
-    // Create the cart table
-    let cartHTML = `
-        <table class="cart-table">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Size</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Total</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-    
-    // Add each item to the table
-    let subtotal = 0;
-    
-    cartState.items.forEach(item => {
-        item.sizes.forEach(size => {
-            const itemTotal = size.Quantity * size.UnitPrice;
-            subtotal += itemTotal;
-            
-            cartHTML += `
-                <tr data-cart-item-id="${item.CartItemID}" data-size-item-id="${size.SizeItemID}">
-                    <td>
-                        <div class="product-info">
-                            <img src="https://via.placeholder.com/80" alt="${item.StyleNumber}" class="product-image">
-                            <div class="product-details">
-                                <div class="product-name">${item.StyleNumber}</div>
-                                <div class="product-meta">
-                                    Color: ${item.Color}<br>
-                                    Imprint: ${item.ImprintType}
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>${size.Size}</td>
-                    <td>
-                        <div class="quantity-control">
-                            <div class="quantity-btn" onclick="updateQuantity(${size.SizeItemID}, ${size.Quantity - 1})">-</div>
-                            <input type="number" class="quantity-input" value="${size.Quantity}" min="1" onchange="updateQuantity(${size.SizeItemID}, this.value)">
-                            <div class="quantity-btn" onclick="updateQuantity(${size.SizeItemID}, ${size.Quantity + 1})">+</div>
-                        </div>
-                    </td>
-                    <td>$${size.UnitPrice.toFixed(2)}</td>
-                    <td>$${itemTotal.toFixed(2)}</td>
-                    <td>
-                        <button class="remove-btn" onclick="removeItem(${size.SizeItemID})">×</button>
-                    </td>
-                </tr>
-            `;
-        });
-    });
-    
-    cartHTML += `
-            </tbody>
-        </table>
-    `;
-    
-    // Add cart summary
-    cartHTML += `
-        <div class="cart-summary">
-            <div class="summary-row">
-                <div class="summary-label">Subtotal:</div>
-                <div class="summary-value">$${subtotal.toFixed(2)}</div>
-            </div>
-            <div class="summary-row">
-                <div class="summary-label">Estimated Tax:</div>
-                <div class="summary-value">Calculated at checkout</div>
-            </div>
-            <div class="summary-row">
-                <div class="summary-label">Estimated Total:</div>
-                <div class="summary-value">$${subtotal.toFixed(2)}</div>
-            </div>
-        </div>
-        
-        <div class="cart-actions">
-            <a href="index.html" class="btn btn-secondary">Continue Shopping</a>
-            <button class="btn btn-primary" onclick="proceedToCheckout()">Proceed to Checkout</button>
-        </div>
-    `;
-    
-    cartContentEl.innerHTML = cartHTML;
-    
-    // Also update the cart summary in the checkout step
-    document.getElementById('step-cart').innerHTML = `
-        <div class="cart-summary">
-            <div class="summary-row">
-                <div class="summary-label">Items:</div>
-                <div class="summary-value">${cartState.items.length}</div>
-            </div>
-            <div class="summary-row">
-                <div class="summary-label">Subtotal:</div>
-                <div class="summary-value">$${subtotal.toFixed(2)}</div>
-            </div>
-            <div class="summary-row">
-                <div class="summary-label">Estimated Tax:</div>
-                <div class="summary-value">Calculated at checkout</div>
-            </div>
-            <div class="summary-row">
-                <div class="summary-label">Estimated Total:</div>
-                <div class="summary-value">$${subtotal.toFixed(2)}</div>
-            </div>
-        </div>
-    `;
-}
-
-// Update item quantity
-async function updateQuantity(sizeItemId, newQuantity) {
-    // Ensure quantity is at least 1
-    newQuantity = Math.max(1, parseInt(newQuantity));
-    
-    try {
-        // Find the size item in the cart state
-        let sizeItem = null;
-        let cartItem = null;
-        
-        for (const item of cartState.items) {
-            for (const size of item.sizes) {
-                if (size.SizeItemID === sizeItemId) {
-                    sizeItem = size;
-                    cartItem = item;
-                    break;
-                }
-            }
-            if (sizeItem) break;
-        }
-        
-        if (!sizeItem) {
-            throw new Error('Size item not found');
-        }
-        
-        // Update the quantity in the API
-        const response = await fetch(ENDPOINTS.cartItemSizes.update(sizeItemId), {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                ...sizeItem,
-                Quantity: newQuantity
-            })
-        });
-        
-        if (response.ok) {
-            // Update the quantity in the cart state
-            sizeItem.Quantity = newQuantity;
-            
-            // Update the cart display
-            updateCartDisplay();
-        } else {
-            throw new Error('Failed to update quantity');
-        }
-    } catch (error) {
-        console.error('Error updating quantity:', error);
-        alert('There was an error updating the quantity. Please try again.');
-    }
-}
-
-// Remove item from cart
-async function removeItem(sizeItemId) {
-    try {
-        // Find the size item in the cart state
-        let sizeItemIndex = -1;
-        let cartItemIndex = -1;
-        
-        for (let i = 0; i < cartState.items.length; i++) {
-            const item = cartState.items[i];
-            for (let j = 0; j < item.sizes.length; j++) {
-                if (item.sizes[j].SizeItemID === sizeItemId) {
-                    sizeItemIndex = j;
-                    cartItemIndex = i;
-                    break;
-                }
-            }
-            if (sizeItemIndex !== -1) break;
-        }
-        
-        if (sizeItemIndex === -1) {
-            throw new Error('Size item not found');
-        }
-        
-        // Delete the size item from the API
-        const response = await fetch(ENDPOINTS.cartItemSizes.delete(sizeItemId), {
-            method: 'DELETE'
-        });
-        
-        if (response.ok) {
-            // Remove the size item from the cart state
-            const cartItem = cartState.items[cartItemIndex];
-            cartItem.sizes.splice(sizeItemIndex, 1);
-            
-            // If there are no more sizes for this cart item, remove the cart item
-            if (cartItem.sizes.length === 0) {
-                // Delete the cart item from the API
-                await fetch(ENDPOINTS.cartItems.delete(cartItem.CartItemID), {
-                    method: 'DELETE'
-                });
-                
-                // Remove the cart item from the cart state
-                cartState.items.splice(cartItemIndex, 1);
-            }
-            
-            // Update the cart display
-            updateCartDisplay();
-        } else {
-            throw new Error('Failed to remove item');
-        }
-    } catch (error) {
-        console.error('Error removing item:', error);
-        alert('There was an error removing the item. Please try again.');
-    }
-}
-
-// Proceed to checkout
-function proceedToCheckout() {
-    // Show the checkout container
-    checkoutContainerEl.style.display = 'block';
-    
-    // Scroll to the checkout container
-    checkoutContainerEl.scrollIntoView({ behavior: 'smooth' });
-}
-
-// Set up checkout navigation
-function setupCheckoutNavigation() {
-    // Previous step button
-    prevStepBtn.addEventListener('click', () => {
-        if (currentStep === 'customer') {
-            goToStep('cart');
-        } else if (currentStep === 'review') {
-            goToStep('customer');
-        }
-    });
-    
-    // Next step button
-    nextStepBtn.addEventListener('click', () => {
-        if (currentStep === 'cart') {
-            goToStep('customer');
-        } else if (currentStep === 'customer') {
-            // Validate customer form
-            if (validateCustomerForm()) {
-                // Save customer info
-                saveCustomerInfo();
-                goToStep('review');
-            }
-        }
-    });
-    
-    // Submit order button
-    submitOrderBtn.addEventListener('click', async () => {
-        // Check if terms are agreed
-        const termsAgree = document.getElementById('terms-agree');
-        if (!termsAgree.checked) {
-            alert('Please agree to the terms to submit your quote request.');
-            return;
-        }
-        
-        // Submit the order
-        await submitOrder();
-    });
-}
-
-// Go to a specific checkout step
-function goToStep(step) {
-    // Update current step
-    currentStep = step;
-    
-    // Update step indicators
-    stepElements.forEach(el => {
-        el.classList.remove('active', 'completed');
-        
-        if (el.dataset.step === step) {
-            el.classList.add('active');
-        } else if (
-            (step === 'customer' && el.dataset.step === 'cart') ||
-            (step === 'review' && (el.dataset.step === 'cart' || el.dataset.step === 'customer'))
-        ) {
-            el.classList.add('completed');
-        }
-    });
-    
-    // Show the current step content
-    stepContentElements.forEach(el => {
-        el.style.display = el.id === `step-${step}` ? 'block' : 'none';
-    });
-    
-    // Update navigation buttons
-    if (step === 'cart') {
-        prevStepBtn.style.display = 'none';
-        nextStepBtn.style.display = 'block';
-        nextStepBtn.textContent = 'Continue to Customer Information';
-        submitOrderBtn.style.display = 'none';
-    } else if (step === 'customer') {
-        prevStepBtn.style.display = 'block';
-        nextStepBtn.style.display = 'block';
-        nextStepBtn.textContent = 'Continue to Review';
-        submitOrderBtn.style.display = 'none';
-    } else if (step === 'review') {
-        prevStepBtn.style.display = 'block';
-        nextStepBtn.style.display = 'none';
-        submitOrderBtn.style.display = 'block';
-        
-        // Update review content
-        updateReviewContent();
-    }
-}
-
-// Validate customer form
-function validateCustomerForm() {
-    const form = document.getElementById('customer-form');
-    const requiredFields = form.querySelectorAll('[required]');
-    
-    let isValid = true;
-    
-    requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-            isValid = false;
-            field.classList.add('invalid');
-        } else {
-            field.classList.remove('invalid');
-        }
-    });
-    
-    if (!isValid) {
-        alert('Please fill in all required fields.');
-    }
-    
-    return isValid;
-}
-
-// Save customer information
-function saveCustomerInfo() {
-    const form = document.getElementById('customer-form');
-    
-    cartState.customer = {
-        name: form.elements.name.value,
-        email: form.elements.email.value,
-        phone: form.elements.phone.value,
-        company: form.elements.company.value,
-        address1: form.elements.address1.value,
-        address2: form.elements.address2.value,
-        city: form.elements.city.value,
-        state: form.elements.state.value,
-        zipcode: form.elements.zipcode.value,
-        country: form.elements.country.value,
-        notes: form.elements.notes.value
-    };
-}
-
-// Update review content
-function updateReviewContent() {
-    // Update cart summary in review
-    const reviewCartSummary = document.getElementById('review-cart-summary');
-    let subtotal = 0;
-    let itemsHtml = '';
-    
-    cartState.items.forEach(item => {
-        item.sizes.forEach(size => {
-            const itemTotal = size.Quantity * size.UnitPrice;
-            subtotal += itemTotal;
-            
-            itemsHtml += `
-                <div class="review-item">
-                    <div class="review-item-details">
-                        <strong>${item.StyleNumber}</strong> - ${item.Color}
-                        <div>Size: ${size.Size}, Quantity: ${size.Quantity}</div>
-                        <div>Imprint: ${item.ImprintType}</div>
-                    </div>
-                    <div class="review-item-price">
-                        $${itemTotal.toFixed(2)}
-                    </div>
-                </div>
-            `;
-        });
-    });
-    
-    reviewCartSummary.innerHTML = `
-        <div class="review-items">
-            ${itemsHtml}
-        </div>
-        <div class="review-totals">
-            <div class="summary-row">
-                <div class="summary-label">Subtotal:</div>
-                <div class="summary-value">$${subtotal.toFixed(2)}</div>
-            </div>
-            <div class="summary-row">
-                <div class="summary-label">Estimated Tax:</div>
-                <div class="summary-value">Calculated at checkout</div>
-            </div>
-            <div class="summary-row">
-                <div class="summary-label">Estimated Total:</div>
-                <div class="summary-value">$${subtotal.toFixed(2)}</div>
-            </div>
-        </div>
-    `;
-    
-    // Update customer info in review
-    const reviewCustomerInfo = document.getElementById('review-customer-info');
-    
-    reviewCustomerInfo.innerHTML = `
-        <div class="review-row">
-            <div class="review-label">Name:</div>
-            <div class="review-value">${cartState.customer.name}</div>
-        </div>
-        <div class="review-row">
-            <div class="review-label">Email:</div>
-            <div class="review-value">${cartState.customer.email}</div>
-        </div>
-        ${cartState.customer.phone ? `
-            <div class="review-row">
-                <div class="review-label">Phone:</div>
-                <div class="review-value">${cartState.customer.phone}</div>
-            </div>
-        ` : ''}
-        ${cartState.customer.company ? `
-            <div class="review-row">
-                <div class="review-label">Company:</div>
-                <div class="review-value">${cartState.customer.company}</div>
-            </div>
-        ` : ''}
-        ${cartState.customer.address1 ? `
-            <div class="review-row">
-                <div class="review-label">Address:</div>
-                <div class="review-value">
-                    ${cartState.customer.address1}<br>
-                    ${cartState.customer.address2 ? cartState.customer.address2 + '<br>' : ''}
-                    ${cartState.customer.city ? cartState.customer.city + ', ' : ''}
-                    ${cartState.customer.state || ''} ${cartState.customer.zipcode || ''}<br>
-                    ${cartState.customer.country || ''}
-                </div>
-            </div>
-        ` : ''}
-        ${cartState.customer.notes ? `
-            <div class="review-row">
-                <div class="review-label">Notes:</div>
-                <div class="review-value">${cartState.customer.notes}</div>
-            </div>
-        ` : ''}
-    `;
-}
-
-// Submit order
-async function submitOrder() {
-    try {
-        // First, save the customer information to the database
-        const customerData = {
-            Name: cartState.customer.name,
-            Email: cartState.customer.email,
-            Phone: cartState.customer.phone || '',
-            Company: cartState.customer.company || '',
-            Address1: cartState.customer.address1 || '',
-            Address2: cartState.customer.address2 || '',
-            City: cartState.customer.city || '',
-            State: cartState.customer.state || '',
-            ZipCode: cartState.customer.zipcode || '',
-            Country: cartState.customer.country || 'USA',
-            DateCreated: new Date().toISOString(),
-            LastUpdated: new Date().toISOString(),
-            Notes: cartState.customer.notes || ''
-        };
-        
-        // Check if customer already exists
-        const customerResponse = await fetch(ENDPOINTS.customers.getByEmail(cartState.customer.email));
-        let customerId;
-        
-        if (customerResponse.ok) {
-            const existingCustomers = await customerResponse.json();
-            
-            if (existingCustomers && existingCustomers.length > 0) {
-                // Update existing customer
-                customerId = existingCustomers[0].CustomerID;
-                
-                await fetch(ENDPOINTS.customers.update(customerId), {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        ...existingCustomers[0],
-                        ...customerData
-                    })
-                });
-            } else {
-                // Create new customer
-                const createResponse = await fetch(ENDPOINTS.customers.create, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(customerData)
-                });
-                
-                if (createResponse.ok) {
-                    const newCustomer = await createResponse.json();
-                    customerId = newCustomer.CustomerID;
-                } else {
-                    throw new Error('Failed to create customer');
-                }
-            }
-        } else {
-            throw new Error('Failed to check if customer exists');
-        }
-        
-        // Calculate order total
-        let totalAmount = 0;
-        cartState.items.forEach(item => {
-            item.sizes.forEach(size => {
-                totalAmount += size.Quantity * size.UnitPrice;
-            });
-        });
-        
-        // Determine imprint type (use the first item's imprint type)
-        const imprintType = cartState.items.length > 0 ? cartState.items[0].ImprintType : '';
-        
-        // Create order
-        const orderData = {
-            CustomerID: customerId,
-            OrderDate: new Date().toISOString(),
-            TotalAmount: totalAmount,
-            OrderStatus: 'New',
-            ImprintType: imprintType,
-            PaymentStatus: 'Pending',
-            Notes: cartState.customer.notes || ''
-        };
-        
-        const orderResponse = await fetch('/api/orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(orderData)
-        });
-        
-        if (orderResponse.ok) {
-            const newOrder = await orderResponse.json();
-            
-            // Update cart items with the order ID
-            for (const item of cartState.items) {
-                await fetch(ENDPOINTS.cartItems.update(item.CartItemID), {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        ...item,
-                        OrderID: newOrder.OrderID,
-                        CartStatus: 'Converted'
-                    })
-                });
-            }
-            
-            // Mark the session as inactive
-            await fetch(ENDPOINTS.cartSessions.update(cartState.sessionId), {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    SessionID: cartState.sessionId,
-                    IsActive: false,
-                    LastActivity: new Date().toISOString()
-                })
+              },
+              body: JSON.stringify(itemData)
             });
             
-            // Clear the cart session from localStorage
-            localStorage.removeItem('nwca_cart_session_id');
+            if (!createResponse.ok) {
+              const errorText = await createResponse.text();
+              throw new Error(`Failed to create item ${item.StyleNumber}: ${createResponse.status} ${errorText}`);
+            }
             
-            // Show order confirmation
-            showOrderConfirmation(newOrder.OrderID);
-        } else {
-            throw new Error('Failed to create order');
-        }
-    } catch (error) {
-        console.error('Error submitting order:', error);
-        alert('There was an error submitting your order. Please try again later.');
-    }
-}
-
-// Show order confirmation
-function showOrderConfirmation(orderId) {
-    // Hide checkout container
-    checkoutContainerEl.style.display = 'none';
-    
-    // Show confirmation container
-    confirmationContainerEl.style.display = 'block';
-    
-    // Set quote reference
-    document.getElementById('quote-reference').textContent = `Q${orderId}`;
-    
-    // Scroll to confirmation
-    confirmationContainerEl.scrollIntoView({ behavior: 'smooth' });
-}
-
-// Add to cart function (to be called from product page)
-window.addToCart = async function(productData) {
-    try {
-        // Initialize cart if needed
-        if (!cartState.sessionId) {
-            await initializeCart();
-        }
-        
-        // Create cart item
-        const cartItemData = {
-            SessionID: cartState.sessionId,
-            ProductID: productData.productId,
-            StyleNumber: productData.styleNumber,
-            Color: productData.color,
-            ImprintType: productData.imprintType,
-            DateAdded: new Date().toISOString(),
-            CartStatus: 'Active'
-        };
-        
-        const response = await fetch(ENDPOINTS.cartItems.create, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(cartItemData)
-        });
-        
-        if (response.ok) {
-            const newCartItem = await response.json();
+            const newItem = await createResponse.json();
             
-            // Create cart item sizes
-            for (const size of productData.sizes) {
+            // Track size sync errors
+            const sizeErrors = [];
+            
+            // Create the sizes on the server
+            await Promise.all((item.sizes || []).map(async (size) => {
+              try {
                 const sizeData = {
-                    CartItemID: newCartItem.CartItemID,
-                    Size: size.size,
-                    Quantity: size.quantity,
-                    UnitPrice: size.unitPrice
+                  CartItemID: newItem.CartItemID,
+                  Size: size.Size,
+                  Quantity: size.Quantity,
+                  UnitPrice: size.UnitPrice
                 };
                 
-                await fetch(ENDPOINTS.cartItemSizes.create, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(sizeData)
+                const sizeResponse = await fetch(ENDPOINTS.cartItemSizes.create, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(sizeData)
                 });
+                
+                if (!sizeResponse.ok) {
+                  const errorText = await sizeResponse.text();
+                  throw new Error(`Failed to create size ${size.Size}: ${sizeResponse.status} ${errorText}`);
+                }
+              } catch (sizeError) {
+                console.error('Error syncing size:', sizeError);
+                sizeErrors.push(sizeError.message);
+              }
+            }));
+            
+            // If there were size errors, add them to the sync errors
+            if (sizeErrors.length > 0) {
+              syncErrors.push(`Item ${item.StyleNumber}: ${sizeErrors.length} sizes failed to sync`);
             }
-            
-            // Reload cart items
-            await loadCartItems();
-            
-            // Update cart count
-            updateCartCount();
-            
-            return true;
-        } else {
-            throw new Error('Failed to add item to cart');
+          } catch (itemError) {
+            console.error('Error syncing item:', itemError);
+            syncErrors.push(itemError.message);
+          }
+        }));
+        
+        // Check if there were any sync errors
+        if (syncErrors.length > 0) {
+          // Set a user-friendly error message
+          if (syncErrors.length === localItemsWithoutIds.length) {
+            // All items failed to sync
+            cartState.error = 'Failed to sync any items with the server. Please try again later.';
+          } else {
+            // Some items failed to sync
+            cartState.error = `Some items failed to sync with the server (${syncErrors.length} of ${localItemsWithoutIds.length}).`;
+          }
         }
+        
+        // Reload from server to get the updated data
+        try {
+          await loadCartItems();
+        } catch (loadError) {
+          console.error('Error reloading items after sync:', loadError);
+          // If we already have an error, don't overwrite it
+          if (!cartState.error) {
+            cartState.error = 'Items were synced but could not be reloaded. Please refresh the page.';
+          }
+        }
+      }
+      
+      // Success (even with partial errors)
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      
+      return {
+        success: true,
+        error: cartState.error // May contain partial error message
+      };
     } catch (error) {
-        console.error('Error adding to cart:', error);
-        return false;
+      console.error('Error syncing with server:', error);
+      
+      // Check if it's a network error
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        cartState.error = 'Network error. Please check your connection and try again.';
+      } else {
+        cartState.error = error.message || 'Unable to sync with server. Please try again later.';
+      }
+      
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      
+      return { success: false, error: cartState.error };
     }
+  }
+
+  /**
+   * Add an item to the cart
+   * @param {Object} productData - Product data
+   * @returns {Promise<{success: boolean, error: string|null}>} - Result with success status and error message
+   */
+  async function addToCart(productData) {
+    // Reset error state
+    cartState.error = null;
+    
+    try {
+      // Show loading state
+      cartState.loading = true;
+      triggerEvent('cartUpdated');
+      
+      // Initialize cart if needed
+      if (!cartState.sessionId) {
+        await initializeCart();
+        if (!cartState.sessionId) {
+          throw new Error('Unable to create or retrieve cart session');
+        }
+      }
+      
+      // Validate product data
+      if (!productData.styleNumber || !productData.color || !productData.embellishmentType) {
+        throw new Error('Missing required product information');
+      }
+      
+      if (!productData.sizes || !Array.isArray(productData.sizes) || productData.sizes.length === 0) {
+        throw new Error('No sizes selected');
+      }
+      
+      // Check if we already have items with a different embellishment type
+      const existingEmbellishmentTypes = new Set(
+        cartState.items
+          .filter(item => item.CartStatus === 'Active')
+          .map(item => item.ImprintType)
+      );
+      
+      if (existingEmbellishmentTypes.size > 0 &&
+          !existingEmbellishmentTypes.has(productData.embellishmentType)) {
+        // Show warning about different embellishment types
+        const proceed = confirm(
+          `You already have items with ${Array.from(existingEmbellishmentTypes).join(', ')} ` +
+          `in your cart. Adding items with ${productData.embellishmentType} may result in ` +
+          `separate production runs. For optimal pricing and production, we recommend ` +
+          `placing separate orders for different embellishment types. Do you want to proceed?`
+        );
+        
+        if (!proceed) {
+          cartState.loading = false;
+          triggerEvent('cartUpdated');
+          return { success: false, error: null }; // User canceled, not an error
+        }
+      }
+      
+      // Check inventory before adding
+      const inventoryResponse = await fetch(
+        ENDPOINTS.inventory.getByStyleAndColor(
+          productData.styleNumber,
+          productData.color
+        )
+      );
+      
+      if (!inventoryResponse.ok) {
+        const errorText = await inventoryResponse.text();
+        throw new Error(`Failed to check inventory: ${inventoryResponse.status} ${errorText}`);
+      }
+      
+      const inventoryData = await inventoryResponse.json();
+      
+      // Create a map of available inventory by size
+      const availableInventory = {};
+      inventoryData.forEach(item => {
+        if (!availableInventory[item.size]) {
+          availableInventory[item.size] = 0;
+        }
+        availableInventory[item.size] += item.quantity;
+      });
+      
+      // Validate requested quantities against inventory
+      const validSizes = [];
+      const inventoryErrors = [];
+      
+      for (const sizeData of productData.sizes) {
+        if (!sizeData.size || !sizeData.quantity || sizeData.quantity <= 0) {
+          continue; // Skip invalid sizes
+        }
+        
+        const availableQty = availableInventory[sizeData.size] || 0;
+        
+        if (sizeData.quantity > availableQty) {
+          inventoryErrors.push(`Only ${availableQty} units of size ${sizeData.size} are available.`);
+        } else {
+          validSizes.push(sizeData);
+        }
+      }
+      
+      if (inventoryErrors.length > 0) {
+        // Join all inventory errors into a single message
+        throw new Error(`Inventory issues:\n${inventoryErrors.join('\n')}`);
+      }
+      
+      if (validSizes.length === 0) {
+        throw new Error('No valid sizes selected');
+      }
+      
+      // Create cart item
+      const cartItemData = {
+        SessionID: cartState.sessionId,
+        ProductID: productData.productId || '',
+        StyleNumber: productData.styleNumber,
+        Color: productData.color,
+        ImprintType: productData.embellishmentType,
+        EmbellishmentOptions: JSON.stringify(productData.embellishmentOptions || {}),
+        DateAdded: new Date().toISOString(),
+        CartStatus: 'Active'
+      };
+      
+      const response = await fetch(ENDPOINTS.cartItems.create, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(cartItemData)
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to add item to cart: ${response.status} ${errorText}`);
+      }
+      
+      const newCartItem = await response.json();
+      
+      // Add sizes
+      const sizes = [];
+      const sizeErrors = [];
+      
+      // Process sizes in parallel for better performance
+      await Promise.all(validSizes.map(async (sizeData) => {
+        try {
+          const sizeResponse = await fetch(ENDPOINTS.cartItemSizes.create, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              CartItemID: newCartItem.CartItemID,
+              Size: sizeData.size,
+              Quantity: sizeData.quantity,
+              UnitPrice: sizeData.unitPrice,
+              WarehouseSource: sizeData.warehouseSource || ''
+            })
+          });
+          
+          if (!sizeResponse.ok) {
+            const errorText = await sizeResponse.text();
+            throw new Error(`Failed to add size ${sizeData.size}: ${sizeResponse.status} ${errorText}`);
+          }
+          
+          const newSize = await sizeResponse.json();
+          sizes.push(newSize);
+        } catch (sizeError) {
+          sizeErrors.push(sizeError.message);
+        }
+      }));
+      
+      if (sizeErrors.length > 0) {
+        // If there were errors adding sizes, delete the cart item
+        await fetch(ENDPOINTS.cartItems.delete(newCartItem.CartItemID), {
+          method: 'DELETE'
+        });
+        
+        throw new Error(`Failed to add sizes:\n${sizeErrors.join('\n')}`);
+      }
+      
+      // Add to local cart state
+      cartState.items.push({
+        ...newCartItem,
+        sizes: sizes
+      });
+      
+      // Save to localStorage
+      saveToLocalStorage();
+      
+      // Success!
+      cartState.error = null;
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      
+      return { success: true, error: null };
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      cartState.error = error.message || 'Failed to add item to cart';
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      
+      return { success: false, error: cartState.error };
+    }
+  }
+
+  /**
+   * Update item quantity
+   * @param {number} cartItemId - Cart item ID
+   * @param {string} size - Size to update
+   * @param {number} quantity - New quantity
+   * @returns {Promise<{success: boolean, error: string|null}>} - Result with success status and error message
+   */
+  async function updateQuantity(cartItemId, size, quantity) {
+    // Reset error state
+    cartState.error = null;
+    
+    try {
+      // Show loading state
+      cartState.loading = true;
+      triggerEvent('cartUpdated');
+      
+      // Find the item and size in the cart
+      const itemIndex = cartState.items.findIndex(item => item.CartItemID === cartItemId);
+      
+      if (itemIndex === -1) {
+        throw new Error('Item not found in cart');
+      }
+      
+      const item = cartState.items[itemIndex];
+      const sizeIndex = item.sizes.findIndex(s => s.Size === size);
+      
+      if (sizeIndex === -1) {
+        throw new Error('Size not found for item');
+      }
+      
+      const sizeItem = item.sizes[sizeIndex];
+      
+      // Check inventory before updating
+      const inventoryResponse = await fetch(
+        ENDPOINTS.inventory.getByStyleAndColor(
+          item.StyleNumber,
+          item.Color
+        )
+      );
+      
+      if (!inventoryResponse.ok) {
+        const errorText = await inventoryResponse.text();
+        throw new Error(`Failed to check inventory: ${inventoryResponse.status} ${errorText}`);
+      }
+      
+      const inventoryData = await inventoryResponse.json();
+      
+      // Calculate available inventory for this size
+      let availableQty = 0;
+      inventoryData.forEach(invItem => {
+        if (invItem.size === size) {
+          availableQty += invItem.quantity;
+        }
+      });
+      
+      if (quantity > availableQty) {
+        cartState.error = `Sorry, only ${availableQty} units of size ${size} are available.`;
+        cartState.loading = false;
+        triggerEvent('cartUpdated');
+        return { success: false, error: cartState.error };
+      }
+      
+      if (quantity <= 0) {
+        // Remove the size
+        const deleteResponse = await fetch(ENDPOINTS.cartItemSizes.delete(sizeItem.SizeItemID), {
+          method: 'DELETE'
+        });
+        
+        if (!deleteResponse.ok) {
+          const errorText = await deleteResponse.text();
+          throw new Error(`Failed to delete size: ${deleteResponse.status} ${errorText}`);
+        }
+        
+        // Remove from local state
+        item.sizes.splice(sizeIndex, 1);
+        
+        // If no sizes left, remove the item
+        if (item.sizes.length === 0) {
+          const removeResult = await removeItem(cartItemId);
+          if (!removeResult.success) {
+            throw new Error(removeResult.error || 'Failed to remove item after deleting last size');
+          }
+        } else {
+          // Save to localStorage
+          saveToLocalStorage();
+          
+          // Success!
+          cartState.error = null;
+          cartState.loading = false;
+          triggerEvent('cartUpdated');
+        }
+        
+        return { success: true, error: null };
+      } else {
+        // Update the size quantity
+        const updateResponse = await fetch(ENDPOINTS.cartItemSizes.update(sizeItem.SizeItemID), {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            ...sizeItem,
+            Quantity: quantity
+          })
+        });
+        
+        if (!updateResponse.ok) {
+          const errorText = await updateResponse.text();
+          throw new Error(`Failed to update size quantity: ${updateResponse.status} ${errorText}`);
+        }
+        
+        // Update local state
+        item.sizes[sizeIndex].Quantity = quantity;
+        
+        // Save to localStorage
+        saveToLocalStorage();
+        
+        // Success!
+        cartState.error = null;
+        cartState.loading = false;
+        triggerEvent('cartUpdated');
+        
+        return { success: true, error: null };
+      }
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      cartState.error = error.message || 'Failed to update quantity';
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      
+      return { success: false, error: cartState.error };
+    }
+  }
+
+  /**
+   * Remove an item from the cart
+   * @param {number} cartItemId - Cart item ID
+   * @returns {Promise<{success: boolean, error: string|null}>} - Result with success status and error message
+   */
+  async function removeItem(cartItemId) {
+    // Reset error state
+    cartState.error = null;
+    
+    try {
+      // Show loading state
+      cartState.loading = true;
+      triggerEvent('cartUpdated');
+      
+      // Find the item in the cart
+      const itemIndex = cartState.items.findIndex(item => item.CartItemID === cartItemId);
+      
+      if (itemIndex === -1) {
+        throw new Error('Item not found in cart');
+      }
+      
+      // Delete from server
+      const response = await fetch(ENDPOINTS.cartItems.delete(cartItemId), {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to delete item: ${response.status} ${errorText}`);
+      }
+      
+      // Remove from local state
+      cartState.items.splice(itemIndex, 1);
+      
+      // Save to localStorage
+      saveToLocalStorage();
+      
+      // Success!
+      cartState.error = null;
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      
+      return { success: true, error: null };
+    } catch (error) {
+      console.error('Error removing item:', error);
+      cartState.error = error.message || 'Failed to remove item';
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      
+      return { success: false, error: cartState.error };
+    }
+  }
+
+  /**
+   * Save cart for later
+   * @returns {Promise<{success: boolean, error: string|null}>} - Result with success status and error message
+   */
+  async function saveForLater() {
+    // Reset error state
+    cartState.error = null;
+    
+    try {
+      // Show loading state
+      cartState.loading = true;
+      triggerEvent('cartUpdated');
+      
+      const activeItems = cartState.items.filter(item => item.CartStatus === 'Active');
+      
+      if (activeItems.length === 0) {
+        cartState.error = 'No active items to save for later';
+        cartState.loading = false;
+        triggerEvent('cartUpdated');
+        return { success: false, error: cartState.error };
+      }
+      
+      // Track any errors that occur during the process
+      const errors = [];
+      
+      // Update all items to SavedForLater status
+      await Promise.all(activeItems.map(async (item) => {
+        try {
+          const updateResponse = await fetch(ENDPOINTS.cartItems.update(item.CartItemID), {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              ...item,
+              CartStatus: 'SavedForLater'
+            })
+          });
+          
+          if (updateResponse.ok) {
+            // Update local state
+            item.CartStatus = 'SavedForLater';
+          } else {
+            const errorText = await updateResponse.text();
+            throw new Error(`Failed to save item ${item.StyleNumber} for later: ${updateResponse.status} ${errorText}`);
+          }
+        } catch (itemError) {
+          console.error('Error saving item for later:', itemError);
+          errors.push(itemError.message);
+        }
+      }));
+      
+      // Save to localStorage
+      saveToLocalStorage();
+      
+      // Check if there were any errors
+      if (errors.length > 0) {
+        if (errors.length === activeItems.length) {
+          // All items failed
+          cartState.error = 'Failed to save any items for later';
+          cartState.loading = false;
+          triggerEvent('cartUpdated');
+          return { success: false, error: cartState.error };
+        } else {
+          // Some items failed, some succeeded
+          cartState.error = `Some items could not be saved for later: ${errors.length} of ${activeItems.length} failed`;
+          cartState.loading = false;
+          triggerEvent('cartUpdated');
+          return { success: true, error: cartState.error };
+        }
+      }
+      
+      // Success!
+      cartState.error = null;
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      
+      return { success: true, error: null };
+    } catch (error) {
+      console.error('Error saving cart for later:', error);
+      cartState.error = error.message || 'Failed to save cart for later';
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      
+      return { success: false, error: cartState.error };
+    }
+  }
+
+  /**
+   * Get cart items
+   * @param {string} status - Filter by status (optional)
+   * @returns {Array} - Cart items
+   */
+  function getCartItems(status) {
+    if (status) {
+      return cartState.items.filter(item => item.CartStatus === status);
+    }
+    return cartState.items;
+  }
+
+  /**
+   * Get cart count
+   * @returns {number} - Total number of items in cart
+   */
+  function getCartCount() {
+    let count = 0;
+    
+    cartState.items.forEach(item => {
+      if (item.CartStatus === 'Active') {
+        item.sizes.forEach(size => {
+          count += size.Quantity;
+        });
+      }
+    });
+    
+    return count;
+  }
+
+  /**
+   * Get cart total
+   * @returns {number} - Total price of items in cart
+   */
+  function getCartTotal() {
+    let total = 0;
+    
+    cartState.items.forEach(item => {
+      if (item.CartStatus === 'Active') {
+        item.sizes.forEach(size => {
+          total += size.Quantity * size.UnitPrice;
+        });
+      }
+    });
+    
+    return total;
+  }
+
+  /**
+   * Check if cart has items with a specific embellishment type
+   * @param {string} embellishmentType - Embellishment type to check
+   * @returns {boolean} - True if cart has items with the specified embellishment type
+   */
+  function hasEmbellishmentType(embellishmentType) {
+    return cartState.items.some(item => 
+      item.CartStatus === 'Active' && item.ImprintType === embellishmentType
+    );
+  }
+
+  /**
+   * Get embellishment types in cart
+   * @returns {Array} - Array of embellishment types in cart
+   */
+  function getEmbellishmentTypes() {
+    const types = new Set();
+    
+    cartState.items.forEach(item => {
+      if (item.CartStatus === 'Active') {
+        types.add(item.ImprintType);
+      }
+    });
+    
+    return Array.from(types);
+  }
+
+  /**
+   * Add event listener
+   * @param {string} event - Event name
+   * @param {Function} callback - Callback function
+   */
+  function addEventListener(event, callback) {
+    if (eventListeners[event]) {
+      eventListeners[event].push(callback);
+    }
+  }
+
+  /**
+   * Remove event listener
+   * @param {string} event - Event name
+   * @param {Function} callback - Callback function
+   */
+  function removeEventListener(event, callback) {
+    if (eventListeners[event]) {
+      const index = eventListeners[event].indexOf(callback);
+      if (index !== -1) {
+        eventListeners[event].splice(index, 1);
+      }
+    }
+  }
+
+  /**
+   * Trigger event
+   * @param {string} event - Event name
+   */
+  function triggerEvent(event) {
+    if (eventListeners[event]) {
+      eventListeners[event].forEach(callback => {
+        try {
+          callback();
+        } catch (error) {
+          console.error(`Error in ${event} event listener:`, error);
+        }
+      });
+    }
+  }
+
+  // Public API
+  return {
+    initializeCart,
+    addToCart,
+    updateQuantity,
+    removeItem,
+    saveForLater,
+    getCartItems,
+    getCartCount,
+    getCartTotal,
+    hasEmbellishmentType,
+    getEmbellishmentTypes,
+    addEventListener,
+    removeEventListener,
+    syncWithServer,
+    isLoading: () => cartState.loading,
+    getError: () => cartState.error
+  };
+})();
+
+// Initialize cart when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  NWCACart.initializeCart();
+  
+  // Update cart count in header (if element exists)
+  const updateCartCount = function() {
+    const cartCountElement = document.getElementById('cart-count');
+    if (cartCountElement) {
+      cartCountElement.textContent = NWCACart.getCartCount();
+    }
+  };
+  
+  // Listen for cart updates
+  NWCACart.addEventListener('cartUpdated', updateCartCount);
+  
+  // Initial update
+  updateCartCount();
+});
+
+// Example embellishment options structures for different types
+const embellishmentOptionsExamples = {
+  // Embroidery options
+  embroidery: {
+    stitchCount: 8000, // 5000, 8000, or 10000
+    location: 'left-chest' // left-chest, right-chest, full-back, etc.
+  },
+  
+  // Cap embroidery options
+  'cap-embroidery': {
+    stitchCount: 8000, // 5000, 8000, or 10000
+    location: 'front' // front, side, back
+  },
+  
+  // DTG options
+  dtg: {
+    location: 'FF', // LC, FF, FB, JF, JB, LC_FB, FF_FB, JF_JB
+    colorType: 'full-color' // full-color, white-only
+  },
+  
+  // Screen print options
+  'screen-print': {
+    colorCount: 3, // 1-6
+    additionalLocations: [
+      {
+        location: 'back',
+        colorCount: 1
+      }
+    ],
+    requiresWhiteBase: true, // For dark garments
+    specialInk: false // Reflective, metallic, etc.
+  }
 };
