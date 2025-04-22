@@ -1277,6 +1277,12 @@
                          return;
                      }
                      
+                     // Make sure we're using the current selected color if one isn't provided
+                     if (!colorCode && window.selectedColorName) {
+                         colorCode = window.selectedColorName;
+                         console.log(`No color code provided, using selected color name: ${colorCode}`);
+                     }
+                     
                      const pricingLinks = document.querySelectorAll('.pricing-link');
                      pricingLinks.forEach(link => {
                          let href = link.getAttribute('href');
@@ -1359,8 +1365,9 @@
                     console.log("Calling loadSwatches with styleNumber:", styleNumber);
                     await loadSwatches(styleNumber);
                     
-                    // Update pricing links with the style number (no color yet)
-                    updatePricingLinks(styleNumber, null);
+                    // Update pricing links with the style number and current color if available
+                    const currentColor = window.selectedColorName || window.selectedCatalogColor;
+                    updatePricingLinks(styleNumber, currentColor);
                     
                     console.log("--- StyleSearch: Initial updates triggered for style", styleNumber);
                 }
