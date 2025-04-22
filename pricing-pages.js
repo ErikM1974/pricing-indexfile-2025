@@ -164,12 +164,19 @@ function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
     container.appendChild(script);
 }
 
-// Load cart.js script
+// Load cart.js script and initialize the cart
 function loadCartScript() {
     return new Promise((resolve, reject) => {
         // Check if NWCACart is already defined
         if (window.NWCACart) {
             console.log('NWCACart already loaded');
+            
+            // Make sure it's initialized
+            if (typeof window.NWCACart.initializeCart === 'function') {
+                window.NWCACart.initializeCart();
+                console.log('NWCACart initialized after checking it was loaded');
+            }
+            
             resolve();
             return;
         }
@@ -182,7 +189,17 @@ function loadCartScript() {
         // Add event listeners
         script.onload = () => {
             console.log('Cart script loaded successfully');
-            resolve();
+            
+            // Initialize the cart after loading
+            setTimeout(() => {
+                if (window.NWCACart && typeof window.NWCACart.initializeCart === 'function') {
+                    window.NWCACart.initializeCart();
+                    console.log('NWCACart initialized after script load');
+                } else {
+                    console.warn('NWCACart not available after script load');
+                }
+                resolve();
+            }, 100); // Small delay to ensure script is fully processed
         };
         
         script.onerror = () => {

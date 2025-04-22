@@ -86,8 +86,18 @@ const NWCACartUI = (function() {
     // Listen for cart updates
     NWCACart.addEventListener('cartUpdated', renderCart);
     
-    // Initial render
-    renderCart();
+    // Force a sync with the server before initial render
+    console.log("Initializing cart UI, syncing with server...");
+    NWCACart.syncWithServer()
+      .then(() => {
+        console.log("Cart sync complete, rendering cart...");
+        renderCart();
+      })
+      .catch(error => {
+        console.error("Error syncing cart:", error);
+        // Render anyway even if sync fails
+        renderCart();
+      });
   }
   
   /**
@@ -97,6 +107,8 @@ const NWCACartUI = (function() {
     // Get cart items
     const activeItems = NWCACart.getCartItems('Active');
     const savedItems = NWCACart.getCartItems('SavedForLater');
+    
+    console.log("Rendering cart with active items:", activeItems);
     
     // Check if cart is loading
     if (NWCACart.isLoading() && elements.cartItemsContainer) {
@@ -143,7 +155,12 @@ const NWCACartUI = (function() {
     }
     
     // Handle empty cart
-    if (activeItems.length === 0 && elements.cartItemsContainer) {
+    if (!activeItems || activeItems.length === 0) {
+      console.log("Cart is empty, showing empty cart message");
+      if (elements.cartItemsContainer) {
+        elements.cartItemsContainer.innerHTML = '';
+      }
+      
       if (elements.emptyCartMessage) {
         elements.emptyCartMessage.style.display = 'block';
       }
@@ -152,7 +169,6 @@ const NWCACartUI = (function() {
         elements.cartSummary.style.display = 'none';
       }
       
-      elements.cartItemsContainer.innerHTML = '';
       return;
     }
     

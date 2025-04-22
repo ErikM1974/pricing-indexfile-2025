@@ -44,7 +44,18 @@ const AddToCartButton = (function() {
       const productData = getProductDataFn();
       
       // Add to cart
-      const result = await NWCACart.addToCart(productData);
+      // Check if NWCACart is available
+      if (!window.NWCACart) {
+        console.error("NWCACart is not available");
+        errorContainer.textContent = "Cart system is not available. Please refresh the page and try again.";
+        errorContainer.style.display = 'block';
+        button.disabled = false;
+        button.innerHTML = 'Add to Cart';
+        return;
+      }
+      
+      console.log("Adding to cart:", productData);
+      const result = await window.NWCACart.addToCart(productData);
       
       // Reset button state
       button.disabled = false;

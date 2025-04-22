@@ -1,6 +1,0 @@
-Field Name,Data Type,Field Size,Required,Unique,Auto Increment,Default Value,Description
-SizeItemID,AutoNumber,0,Yes,Yes,Yes,,Primary key for size items
-CartItemID,Number,0,Yes,No,No,,Foreign key to Cart_Items table
-Size,Text,20,Yes,No,No,,Size of the item (S, M, L, XL, etc.)
-Quantity,Number,0,Yes,No,No,1,Quantity of items in this size
-UnitPrice,Currency,0,Yes,No,No,0.00,Unit price for this item/size combination
