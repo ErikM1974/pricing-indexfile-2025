@@ -15,24 +15,36 @@ function getUrlParameter(name) {
 // Update product context area with product details
 function updateProductContext() {
     const styleNumber = getUrlParameter('StyleNumber');
-    const colorCode = getUrlParameter('COLOR');
-    const colorName = colorCode ? decodeURIComponent(colorCode.replace(/\+/g, ' ')) : 'N/A';
+    const colorFromUrl = getUrlParameter('COLOR'); // Get color from URL
     
-    console.log(`Product Context: StyleNumber=${styleNumber}, COLOR=${colorCode}, decoded=${colorName}`);
+    // Log the raw URL for debugging
+    console.log(`DEBUG - Raw URL: ${window.location.href}`);
+    console.log(`DEBUG - URL Parameters: ${window.location.search}`);
+    console.log(`Product Context: StyleNumber=${styleNumber}, COLOR=${colorFromUrl}`);
+    
+    // Store the color name and style number in the global variables for use in other functions
+    window.selectedStyleNumber = styleNumber;
+    window.selectedColorName = colorFromUrl; // Use URL color as name for consistency
+    window.selectedCatalogColor = colorFromUrl; // Use URL color as catalog color
+    
+    console.log(`Color updated from URL: Name='${window.selectedColorName}', Catalog='${window.selectedCatalogColor}'`);
     
     // Update product details text
     document.getElementById('product-style').textContent = styleNumber || 'N/A';
-    document.getElementById('product-color').textContent = colorName;
+    document.getElementById('product-color').textContent = window.selectedColorName || 'Not Selected';
     
     // Update back to product link
     const backLink = document.getElementById('back-to-product');
     if (backLink) {
-        backLink.href = `/product?StyleNumber=${encodeURIComponent(styleNumber || '')}&COLOR=${encodeURIComponent(colorCode || '')}`;
+        // Use the color name from the URL parameter
+        // This ensures consistency when navigating back to the product page
+        backLink.href = `/product?StyleNumber=${encodeURIComponent(styleNumber || '')}&COLOR=${encodeURIComponent(colorFromUrl || '')}`;
+        console.log(`Back to product link updated with color: ${colorFromUrl || 'None'}`);
     }
     
     // Fetch product details to get image and title
     if (styleNumber) {
-        fetchProductDetails(styleNumber, colorCode);
+        fetchProductDetails(styleNumber);
     } else {
         document.getElementById('product-title').textContent = 'Product Not Found';
         document.getElementById('product-image').src = ''; // Placeholder or default image
@@ -40,16 +52,16 @@ function updateProductContext() {
 }
 
 // Fetch product details from API
-async function fetchProductDetails(styleNumber, colorCode) {
+async function fetchProductDetails(styleNumber) {
     try {
         let detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`;
         
-        if (colorCode) {
-            // Use both COLOR_NAME and CATALOG_COLOR to ensure we get the right color
-            detailApiUrl += `&COLOR_NAME=${encodeURIComponent(colorCode)}&CATALOG_COLOR=${encodeURIComponent(colorCode)}`;
-            console.log(`Using color code for API request: ${colorCode}`);
-        } else {
-            console.log("No color code provided for product details");
+        // Prioritize catalog color from global scope for API parameters
+        const colorIdentifier = window.selectedCatalogColor || window.selectedColorName || 'DefaultColor'; // Use catalog color first, then name, then fallback
+        console.log(`Using color identifier for fetch: '${colorIdentifier}' (Catalog: '${window.selectedCatalogColor}', Name: '${window.selectedColorName}')`);
+        
+        if (colorIdentifier) {
+            detailApiUrl += `&color=${encodeURIComponent(colorIdentifier)}`;
         }
         
         const response = await fetch(detailApiUrl);
@@ -65,7 +77,7 @@ async function fetchProductDetails(styleNumber, colorCode) {
         const mainImageUrl = details.FRONT_MODEL || details.FRONT_FLAT || '';
         if (mainImageUrl) {
             document.getElementById('product-image').src = mainImageUrl;
-            document.getElementById('product-image').alt = `${details.PRODUCT_TITLE || styleNumber} - ${colorCode || 'Default'}`;
+            document.getElementById('product-image').alt = `${details.PRODUCT_TITLE || styleNumber} - ${colorIdentifier}`;
         }
     } catch (error) {
         console.error('Error fetching product details:', error);
@@ -79,6 +91,8 @@ function updateTabNavigation() {
     const colorCode = getUrlParameter('COLOR');
     const currentPage = window.location.pathname;
     
+    // The color from URL is likely the color name, not the catalog color code
+    // We need to preserve it exactly as it is
     console.log(`Tab Navigation: StyleNumber=${styleNumber}, COLOR=${colorCode}`);
     
     const tabs = document.querySelectorAll('.pricing-tab');
@@ -108,9 +122,9 @@ function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
         return;
     }
     
-    // Get color parameter if available
-    const colorCode = getUrlParameter('COLOR');
-    console.log(`Caspio Embed: Using color code from URL: ${colorCode || 'None'}`);
+    // Prioritize catalog color from global scope for Caspio parameters
+    const colorForCaspio = window.selectedCatalogColor || window.selectedColorName || ''; // Use catalog color first, then name
+    console.log(`Using color for Caspio: '${colorForCaspio}' (Catalog: '${window.selectedCatalogColor}', Name: '${window.selectedColorName}')`);
     
     // Get the container element
     const container = document.getElementById(containerId);
@@ -148,26 +162,29 @@ function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
     // Build the Caspio URL with parameters
     let caspioUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}/emb`;
     
-    // Add parameters to the URL
+    // Append parameters, ensuring the correct color is passed
     const params = new URLSearchParams();
     params.append('StyleNumber', styleNumber);
-    if (colorCode) {
-        params.append('COLOR', colorCode);
+    if (colorForCaspio) {
+        params.append('COLOR', colorForCaspio); // Use the determined color
     }
+    const fullUrl = `${caspioUrl}?${params.toString()}`;
     
-    // Set the script src with parameters
-    script.src = `${caspioUrl}?${params.toString()}`;
+    console.log(`Loading Caspio embed from URL: ${fullUrl}`);
+    
+    // Set the script src
+    script.src = fullUrl; // Use the fully constructed URL
     
     // Add event listeners for script loading
     script.onload = function() {
-        console.log(`${caspioAppKey} script loaded successfully`);
+        console.log(`${caspioAppKey} script loaded successfully from ${fullUrl}`);
         // Remove loading message when script is loaded
         const loadingMsg = container.querySelector('.loading-message');
         if (loadingMsg) loadingMsg.style.display = 'none';
     };
     
     script.onerror = function() {
-        console.error(`Error loading ${caspioAppKey} script`);
+        console.error(`Error loading ${caspioAppKey} script from ${fullUrl}`);
         container.innerHTML = '<div class="error-message">Error loading pricing calculator. Please try again later.</div>';
     };
     

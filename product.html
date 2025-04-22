@@ -1139,7 +1139,9 @@
                      triggerPricingDataPageUpdates(window.selectedStyleNumber, catalogColor); // Update Pricing DPs
                      
                      // Update pricing links with the new color
-                     updatePricingLinks(window.selectedStyleNumber, catalogColor);
+                     // Always use the color name for better user experience
+                     console.log(`handleSwatchClick: Using color name for pricing links: ${colorName}`);
+                     updatePricingLinks(window.selectedStyleNumber, colorName);
                  }
         
                 // --- Inventory Update Function (Using New Tabular API) ---
@@ -1237,11 +1239,21 @@
                       window.selectedStyleNumber = styleNumber;
                       window.selectedCatalogColor = catalogColor;
                       window.selectedColorName = window.selectedColorName; // Keep existing name
-        
+                      
                       // Update URL with parameters
                       const url = new URL(window.location);
                       url.searchParams.set('StyleNumber', styleNumber);
-                      if (catalogColor) url.searchParams.set('COLOR', catalogColor);
+                      
+                      // Always use the color name for URL parameters instead of catalog color code
+                      // This ensures better user experience and consistency with the Caspio datapage
+                      if (window.selectedColorName) {
+                          console.log(`Using color name for URL parameter: ${window.selectedColorName}`);
+                          url.searchParams.set('COLOR', window.selectedColorName);
+                      } else if (catalogColor) {
+                          console.log(`No color name available, using catalog color: ${catalogColor}`);
+                          url.searchParams.set('COLOR', catalogColor);
+                      }
+                      
                       window.history.replaceState({}, '', url);
                       console.log("URL updated with parameters:", url.search);
         
@@ -1283,12 +1295,26 @@
                          console.log(`No color code provided, using selected color name: ${colorCode}`);
                      }
                      
+                     // Always prefer the color name over the catalog color code for better user experience
+                     const colorToUse = window.selectedColorName || colorCode;
+                     console.log(`Using color for pricing links: ${colorToUse}`);
+                     
                      const pricingLinks = document.querySelectorAll('.pricing-link');
                      pricingLinks.forEach(link => {
-                         let href = link.getAttribute('href');
-                         href = href.replace('{styleNumber}', encodeURIComponent(styleNumber));
-                         href = href.replace('{colorCode}', encodeURIComponent(colorCode || ''));
-                         link.setAttribute('href', href);
+                         // Get the link's base path (e.g., "/pricing/embroidery")
+                         const currentHref = link.getAttribute('href');
+                         const urlParts = currentHref.split('?');
+                         const basePath = urlParts[0]; // This should be like "/pricing/embroidery", "/pricing/dtg", etc.
+                         
+                         // Reconstruct the new href with the current style and selected color
+                         // Ensure styleNumber and colorToUse are properly encoded for URLs
+                         const newHref = `${basePath}?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorToUse || '')}`;
+                         
+                         // Log the constructed URL for debugging
+                         console.log(`DEBUG - Pricing link for ${basePath}: ${newHref}`);
+                         
+                         // Set the updated href attribute on the link
+                         link.setAttribute('href', newHref);
                          
                          // Add hover effect
                          link.addEventListener('mouseover', function() {
@@ -1366,7 +1392,9 @@
                     await loadSwatches(styleNumber);
                     
                     // Update pricing links with the style number and current color if available
+                    // Always prefer the color name over the catalog color code for better user experience
                     const currentColor = window.selectedColorName || window.selectedCatalogColor;
+                    console.log(`updatePageForStyle: Using color for pricing links: ${currentColor || 'None'}`);
                     updatePricingLinks(styleNumber, currentColor);
                     
                     console.log("--- StyleSearch: Initial updates triggered for style", styleNumber);
