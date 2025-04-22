@@ -18,6 +18,8 @@ function updateProductContext() {
     const colorCode = getUrlParameter('COLOR');
     const colorName = colorCode ? decodeURIComponent(colorCode.replace(/\+/g, ' ')) : 'N/A';
     
+    console.log(`Product Context: StyleNumber=${styleNumber}, COLOR=${colorCode}, decoded=${colorName}`);
+    
     // Update product details text
     document.getElementById('product-style').textContent = styleNumber || 'N/A';
     document.getElementById('product-color').textContent = colorName;
@@ -43,7 +45,11 @@ async function fetchProductDetails(styleNumber, colorCode) {
         let detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`;
         
         if (colorCode) {
+            // Use both COLOR_NAME and CATALOG_COLOR to ensure we get the right color
             detailApiUrl += `&COLOR_NAME=${encodeURIComponent(colorCode)}&CATALOG_COLOR=${encodeURIComponent(colorCode)}`;
+            console.log(`Using color code for API request: ${colorCode}`);
+        } else {
+            console.log("No color code provided for product details");
         }
         
         const response = await fetch(detailApiUrl);
@@ -73,6 +79,8 @@ function updateTabNavigation() {
     const colorCode = getUrlParameter('COLOR');
     const currentPage = window.location.pathname;
     
+    console.log(`Tab Navigation: StyleNumber=${styleNumber}, COLOR=${colorCode}`);
+    
     const tabs = document.querySelectorAll('.pricing-tab');
     tabs.forEach(tab => {
         // Get the tab's target page
@@ -81,6 +89,8 @@ function updateTabNavigation() {
         // Build the URL with parameters
         const url = `/pricing/${targetPage}?StyleNumber=${encodeURIComponent(styleNumber || '')}&COLOR=${encodeURIComponent(colorCode || '')}`;
         tab.href = url;
+        
+        console.log(`Tab ${targetPage} URL set to: ${url}`);
         
         // Set active state based on current page
         if (currentPage.includes(targetPage)) {
@@ -100,6 +110,7 @@ function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
     
     // Get color parameter if available
     const colorCode = getUrlParameter('COLOR');
+    console.log(`Caspio Embed: Using color code from URL: ${colorCode || 'None'}`);
     
     // Get the container element
     const container = document.getElementById(containerId);
