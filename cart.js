@@ -4,7 +4,10 @@
  * Shopping Cart Module for Northwest Custom Apparel
  * Handles cart operations and synchronization with Caspio database
  */
-const NWCACart = (function() {
+// Check if NWCACart is already defined to prevent redeclaration
+if (typeof window.NWCACart === 'undefined') {
+  console.log("Initializing NWCACart module");
+  window.NWCACart = (function() {
   // API endpoints
   const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
   const ENDPOINTS = {
@@ -62,51 +65,63 @@ const NWCACart = (function() {
    */
   async function initializeCart() {
     try {
+      console.log("Initializing cart...");
       cartState.loading = true;
       
       // Load items from localStorage first
       loadFromLocalStorage();
+      console.log("Loaded from localStorage:", cartState.items.length, "items");
       
       // Check if we have a session ID in localStorage
       const storedSessionId = localStorage.getItem(STORAGE_KEYS.sessionId);
+      console.log("Stored session ID:", storedSessionId);
       
       if (storedSessionId) {
         try {
           // Try to get the session from the API
+          console.log("Verifying session with API:", ENDPOINTS.cartSessions.getById(storedSessionId));
           const response = await fetch(ENDPOINTS.cartSessions.getById(storedSessionId));
           
           if (response.ok) {
             const sessions = await response.json();
+            console.log("API returned sessions:", sessions);
             
             // Check if we got any sessions back and if the first one is active
             if (sessions && sessions.length > 0 && sessions[0].IsActive) {
+              console.log("Using existing active session");
               cartState.sessionId = storedSessionId;
               await loadCartItems();
             } else {
+              console.log("Session exists but is not active, creating new session");
               // Session is no longer active, create a new one
-              await createLocalSession();
+              await createNewSession();
             }
           } else {
+            console.log("Session not found or API error, creating new session");
             // Session not found or other error, create a new one
-            await createLocalSession();
+            await createNewSession();
           }
         } catch (error) {
           console.error('Error retrieving session:', error);
-          await createLocalSession();
+          console.log("Creating new session after error");
+          await createNewSession();
         }
       } else {
+        console.log("No stored session ID, creating new session");
         // No stored session ID, create a new one
-        await createLocalSession();
+        await createNewSession();
       }
       
       // Try to sync with server (this will update the localStorage if needed)
       try {
+        console.log("Syncing with server...");
         await syncWithServer();
       } catch (error) {
         console.warn('Could not sync with server, using local storage only:', error);
       }
       
       cartState.loading = false;
+      console.log("Cart initialization complete, triggering cartUpdated event");
       triggerEvent('cartUpdated');
     } catch (error) {
       console.error('Error initializing cart:', error);
@@ -236,6 +251,7 @@ const NWCACart = (function() {
         
         // The API returns items for the session
         const items = await response.json();
+        console.log("loadCartItems - API returned items:", items);
         
         if (!items || !Array.isArray(items)) {
           console.warn('API returned non-array items:', items);
@@ -353,6 +369,7 @@ const NWCACart = (function() {
         
         // The API returns items for the session
         serverItems = await response.json();
+        console.log("syncWithServer - API returned items:", serverItems);
         
         if (!serverItems || !Array.isArray(serverItems)) {
           console.warn('API returned non-array items:', serverItems);
@@ -456,6 +473,7 @@ const NWCACart = (function() {
             // Create the sizes on the server
             await Promise.all((item.sizes || []).map(async (size) => {
               try {
+                // Create payload, ensuring we don't include SizeItemID which is an Autonumber field in Caspio
                 const sizeData = {
                   CartItemID: newItem.CartItemID,
                   Size: size.Size,
@@ -545,41 +563,60 @@ const NWCACart = (function() {
    * @param {Object} productData - Product data
    * @returns {Promise<{success: boolean, error: string|null}>} - Result with success status and error message
    */
+  // Internal debug function
+  function debugCart(area, ...args) {
+    const debug = window.location.hostname === 'localhost' ||
+                 window.location.hostname === '127.0.0.1' ||
+                 window.location.search.includes('debug=true');
+    if (debug) {
+      console.log(`[CART:${area}]`, ...args);
+    }
+  }
+
   async function addToCart(productData) {
+    console.log("Starting add to cart process in NWCACart");
+    console.log("Product data:", productData);
+    
     // Reset error state
     cartState.error = null;
-    
+
     try {
       // Show loading state
       cartState.loading = true;
       triggerEvent('cartUpdated');
-      
+
       // Initialize cart if needed
       if (!cartState.sessionId) {
+        debugCart("ADD", "No session ID found, initializing cart...");
         await initializeCart();
         if (!cartState.sessionId) {
           throw new Error('Unable to create or retrieve cart session');
         }
+        debugCart("ADD", "Cart initialized with session ID:", cartState.sessionId);
       }
-      
+
       // Validate product data
       if (!productData.styleNumber || !productData.color || !productData.embellishmentType) {
+        debugCart("ADD-ERROR", "Missing required product information", productData);
         throw new Error('Missing required product information');
       }
-      
+
       if (!productData.sizes || !Array.isArray(productData.sizes) || productData.sizes.length === 0) {
+        debugCart("ADD-ERROR", "No sizes selected", productData.sizes);
         throw new Error('No sizes selected');
       }
-      
+      debugCart("ADD", "Product data validated");
+
       // Check if we already have items with a different embellishment type
       const existingEmbellishmentTypes = new Set(
         cartState.items
           .filter(item => item.CartStatus === 'Active')
           .map(item => item.ImprintType)
       );
-      
+
       if (existingEmbellishmentTypes.size > 0 &&
           !existingEmbellishmentTypes.has(productData.embellishmentType)) {
+        debugCart("ADD", "Different embellishment type detected", {existing: Array.from(existingEmbellishmentTypes), new: productData.embellishmentType});
         // Show warning about different embellishment types
         const proceed = confirm(
           `You already have items with ${Array.from(existingEmbellishmentTypes).join(', ')} ` +
@@ -587,29 +624,34 @@ const NWCACart = (function() {
           `separate production runs. For optimal pricing and production, we recommend ` +
           `placing separate orders for different embellishment types. Do you want to proceed?`
         );
-        
+
         if (!proceed) {
+          debugCart("ADD", "User canceled adding item due to different embellishment type");
           cartState.loading = false;
           triggerEvent('cartUpdated');
           return { success: false, error: null }; // User canceled, not an error
         }
+        debugCart("ADD", "User chose to proceed with different embellishment type");
       }
-      
+
       // Check inventory before adding
+      debugCart("ADD", "Checking inventory for", {style: productData.styleNumber, color: productData.color});
       const inventoryResponse = await fetch(
         ENDPOINTS.inventory.getByStyleAndColor(
           productData.styleNumber,
           productData.color
         )
       );
-      
+
       if (!inventoryResponse.ok) {
         const errorText = await inventoryResponse.text();
+        debugCart("ADD-ERROR", `Failed to check inventory: ${inventoryResponse.status} ${errorText}`);
         throw new Error(`Failed to check inventory: ${inventoryResponse.status} ${errorText}`);
       }
-      
+
       const inventoryData = await inventoryResponse.json();
-      
+      debugCart("ADD", "Inventory data received:", inventoryData);
+
       // Create a map of available inventory by size
       const availableInventory = {};
       inventoryData.forEach(item => {
@@ -618,38 +660,53 @@ const NWCACart = (function() {
         }
         availableInventory[item.size] += item.quantity;
       });
-      
+      debugCart("ADD", "Available inventory map:", availableInventory);
+
       // Validate requested quantities against inventory
       const validSizes = [];
       const inventoryErrors = [];
-      
+
       for (const sizeData of productData.sizes) {
-        if (!sizeData.size || !sizeData.quantity || sizeData.quantity <= 0) {
-          continue; // Skip invalid sizes
+        if (!sizeData.size || sizeData.quantity === undefined || sizeData.quantity === null || sizeData.quantity < 0) {
+           debugCart("ADD", "Skipping invalid size data:", sizeData);
+           continue; // Skip invalid or zero/negative quantities
         }
-        
+        const requestedQty = parseInt(sizeData.quantity) || 0; // Ensure quantity is a number
+
+        if (requestedQty <= 0) {
+             debugCart("ADD", "Skipping size with zero or negative quantity:", sizeData);
+             continue;
+        }
+
         const availableQty = availableInventory[sizeData.size] || 0;
-        
-        if (sizeData.quantity > availableQty) {
+        debugCart("ADD", `Checking quantity for size ${sizeData.size}: Requested ${requestedQty}, Available ${availableQty}`);
+
+        if (requestedQty > availableQty) {
           inventoryErrors.push(`Only ${availableQty} units of size ${sizeData.size} are available.`);
+          debugCart("ADD-ERROR", `Inventory insufficient for size ${sizeData.size}`);
         } else {
-          validSizes.push(sizeData);
+          validSizes.push({...sizeData, quantity: requestedQty}); // Use parsed quantity
+          debugCart("ADD", `Size ${sizeData.size} quantity ${requestedQty} is valid`);
         }
       }
-      
+
       if (inventoryErrors.length > 0) {
         // Join all inventory errors into a single message
+        debugCart("ADD-ERROR", "Inventory validation failed", inventoryErrors);
         throw new Error(`Inventory issues:\n${inventoryErrors.join('\n')}`);
       }
-      
+
       if (validSizes.length === 0) {
-        throw new Error('No valid sizes selected');
+        debugCart("ADD-ERROR", "No valid sizes selected after validation");
+        throw new Error('Please select at least one size and quantity');
       }
-      
+      debugCart("ADD", "Inventory validated, valid sizes:", validSizes);
+
+
       // Create cart item
       const cartItemData = {
         SessionID: cartState.sessionId,
-        ProductID: productData.productId || '',
+        ProductID: productData.productId || productData.ProductID || `${productData.styleNumber}_${productData.color}`, // Ensure ProductID is included
         StyleNumber: productData.styleNumber,
         Color: productData.color,
         ImprintType: productData.embellishmentType,
@@ -657,7 +714,8 @@ const NWCACart = (function() {
         DateAdded: new Date().toISOString(),
         CartStatus: 'Active'
       };
-      
+
+      debugCart("ADD", "Creating cart item on server with data:", cartItemData);
       const response = await fetch(ENDPOINTS.cartItems.create, {
         method: 'POST',
         headers: {
@@ -665,95 +723,160 @@ const NWCACart = (function() {
         },
         body: JSON.stringify(cartItemData)
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
+        debugCart("ADD-ERROR", "API error creating cart item:", {status: response.status, text: errorText});
         throw new Error(`Failed to add item to cart: ${response.status} ${errorText}`);
       }
-      
+
       const newCartItemResponse = await response.json();
       console.log("Cart item creation response:", newCartItemResponse);
+      debugCart("ADD", "API success response for cart item creation:", newCartItemResponse);
       
-      // The API doesn't return the cart item ID, we need to fetch it
+      // Extract CartItemID from the response
       let cartItemId;
       
-      try {
-        // Get the cart items for this session to find the one we just created
-        const itemsResponse = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
-        
-        if (!itemsResponse.ok) {
-          throw new Error(`Failed to fetch cart items after creation: ${itemsResponse.status}`);
+      // Check if the response contains a CartItemID
+      if (newCartItemResponse.CartItemID) {
+        cartItemId = newCartItemResponse.CartItemID;
+      } else if (newCartItemResponse.cartItem && newCartItemResponse.cartItem.CartItemID) {
+        cartItemId = newCartItemResponse.cartItem.CartItemID;
+      } else if (newCartItemResponse.id || newCartItemResponse.ID || newCartItemResponse.Id) {
+        cartItemId = newCartItemResponse.id || newCartItemResponse.ID || newCartItemResponse.Id;
+      } else if (newCartItemResponse.message && typeof newCartItemResponse.message === 'string') {
+        // Try to extract ID from success message like "Cart item created with ID: 1234"
+        const idMatch = newCartItemResponse.message.match(/ID:?\s*(\d+)/i);
+        if (idMatch && idMatch[1]) {
+          cartItemId = parseInt(idMatch[1], 10);
         }
-        
-        const items = await itemsResponse.json();
-        console.log("Retrieved cart items after creation:", items);
-        
-        if (items && Array.isArray(items) && items.length > 0) {
-          // Find the item with matching style number and color that we just added
-          const matchingItems = items.filter(item =>
-            item.StyleNumber === productData.styleNumber &&
-            item.Color === productData.color &&
-            item.ImprintType === productData.embellishmentType
-          );
-          
-          if (matchingItems.length > 0) {
-            // Use the most recently added item (should be the one we just created)
-            const newItem = matchingItems[matchingItems.length - 1];
-            cartItemId = newItem.CartItemID;
-            console.log("Found cart item ID:", cartItemId);
-          } else {
-            throw new Error('No matching cart item found after creation');
-          }
-        } else {
-          throw new Error('No cart items found after creation');
-        }
-      } catch (fetchError) {
-        console.error('Error fetching cart item ID:', fetchError);
-        throw new Error('Failed to get cart item ID after creation');
       }
       
+      // If no CartItemID found in the response, generate a numeric ID
+      // CartItemID must be a number (not a string) for the Caspio database
+      if (!cartItemId) {
+        // Generate a numeric ID using timestamp (ensure it's a number, not a string)
+        cartItemId = Date.now(); // This will be a number
+        debugCart("ADD", "No CartItemID found in API response, using generated numeric ID:", cartItemId);
+      } else if (typeof cartItemId === 'string') {
+        // If cartItemId is a string, convert it to a number if possible
+        const numericId = parseInt(cartItemId, 10);
+        if (!isNaN(numericId)) {
+          cartItemId = numericId;
+          debugCart("ADD", "Converted string CartItemID to number:", cartItemId);
+        } else {
+          // If conversion fails, generate a new numeric ID
+          cartItemId = Date.now();
+          debugCart("ADD", "Could not convert CartItemID to number, using generated numeric ID:", cartItemId);
+        }
+      }
+      
+      console.log("Extracted CartItemID:", cartItemId);
+      debugCart("ADD", "Received CartItemID from API:", cartItemId);
+      
+      console.log("Extracted CartItemID:", cartItemId);
+      debugCart("ADD", "Received CartItemID from API:", cartItemId);
+
+
       // Add sizes
+      debugCart("ADD", "Adding sizes for CartItemID:", cartItemId, "Sizes:", validSizes);
       const sizes = [];
       const sizeErrors = [];
-      
+
       // Process sizes in parallel for better performance
       await Promise.all(validSizes.map(async (sizeData) => {
         try {
-          const sizeResponse = await fetch(ENDPOINTS.cartItemSizes.create, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              CartItemID: cartItemId,
-              Size: sizeData.size,
-              Quantity: sizeData.quantity,
-              UnitPrice: sizeData.unitPrice,
-              WarehouseSource: sizeData.warehouseSource || ''
-            })
-          });
+          // Create payload, ensuring we don't include SizeItemID which is an Autonumber field in Caspio
+          const sizeDataPayload = {
+            CartItemID: cartItemId,
+            Size: sizeData.size,
+            Quantity: sizeData.quantity,
+            UnitPrice: sizeData.unitPrice
+          };
           
-          if (!sizeResponse.ok) {
-            const errorText = await sizeResponse.text();
-            throw new Error(`Failed to add size ${sizeData.size}: ${sizeResponse.status} ${errorText}`);
+          // Only add WarehouseSource if it exists
+          if (sizeData.warehouseSource) {
+            sizeDataPayload.WarehouseSource = sizeData.warehouseSource;
+          }
+          debugCart("ADD", "Creating size on server with data:", sizeDataPayload);
+          
+          // Try up to 3 times to create the size
+          let attempt = 0;
+          let sizeResponse;
+          let errorText;
+          
+          while (attempt < 3) {
+            try {
+              sizeResponse = await fetch(ENDPOINTS.cartItemSizes.create, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(sizeDataPayload)
+              });
+              
+              if (sizeResponse.ok) {
+                // Success, break out of retry loop
+                break;
+              }
+              
+              // Not successful, get error text for logging
+              errorText = await sizeResponse.text();
+              debugCart("ADD-WARNING", `API error creating size ${sizeData.size} (attempt ${attempt + 1}/3):`, {status: sizeResponse.status, text: errorText});
+              
+              // Wait before retrying (exponential backoff)
+              await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, attempt)));
+              attempt++;
+            } catch (fetchError) {
+              // Network error or other fetch error
+              debugCart("ADD-WARNING", `Fetch error creating size ${sizeData.size} (attempt ${attempt + 1}/3):`, fetchError);
+              
+              // Wait before retrying (exponential backoff)
+              await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, attempt)));
+              attempt++;
+            }
           }
           
+          // Check if any of the attempts were successful
+          if (!sizeResponse || !sizeResponse.ok) {
+            debugCart("ADD-ERROR", `API error creating size ${sizeData.size} after ${attempt} attempts:`, {status: sizeResponse?.status, text: errorText});
+            throw new Error(`Failed to add size ${sizeData.size}: ${sizeResponse?.status || 'Network Error'} ${errorText || ''}`);
+          }
+
           const newSize = await sizeResponse.json();
+          debugCart("ADD", `API success response for size ${sizeData.size}:`, newSize);
           sizes.push(newSize);
         } catch (sizeError) {
+          console.error('Error syncing size:', sizeError); // Keep console.error for visibility
           sizeErrors.push(sizeError.message);
         }
       }));
-      
+
+      // If there were errors adding sizes
       if (sizeErrors.length > 0) {
-        // If there were errors adding sizes, delete the cart item
-        await fetch(ENDPOINTS.cartItems.delete(cartItemId), {
-          method: 'DELETE'
-        });
+        debugCart("ADD-ERROR", "Errors occurred while adding sizes", sizeErrors);
         
-        throw new Error(`Failed to add sizes:\n${sizeErrors.join('\n')}`);
+        // If all sizes failed, delete the cart item and throw an error
+        if (sizeErrors.length === validSizes.length) {
+          debugCart("ADD", "All sizes failed, deleting cart item:", cartItemId);
+          try {
+            await fetch(ENDPOINTS.cartItems.delete(cartItemId), {
+              method: 'DELETE'
+            });
+          } catch (deleteError) {
+            debugCart("ADD-WARNING", "Error deleting cart item after size errors:", deleteError);
+            // Continue even if delete fails
+          }
+          
+          throw new Error(`Failed to add sizes:\n${sizeErrors.join('\n')}`);
+        } else {
+          // Some sizes succeeded, some failed - log warning but continue
+          debugCart("ADD-WARNING", `${sizeErrors.length} of ${validSizes.length} sizes failed to add, but continuing with successful ones`);
+          console.warn(`${sizeErrors.length} of ${validSizes.length} sizes failed to add, but continuing with successful ones`);
+        }
       }
-      
+      debugCart("ADD", "All sizes added successfully");
+
       // Get the full item with sizes to add to local state
       const itemWithSizes = {
         CartItemID: cartItemId,
@@ -762,30 +885,52 @@ const NWCACart = (function() {
         StyleNumber: productData.styleNumber,
         Color: productData.color,
         ImprintType: productData.embellishmentType,
-        EmbellishmentOptions: JSON.stringify(productData.embellishmentOptions || {}),
+        EmbellishmentOptions: productData.embellishmentOptions || {}, // Keep as object
         DateAdded: new Date().toISOString(),
         CartStatus: 'Active',
-        sizes: sizes
+        sizes: sizes.map(s => ({ // Map server response size format to local state format
+             SizeItemID: s.SizeItemID,
+             CartItemID: s.CartItemID,
+             size: s.Size, // Use 'size' key for consistency with productData
+             quantity: s.Quantity, // Use 'quantity' key
+             unitPrice: s.UnitPrice, // Use 'unitPrice' key
+             WarehouseSource: s.WarehouseSource
+        }))
       };
-      
+
       // Add to local cart state
+      debugCart("ADD", "Adding item to cartState.items:", itemWithSizes);
+      console.log("Adding item to cart state:", itemWithSizes);
       cartState.items.push(itemWithSizes);
       
+      // Force a sync with the server to ensure everything is up to date
+      try {
+          console.log("Syncing with server after adding item...");
+          await syncWithServer();
+          console.log("Cart synced with server after adding item");
+      } catch (syncError) {
+          console.warn("Error syncing with server after adding item:", syncError);
+          // Continue even if sync fails, as the item is already in local state
+      }
+
       // Save to localStorage
       saveToLocalStorage();
-      
+      debugCart("ADD", "Cart state saved to localStorage");
+
       // Success!
       cartState.error = null;
       cartState.loading = false;
       triggerEvent('cartUpdated');
-      
+      debugCart("ADD", "Item added successfully, cart updated");
+
       return { success: true, error: null };
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      console.error('Error adding to cart:', error); // Keep console.error for visibility
+      debugCart("ADD-ERROR", "Error during add to cart process:", error);
       cartState.error = error.message || 'Failed to add item to cart';
       cartState.loading = false;
       triggerEvent('cartUpdated');
-      
+
       return { success: false, error: cartState.error };
     }
   }
@@ -891,8 +1036,10 @@ const NWCACart = (function() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            ...sizeItem,
-            Quantity: quantity
+            CartItemID: sizeItem.CartItemID,
+            Size: sizeItem.Size,
+            Quantity: quantity,
+            UnitPrice: sizeItem.UnitPrice
           })
         });
         
@@ -1071,15 +1218,22 @@ const NWCACart = (function() {
    * @returns {Array} - Cart items
    */
   function getCartItems(status) {
+    console.log("Getting cart items with status:", status);
+    
     // Ensure cartState.items is an array
     if (!cartState.items || !Array.isArray(cartState.items)) {
+      console.log("cartState.items is not an array, initializing empty array");
       cartState.items = [];
       saveToLocalStorage();
     }
     
     if (status) {
-      return cartState.items.filter(item => item.CartStatus === status);
+      const filteredItems = cartState.items.filter(item => item.CartStatus === status);
+      console.log(`Found ${filteredItems.length} items with status ${status}`);
+      return filteredItems;
     }
+    
+    console.log(`Returning all ${cartState.items.length} items`);
     return cartState.items;
   }
 
@@ -1215,6 +1369,73 @@ const NWCACart = (function() {
     }
   }
 
+  /**
+   * Get the current cart state
+   * @returns {Object} - Cart state
+   */
+  function getCartState() {
+    return {
+      sessionId: cartState.sessionId,
+      itemCount: getCartCount(),
+      totalAmount: getCartTotal(),
+      items: cartState.items,
+      loading: cartState.loading,
+      error: cartState.error,
+      lastSync: cartState.lastSync
+    };
+  }
+
+  /**
+   * Clear the cart
+   * @returns {Promise<{success: boolean, error: string|null}>} - Result with success status and error message
+   */
+  async function clearCart() {
+    try {
+      // Reset cart state
+      cartState.items = [];
+      cartState.error = null;
+      
+      // Save to localStorage
+      saveToLocalStorage();
+      
+      // Try to sync with server if we have a session
+      if (cartState.sessionId && !cartState.sessionId.startsWith('local_')) {
+        try {
+          // Get all items for this session
+          const response = await fetch(ENDPOINTS.cartItems.getBySession(cartState.sessionId));
+          
+          if (response.ok) {
+            const items = await response.json();
+            
+            // Delete each item
+            if (items && Array.isArray(items)) {
+              await Promise.all(items.map(async (item) => {
+                try {
+                  await fetch(ENDPOINTS.cartItems.delete(item.CartItemID), {
+                    method: 'DELETE'
+                  });
+                } catch (deleteError) {
+                  console.error(`Error deleting item ${item.CartItemID}:`, deleteError);
+                }
+              }));
+            }
+          }
+        } catch (syncError) {
+          console.warn('Error syncing with server during clear:', syncError);
+        }
+      }
+      
+      // Trigger event
+      triggerEvent('cartUpdated');
+      
+      return { success: true, error: null };
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+      cartState.error = 'Failed to clear cart';
+      return { success: false, error: cartState.error };
+    }
+  }
+
   // Public API
   return {
     initializeCart,
@@ -1231,28 +1452,34 @@ const NWCACart = (function() {
     removeEventListener,
     syncWithServer,
     isLoading: () => cartState.loading,
-    getError: () => cartState.error
+    getError: () => cartState.error,
+    getCartState, // Add the getCartState method to the public API
+    clearCart // Add the clearCart method to the public API
   };
-})();
+  })();
 
-// Initialize cart when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  NWCACart.initializeCart();
-  
-  // Update cart count in header (if element exists)
-  const updateCartCount = function() {
-    const cartCountElement = document.getElementById('cart-count');
-    if (cartCountElement) {
-      cartCountElement.textContent = NWCACart.getCartCount();
-    }
-  };
-  
-  // Listen for cart updates
-  NWCACart.addEventListener('cartUpdated', updateCartCount);
-  
-  // Initial update
-  updateCartCount();
-});
+  // Initialize cart when DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM loaded, initializing NWCACart");
+    window.NWCACart.initializeCart();
+    
+    // Update cart count in header (if element exists)
+    const updateCartCount = function() {
+      const cartCountElement = document.getElementById('cart-count');
+      if (cartCountElement) {
+        cartCountElement.textContent = window.NWCACart.getCartCount();
+      }
+    };
+    
+    // Listen for cart updates
+    window.NWCACart.addEventListener('cartUpdated', updateCartCount);
+    
+    // Initial update
+    updateCartCount();
+  });
+} else {
+  console.log("NWCACart already defined, skipping initialization");
+}
 
 // Example embellishment options structures for different types
 const embellishmentOptionsExamples = {
