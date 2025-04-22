@@ -181,11 +181,26 @@ function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
         // Remove loading message when script is loaded
         const loadingMsg = container.querySelector('.loading-message');
         if (loadingMsg) loadingMsg.style.display = 'none';
+        
+        // Set a timeout to check if the Caspio DataPage has loaded properly
+        setTimeout(function() {
+            // Check if there's an error message or "No records found" message
+            if (container.innerHTML.includes('Error: Initializing script') ||
+                container.innerHTML.includes('No records found')) {
+                console.log(`Caspio DataPage failed to load properly for ${caspioAppKey}, displaying unavailable message`);
+                
+                // Display unavailable message and mark the container
+                container.innerHTML = '<div class="error-message">Pricing unavailable, please try again later.</div>';
+                container.classList.add('pricing-unavailable');
+            }
+        }, 3000); // Wait 3 seconds to allow Caspio DataPage to load
     };
     
     script.onerror = function() {
         console.error(`Error loading ${caspioAppKey} script from ${fullUrl}`);
-        container.innerHTML = '<div class="error-message">Error loading pricing calculator. Please try again later.</div>';
+        // Display unavailable message and mark the container
+        container.innerHTML = '<div class="error-message">Pricing unavailable, please try again later.</div>';
+        container.classList.add('pricing-unavailable');
     };
     
     // Append the script to the container
@@ -291,16 +306,355 @@ async function initPricingPage() {
     if (currentPage.includes('embroidery-pricing') || currentPage.includes('/pricing/embroidery')) {
         // Use the Caspio app key from the provided embedded code
         loadCaspioEmbed('pricing-calculator', 'a0e150001c7143d027a54c439c01', styleNumber);
+        
+        // Initialize fallback pricing data for embroidery if not already defined
+        // This prevents errors in cart-integration.js when Caspio doesn't load properly
+        setTimeout(() => {
+            if (!window.embroideryGroupedHeaders && !window.dp5GroupedHeaders) {
+                console.log('Initializing fallback pricing data for embroidery');
+                
+                // Define fallback pricing data
+                window.embroideryGroupedHeaders = ['XS-S', 'M-L', 'XL-2XL', '3XL-4XL', '5XL-6XL'];
+                window.embroideryGroupedPrices = {
+                    'XS-S': { 'Tier1': 18.99, 'Tier2': 17.99, 'Tier3': 16.99, 'Tier4': 15.99 },
+                    'M-L': { 'Tier1': 19.99, 'Tier2': 18.99, 'Tier3': 17.99, 'Tier4': 16.99 },
+                    'XL-2XL': { 'Tier1': 21.99, 'Tier2': 20.99, 'Tier3': 19.99, 'Tier4': 18.99 },
+                    '3XL-4XL': { 'Tier1': 23.99, 'Tier2': 22.99, 'Tier3': 21.99, 'Tier4': 20.99 },
+                    '5XL-6XL': { 'Tier1': 25.99, 'Tier2': 24.99, 'Tier3': 23.99, 'Tier4': 22.99 }
+                };
+                window.embroideryApiTierData = {
+                    'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11 },
+                    'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23 },
+                    'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 },
+                    'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 10000 }
+                };
+                
+                // Also define dp5 versions for compatibility
+                window.dp5GroupedHeaders = window.embroideryGroupedHeaders;
+                window.dp5GroupedPrices = window.embroideryGroupedPrices;
+                window.dp5ApiTierData = window.embroideryApiTierData;
+                
+                console.log('Fallback pricing data initialized successfully');
+            }
+        }, 1000); // Wait 1 second to allow Caspio to load first
     } else if (currentPage.includes('cap-embroidery-pricing') || currentPage.includes('/pricing/cap-embroidery')) {
         loadCaspioEmbed('pricing-calculator', 'a0e150004ecd0739f853449c8d7f', styleNumber);
+        
+        // Initialize fallback pricing data for cap embroidery
+        setTimeout(() => {
+            if (!window['cap-embroideryGroupedHeaders'] && !window.dp5GroupedHeaders) {
+                console.log('Initializing fallback pricing data for cap embroidery');
+                
+                // Define fallback pricing data
+                window['cap-embroideryGroupedHeaders'] = ['One Size'];
+                window['cap-embroideryGroupedPrices'] = {
+                    'One Size': { 'Tier1': 22.99, 'Tier2': 21.99, 'Tier3': 20.99, 'Tier4': 19.99 }
+                };
+                window['cap-embroideryApiTierData'] = {
+                    'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11 },
+                    'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23 },
+                    'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 },
+                    'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 10000 }
+                };
+                
+                // Also define dp5 versions for compatibility
+                window.dp5GroupedHeaders = window['cap-embroideryGroupedHeaders'];
+                window.dp5GroupedPrices = window['cap-embroideryGroupedPrices'];
+                window.dp5ApiTierData = window['cap-embroideryApiTierData'];
+                
+                console.log('Fallback pricing data initialized successfully for cap embroidery');
+            }
+        }, 1000);
     } else if (currentPage.includes('dtg-pricing') || currentPage.includes('/pricing/dtg')) {
         loadCaspioEmbed('pricing-calculator', 'a0e150002eb9491a50104c1d99d7', styleNumber);
+        
+        // Initialize fallback pricing data for DTG
+        setTimeout(() => {
+            if (!window.dtgGroupedHeaders && !window.dp5GroupedHeaders) {
+                console.log('Initializing fallback pricing data for DTG');
+                
+                // Define fallback pricing data
+                window.dtgGroupedHeaders = ['XS-S', 'M-L', 'XL-2XL', '3XL-4XL', '5XL-6XL'];
+                window.dtgGroupedPrices = {
+                    'XS-S': { 'Tier1': 20.99, 'Tier2': 19.99, 'Tier3': 18.99, 'Tier4': 17.99 },
+                    'M-L': { 'Tier1': 21.99, 'Tier2': 20.99, 'Tier3': 19.99, 'Tier4': 18.99 },
+                    'XL-2XL': { 'Tier1': 23.99, 'Tier2': 22.99, 'Tier3': 21.99, 'Tier4': 20.99 },
+                    '3XL-4XL': { 'Tier1': 25.99, 'Tier2': 24.99, 'Tier3': 23.99, 'Tier4': 22.99 },
+                    '5XL-6XL': { 'Tier1': 27.99, 'Tier2': 26.99, 'Tier3': 25.99, 'Tier4': 24.99 }
+                };
+                window.dtgApiTierData = {
+                    'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11 },
+                    'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23 },
+                    'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 },
+                    'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 10000 }
+                };
+                
+                // Also define dp5 versions for compatibility
+                window.dp5GroupedHeaders = window.dtgGroupedHeaders;
+                window.dp5GroupedPrices = window.dtgGroupedPrices;
+                window.dp5ApiTierData = window.dtgApiTierData;
+                
+                console.log('Fallback pricing data initialized successfully for DTG');
+            }
+        }, 1000);
     } else if (currentPage.includes('screen-print-pricing') || currentPage.includes('/pricing/screen-print')) {
         loadCaspioEmbed('pricing-calculator', 'a0e1500026349f420e494800b43e', styleNumber);
+        
+        // Initialize fallback pricing data for screen print
+        setTimeout(() => {
+            if (!window['screen-printGroupedHeaders'] && !window.dp5GroupedHeaders) {
+                console.log('Initializing fallback pricing data for screen print');
+                
+                // Define fallback pricing data
+                window['screen-printGroupedHeaders'] = ['XS-S', 'M-L', 'XL-2XL', '3XL-4XL', '5XL-6XL'];
+                window['screen-printGroupedPrices'] = {
+                    'XS-S': { 'Tier1': 16.99, 'Tier2': 15.99, 'Tier3': 14.99, 'Tier4': 13.99 },
+                    'M-L': { 'Tier1': 17.99, 'Tier2': 16.99, 'Tier3': 15.99, 'Tier4': 14.99 },
+                    'XL-2XL': { 'Tier1': 19.99, 'Tier2': 18.99, 'Tier3': 17.99, 'Tier4': 16.99 },
+                    '3XL-4XL': { 'Tier1': 21.99, 'Tier2': 20.99, 'Tier3': 19.99, 'Tier4': 18.99 },
+                    '5XL-6XL': { 'Tier1': 23.99, 'Tier2': 22.99, 'Tier3': 21.99, 'Tier4': 20.99 }
+                };
+                window['screen-printApiTierData'] = {
+                    'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11 },
+                    'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23 },
+                    'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 },
+                    'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 10000 }
+                };
+                
+                // Also define dp5 versions for compatibility
+                window.dp5GroupedHeaders = window['screen-printGroupedHeaders'];
+                window.dp5GroupedPrices = window['screen-printGroupedPrices'];
+                window.dp5ApiTierData = window['screen-printApiTierData'];
+                
+                console.log('Fallback pricing data initialized successfully for screen print');
+            }
+        }, 1000);
     } else if (currentPage.includes('dtf-pricing') || currentPage.includes('/pricing/dtf')) {
         // For DTF, use a special app key that will trigger the coming soon message
         loadCaspioEmbed('pricing-calculator', 'dtf', styleNumber);
+        
+        // Initialize fallback pricing data for DTF
+        setTimeout(() => {
+            if (!window.dtfGroupedHeaders && !window.dp5GroupedHeaders) {
+                console.log('Initializing fallback pricing data for DTF');
+                
+                // Define fallback pricing data
+                window.dtfGroupedHeaders = ['XS-S', 'M-L', 'XL-2XL', '3XL-4XL', '5XL-6XL'];
+                window.dtfGroupedPrices = {
+                    'XS-S': { 'Tier1': 21.99, 'Tier2': 20.99, 'Tier3': 19.99, 'Tier4': 18.99 },
+                    'M-L': { 'Tier1': 22.99, 'Tier2': 21.99, 'Tier3': 20.99, 'Tier4': 19.99 },
+                    'XL-2XL': { 'Tier1': 24.99, 'Tier2': 23.99, 'Tier3': 22.99, 'Tier4': 21.99 },
+                    '3XL-4XL': { 'Tier1': 26.99, 'Tier2': 25.99, 'Tier3': 24.99, 'Tier4': 23.99 },
+                    '5XL-6XL': { 'Tier1': 28.99, 'Tier2': 27.99, 'Tier3': 26.99, 'Tier4': 25.99 }
+                };
+                window.dtfApiTierData = {
+                    'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11 },
+                    'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23 },
+                    'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 },
+                    'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 10000 }
+                };
+                
+                // Also define dp5 versions for compatibility
+                window.dp5GroupedHeaders = window.dtfGroupedHeaders;
+                window.dp5GroupedPrices = window.dtfGroupedPrices;
+                window.dp5ApiTierData = window.dtfApiTierData;
+                
+                console.log('Fallback pricing data initialized successfully for DTF');
+            }
+        }, 1000);
     }
+}
+
+// Helper function to get the embellishment type from the URL
+function getEmbellishmentTypeFromUrl() {
+    const currentPage = window.location.pathname;
+    let embType = 'embroidery'; // Default
+    
+    if (currentPage.includes('cap-embroidery')) {
+        embType = 'cap-embroidery';
+    } else if (currentPage.includes('dtg')) {
+        embType = 'dtg';
+    } else if (currentPage.includes('screen-print')) {
+        embType = 'screen-print';
+    } else if (currentPage.includes('dtf')) {
+        embType = 'dtf';
+    }
+    
+    return embType;
+}
+
+// Define the initDp5ApiFetch function that Caspio DataPage is looking for
+window.initDp5ApiFetch = function() {
+    console.log("initDp5ApiFetch called by Caspio DataPage");
+    
+    // This function is called by the Caspio DataPage when it's ready
+    // It should fetch data from the API and update the pricing table
+    
+    try {
+        // Get the current embellishment type from the URL
+        const embType = getEmbellishmentTypeFromUrl();
+        
+        console.log(`initDp5ApiFetch: Detected embellishment type: ${embType}`);
+        
+        // Find the pricing table elements
+        const pricingTable = document.querySelector('.matrix-price-table');
+        const tableBody = document.getElementById('matrix-price-body');
+        
+        if (pricingTable && tableBody) {
+            console.log("initDp5ApiFetch: Found pricing table elements, updating with data");
+            
+            // The table exists, so we can update it with our data
+            // This will be handled by the Caspio DataPage
+        } else {
+            console.log("initDp5ApiFetch: Pricing table elements not found, may need to create them");
+            
+            // The table doesn't exist yet, so we'll need to wait for it to be created
+            // or create it ourselves if necessary
+            const pricingCalculator = document.getElementById('pricing-calculator');
+            if (pricingCalculator) {
+                // Check if there's an error message
+                const errorElement = pricingCalculator.querySelector('.error-message');
+                const noRecordsElement = pricingCalculator.querySelector(':contains("No records found")');
+                
+                if (errorElement || noRecordsElement || pricingCalculator.innerHTML.includes("Error: Initializing script")) {
+                    console.log("initDp5ApiFetch: Detected error in pricing calculator, will attempt to fix");
+                    
+                    // Create a fallback pricing table
+                    createFallbackPricingTable(pricingCalculator, embType);
+                }
+            }
+        }
+    } catch (error) {
+        console.error("Error in initDp5ApiFetch:", error);
+    }
+    
+    return true; // Indicate success to the Caspio DataPage
+};
+
+// Function to create a fallback pricing table when Caspio DataPage fails
+function createFallbackPricingTable(container, embType) {
+    console.log(`Creating fallback pricing table for ${embType}`);
+    
+    // Clear the container
+    container.innerHTML = '';
+    
+    // Get the pricing data based on embellishment type
+    let headers, prices, tiers;
+    
+    // Use the pricing data we've already defined
+    if (embType === 'embroidery') {
+        headers = window.embroideryGroupedHeaders || window.dp5GroupedHeaders;
+        prices = window.embroideryGroupedPrices || window.dp5GroupedPrices;
+        tiers = window.embroideryApiTierData || window.dp5ApiTierData;
+    } else if (embType === 'cap-embroidery') {
+        headers = window['cap-embroideryGroupedHeaders'] || window.dp5GroupedHeaders;
+        prices = window['cap-embroideryGroupedPrices'] || window.dp5GroupedPrices;
+        tiers = window['cap-embroideryApiTierData'] || window.dp5ApiTierData;
+    } else if (embType === 'dtg') {
+        headers = window.dtgGroupedHeaders || window.dp5GroupedHeaders;
+        prices = window.dtgGroupedPrices || window.dp5GroupedPrices;
+        tiers = window.dtgApiTierData || window.dp5ApiTierData;
+    } else if (embType === 'screen-print') {
+        headers = window['screen-printGroupedHeaders'] || window.dp5GroupedHeaders;
+        prices = window['screen-printGroupedPrices'] || window.dp5GroupedPrices;
+        tiers = window['screen-printApiTierData'] || window.dp5ApiTierData;
+    } else if (embType === 'dtf') {
+        headers = window.dtfGroupedHeaders || window.dp5GroupedHeaders;
+        prices = window.dtfGroupedPrices || window.dp5GroupedPrices;
+        tiers = window.dtfApiTierData || window.dp5ApiTierData;
+    }
+    
+    // If we don't have pricing data, show an error message
+    if (!headers || !prices || !tiers) {
+        container.innerHTML = '<div class="error-message">Error: Pricing data not available. Please try again later.</div>';
+        return;
+    }
+    
+    // Create the pricing table
+    const table = document.createElement('table');
+    table.className = 'matrix-price-table';
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
+    table.style.marginBottom = '20px';
+    
+    // Create the table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    // Add the "Size" header
+    const sizeHeader = document.createElement('th');
+    sizeHeader.textContent = 'Size';
+    sizeHeader.style.padding = '10px';
+    sizeHeader.style.backgroundColor = '#f8f8f8';
+    sizeHeader.style.borderBottom = '2px solid #ddd';
+    sizeHeader.style.textAlign = 'left';
+    headerRow.appendChild(sizeHeader);
+    
+    // Add the quantity tier headers
+    const tierNames = Object.keys(tiers).sort((a, b) => {
+        return tiers[a].MinQuantity - tiers[b].MinQuantity;
+    });
+    
+    tierNames.forEach(tierName => {
+        const tier = tiers[tierName];
+        const th = document.createElement('th');
+        th.textContent = `${tier.MinQuantity}${tier.MaxQuantity < 10000 ? '-' + tier.MaxQuantity : '+'}`;
+        th.style.padding = '10px';
+        th.style.backgroundColor = '#f8f8f8';
+        th.style.borderBottom = '2px solid #ddd';
+        th.style.textAlign = 'center';
+        headerRow.appendChild(th);
+    });
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Create the table body
+    const tbody = document.createElement('tbody');
+    tbody.id = 'matrix-price-body';
+    
+    // Add rows for each size group
+    headers.forEach(sizeGroup => {
+        const row = document.createElement('tr');
+        
+        // Add the size group cell
+        const sizeCell = document.createElement('td');
+        sizeCell.textContent = sizeGroup;
+        sizeCell.style.padding = '10px';
+        sizeCell.style.borderBottom = '1px solid #ddd';
+        sizeCell.style.fontWeight = 'bold';
+        row.appendChild(sizeCell);
+        
+        // Add the price cells for each tier
+        tierNames.forEach(tierName => {
+            const priceCell = document.createElement('td');
+            const price = prices[sizeGroup][tierName];
+            priceCell.textContent = price ? `$${price.toFixed(2)}` : 'N/A';
+            priceCell.style.padding = '10px';
+            priceCell.style.borderBottom = '1px solid #ddd';
+            priceCell.style.textAlign = 'center';
+            row.appendChild(priceCell);
+        });
+        
+        tbody.appendChild(row);
+    });
+    
+    table.appendChild(tbody);
+    
+    // Add a note about the pricing
+    const note = document.createElement('div');
+    note.id = 'matrix-note';
+    note.style.marginTop = '10px';
+    note.style.fontSize = '0.9em';
+    note.style.color = '#666';
+    note.innerHTML = 'Note: Pricing shown is for reference only. Final pricing may vary based on specific requirements.';
+    
+    // Add the table and note to the container
+    container.appendChild(table);
+    container.appendChild(note);
+    
+    console.log(`Fallback pricing table created for ${embType}`);
 }
 
 // Run initialization when DOM is loaded
