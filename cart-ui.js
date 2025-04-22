@@ -222,6 +222,18 @@ const NWCACartUI = (function() {
     const template = templates.cartItem.content.cloneNode(true);
     const itemElement = template.querySelector('.cart-item');
     
+    // Enhance cart item styling
+    itemElement.style.border = '1px solid #dee2e6';
+    itemElement.style.borderRadius = '8px';
+    itemElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+    
+    if (isSaved) {
+      itemElement.style.backgroundColor = '#f8f9fa';
+      itemElement.style.borderLeft = '4px solid #6c757d';
+    } else {
+      itemElement.style.borderLeft = '4px solid #0056b3';
+    }
+    
     // Set item data
     const titleElement = itemElement.querySelector('.cart-item-title');
     const styleElement = itemElement.querySelector('.cart-item-style span');
@@ -231,6 +243,24 @@ const NWCACartUI = (function() {
     const sizesContainer = itemElement.querySelector('.cart-item-sizes');
     const imageElement = itemElement.querySelector('.cart-item-image');
     const removeButton = itemElement.querySelector('.remove-item-btn');
+    
+    // Enhance title styling
+    if (titleElement) {
+      titleElement.style.color = '#0056b3';
+      titleElement.style.fontSize = '1.2rem';
+      titleElement.style.marginBottom = '8px';
+    }
+    
+    // Add a header to the sizes section
+    if (sizesContainer) {
+      const sizesHeader = document.createElement('h6');
+      sizesHeader.textContent = 'Sizes & Quantities';
+      sizesHeader.style.backgroundColor = '#e9ecef';
+      sizesHeader.style.padding = '5px 10px';
+      sizesHeader.style.borderRadius = '4px';
+      sizesHeader.style.marginBottom = '10px';
+      sizesContainer.insertBefore(sizesHeader, sizesContainer.firstChild);
+    }
     
     // Set basic item info
     if (titleElement) {
@@ -247,24 +277,67 @@ const NWCACartUI = (function() {
     
     if (embellishmentTypeElement) {
       embellishmentTypeElement.textContent = formatEmbellishmentType(item.ImprintType);
+      embellishmentTypeElement.style.fontWeight = 'bold';
+      
+      // Add a visual indicator for the embellishment type
+      const embTypeContainer = embellishmentTypeElement.parentElement;
+      if (embTypeContainer) {
+        embTypeContainer.style.display = 'inline-block';
+        embTypeContainer.style.backgroundColor = getEmbellishmentColor(item.ImprintType);
+        embTypeContainer.style.color = '#fff';
+        embTypeContainer.style.padding = '3px 8px';
+        embTypeContainer.style.borderRadius = '4px';
+        embTypeContainer.style.marginTop = '5px';
+      }
     }
     
-    // Set embellishment options
+    // Set embellishment options with improved styling
     if (embellishmentOptionsElement) {
       try {
         const options = JSON.parse(item.EmbellishmentOptions || '{}');
         embellishmentOptionsElement.innerHTML = '';
+        embellishmentOptionsElement.style.marginTop = '10px';
+        embellishmentOptionsElement.style.padding = '8px';
+        embellishmentOptionsElement.style.backgroundColor = '#f0f8ff';
+        embellishmentOptionsElement.style.borderRadius = '4px';
+        embellishmentOptionsElement.style.borderLeft = '3px solid #0056b3';
         
+        // Add a title for the options section
+        const optionsTitle = document.createElement('div');
+        optionsTitle.textContent = 'Decoration Details:';
+        optionsTitle.style.fontWeight = 'bold';
+        optionsTitle.style.marginBottom = '5px';
+        optionsTitle.style.color = '#0056b3';
+        embellishmentOptionsElement.appendChild(optionsTitle);
+        
+        // Create a list for the options
+        const optionsList = document.createElement('ul');
+        optionsList.style.listStyleType = 'none';
+        optionsList.style.padding = '0';
+        optionsList.style.margin = '0';
+        embellishmentOptionsElement.appendChild(optionsList);
+        
+        // Add each option as a list item
         for (const [key, value] of Object.entries(options)) {
           if (key === 'additionalLocations' && Array.isArray(value)) {
-            const locationsElement = document.createElement('p');
-            locationsElement.textContent = `Additional Locations: ${value.length}`;
-            embellishmentOptionsElement.appendChild(locationsElement);
+            const locationsItem = document.createElement('li');
+            locationsItem.style.marginBottom = '3px';
+            locationsItem.innerHTML = `<strong>Additional Locations:</strong> ${value.length}`;
+            optionsList.appendChild(locationsItem);
           } else {
-            const optionElement = document.createElement('p');
-            optionElement.textContent = `${formatOptionName(key)}: ${formatOptionValue(key, value)}`;
-            embellishmentOptionsElement.appendChild(optionElement);
+            const optionItem = document.createElement('li');
+            optionItem.style.marginBottom = '3px';
+            optionItem.innerHTML = `<strong>${formatOptionName(key)}:</strong> ${formatOptionValue(key, value)}`;
+            optionsList.appendChild(optionItem);
           }
+        }
+        
+        // If no options, show a message
+        if (Object.keys(options).length === 0) {
+          const noOptionsItem = document.createElement('li');
+          noOptionsItem.textContent = 'Standard decoration options';
+          noOptionsItem.style.fontStyle = 'italic';
+          optionsList.appendChild(noOptionsItem);
         }
       } catch (error) {
         console.error('Error parsing embellishment options:', error);
@@ -272,10 +345,44 @@ const NWCACartUI = (function() {
       }
     }
     
-    // Set image (placeholder for now)
+    // Set product image - try to use actual product image if available
     if (imageElement) {
-      imageElement.src = `https://via.placeholder.com/150?text=${encodeURIComponent(item.StyleNumber)}`;
+      if (item.imageUrl) {
+        // Use the actual product image if it was stored with the cart item
+        imageElement.src = item.imageUrl;
+        console.log("Using stored product image:", item.imageUrl);
+      } else {
+        // Try to fetch the image from the API
+        const styleNumber = item.StyleNumber;
+        const color = item.Color;
+        
+        // First try to get the image from the product details API
+        fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}&COLOR_NAME=${encodeURIComponent(color)}`)
+          .then(response => response.json())
+          .then(details => {
+            // Try different image types in order of preference
+            const imageUrl = details.FRONT_MODEL || details.FRONT_FLAT || details.BACK_MODEL || details.BACK_FLAT;
+            if (imageUrl) {
+              imageElement.src = imageUrl;
+              console.log("Fetched product image:", imageUrl);
+            } else {
+              // Fallback to placeholder if no images found
+              imageElement.src = `https://via.placeholder.com/150?text=${encodeURIComponent(item.StyleNumber)}`;
+              console.log("No product images found, using placeholder");
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching product image:", error);
+            // Fallback to placeholder on error
+            imageElement.src = `https://via.placeholder.com/150?text=${encodeURIComponent(item.StyleNumber)}`;
+          });
+      }
+      
       imageElement.alt = `${item.StyleNumber} - ${item.Color}`;
+      imageElement.style.maxWidth = "100%";
+      imageElement.style.height = "auto";
+      imageElement.style.border = "1px solid #ddd";
+      imageElement.style.borderRadius = "4px";
     }
     
     // Render sizes
@@ -290,6 +397,24 @@ const NWCACartUI = (function() {
     
     // Add event listener to remove button
     if (removeButton) {
+      // Enhance remove button styling
+      removeButton.className = 'btn btn-sm btn-outline-danger';
+      removeButton.style.borderRadius = '4px';
+      removeButton.style.padding = '4px 10px';
+      removeButton.style.fontWeight = 'normal';
+      removeButton.style.transition = 'all 0.2s ease';
+      
+      // Add hover effect
+      removeButton.addEventListener('mouseover', () => {
+        removeButton.style.backgroundColor = '#dc3545';
+        removeButton.style.color = '#fff';
+      });
+      
+      removeButton.addEventListener('mouseout', () => {
+        removeButton.style.backgroundColor = '';
+        removeButton.style.color = '';
+      });
+      
       removeButton.addEventListener('click', async () => {
         // Show loading state
         removeButton.disabled = true;
@@ -353,13 +478,26 @@ const NWCACartUI = (function() {
     const increaseBtn = sizeElement.querySelector('.quantity-increase');
     const priceElement = sizeElement.querySelector('.size-price');
     
+    // Enhance the size element with better styling
+    sizeElement.style.backgroundColor = '#f8f9fa';
+    sizeElement.style.padding = '8px';
+    sizeElement.style.borderRadius = '4px';
+    sizeElement.style.marginBottom = '8px';
+    
     if (sizeLabel) {
       sizeLabel.textContent = size.Size;
+      sizeLabel.style.fontWeight = 'bold';
+      sizeLabel.style.minWidth = '40px';
     }
     
     if (quantityInput) {
       quantityInput.value = size.Quantity;
       quantityInput.disabled = isSaved;
+      quantityInput.style.textAlign = 'center';
+      quantityInput.style.fontWeight = 'bold';
+      quantityInput.style.width = '50px';
+      quantityInput.style.border = '1px solid #ced4da';
+      quantityInput.style.borderRadius = '4px';
       
       // Add event listener for quantity changes
       if (!isSaved) {
@@ -368,11 +506,13 @@ const NWCACartUI = (function() {
           
           // Show loading state
           quantityInput.disabled = true;
+          quantityInput.style.backgroundColor = '#e9ecef';
           
           const result = await NWCACart.updateQuantity(cartItemId, size.Size, newQuantity);
           
           // Reset input state
           quantityInput.disabled = false;
+          quantityInput.style.backgroundColor = '';
           
           if (!result.success) {
             // Show error notification
@@ -386,6 +526,11 @@ const NWCACartUI = (function() {
     
     if (decreaseBtn) {
       decreaseBtn.disabled = isSaved;
+      decreaseBtn.style.backgroundColor = '#f8f9fa';
+      decreaseBtn.style.borderColor = '#ced4da';
+      decreaseBtn.style.fontWeight = 'bold';
+      decreaseBtn.style.width = '30px';
+      decreaseBtn.style.padding = '2px';
       
       if (!isSaved) {
         decreaseBtn.addEventListener('click', async () => {
@@ -400,12 +545,20 @@ const NWCACartUI = (function() {
           increaseBtn.disabled = true;
           quantityInput.disabled = true;
           
+          // Visual feedback during update
+          decreaseBtn.style.opacity = '0.6';
+          increaseBtn.style.opacity = '0.6';
+          quantityInput.style.backgroundColor = '#e9ecef';
+          
           const result = await NWCACart.updateQuantity(cartItemId, size.Size, newQuantity);
           
           // Reset controls state
           decreaseBtn.disabled = isSaved;
           increaseBtn.disabled = isSaved;
           quantityInput.disabled = isSaved;
+          decreaseBtn.style.opacity = '1';
+          increaseBtn.style.opacity = '1';
+          quantityInput.style.backgroundColor = '';
           
           if (!result.success) {
             // Show error notification
@@ -417,6 +570,11 @@ const NWCACartUI = (function() {
     
     if (increaseBtn) {
       increaseBtn.disabled = isSaved;
+      increaseBtn.style.backgroundColor = '#f8f9fa';
+      increaseBtn.style.borderColor = '#ced4da';
+      increaseBtn.style.fontWeight = 'bold';
+      increaseBtn.style.width = '30px';
+      increaseBtn.style.padding = '2px';
       
       if (!isSaved) {
         increaseBtn.addEventListener('click', async () => {
@@ -431,12 +589,20 @@ const NWCACartUI = (function() {
           increaseBtn.disabled = true;
           quantityInput.disabled = true;
           
+          // Visual feedback during update
+          decreaseBtn.style.opacity = '0.6';
+          increaseBtn.style.opacity = '0.6';
+          quantityInput.style.backgroundColor = '#e9ecef';
+          
           const result = await NWCACart.updateQuantity(cartItemId, size.Size, newQuantity);
           
           // Reset controls state
           decreaseBtn.disabled = isSaved;
           increaseBtn.disabled = isSaved;
           quantityInput.disabled = isSaved;
+          decreaseBtn.style.opacity = '1';
+          increaseBtn.style.opacity = '1';
+          quantityInput.style.backgroundColor = '';
           
           if (!result.success) {
             // Show error notification
@@ -449,6 +615,27 @@ const NWCACartUI = (function() {
     if (priceElement) {
       const totalPrice = size.Quantity * size.UnitPrice;
       priceElement.textContent = formatCurrency(totalPrice);
+      priceElement.style.fontWeight = 'bold';
+      priceElement.style.color = '#0056b3';
+      priceElement.style.minWidth = '80px';
+      priceElement.style.textAlign = 'right';
+      
+      // Add unit price as a smaller text below the total
+      const unitPriceElement = document.createElement('div');
+      unitPriceElement.textContent = `${formatCurrency(size.UnitPrice)} each`;
+      unitPriceElement.style.fontSize = '0.8em';
+      unitPriceElement.style.color = '#6c757d';
+      unitPriceElement.style.textAlign = 'right';
+      
+      // Replace the price element with a container that has both prices
+      const priceContainer = document.createElement('div');
+      priceContainer.style.display = 'flex';
+      priceContainer.style.flexDirection = 'column';
+      
+      // Replace the price element with our container
+      priceElement.parentNode.insertBefore(priceContainer, priceElement);
+      priceContainer.appendChild(priceElement);
+      priceContainer.appendChild(unitPriceElement);
     }
     
     return sizeElement;
@@ -855,10 +1042,34 @@ const NWCACartUI = (function() {
         return 'Cap Embroidery';
       case 'dtg':
         return 'DTG (Direct to Garment)';
+      case 'dtf':
+        return 'DTF (Direct to Film)';
       case 'screen-print':
         return 'Screen Print';
       default:
         return type;
+    }
+  }
+  
+  /**
+   * Get color for embellishment type badge
+   * @param {string} type - Embellishment type
+   * @returns {string} - Color code
+   */
+  function getEmbellishmentColor(type) {
+    switch (type) {
+      case 'embroidery':
+        return '#28a745'; // Green
+      case 'cap-embroidery':
+        return '#20c997'; // Teal
+      case 'dtg':
+        return '#007bff'; // Blue
+      case 'dtf':
+        return '#6610f2'; // Purple
+      case 'screen-print':
+        return '#fd7e14'; // Orange
+      default:
+        return '#6c757d'; // Gray
     }
   }
   

@@ -269,54 +269,58 @@ window.initCartIntegration = function() {
 };
 
 function checkAndAddCartButton() {
-  debugCart("UI", "Checking for DOM elements to add cart button");
-  
-  // More robust DOM element checking
-  const noteDiv = document.getElementById('matrix-note');
-  const tableBody = document.getElementById('matrix-price-body');
+  debugCart("CHECK", "Running checkAndAddCartButton");
   const priceTable = document.querySelector('table.matrix-price-table');
-  
-  // Log what we found for debugging
-  debugCart("UI", "DOM elements found:", {
-    noteDiv: !!noteDiv,
-    tableBody: !!tableBody,
-    priceTable: !!priceTable
-  });
-  
-  // Try multiple possible locations
-  if (noteDiv && tableBody && tableBody.children.length > 0) {
-    debugCart("UI", "Found primary DOM elements, adding cart button");
-    addCartButton();
-    addViewCartLink();
-  } else if (noteDiv && priceTable) {
-    debugCart("UI", "Found alternative DOM elements, adding cart button");
-    addCartButton();
-    addViewCartLink();
-  } else if (document.querySelector('.caspio-table') || document.querySelector('.cbResultSetTable')) {
-    // Try to find any Caspio table as a fallback
-    debugCart("UI", "Found Caspio table, adding cart button as fallback");
-    const caspio = document.querySelector('.caspio-table') || document.querySelector('.cbResultSetTable');
-    // Create a note div if it doesn't exist
-    if (!noteDiv) {
-      const newNoteDiv = document.createElement('div');
-      newNoteDiv.id = 'matrix-note';
-      caspio.parentNode.insertBefore(newNoteDiv, caspio.nextSibling);
-      debugCart("UI", "Created matrix-note div as it was missing");
+  // Find the note div using any of the known IDs
+  const noteDiv = document.querySelector('#matrix-note, #cap-matrix-note, #dtg-matrix-note, #sp-matrix-note');
+  // Find the title element using any of the known IDs
+  const titleElement = document.querySelector('#matrix-title, #cap-matrix-title, #dtg-matrix-title, #sp-matrix-title');
+
+  debugCart("CHECK", "Price Table Found:", !!priceTable);
+  debugCart("CHECK", "Note Div Found:", !!noteDiv, noteDiv ? noteDiv.id : 'Not Found');
+  debugCart("CHECK", "Title Element Found:", !!titleElement, titleElement ? titleElement.id : 'Not Found');
+
+  if (priceTable && noteDiv && titleElement) {
+    debugCart("CHECK", "All elements found, proceeding to add button and link.");
+    // Prevent adding multiple times by checking if container exists
+    if (!document.getElementById('cart-button-container')) {
+        addCartButton(noteDiv);         // Pass the found noteDiv
+    } else {
+        debugCart("CHECK", "Cart button container already exists, skipping addCartButton call.");
     }
-    addCartButton();
-    addViewCartLink();
+    // Prevent adding multiple times by checking if link exists
+    if (!document.getElementById('view-cart-link')) {
+        addViewCartLink(titleElement);  // Pass the found titleElement
+    } else {
+        debugCart("CHECK", "View cart link already exists, skipping addViewCartLink call.");
+    }
   } else {
-    debugCart("UI", "Required DOM elements not found, retrying in 500ms");
-    setTimeout(checkAndAddCartButton, 500);
+    debugCart("CHECK", "Required elements not found, attempting retry via init logic.");
+    // Optional: Add more specific logging about which element is missing
+    if (!priceTable) debugCart("CHECK", "Missing: table.matrix-price-table");
+    if (!noteDiv) debugCart("CHECK", "Missing: A note div (#matrix-note, #cap-matrix-note, etc.)");
+    if (!titleElement) debugCart("CHECK", "Missing: A title element (#matrix-title, #cap-matrix-title, etc.)");
+    // NOTE: Relying on the initialization retry in initCartIntegration, removed the direct retry here
   }
 }
 
-function addCartButton() {
-  const noteDiv = document.getElementById('matrix-note');
-  if (!noteDiv) return;
-  
-  if (document.getElementById('cart-button-container')) return;
-  
+/**
+ * Adds the main 'Add to Cart' button container, size inputs, and options.
+ * @param {HTMLElement} noteDiv - The specific note div element found by checkAndAddCartButton.
+ */
+function addCartButton(noteDiv) {
+  // const noteDiv = document.getElementById('matrix-note'); // Removed: noteDiv is now passed as an argument
+  if (!noteDiv) {
+    debugCart("UI-ERROR", "addCartButton called without a valid noteDiv element.");
+    return; // Exit if the noteDiv wasn't found/passed correctly
+  }
+
+  // Prevent adding multiple times (check might already be here)
+  if (document.getElementById('cart-button-container')) {
+     debugCart("UI", "Cart button container already exists, skipping add.");
+     return;
+  }
+
   const container = document.createElement('div');
   container.id = 'cart-button-container';
   container.style.marginTop = '20px';
@@ -444,6 +448,7 @@ function addCartButton() {
   button.addEventListener('click', handleAddToCart);
   container.appendChild(button);
   
+  // Use the passed noteDiv to insert the container
   noteDiv.parentNode.insertBefore(container, noteDiv.nextSibling);
   debugCart("UI", "Cart button added successfully");
 }
@@ -1010,7 +1015,6 @@ if (!window.DirectCartAPI) {
           }
           
           localStorage.setItem(this.storageKeys.cartItems, JSON.stringify(cartData));
-          return { success: true };
         }
       } catch (e) {
         debugCart("CART-ERROR", "Error updating stored cart data:", e);
@@ -1976,7 +1980,7 @@ function getFallbackSizes() {
 }
 
 // Add a "View Cart" link to the top of the DataPage
-function addViewCartLink() {
+function addViewCartLink(titleElement) { // <-- Add titleElement argument here
   // Check if it already exists
   if (document.getElementById('view-cart-link')) return;
   
@@ -2067,12 +2071,15 @@ function addViewCartLink() {
   
   linkContainer.appendChild(link);
   
-  // Add to page - find a good location
-  const titleElement = document.querySelector('h4[id="matrix-title"]');
-  if (titleElement) {
+  // Add to page - use the passed titleElement
+  // const titleElement = document.querySelector('h4[id="matrix-title"]'); // Removed: titleElement is now passed as an argument
+  if (titleElement) { // <-- Use the passed titleElement here
+    // Insert the link container *before* the found title element
     titleElement.parentNode.insertBefore(linkContainer, titleElement);
+    debugCart("VIEW-CART", "View Cart link added before title:", titleElement.id);
   } else {
-    // Fallback - add to top of body
+    // Fallback - add to top of body if title wasn't found (shouldn't happen if checkAndAddCartButton worked)
+    debugCart("VIEW-CART", "Title element not provided or found, adding View Cart link to body start.");
     document.body.insertBefore(linkContainer, document.body.firstChild);
   }
 }
