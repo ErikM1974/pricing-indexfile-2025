@@ -36,6 +36,38 @@ window.initDp5ApiFetch = function() {
     return true; // Indicate success to the Caspio DataPage
 };
 
+// Define the initDp7ApiFetch function for cap-embroidery page
+window.initDp7ApiFetch = function() {
+    console.log("initDp7ApiFetch called by Caspio DataPage");
+    
+    // This function is called by the Caspio DataPage when it's ready
+    // It should fetch data from the API and update the pricing table
+    
+    try {
+        // Get the current embellishment type from the URL
+        const embType = getEmbellishmentTypeFromUrl();
+        
+        console.log(`initDp7ApiFetch: Detected embellishment type: ${embType}`);
+        
+        // Find the pricing table elements
+        const pricingTable = document.querySelector('.matrix-price-table');
+        const tableBody = document.getElementById('matrix-price-body');
+        
+        if (pricingTable && tableBody) {
+            console.log("initDp7ApiFetch: Found pricing table elements, updating with data");
+            
+            // The table exists, so we can update it with our data
+            // This will be handled by the Caspio DataPage
+        } else {
+            console.log("initDp7ApiFetch: Pricing table elements not found, may need to create them");
+        }
+    } catch (error) {
+        console.error("Error in initDp7ApiFetch:", error);
+    }
+    
+    return true; // Indicate success to the Caspio DataPage
+};
+
 // Base API URL
 const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
