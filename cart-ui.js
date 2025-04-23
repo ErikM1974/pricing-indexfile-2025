@@ -88,7 +88,7 @@ const NWCACartUI = (function() {
   // Placeholder for quantity change handler - Needs to interact with NWCACart
   async function handleQuantityChange(event) {
       const input = event.target;
-      const itemId = input.dataset.itemId;
+      const itemId = input.dataset.itemId; // This is a string
       const size = input.dataset.size;
       const newQuantity = parseInt(input.value);
 
@@ -98,24 +98,35 @@ const NWCACartUI = (function() {
           return;
       }
 
-      debugCartUI("ACTION", `Attempting to update quantity for item ${itemId}, size ${size} to ${newQuantity}`);
+      // Parse the itemId string to an integer
+      const itemIdNumber = parseInt(itemId, 10); // <-- ADDED PARSING
+
+      if (isNaN(itemIdNumber)) { // <-- ADDED VALIDATION
+          showNotification('Error: Invalid item ID format for quantity update.', 'danger');
+          debugCartUI("ACTION-ERROR", `Invalid item ID for quantity update: ${itemId}`);
+          return; // Stop if ID is not a valid number
+      }
+
+      debugCartUI("ACTION", `Attempting to update quantity for item ${itemIdNumber}, size ${size} to ${newQuantity}`); // <-- Use itemIdNumber in log
 
       // Show loading state? (Disable input?)
       input.disabled = true;
 
       // Example: Assuming NWCACart.updateQuantity exists and takes itemId, size, quantity
-      // Adjust based on NWCACart's actual function signature (itemId vs CartItemID, size vs Size, quantity vs Quantity)
-      const result = await NWCACart.updateQuantity(itemId, size, newQuantity);
+      // Pass the number ID
+      const result = await NWCACart.updateQuantity(itemIdNumber, size, newQuantity); // <--- PASS itemIdNumber
 
       input.disabled = false; // Re-enable input
 
       if (!result || !result.success) {
           showNotification(result?.error || `Failed to update quantity for ${size}`, 'danger');
-          debugCartUI("ACTION-ERROR", `Failed quantity update for item ${itemId}, size ${size}`, result);
+           // <-- Use itemIdNumber in log
+          debugCartUI("ACTION-ERROR", `Failed quantity update for item ${itemIdNumber}, size ${size}`, result);
           // The cart re-render triggered by cartUpdated should reset the input value if the update failed server-side
       } else {
           // Success feedback is optional, re-render handles visual update
-           debugCartUI("ACTION-SUCCESS", `Successfully updated quantity for item ${itemId}, size ${size}`);
+           // <-- Use itemIdNumber in log
+           debugCartUI("ACTION-SUCCESS", `Successfully updated quantity for item ${itemIdNumber}, size ${size}`);
       }
   }
   // --- End of added definitions ---
