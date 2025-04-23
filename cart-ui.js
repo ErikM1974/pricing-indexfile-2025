@@ -137,7 +137,7 @@ const NWCACartUI = (function() {
     }
 
     if (elements.submitOrderBtn) {
-      elements.submitOrderBtn.addEventListener('click', handleSubmitOrder);
+      elements.submitOrderBtn.addEventListener('click', handleSubmitQuoteRequest);
     }
 
     // Listen for cart updates
@@ -818,10 +818,10 @@ function renderSizeItem(sizeInfo, itemId) {
   }
 
   /**
-   * Handle submit order
+   * Handle submit quote request
    */
-  async function handleSubmitOrder() {
-     debugCartUI("ACTION", "Attempting to submit order.");
+  async function handleSubmitQuoteRequest() {
+     debugCartUI("ACTION", "Attempting to submit quote request.");
     try {
       // Show loading state
       elements.submitOrderBtn.disabled = true;
