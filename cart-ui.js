@@ -63,14 +63,24 @@ const NWCACartUI = (function() {
   // Placeholder for remove item handler - Needs to interact with NWCACart
   async function handleRemoveItem(itemId) {
       debugCartUI("ACTION", `Attempting to remove item: ${itemId}`);
+      
+      // Parse the itemId string to an integer
+      const itemIdNumber = parseInt(itemId, 10);
+
+      if (isNaN(itemIdNumber)) {
+          showNotification('Error: Invalid item ID format.', 'danger');
+          debugCartUI("ACTION-ERROR", `Invalid item ID for removal: ${itemId}`);
+          return; // Stop if ID is not a valid number
+      }
+
       // Example: Assuming NWCACart expects the ID as passed
-      const result = await NWCACart.removeItem(itemId); // Adjust based on NWCACart's expected parameter (itemId vs CartItemID)
+      const result = await NWCACart.removeItem(itemIdNumber); // Pass the number
       if (!result || !result.success) {
-          showNotification(result?.error || `Failed to remove item ${itemId}`, 'danger');
-          debugCartUI("ACTION-ERROR", `Failed removal for item: ${itemId}`, result);
+          showNotification(result?.error || `Failed to remove item ${itemIdNumber}`, 'danger');
+          debugCartUI("ACTION-ERROR", `Failed removal for item: ${itemIdNumber}`, result);
       } else {
          showNotification(`Item removed successfully`, 'success');
-         debugCartUI("ACTION-SUCCESS", `Successfully removed item: ${itemId}`);
+         debugCartUI("ACTION-SUCCESS", `Successfully removed item: ${itemIdNumber}`);
          // Cart should re-render automatically via the cartUpdated event listener
       }
   }
@@ -299,7 +309,7 @@ const NWCACartUI = (function() {
     debugCartUI("RENDER", "Rendering cart item:", item);
     const itemElement = document.createElement('div');
     itemElement.className = 'cart-item card mb-3'; // Added bootstrap card styling
-    itemElement.dataset.itemId = item.id;
+    itemElement.dataset.itemId = item.id; // Use item.id from adapted object
     itemElement.style.borderLeft = '4px solid #0056b3'; // Style from original
 
     // Format embellishment type using the helper
@@ -342,7 +352,7 @@ const NWCACartUI = (function() {
         if (validSizes.length > 0) {
              sizesContainer.innerHTML = '<h6 class="sizes-header" style="background-color: #e9ecef; padding: 5px 10px; border-radius: 4px; margin-bottom: 10px;">Sizes & Quantities</h6>'; // Clear previous sizes but keep header
              validSizes.forEach(sizeInfo => {
-                 const sizeElement = renderSizeItem(sizeInfo, item.id);
+                 const sizeElement = renderSizeItem(sizeInfo, item.id); // Use item.id here
                  if (sizeElement) {
                      sizesContainer.appendChild(sizeElement);
                  }
@@ -390,7 +400,7 @@ const NWCACartUI = (function() {
         const moveToCartBtn = document.createElement('button');
         moveToCartBtn.className = 'btn btn-sm btn-primary mr-2 move-to-cart-btn'; // Added class
         moveToCartBtn.textContent = 'Move to Cart';
-        moveToCartBtn.dataset.itemId = item.id;
+        moveToCartBtn.dataset.itemId = item.id; // Use item.id here
         moveToCartBtn.style.marginRight = '5px'; // Add spacing
 
         // Add listener for Move to Cart
