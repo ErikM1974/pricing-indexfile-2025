@@ -43,6 +43,16 @@ const AddToCartButton = (function() {
       // Get product data
       const productData = getProductDataFn();
       
+      // Get the image URL
+      const productImageElement = document.getElementById('product-image');
+      if (productImageElement && productImageElement.src) {
+        productData.imageUrl = productImageElement.src;
+        console.log("Found image URL:", productData.imageUrl); // Debugging log
+      } else {
+        console.warn("Could not find product image element or its src attribute.");
+        productData.imageUrl = null; // Ensure it's explicitly set if not found
+      }
+      
       // Add to cart
       // Check if NWCACart is available
       if (!window.NWCACart) {

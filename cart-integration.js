@@ -1112,6 +1112,17 @@ async function handleAddToCart() {
       embType: productData.embellishmentType
     });
 
+    // --- Added: Get the image URL ---
+    const productImageElement = document.getElementById('product-image');
+    if (productImageElement && productImageElement.src) {
+        productData.imageUrl = productImageElement.src;
+        console.log("[handleAddToCart] Found image URL:", productData.imageUrl);
+    } else {
+        console.warn("[handleAddToCart] Could not find product image element or its src attribute.");
+        productData.imageUrl = null; // Ensure it's explicitly set if not found
+    }
+    // --- End Added ---
+
     // Validate required product data
     if (!productData.styleNumber || !productData.color) {
       throw new Error('Missing product information (style or color)');

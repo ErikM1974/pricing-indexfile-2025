@@ -722,6 +722,7 @@ if (typeof window.NWCACart === 'undefined') {
         StyleNumber: productData.styleNumber,
         Color: productData.color,
         ImprintType: productData.embellishmentType,
+        imageUrl: productData.imageUrl, // Add the imageUrl property from the input productData
         EmbellishmentOptions: JSON.stringify(productData.embellishmentOptions || {}),
         DateAdded: new Date().toISOString(),
         CartStatus: 'Active'

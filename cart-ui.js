@@ -313,17 +313,17 @@ const NWCACartUI = (function() {
                  <h5 class="card-title item-title mb-1">${item.styleNumber} - ${item.color}</h5>
                  <span class="item-embellishment badge" style="background-color: ${getEmbellishmentColor(item.embellishmentType)}; color: white;">${formattedEmbType}</span>
             </div>
-            <button class="remove-item-btn btn btn-sm btn-outline-danger" data-item-id="${item.id}">&times;</button> {/* Use &times; for a nicer 'X' */}
+            <button class="remove-item-btn btn btn-sm btn-outline-danger" data-item-id="${item.id}">&times;</button>
         </div>
         <div class="cart-item-details row">
           ${item.imageUrl ? `
             <div class="col-md-3 item-image-container">
                  <img src="${item.imageUrl}" alt="${item.styleNumber}" class="item-image img-fluid rounded border">
             </div>
-          ` : '<div class="col-md-3"></div>'} {/* Placeholder if no image */}
+          ` : ''}
           <div class="col-md-9">
               <div class="cart-item-options mb-2">
-                ${renderEmbellishmentOptions(item.embellishmentOptions)} {/* Call helper */}
+                ${renderEmbellishmentOptions(item.embellishmentOptions)}
               </div>
               <div class="cart-item-sizes">
                  <h6 class="sizes-header" style="background-color: #e9ecef; padding: 5px 10px; border-radius: 4px; margin-bottom: 10px;">Sizes & Quantities</h6>
@@ -451,12 +451,10 @@ function renderSizeItem(sizeInfo, itemId) {
 
     sizeElement.innerHTML = `
         <span class="size-label font-weight-bold" style="min-width: 50px;">${sizeInfo.size}</span>
-        <span class="size-quantity d-flex align-items-center"> {/* Wrap input */}
-             {/* Removed +/- buttons as per new code */}
-             <label for="qty-${itemId}-${sizeInfo.size}" class="sr-only">Quantity for ${sizeInfo.size}</label> {/* Accessibility */}
+        <span class="size-quantity d-flex align-items-center">
+             <label for="qty-${itemId}-${sizeInfo.size}" class="sr-only">Quantity for ${sizeInfo.size}</label>
              <input type="number" id="qty-${itemId}-${sizeInfo.size}" class="quantity-input form-control form-control-sm" value="${quantity}" min="0" data-item-id="${itemId}" data-size="${sizeInfo.size}" style="width: 60px; text-align: center; margin-left: 5px;">
         </span>
-         {/* Combined Price Display */}
          <div class="text-right" style="min-width: 100px;">
              <span class="size-line-total d-block font-weight-bold" style="color: #0056b3;">${formattedLineTotal}</span>
              <span class="size-price d-block" style="font-size: 0.8em; color: #6c757d;">(${formattedPrice} each)</span>
