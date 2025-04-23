@@ -189,6 +189,11 @@
           if (storedData) {
             const cartData = JSON.parse(storedData);
 
+            // Ensure cartData.items is defined and is an array
+            if (!cartData.items || !Array.isArray(cartData.items)) {
+              cartData.items = [];
+            }
+
             // Filter out synced items
             if (cartData.items && Array.isArray(cartData.items)) {
               cartData.items = cartData.items.filter(item => !syncedItemIds.includes(item.id));
@@ -1130,6 +1135,8 @@ async function handleAddToCart() {
     }
     debugCart("ADD", `Using ${cartSystem.source} cart system for checks and adding.`);
 
+    // Log the detailed structure for debugging cart UI rendering
+    debugCart("ADD", "Detailed Structure:", JSON.stringify(productData, null, 2));
 
     // --- START: Embellishment Type Check ---
     debugCart("ADD", "Checking cart for existing embellishment type");

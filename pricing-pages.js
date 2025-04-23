@@ -28,6 +28,13 @@ window.initDp5ApiFetch = function() {
             // This will be handled by the Caspio DataPage
         } else {
             console.log("initDp5ApiFetch: Pricing table elements not found, may need to create them");
+            
+            // The table doesn't exist yet, so we'll need to create it
+            const pricingCalculator = document.getElementById('pricing-calculator');
+            if (pricingCalculator) {
+                console.log("initDp5ApiFetch: Creating fallback pricing table");
+                createFallbackPricingTable(pricingCalculator, embType);
+            }
         }
     } catch (error) {
         console.error("Error in initDp5ApiFetch:", error);
@@ -60,6 +67,13 @@ window.initDp7ApiFetch = function() {
             // This will be handled by the Caspio DataPage
         } else {
             console.log("initDp7ApiFetch: Pricing table elements not found, may need to create them");
+            
+            // The table doesn't exist yet, so we'll need to create it
+            const pricingCalculator = document.getElementById('pricing-calculator');
+            if (pricingCalculator) {
+                console.log("initDp7ApiFetch: Creating fallback pricing table");
+                createFallbackPricingTable(pricingCalculator, embType);
+            }
         }
     } catch (error) {
         console.error("Error in initDp7ApiFetch:", error);

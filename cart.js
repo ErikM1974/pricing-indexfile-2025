@@ -260,15 +260,23 @@ if (typeof window.NWCACart === 'undefined') {
         
         // For each item, get its sizes
         const itemsWithSizes = await Promise.all(items.map(async (item) => {
+          const sizeFetchUrl = ENDPOINTS.cartItemSizes.getByCartItem(item.CartItemID);
+          console.log(`[loadCartItems] Fetching sizes for item ${item.CartItemID} from: ${sizeFetchUrl}`);
           try {
-            const sizesResponse = await fetch(ENDPOINTS.cartItemSizes.getByCartItem(item.CartItemID));
+            const sizesResponse = await fetch(sizeFetchUrl);
+            console.log(`[loadCartItems] Sizes response status for item ${item.CartItemID}: ${sizesResponse.status}`);
             
             if (sizesResponse.ok) {
               const sizes = await sizesResponse.json();
+              console.log(`[loadCartItems] Raw sizes data for item ${item.CartItemID}:`, JSON.stringify(sizes)); // Log raw data
               return {
                 ...item,
                 sizes: Array.isArray(sizes) ? sizes : []
               };
+            } else {
+              console.warn(`[loadCartItems] Failed to fetch sizes for item ${item.CartItemID}. Status: ${sizesResponse.status}`);
+              const errorText = await sizesResponse.text();
+              console.warn(`[loadCartItems] Error details for item ${item.CartItemID}: ${errorText}`);
             }
             
             return {
@@ -276,7 +284,7 @@ if (typeof window.NWCACart === 'undefined') {
               sizes: []
             };
           } catch (sizeError) {
-            console.error(`Error fetching sizes for item ${item.CartItemID}:`, sizeError);
+            console.error(`[loadCartItems] Error fetching sizes for item ${item.CartItemID}:`, sizeError);
             return {
               ...item,
               sizes: []
@@ -481,6 +489,11 @@ if (typeof window.NWCACart === 'undefined') {
                   UnitPrice: size.UnitPrice
                 };
                 
+                // Only add WarehouseSource if it exists
+                if (size.WarehouseSource) {
+                  sizeData.WarehouseSource = size.WarehouseSource;
+                }
+                
                 const sizeResponse = await fetch(ENDPOINTS.cartItemSizes.create, {
                   method: 'POST',
                   headers: {
@@ -511,13 +524,12 @@ if (typeof window.NWCACart === 'undefined') {
         
         // Check if there were any sync errors
         if (syncErrors.length > 0) {
-          // Set a user-friendly error message
           if (syncErrors.length === localItemsWithoutIds.length) {
             // All items failed to sync
             cartState.error = 'Failed to sync any items with the server. Please try again later.';
           } else {
             // Some items failed to sync
-            cartState.error = `Some items failed to sync with the server (${syncErrors.length} of ${localItemsWithoutIds.length}).`;
+            cartState.error = `Some items could not be synced with the server (${syncErrors.length} of ${localItemsWithoutIds.length}).`;
           }
         }
         
@@ -716,6 +728,7 @@ if (typeof window.NWCACart === 'undefined') {
       };
 
       debugCart("ADD", "Creating cart item on server with data:", cartItemData);
+      
       const response = await fetch(ENDPOINTS.cartItems.create, {
         method: 'POST',
         headers: {
@@ -724,62 +737,54 @@ if (typeof window.NWCACart === 'undefined') {
         body: JSON.stringify(cartItemData)
       });
 
+      // Log the raw response status and text/json for debugging
+      const responseText = await response.text(); 
+      debugCart(`[CART:ADD] Raw response status: ${response.status}`);
+      debugCart(`[CART:ADD] Raw response text: ${responseText}`);
+
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText); // Try parsing the logged text
+        debugCart(`[CART:ADD] Parsed API response data for cart item creation:`, responseData);
+      } catch (e) {
+        debugCart(`[CART:ADD] Failed to parse JSON response: ${e}`);
+        debugCart(`[CART:ADD] Response text was: ${responseText}`);
+        // Even if parsing fails, try to proceed if status was ok, maybe it's not JSON?
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        }
+        responseData = { status: 'success', message: 'Non-JSON response received', raw: responseText }; // Provide a fallback object
+      }
+
+      // debugCart(`[CART:ADD] API success response for cart item creation:`, responseData);
       if (!response.ok) {
-        const errorText = await response.text();
-        debugCart("ADD-ERROR", "API error creating cart item:", {status: response.status, text: errorText});
-        throw new Error(`Failed to add item to cart: ${response.status} ${errorText}`);
+        debugCart(`[CART:ADD] API Error creating cart item:`, responseData);
       }
 
-      const newCartItemResponse = await response.json();
-      console.log("Cart item creation response:", newCartItemResponse);
-      debugCart("ADD", "API success response for cart item creation:", newCartItemResponse);
-      
-      // Extract CartItemID from the response
-      let cartItemId;
-      
-      // Check if the response contains a CartItemID
-      if (newCartItemResponse.CartItemID) {
-        cartItemId = newCartItemResponse.CartItemID;
-      } else if (newCartItemResponse.cartItem && newCartItemResponse.cartItem.CartItemID) {
-        cartItemId = newCartItemResponse.cartItem.CartItemID;
-      } else if (newCartItemResponse.id || newCartItemResponse.ID || newCartItemResponse.Id) {
-        cartItemId = newCartItemResponse.id || newCartItemResponse.ID || newCartItemResponse.Id;
-      } else if (newCartItemResponse.message && typeof newCartItemResponse.message === 'string') {
-        // Try to extract ID from success message like "Cart item created with ID: 1234"
-        const idMatch = newCartItemResponse.message.match(/ID:?\s*(\d+)/i);
-        if (idMatch && idMatch[1]) {
-          cartItemId = parseInt(idMatch[1], 10);
-        }
-      }
-      
-      // If no CartItemID found in the response, generate a numeric ID
-      // CartItemID must be a number (not a string) for the Caspio database
-      if (!cartItemId) {
-        // Generate a numeric ID using timestamp (ensure it's a number, not a string)
-        cartItemId = Date.now(); // This will be a number
-        debugCart("ADD", "No CartItemID found in API response, using generated numeric ID:", cartItemId);
-      } else if (typeof cartItemId === 'string') {
-        // If cartItemId is a string, convert it to a number if possible
-        const numericId = parseInt(cartItemId, 10);
-        if (!isNaN(numericId)) {
-          cartItemId = numericId;
-          debugCart("ADD", "Converted string CartItemID to number:", cartItemId);
-        } else {
-          // If conversion fails, generate a new numeric ID
-          cartItemId = Date.now();
-          debugCart("ADD", "Could not convert CartItemID to number, using generated numeric ID:", cartItemId);
-        }
-      }
-      
-      console.log("Extracted CartItemID:", cartItemId);
-      debugCart("ADD", "Received CartItemID from API:", cartItemId);
-      
-      console.log("Extracted CartItemID:", cartItemId);
-      debugCart("ADD", "Received CartItemID from API:", cartItemId);
+      // Attempt to extract CartItemID - ADJUST THIS based on actual response structure
+      // Common patterns: responseData.CartItemID, responseData.id, responseData.data.CartItemID, etc.
+      // Corrected access based on the actual API response structure
+      const cartItemID = responseData?.cartItem?.CartItemID;
+      debugCart(`[CART:ADD] Attempted extraction of CartItemID yields: ${cartItemID}`);
 
+      let extractedCartItemID;
+      if (!cartItemID) {
+        // Fallback only if extraction truly fails
+        const generatedId = Date.now(); // Use timestamp as a fallback ID
+        debugCart(`[CART:ADD] No CartItemID found in API response, using generated numeric ID: ${generatedId}`);
+        // throw new Error('CartItemID not found in API response'); 
+        // For now, let's keep the fallback but log it clearly
+        extractedCartItemID = generatedId;
+      } else {
+        extractedCartItemID = cartItemID;
+      }
+
+      debugCart(`[CART:ADD] Extracted CartItemID: ${extractedCartItemID}`);
+      debugCart(`[CART:ADD] Received CartItemID from API processing: ${extractedCartItemID}`);
+      debugCart(`[CART:ADD] Using CartItemID for sizes: ${extractedCartItemID}`);
 
       // Add sizes
-      debugCart("ADD", "Adding sizes for CartItemID:", cartItemId, "Sizes:", validSizes);
+      debugCart("ADD", "Adding sizes for CartItemID:", extractedCartItemID, "Sizes:", validSizes);
       const sizes = [];
       const sizeErrors = [];
 
@@ -788,7 +793,7 @@ if (typeof window.NWCACart === 'undefined') {
         try {
           // Create payload, ensuring we don't include SizeItemID which is an Autonumber field in Caspio
           const sizeDataPayload = {
-            CartItemID: cartItemId,
+            CartItemID: extractedCartItemID,
             Size: sizeData.size,
             Quantity: sizeData.quantity,
             UnitPrice: sizeData.unitPrice
@@ -858,9 +863,9 @@ if (typeof window.NWCACart === 'undefined') {
         
         // If all sizes failed, delete the cart item and throw an error
         if (sizeErrors.length === validSizes.length) {
-          debugCart("ADD", "All sizes failed, deleting cart item:", cartItemId);
+          debugCart("ADD", "All sizes failed, deleting cart item:", extractedCartItemID);
           try {
-            await fetch(ENDPOINTS.cartItems.delete(cartItemId), {
+            await fetch(ENDPOINTS.cartItems.delete(extractedCartItemID), {
               method: 'DELETE'
             });
           } catch (deleteError) {
@@ -879,7 +884,7 @@ if (typeof window.NWCACart === 'undefined') {
 
       // Get the full item with sizes to add to local state
       const itemWithSizes = {
-        CartItemID: cartItemId,
+        CartItemID: extractedCartItemID,
         SessionID: cartState.sessionId,
         ProductID: productData.productId || '',
         StyleNumber: productData.styleNumber,

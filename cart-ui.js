@@ -147,8 +147,11 @@ const NWCACartUI = (function() {
     console.log("Initializing cart UI, syncing with server...");
     NWCACart.syncWithServer()
       .then(() => {
-        console.log("Cart sync complete, rendering cart...");
-        renderCart();
+        console.log("Cart sync complete, rendering cart..."); // This log might be premature
+        // renderCart(); // <-- Removed direct call
+
+        // Initialize progress steps
+        goToStep(1);
       })
       .catch(error => {
         console.error("Error syncing cart:", error);
@@ -173,7 +176,9 @@ const NWCACartUI = (function() {
 
      // *** ADAPTATION NEEDED HERE ***
      // Convert original item format to the format expected by new render functions
+     console.log('[CART-UI] Raw items from NWCACart.getCartItems():', JSON.stringify(activeItemsOriginal, null, 2));
      const activeItems = activeItemsOriginal.map(adaptItemFormat);
+     console.log('[CART-UI] Items AFTER adaptItemFormat:', JSON.stringify(activeItems, null, 2));
      const savedItems = savedItemsOriginal.map(adaptItemFormat);
      // *** END ADAPTATION ***
 
