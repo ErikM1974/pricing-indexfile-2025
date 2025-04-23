@@ -265,14 +265,18 @@ function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
         setTimeout(function() {
             // Check if there's an error message or "No records found" message
             if (container.innerHTML.includes('Error: Initializing script') ||
-                container.innerHTML.includes('No records found')) {
+                container.innerHTML.includes('No records found') ||
+                container.innerHTML.includes('Error loading DataPage')) {
                 console.log(`Caspio DataPage failed to load properly for ${caspioAppKey}, displaying unavailable message`);
                 
                 // Display unavailable message and mark the container
                 container.innerHTML = '<div class="error-message">Pricing unavailable, please try again later.</div>';
                 container.classList.add('pricing-unavailable');
+                
+                // Try to create a fallback pricing table
+                createFallbackPricingTable(container, getEmbellishmentTypeFromUrl());
             }
-        }, 3000); // Wait 3 seconds to allow Caspio DataPage to load
+        }, 5000); // Wait 5 seconds to allow Caspio DataPage to load (increased from 3 seconds)
     };
     
     script.onerror = function() {
@@ -384,7 +388,17 @@ async function initPricingPage() {
     
     if (currentPage.includes('embroidery-pricing') || currentPage.includes('/pricing/embroidery')) {
         // Use the Caspio app key from the provided embedded code
+        // Note: If the app key is incorrect, update it here
         loadCaspioEmbed('pricing-calculator', 'a0e150001c7143d027a54c439c01', styleNumber);
+        
+        // Add a retry mechanism after 6 seconds if the pricing is still unavailable
+        setTimeout(() => {
+            const pricingContainer = document.getElementById('pricing-calculator');
+            if (pricingContainer && pricingContainer.classList.contains('pricing-unavailable')) {
+                console.log('Retrying Caspio DataPage load for embroidery pricing...');
+                loadCaspioEmbed('pricing-calculator', 'a0e150001c7143d027a54c439c01', styleNumber);
+            }
+        }, 6000);
         
         // Initialize fallback pricing data for embroidery if not already defined
         // This prevents errors in cart-integration.js when Caspio doesn't load properly
