@@ -1442,6 +1442,94 @@ if (typeof window.NWCACart === 'undefined') {
     }
   }
 
+  /**
+   * Submits the current active cart items as a quote request.
+   * Updates the status of each active item to 'Submitted' via the API.
+   * @returns {Promise<{success: boolean, error: string|null, failedItems: Array}>} - Result object with success status, potential error message, and list of items that failed to update.
+   */
+  async function submitQuoteRequest() {
+    debugCart("SUBMIT_QUOTE", "Attempting to submit quote request");
+    cartState.loading = true;
+    triggerEvent('cartUpdated'); // Indicate loading start
+
+    const activeItems = getCartItems('Active');
+    if (activeItems.length === 0) {
+      debugCart("SUBMIT_QUOTE", "No active items to submit.");
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      return { success: true, error: null, failedItems: [] }; // Nothing to submit
+    }
+
+    const updatePromises = activeItems.map(item => {
+      const itemId = item.CartItemID;
+      const updateUrl = `${ENDPOINTS.cartItems}/${itemId}`; // Assumes ENDPOINTS.cartItems is the base URL like '/api/cart-items'
+      const payload = { QuoteStatus: 'Submitted' }; // Assumes a 'QuoteStatus' field exists
+
+      debugCart("SUBMIT_QUOTE", `Updating item ${itemId} status to Submitted`, { url: updateUrl, payload });
+
+      return fetch(updateUrl, {
+        method: 'PUT', // Or PATCH, depending on your API design
+        headers: {
+          'Content-Type': 'application/json',
+          'Session-ID': cartState.sessionId
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.text().then(text => {
+            const errorMsg = `Failed to update item ${itemId} (${item.StyleNumber}): ${response.status} ${text}`;
+            console.error("[CART] Submit Quote Error:", errorMsg);
+            return { status: 'rejected', reason: errorMsg, itemId: itemId }; 
+          });
+        }
+        debugCart("SUBMIT_QUOTE", `Successfully updated item ${itemId}`);
+        return { status: 'fulfilled', value: { itemId: itemId, success: true } };
+      })
+      .catch(error => {
+        const errorMsg = `Network error updating item ${itemId}: ${error.message}`;
+        console.error("[CART] Submit Quote Network Error:", errorMsg);
+        return { status: 'rejected', reason: errorMsg, itemId: itemId };
+      });
+    });
+
+    const results = await Promise.all(updatePromises);
+
+    const failedItems = results.filter(result => result.status === 'rejected');
+    const successfullyUpdatedIds = results
+        .filter(result => result.status === 'fulfilled')
+        .map(result => result.value.itemId);
+
+    if (failedItems.length > 0) {
+      const errorMessages = failedItems.map(f => f.reason).join('; ');
+      cartState.error = `Failed to submit some items: ${errorMessages}`;
+      debugCart("SUBMIT_QUOTE_ERROR", `Submission failed for ${failedItems.length} items.`, { errors: errorMessages });
+      cartState.loading = false;
+      triggerEvent('cartUpdated');
+      return { success: false, error: cartState.error, failedItems: failedItems.map(f => f.itemId) };
+    }
+
+    // All items updated successfully
+    debugCart("SUBMIT_QUOTE_SUCCESS", "All active items successfully marked as Submitted.");
+
+    // Option 1: Remove submitted items from local cart
+    cartState.items = cartState.items.filter(item => item.CartStatus !== 'Active');
+    
+    // Option 2: Change local status (if you want to show them differently)
+    // cartState.items.forEach(item => {
+    //   if (successfullyUpdatedIds.includes(item.CartItemID)) {
+    //     item.CartStatus = 'Submitted'; // Or a different status like 'PendingQuote'
+    //   }
+    // });
+
+    cartState.error = null;
+    cartState.loading = false;
+    saveToLocalStorage();
+    triggerEvent('cartUpdated');
+
+    return { success: true, error: null, failedItems: [] };
+  }
+
   // Public API
   return {
     initializeCart,
@@ -1460,7 +1548,8 @@ if (typeof window.NWCACart === 'undefined') {
     isLoading: () => cartState.loading,
     getError: () => cartState.error,
     getCartState, // Add the getCartState method to the public API
-    clearCart // Add the clearCart method to the public API
+    clearCart, // Add the clearCart method to the public API
+    submitQuoteRequest // Expose the new function
   };
   })();
 

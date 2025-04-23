@@ -822,141 +822,41 @@ function renderSizeItem(sizeInfo, itemId) {
    */
   async function handleSubmitQuoteRequest() {
      debugCartUI("ACTION", "Attempting to submit quote request.");
+    
+    // Get active items first to check if cart is empty locally
+    const items = NWCACart.getCartItems('Active'); // Ensure NWCACart.getCartItems exists and works
+    if (items.length === 0) {
+      showNotification('Your quote request list is empty.', 'warning');
+      return;
+    }
+
+    // Disable button, show loading state (optional, add if needed)
+    if (elements.submitOrderBtn) elements.submitOrderBtn.disabled = true;
+    // You might want to add a loading spinner indicator here
+    showNotification('Submitting quote request...', 'info'); 
+
     try {
-      // Show loading state
-      elements.submitOrderBtn.disabled = true;
-      elements.submitOrderBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+       const result = await NWCACart.submitQuoteRequest(); // Call the function in cart.js
 
-      // Get cart items in their *original* format as likely expected by the API
-      const activeItemsOriginal = NWCACart.getCartItems('Active');
-
-      if (!activeItemsOriginal || activeItemsOriginal.length === 0) {
-        throw new Error('Your cart is empty');
-      }
-
-      // *** API Interaction - Ensure payload matches server expectations ***
-
-      // 1. Create customer (if needed) - Assuming API expects the customerData structure
-       debugCartUI("API", "Submitting customer data:", customerData);
-      const customerResponse = await fetch('/api/customers', { // Endpoint check needed
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(customerData) // Send collected data
-      });
-
-      if (!customerResponse.ok) {
-         const errorText = await customerResponse.text();
-         debugCartUI("API-ERROR", `Failed to create/update customer (${customerResponse.status})`, errorText);
-        throw new Error(`Failed to save customer information (${customerResponse.status})`);
-      }
-
-      const customer = await customerResponse.json();
-       debugCartUI("API-SUCCESS", "Customer save successful:", customer);
-
-      // Check if customer object and CustomerID are valid
-      if (!customer || !customer.CustomerID) {
-          throw new Error('Received invalid customer data from server.');
-      }
-
-
-      // 2. Create order - Ensure payload matches API expectations
-      const orderData = {
-        CustomerID: customer.CustomerID, // Use ID from response
-        OrderDate: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD likely better for DB
-        // *** Recalculate total based on original items or trust NWCACart ***
-        // It's safer if NWCACart's total is reliable.
-        TotalAmount: NWCACart.getCartTotal(),
-        OrderStatus: 'New', // Or 'Quote Request'?
-        // Use ImprintType from the first item (as original logic) - ensure it exists
-        ImprintType: activeItemsOriginal[0]?.ImprintType || 'Unknown',
-        PaymentStatus: 'Pending', // Or 'Quote'?
-        Notes: customerData.notes || '', // Include notes from form
-         // Add LTM Fee to order data if applicable
-         LTMQuoteFee: (NWCACart.getCartTotal() < 100 ? 15 : 0)
-      };
-       debugCartUI("API", "Submitting order data:", orderData);
-
-      const orderResponse = await fetch('/api/orders', { // Endpoint check needed
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderData)
-      });
-
-      if (!orderResponse.ok) {
-         const errorText = await orderResponse.text();
-          debugCartUI("API-ERROR", `Failed to create order (${orderResponse.status})`, errorText);
-        throw new Error(`Failed to create order (${orderResponse.status})`);
-      }
-
-      const order = await orderResponse.json();
-       debugCartUI("API-SUCCESS", "Order creation successful:", order);
-
-       // Check if order object and OrderID are valid
-       if (!order || !order.OrderID) {
-           throw new Error('Received invalid order data from server.');
+       if (result.success) {
+           debugCartUI("ACTION-SUCCESS", "Quote Request Submitted Successfully!");
+           showNotification('Quote Request Submitted Successfully!', 'success');
+           // Option 1: Clear cart display (NWCACart already removes items locally)
+           renderCart(); // Re-render to show the empty cart (if items were removed locally)
+           // Option 2: Redirect to a confirmation page
+           // window.location.href = '/quote-submitted.html'; // Create this page if needed
+       } else {
+           debugCartUI("ACTION-ERROR", "Error submitting quote request", result.error);
+           showNotification(`Error submitting quote request: ${result.error || 'Unknown error.'}`, 'danger');
        }
-
-
-      // 3. Update cart items with order ID - Use *original* item structure
-       debugCartUI("API", `Updating ${activeItemsOriginal.length} cart items with OrderID ${order.OrderID}`);
-      for (const item of activeItemsOriginal) {
-         // Ensure item has CartItemID
-         if (!item.CartItemID) {
-             debugCartUI("API-WARN", "Skipping cart item update due to missing CartItemID", item);
-             continue;
-         }
-         // Use PUT /api/cart-items/:cartItemId endpoint
-        const itemUpdateResponse = await fetch(`/api/cart-items/${item.CartItemID}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            // Spread original item data first
-             ...item,
-            // Update OrderID and Status
-             OrderID: order.OrderID,
-            CartStatus: 'Converted' // Mark as converted
-            // Ensure other fields expected by API are present
-          })
-        });
-         if (!itemUpdateResponse.ok) {
-             // Log error but continue trying other items
-             const errorText = await itemUpdateResponse.text();
-             console.error(`Failed to update cart item ${item.CartItemID}: ${errorText}`);
-              debugCartUI("API-ERROR", `Failed to update cart item ${item.CartItemID} (${itemUpdateResponse.status})`, errorText);
-         }
-      }
-       debugCartUI("API", "Finished updating cart items.");
-
-      // Generate a quote reference (potentially use OrderID?)
-      const quoteRef = order.OrderNumber || `Q-${order.OrderID}` || `Q${Date.now().toString().substring(3)}`; // Prefer OrderNumber or OrderID
-       debugCartUI("INFO", `Generated Quote Reference: ${quoteRef}`);
-
-      // Show confirmation
-      if (elements.quoteReference) {
-        elements.quoteReference.textContent = quoteRef;
-      }
-
-      // Go to confirmation step
-      goToStep(4);
-
-      // Clear the cart's local state and sync (important!)
-      await NWCACart.clearCart(); // Assuming NWCACart has a method like this
-      await NWCACart.syncWithServer(); // Ensure UI reflects empty cart
-
     } catch (error) {
-      console.error('Error submitting order:', error);
-      debugCartUI("ACTION-ERROR", "Error submitting order:", error.message);
-      showNotification(`Failed to submit quote request: ${error.message}`, 'danger');
-
-      // Reset button state
-      elements.submitOrderBtn.disabled = false;
-      elements.submitOrderBtn.textContent = 'Submit Quote Request';
+       console.error('Critical error submitting quote request:', error);
+       debugCartUI("ACTION-CRITICAL-ERROR", "An unexpected error occurred.", error);
+       showNotification('An unexpected critical error occurred while submitting your quote request. Please try again later.', 'danger');
+    } finally {
+        // Re-enable button, hide loading state (optional)
+        if (elements.submitOrderBtn) elements.submitOrderBtn.disabled = false;
+        // Hide loading spinner here
     }
   }
 
