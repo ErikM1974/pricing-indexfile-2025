@@ -3,6 +3,39 @@
  * Handles URL parameters, navigation, and loading Caspio embedded content
  */
 
+// Define the initDp5ApiFetch function that Caspio DataPage is looking for
+// This needs to be defined globally before any other code
+window.initDp5ApiFetch = function() {
+    console.log("initDp5ApiFetch called by Caspio DataPage");
+    
+    // This function is called by the Caspio DataPage when it's ready
+    // It should fetch data from the API and update the pricing table
+    
+    try {
+        // Get the current embellishment type from the URL
+        const embType = getEmbellishmentTypeFromUrl();
+        
+        console.log(`initDp5ApiFetch: Detected embellishment type: ${embType}`);
+        
+        // Find the pricing table elements
+        const pricingTable = document.querySelector('.matrix-price-table');
+        const tableBody = document.getElementById('matrix-price-body');
+        
+        if (pricingTable && tableBody) {
+            console.log("initDp5ApiFetch: Found pricing table elements, updating with data");
+            
+            // The table exists, so we can update it with our data
+            // This will be handled by the Caspio DataPage
+        } else {
+            console.log("initDp5ApiFetch: Pricing table elements not found, may need to create them");
+        }
+    } catch (error) {
+        console.error("Error in initDp5ApiFetch:", error);
+    }
+    
+    return true; // Indicate success to the Caspio DataPage
+};
+
 // Base API URL
 const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
@@ -482,54 +515,6 @@ function getEmbellishmentTypeFromUrl() {
     
     return embType;
 }
-
-// Define the initDp5ApiFetch function that Caspio DataPage is looking for
-window.initDp5ApiFetch = function() {
-    console.log("initDp5ApiFetch called by Caspio DataPage");
-    
-    // This function is called by the Caspio DataPage when it's ready
-    // It should fetch data from the API and update the pricing table
-    
-    try {
-        // Get the current embellishment type from the URL
-        const embType = getEmbellishmentTypeFromUrl();
-        
-        console.log(`initDp5ApiFetch: Detected embellishment type: ${embType}`);
-        
-        // Find the pricing table elements
-        const pricingTable = document.querySelector('.matrix-price-table');
-        const tableBody = document.getElementById('matrix-price-body');
-        
-        if (pricingTable && tableBody) {
-            console.log("initDp5ApiFetch: Found pricing table elements, updating with data");
-            
-            // The table exists, so we can update it with our data
-            // This will be handled by the Caspio DataPage
-        } else {
-            console.log("initDp5ApiFetch: Pricing table elements not found, may need to create them");
-            
-            // The table doesn't exist yet, so we'll need to wait for it to be created
-            // or create it ourselves if necessary
-            const pricingCalculator = document.getElementById('pricing-calculator');
-            if (pricingCalculator) {
-                // Check if there's an error message
-                const errorElement = pricingCalculator.querySelector('.error-message');
-                const noRecordsElement = pricingCalculator.querySelector(':contains("No records found")');
-                
-                if (errorElement || noRecordsElement || pricingCalculator.innerHTML.includes("Error: Initializing script")) {
-                    console.log("initDp5ApiFetch: Detected error in pricing calculator, will attempt to fix");
-                    
-                    // Create a fallback pricing table
-                    createFallbackPricingTable(pricingCalculator, embType);
-                }
-            }
-        }
-    } catch (error) {
-        console.error("Error in initDp5ApiFetch:", error);
-    }
-    
-    return true; // Indicate success to the Caspio DataPage
-};
 
 // Function to create a fallback pricing table when Caspio DataPage fails
 function createFallbackPricingTable(container, embType) {
