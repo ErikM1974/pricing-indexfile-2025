@@ -4,929 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NW Custom Apparel Online Catalog 2025</title>
-    
-    <!-- Favicon -->
+
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link rel="shortcut icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link rel="apple-touch-icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
-    <style>
-        /* --- CSS Variables for Theming --- */
-        /* Define consistent colors, spacing, fonts, etc. */
-        :root {
-            --primary-color: #0056b3;       /* Main blue color */
-            --primary-light: #e6f0ff;      /* Lighter blue for backgrounds/borders */
-            --secondary-color: #5cb85c;    /* Accent green color (example) */
-            --secondary-light: #eaffea;     /* Lighter green */
-            --text-color: #333;            /* Main text color (dark grey) */
-            --text-light: #666;            /* Lighter text color (medium grey) */
-            --border-color: #ddd;          /* Standard border color (light grey) */
-            --border-light: #eee;          /* Very light border/background */
-            --background-color: #fff;      /* White background */
-            --background-light: #f8f8f8;   /* Off-white/light grey background */
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
-            --shadow-md: 0 4px 8px rgba(0,0,0,0.1);  /* Medium shadow */
-            --radius-sm: 4px;              /* Small rounded corners */
-            --radius-md: 8px;              /* Medium rounded corners */
-            --spacing-xs: 5px;             /* Extra small space */
-            --spacing-sm: 10px;            /* Small space */
-            --spacing-md: 20px;            /* Medium space */
-            --spacing-lg: 30px;            /* Large space */
-            --font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Font stack */
-            --transition-fast: 0.2s ease;    /* Fast animation speed */
-            --transition-normal: 0.3s ease;  /* Normal animation speed */
-        }
 
-        /* --- General Page Styling (Scoped if possible, or remove if handled globally) --- */
-        /* Applying base font and background to body - may conflict with site styles */
-        /* Consider removing if your main site CSS handles this */
-        body {
-            font-family: var(--font-family);
-            /* padding: var(--spacing-md); REMOVED - Apply padding to specific containers */
-            font-size: 14px;
-            color: var(--text-color);
-            line-height: 1.5;
-            background-color: var(--background-light);
-            margin: 0; /* Reset default body margin */
-        }
-        
-        /* --- Header Styling --- */
-        .site-header {
-            background: linear-gradient(to right, #003366, #0056b3);
-            color: white;
-            padding: var(--spacing-md) 0;
-            margin-bottom: var(--spacing-lg);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-md);
-        }
-        
-        .site-header h1 {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-align: center;
-        }
-        
-        @media (max-width: 768px) {
-            .site-header h1 {
-                font-size: 1.5rem;
-            }
-        }
-        
-        /* --- Back Button Styling --- */
-        /* Styles the container for a back button */
-        .back-button-container {
-            margin-bottom: var(--spacing-md);
-        }
+    <link rel="stylesheet" href="main.css">
 
-        /* Styles the back button link */
-        .back-to-gallery-btn {
-            display: inline-flex; /* Use flex for icon alignment */
-            align-items: center; /* Vertically align icon and text */
-            color: var(--primary-color); /* Use primary color */
-            text-decoration: none; /* Remove underline */
-            font-weight: 500; /* Medium font weight */
-            padding: var(--spacing-xs) var(--spacing-sm); /* Padding */
-            border-radius: var(--radius-sm); /* Rounded corners */
-            transition: background-color var(--transition-fast); /* Animate background */
-        }
-
-        /* Add hover effect for back button */
-        .back-to-gallery-btn:hover {
-            background-color: var(--primary-light); /* Light blue background on hover */
-        }
-
-
-        /* --- Caspio Gallery Container Styling --- */
-        /* Apply container styles directly to the Caspio outer container */
-        /* Roo: Verify this ID (#cbOuterAjaxCtnr_6223e8ad4bff72) on the live page */
-        #cbOuterAjaxCtnr_6223e8ad4bff72,
-        [id^="cbOuterAjaxCtnr_"] {
-            margin-top: var(--spacing-md); /* Add space above the results */
-            /* Styles previously applied to '.container' are moved here */
-            max-width: 1200px; /* Or adjust as needed */
-            margin-left: auto;
-            margin-right: auto;
-            background-color: var(--background-color);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            padding: var(--spacing-md);
-        }
-
-        /* Target the specific Caspio section containing the gallery grid */
-        /* Roo: Verify this ID (#GridCtnr_6223e8ad4bff72) on the live page */
-        #GridCtnr_6223e8ad4bff72 section.cbColumnarReport,
-        [id^="GridCtnr_"] section.cbColumnarReport {
-            display: grid; /* Use CSS Grid for layout */
-            /* Create columns that are at least 250px wide, filling available space */
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: var(--spacing-md); /* Space between grid items */
-            padding-top: var(--spacing-md); /* Space above the grid */
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Hide the default Caspio "STYLE#" label */
-        .cbResultSetListViewDataLabel {
-            display: none;
-        }
-
-        /* --- Navigation and Pagination Styling --- */
-        /* Style the container for pagination controls */
-        .cbResultSetNavigationTable {
-            margin-top: var(--spacing-md); /* Space above pagination */
-            padding: var(--spacing-sm); /* Inner padding */
-            background-color: var(--background-color); /* Background */
-            border-radius: var(--radius-sm); /* Rounded corners */
-            box-shadow: var(--shadow-sm); /* Subtle shadow */
-            display: flex; /* Use flexbox for alignment */
-            justify-content: center; /* Center pagination items */
-            align-items: center; /* Vertically align items */
-            flex-wrap: wrap; /* Allow wrapping on small screens */
-            gap: var(--spacing-sm); /* Space between pagination elements */
-        }
-
-        /* Style pagination links (Prev, Next, page numbers) */
-        .cbResultSetNavigationLinks {
-            color: var(--primary-color); /* Link color */
-            text-decoration: none; /* Remove underline */
-            padding: var(--spacing-xs) var(--spacing-sm); /* Padding */
-            border-radius: var(--radius-sm); /* Rounded corners */
-            transition: background-color var(--transition-fast); /* Animate background */
-        }
-
-        /* Add background highlight on hover */
-        .cbResultSetNavigationLinks:hover {
-            background-color: var(--primary-light);
-        }
-
-        /* Style the "Jump to page" input field */
-        .cbResultSetJumpToTextField {
-            padding: 5px; /* Padding */
-            border: 1px solid var(--border-color); /* Border */
-            border-radius: var(--radius-sm); /* Rounded corners */
-            width: 40px; /* Fixed width */
-            text-align: center; /* Center text */
-        }
-
-        /* Style the responsive "Jump to page" dropdown */
-        .cbResultSetNavigationDDown {
-            padding: 5px; /* Padding */
-            border: 1px solid var(--border-color); /* Border */
-            border-radius: var(--radius-sm); /* Rounded corners */
-            background-color: var(--background-color); /* Background */
-        }
-
-        /* --- Responsive Design Adjustments --- */
-        /* Tablet breakpoint */
-        @media (max-width: 1024px) {
-            /* Adjust gallery columns */
-            /* Roo: Verify #GridCtnr_... ID */
-            #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            }
-        }
-
-        /* Smaller tablet / Large phone breakpoint */
-        @media (max-width: 768px) {
-             /* Adjust gallery columns */
-             /* Roo: Verify #GridCtnr_... ID */
-            #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            }
-
-            /* Stack search form elements vertically */
-            /* Suffix UPDATED based on assumed correct search form ID */
-            /* Roo: Verify #cbTable_... ID */
-            #cbTable_24144edcc4e22d { /* Targets the main search container */
-                flex-direction: column; /* Stack children (field blocks) vertically */
-                align-items: stretch; /* Make items stretch full width */
-            }
-
-            /* Add space between stacked search form blocks */
-            /* Suffix UPDATED based on assumed correct search form ID */
-            /* Applies to the containers for each label/input pair */
-            .cbFormBlock2_24144edcc4e22d,
-            .cbFormBlock3_24144edcc4e22d,
-            .cbFormBlock4_24144edcc4e22d,
-            .cbFormBlock5_24144edcc4e22d {
-                margin-bottom: var(--spacing-sm);
-                min-width: unset; /* Remove min-width when stacked */
-            }
-
-             /* Adjust label alignment for stacked form */
-            .cbFormLabelCell label {
-               text-align: center; /* Keep label text centered */
-            }
-
-            /* Adjust button alignment for stacked form */
-             .cbSearchButtonContainer {
-                padding-left: 0; /* Ensure no left padding */
-                text-align: center; /* Keep button centered */
-                margin-top: 0; /* Reset margin as spacing is handled by gap/block margin */
-                display: flex;
-                justify-content: center;
-             }
-        }
-
-        /* Mobile breakpoint */
-        @media (max-width: 576px) {
-             /* Adjust gallery columns */
-             /* Roo: Verify #GridCtnr_... ID */
-            #GridCtnr_6223e8ad4bff72 section.cbColumnarReport {
-                /* Use 2 columns even on small screens, adjust minmax as needed */
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: var(--spacing-sm); /* Slightly reduce gap */
-            }
-
-            /* Reduce padding on main Caspio container */
-             /* Roo: Verify #cbOuterAjaxCtnr_... ID */
-            #cbOuterAjaxCtnr_6223e8ad4bff72 {
-                 padding: var(--spacing-sm);
-            }
-
-            /* Adjust search form padding */
-             /* Roo: Verify #cbTable_... ID */
-            #cbTable_24144edcc4e22d {
-                padding: var(--spacing-sm);
-            }
-        }
-
-        /* Gallery Card Styling */
-        .cbResultSetListViewTableOddCell,
-        .cbResultSetListViewTableEvenCell {
-            background: var(--background-color);
-            border: 1.5px solid var(--border-light);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            padding: var(--spacing-md) var(--spacing-sm);
-            margin: var(--spacing-sm);
-            transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
-            min-height: 340px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .cbResultSetListViewTableOddCell:hover,
-        .cbResultSetListViewTableEvenCell:hover {
-            box-shadow: 0 8px 24px rgba(0,0,0,0.13);
-            border-color: var(--primary-light);
-            transform: translateY(-6px) scale(1.03);
-        }
-        .cbResultSetListViewTableOddCell img,
-        .cbResultSetListViewTableEvenCell img {
-            max-width: 90%;
-            max-height: 140px;
-            margin-bottom: var(--spacing-sm);
-            border-radius: var(--radius-sm);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            transition: transform 0.2s;
-        }
-        .cbResultSetListViewTableOddCell:hover img,
-        .cbResultSetListViewTableEvenCell:hover img {
-            transform: scale(1.05);
-        }
-        .cbResultSetListViewTableOddCell .cbResultSetListViewTableCell,
-        .cbResultSetListViewTableEvenCell .cbResultSetListViewTableCell {
-            font-size: 1.07rem;
-            font-weight: 500;
-            color: var(--primary-color);
-            margin-bottom: 6px;
-            text-align: center;
-        }
-        .cbResultSetListViewTableOddCell .cbResultSetListViewTableCell:last-child,
-        .cbResultSetListViewTableEvenCell .cbResultSetListViewTableCell:last-child {
-            color: var(--text-light);
-            font-size: 0.98rem;
-            margin-bottom: 0;
-        }
-    </style>
-    
-    <!-- Hero Image Styling -->
-    <style>
-        /* Hero Section Styling */
-        #hero-section {
-            width: 100%;
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 50px; /* Add space below the hero section */
-        }
-
-        .hero-container {
-            width: 100%;
-            height: 350px; /* Increased height to show more of the image */
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center top; /* Position from the top to ensure faces are visible */
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 576px) {
-            .hero-container {
-                height: 200px; /* Shorter on mobile */
-            }
-        }
-    </style>
-    
-    <!-- Enhanced Styling for Instructions Section with Accordion -->
-    <style>
-        /* Add space between hero image and instructions */
-        #gallery-container {
-            margin-top: 50px; /* Increased space above the instructions */
-        }
-        
-        /* Main container styling */
-        #gallery-container > div:first-of-type {
-            background-color: var(--background-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            padding: 20px;
-            margin-bottom: 20px;
-            max-width: 1100px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        /* Main heading */
-        #gallery-container h3 {
-            color: var(--primary-color);
-            font-size: 1.5rem;
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--primary-light);
-        }
-        
-        /* Welcome text */
-        #gallery-container > div:first-of-type > p:first-of-type {
-            font-size: 1rem;
-            text-align: center;
-            margin-bottom: 20px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        /* Accordion styling */
-        .accordion-section {
-            margin-bottom: 10px;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-        }
-        
-        /* Accordion header */
-        .accordion-header {
-            background-color: var(--background-light);
-            padding: 12px 15px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            border-radius: var(--radius-sm);
-            border-left: 4px solid var(--primary-color);
-            transition: background-color var(--transition-fast);
-        }
-        
-        .accordion-header:hover {
-            background-color: #f0f0f0;
-        }
-        
-        /* Step 1 header - Green */
-        .accordion-section:nth-of-type(1) .accordion-header {
-            border-left-color: #34A853;
-        }
-        
-        /* Step 2 header - Yellow */
-        .accordion-section:nth-of-type(2) .accordion-header {
-            border-left-color: #FBBC05;
-        }
-        
-        /* Step 3 header - Blue */
-        .accordion-section:nth-of-type(3) .accordion-header {
-            border-left-color: #4285F4;
-        }
-        
-        /* Accordion content */
-        .accordion-content {
-            background-color: white;
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-        }
-        
-        /* Active accordion content */
-        .accordion-section.active .accordion-content {
-            padding: 15px;
-            max-height: 1000px; /* Large enough to fit content */
-            border: 1px solid var(--border-light);
-            border-top: none;
-            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-        }
-        
-        /* Accordion icon */
-        .accordion-icon {
-            margin-left: auto;
-            transition: transform 0.3s ease;
-        }
-        
-        .accordion-section.active .accordion-icon {
-            transform: rotate(180deg);
-        }
-        
-        /* Step headings */
-        #gallery-container h4 {
-            color: var(--primary-color);
-            font-size: 1.2rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-        }
-        
-        /* Step number icons */
-        #gallery-container h4 .step-icon {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            margin-right: 10px;
-        }
-        
-        /* List items */
-        #gallery-container ul {
-            margin-bottom: 10px;
-            padding-left: 20px;
-        }
-        
-        #gallery-container ul li {
-            margin-bottom: 8px;
-            position: relative;
-            list-style-type: none;
-            padding-left: 20px;
-        }
-        
-        /* Arrow styling for list items */
-        #gallery-container ul li::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-        
-        /* Step 1 arrows - Green */
-        .accordion-section:nth-of-type(1) ul li::before {
-            color: #34A853;
-        }
-        
-        /* Step 2 arrows - Yellow */
-        .accordion-section:nth-of-type(2) ul li::before {
-            color: #FBBC05;
-        }
-        
-        /* Step 3 arrows - Blue */
-        .accordion-section:nth-of-type(3) ul li::before {
-            color: #4285F4;
-        }
-        
-        /* Strong text */
-        #gallery-container strong {
-            color: var(--primary-color);
-        }
-        
-        /* Contact information section */
-        .contact-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        /* Contact method boxes */
-        .contact-method {
-            flex: 1;
-            min-width: 200px;
-            background-color: var(--background-light);
-            padding: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        /* Final note */
-        #gallery-container > div:first-of-type > p:last-of-type {
-            text-align: center;
-            margin-top: 15px;
-            font-weight: 500;
-            color: var(--primary-color);
-        }
-        
-        /* Search form styling */
-        #gallery-container > div:nth-of-type(2) {
-            background-color: var(--background-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            padding: 20px;
-            max-width: 1100px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            #gallery-container > div:first-of-type {
-                padding: 15px;
-            }
-            
-            .contact-info {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-    </style>
-    
-    <!-- Catalog Instructions Styling -->
-    <style>
-        /* Catalog Instructions Styling */
-        .catalog-instructions {
-            background-color: var(--background-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            padding: var(--spacing-lg);
-            margin: 0 auto var(--spacing-lg) auto;
-            max-width: 1200px;
-            font-family: var(--font-family);
-            line-height: 1.6;
-            color: var(--text-color);
-            font-size: 16px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Decorative accent */
-        .catalog-instructions::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 6px;
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-        }
-        
-        .catalog-instructions h3 {
-            color: var(--primary-color);
-            margin-top: 0;
-            padding-bottom: var(--spacing-sm);
-            border-bottom: 2px solid var(--primary-light);
-            font-size: 1.8rem;
-            text-align: center;
-            margin-bottom: var(--spacing-md);
-        }
-        
-        .catalog-instructions .intro-text {
-            font-size: 1.1rem;
-            text-align: center;
-            margin-bottom: var(--spacing-md);
-        }
-
-        /* Accordion styling */
-        .accordion-section {
-            margin-bottom: var(--spacing-md);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-        }
-        
-        /* Accordion header */
-        .accordion-header {
-            background-color: var(--background-light);
-            padding: var(--spacing-sm);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-radius: var(--radius-sm);
-            transition: background-color var(--transition-fast);
-        }
-        
-        .accordion-header:hover {
-            background-color: #f0f0f0;
-        }
-        
-        /* Accordion content */
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            background-color: white;
-        }
-        
-        /* Active accordion */
-        .accordion-section.active .accordion-content {
-            max-height: 1000px; /* Large enough to fit content */
-            padding: var(--spacing-md);
-            border: 1px solid var(--border-light);
-            border-top: none;
-            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-        }
-        
-        /* Accordion icon */
-        .accordion-icon {
-            font-size: 12px;
-            transition: transform 0.3s ease;
-        }
-        
-        .accordion-section.active .accordion-icon {
-            transform: rotate(180deg);
-        }
-        
-        /* Step container styling */
-        .step-container {
-            background-color: var(--background-light);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--spacing-md);
-            transition: box-shadow var(--transition-normal);
-        }
-        
-        /* Different accent colors for each step */
-        .step-container:nth-child(3) {
-            border-left: 4px solid #34A853; /* Google Green */
-        }
-        
-        .step-container:nth-child(4) {
-            border-left: 4px solid #FBBC05; /* Google Yellow */
-        }
-        
-        .step-container:nth-child(5) {
-            border-left: 4px solid #4285F4; /* Google Blue */
-        }
-
-        .catalog-instructions h4 {
-            color: var(--primary-color);
-            margin-top: 0;
-            margin-bottom: var(--spacing-sm);
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-        }
-        
-        /* Step number icons */
-        .step-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            margin-right: var(--spacing-sm);
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        
-        /* Different colors for each step icon */
-        .step-container:nth-child(3) .step-icon {
-            background-color: #34A853; /* Google Green */
-        }
-        
-        .step-container:nth-child(4) .step-icon {
-            background-color: #FBBC05; /* Google Yellow */
-        }
-        
-        .step-container:nth-child(5) .step-icon {
-            background-color: #4285F4; /* Google Blue */
-        }
-
-        .catalog-instructions p {
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .catalog-instructions strong {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .catalog-instructions ul {
-            list-style-type: none;
-            margin-left: 10px;
-            margin-bottom: var(--spacing-sm);
-        }
-        
-        .catalog-instructions ul li {
-            position: relative;
-            padding-left: 25px;
-            margin-bottom: 10px;
-        }
-        
-        .catalog-instructions ul li::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-        
-        /* Different arrow colors for each step */
-        .step-container:nth-child(3) ul li::before {
-            color: #34A853; /* Google Green */
-        }
-        
-        .step-container:nth-child(4) ul li::before {
-            color: #FBBC05; /* Google Yellow */
-        }
-        
-        .step-container:nth-child(5) ul li::before {
-            color: #4285F4; /* Google Blue */
-        }
-
-        .catalog-instructions a {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: all var(--transition-fast);
-            font-weight: 500;
-            border-bottom: 1px dotted var(--primary-color);
-            padding-bottom: 2px;
-        }
-
-        .catalog-instructions a:hover {
-            color: #003d80;
-            border-bottom: 1px solid #003d80;
-        }
-        
-        /* Contact info styling */
-        .contact-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--spacing-md);
-            margin-top: var(--spacing-md);
-        }
-        
-        .contact-method {
-            flex: 1;
-            min-width: 200px;
-            background-color: rgba(255,255,255,0.7);
-            padding: var(--spacing-sm);
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-sm);
-            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-        }
-        
-        .contact-method:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .contact-method-title {
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-            display: block;
-        }
-        
-        .final-note {
-            text-align: center;
-            margin-top: var(--spacing-md);
-            font-weight: 500;
-            font-size: 1.1rem;
-            color: var(--primary-color);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .catalog-instructions {
-                padding: var(--spacing-md);
-                font-size: 15px;
-            }
-            
-            .catalog-instructions h3 {
-                font-size: 1.5rem;
-            }
-            
-            .catalog-instructions h4 {
-                font-size: 1.2rem;
-            }
-            
-            .step-icon {
-                width: 30px;
-                height: 30px;
-                font-size: 1rem;
-            }
-            
-            .contact-info {
-                flex-direction: column;
-                gap: var(--spacing-sm);
-            }
-        }
-    </style>
-    
-    <!-- JavaScript for Accordion Functionality -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Function to convert step containers to accordions
             function setupAccordions() {
-                // Get all step containers
-                const stepContainers = document.querySelectorAll('.step-container');
-                
+                const stepContainers = document.querySelectorAll('.catalog-instructions .step-container');
                 if (stepContainers.length > 0) {
-                    // Add accordion functionality to each step container
                     stepContainers.forEach(function(container, index) {
-                        // Get the heading
                         const heading = container.querySelector('h4');
-                        if (!heading) return;
-                        
-                        // Get all content elements after the heading
+                        if (!heading || container.classList.contains('accordion-section')) return; // Skip if no heading or already processed
+
                         const content = document.createElement('div');
                         content.className = 'accordion-content';
-                        
-                        // Move all elements after the heading into the content div
                         let nextElement = heading.nextElementSibling;
                         while (nextElement) {
                             const temp = nextElement.nextElementSibling;
                             content.appendChild(nextElement);
                             nextElement = temp;
                         }
-                        
-                        // Create accordion header
+
                         const header = document.createElement('div');
                         header.className = 'accordion-header';
-                        
-                        // Add dropdown icon
                         const icon = document.createElement('span');
                         icon.className = 'accordion-icon';
                         icon.innerHTML = '▼';
-                        
-                        // Move the heading to the header
-                        container.removeChild(heading);
-                        header.appendChild(heading);
-                        header.appendChild(icon);
-                        
-                        // Add the header and content to the container
-                        container.classList.add('accordion-section');
-                        container.appendChild(header);
-                        container.appendChild(content);
-                        
-                        // Open the first accordion by default
-                        if (index === 0) {
-                            container.classList.add('active');
+
+                        const title = document.createElement('span');
+                        title.className = 'accordion-title';
+                        while(heading.firstChild) {
+                            title.appendChild(heading.firstChild);
                         }
-                        
-                        // Add click event to toggle accordion
+
+                        header.appendChild(title);
+                        header.appendChild(icon);
+
+                        container.removeChild(heading);
+                        container.insertBefore(header, container.firstChild);
+                        container.appendChild(content);
+                        container.classList.add('accordion-section');
+
+                        // All steps closed by default (first step open code is commented out)
+                        // if (index === 0) { container.classList.add('active'); }
+
                         header.addEventListener('click', function() {
                             container.classList.toggle('active');
                         });
                     });
                 }
             }
-            
-            // Run the setup after a short delay to ensure the DOM is fully loaded
-            setTimeout(setupAccordions, 500);
+            setTimeout(setupAccordions, 0);
         });
     </script>
 </head>
 <body>
-    <!-- Header with improved styling -->
     <header class="site-header">
         <div class="header-container">
             <h1>NW Custom Apparel Online Catalog 2025</h1>
         </div>
     </header>
 
-    <!-- Hero Image Section -->
     <section id="hero-section">
         <div class="hero-container">
-            <!-- Hero image -->
-            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/TEAM%20NWCA%20HERO%20Image.png?ver=1" alt="NW Custom Apparel Team" class="hero-image">
-        </div>
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/GREEN%20TEAM%20NWCA%20HERO%20Image.png?ver=1" alt="NW Custom Apparel Team - Green Theme" class="hero-image">
+            </div>
     </section>
 
-    <!-- Catalog Instructions Section -->
-    <section id="catalog-instructions-section" style="margin-top: 50px;">
+    <div id="gallery-container">
+        <p style="text-align: center; max-width: 1100px; margin: 0 auto var(--spacing-md) auto; font-size: 1.1rem;">
+            Use the filters below to find your perfect product. Need help?
+            <a href="#catalog-instructions-section" style="color: var(--primary-color); text-decoration: underline;">See our step-by-step guide.</a>
+        </p>
+        <h2>Search Catalog</h2>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb"></script>
+    </div>
+
+    <section id="catalog-instructions-section">
         <div class="catalog-instructions">
             <h3>Your Custom Look Starts Here: Find Apparel & See Decorated Pricing</h3>
-            
             <p class="intro-text">Welcome! Browse thousands of apparel items ready for your custom logo or design. Finding your gear and seeing decoration pricing is easy:</p>
-            
+
             <div class="step-container">
                 <h4><span class="step-icon">1</span> Find Your Perfect Product:</h4>
                 <ul>
-                    <li>Use the <strong>Search Filters Below</strong> - Enter a specific <strong>STYLE#</strong> or use the <strong>CATEGORY</strong>, <strong>SUBCATEGORY</strong>, and <strong>BRAND</strong> dropdowns to explore options.</li>
+                    <li>Use the <strong>Search Filters Above</strong> - Enter a specific <strong>STYLE#</strong> or use the <strong>CATEGORY</strong>, <strong>SUBCATEGORY</strong>, and <strong>BRAND</strong> dropdowns to explore options.</li>
                     <li>Hit the <strong>Search</strong> button to see results.</li>
                 </ul>
             </div>
-            
             <div class="step-container">
                 <h4><span class="step-icon">2</span> See Your Price – Decoration Included:</h4>
                 <ul>
@@ -935,48 +104,34 @@
                     <li>The price grid will show the <strong>price per item</strong>, including standard decoration, based on quantity.</li>
                 </ul>
             </div>
-            
             <div class="step-container">
                 <h4><span class="step-icon">3</span> Ready to Order or Have Questions?</h4>
                 <p><strong>Note:</strong> Full online ordering is coming soon! Until then, we're here to help you place your order personally.</p>
                 <p>Once you've found your items (note the Style #, color, quantity, and decoration method), contact us:</p>
-                
                 <div class="contact-info">
                     <div class="contact-method">
                         <span class="contact-method-title">Email Us:</span>
                         <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
                     </div>
-                    
                     <div class="contact-method">
                         <span class="contact-method-title">Account Executives:</span>
                         <strong>Taylar:</strong> <a href="mailto:taylar@nwcustomapparel.com">taylar@nwcustomapparel.com</a><br>
                         <strong>Nika:</strong> <a href="mailto:nika@nwcustomapparel.com">nika@nwcustomapparel.com</a>
                     </div>
-                    
                     <div class="contact-method">
                         <span class="contact-method-title">Call Us:</span>
                         <strong>253-922-5793</strong><br>
                         Monday - Friday, 9:00 AM - 5:00 PM Pacific
                     </div>
-                    
                     <div class="contact-method">
                         <span class="contact-method-title">Visit Our Showroom:</span>
                         Come to Milton, WA to see and feel the quality firsthand.
                     </div>
                 </div>
             </div>
-            
             <p class="final-note">We look forward to working with you to create your custom apparel!</p>
         </div>
     </section>
 
-    <div id="gallery-container">
-        <!-- Search Catalog Heading -->
-        <h2 style="color: var(--primary-color); text-align: center; margin-bottom: 20px; font-size: 1.8rem; padding-bottom: 10px; border-bottom: 2px solid var(--primary-light); max-width: 1100px; margin-left: auto; margin-right: auto;">Search Catalog</h2>
-        
-        <!-- Caspio Gallery Block -->
-        <!-- Ensure the script below points to the correct Caspio DataPage deployment -->
-        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb"></script>
-    </div>
-</body>
+    </body>
 </html>
