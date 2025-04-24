@@ -39,11 +39,29 @@
                 #cart-button-container {
                     display: block !important;
                     margin-top: 20px !important;
-                    padding: 15px !important;
+                    padding: 20px !important;
                     background-color: #f8f8f8 !important;
-                    border-radius: 5px !important;
+                    border-radius: 8px !important;
                     border: 1px solid #ddd !important;
                     z-index: 1000 !important;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+                }
+                
+                #cart-button-container h4 {
+                    text-align: center !important;
+                    color: #0056b3 !important;
+                    font-size: 1.2rem !important;
+                    margin-bottom: 15px !important;
+                }
+                
+                .product-summary {
+                    display: flex !important;
+                    align-items: center !important;
+                    margin-bottom: 20px !important;
+                    padding: 15px !important;
+                    background-color: #f0f8ff !important;
+                    border-radius: 5px !important;
+                    border: 1px solid #d0e5ff !important;
                 }
                 
                 #add-to-cart-button {
@@ -52,27 +70,61 @@
                     color: white !important;
                     border: none !important;
                     border-radius: 4px !important;
-                    padding: 10px 20px !important;
+                    padding: 12px 25px !important;
                     cursor: pointer !important;
                     font-weight: bold !important;
-                    margin-top: 15px !important;
+                    margin: 20px auto 0 !important;
+                    font-size: 1.1rem !important;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+                    transition: all 0.2s ease !important;
+                }
+                
+                #add-to-cart-button:hover {
+                    background-color: #003d80 !important;
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
                 }
                 
                 .size-input-grid {
                     display: grid !important;
-                    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
-                    gap: 10px !important;
-                    margin-bottom: 15px !important;
+                    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
+                    gap: 15px !important;
+                    margin-bottom: 20px !important;
+                    justify-content: center !important;
+                    margin: 0 auto !important;
+                    max-width: 800px !important;
                 }
                 
                 .size-input-group {
                     display: flex !important;
                     flex-direction: column !important;
                     align-items: center !important;
-                    padding: 8px !important;
-                    border: 1px solid #e0e0e0 !important;
-                    border-radius: 4px !important;
+                    padding: 10px !important;
+                    border: 1px solid #d0e5ff !important;
+                    border-radius: 6px !important;
                     background-color: #f9f9f9 !important;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+                    transition: all 0.2s ease !important;
+                }
+                
+                .size-input-group:hover {
+                    background-color: #f0f8ff !important;
+                    border-color: #90c3ff !important;
+                }
+                
+                .size-input-group label {
+                    margin-bottom: 8px !important;
+                    font-weight: bold !important;
+                    color: #0056b3 !important;
+                }
+                
+                .size-quantity-input {
+                    width: 65px !important;
+                    padding: 8px !important;
+                    text-align: center !important;
+                    border: 1px solid #ccc !important;
+                    border-radius: 4px !important;
+                    font-size: 1rem !important;
                 }
             `;
             document.head.appendChild(styleEl);
@@ -163,15 +215,81 @@
         const heading = document.createElement('h4');
         heading.textContent = 'Add to Quote';
         heading.style.marginBottom = '15px';
+        heading.style.textAlign = 'center';
+        heading.style.color = '#0056b3';
+        heading.style.fontSize = '1.2rem';
         container.appendChild(heading);
         
-        // Add size inputs section
+        // Add product summary section
+        const productSummary = document.createElement('div');
+        productSummary.className = 'product-summary';
+        productSummary.style.display = 'flex';
+        productSummary.style.alignItems = 'center';
+        productSummary.style.marginBottom = '20px';
+        productSummary.style.padding = '15px';
+        productSummary.style.backgroundColor = '#f0f8ff';
+        productSummary.style.borderRadius = '5px';
+        productSummary.style.border = '1px solid #d0e5ff';
+        
+        // Try to get product image
+        const productImageSrc = document.querySelector('.product-image img')?.src ||
+                               document.querySelector('#product-image')?.src ||
+                               document.querySelector('img[alt*="product"]')?.src ||
+                               document.querySelector('.cbResultSetData img')?.src;
+        
+        // Add product image if found
+        if (productImageSrc) {
+            const productImage = document.createElement('img');
+            productImage.src = productImageSrc;
+            productImage.alt = 'Product Image';
+            productImage.style.width = '80px';
+            productImage.style.height = 'auto';
+            productImage.style.marginRight = '15px';
+            productImage.style.border = '1px solid #ddd';
+            productImage.style.borderRadius = '4px';
+            productSummary.appendChild(productImage);
+        }
+        
+        // Add product details
+        const productDetails = document.createElement('div');
+        productDetails.style.flex = '1';
+        
+        // Get product name
+        const productName = document.querySelector('h1')?.textContent ||
+                           document.querySelector('h2')?.textContent ||
+                           `Product ${styleNumber}`;
+        
+        const productNameElem = document.createElement('div');
+        productNameElem.style.fontWeight = 'bold';
+        productNameElem.style.fontSize = '1.1rem';
+        productNameElem.style.marginBottom = '5px';
+        productNameElem.textContent = productName;
+        productDetails.appendChild(productNameElem);
+        
+        const productStyle = document.createElement('div');
+        productStyle.innerHTML = `<strong>Style:</strong> ${styleNumber}`;
+        productStyle.style.marginBottom = '3px';
+        productDetails.appendChild(productStyle);
+        
+        const productColor = document.createElement('div');
+        productColor.innerHTML = `<strong>Color:</strong> ${colorCode}`;
+        productDetails.appendChild(productColor);
+        
+        productSummary.appendChild(productDetails);
+        
+        // Add the product summary to the container
+        container.appendChild(productSummary);
+        
+        // Add size inputs section with improved styling
         const sizeInputs = document.createElement('div');
         sizeInputs.className = 'size-input-grid';
         sizeInputs.style.display = 'grid';
-        sizeInputs.style.gridTemplateColumns = 'repeat(auto-fill, minmax(80px, 1fr))';
-        sizeInputs.style.gap = '10px';
-        sizeInputs.style.marginBottom = '15px';
+        sizeInputs.style.gridTemplateColumns = 'repeat(auto-fill, minmax(90px, 1fr))';
+        sizeInputs.style.gap = '15px';
+        sizeInputs.style.marginBottom = '20px';
+        sizeInputs.style.justifyContent = 'center';
+        sizeInputs.style.margin = '0 auto';
+        sizeInputs.style.maxWidth = '800px';
         
         // Get the product info from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -212,14 +330,20 @@
                         // Extract unique sizes from inventory data
                         let sizes = [];
                         if (data && Array.isArray(data)) {
-                            // Extract unique sizes and sort them
-                            const sizeSet = new Set();
+                            // Extract unique sizes and sort them by SizeSortOrder
+                            const sizeMap = new Map(); // Use a map to store size and its sort order
                             data.forEach(item => {
-                                if (item.size) {
-                                    sizeSet.add(item.size);
+                                if (item.size && !sizeMap.has(item.size)) {
+                                    // Store the size with its sort order
+                                    sizeMap.set(item.size, parseInt(item.SizeSortOrder) || 99);
                                 }
                             });
-                            sizes = Array.from(sizeSet).sort();
+                            
+                            // Convert map to array, sort by sort order, then extract just the size names
+                            sizes = Array.from(sizeMap.entries())
+                                .sort((a, b) => a[1] - b[1]) // Sort by SizeSortOrder
+                                .map(entry => entry[0]); // Get only the size name
+                                
                             console.log("[ADD-TO-CART] Found sizes from inventory:", sizes);
                         }
                         
@@ -309,15 +433,29 @@
             sizeGroup.style.display = 'flex';
             sizeGroup.style.flexDirection = 'column';
             sizeGroup.style.alignItems = 'center';
-            sizeGroup.style.padding = '8px';
-            sizeGroup.style.border = '1px solid #e0e0e0';
-            sizeGroup.style.borderRadius = '4px';
+            sizeGroup.style.padding = '10px';
+            sizeGroup.style.border = '1px solid #d0e5ff';
+            sizeGroup.style.borderRadius = '6px';
             sizeGroup.style.backgroundColor = '#f9f9f9';
+            sizeGroup.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+            sizeGroup.style.transition = 'all 0.2s ease';
+            
+            // Add hover effect
+            sizeGroup.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = '#f0f8ff';
+                this.style.borderColor = '#90c3ff';
+            });
+            
+            sizeGroup.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '#f9f9f9';
+                this.style.borderColor = '#d0e5ff';
+            });
             
             const label = document.createElement('label');
             label.textContent = size;
-            label.style.marginBottom = '5px';
+            label.style.marginBottom = '8px';
             label.style.fontWeight = 'bold';
+            label.style.color = '#0056b3';
             
             const input = document.createElement('input');
             input.type = 'number';
@@ -325,9 +463,12 @@
             input.value = '0';
             input.className = 'size-quantity-input';
             input.dataset.size = size;
-            input.style.width = '60px';
-            input.style.padding = '5px';
+            input.style.width = '65px';
+            input.style.padding = '8px';
             input.style.textAlign = 'center';
+            input.style.border = '1px solid #ccc';
+            input.style.borderRadius = '4px';
+            input.style.fontSize = '1rem';
             
             sizeGroup.appendChild(label);
             sizeGroup.appendChild(input);
@@ -344,11 +485,27 @@
         button.style.color = 'white';
         button.style.border = 'none';
         button.style.borderRadius = '4px';
-        button.style.padding = '10px 20px';
+        button.style.padding = '12px 25px';
         button.style.cursor = 'pointer';
         button.style.fontWeight = 'bold';
         button.style.display = 'block';
-        button.style.marginTop = '15px';
+        button.style.margin = '20px auto 0';
+        button.style.fontSize = '1.1rem';
+        button.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        button.style.transition = 'all 0.2s ease';
+        
+        // Add hover effect
+        button.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#003d80';
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '#0056b3';
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        });
         
         // Add click event
         button.addEventListener('click', function() {
