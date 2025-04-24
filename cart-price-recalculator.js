@@ -66,6 +66,9 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                 return true;
             }
             
+            // Log the items we're recalculating
+            console.log("[PRICE-RECALC:ITEMS] Items to recalculate:", itemsOfType);
+            
             // For each item, update prices based on total quantity
             for (const item of itemsOfType) {
                 if (!item.sizes || !Array.isArray(item.sizes) || item.sizes.length === 0) {
@@ -85,6 +88,7 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                             // Find the appropriate quantity tier
                             let tier = null;
                             
+                            // First, try to find an exact match for the tier
                             for (const row of pricingData.rows) {
                                 const tierText = row.tier;
                                 
@@ -114,6 +118,38 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                                 }
                             }
                             
+                            // If no tier found, use the lowest tier (usually 1-23)
+                            if (!tier && pricingData.rows.length > 0) {
+                                console.log(`[PRICE-RECALC:INFO] No exact tier match found for quantity ${totalQuantity}, using lowest tier`);
+                                
+                                // Find the tier with the lowest minimum quantity
+                                let lowestMin = Number.MAX_SAFE_INTEGER;
+                                let lowestTier = null;
+                                
+                                for (const row of pricingData.rows) {
+                                    const tierText = row.tier;
+                                    let min = Number.MAX_SAFE_INTEGER;
+                                    
+                                    if (tierText.includes('-')) {
+                                        min = parseInt(tierText.split('-')[0].trim());
+                                    } else if (tierText.includes('+')) {
+                                        min = parseInt(tierText.replace('+', '').trim());
+                                    } else {
+                                        min = parseInt(tierText.trim());
+                                    }
+                                    
+                                    if (!isNaN(min) && min < lowestMin) {
+                                        lowestMin = min;
+                                        lowestTier = row;
+                                    }
+                                }
+                                
+                                if (lowestTier) {
+                                    console.log(`[PRICE-RECALC:INFO] Using lowest tier: ${lowestTier.tier}`);
+                                    tier = lowestTier;
+                                }
+                            }
+                            
                             if (tier) {
                                 // Update prices for each size
                                 for (const size of item.sizes) {
@@ -136,11 +172,37 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                                     
                                     const price = tier.prices[sizeKey];
                                     
-                                    if (price && price !== size.UnitPrice) {
+                                    if (price) {
                                         console.log(`[PRICE-RECALC:UPDATE] Updating price for ${item.StyleNumber}, ${item.Color}, ${size.Size} from $${size.UnitPrice} to $${price}`);
                                         
-                                        // Update price in cart
+                                        // Update price in cart and in the database
                                         size.UnitPrice = price;
+                                        
+                                        // Update the price in the database
+                                        try {
+                                            const updateUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/cart-item-sizes/${size.SizeItemID}`;
+                                            fetch(updateUrl, {
+                                                method: 'PUT',
+                                                headers: {
+                                                    'Content-Type': 'application/json'
+                                                },
+                                                body: JSON.stringify({
+                                                    UnitPrice: price
+                                                })
+                                            })
+                                            .then(response => {
+                                                if (response.ok) {
+                                                    console.log(`[PRICE-RECALC:DB-UPDATE] Successfully updated price in database for size ${size.Size}`);
+                                                } else {
+                                                    console.error(`[PRICE-RECALC:DB-UPDATE] Failed to update price in database for size ${size.Size}: ${response.status}`);
+                                                }
+                                            })
+                                            .catch(error => {
+                                                console.error(`[PRICE-RECALC:DB-UPDATE] Error updating price in database:`, error);
+                                            });
+                                        } catch (dbError) {
+                                            console.error(`[PRICE-RECALC:DB-UPDATE] Error updating price in database:`, dbError);
+                                        }
                                     }
                                 }
                             }

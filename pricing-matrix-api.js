@@ -123,6 +123,7 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
                 // Find the appropriate quantity tier
                 let tier = null;
                 
+                // First, try to find an exact match for the tier
                 for (const row of data.rows) {
                     const tierText = row.tier;
                     
@@ -149,6 +150,38 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
                             tier = row;
                             break;
                         }
+                    }
+                }
+                
+                // If no tier found, use the lowest tier (usually 1-23)
+                if (!tier && data.rows.length > 0) {
+                    console.log(`[PRICING-MATRIX-API:PRICE] No exact tier match found for quantity ${quantity}, using lowest tier`);
+                    
+                    // Find the tier with the lowest minimum quantity
+                    let lowestMin = Number.MAX_SAFE_INTEGER;
+                    let lowestTier = null;
+                    
+                    for (const row of data.rows) {
+                        const tierText = row.tier;
+                        let min = Number.MAX_SAFE_INTEGER;
+                        
+                        if (tierText.includes('-')) {
+                            min = parseInt(tierText.split('-')[0].trim());
+                        } else if (tierText.includes('+')) {
+                            min = parseInt(tierText.replace('+', '').trim());
+                        } else {
+                            min = parseInt(tierText.trim());
+                        }
+                        
+                        if (!isNaN(min) && min < lowestMin) {
+                            lowestMin = min;
+                            lowestTier = row;
+                        }
+                    }
+                    
+                    if (lowestTier) {
+                        console.log(`[PRICING-MATRIX-API:PRICE] Using lowest tier: ${lowestTier.tier}`);
+                        tier = lowestTier;
                     }
                 }
                 
