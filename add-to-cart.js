@@ -173,9 +173,133 @@
         sizeInputs.style.gap = '10px';
         sizeInputs.style.marginBottom = '15px';
         
-        // Add some default sizes
-        const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
-        sizes.forEach(size => {
+        // Get the product info from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const styleNumber = urlParams.get('StyleNumber');
+        const colorCode = urlParams.get('COLOR');
+        
+        // Create a loading message
+        const loadingMsg = document.createElement('div');
+        loadingMsg.textContent = 'Loading available sizes...';
+        loadingMsg.style.fontStyle = 'italic';
+        loadingMsg.style.color = '#666';
+        loadingMsg.style.width = '100%';
+        sizeInputs.appendChild(loadingMsg);
+        
+        // Always try to fetch inventory data, even if we need to retry
+        if (styleNumber && colorCode) {
+            console.log("[ADD-TO-CART] Fetching inventory sizes for", styleNumber, colorCode);
+            
+            // Function to fetch inventory with retries
+            const fetchInventoryWithRetry = (retryCount = 0, maxRetries = 3) => {
+                fetch(`${window.location.origin}/api/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(colorCode)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Remove loading message
+                        if (loadingMsg.parentNode) {
+                            loadingMsg.parentNode.removeChild(loadingMsg);
+                        }
+                        
+                        // Extract unique sizes from inventory data
+                        let sizes = [];
+                        if (data && Array.isArray(data)) {
+                            // Extract unique sizes and sort them
+                            const sizeSet = new Set();
+                            data.forEach(item => {
+                                if (item.size) {
+                                    sizeSet.add(item.size);
+                                }
+                            });
+                            sizes = Array.from(sizeSet).sort();
+                            console.log("[ADD-TO-CART] Found sizes from inventory:", sizes);
+                        }
+                        
+                        if (sizes.length === 0) {
+                            // If no sizes found, try to fetch from a different endpoint
+                            console.log("[ADD-TO-CART] No sizes found in inventory, trying alternative endpoint");
+                            fetch(`${window.location.origin}/api/sizes?styleNumber=${encodeURIComponent(styleNumber)}`)
+                                .then(response => response.json())
+                                .then(sizeData => {
+                                    if (sizeData && Array.isArray(sizeData) && sizeData.length > 0) {
+                                        console.log("[ADD-TO-CART] Found sizes from alternative endpoint:", sizeData);
+                                        // Add size inputs
+                                        sizeData.forEach(size => {
+                                            addSizeInput(sizeInputs, size);
+                                        });
+                                    } else {
+                                        // If still no sizes, show error message
+                                        const errorMsg = document.createElement('div');
+                                        errorMsg.textContent = 'Unable to load sizes for this product. Please try again later.';
+                                        errorMsg.style.color = 'red';
+                                        errorMsg.style.fontWeight = 'bold';
+                                        errorMsg.style.margin = '10px 0';
+                                        sizeInputs.appendChild(errorMsg);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("[ADD-TO-CART] Error fetching from alternative endpoint:", error);
+                                    // Show error message
+                                    const errorMsg = document.createElement('div');
+                                    errorMsg.textContent = 'Unable to load sizes for this product. Please try again later.';
+                                    errorMsg.style.color = 'red';
+                                    errorMsg.style.fontWeight = 'bold';
+                                    errorMsg.style.margin = '10px 0';
+                                    sizeInputs.appendChild(errorMsg);
+                                });
+                        } else {
+                            // Add size inputs for the sizes we found
+                            sizes.forEach(size => {
+                                addSizeInput(sizeInputs, size);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("[ADD-TO-CART] Error fetching inventory:", error);
+                        
+                        // Retry if we haven't exceeded max retries
+                        if (retryCount < maxRetries) {
+                            console.log(`[ADD-TO-CART] Retrying inventory fetch (${retryCount + 1}/${maxRetries})`);
+                            setTimeout(() => fetchInventoryWithRetry(retryCount + 1, maxRetries), 1000);
+                        } else {
+                            // If all retries fail, show error and remove loading message
+                            if (loadingMsg.parentNode) {
+                                loadingMsg.parentNode.removeChild(loadingMsg);
+                            }
+                            
+                            // Show error message
+                            const errorMsg = document.createElement('div');
+                            errorMsg.textContent = 'Unable to load sizes for this product. Please try again later.';
+                            errorMsg.style.color = 'red';
+                            errorMsg.style.fontWeight = 'bold';
+                            errorMsg.style.margin = '10px 0';
+                            sizeInputs.appendChild(errorMsg);
+                        }
+                    });
+            };
+            
+            // Start the fetch process with retries
+            fetchInventoryWithRetry();
+        } else {
+            // If we don't have style/color info, show error
+            if (loadingMsg.parentNode) {
+                loadingMsg.parentNode.removeChild(loadingMsg);
+            }
+            
+            const errorMsg = document.createElement('div');
+            errorMsg.textContent = 'Missing product information. Please select a product first.';
+            errorMsg.style.color = 'red';
+            errorMsg.style.fontWeight = 'bold';
+            errorMsg.style.margin = '10px 0';
+            sizeInputs.appendChild(errorMsg);
+        }
+        
+        // Helper function to add a single size input
+        function addSizeInput(container, size) {
             const sizeGroup = document.createElement('div');
             sizeGroup.className = 'size-input-group';
             sizeGroup.style.display = 'flex';
@@ -203,8 +327,8 @@
             
             sizeGroup.appendChild(label);
             sizeGroup.appendChild(input);
-            sizeInputs.appendChild(sizeGroup);
-        });
+            container.appendChild(sizeGroup);
+        }
         
         container.appendChild(sizeInputs);
         
