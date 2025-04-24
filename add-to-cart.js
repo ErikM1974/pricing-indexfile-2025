@@ -192,7 +192,11 @@
             
             // Function to fetch inventory with retries
             const fetchInventoryWithRetry = (retryCount = 0, maxRetries = 3) => {
-                fetch(`${window.location.origin}/api/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(colorCode)}`)
+                // Use the same API endpoint format as cart-integration.js
+                const apiUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(colorCode)}`;
+                console.log(`[ADD-TO-CART] Fetching inventory from: ${apiUrl}`);
+                
+                fetch(apiUrl)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -222,7 +226,7 @@
                         if (sizes.length === 0) {
                             // If no sizes found, try to fetch from a different endpoint
                             console.log("[ADD-TO-CART] No sizes found in inventory, trying alternative endpoint");
-                            fetch(`${window.location.origin}/api/sizes?styleNumber=${encodeURIComponent(styleNumber)}`)
+                            fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes?styleNumber=${encodeURIComponent(styleNumber)}`)
                                 .then(response => response.json())
                                 .then(sizeData => {
                                     if (sizeData && Array.isArray(sizeData) && sizeData.length > 0) {
