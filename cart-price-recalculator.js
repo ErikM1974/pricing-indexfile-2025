@@ -4,6 +4,55 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
 (function() {
     "use strict";
     
+    // Constants
+    const LTM_FEE = 50.00; // Less Than Minimum fee
+    const LTM_THRESHOLD = 24; // Threshold for LTM fee (applies when quantity < this value)
+    
+    /**
+     * Get pricing tier description based on quantity
+     * @param {number} quantity - The total quantity
+     * @returns {string} - Pricing tier description
+     */
+    function getPricingTierForQuantity(quantity) {
+        if (quantity <= 0) {
+            return "N/A";
+        } else if (quantity >= 1 && quantity <= 23) {
+            return "1-23";
+        } else if (quantity >= 24 && quantity <= 47) {
+            return "24-47";
+        } else if (quantity >= 48 && quantity <= 71) {
+            return "48-71";
+        } else if (quantity >= 72) {
+            return "72+";
+        } else {
+            return "Unknown";
+        }
+    }
+    
+    /**
+     * Calculate the Less Than Minimum (LTM) fee per item
+     * @param {number} totalQuantity - Total quantity of items
+     * @returns {number} - LTM fee per item, or 0 if not applicable
+     */
+    function calculateLTMFeePerItem(totalQuantity) {
+        if (totalQuantity < LTM_THRESHOLD && totalQuantity > 0) {
+            // Calculate the per-item LTM fee
+            const ltmFeePerItem = LTM_FEE / totalQuantity;
+            console.log(`[PRICE-RECALC:LTM] Applying LTM fee: $${LTM_FEE.toFixed(2)} ÷ ${totalQuantity} = $${ltmFeePerItem.toFixed(2)} per item`);
+            return ltmFeePerItem;
+        }
+        return 0; // No LTM fee for quantities >= LTM_THRESHOLD
+    }
+    
+    /**
+     * Check if LTM fee applies
+     * @param {number} totalQuantity - Total quantity of items
+     * @returns {boolean} - True if LTM fee applies
+     */
+    function hasLTMFee(totalQuantity) {
+        return totalQuantity > 0 && totalQuantity < LTM_THRESHOLD;
+    }
+    
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', initialize);
     
@@ -61,13 +110,15 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
             // Log the total quantity for debugging
             console.log(`[PRICE-RECALC:CALC] Total quantity for ${embellishmentType} across all items: ${totalQuantity}`);
             
-            console.log("[PRICE-RECALC:CALC] Total quantity for", embellishmentType, ":", totalQuantity);
-            
             // If total quantity is 0, nothing to recalculate
             if (totalQuantity === 0) {
                 console.log("[PRICE-RECALC:INFO] Total quantity is 0, nothing to recalculate");
                 return true;
             }
+            
+            // Determine pricing tier based on total quantity
+            const pricingTier = getPricingTierForQuantity(totalQuantity);
+            console.log(`[PRICE-RECALC:TIER] Using pricing tier ${pricingTier} for total quantity ${totalQuantity}`);
             
             // Log the items we're recalculating
             console.log("[PRICE-RECALC:ITEMS] Items to recalculate:", itemsOfType);
@@ -80,6 +131,16 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
             // This ensures quantity discounts apply across all styles with the same embellishment
             console.log(`[PRICE-RECALC:TOTAL] Processing all ${itemsOfType.length} items with embellishment type ${embellishmentType}`);
             console.log(`[PRICE-RECALC:TOTAL] Total quantity for ${embellishmentType}: ${totalQuantity}`);
+            
+            // Check if LTM fee applies
+            const ltmFeeApplies = hasLTMFee(totalQuantity);
+            const ltmFeePerItem = calculateLTMFeePerItem(totalQuantity);
+            
+            if (ltmFeeApplies) {
+                console.log(`[PRICE-RECALC:LTM] Less Than Minimum fee applies: $${LTM_FEE.toFixed(2)} total, $${ltmFeePerItem.toFixed(2)} per item`);
+            } else {
+                console.log(`[PRICE-RECALC:LTM] No Less Than Minimum fee applies (quantity >= ${LTM_THRESHOLD})`);
+            }
             
             // For each item, update prices based on the total quantity across all items
             for (const item of itemsOfType) {
@@ -174,37 +235,70 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                                         // Find the price for this size
                                         let sizeKey = size.Size;
                                         
+                                        // Check if tier.prices exists
+                                        if (!tier.prices) {
+                                            console.error(`[PRICE-RECALC:ERROR] tier.prices is undefined for tier ${tier.tier}`);
+                                            continue;
+                                        }
+                                        
                                         // Handle size ranges (e.g., XS-XL)
                                         if (!tier.prices[size.Size]) {
                                             // Define size order for comparison
                                             const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
-                                            const sizeIdx = sizeOrder.indexOf(size.Size.toUpperCase());
+                                            
+                                            // Check if size.Size exists before calling toUpperCase()
+                                            const sizeValue = size.Size || '';
+                                            const sizeIdx = sizeOrder.indexOf(sizeValue.toString().toUpperCase());
+                                            
+                                            console.log(`[PRICE-RECALC:SIZE] Checking size: ${sizeValue}, index in sizeOrder: ${sizeIdx}`);
                                             
                                             if (sizeIdx !== -1) {
                                                 for (const key in tier.prices) {
-                                                    if (key.includes('-')) {
-                                                        const [start, end] = key.split('-').map(s => s.trim().toUpperCase());
-                                                        const startIdx = sizeOrder.indexOf(start);
-                                                        const endIdx = sizeOrder.indexOf(end);
-                                                        
-                                                        if (startIdx !== -1 && endIdx !== -1 &&
-                                                            sizeIdx >= startIdx && sizeIdx <= endIdx) {
-                                                            sizeKey = key;
-                                                            console.log(`[PRICE-RECALC:SIZE] Size ${size.Size} matches range ${key}`);
-                                                            break;
+                                                    try {
+                                                        if (key && key.includes && key.includes('-')) {
+                                                            const parts = key.split('-');
+                                                            if (parts.length === 2) {
+                                                                const start = parts[0].trim().toUpperCase();
+                                                                const end = parts[1].trim().toUpperCase();
+                                                                const startIdx = sizeOrder.indexOf(start);
+                                                                const endIdx = sizeOrder.indexOf(end);
+                                                                
+                                                                console.log(`[PRICE-RECALC:SIZE] Checking range ${key}: ${start}(${startIdx}) to ${end}(${endIdx}) for size ${sizeValue}(${sizeIdx})`);
+                                                                
+                                                                if (startIdx !== -1 && endIdx !== -1 &&
+                                                                    sizeIdx >= startIdx && sizeIdx <= endIdx) {
+                                                                    sizeKey = key;
+                                                                    console.log(`[PRICE-RECALC:SIZE] Size ${sizeValue} matches range ${key}`);
+                                                                    break;
+                                                                }
+                                                            }
                                                         }
+                                                    } catch (rangeError) {
+                                                        console.error(`[PRICE-RECALC:SIZE-ERROR] Error processing size range ${key}:`, rangeError);
                                                     }
                                                 }
                                             }
                                         }
                                         
-                                        const price = tier.prices[sizeKey];
+                                        let price = tier.prices[sizeKey];
                                         
-                                        if (price) {
-                                            console.log(`[PRICE-RECALC:UPDATE] Updating price for ${item.StyleNumber}, ${item.Color}, ${size.Size} from $${size.UnitPrice} to $${price}`);
+                                        // Log the price lookup result
+                                        console.log(`[PRICE-RECALC:PRICE] Looking up price for size ${sizeKey}: ${price !== undefined ? '$' + price : 'not found'}`);
+                                        
+                                        if (price !== undefined && price !== null) {
+                                            // Apply LTM fee if applicable
+                                            let finalPrice = price;
+                                            let ltmFeeMessage = '';
+                                            
+                                            if (ltmFeeApplies) {
+                                                finalPrice = price + ltmFeePerItem;
+                                                ltmFeeMessage = ` (base price $${price.toFixed(2)} + LTM fee $${ltmFeePerItem.toFixed(2)})`;
+                                            }
+                                            
+                                            console.log(`[PRICE-RECALC:UPDATE] Updating price for ${item.StyleNumber}, ${item.Color}, ${size.Size} from $${size.UnitPrice} to $${finalPrice.toFixed(2)}${ltmFeeMessage}`);
                                             
                                             // Update price in cart and in the database
-                                            size.UnitPrice = price;
+                                            size.UnitPrice = finalPrice;
                                             
                                             // Update the price in the database
                                             try {
@@ -215,7 +309,7 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                                                         'Content-Type': 'application/json'
                                                     },
                                                     body: JSON.stringify({
-                                                        UnitPrice: price
+                                                        UnitPrice: finalPrice
                                                     })
                                                 })
                                                 .then(response => {

@@ -346,6 +346,40 @@ app.get('/api/inventory', async (req, res) => {
   }
 });
 
+// Pricing Matrix API
+app.get('/api/pricing-matrix', async (req, res) => {
+  try {
+    const { styleNumber, color, embType } = req.query;
+    
+    if (!styleNumber || !color || !embType) {
+      return res.status(400).json({ error: 'styleNumber, color, and embType parameters are required' });
+    }
+    
+    const data = await makeApiRequest(`/pricing-matrix?filter=StyleNumber='${styleNumber}' AND Color='${color}' AND EmbellishmentType='${embType}'`);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch pricing matrix data' });
+  }
+});
+
+app.post('/api/pricing-matrix', async (req, res) => {
+  try {
+    const data = await makeApiRequest('/pricing-matrix', 'POST', req.body);
+    res.status(201).json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create pricing matrix data' });
+  }
+});
+
+app.put('/api/pricing-matrix/:id', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/pricing-matrix/${req.params.id}`, 'PUT', req.body);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update pricing matrix data' });
+  }
+});
+
 // Serve cart-integration.js for Caspio DataPages
 app.get('/api/cart-integration.js', (req, res) => {
   res.setHeader('Content-Type', 'application/javascript');

@@ -1,0 +1,265 @@
+/* Enhanced Pricing Pages CSS - Builds on existing pricing-pages.css */
+
+/* Improved spacing and visual hierarchy */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
+    background-color: var(--background-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Enhanced pricing info section */
+.pricing-info {
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: #e6f0ff;
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.pricing-info h2 {
+    margin-top: 0;
+    color: var(--primary-color);
+    font-size: 1.4em;
+    border-bottom: 1px solid rgba(0,86,179,0.2);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+/* View Cart button styling */
+.view-cart-link {
+    display: inline-block;
+    background-color: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    float: right;
+    margin-top: -40px;
+    position: relative;
+    z-index: 10;
+}
+
+.view-cart-link:hover {
+    background-color: #218838;
+}
+
+/* LTM fee highlight */
+.ltm-fee {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.ltm-explanation {
+    background-color: #fff8e8;
+    border-left: 4px solid #ffc107;
+    padding: 10px 15px;
+    margin: 15px 0;
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+}
+
+/* Pricing matrix enhancements */
+.matrix-price-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.matrix-price-table th {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+.matrix-price-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.matrix-price-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.matrix-price-table tr:hover {
+    background-color: #e6f0ff;
+}
+
+/* Quantity tier highlighting */
+.quantity-tier-1-23 {
+    background-color: #fff8e8 !important;
+}
+
+.quantity-tier-24-47 {
+    background-color: #e8f8e8 !important;
+}
+
+.quantity-tier-recommended {
+    position: relative;
+}
+
+.quantity-tier-recommended::after {
+    content: "Recommended";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #28a745;
+    color: white;
+    font-size: 0.7em;
+    padding: 2px 6px;
+    border-radius: 10px;
+    transform: rotate(15deg);
+}
+
+/* Add to Quote section enhancements */
+.add-to-quote-section {
+    background-color: #f8f9fa;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border: 1px solid var(--border-color);
+}
+
+.add-to-quote-section h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+}
+
+.add-to-cart-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: block;
+    margin: 20px auto;
+    min-width: 200px;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #004494;
+}
+
+/* Size selection grid enhancements */
+.size-selection-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: var(--spacing-md);
+}
+
+.size-selection-item {
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background-color: white;
+}
+
+.size-selection-item:hover {
+    background-color: #f8f9fa;
+}
+
+.size-label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.size-price {
+    color: #666;
+    font-size: 0.9em;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Tier progress indicator */
+.tier-progress {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.tier-progress-bar {
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.tier-progress-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    width: 25%; /* Will be set dynamically via JS */
+}
+
+.tier-message {
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Update indicator */
+.update-indicator {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    z-index: 1000;
+}
+
+.spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 5px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .view-cart-link {
+        float: none;
+        margin-top: 10px;
+        display: block;
+        text-align: center;
+    }
+    
+    .size-selection-grid {
+        flex-direction: column;
+    }
+    
+    .size-selection-item {
+        min-width: auto;
+    }
+}
