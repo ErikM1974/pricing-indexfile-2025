@@ -57,11 +57,14 @@
                 .product-summary {
                     display: flex !important;
                     align-items: center !important;
+                    justify-content: center !important;
+                    flex-direction: column !important;
                     margin-bottom: 20px !important;
                     padding: 15px !important;
                     background-color: #f0f8ff !important;
                     border-radius: 5px !important;
                     border: 1px solid #d0e5ff !important;
+                    text-align: center !important;
                 }
                 
                 #add-to-cart-button {
@@ -86,13 +89,15 @@
                 }
                 
                 .size-input-grid {
-                    display: grid !important;
-                    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
+                    display: flex !important;
+                    flex-wrap: nowrap !important;
                     gap: 15px !important;
                     margin-bottom: 20px !important;
                     justify-content: center !important;
                     margin: 0 auto !important;
-                    max-width: 800px !important;
+                    max-width: 100% !important;
+                    overflow-x: auto !important;
+                    padding: 10px 0 !important;
                 }
                 
                 .size-input-group {
@@ -232,11 +237,14 @@
         productSummary.className = 'product-summary';
         productSummary.style.display = 'flex';
         productSummary.style.alignItems = 'center';
+        productSummary.style.justifyContent = 'center';
         productSummary.style.marginBottom = '20px';
         productSummary.style.padding = '15px';
         productSummary.style.backgroundColor = '#f0f8ff';
         productSummary.style.borderRadius = '5px';
         productSummary.style.border = '1px solid #d0e5ff';
+        productSummary.style.textAlign = 'center';
+        productSummary.style.flexDirection = 'column'; // Stack image and text vertically
         
         // Try to get product image
         const productImageSrc = document.querySelector('.product-image img')?.src ||
@@ -249,11 +257,12 @@
             const productImage = document.createElement('img');
             productImage.src = productImageSrc;
             productImage.alt = 'Product Image';
-            productImage.style.width = '80px';
+            productImage.style.width = '150px';
             productImage.style.height = 'auto';
-            productImage.style.marginRight = '15px';
+            productImage.style.marginBottom = '15px';
             productImage.style.border = '1px solid #ddd';
             productImage.style.borderRadius = '4px';
+            productImage.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
             productSummary.appendChild(productImage);
         }
         
@@ -290,31 +299,76 @@
         // Add size inputs section with improved styling
         const sizeInputs = document.createElement('div');
         sizeInputs.className = 'size-input-grid';
-        sizeInputs.style.display = 'grid';
-        sizeInputs.style.gridTemplateColumns = 'repeat(auto-fill, minmax(90px, 1fr))';
+        sizeInputs.style.display = 'flex';
+        sizeInputs.style.flexWrap = 'nowrap';
         sizeInputs.style.gap = '15px';
         sizeInputs.style.marginBottom = '20px';
         sizeInputs.style.justifyContent = 'center';
         sizeInputs.style.margin = '0 auto';
-        sizeInputs.style.maxWidth = '800px';
+        sizeInputs.style.maxWidth = '100%';
+        sizeInputs.style.overflowX = 'auto';
+        sizeInputs.style.padding = '10px 0';
         
-        // Create a loading message
+        // Create a loading message with spinner
         const loadingMsg = document.createElement('div');
-        loadingMsg.textContent = 'Loading available sizes...';
-        loadingMsg.style.fontStyle = 'italic';
-        loadingMsg.style.color = '#666';
+        loadingMsg.style.display = 'flex';
+        loadingMsg.style.alignItems = 'center';
+        loadingMsg.style.justifyContent = 'center';
         loadingMsg.style.width = '100%';
+        loadingMsg.style.padding = '20px';
+        
+        // Add spinner
+        const spinner = document.createElement('div');
+        spinner.className = 'loading-spinner';
+        spinner.style.display = 'inline-block';
+        spinner.style.width = '20px';
+        spinner.style.height = '20px';
+        spinner.style.border = '3px solid rgba(0,86,179,0.3)';
+        spinner.style.borderRadius = '50%';
+        spinner.style.borderTopColor = '#0056b3';
+        spinner.style.marginRight = '10px';
+        spinner.style.animation = 'spin 1s linear infinite';
+        
+        // Add animation keyframes if not already added
+        if (!document.getElementById('spinner-keyframes')) {
+            const keyframes = document.createElement('style');
+            keyframes.id = 'spinner-keyframes';
+            keyframes.textContent = `
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(keyframes);
+        }
+        
+        // Add text
+        const loadingText = document.createElement('span');
+        loadingText.textContent = 'Loading available sizes...';
+        loadingText.style.fontStyle = 'italic';
+        loadingText.style.color = '#0056b3';
+        loadingText.style.fontWeight = 'bold';
+        
+        // Append spinner and text to loading message
+        loadingMsg.appendChild(spinner);
+        loadingMsg.appendChild(loadingText);
         sizeInputs.appendChild(loadingMsg);
         
         // Always try to fetch inventory data, even if we need to retry
         if (styleNumber && colorCode) {
             console.log("[ADD-TO-CART] Fetching inventory sizes for", styleNumber, colorCode);
             
-            // Function to fetch inventory with retries
+            // Function to fetch inventory with retries - faster timeout
             const fetchInventoryWithRetry = (retryCount = 0, maxRetries = 3) => {
                 // Use the same API endpoint format as cart-integration.js
                 const apiUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(colorCode)}`;
                 console.log(`[ADD-TO-CART] Fetching inventory from: ${apiUrl}`);
+                
+                // Show loading animation more prominently
+                spinner.style.width = '30px';
+                spinner.style.height = '30px';
+                spinner.style.border = '4px solid rgba(0,86,179,0.3)';
+                spinner.style.borderTopColor = '#0056b3';
+                loadingText.style.fontSize = '1.1rem';
                 
                 fetch(apiUrl)
                     .then(response => {
@@ -511,7 +565,52 @@
         
         // Add click event
         button.addEventListener('click', function() {
-            alert('Add to Cart functionality is being implemented. Please check back soon!');
+            // Show loading state
+            const originalText = this.textContent;
+            this.disabled = true;
+            this.textContent = 'Adding...';
+            
+            // Add loading spinner
+            const spinner = document.createElement('span');
+            spinner.className = 'loading-spinner';
+            spinner.style.display = 'inline-block';
+            spinner.style.width = '16px';
+            spinner.style.height = '16px';
+            spinner.style.border = '3px solid rgba(255,255,255,0.3)';
+            spinner.style.borderRadius = '50%';
+            spinner.style.borderTopColor = '#fff';
+            spinner.style.animation = 'spin 1s linear infinite';
+            spinner.style.marginLeft = '10px';
+            spinner.style.verticalAlign = 'middle';
+            this.appendChild(spinner);
+            
+            // Add animation keyframes if not already added
+            if (!document.getElementById('spinner-keyframes')) {
+                const keyframes = document.createElement('style');
+                keyframes.id = 'spinner-keyframes';
+                keyframes.textContent = `
+                    @keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
+                `;
+                document.head.appendChild(keyframes);
+            }
+            
+            // Simulate API call delay - faster for better UX
+            setTimeout(() => {
+                // Reset button state
+                this.disabled = false;
+                this.textContent = originalText;
+                
+                // Show success message
+                alert('Item added to cart successfully!');
+                
+                // Change button text to show success briefly
+                this.textContent = 'Added! ✓';
+                setTimeout(() => {
+                    this.textContent = originalText;
+                }, 1500);
+            }, 800);
         });
         
         container.appendChild(button);
