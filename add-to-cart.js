@@ -32,6 +32,51 @@
             noteElement.style.display = 'block'; // This needs to be visible for the cart button
             pricingCalculator.appendChild(noteElement);
             console.log("[ADD-TO-CART] Added matrix-note element");
+            
+            // Add a style to make the cart button container visible when it's added
+            const styleEl = document.createElement('style');
+            styleEl.textContent = `
+                #cart-button-container {
+                    display: block !important;
+                    margin-top: 20px !important;
+                    padding: 15px !important;
+                    background-color: #f8f8f8 !important;
+                    border-radius: 5px !important;
+                    border: 1px solid #ddd !important;
+                    z-index: 1000 !important;
+                }
+                
+                #add-to-cart-button {
+                    display: block !important;
+                    background-color: #0056b3 !important;
+                    color: white !important;
+                    border: none !important;
+                    border-radius: 4px !important;
+                    padding: 10px 20px !important;
+                    cursor: pointer !important;
+                    font-weight: bold !important;
+                    margin-top: 15px !important;
+                }
+                
+                .size-input-grid {
+                    display: grid !important;
+                    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
+                    gap: 10px !important;
+                    margin-bottom: 15px !important;
+                }
+                
+                .size-input-group {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    padding: 8px !important;
+                    border: 1px solid #e0e0e0 !important;
+                    border-radius: 4px !important;
+                    background-color: #f9f9f9 !important;
+                }
+            `;
+            document.head.appendChild(styleEl);
+            console.log("[ADD-TO-CART] Added styles to ensure cart button visibility");
         }
         
         // 3. Add matrix-price-table element if it doesn't exist
@@ -84,6 +129,136 @@
             }, 1000);
         }
     }
+    
+    // Function to manually add the cart button if it's not being added by cart-integration.js
+    function addCartButtonManually() {
+        console.log("[ADD-TO-CART] Checking if cart button needs to be added manually");
+        
+        // Check if the cart button container already exists
+        if (document.getElementById('cart-button-container')) {
+            console.log("[ADD-TO-CART] Cart button container already exists, no need to add manually");
+            return;
+        }
+        
+        // Find the note element where the cart button should be added
+        const noteElement = document.getElementById('matrix-note');
+        if (!noteElement) {
+            console.log("[ADD-TO-CART] Note element not found, cannot add cart button manually");
+            return;
+        }
+        
+        console.log("[ADD-TO-CART] Adding cart button manually");
+        
+        // Create the cart button container
+        const container = document.createElement('div');
+        container.id = 'cart-button-container';
+        container.style.display = 'block';
+        container.style.marginTop = '20px';
+        container.style.padding = '15px';
+        container.style.backgroundColor = '#f8f8f8';
+        container.style.borderRadius = '5px';
+        container.style.border = '1px solid #ddd';
+        
+        // Add heading
+        const heading = document.createElement('h4');
+        heading.textContent = 'Add to Quote';
+        heading.style.marginBottom = '15px';
+        container.appendChild(heading);
+        
+        // Add size inputs section
+        const sizeInputs = document.createElement('div');
+        sizeInputs.className = 'size-input-grid';
+        sizeInputs.style.display = 'grid';
+        sizeInputs.style.gridTemplateColumns = 'repeat(auto-fill, minmax(80px, 1fr))';
+        sizeInputs.style.gap = '10px';
+        sizeInputs.style.marginBottom = '15px';
+        
+        // Add some default sizes
+        const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+        sizes.forEach(size => {
+            const sizeGroup = document.createElement('div');
+            sizeGroup.className = 'size-input-group';
+            sizeGroup.style.display = 'flex';
+            sizeGroup.style.flexDirection = 'column';
+            sizeGroup.style.alignItems = 'center';
+            sizeGroup.style.padding = '8px';
+            sizeGroup.style.border = '1px solid #e0e0e0';
+            sizeGroup.style.borderRadius = '4px';
+            sizeGroup.style.backgroundColor = '#f9f9f9';
+            
+            const label = document.createElement('label');
+            label.textContent = size;
+            label.style.marginBottom = '5px';
+            label.style.fontWeight = 'bold';
+            
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.value = '0';
+            input.className = 'size-quantity-input';
+            input.dataset.size = size;
+            input.style.width = '60px';
+            input.style.padding = '5px';
+            input.style.textAlign = 'center';
+            
+            sizeGroup.appendChild(label);
+            sizeGroup.appendChild(input);
+            sizeInputs.appendChild(sizeGroup);
+        });
+        
+        container.appendChild(sizeInputs);
+        
+        // Add the Add to Cart button
+        const button = document.createElement('button');
+        button.id = 'add-to-cart-button';
+        button.textContent = 'Add to Cart';
+        button.style.backgroundColor = '#0056b3';
+        button.style.color = 'white';
+        button.style.border = 'none';
+        button.style.borderRadius = '4px';
+        button.style.padding = '10px 20px';
+        button.style.cursor = 'pointer';
+        button.style.fontWeight = 'bold';
+        button.style.display = 'block';
+        button.style.marginTop = '15px';
+        
+        // Add click event
+        button.addEventListener('click', function() {
+            alert('Add to Cart functionality is being implemented. Please check back soon!');
+        });
+        
+        container.appendChild(button);
+        
+        // Add the container to the page
+        noteElement.appendChild(container);
+        console.log("[ADD-TO-CART] Cart button added manually");
+    }
+    
+    // Function to ensure cart button is visible
+    function ensureCartButtonVisible() {
+        console.log("[ADD-TO-CART] Checking for cart button container");
+        const cartButtonContainer = document.getElementById('cart-button-container');
+        
+        if (cartButtonContainer) {
+            console.log("[ADD-TO-CART] Found cart button container, ensuring visibility");
+            cartButtonContainer.style.display = 'block';
+            cartButtonContainer.style.visibility = 'visible';
+            cartButtonContainer.style.opacity = '1';
+            
+            // Also ensure the Add to Cart button is visible
+            const addToCartButton = document.getElementById('add-to-cart-button');
+            if (addToCartButton) {
+                addToCartButton.style.display = 'block';
+                addToCartButton.style.visibility = 'visible';
+                addToCartButton.style.opacity = '1';
+                console.log("[ADD-TO-CART] Ensured Add to Cart button visibility");
+            } else {
+                console.log("[ADD-TO-CART] Add to Cart button not found");
+            }
+        } else {
+            console.log("[ADD-TO-CART] Cart button container not found");
+        }
+    }
 
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
@@ -122,5 +297,19 @@
 
     // Also try after a fixed delay as a fallback
     setTimeout(initializeCartIntegration, 3000);
+    
+    // Set up periodic checks to ensure cart button is visible
+    const visibilityCheckIntervals = [1000, 2000, 3000, 5000, 8000];
+    visibilityCheckIntervals.forEach(interval => {
+        setTimeout(ensureCartButtonVisible, interval);
+    });
+    
+    // Try to add the cart button manually if it's not added after a delay
+    setTimeout(() => {
+        if (!document.getElementById('cart-button-container')) {
+            console.log("[ADD-TO-CART] Cart button container not found after delay, adding manually");
+            addCartButtonManually();
+        }
+    }, 6000);
 
 })();
