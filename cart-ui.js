@@ -325,6 +325,12 @@ const NWCACartUI = (function() {
 
     // Format embellishment type using the helper
     const formattedEmbType = formatEmbellishmentType(item.embellishmentType);
+    
+    // Get total quantity for this embellishment type
+    const totalQuantityForType = getTotalQuantityForEmbellishmentType(item.embellishmentType);
+    
+    // Get pricing tier based on total quantity
+    const pricingTier = getPricingTierForQuantity(totalQuantityForType);
 
     // Basic item structure - Improved with Bootstrap structure
     itemElement.innerHTML = `
@@ -333,6 +339,9 @@ const NWCACartUI = (function() {
             <div>
                  <h5 class="card-title item-title mb-1">${item.styleNumber} - ${item.color}</h5>
                  <span class="item-embellishment badge" style="background-color: ${getEmbellishmentColor(item.embellishmentType)}; color: white;">${formattedEmbType}</span>
+                 <div class="mt-1">
+                    <small class="text-muted">Total ${formattedEmbType} Quantity: <span class="font-weight-bold">${totalQuantityForType}</span> (${pricingTier} pricing tier)</small>
+                 </div>
             </div>
             <button class="remove-item-btn btn btn-sm btn-outline-danger" data-item-id="${item.id}">&times;</button>
         </div>
@@ -811,16 +820,21 @@ function renderSizeItem(sizeInfo, itemId) {
        }
 
 
+      // Get total quantity for this embellishment type across all items
+      const totalQuantityForType = getTotalQuantityForEmbellishmentType(item.embellishmentType);
+      const pricingTier = getPricingTierForQuantity(totalQuantityForType);
+      
       itemElement.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div>
              {/* Use adapted item properties */}
             <h5 class="mb-1">${item.styleNumber} - ${item.color}</h5>
             <p class="mb-1">Embellishment: ${formatEmbellishmentType(item.embellishmentType)}</p>
+            <p class="mb-1"><small class="text-muted">Total ${formatEmbellishmentType(item.embellishmentType)} Quantity: <span class="font-weight-bold">${totalQuantityForType}</span> (${pricingTier} pricing tier)</small></p>
              {/* Optionally show embellishment options again here if needed */}
           </div>
           <div class="text-right">
-            <p class="mb-1">Total Quantity: ${totalQuantity}</p>
+            <p class="mb-1">Item Quantity: ${totalQuantity}</p>
             <p class="mb-0 font-weight-bold">Item Total: ${formatCurrency(itemTotal)}</p>
           </div>
         </div>
@@ -1047,6 +1061,55 @@ function renderSizeItem(sizeInfo, itemId) {
       default:
         // Capitalize first letter if unknown
         return type.charAt(0).toUpperCase() + type.slice(1);
+    }
+  }
+  
+  /**
+   * Get total quantity for a specific embellishment type across all cart items
+   * @param {string} embellishmentType - The embellishment type to calculate total for
+   * @returns {number} - Total quantity
+   */
+  function getTotalQuantityForEmbellishmentType(embellishmentType) {
+    if (!embellishmentType || typeof NWCACart === 'undefined') {
+      return 0;
+    }
+    
+    let totalQuantity = 0;
+    const cartItems = NWCACart.getCartItems('Active');
+    
+    // Filter items by embellishment type
+    const itemsOfType = cartItems.filter(item => item.ImprintType === embellishmentType);
+    
+    // Calculate total quantity
+    itemsOfType.forEach(item => {
+      if (item.sizes && Array.isArray(item.sizes)) {
+        item.sizes.forEach(size => {
+          totalQuantity += parseInt(size.Quantity) || 0;
+        });
+      }
+    });
+    
+    return totalQuantity;
+  }
+  
+  /**
+   * Get pricing tier description based on quantity
+   * @param {number} quantity - The total quantity
+   * @returns {string} - Pricing tier description
+   */
+  function getPricingTierForQuantity(quantity) {
+    if (quantity <= 0) {
+      return "N/A";
+    } else if (quantity >= 1 && quantity <= 23) {
+      return "1-23";
+    } else if (quantity >= 24 && quantity <= 47) {
+      return "24-47";
+    } else if (quantity >= 48 && quantity <= 71) {
+      return "48-71";
+    } else if (quantity >= 72) {
+      return "72+";
+    } else {
+      return "Unknown";
     }
   }
 
