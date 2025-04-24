@@ -71,5 +71,110 @@
     </div>
     
     <script src="/pricing-pages.js"></script>
+    
+    <!-- Script to fix loading message issue -->
+    <script>
+        (function() {
+            console.log("Loading message fix script initialized");
+            
+            // Function to hide the loading message
+            function hideLoadingMessage() {
+                const loadingMessages = document.querySelectorAll('.loading-message');
+                loadingMessages.forEach(function(msg) {
+                    console.log('Hiding loading message:', msg);
+                    msg.style.display = 'none';
+                });
+            }
+            
+            // Function to check if Caspio table is loaded
+            function checkCaspioTableLoaded() {
+                // Check for various indicators that Caspio content has loaded
+                const hasCaspioTable = !!document.querySelector('.matrix-price-table') ||
+                                      !!document.querySelector('.cbResultSetTable') ||
+                                      !!document.querySelector('#matrix-price-body') ||
+                                      !!document.querySelector('.cbResultSet') ||
+                                      !!document.querySelector('iframe[src*="caspio"]');
+                
+                if (hasCaspioTable) {
+                    console.log('Caspio table detected, hiding loading messages');
+                    hideLoadingMessage();
+                    return true;
+                }
+                return false;
+            }
+            
+            // Set up a MutationObserver to detect when Caspio content is added
+            const observer = new MutationObserver(function(mutations) {
+                if (checkCaspioTableLoaded()) {
+                    // If we found the table, disconnect the observer
+                    observer.disconnect();
+                }
+            });
+            
+            // Start observing the document with the configured parameters
+            observer.observe(document.body, { childList: true, subtree: true });
+            
+            // Also check immediately in case the table is already loaded
+            checkCaspioTableLoaded();
+            
+            // Set up periodic checks to ensure loading message is hidden
+            const checkIntervals = [1000, 2000, 3000, 5000, 8000, 10000];
+            checkIntervals.forEach(interval => {
+                setTimeout(() => {
+                    if (document.querySelector('.loading-message')) {
+                        console.log(`Checking for Caspio table after ${interval}ms`);
+                        if (checkCaspioTableLoaded()) {
+                            console.log(`Found Caspio table after ${interval}ms`);
+                        } else if (interval >= 5000) {
+                            // If we still have loading messages but no table after 5+ seconds,
+                            // hide them anyway as a fallback
+                            console.log(`No Caspio table found after ${interval}ms, hiding loading messages anyway`);
+                            hideLoadingMessage();
+                        }
+                    }
+                }, interval);
+            });
+            
+            // Add CSS to hide loading messages when Caspio content is present
+            const styleEl = document.createElement('style');
+            styleEl.textContent = `
+                /* Hide loading messages when Caspio content is present */
+                .matrix-price-table ~ .loading-message,
+                .cbResultSetTable ~ .loading-message,
+                #matrix-price-body ~ .loading-message,
+                .cbResultSet ~ .loading-message,
+                iframe[src*="caspio"] ~ .loading-message,
+                .loading-message:has(+ .matrix-price-table),
+                .loading-message:has(+ .cbResultSetTable),
+                .loading-message:has(+ #matrix-price-body),
+                .loading-message:has(+ .cbResultSet),
+                .loading-message:has(+ iframe[src*="caspio"]) {
+                    display: none !important;
+                }
+                
+                /* Hide loading message when pricing calculator has other content */
+                #pricing-calculator:has(table) .loading-message,
+                #pricing-calculator:has(iframe) .loading-message,
+                #pricing-calculator:has(.matrix-price-table) .loading-message,
+                #pricing-calculator:has(.cbResultSetTable) .loading-message,
+                #pricing-calculator:has(#matrix-price-body) .loading-message,
+                #pricing-calculator:has(.cbResultSet) .loading-message {
+                    display: none !important;
+                }
+            `;
+            document.head.appendChild(styleEl);
+            
+            // Simple final cleanup that only targets loading messages
+            setTimeout(function() {
+                console.log('Final targeted cleanup - only hiding .loading-message elements');
+                // Only hide elements with the specific loading-message class
+                const loadingMessages = document.querySelectorAll('.loading-message');
+                loadingMessages.forEach(function(msg) {
+                    console.log('Final cleanup hiding loading message:', msg);
+                    msg.style.display = 'none';
+                });
+            }, 8000);
+        })();
+    </script>
 </body>
 </html>

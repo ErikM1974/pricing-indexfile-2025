@@ -1244,14 +1244,14 @@
                       const url = new URL(window.location);
                       url.searchParams.set('StyleNumber', styleNumber);
                       
-                      // Always use the color name for URL parameters instead of catalog color code
-                      // This ensures better user experience and consistency with the Caspio datapage
-                      if (window.selectedColorName) {
-                          console.log(`Using color name for URL parameter: ${window.selectedColorName}`);
-                          url.searchParams.set('COLOR', window.selectedColorName);
-                      } else if (catalogColor) {
-                          console.log(`No color name available, using catalog color: ${catalogColor}`);
+                      // Always use the catalog color code for URL parameters instead of color name
+                      // This ensures better compatibility with the Caspio datapage
+                      if (catalogColor) {
+                          console.log(`Using catalog color code for URL parameter: ${catalogColor}`);
                           url.searchParams.set('COLOR', catalogColor);
+                      } else if (window.selectedColorName) {
+                          console.log(`No catalog color available, using color name: ${window.selectedColorName}`);
+                          url.searchParams.set('COLOR', window.selectedColorName);
                       }
                       
                       window.history.replaceState({}, '', url);
@@ -1295,8 +1295,8 @@
                          console.log(`No color code provided, using selected color name: ${colorCode}`);
                      }
                      
-                     // Always prefer the color name over the catalog color code for better user experience
-                     const colorToUse = window.selectedColorName || colorCode;
+                     // Always prefer the catalog color code over the color name for better compatibility with Caspio
+                     const colorToUse = window.selectedCatalogColor || colorCode;
                      console.log(`Using color for pricing links: ${colorToUse}`);
                      
                      const pricingLinks = document.querySelectorAll('.pricing-link');
@@ -1900,10 +1900,79 @@
                 });
             </script>
             
-            <!-- Additional script to immediately hide script content -->
+            <!-- Additional script to immediately hide script content and handle loading messages -->
             <script>
-                // This script runs immediately to hide any script content
+                // This script runs immediately to hide script content and handle loading messages
                 (function() {
+                    // TARGETED FIX FOR CASPIO LOADING MESSAGE
+                    function setupCaspioLoadingMessageFix() {
+                        console.log("Setting up Caspio loading message fix");
+                        
+                        // Function to hide all loading messages
+                        function hideAllLoadingMessages() {
+                            const loadingMessages = document.querySelectorAll('.loading-message');
+                            loadingMessages.forEach(function(msg) {
+                                console.log('Hiding loading message:', msg);
+                                msg.style.display = 'none';
+                            });
+                        }
+                        
+                        // Function to check if Caspio table is loaded
+                        function checkCaspioTableLoaded() {
+                            // Check for various indicators that Caspio content has loaded
+                            const hasCaspioTable = !!document.querySelector('.matrix-price-table') ||
+                                                  !!document.querySelector('.cbResultSetTable') ||
+                                                  !!document.querySelector('#matrix-price-body') ||
+                                                  !!document.querySelector('.cbResultSet');
+                            
+                            if (hasCaspioTable) {
+                                console.log('Caspio table detected, hiding loading messages');
+                                hideAllLoadingMessages();
+                                return true;
+                            }
+                            return false;
+                        }
+                        
+                        // Set up a MutationObserver to detect when Caspio content is added
+                        const observer = new MutationObserver(function(mutations) {
+                            if (checkCaspioTableLoaded()) {
+                                // If we found the table, disconnect the observer
+                                observer.disconnect();
+                            }
+                        });
+                        
+                        // Start observing the document with the configured parameters
+                        observer.observe(document.body, { childList: true, subtree: true });
+                        
+                        // Also check immediately in case the table is already loaded
+                        checkCaspioTableLoaded();
+                        
+                        // Set up periodic checks to ensure loading message is hidden
+                        const checkIntervals = [1000, 2000, 3000, 5000, 8000, 10000];
+                        checkIntervals.forEach(interval => {
+                            setTimeout(() => {
+                                if (document.querySelector('.loading-message')) {
+                                    console.log(`Checking for Caspio table after ${interval}ms`);
+                                    if (checkCaspioTableLoaded()) {
+                                        console.log(`Found Caspio table after ${interval}ms`);
+                                    } else {
+                                        // If we still have loading messages but no table after 5+ seconds,
+                                        // hide them anyway as a fallback
+                                        if (interval >= 5000) {
+                                            console.log(`No Caspio table found after ${interval}ms, hiding loading messages anyway`);
+                                            hideAllLoadingMessages();
+                                        }
+                                    }
+                                }
+                            }, interval);
+                        });
+                    }
+                    
+                    // Call the setup function immediately
+                    setupCaspioLoadingMessageFix();
+                    
+                    // Also call it when the DOM is fully loaded
+                    document.addEventListener('DOMContentLoaded', setupCaspioLoadingMessageFix);
                     // Create a style element to hide script content
                     const styleEl = document.createElement('style');
                     styleEl.id = 'hide-script-content-style';
@@ -1967,6 +2036,35 @@
                             height: 600px !important;
                             width: 100% !important;
                             border: none !important;
+                        }
+                        
+                        /* IMPORTANT: Hide loading messages when Caspio table is present */
+                        .loading-message:has(+ .matrix-price-table),
+                        .loading-message:has(+ .cbResultSetTable),
+                        .loading-message:has(~ .matrix-price-table),
+                        .loading-message:has(~ .cbResultSetTable),
+                        .loading-message:has(+ iframe),
+                        .loading-message:has(~ iframe) {
+                            display: none !important;
+                        }
+                        
+                        /* Hide loading messages in wrapper divs that contain Caspio content */
+                        #dp5-wrapper:has(.matrix-price-table) .loading-message,
+                        #dp5-wrapper:has(.cbResultSetTable) .loading-message,
+                        #dp5-wrapper:has(iframe) .loading-message,
+                        #dp6-wrapper:has(.matrix-price-table) .loading-message,
+                        #dp6-wrapper:has(.cbResultSetTable) .loading-message,
+                        #dp6-wrapper:has(iframe) .loading-message,
+                        #dp7-wrapper:has(.matrix-price-table) .loading-message,
+                        #dp7-wrapper:has(.cbResultSetTable) .loading-message,
+                        #dp7-wrapper:has(iframe) .loading-message,
+                        #dp8-wrapper:has(.matrix-price-table) .loading-message,
+                        #dp8-wrapper:has(.cbResultSetTable) .loading-message,
+                        #dp8-wrapper:has(iframe) .loading-message,
+                        #dtf-wrapper:has(.matrix-price-table) .loading-message,
+                        #dtf-wrapper:has(.cbResultSetTable) .loading-message,
+                        #dtf-wrapper:has(iframe) .loading-message {
+                            display: none !important;
                         }
                     `;
                     document.head.appendChild(styleEl);
@@ -2044,7 +2142,49 @@
                             });
                         });
                     });
+                    // Run the original script content hiding logic
                 })();
+                
+                // Additional cleanup for any remaining loading messages after a delay
+                setTimeout(function() {
+                    console.log('Final check for loading messages');
+                    const allLoadingMessages = document.querySelectorAll('.loading-message');
+                    if (allLoadingMessages.length > 0) {
+                        console.log(`Found ${allLoadingMessages.length} loading messages still visible, hiding them`);
+                        allLoadingMessages.forEach(function(msg) {
+                            msg.style.display = 'none';
+                        });
+                    } else {
+                        console.log('No loading messages found');
+                    }
+                }, 5000); // Check after 5 seconds
+                
+                // Add a more aggressive final cleanup
+                setTimeout(function() {
+                    console.log('FINAL AGGRESSIVE CLEANUP');
+                    // Force hide ALL loading messages regardless of context
+                    const allLoadingMessages = document.querySelectorAll('.loading-message');
+                    allLoadingMessages.forEach(function(msg) {
+                        console.log('Forcibly hiding loading message:', msg);
+                        msg.style.display = 'none';
+                        msg.style.visibility = 'hidden';
+                        msg.style.opacity = '0';
+                        msg.style.height = '0';
+                        msg.style.overflow = 'hidden';
+                    });
+                    
+                    // Also try to find any elements that might contain "loading" text
+                    const allElements = document.querySelectorAll('*');
+                    allElements.forEach(function(el) {
+                        if (el.textContent && el.textContent.toLowerCase().includes('loading')) {
+                            const isVisible = window.getComputedStyle(el).display !== 'none';
+                            if (isVisible && !el.querySelector('iframe') && !el.closest('iframe')) {
+                                console.log('Found element with loading text, hiding:', el);
+                                el.style.display = 'none';
+                            }
+                        }
+                    });
+                }, 12000); // Final aggressive cleanup after 12 seconds
             </script>
 
             <div id="cap-emb-panel" class="tab-content-panel">
