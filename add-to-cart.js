@@ -9,7 +9,7 @@
         console.log("[ADD-TO-CART] Adding cart integration elements");
 
         // Check if elements already exist
-        if (document.getElementById('matrix-note') && document.getElementById('matrix-title')) {
+        if (document.getElementById('matrix-note') && document.getElementById('matrix-title') && document.querySelector('.matrix-price-table')) {
             console.log("[ADD-TO-CART] Cart integration elements already exist");
             return;
         }
@@ -32,6 +32,30 @@
             noteElement.style.display = 'block'; // This needs to be visible for the cart button
             pricingCalculator.appendChild(noteElement);
             console.log("[ADD-TO-CART] Added matrix-note element");
+        }
+        
+        // 3. Add matrix-price-table element if it doesn't exist
+        if (!document.querySelector('.matrix-price-table')) {
+            // Find the actual pricing table that Caspio creates
+            const existingTable = document.querySelector('table.cbResultSetTable') ||
+                                  document.querySelector('table');
+            
+            if (existingTable) {
+                // Add the matrix-price-table class to the existing table
+                existingTable.classList.add('matrix-price-table');
+                console.log("[ADD-TO-CART] Added matrix-price-table class to existing table");
+            } else {
+                // If no table exists yet, create a hidden one as a placeholder
+                const tableElement = document.createElement('table');
+                tableElement.className = 'matrix-price-table';
+                tableElement.style.display = 'none'; // Hide it as it's just for cart integration
+                
+                // Add it to the pricing calculator
+                if (pricingCalculator) {
+                    pricingCalculator.appendChild(tableElement);
+                    console.log("[ADD-TO-CART] Created placeholder matrix-price-table element");
+                }
+            }
         }
     }
 
@@ -72,12 +96,22 @@
     // Also initialize when Caspio content is loaded
     // This is a backup in case the DOM ready event fires before Caspio content is loaded
     const observer = new MutationObserver(function(mutations) {
-        if (document.querySelector('.matrix-price-table') || 
-            document.querySelector('.cbResultSetTable') || 
-            document.querySelector('#matrix-price-body') || 
-            document.querySelector('.cbResultSet')) {
-            
+        // Check if Caspio content has been loaded
+        const caspioContentLoaded = document.querySelector('.matrix-price-table') ||
+                                   document.querySelector('.cbResultSetTable') ||
+                                   document.querySelector('#matrix-price-body') ||
+                                   document.querySelector('.cbResultSet');
+        
+        if (caspioContentLoaded) {
             console.log("[ADD-TO-CART] Caspio content detected, initializing cart integration");
+            
+            // If a Caspio table was loaded but doesn't have the matrix-price-table class, add it
+            const caspioTable = document.querySelector('.cbResultSetTable');
+            if (caspioTable && !document.querySelector('.matrix-price-table')) {
+                caspioTable.classList.add('matrix-price-table');
+                console.log("[ADD-TO-CART] Added matrix-price-table class to Caspio table");
+            }
+            
             initializeCartIntegration();
             observer.disconnect();
         }
