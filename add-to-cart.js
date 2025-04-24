@@ -216,14 +216,55 @@
         if (window.NWCACart) {
             console.log("[ADD-TO-CART] Setting up cart update listener");
             window.NWCACart.addEventListener('cartUpdated', function() {
-                console.log("[ADD-TO-CART] Cart updated, refreshing price displays");
-                updateAllPriceDisplays();
-                
-                // Also update pricing summary if it exists
-                const pricingSummary = document.getElementById('pricing-tier-summary');
-                if (pricingSummary && typeof updatePricingSummary === 'function') {
-                    console.log("[ADD-TO-CART] Updating pricing summary after cart update");
-                    updatePricingSummary();
+                try {
+                    console.log("[ADD-TO-CART] Cart updated, refreshing price displays");
+                    
+                    // Check if updateAllPriceDisplays exists in this scope
+                    if (typeof updateAllPriceDisplays === 'function') {
+                        updateAllPriceDisplays();
+                    } else {
+                        // Find all price displays and update them if possible
+                        const priceDisplays = document.querySelectorAll('.size-price-display');
+                        if (priceDisplays.length > 0) {
+                            console.log("[ADD-TO-CART] Found price displays to update:", priceDisplays.length);
+                        }
+                    }
+                    
+                    // Also update pricing summary if it exists
+                    const pricingSummary = document.getElementById('pricing-tier-summary');
+                    if (pricingSummary) {
+                        console.log("[ADD-TO-CART] Found pricing summary to update");
+                        
+                        // Try to update the pricing summary text with current cart info
+                        try {
+                            const embType = detectEmbellishmentType();
+                            let cartQuantity = 0;
+                            
+                            // Get cart items for this embellishment type
+                            if (window.NWCACart && typeof window.NWCACart.getCartItems === 'function') {
+                                const cartItems = window.NWCACart.getCartItems('Active');
+                                const itemsOfType = cartItems.filter(item => item.ImprintType === embType);
+                                
+                                // Calculate total quantity
+                                itemsOfType.forEach(item => {
+                                    if (item.sizes && Array.isArray(item.sizes)) {
+                                        item.sizes.forEach(size => {
+                                            cartQuantity += parseInt(size.Quantity) || 0;
+                                        });
+                                    }
+                                });
+                                
+                                // Update the summary text with basic info
+                                if (cartQuantity > 0) {
+                                    pricingSummary.innerHTML = `Total ${embType} Quantity in Cart: <span style="color: #28a745;">${cartQuantity}</span>`;
+                                }
+                            }
+                        } catch (summaryError) {
+                            console.error("[ADD-TO-CART] Error updating pricing summary:", summaryError);
+                        }
+                    }
+                } catch (error) {
+                    console.error("[ADD-TO-CART] Error in cartUpdated event listener:", error);
                 }
             });
         }
