@@ -58,6 +58,9 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                 }
             });
             
+            // Log the total quantity for debugging
+            console.log(`[PRICE-RECALC:CALC] Total quantity for ${embellishmentType} across all items: ${totalQuantity}`);
+            
             console.log("[PRICE-RECALC:CALC] Total quantity for", embellishmentType, ":", totalQuantity);
             
             // If total quantity is 0, nothing to recalculate
@@ -69,15 +72,23 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
             // Log the items we're recalculating
             console.log("[PRICE-RECALC:ITEMS] Items to recalculate:", itemsOfType);
             
-            // For each item, update prices based on total quantity
+            // Log the items we're recalculating
+            console.log("[PRICE-RECALC:ITEMS] Items to recalculate:", itemsOfType.map(item =>
+                `${item.StyleNumber} ${item.Color} (${item.sizes?.length || 0} sizes)`));
+            
+            // Process all items with the same embellishment type together
+            // This ensures quantity discounts apply across all styles with the same embellishment
+            console.log(`[PRICE-RECALC:TOTAL] Processing all ${itemsOfType.length} items with embellishment type ${embellishmentType}`);
+            console.log(`[PRICE-RECALC:TOTAL] Total quantity for ${embellishmentType}: ${totalQuantity}`);
+            
+            // For each item, update prices based on the total quantity across all items
             for (const item of itemsOfType) {
-                if (!item.sizes || !Array.isArray(item.sizes) || item.sizes.length === 0) {
-                    continue;
-                }
+                console.log(`[PRICE-RECALC:ITEM] Processing item ${item.StyleNumber} ${item.Color}`);
                 
-                // Get pricing data from PricingMatrix if available
+                // Get pricing data for each item individually
                 if (window.PricingMatrix && typeof window.PricingMatrix.getPricingData === 'function') {
                     try {
+                        // Get pricing data for this specific item
                         const pricingData = await window.PricingMatrix.getPricingData(
                             item.StyleNumber,
                             item.Color,
@@ -151,60 +162,77 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                             }
                             
                             if (tier) {
+                                console.log(`[PRICE-RECALC:TIER] Using tier ${tier.tier} for total quantity ${totalQuantity}`);
+                                
+                                // Update prices for this item
+                                if (!item.sizes || !Array.isArray(item.sizes) || item.sizes.length === 0) {
+                                    continue;
+                                }
+                                
                                 // Update prices for each size
                                 for (const size of item.sizes) {
-                                    // Find the price for this size
-                                    let sizeKey = size.Size;
-                                    
-                                    // Handle size ranges (e.g., XS-XL)
-                                    if (!tier.prices[size.Size]) {
-                                        for (const key in tier.prices) {
-                                            if (key.includes('-')) {
-                                                const [start, end] = key.split('-').map(s => s.trim());
-                                                
-                                                if (size.Size >= start && size.Size <= end) {
-                                                    sizeKey = key;
-                                                    break;
+                                        // Find the price for this size
+                                        let sizeKey = size.Size;
+                                        
+                                        // Handle size ranges (e.g., XS-XL)
+                                        if (!tier.prices[size.Size]) {
+                                            // Define size order for comparison
+                                            const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+                                            const sizeIdx = sizeOrder.indexOf(size.Size.toUpperCase());
+                                            
+                                            if (sizeIdx !== -1) {
+                                                for (const key in tier.prices) {
+                                                    if (key.includes('-')) {
+                                                        const [start, end] = key.split('-').map(s => s.trim().toUpperCase());
+                                                        const startIdx = sizeOrder.indexOf(start);
+                                                        const endIdx = sizeOrder.indexOf(end);
+                                                        
+                                                        if (startIdx !== -1 && endIdx !== -1 &&
+                                                            sizeIdx >= startIdx && sizeIdx <= endIdx) {
+                                                            sizeKey = key;
+                                                            console.log(`[PRICE-RECALC:SIZE] Size ${size.Size} matches range ${key}`);
+                                                            break;
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                    
-                                    const price = tier.prices[sizeKey];
-                                    
-                                    if (price) {
-                                        console.log(`[PRICE-RECALC:UPDATE] Updating price for ${item.StyleNumber}, ${item.Color}, ${size.Size} from $${size.UnitPrice} to $${price}`);
                                         
-                                        // Update price in cart and in the database
-                                        size.UnitPrice = price;
+                                        const price = tier.prices[sizeKey];
                                         
-                                        // Update the price in the database
-                                        try {
-                                            const updateUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/cart-item-sizes/${size.SizeItemID}`;
-                                            fetch(updateUrl, {
-                                                method: 'PUT',
-                                                headers: {
-                                                    'Content-Type': 'application/json'
-                                                },
-                                                body: JSON.stringify({
-                                                    UnitPrice: price
+                                        if (price) {
+                                            console.log(`[PRICE-RECALC:UPDATE] Updating price for ${item.StyleNumber}, ${item.Color}, ${size.Size} from $${size.UnitPrice} to $${price}`);
+                                            
+                                            // Update price in cart and in the database
+                                            size.UnitPrice = price;
+                                            
+                                            // Update the price in the database
+                                            try {
+                                                const updateUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/cart-item-sizes/${size.SizeItemID}`;
+                                                fetch(updateUrl, {
+                                                    method: 'PUT',
+                                                    headers: {
+                                                        'Content-Type': 'application/json'
+                                                    },
+                                                    body: JSON.stringify({
+                                                        UnitPrice: price
+                                                    })
                                                 })
-                                            })
-                                            .then(response => {
-                                                if (response.ok) {
-                                                    console.log(`[PRICE-RECALC:DB-UPDATE] Successfully updated price in database for size ${size.Size}`);
-                                                } else {
-                                                    console.error(`[PRICE-RECALC:DB-UPDATE] Failed to update price in database for size ${size.Size}: ${response.status}`);
-                                                }
-                                            })
-                                            .catch(error => {
-                                                console.error(`[PRICE-RECALC:DB-UPDATE] Error updating price in database:`, error);
-                                            });
-                                        } catch (dbError) {
-                                            console.error(`[PRICE-RECALC:DB-UPDATE] Error updating price in database:`, dbError);
+                                                .then(response => {
+                                                    if (response.ok) {
+                                                        console.log(`[PRICE-RECALC:DB-UPDATE] Successfully updated price in database for size ${size.Size}`);
+                                                    } else {
+                                                        console.error(`[PRICE-RECALC:DB-UPDATE] Failed to update price in database for size ${size.Size}: ${response.status}`);
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error(`[PRICE-RECALC:DB-UPDATE] Error updating price in database:`, error);
+                                                });
+                                            } catch (dbError) {
+                                                console.error(`[PRICE-RECALC:DB-UPDATE] Error updating price in database:`, dbError);
+                                            }
                                         }
                                     }
-                                }
                             }
                         }
                     } catch (error) {

@@ -123,6 +123,21 @@ if (typeof window.NWCACart === 'undefined') {
       cartState.loading = false;
       console.log("Cart initialization complete, triggering cartUpdated event");
       triggerEvent('cartUpdated');
+      
+      // Recalculate prices for all embellishment types in the cart
+      try {
+        const embTypes = getEmbellishmentTypes();
+        console.log("[CART:INIT] Recalculating prices for embellishment types:", embTypes);
+        
+        for (const embType of embTypes) {
+          if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
+            console.log(`[CART:INIT] Recalculating prices for ${embType}`);
+            await window.recalculatePricesForEmbellishmentType(embType);
+          }
+        }
+      } catch (recalcError) {
+        console.error("[CART:INIT] Error recalculating prices:", recalcError);
+      }
     } catch (error) {
       console.error('Error initializing cart:', error);
       cartState.error = 'Failed to initialize cart';
@@ -911,12 +926,28 @@ if (typeof window.NWCACart === 'undefined') {
       
       // Recalculate prices based on total quantity for this embellishment type
       try {
-        if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
-          debugCart("ADD", `Recalculating prices for ${productData.embellishmentType}`);
-          await window.recalculatePricesForEmbellishmentType(productData.embellishmentType);
-        } else {
-          debugCart("ADD-WARN", "recalculatePricesForEmbellishmentType function not available");
-        }
+          if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
+              debugCart("ADD", `Recalculating prices for ${productData.embellishmentType}`);
+              
+              // Calculate total quantity for this embellishment type
+              let totalQuantity = 0;
+              cartState.items.forEach(item => {
+                  if (item.ImprintType === productData.embellishmentType && item.CartStatus === 'Active') {
+                      if (item.sizes && Array.isArray(item.sizes)) {
+                          item.sizes.forEach(size => {
+                              totalQuantity += parseInt(size.Quantity) || 0;
+                          });
+                      }
+                  }
+              });
+              
+              console.log(`[CART:RECALC] Total quantity for ${productData.embellishmentType}: ${totalQuantity}`);
+              
+              // Call the recalculation function
+              await window.recalculatePricesForEmbellishmentType(productData.embellishmentType);
+          } else {
+              debugCart("ADD-WARN", "recalculatePricesForEmbellishmentType function not available");
+          }
         
         // Dispatch event for cart item added
         const event = new CustomEvent('cartItemAdded', {
