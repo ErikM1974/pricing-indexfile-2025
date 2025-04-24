@@ -201,6 +201,13 @@
         
         console.log("[ADD-TO-CART] Adding cart button manually");
         
+        // Get the product info from URL first to avoid reference errors
+        const urlParams = new URLSearchParams(window.location.search);
+        const styleNumber = urlParams.get('StyleNumber') || '';
+        const colorCode = urlParams.get('COLOR') || '';
+        
+        console.log("[ADD-TO-CART] Product info from URL:", styleNumber, colorCode);
+        
         // Create the cart button container
         const container = document.createElement('div');
         container.id = 'cart-button-container';
@@ -290,11 +297,6 @@
         sizeInputs.style.justifyContent = 'center';
         sizeInputs.style.margin = '0 auto';
         sizeInputs.style.maxWidth = '800px';
-        
-        // Get the product info from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const styleNumber = urlParams.get('StyleNumber');
-        const colorCode = urlParams.get('COLOR');
         
         // Create a loading message
         const loadingMsg = document.createElement('div');
