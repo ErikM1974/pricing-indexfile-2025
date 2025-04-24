@@ -3,6 +3,32 @@
     "use strict";
 
     console.log("[ADD-TO-CART] Initializing add to cart functionality");
+    
+    // Detect embellishment type based on URL or page content
+    function detectEmbellishmentType() {
+        // Try to detect from URL or page title
+        const url = window.location.href.toLowerCase();
+        const title = document.title.toLowerCase();
+        
+        if (url.includes('cap-embroidery') || title.includes('cap embroidery')) {
+            return 'cap-embroidery';
+        }
+        if (url.includes('embroidery') || title.includes('embroidery')) {
+            return 'embroidery';
+        }
+        if (url.includes('dtg') || title.includes('dtg')) {
+            return 'dtg';
+        }
+        if (url.includes('screen-print') || url.includes('screenprint') || title.includes('screen print')) {
+            return 'screen-print';
+        }
+        if (url.includes('dtf') || title.includes('dtf')) {
+            return 'dtf';
+        }
+        
+        // Default if we can't detect
+        return 'embroidery';
+    }
 
     // Function to add necessary elements for cart integration
     function addCartIntegrationElements() {
@@ -482,6 +508,153 @@
             sizeInputs.appendChild(errorMsg);
         }
         
+        // Helper function to get price for a size and quantity
+        async function getPrice(size, quantity) {
+            try {
+                console.log(`[ADD-TO-CART] Getting price for ${size}, quantity ${quantity}`);
+                
+                // Get product info from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const styleNumber = urlParams.get('StyleNumber') || '';
+                const colorCode = urlParams.get('COLOR') || '';
+                const embType = detectEmbellishmentType();
+                
+                // First try to use the PricingMatrixAPI if available
+                if (window.PricingMatrixAPI && typeof window.PricingMatrixAPI.getPrice === 'function') {
+                    console.log(`[ADD-TO-CART] Using PricingMatrixAPI to get price`);
+                    try {
+                        const price = await window.PricingMatrixAPI.getPrice(styleNumber, colorCode, embType, size, quantity);
+                        if (price && !isNaN(price) && price > 0) {
+                            console.log(`[ADD-TO-CART] PricingMatrixAPI returned price: $${price}`);
+                            return price;
+                        }
+                    } catch (apiError) {
+                        console.error(`[ADD-TO-CART] Error using PricingMatrixAPI:`, apiError);
+                    }
+                }
+                
+                // Next try to use the PricingMatrix if available
+                if (window.PricingMatrix && typeof window.PricingMatrix.getPrice === 'function') {
+                    console.log(`[ADD-TO-CART] Using PricingMatrix to get price`);
+                    try {
+                        const price = await window.PricingMatrix.getPrice(styleNumber, colorCode, embType, size, quantity);
+                        if (price && !isNaN(price) && price > 0) {
+                            console.log(`[ADD-TO-CART] PricingMatrix returned price: $${price}`);
+                            return price;
+                        }
+                    } catch (matrixError) {
+                        console.error(`[ADD-TO-CART] Error using PricingMatrix:`, matrixError);
+                    }
+                }
+                
+                // Try to get price from the pricing matrix table in the DOM
+                const priceTable = document.querySelector('.matrix-price-table');
+                if (priceTable) {
+                    // Find the row for the quantity tier
+                    let quantityTier = '1-23'; // Default to lowest tier
+                    
+                    // Find the appropriate quantity tier
+                    if (quantity >= 72) {
+                        quantityTier = '72+';
+                    } else if (quantity >= 48) {
+                        quantityTier = '48-71';
+                    } else if (quantity >= 24) {
+                        quantityTier = '24-47';
+                    }
+                    
+                    // Find the row with this quantity tier
+                    const rows = priceTable.querySelectorAll('tr');
+                    let priceCell = null;
+                    
+                    for (const row of rows) {
+                        const firstCell = row.querySelector('td:first-child');
+                        if (firstCell && firstCell.textContent.includes(quantityTier)) {
+                            // Find the column for this size
+                            let columnIndex = 0;
+                            
+                            // Map size to column header
+                            let sizeHeader = size;
+                            if (['S', 'M', 'L', 'XL'].includes(size)) {
+                                sizeHeader = 'XS-XL';
+                            } else if (size === '2XL' || size === 'XXL') {
+                                sizeHeader = '2XL';
+                            } else if (size === '3XL') {
+                                sizeHeader = '3XL';
+                            } else if (size === '4XL') {
+                                sizeHeader = '4XL';
+                            }
+                            
+                            // Find the column index for this size
+                            const headers = priceTable.querySelectorAll('th');
+                            for (let i = 0; i < headers.length; i++) {
+                                if (headers[i].textContent.trim() === sizeHeader) {
+                                    columnIndex = i;
+                                    break;
+                                }
+                            }
+                            
+                            // Get the price cell
+                            priceCell = row.querySelector(`td:nth-child(${columnIndex + 1})`);
+                            break;
+                        }
+                    }
+                    
+                    if (priceCell) {
+                        // Extract the price (remove $ and any other non-numeric characters)
+                        const priceText = priceCell.textContent.trim();
+                        const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+                        
+                        if (!isNaN(price) && price > 0) {
+                            console.log(`[ADD-TO-CART] Found price in DOM table for ${size}, quantity ${quantity}: $${price}`);
+                            return price;
+                        }
+                    }
+                }
+                
+                // Fallback pricing if we couldn't find the price in the table
+                console.log(`[ADD-TO-CART] Using fallback pricing for ${size}, quantity ${quantity}`);
+                
+                // Base price by size
+                let basePrice = 18.00; // Default for S-XL
+                const upperSize = size.toUpperCase();
+                
+                if (upperSize === '2XL' || upperSize === 'XXL') {
+                    basePrice = 22.00;
+                } else if (upperSize === '3XL') {
+                    basePrice = 23.00;
+                } else if (upperSize === '4XL') {
+                    basePrice = 25.00;
+                }
+                
+                // Apply quantity discount
+                if (quantity >= 72) {
+                    basePrice -= 2.00;
+                } else if (quantity >= 48) {
+                    basePrice -= 1.00;
+                }
+                
+                // Add embellishment cost based on type
+                let embCost = 0;
+                
+                if (embType === 'embroidery' || embType === 'cap-embroidery') {
+                    embCost = 3.50;
+                } else if (embType === 'dtg' || embType === 'dtf') {
+                    embCost = 4.00;
+                } else if (embType === 'screen-print') {
+                    embCost = 2.50;
+                }
+                
+                const finalPrice = basePrice + embCost;
+                console.log(`[ADD-TO-CART] Calculated fallback price: $${finalPrice.toFixed(2)}`);
+                
+                return parseFloat(finalPrice.toFixed(2));
+            } catch (error) {
+                console.error('[ADD-TO-CART] Error calculating price:', error);
+                // Return a default price if all else fails
+                return 25.00;
+            }
+        }
+        
         // Helper function to add a single size input
         function addSizeInput(container, size) {
             const sizeGroup = document.createElement('div');
@@ -564,7 +737,7 @@
         });
         
         // Add click event
-        button.addEventListener('click', function() {
+        button.addEventListener('click', async function() {
             // Show loading state
             const originalText = this.textContent;
             this.disabled = true;
@@ -596,21 +769,182 @@
                 document.head.appendChild(keyframes);
             }
             
-            // Simulate API call delay - faster for better UX
-            setTimeout(() => {
+            try {
+                // Collect product data
+                const productData = {
+                    styleNumber: styleNumber,
+                    color: colorCode,
+                    embellishmentType: detectEmbellishmentType(),
+                    imageUrl: productImageSrc,
+                    sizes: []
+                };
+                
+                // Get embellishment options
+                const embOptions = {};
+                
+                // Get options based on embellishment type
+                if (productData.embellishmentType === 'embroidery' || productData.embellishmentType === 'cap-embroidery') {
+                    const stitchCount = document.getElementById('stitch-count');
+                    if (stitchCount) {
+                        embOptions.stitchCount = parseInt(stitchCount.value) || 8000;
+                    }
+                    
+                    const location = document.getElementById('location');
+                    if (location) {
+                        embOptions.location = location.value || (productData.embellishmentType === 'embroidery' ? 'left-chest' : 'front');
+                    }
+                } else if (productData.embellishmentType === 'dtg' || productData.embellishmentType === 'dtf') {
+                    const location = document.getElementById('location');
+                    if (location) {
+                        embOptions.location = location.value || 'FF';
+                    }
+                    
+                    const colorType = document.getElementById('color-type');
+                    if (colorType) {
+                        embOptions.colorType = colorType.value || 'full-color';
+                    }
+                } else if (productData.embellishmentType === 'screen-print') {
+                    const colorCount = document.getElementById('color-count');
+                    if (colorCount) {
+                        embOptions.colorCount = parseInt(colorCount.value) || 1;
+                    }
+                    
+                    const location = document.getElementById('location');
+                    if (location) {
+                        embOptions.location = location.value || 'front';
+                    }
+                    
+                    const whiteBase = document.getElementById('white-base');
+                    if (whiteBase) {
+                        embOptions.requiresWhiteBase = whiteBase.checked;
+                    }
+                    
+                    const specialInk = document.getElementById('special-ink');
+                    if (specialInk) {
+                        embOptions.specialInk = specialInk.checked;
+                    }
+                }
+                
+                productData.embellishmentOptions = embOptions;
+                
+                // Get sizes and quantities - need to handle async getPrice
+                const sizeInputs = document.querySelectorAll('.size-quantity-input');
+                let hasSizes = false;
+                
+                // Process each size input with quantity > 0
+                const sizePromises = [];
+                
+                sizeInputs.forEach(input => {
+                    const size = input.dataset.size;
+                    const quantity = parseInt(input.value) || 0;
+                    
+                    if (quantity > 0) {
+                        hasSizes = true;
+                        // Create a promise for getting the price
+                        const sizePromise = getPrice(size, quantity).then(price => {
+                            return {
+                                size: size,
+                                quantity: quantity,
+                                unitPrice: price
+                            };
+                        });
+                        
+                        sizePromises.push(sizePromise);
+                    }
+                });
+                
+                // Wait for all price promises to resolve
+                productData.sizes = await Promise.all(sizePromises);
+                
+                if (!hasSizes) {
+                    throw new Error('Please select at least one size and quantity');
+                }
+                
+                console.log("[ADD-TO-CART] Adding to cart with data:", productData);
+                
+                // Check if NWCACart is available
+                if (!window.NWCACart || typeof window.NWCACart.addToCart !== 'function') {
+                    throw new Error('Cart system not available. Please refresh the page and try again.');
+                }
+                
+                // Add to cart
+                const result = await window.NWCACart.addToCart(productData);
+                
+                if (result.success) {
+                    // Show success message
+                    console.log("[ADD-TO-CART] Item added to cart successfully");
+                    
+                    // Change button text to show success
+                    this.disabled = false;
+                    this.textContent = 'Added! ✓';
+                    
+                    // Remove spinner if it exists
+                    const spinnerElement = this.querySelector('.loading-spinner');
+                    if (spinnerElement) {
+                        spinnerElement.remove();
+                    }
+                    
+                    // Reset button text after a delay
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 1500);
+                    
+                    // Show success message
+                    const successMsg = document.createElement('div');
+                    successMsg.style.backgroundColor = '#d4edda';
+                    successMsg.style.color = '#155724';
+                    successMsg.style.padding = '10px';
+                    successMsg.style.marginTop = '10px';
+                    successMsg.style.borderRadius = '4px';
+                    successMsg.style.textAlign = 'center';
+                    successMsg.innerHTML = 'Item added to cart successfully! <a href="/cart.html" style="color: #155724; text-decoration: underline; font-weight: bold;">View Cart</a>';
+                    
+                    // Add success message after the button
+                    this.parentNode.appendChild(successMsg);
+                    
+                    // Remove success message after a delay
+                    setTimeout(() => {
+                        if (successMsg.parentNode) {
+                            successMsg.parentNode.removeChild(successMsg);
+                        }
+                    }, 5000);
+                } else {
+                    // Show error message
+                    throw new Error(result.error || 'Failed to add item to cart');
+                }
+            } catch (error) {
+                console.error("[ADD-TO-CART] Error adding to cart:", error);
+                
                 // Reset button state
                 this.disabled = false;
                 this.textContent = originalText;
                 
-                // Show success message
-                alert('Item added to cart successfully!');
+                // Remove spinner if it exists
+                const spinnerElement = this.querySelector('.loading-spinner');
+                if (spinnerElement) {
+                    spinnerElement.remove();
+                }
                 
-                // Change button text to show success briefly
-                this.textContent = 'Added! ✓';
+                // Show error message
+                const errorMsg = document.createElement('div');
+                errorMsg.style.backgroundColor = '#f8d7da';
+                errorMsg.style.color = '#721c24';
+                errorMsg.style.padding = '10px';
+                errorMsg.style.marginTop = '10px';
+                errorMsg.style.borderRadius = '4px';
+                errorMsg.style.textAlign = 'center';
+                errorMsg.textContent = error.message || 'An error occurred while adding to cart';
+                
+                // Add error message after the button
+                this.parentNode.appendChild(errorMsg);
+                
+                // Remove error message after a delay
                 setTimeout(() => {
-                    this.textContent = originalText;
-                }, 1500);
-            }, 800);
+                    if (errorMsg.parentNode) {
+                        errorMsg.parentNode.removeChild(errorMsg);
+                    }
+                }, 5000);
+            }
         });
         
         container.appendChild(button);
