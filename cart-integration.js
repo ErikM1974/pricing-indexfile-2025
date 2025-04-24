@@ -373,29 +373,29 @@
     if (styleNumber && catalogColorForInventory) {
       // Fetch inventory data to get available sizes
       fetchInventoryData(styleNumber, catalogColorForInventory) // Use catalog color here
-        .then(sizes => {
+        .then(result => {
           // Remove loading message
           if (loadingMsg.parentNode === sizeInputs) {
                sizeInputs.removeChild(loadingMsg);
           }
 
-          if (sizes && sizes.length > 0) {
-            // Create size inputs
-            addSizeInputs(sizeInputs, sizes); // Use helper function
+          if (result.sizes && result.sizes.length > 0) {
+            // Create size inputs with inventory data
+            addSizeInputs(sizeInputs, result.sizes, result.inventory); // Pass inventory data
           } else {
             // Fallback if no sizes found or API failed
             const noSizesMsg = document.createElement('div');
             noSizesMsg.textContent = 'No size information available. Using standard sizes.';
             noSizesMsg.style.fontStyle = 'italic';
             noSizesMsg.style.color = '#666';
-             noSizesMsg.style.width = '100%'; // Span full width
+            noSizesMsg.style.width = '100%'; // Span full width
             sizeInputs.appendChild(noSizesMsg);
-             // Add fallback sizes
-            addSizeInputs(sizeInputs, getFallbackSizes());
+            // Add fallback sizes
+            addSizeInputs(sizeInputs, getFallbackSizes(), null); // No inventory data for fallback
           }
         })
-        // Catch is removed here - fetchInventoryData now returns [] on error/no data
-        // The '.then' block above handles the empty array case.
+        // Catch is removed here - fetchInventoryData now returns empty object on error/no data
+        // The '.then' block above handles the empty case.
     } else {
       // No style/color info, use fallback
       if (loadingMsg.parentNode === sizeInputs) {
@@ -406,7 +406,7 @@
 
 
       // Add fallback sizes
-      addSizeInputs(sizeInputs, getFallbackSizes());
+      addSizeInputs(sizeInputs, getFallbackSizes(), null); // No inventory data for fallback
     }
 
     container.appendChild(sizeInputs);
@@ -1622,7 +1622,7 @@ async function handleAddToCart() {
   async function fetchInventoryData(styleNumber, colorCode) {
       try {
         // colorCode here should ideally be the CATALOG_COLOR for API lookup
-        debugCart("INVENTORY", `Workspaceing inventory data for style ${styleNumber}, color ${colorCode}`);
+        debugCart("INVENTORY", `Fetching inventory data for style ${styleNumber}, color ${colorCode}`);
 
         // Use the config.apiBaseUrl instead of hardcoding the URL
         const apiUrl = `${config.apiBaseUrl}/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(colorCode)}`;
@@ -1642,11 +1642,11 @@ async function handleAddToCart() {
 
         if (!Array.isArray(inventoryData)) { // Check if it's an array
             debugCart("INVENTORY-WARN", 'Inventory data is not an array:', inventoryData);
-            return []; // Return empty if not an array
+            return { sizes: [], inventory: [] }; // Return empty if not an array
         }
         if (inventoryData.length === 0) {
             debugCart("INVENTORY-WARN", 'No inventory data returned from API (empty array)');
-            return []; // Return empty array if no data
+            return { sizes: [], inventory: [] }; // Return empty array if no data
         }
 
         // Extract unique sizes and sort them (using SizeSortOrder if available)
@@ -1670,33 +1670,49 @@ async function handleAddToCart() {
 
 
         debugCart("INVENTORY", 'Available sizes with quantity > 0:', sizes);
-        return sizes;
+        return { sizes, inventory: inventoryData };
       } catch (error) {
         debugCart("INVENTORY-ERROR", 'Error fetching or processing inventory data:', error);
         // Don't re-throw here, let the caller handle it and use fallbacks
-         return []; // Return empty array on error
+         return { sizes: [], inventory: [] }; // Return empty object on error
       }
   }
 
 
   // Helper function to add size inputs
-  function addSizeInputs(container, sizes) {
+  function addSizeInputs(container, sizes, inventoryData) {
     // Clear existing inputs first to prevent duplicates if called multiple times
     const existingInputs = container.querySelectorAll('.size-input-group');
     existingInputs.forEach(el => el.remove());
 
-     // Add fallback explanation if sizes array is the default fallback one
-     if (sizes.length > 0 && sizes[0] === 'S' && sizes.length === getFallbackSizes().length) {
-         debugCart("UI-WARN", "Using fallback sizes for inputs.");
-     }
+    // Create a grid container for the size inputs
+    const gridContainer = document.createElement('div');
+    gridContainer.className = 'size-input-grid';
+    gridContainer.style.display = 'grid';
+    gridContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(80px, 1fr))';
+    gridContainer.style.gap = '10px';
+    gridContainer.style.marginBottom = '15px';
+
+    // Add fallback explanation if sizes array is the default fallback one
+    if (sizes.length > 0 && sizes[0] === 'S' && sizes.length === getFallbackSizes().length) {
+      debugCart("UI-WARN", "Using fallback sizes for inputs.");
+    }
 
     sizes.forEach(size => {
+      // Get inventory for this size
+      const inventory = inventoryData ?
+        inventoryData.filter(item => item.size === size)
+          .reduce((total, item) => total + (parseInt(item.quantity) || 0), 0) : 0;
+      
       const group = document.createElement('div');
       group.className = 'size-input-group'; // Add class for easier removal
       group.style.display = 'flex';
       group.style.flexDirection = 'column';
       group.style.alignItems = 'center'; // Center label and input
-
+      group.style.padding = '8px';
+      group.style.border = '1px solid #e0e0e0';
+      group.style.borderRadius = '4px';
+      group.style.backgroundColor = '#f9f9f9';
 
       const label = document.createElement('label');
       label.textContent = size;
@@ -1706,17 +1722,43 @@ async function handleAddToCart() {
       const input = document.createElement('input');
       input.type = 'number';
       input.min = '0';
+      input.max = inventory > 0 ? inventory.toString() : '999';
       input.value = '0';
       input.className = 'size-quantity-input';
       input.dataset.size = size;
       input.style.width = '60px';
       input.style.padding = '5px';
       input.style.textAlign = 'center'; // Center text in input
+      
+      // Add inventory display
+      const inventoryDisplay = document.createElement('div');
+      inventoryDisplay.className = 'inventory-display';
+      inventoryDisplay.style.fontSize = '0.8em';
+      inventoryDisplay.style.marginTop = '5px';
+      
+      if (inventory > 0) {
+        inventoryDisplay.textContent = `${inventory} in stock`;
+        
+        // Add warning for low inventory
+        if (inventory < 10) {
+          inventoryDisplay.style.color = 'orange';
+          inventoryDisplay.textContent = `Only ${inventory} left!`;
+        } else {
+          inventoryDisplay.style.color = 'green';
+        }
+      } else {
+        inventoryDisplay.textContent = 'Out of stock';
+        inventoryDisplay.style.color = 'red';
+        input.disabled = true;
+      }
 
       group.appendChild(label);
       group.appendChild(input);
-      container.appendChild(group);
+      group.appendChild(inventoryDisplay);
+      gridContainer.appendChild(group);
     });
+    
+    container.appendChild(gridContainer);
   }
 
 

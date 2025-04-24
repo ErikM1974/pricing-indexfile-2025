@@ -349,6 +349,31 @@ function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
 
                 // Ensure hidden elements needed for cart integration exist IF Caspio succeeded
                 ensureHiddenCartElements(container);
+                
+                // Capture pricing matrix data for cart integration
+                const embType = getEmbellishmentTypeFromUrl();
+                if (window.dp5ApiTierData && window.dp5GroupedHeaders && window.dp5GroupedPrices) {
+                    console.log(`PricingPages: Pricing data found, dispatching pricingDataLoaded event for ${embType}`);
+                    
+                    // Dispatch a custom event to trigger pricing matrix capture
+                    const event = new CustomEvent('pricingDataLoaded', {
+                        detail: {
+                            styleNumber: window.selectedStyleNumber,
+                            color: window.selectedCatalogColor || window.selectedColorName,
+                            embellishmentType: embType
+                        }
+                    });
+                    window.dispatchEvent(event);
+                    
+                    // If the capturePricingMatrix function is available, call it directly as well
+                    if (typeof window.capturePricingMatrix === 'function') {
+                        window.capturePricingMatrix(
+                            window.selectedStyleNumber,
+                            window.selectedCatalogColor || window.selectedColorName,
+                            embType
+                        );
+                    }
+                }
             }
         }, 5000); // 5-second delay - adjust if needed, but ensure it's longer than Caspio's internal processing
     };
@@ -481,6 +506,34 @@ function loadCartIntegrationScript() {
 
 // --- Main Initialization ---
 
+// Load pricing matrix capture script
+function loadPricingMatrixCaptureScript() {
+    return new Promise((resolve, reject) => {
+        // Check if the script is already loaded
+        if (window.capturePricingMatrix) {
+            console.log('PricingPages: Pricing matrix capture script already loaded.');
+            resolve();
+            return;
+        }
+
+        console.log('PricingPages: Loading pricing-matrix-capture.js...');
+        const script = document.createElement('script');
+        script.src = '/pricing-matrix-capture.js';
+        script.async = true;
+
+        script.onload = () => {
+            console.log('PricingPages: pricing-matrix-capture.js loaded successfully.');
+            resolve();
+        };
+
+        script.onerror = () => {
+            console.error('PricingPages: Error loading pricing-matrix-capture.js.');
+            reject(new Error('Failed to load pricing-matrix-capture.js'));
+        };
+        document.head.appendChild(script);
+    });
+}
+
 // Initialize the page (Called on DOMContentLoaded)
 async function initPricingPage() {
     console.log("PricingPages: Initializing pricing page...");
@@ -491,9 +544,10 @@ async function initPricingPage() {
     try {
         await loadCartScript();
         await loadCartIntegrationScript();
-        console.log("PricingPages: Core cart scripts loaded.");
+        await loadPricingMatrixCaptureScript();
+        console.log("PricingPages: Core cart and pricing matrix scripts loaded.");
     } catch (error) {
-        console.error('PricingPages: Error loading core cart scripts, subsequent functionality may be affected:', error);
+        console.error('PricingPages: Error loading core scripts, subsequent functionality may be affected:', error);
         // Decide if we should stop or continue without cart integration
         // For now, let's continue to try loading Caspio pricing
     }

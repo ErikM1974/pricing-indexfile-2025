@@ -909,6 +909,29 @@ if (typeof window.NWCACart === 'undefined') {
       console.log("Adding item to cart state:", itemWithSizes);
       cartState.items.push(itemWithSizes);
       
+      // Recalculate prices based on total quantity for this embellishment type
+      try {
+        if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
+          debugCart("ADD", `Recalculating prices for ${productData.embellishmentType}`);
+          await window.recalculatePricesForEmbellishmentType(productData.embellishmentType);
+        } else {
+          debugCart("ADD-WARN", "recalculatePricesForEmbellishmentType function not available");
+        }
+        
+        // Dispatch event for cart item added
+        const event = new CustomEvent('cartItemAdded', {
+          detail: {
+            embellishmentType: productData.embellishmentType,
+            styleNumber: productData.styleNumber,
+            color: productData.color
+          }
+        });
+        window.dispatchEvent(event);
+      } catch (recalcError) {
+        debugCart("ADD-ERROR", "Error recalculating prices:", recalcError);
+        // Continue even if recalculation fails
+      }
+      
       // Force a sync with the server to ensure everything is up to date
       try {
           console.log("Syncing with server after adding item...");
@@ -1549,7 +1572,16 @@ if (typeof window.NWCACart === 'undefined') {
     getError: () => cartState.error,
     getCartState, // Add the getCartState method to the public API
     clearCart, // Add the clearCart method to the public API
-    submitQuoteRequest // Expose the new function
+    submitQuoteRequest, // Expose the new function
+    recalculatePrices: async function(embellishmentType) {
+      // Call the recalculate function if available
+      if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
+        return await window.recalculatePricesForEmbellishmentType(embellishmentType);
+      } else {
+        console.warn("recalculatePricesForEmbellishmentType function not available");
+        return false;
+      }
+    }
   };
   })();
 
