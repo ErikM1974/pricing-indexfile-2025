@@ -341,6 +341,9 @@ const NWCACartUI = (function() {
                  <span class="item-embellishment badge" style="background-color: ${getEmbellishmentColor(item.embellishmentType)}; color: white;">${formattedEmbType}</span>
                  <div class="mt-1">
                     <small class="text-muted">Total ${formattedEmbType} Quantity: <span class="font-weight-bold">${totalQuantityForType}</span> (${pricingTier} pricing tier)</small>
+                    ${totalQuantityForType < 24 ?
+                      `<br><small class="text-danger"><strong>Less Than Minimum Fee Applied:</strong> $50.00 total fee ÷ ${totalQuantityForType} items = $${(50/totalQuantityForType).toFixed(2)} per item</small>` :
+                      ''}
                  </div>
             </div>
             <button class="remove-item-btn btn btn-sm btn-outline-danger" data-item-id="${item.id}">&times;</button>
@@ -479,15 +482,34 @@ function renderSizeItem(sizeInfo, itemId) {
     const lineTotal = (!isNaN(unitPrice) ? unitPrice : 0) * quantity;
     const formattedLineTotal = formatCurrency(lineTotal); // Use helper
 
+    // Get embellishment type from the parent item
+    // We need to find the embellishment type from the cart items since it's not passed to this function
+    const parentItem = NWCACart.getCartItems('Active').find(item => item.CartItemID == itemId);
+    const embellishmentType = parentItem ? parentItem.ImprintType : null;
+    
+    // Check if LTM fee applies
+    const totalQuantityForType = embellishmentType ? getTotalQuantityForEmbellishmentType(embellishmentType) : 0;
+    const hasLtmFee = totalQuantityForType < 24 && totalQuantityForType > 0;
+    const ltmFeePerItem = hasLtmFee ? 50 / totalQuantityForType : 0;
+    
+    // Calculate base price and total price with LTM fee
+    const basePrice = !isNaN(unitPrice) ? unitPrice - ltmFeePerItem : 0;
+    const formattedBasePrice = formatCurrency(basePrice);
+    
     sizeElement.innerHTML = `
         <span class="size-label font-weight-bold" style="min-width: 50px;">${sizeInfo.size}</span>
         <span class="size-quantity d-flex align-items-center">
              <label for="qty-${itemId}-${sizeInfo.size}" class="sr-only">Quantity for ${sizeInfo.size}</label>
              <input type="number" id="qty-${itemId}-${sizeInfo.size}" class="quantity-input form-control form-control-sm" value="${quantity}" min="0" data-item-id="${itemId}" data-size="${sizeInfo.size}" style="width: 60px; text-align: center; margin-left: 5px;">
         </span>
-         <div class="text-right" style="min-width: 100px;">
+         <div class="text-right" style="min-width: 150px;">
              <span class="size-line-total d-block font-weight-bold" style="color: #0056b3;">${formattedLineTotal}</span>
-             <span class="size-price d-block" style="font-size: 0.8em; color: #6c757d;">(${formattedPrice} each)</span>
+             ${hasLtmFee ?
+                `<span class="size-price d-block" style="font-size: 0.8em; color: #6c757d;">
+                    (${formattedBasePrice} + $${ltmFeePerItem.toFixed(2)} LTM = ${formattedPrice} each)
+                </span>` :
+                `<span class="size-price d-block" style="font-size: 0.8em; color: #6c757d;">(${formattedPrice} each)</span>`
+             }
          </div>
     `;
 
@@ -584,15 +606,45 @@ function renderSizeItem(sizeInfo, itemId) {
    * Update the cart summary
    */
   function updateCartSummary() {
-    // *** IMPORTANT: NWCACart.getCartTotal() might need adjustment ***
-    // If NWCACart calculated totals based on the OLD item structure,
-    // ensure it now correctly calculates based on the potentially NEW structure
-    // (e.g., using 'unitPrice' instead of 'UnitPrice').
-    // Or, if NWCACart still works correctly, this part is fine.
-    const subtotal = NWCACart.getCartTotal(); // Assuming this still works
-    const ltmFeeAmount = subtotal < 100 ? 15 : 0; // Example: Less Than Minimum fee
+    // Get cart items and calculate totals
+    const activeItems = NWCACart.getCartItems('Active');
+    
+    // Calculate subtotal from items
+    let subtotal = 0;
+    activeItems.forEach(item => {
+      if (item.sizes && Array.isArray(item.sizes)) {
+        item.sizes.forEach(size => {
+          subtotal += (parseFloat(size.UnitPrice) || 0) * (parseInt(size.Quantity) || 0);
+        });
+      }
+    });
+    
+    // Calculate LTM fee based on embellishment types
+    let ltmFeeAmount = 0;
+    
+    // Get unique embellishment types
+    const embellishmentTypes = [...new Set(activeItems.map(item => item.ImprintType))];
+    
+    // For each embellishment type, check if LTM fee applies
+    embellishmentTypes.forEach(embType => {
+      // Calculate total quantity for this embellishment type
+      let totalQuantity = 0;
+      activeItems.filter(item => item.ImprintType === embType).forEach(item => {
+        if (item.sizes && Array.isArray(item.sizes)) {
+          item.sizes.forEach(size => {
+            totalQuantity += parseInt(size.Quantity) || 0;
+          });
+        }
+      });
+      
+      // If quantity is less than 24, add LTM fee
+      if (totalQuantity > 0 && totalQuantity < 24) {
+        ltmFeeAmount += 50.00; // Add $50 LTM fee for each embellishment type below threshold
+      }
+    });
+    
     const total = subtotal + ltmFeeAmount;
-     debugCartUI("SUMMARY", `Updating summary: Subtotal=${subtotal}, LTM Fee=${ltmFeeAmount}, Total=${total}`);
+    debugCartUI("SUMMARY", `Updating summary: Subtotal=${subtotal}, LTM Fee=${ltmFeeAmount}, Total=${total}`);
 
     // Update cart summary
     if (elements.cartSubtotal) {
@@ -605,12 +657,49 @@ function renderSizeItem(sizeInfo, itemId) {
 
     if (elements.ltmFee) {
       elements.ltmFee.textContent = formatCurrency(ltmFeeAmount);
+      
+      // Add explanation for LTM fee if it exists
+      if (ltmFeeAmount > 0) {
+        // Find or create the explanation element
+        let ltmExplanation = document.getElementById('ltm-fee-explanation');
+        if (!ltmExplanation) {
+          ltmExplanation = document.createElement('small');
+          ltmExplanation.id = 'ltm-fee-explanation';
+          ltmExplanation.className = 'text-danger d-block mt-1';
+          elements.ltmFee.parentNode.appendChild(ltmExplanation);
+        }
+        
+        // Count embellishment types with LTM fee
+        const embTypesWithLtm = embellishmentTypes.filter(embType => {
+          const typeQuantity = getTotalQuantityForEmbellishmentType(embType);
+          return typeQuantity > 0 && typeQuantity < 24;
+        });
+        
+        ltmExplanation.innerHTML = `Applied to ${embTypesWithLtm.length} embellishment type${embTypesWithLtm.length !== 1 ? 's' : ''} with less than 24 items`;
+      } else {
+        // Remove explanation if it exists
+        const ltmExplanation = document.getElementById('ltm-fee-explanation');
+        if (ltmExplanation) {
+          ltmExplanation.remove();
+        }
+      }
     }
 
     if (elements.ltmFeeRow) {
       // Check if display should be flex or table-row depending on original CSS
-       const displayStyle = elements.ltmFeeRow.tagName === 'TR' ? 'table-row' : 'flex';
+      const displayStyle = elements.ltmFeeRow.tagName === 'TR' ? 'table-row' : 'flex';
       elements.ltmFeeRow.style.display = ltmFeeAmount > 0 ? displayStyle : 'none';
+      
+      // Add a highlight to the row if LTM fee exists
+      if (ltmFeeAmount > 0) {
+        elements.ltmFeeRow.style.backgroundColor = '#fff8e8';
+        elements.ltmFeeRow.style.padding = '5px';
+        elements.ltmFeeRow.style.borderRadius = '4px';
+      } else {
+        elements.ltmFeeRow.style.backgroundColor = '';
+        elements.ltmFeeRow.style.padding = '';
+        elements.ltmFeeRow.style.borderRadius = '';
+      }
     }
 
     // Update review summary (if these elements exist)
@@ -624,10 +713,45 @@ function renderSizeItem(sizeInfo, itemId) {
 
     if (elements.reviewLtmFee) {
       elements.reviewLtmFee.textContent = formatCurrency(ltmFeeAmount);
-         const reviewLtmRow = elements.reviewLtmFee.closest('tr') || elements.reviewLtmFee.closest('.row'); // Try to find parent row
-         if (reviewLtmRow) {
-            reviewLtmRow.style.display = ltmFeeAmount > 0 ? '' : 'none'; // Show/hide row
-         }
+      const reviewLtmRow = elements.reviewLtmFee.closest('tr') || elements.reviewLtmFee.closest('.row'); // Try to find parent row
+      
+      if (reviewLtmRow) {
+        reviewLtmRow.style.display = ltmFeeAmount > 0 ? '' : 'none'; // Show/hide row
+        
+        // Add highlighting and explanation if LTM fee exists
+        if (ltmFeeAmount > 0) {
+          reviewLtmRow.style.backgroundColor = '#fff8e8';
+          reviewLtmRow.style.padding = '5px';
+          reviewLtmRow.style.borderRadius = '4px';
+          
+          // Add explanation for LTM fee
+          let reviewLtmExplanation = document.getElementById('review-ltm-explanation');
+          if (!reviewLtmExplanation) {
+            reviewLtmExplanation = document.createElement('small');
+            reviewLtmExplanation.id = 'review-ltm-explanation';
+            reviewLtmExplanation.className = 'text-danger d-block mt-1';
+            elements.reviewLtmFee.parentNode.appendChild(reviewLtmExplanation);
+          }
+          
+          // Count embellishment types with LTM fee
+          const embTypesWithLtm = embellishmentTypes.filter(embType => {
+            const typeQuantity = getTotalQuantityForEmbellishmentType(embType);
+            return typeQuantity > 0 && typeQuantity < 24;
+          });
+          
+          reviewLtmExplanation.innerHTML = `Applied to ${embTypesWithLtm.length} embellishment type${embTypesWithLtm.length !== 1 ? 's' : ''} with less than 24 items`;
+        } else {
+          reviewLtmRow.style.backgroundColor = '';
+          reviewLtmRow.style.padding = '';
+          reviewLtmRow.style.borderRadius = '';
+          
+          // Remove explanation if it exists
+          const reviewLtmExplanation = document.getElementById('review-ltm-explanation');
+          if (reviewLtmExplanation) {
+            reviewLtmExplanation.remove();
+          }
+        }
+      }
     }
   }
 
@@ -805,11 +929,24 @@ function renderSizeItem(sizeInfo, itemId) {
                       itemTotal += lineTotal;
                       totalQuantity += quantity;
 
+                      // Get total quantity for this embellishment type
+                      const totalQuantityForType = getTotalQuantityForEmbellishmentType(item.embellishmentType);
+                      const hasLtmFee = totalQuantityForType < 24 && totalQuantityForType > 0;
+                      const ltmFeePerItem = hasLtmFee ? 50 / totalQuantityForType : 0;
+                      const basePrice = unitPrice - ltmFeePerItem;
+                      
+                      // Format the unit price display
+                      let unitPriceDisplay = formatCurrency(unitPrice);
+                      if (hasLtmFee) {
+                          unitPriceDisplay = `${formatCurrency(basePrice)} + ${formatCurrency(ltmFeePerItem)} LTM`;
+                      }
+                      
                       sizesHtml += `
-                      <div class="d-flex justify-content-between">
-                          <span>${sizeInfo.size}</span>
-                          <span>${quantity}</span>
-                          <span>${formatCurrency(lineTotal)}</span>
+                      <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
+                          <span class="font-weight-bold" style="min-width: 50px;">${sizeInfo.size}</span>
+                          <span style="min-width: 50px; text-align: center;">${quantity}</span>
+                          <span style="min-width: 120px; text-align: right;">${unitPriceDisplay}</span>
+                          <span style="min-width: 80px; text-align: right; font-weight: bold;">${formatCurrency(lineTotal)}</span>
                       </div>
                       `;
                  }
@@ -823,15 +960,23 @@ function renderSizeItem(sizeInfo, itemId) {
       // Get total quantity for this embellishment type across all items
       const totalQuantityForType = getTotalQuantityForEmbellishmentType(item.embellishmentType);
       const pricingTier = getPricingTierForQuantity(totalQuantityForType);
+      const hasLtmFee = totalQuantityForType < 24 && totalQuantityForType > 0;
+      const ltmFeePerItem = hasLtmFee ? 50 / totalQuantityForType : 0;
       
       itemElement.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div>
-             {/* Use adapted item properties */}
+             <!-- Use adapted item properties -->
             <h5 class="mb-1">${item.styleNumber} - ${item.color}</h5>
             <p class="mb-1">Embellishment: ${formatEmbellishmentType(item.embellishmentType)}</p>
             <p class="mb-1"><small class="text-muted">Total ${formatEmbellishmentType(item.embellishmentType)} Quantity: <span class="font-weight-bold">${totalQuantityForType}</span> (${pricingTier} pricing tier)</small></p>
-             {/* Optionally show embellishment options again here if needed */}
+            ${hasLtmFee ?
+              `<p class="mb-1"><small class="text-danger"><strong>Less Than Minimum Fee Applied:</strong> $50.00 total fee ÷ ${totalQuantityForType} items = $${ltmFeePerItem.toFixed(2)} per item</small></p>` :
+              ''}
+             <!-- Embellishment options -->
+             <div class="embellishment-options small text-muted mt-2">
+                ${renderEmbellishmentOptions(item.embellishmentOptions)}
+             </div>
           </div>
           <div class="text-right">
             <p class="mb-1">Item Quantity: ${totalQuantity}</p>
@@ -842,9 +987,10 @@ function renderSizeItem(sizeInfo, itemId) {
           <div class="d-flex justify-content-between font-weight-bold border-bottom pb-1 mb-1">
             <span>Size</span>
             <span>Quantity</span>
-            <span>Price</span>
+            <span>Unit Price</span>
+            <span>Total</span>
           </div>
-          ${sizesHtml || '<p><i>No items with quantity > 0.</i></p>'} {/* Fallback message */}
+          ${sizesHtml || '<p><i>No items with quantity > 0.</i></p>'}
         </div>
       `;
 
