@@ -211,6 +211,22 @@
                 }
             }, 1000);
         }
+        
+        // Listen for cart updates to refresh price displays
+        if (window.NWCACart) {
+            console.log("[ADD-TO-CART] Setting up cart update listener");
+            window.NWCACart.addEventListener('cartUpdated', function() {
+                console.log("[ADD-TO-CART] Cart updated, refreshing price displays");
+                updateAllPriceDisplays();
+                
+                // Also update pricing summary if it exists
+                const pricingSummary = document.getElementById('pricing-tier-summary');
+                if (pricingSummary && typeof updatePricingSummary === 'function') {
+                    console.log("[ADD-TO-CART] Updating pricing summary after cart update");
+                    updatePricingSummary();
+                }
+            });
+        }
     }
     
     // Function to manually add the cart button if it's not being added by cart-integration.js
@@ -272,6 +288,19 @@
         productSummary.style.textAlign = 'center';
         productSummary.style.flexDirection = 'column'; // Stack image and text vertically
         
+        // Add pricing tier summary
+        const pricingSummary = document.createElement('div');
+        pricingSummary.id = 'pricing-tier-summary';
+        pricingSummary.style.marginTop = '15px';
+        pricingSummary.style.padding = '8px 12px';
+        pricingSummary.style.backgroundColor = '#e8f4ff';
+        pricingSummary.style.borderRadius = '4px';
+        pricingSummary.style.border = '1px dashed #90c3ff';
+        pricingSummary.style.fontSize = '0.9rem';
+        pricingSummary.style.color = '#0056b3';
+        pricingSummary.style.fontWeight = 'bold';
+        pricingSummary.textContent = 'Calculating pricing...';
+        
         // Try to get product image
         const productImageSrc = document.querySelector('.product-image img')?.src ||
                                document.querySelector('#product-image')?.src ||
@@ -318,9 +347,70 @@
         productDetails.appendChild(productColor);
         
         productSummary.appendChild(productDetails);
+        productSummary.appendChild(pricingSummary);
         
         // Add the product summary to the container
         container.appendChild(productSummary);
+        
+        // Function to update the pricing tier summary
+        async function updatePricingSummary() {
+            const summary = document.getElementById('pricing-tier-summary');
+            if (!summary) return;
+            
+            try {
+                const totalQuantity = await getTotalQuantityForEmbellishmentType();
+                const pricingTier = getPricingTierForQuantity(totalQuantity);
+                const ltmFeePerItem = calculateLTMFeePerItem(totalQuantity);
+                const embType = detectEmbellishmentType();
+                
+                // Format the embellishment type
+                let formattedEmbType = embType;
+                if (embType === 'embroidery') {
+                    formattedEmbType = 'Embroidery';
+                } else if (embType === 'cap-embroidery') {
+                    formattedEmbType = 'Cap Embroidery';
+                } else if (embType === 'dtg') {
+                    formattedEmbType = 'DTG Print';
+                } else if (embType === 'dtf') {
+                    formattedEmbType = 'DTF Transfer';
+                } else if (embType === 'screen-print') {
+                    formattedEmbType = 'Screen Print';
+                }
+                
+                // Update the summary text
+                if (ltmFeePerItem > 0) {
+                    summary.innerHTML = `Total ${formattedEmbType} Quantity: <span style="color: #dc3545;">${totalQuantity}</span> (${pricingTier} tier + $50.00 LTM fee)`;
+                    summary.style.backgroundColor = '#fff8e8';
+                    summary.style.borderColor = '#ffc107';
+                    
+                    // Add next tier info
+                    if (totalQuantity < 24) {
+                        const neededForNextTier = 24 - totalQuantity;
+                        summary.innerHTML += `<br><span style="font-size: 0.85em; color: #6c757d;">Add ${neededForNextTier} more for 24-47 tier pricing (no LTM fee)</span>`;
+                    }
+                } else {
+                    summary.innerHTML = `Total ${formattedEmbType} Quantity: <span style="color: #28a745;">${totalQuantity}</span> (${pricingTier} tier)`;
+                    
+                    // Add next tier info
+                    if (totalQuantity >= 24 && totalQuantity < 48) {
+                        const neededForNextTier = 48 - totalQuantity;
+                        summary.innerHTML += `<br><span style="font-size: 0.85em; color: #6c757d;">Add ${neededForNextTier} more for 48-71 tier pricing</span>`;
+                    } else if (totalQuantity >= 48 && totalQuantity < 72) {
+                        const neededForNextTier = 72 - totalQuantity;
+                        summary.innerHTML += `<br><span style="font-size: 0.85em; color: #6c757d;">Add ${neededForNextTier} more for 72+ tier pricing</span>`;
+                    } else if (totalQuantity >= 72) {
+                        summary.innerHTML += `<br><span style="font-size: 0.85em; color: #28a745;">You're getting our best quantity pricing!</span>`;
+                    }
+                }
+            } catch (error) {
+                console.error('[ADD-TO-CART] Error updating pricing summary:', error);
+                summary.textContent = 'Pricing information unavailable';
+                summary.style.color = '#dc3545';
+            }
+        }
+        
+        // Update pricing summary initially
+        updatePricingSummary();
         
         // Add size inputs section with improved styling
         const sizeInputs = document.createElement('div');
@@ -686,6 +776,17 @@
             label.style.fontWeight = 'bold';
             label.style.color = '#0056b3';
             
+            // Add price display element
+            const priceDisplay = document.createElement('div');
+            priceDisplay.className = 'size-price-display';
+            priceDisplay.dataset.size = size;
+            priceDisplay.style.fontSize = '0.9rem';
+            priceDisplay.style.color = '#28a745';
+            priceDisplay.style.fontWeight = 'bold';
+            priceDisplay.style.marginBottom = '5px';
+            priceDisplay.style.height = '20px';
+            priceDisplay.textContent = 'Calculating...';
+            
             const input = document.createElement('input');
             input.type = 'number';
             input.min = '0';
@@ -699,9 +800,150 @@
             input.style.borderRadius = '4px';
             input.style.fontSize = '1rem';
             
+            // Add event listener to update prices when quantity changes
+            input.addEventListener('input', function() {
+                updateAllPriceDisplays();
+                updatePricingSummary();
+            });
+            
             sizeGroup.appendChild(label);
+            sizeGroup.appendChild(priceDisplay);
             sizeGroup.appendChild(input);
             container.appendChild(sizeGroup);
+            
+            // Initialize price display
+            updatePriceDisplay(size);
+        }
+        
+        // Function to get the total quantity for an embellishment type (cart + current form)
+        async function getTotalQuantityForEmbellishmentType() {
+            const embType = detectEmbellishmentType();
+            let totalQuantity = 0;
+            
+            // Get quantity from cart if NWCACart is available
+            if (window.NWCACart && typeof window.NWCACart.getCartItems === 'function') {
+                try {
+                    const cartItems = window.NWCACart.getCartItems('Active');
+                    
+                    // Filter items by embellishment type
+                    const itemsOfType = cartItems.filter(item => item.ImprintType === embType);
+                    
+                    // Calculate total quantity from cart
+                    itemsOfType.forEach(item => {
+                        if (item.sizes && Array.isArray(item.sizes)) {
+                            item.sizes.forEach(size => {
+                                totalQuantity += parseInt(size.Quantity) || 0;
+                            });
+                        }
+                    });
+                    
+                    console.log(`[ADD-TO-CART] Cart quantity for ${embType}: ${totalQuantity}`);
+                } catch (error) {
+                    console.error('[ADD-TO-CART] Error getting cart quantity:', error);
+                }
+            }
+            
+            // Add quantity from current form
+            const sizeInputs = document.querySelectorAll('.size-quantity-input');
+            let formQuantity = 0;
+            
+            sizeInputs.forEach(input => {
+                const quantity = parseInt(input.value) || 0;
+                formQuantity += quantity;
+            });
+            
+            console.log(`[ADD-TO-CART] Form quantity for ${embType}: ${formQuantity}`);
+            
+            // Total = cart quantity + form quantity
+            const grandTotal = totalQuantity + formQuantity;
+            console.log(`[ADD-TO-CART] Total quantity for ${embType}: ${grandTotal}`);
+            
+            return grandTotal;
+        }
+        
+        // Function to determine pricing tier based on quantity
+        function getPricingTierForQuantity(quantity) {
+            if (quantity <= 0) {
+                return "N/A";
+            } else if (quantity >= 1 && quantity <= 23) {
+                return "1-23";
+            } else if (quantity >= 24 && quantity <= 47) {
+                return "24-47";
+            } else if (quantity >= 48 && quantity <= 71) {
+                return "48-71";
+            } else if (quantity >= 72) {
+                return "72+";
+            } else {
+                return "Unknown";
+            }
+        }
+        
+        // Function to calculate LTM fee per item
+        function calculateLTMFeePerItem(totalQuantity) {
+            const LTM_FEE = 50.00; // Less Than Minimum fee
+            const LTM_THRESHOLD = 24; // Threshold for LTM fee
+            
+            if (totalQuantity < LTM_THRESHOLD && totalQuantity > 0) {
+                // Calculate the per-item LTM fee
+                const ltmFeePerItem = LTM_FEE / totalQuantity;
+                return ltmFeePerItem;
+            }
+            return 0; // No LTM fee for quantities >= LTM_THRESHOLD
+        }
+        
+        // Function to update price display for a specific size
+        async function updatePriceDisplay(size) {
+            const priceDisplay = document.querySelector(`.size-price-display[data-size="${size}"]`);
+            if (!priceDisplay) return;
+            
+            try {
+                // Get total quantity
+                const totalQuantity = await getTotalQuantityForEmbellishmentType();
+                
+                // Get base price for this size and quantity
+                const basePrice = await getPrice(size, totalQuantity);
+                
+                // Calculate LTM fee if applicable
+                const ltmFeePerItem = calculateLTMFeePerItem(totalQuantity);
+                const finalPrice = basePrice + ltmFeePerItem;
+                
+                // Get pricing tier
+                const pricingTier = getPricingTierForQuantity(totalQuantity);
+                
+                // Format the price display
+                if (ltmFeePerItem > 0) {
+                    priceDisplay.innerHTML = `$${finalPrice.toFixed(2)} <span style="font-size: 0.8em; color: #dc3545;">(${pricingTier} + LTM)</span>`;
+                    priceDisplay.title = `Base price: $${basePrice.toFixed(2)} + LTM fee: $${ltmFeePerItem.toFixed(2)}`;
+                } else {
+                    priceDisplay.innerHTML = `$${finalPrice.toFixed(2)} <span style="font-size: 0.8em; color: #6c757d;">(${pricingTier})</span>`;
+                    priceDisplay.title = `Price tier: ${pricingTier}`;
+                }
+                
+                // Update color based on tier
+                if (pricingTier === "72+") {
+                    priceDisplay.style.color = "#28a745"; // Green for best price
+                } else if (pricingTier === "48-71") {
+                    priceDisplay.style.color = "#17a2b8"; // Teal for good price
+                } else if (pricingTier === "24-47") {
+                    priceDisplay.style.color = "#007bff"; // Blue for better price
+                } else {
+                    priceDisplay.style.color = "#6c757d"; // Gray for base price
+                }
+            } catch (error) {
+                console.error(`[ADD-TO-CART] Error updating price display for ${size}:`, error);
+                priceDisplay.textContent = "Price unavailable";
+                priceDisplay.style.color = "#dc3545"; // Red for error
+            }
+        }
+        
+        // Function to update all price displays
+        async function updateAllPriceDisplays() {
+            const priceDisplays = document.querySelectorAll('.size-price-display');
+            
+            for (const display of priceDisplays) {
+                const size = display.dataset.size;
+                await updatePriceDisplay(size);
+            }
         }
         
         container.appendChild(sizeInputs);
@@ -855,6 +1097,10 @@
                 
                 // Wait for all price promises to resolve
                 productData.sizes = await Promise.all(sizePromises);
+                
+                // Calculate total quantity for this embellishment type
+                const totalQuantity = productData.sizes.reduce((sum, size) => sum + size.quantity, 0);
+                console.log(`[ADD-TO-CART] Total quantity for ${productData.embellishmentType}: ${totalQuantity}`);
                 
                 if (!hasSizes) {
                     throw new Error('Please select at least one size and quantity');
