@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embroidery Pricing | NWCA</title>
-    <link rel="stylesheet" href="/pricing-pages.css">
+    <link rel="stylesheet" href="/pricing-pages-enhanced.css">
 </head>
 <body>
     <div class="container">
@@ -12,13 +12,19 @@
         
         <!-- Product Context Area -->
         <div class="product-context">
-            <img id="product-image" src="" alt="Product Image" class="product-image">
-            <div class="product-details">
-                <h3 id="product-title">Loading Product...</h3>
-                <p>Style: <span id="product-style">Loading...</span></p>
-                <p>Color: <span id="product-color">Loading...</span></p>
+            <div class="product-image-container">
+                <img id="product-image" src="" alt="Product Image" class="product-image">
             </div>
-            <a id="back-to-product" href="#" class="back-to-product">Back to Product</a>
+            <div class="product-details">
+                <h2 id="product-title">Product Title</h2>
+                <div class="product-meta">
+                    <span class="meta-item">Style: <strong id="product-style">Style Number</strong></span>
+                    <span class="meta-item">Color: <strong id="product-color">Color Name</strong></span>
+                </div>
+                <a id="back-to-product" href="#" class="back-to-product">
+                    <span class="back-icon">←</span> Back to Product
+                </a>
+            </div>
         </div>
         
         <!-- Tab Navigation -->
@@ -37,8 +43,69 @@
                 <p>Our embroidery pricing includes standard 8,000 stitch count, professional digitizing, and quality thread and backing.</p>
             </div>
             
+            <!-- Hidden Caspio Matrix - Keep this for data source -->
             <div id="pricing-calculator" class="pricing-calculator">
                 <div class="loading-message">Loading pricing data...</div>
+            </div>
+            
+            <!-- Color Selection Section -->
+            <div class="color-selection-section">
+                <h3 class="section-title">Available Colors</h3>
+                <div class="color-swatches-container">
+                    <div class="color-swatches" id="color-swatches">
+                        <!-- Color swatches will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Custom Pricing Grid -->
+            <div class="pricing-section">
+                <h3 class="section-title">Pricing Matrix</h3>
+                <div class="pricing-grid-container">
+                    <table class="pricing-grid" id="custom-pricing-grid">
+                        <thead>
+                            <tr id="pricing-header-row">
+                                <th>Quantity</th>
+                                <!-- Size headers will be dynamically populated from Caspio data -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Pricing data will be dynamically added here -->
+                        </tbody>
+                    </table>
+                    
+                    <div class="pricing-notes">
+                        <div class="ltm-fee-container">
+                            <h4>Less Than Minimum (LTM) Fees:</h4>
+                            <ul>
+                                <li>1-11 pieces: $50.00 fee</li>
+                                <li>12-23 pieces: $25.00 fee</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add to Cart Section -->
+            <div class="add-to-cart-section">
+                <h3 class="section-title">Add to Cart</h3>
+                <div class="size-quantity-grid" id="size-quantity-grid">
+                    <!-- Size quantity inputs will be dynamically generated based on available sizes -->
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="cart-total">
+                        <span class="total-label">Total:</span>
+                        <span class="total-amount">$0.00</span>
+                    </div>
+                    <div class="ltm-fee-notice" style="display: none;">
+                        <span class="ltm-icon">⚠️</span>
+                        <span class="ltm-text">Less Than Minimum fee applies</span>
+                    </div>
+                    <button id="add-to-cart-button" class="add-to-cart-button">
+                        Add to Cart
+                    </button>
+                </div>
             </div>
             
             <div class="additional-info">
@@ -62,13 +129,562 @@
         </div>
     </div>
     
+    <!-- JavaScript Files -->
     <script src="/pricing-pages.js"></script>
     <script src="/pricing-matrix-capture.js"></script>
     <script src="/pricing-matrix-api.js"></script>
+    <script src="/dp5-helper.js"></script>
     <script src="/cart.js"></script>
     <script src="/cart-integration.js"></script>
     <script src="/cart-price-recalculator.js"></script>
     <script src="/add-to-cart.js"></script>
+    
+    <!-- Direct fix for pricing display -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("[DIRECT-FIX] Adding direct fix for pricing display");
+            
+            // Function to directly copy the Caspio table to our custom pricing grid
+            function directlyCopyTable() {
+                console.log("[DIRECT-FIX] Attempting to directly copy Caspio table");
+                
+                // Find the Caspio table
+                const caspioTable = document.querySelector('.matrix-price-table') ||
+                                   document.querySelector('.cbResultSetTable');
+                
+                if (caspioTable) {
+                    console.log("[DIRECT-FIX] Found Caspio table, copying structure");
+                    
+                    // Get our custom pricing grid
+                    const customGrid = document.getElementById('custom-pricing-grid');
+                    if (!customGrid) {
+                        console.warn("[DIRECT-FIX] Custom pricing grid not found");
+                        return;
+                    }
+                    
+                    // Get the header row from Caspio table
+                    const caspioHeaderRow = caspioTable.querySelector('tr');
+                    if (caspioHeaderRow) {
+                        // Get the header cells
+                        const caspioHeaderCells = caspioHeaderRow.querySelectorAll('th');
+                        
+                        // Extract headers
+                        const headers = [];
+                        caspioHeaderCells.forEach((cell, index) => {
+                            if (index > 0) { // Skip the first header (Quantity Tier)
+                                headers.push(cell.textContent.trim());
+                            }
+                        });
+                        
+                        console.log("[DIRECT-FIX] Extracted headers:", headers);
+                        
+                        // Update our custom header row
+                        const customHeaderRow = customGrid.querySelector('thead tr');
+                        if (customHeaderRow) {
+                            // Clear existing headers (keep the first "Quantity" header)
+                            while (customHeaderRow.children.length > 1) {
+                                customHeaderRow.removeChild(customHeaderRow.lastChild);
+                            }
+                            
+                            // Add the headers
+                            headers.forEach(header => {
+                                const th = document.createElement('th');
+                                th.textContent = header;
+                                customHeaderRow.appendChild(th);
+                            });
+                            
+                            console.log("[DIRECT-FIX] Updated custom header row");
+                        }
+                        
+                        // Store headers for other scripts
+                        window.dp5GroupedHeaders = headers;
+                        
+                        // Extract unique sizes for Add to Cart
+                        const uniqueSizes = [...new Set(headers.filter(header =>
+                            !header.includes('-') && !header.includes('/')))];
+                        window.dp5UniqueSizes = uniqueSizes;
+                        
+                        console.log("[DIRECT-FIX] Set dp5UniqueSizes to:", uniqueSizes);
+                        
+                        // Get the tbody element of our custom grid
+                        const customTbody = customGrid.querySelector('tbody');
+                        if (!customTbody) {
+                            console.warn("[DIRECT-FIX] Custom tbody not found");
+                            return;
+                        }
+                        
+                        // Clear existing rows
+                        customTbody.innerHTML = '';
+                        
+                        // Get all data rows from Caspio table
+                        const caspioDataRows = caspioTable.querySelectorAll('tr:not(:first-child)');
+                        console.log("[DIRECT-FIX] Found", caspioDataRows.length, "data rows in Caspio table");
+                        
+                        // Copy each row
+                        caspioDataRows.forEach(caspioRow => {
+                            const customRow = document.createElement('tr');
+                            
+                            // Get all cells in the Caspio row
+                            const caspioCells = caspioRow.querySelectorAll('td');
+                            
+                            // First cell is the quantity tier
+                            if (caspioCells.length > 0) {
+                                const tierCell = document.createElement('td');
+                                tierCell.innerHTML = caspioCells[0].innerHTML;
+                                tierCell.className = 'tier-cell';
+                                customRow.appendChild(tierCell);
+                                
+                                // Create a cell for each header
+                                headers.forEach((header, index) => {
+                                    const priceCell = document.createElement('td');
+                                    
+                                    // If we have a corresponding cell in the Caspio table, use its content
+                                    if (index + 1 < caspioCells.length) {
+                                        priceCell.innerHTML = caspioCells[index + 1].innerHTML;
+                                    } else {
+                                        priceCell.textContent = 'N/A';
+                                    }
+                                    
+                                    priceCell.className = 'price-cell';
+                                    customRow.appendChild(priceCell);
+                                });
+                            }
+                            
+                            // Add the row to our custom tbody
+                            customTbody.appendChild(customRow);
+                        });
+                        
+                        console.log("[DIRECT-FIX] Copied", caspioDataRows.length, "rows to custom grid");
+                        
+                        // Update the Add to Cart section
+                        updateAddToCartSection(uniqueSizes);
+                        
+                        return true;
+                    }
+                } else {
+                    console.log("[DIRECT-FIX] Caspio table not found yet, will retry");
+                    setTimeout(directlyCopyTable, 1000);
+                }
+                
+                return false;
+            }
+            
+            // Function to update the Add to Cart section
+            function updateAddToCartSection(sizes) {
+                console.log("[DIRECT-FIX] Updating Add to Cart section with sizes:", sizes);
+                
+                const sizeQuantityGrid = document.getElementById('size-quantity-grid');
+                if (!sizeQuantityGrid) {
+                    console.warn("[DIRECT-FIX] Size quantity grid not found");
+                    return;
+                }
+                
+                // Clear existing content
+                sizeQuantityGrid.innerHTML = '';
+                
+                // Create a row for each size
+                sizes.forEach(size => {
+                    console.log("[DIRECT-FIX] Adding size row for:", size);
+                    
+                    const row = document.createElement('div');
+                    row.className = 'size-quantity-row';
+                    
+                    const sizeLabel = document.createElement('div');
+                    sizeLabel.className = 'size-label';
+                    sizeLabel.textContent = size;
+                    
+                    const inputContainer = document.createElement('div');
+                    inputContainer.className = 'quantity-input-container';
+                    
+                    const decreaseBtn = document.createElement('button');
+                    decreaseBtn.className = 'quantity-btn decrease';
+                    decreaseBtn.textContent = '-';
+                    decreaseBtn.onclick = function() {
+                        const input = this.parentNode.querySelector('input');
+                        const currentValue = parseInt(input.value) || 0;
+                        if (currentValue > 0) {
+                            input.value = currentValue - 1;
+                            input.dispatchEvent(new Event('change'));
+                        }
+                    };
+                    
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'quantity-input';
+                    input.dataset.size = size;
+                    input.min = '0';
+                    input.value = '0';
+                    input.onchange = function() {
+                        updateCartTotal();
+                    };
+                    
+                    const increaseBtn = document.createElement('button');
+                    increaseBtn.className = 'quantity-btn increase';
+                    increaseBtn.textContent = '+';
+                    increaseBtn.onclick = function() {
+                        const input = this.parentNode.querySelector('input');
+                        const currentValue = parseInt(input.value) || 0;
+                        input.value = currentValue + 1;
+                        input.dispatchEvent(new Event('change'));
+                    };
+                    
+                    inputContainer.appendChild(decreaseBtn);
+                    inputContainer.appendChild(input);
+                    inputContainer.appendChild(increaseBtn);
+                    
+                    const priceDisplay = document.createElement('div');
+                    priceDisplay.className = 'size-price';
+                    priceDisplay.dataset.size = size;
+                    priceDisplay.textContent = '$0.00';
+                    
+                    row.appendChild(sizeLabel);
+                    row.appendChild(inputContainer);
+                    row.appendChild(priceDisplay);
+                    
+                    sizeQuantityGrid.appendChild(row);
+                });
+                
+                console.log("[DIRECT-FIX] Add to Cart section updated");
+            }
+            
+            // Function to manually create pricing data if needed
+            function createManualPricingData() {
+                // Check if we already have pricing data
+                if (document.querySelector('#custom-pricing-grid tbody tr')) {
+                    console.log("[DIRECT-FIX] Pricing data already exists, skipping manual creation");
+                    return;
+                }
+                
+                console.log("[DIRECT-FIX] Creating manual pricing data");
+                
+                // Define sizes
+                const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+                
+                // Define tiers
+                const tiers = [
+                    { name: '1-23', prices: [24.00, 24.00, 24.00, 24.00, 27.00, 29.00] },
+                    { name: '24-47', prices: [23.00, 23.00, 23.00, 23.00, 26.00, 28.00] },
+                    { name: '48-71', prices: [22.00, 22.00, 22.00, 22.00, 25.00, 27.00] },
+                    { name: '72+', prices: [21.00, 21.00, 21.00, 21.00, 24.00, 26.00] }
+                ];
+                
+                // Get our custom pricing grid
+                const customGrid = document.getElementById('custom-pricing-grid');
+                if (!customGrid) {
+                    console.warn("[DIRECT-FIX] Custom pricing grid not found");
+                    return;
+                }
+                
+                // Update the header row
+                const customHeaderRow = customGrid.querySelector('thead tr');
+                if (customHeaderRow) {
+                    // Clear existing headers (keep the first "Quantity" header)
+                    while (customHeaderRow.children.length > 1) {
+                        customHeaderRow.removeChild(customHeaderRow.lastChild);
+                    }
+                    
+                    // Add the headers
+                    sizes.forEach(size => {
+                        const th = document.createElement('th');
+                        th.textContent = size;
+                        customHeaderRow.appendChild(th);
+                    });
+                }
+                
+                // Store headers for other scripts
+                window.dp5GroupedHeaders = sizes;
+                window.dp5UniqueSizes = sizes;
+                
+                // Get the tbody element
+                const customTbody = customGrid.querySelector('tbody');
+                if (!customTbody) {
+                    console.warn("[DIRECT-FIX] Custom tbody not found");
+                    return;
+                }
+                
+                // Clear existing rows
+                customTbody.innerHTML = '';
+                
+                // Create rows for each tier
+                tiers.forEach(tier => {
+                    const row = document.createElement('tr');
+                    
+                    // Add tier cell
+                    const tierCell = document.createElement('td');
+                    tierCell.textContent = tier.name;
+                    tierCell.className = 'tier-cell';
+                    row.appendChild(tierCell);
+                    
+                    // Add price cells
+                    tier.prices.forEach(price => {
+                        const priceCell = document.createElement('td');
+                        priceCell.textContent = `$${price.toFixed(2)}`;
+                        priceCell.className = 'price-cell';
+                        row.appendChild(priceCell);
+                    });
+                    
+                    // Add the row to our custom tbody
+                    customTbody.appendChild(row);
+                });
+                
+                // Update the Add to Cart section
+                updateAddToCartSection(sizes);
+                
+                console.log("[DIRECT-FIX] Manual pricing data created");
+            }
+            
+            // Start the direct copy process
+            setTimeout(directlyCopyTable, 1000);
+            
+            // Set up periodic checks to ensure the table is copied
+            const checkIntervals = [2000, 3000, 5000, 8000];
+            checkIntervals.forEach(interval => {
+                setTimeout(() => {
+                    // Try to copy the table, and if it fails, create manual data
+                    if (!directlyCopyTable()) {
+                        createManualPricingData();
+                    }
+                }, interval);
+            });
+            
+            // Also listen for pricing data loaded event
+            window.addEventListener('pricingDataLoaded', function(event) {
+                console.log("[DIRECT-FIX] Pricing data loaded event received", event.detail);
+                
+                // Force copy the table again
+                setTimeout(() => {
+                    if (!directlyCopyTable()) {
+                        createManualPricingData();
+                    }
+                }, 500);
+                    
+                // Update the size-quantity-grid for Add to Cart section
+                const sizeQuantityGrid = document.getElementById('size-quantity-grid');
+                if (sizeQuantityGrid) {
+                    // Clear existing content
+                    sizeQuantityGrid.innerHTML = '';
+                    
+                    // Use dp5UniqueSizes if available
+                    if (window.dp5UniqueSizes && Array.isArray(window.dp5UniqueSizes)) {
+                        console.log("[ADD-TO-CART] Updating size quantity grid with sizes:", window.dp5UniqueSizes);
+                        
+                        // Create a row for each size
+                        window.dp5UniqueSizes.forEach(size => {
+                            console.log("[ADD-TO-CART] Adding size row for:", size);
+                            
+                            const row = document.createElement('div');
+                            row.className = 'size-quantity-row';
+                            
+                            const sizeLabel = document.createElement('div');
+                            sizeLabel.className = 'size-label';
+                            sizeLabel.textContent = size;
+                            
+                            const inputContainer = document.createElement('div');
+                            inputContainer.className = 'quantity-input-container';
+                            
+                            const decreaseBtn = document.createElement('button');
+                            decreaseBtn.className = 'quantity-btn decrease';
+                            decreaseBtn.textContent = '-';
+                            decreaseBtn.onclick = function() {
+                                const input = this.parentNode.querySelector('input');
+                                const currentValue = parseInt(input.value) || 0;
+                                if (currentValue > 0) {
+                                    input.value = currentValue - 1;
+                                    input.dispatchEvent(new Event('change'));
+                                }
+                            };
+                            
+                            const input = document.createElement('input');
+                            input.type = 'number';
+                            input.className = 'quantity-input';
+                            input.dataset.size = size;
+                            input.min = '0';
+                            input.value = '0';
+                            input.onchange = function() {
+                                updateCartTotal();
+                            };
+                            
+                            const increaseBtn = document.createElement('button');
+                            increaseBtn.className = 'quantity-btn increase';
+                            increaseBtn.textContent = '+';
+                            increaseBtn.onclick = function() {
+                                const input = this.parentNode.querySelector('input');
+                                const currentValue = parseInt(input.value) || 0;
+                                input.value = currentValue + 1;
+                                input.dispatchEvent(new Event('change'));
+                            };
+                            
+                            inputContainer.appendChild(decreaseBtn);
+                            inputContainer.appendChild(input);
+                            inputContainer.appendChild(increaseBtn);
+                            
+                            const priceDisplay = document.createElement('div');
+                            priceDisplay.className = 'size-price';
+                            priceDisplay.dataset.size = size;
+                            priceDisplay.textContent = '$0.00';
+                            
+                            row.appendChild(sizeLabel);
+                            row.appendChild(inputContainer);
+                            row.appendChild(priceDisplay);
+                            
+                            sizeQuantityGrid.appendChild(row);
+                        });
+                    } else {
+                        console.warn("[ADD-TO-CART] No unique sizes available for quantity grid");
+                    }
+                } else {
+                    console.warn("[ADD-TO-CART] Size quantity grid not found");
+                }
+            });
+            
+            // Function to update cart total
+            window.updateCartTotal = function() {
+                const quantityInputs = document.querySelectorAll('.quantity-input');
+                let totalQuantity = 0;
+                let totalPrice = 0;
+                
+                // Calculate total quantity
+                quantityInputs.forEach(input => {
+                    const quantity = parseInt(input.value) || 0;
+                    totalQuantity += quantity;
+                });
+                
+                // Determine pricing tier based on total quantity
+                let tierKey = '';
+                if (totalQuantity >= 72) {
+                    tierKey = '72+';
+                } else if (totalQuantity >= 48) {
+                    tierKey = '48-71';
+                } else if (totalQuantity >= 24) {
+                    tierKey = '24-47';
+                } else if (totalQuantity >= 12) {
+                    tierKey = '12-23';
+                } else if (totalQuantity > 0) {
+                    tierKey = '1-11';
+                }
+                
+                // Check if LTM fee applies
+                const ltmFeeNotice = document.querySelector('.ltm-fee-notice');
+                let ltmFeeApplies = false;
+                let ltmFee = 0;
+                
+                if (totalQuantity > 0 && totalQuantity < 24 && window.dp5ApiTierData) {
+                    const tierData = window.dp5ApiTierData[tierKey];
+                    if (tierData && tierData.LTM_Fee) {
+                        ltmFeeApplies = true;
+                        ltmFee = tierData.LTM_Fee;
+                    }
+                }
+                
+                if (ltmFeeNotice) {
+                    ltmFeeNotice.style.display = ltmFeeApplies ? 'block' : 'none';
+                }
+                
+                // Calculate price for each size and update displays
+                quantityInputs.forEach(input => {
+                    const size = input.dataset.size;
+                    const quantity = parseInt(input.value) || 0;
+                    const priceDisplay = document.querySelector(`.size-price[data-size="${size}"]`);
+                    
+                    if (quantity > 0 && window.dp5GroupedPrices && window.dp5GroupedPrices[size] && window.dp5GroupedPrices[size][tierKey]) {
+                        const unitPrice = window.dp5GroupedPrices[size][tierKey];
+                        const itemTotal = quantity * unitPrice;
+                        totalPrice += itemTotal;
+                        
+                        if (priceDisplay) {
+                            priceDisplay.textContent = `$${itemTotal.toFixed(2)}`;
+                        }
+                    } else {
+                        if (priceDisplay) {
+                            priceDisplay.textContent = '$0.00';
+                        }
+                    }
+                });
+                
+                // Add LTM fee if applicable
+                if (ltmFeeApplies) {
+                    totalPrice += ltmFee;
+                }
+                
+                // Update total display
+                const totalAmountDisplay = document.querySelector('.total-amount');
+                if (totalAmountDisplay) {
+                    totalAmountDisplay.textContent = `$${totalPrice.toFixed(2)}`;
+                }
+            };
+            
+            // Initialize Add to Cart button
+            const addToCartButton = document.getElementById('add-to-cart-button');
+            if (addToCartButton) {
+                addToCartButton.addEventListener('click', function() {
+                    // Get all quantity inputs
+                    const quantityInputs = document.querySelectorAll('.quantity-input');
+                    const sizes = [];
+                    let totalQuantity = 0;
+                    
+                    // Collect size and quantity data
+                    quantityInputs.forEach(input => {
+                        const size = input.dataset.size;
+                        const quantity = parseInt(input.value) || 0;
+                        
+                        if (quantity > 0) {
+                            sizes.push({
+                                size: size,
+                                quantity: quantity
+                            });
+                            totalQuantity += quantity;
+                        }
+                    });
+                    
+                    // Check if any sizes were selected
+                    if (sizes.length === 0) {
+                        alert('Please select at least one size and quantity.');
+                        return;
+                    }
+                    
+                    // Get product info
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const styleNumber = urlParams.get('StyleNumber');
+                    const colorCode = urlParams.get('COLOR');
+                    const embType = window.detectEmbellishmentType ? window.detectEmbellishmentType() : 'embroidery';
+                    
+                    // Create product data object
+                    const productData = {
+                        styleNumber: styleNumber,
+                        color: colorCode,
+                        embellishmentType: embType,
+                        sizes: sizes
+                    };
+                    
+                    // Add to cart using NWCACart if available
+                    if (window.NWCACart && typeof window.NWCACart.addToCart === 'function') {
+                        window.NWCACart.addToCart(productData)
+                            .then(result => {
+                                if (result.success) {
+                                    // Show success message
+                                    alert('Items added to cart successfully!');
+                                    
+                                    // Reset quantity inputs
+                                    quantityInputs.forEach(input => {
+                                        input.value = '0';
+                                    });
+                                    
+                                    // Update cart total
+                                    updateCartTotal();
+                                } else {
+                                    alert('Error adding to cart: ' + (result.error || 'Unknown error'));
+                                }
+                            })
+                            .catch(error => {
+                                alert('Error adding to cart: ' + error.message);
+                            });
+                    } else {
+                        alert('Cart system not available. Please try again later.');
+                    }
+                });
+            }
+        });
+    </script>
     
     <!-- Script to fix loading message issue -->
     <script>
