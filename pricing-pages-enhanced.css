@@ -1,4 +1,5 @@
 /* Enhanced Pricing Pages CSS for Embroidery Pricing Redesign */
+/* Variables from main.css */
 :root {
     --primary-color: #2f661e;     /* Main green */
     --primary-dark: #1e4d0f;      /* Darker green for hover */
@@ -73,7 +74,7 @@ h1 {
     flex: 1;
 }
 
-.product-details h3 {
+.product-details h2, .product-details h3 {
     margin: 0 0 var(--spacing-sm) 0;
     color: var(--primary-color);
     font-size: 1.4em;
@@ -219,7 +220,7 @@ h1 {
     border: 1px solid var(--primary-light);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    table-layout: fixed; /* Force fixed table layout */
+    table-layout: fixed; /* Force fixed table layout for better control */
 }
 
 .pricing-grid th {
@@ -238,7 +239,7 @@ h1 {
     padding: 12px;
     text-align: center;
     border-bottom: 1px solid var(--primary-light);
-    width: auto; /* Let each column have equal width */
+    width: auto; /* Let each column have appropriate width */
 }
 
 .pricing-grid td:first-child {
@@ -363,6 +364,10 @@ h1 {
         text-align: center;
     }
     
+    .product-image-container {
+        margin: 0 auto var(--spacing-sm);
+    }
+    
     .product-image {
         margin-bottom: var(--spacing-sm);
     }
@@ -382,6 +387,30 @@ h1 {
     
     .color-swatches {
         justify-content: center;
+    }
+    
+    .back-to-product {
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        max-width: 200px;
+    }
+    
+    .pricing-tabs {
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+    
+    .color-swatch {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .color-name {
+        font-size: 0.7em;
+        bottom: -22px;
     }
 }
 
@@ -412,6 +441,32 @@ h1 {
     .color-swatch {
         width: 45px;
         height: 45px;
+    }
+    
+    .color-name {
+        width: 70px;
+        font-size: 0.65em;
+    }
+    
+    .container {
+        padding: var(--spacing-sm);
+    }
+    
+    .product-context {
+        padding: var(--spacing-sm);
+    }
+    
+    .product-details h2, .product-details h3 {
+        font-size: 1.2em;
+    }
+    
+    .meta-item {
+        font-size: 0.8em;
+    }
+    
+    .back-to-product {
+        font-size: 0.8em;
+        padding: 5px 10px;
     }
 }
 
@@ -499,6 +554,7 @@ h1 {
     box-shadow: var(--shadow-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-md);
+    border-left: 4px solid var(--primary-color);
 }
 
 .size-quantity-grid {
@@ -514,6 +570,13 @@ h1 {
     padding: 10px;
     background-color: var(--primary-light);
     border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+}
+
+.size-quantity-row:hover {
+    background-color: var(--secondary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
 }
 
 .size-label {
@@ -566,6 +629,11 @@ h1 {
     font-size: 1em;
 }
 
+.quantity-input:focus {
+    outline: none;
+    background-color: var(--primary-light);
+}
+
 .size-price {
     flex: 1;
     text-align: right;
@@ -578,6 +646,7 @@ h1 {
     padding: var(--spacing-md);
     border-radius: var(--radius-sm);
     margin-top: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
 }
 
 .cart-total {
@@ -588,6 +657,14 @@ h1 {
     margin-bottom: var(--spacing-sm);
 }
 
+.total-label {
+    color: var(--primary-dark);
+}
+
+.total-amount {
+    color: var(--primary-color);
+}
+
 .ltm-fee-notice {
     background-color: #fff3cd;
     color: #856404;
@@ -596,6 +673,7 @@ h1 {
     margin-bottom: var(--spacing-md);
     display: flex;
     align-items: center;
+    border-left: 3px solid #ffc107;
 }
 
 .ltm-icon {
@@ -621,8 +699,60 @@ h1 {
     box-shadow: var(--shadow-md);
 }
 
+.add-to-cart-button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
 @media (max-width: 768px) {
     .size-quantity-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .add-to-cart-section {
+        padding: var(--spacing-sm);
+    }
+    
+    .cart-summary {
+        padding: var(--spacing-sm);
+    }
+    
+    .add-to-cart-button {
+        padding: 10px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .size-quantity-row {
+        padding: 8px;
+    }
+    
+    .quantity-btn {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .quantity-input {
+        width: 40px;
+        height: 25px;
+        font-size: 0.9em;
+    }
+    
+    .size-label {
+        width: 30px;
+        font-size: 0.9em;
+    }
+    
+    .size-price {
+        font-size: 0.9em;
+    }
+    
+    .cart-total {
+        font-size: 1.1em;
+    }
+    
+    .add-to-cart-button {
+        font-size: 1em;
+        padding: 8px 16px;
     }
 }
