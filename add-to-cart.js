@@ -6,84 +6,104 @@
 
     // Function to initialize the Add to Cart section
     function initAddToCart() {
+        // Mark that add-to-cart has initialized
+        window.addToCartInitialized = true;
+        
         // Get the container for size quantity inputs
         const sizeQuantityGrid = document.querySelector('.size-quantity-grid');
         if (!sizeQuantityGrid) return;
         
-        // Clear existing content
-        sizeQuantityGrid.innerHTML = '';
-        
-        // Get available sizes from pricing data
-        const sizes = window.dp5UniqueSizes || [];
-        if (!sizes.length) return;
-        
-        // Create input rows for each size
-        sizes.forEach(size => {
-            const row = document.createElement('div');
-            row.className = 'size-quantity-row';
+        // Check if DIRECT-FIX has already populated the grid
+        if (window.directFixApplied) {
+            console.log("[ADD-TO-CART] Size quantity grid already populated by DIRECT-FIX, skipping creation");
             
-            // Size label
-            const sizeLabel = document.createElement('div');
-            sizeLabel.className = 'size-label';
-            sizeLabel.textContent = size;
+            // Just attach event listeners to existing inputs
+            const existingInputs = sizeQuantityGrid.querySelectorAll('.quantity-input');
+            existingInputs.forEach(input => {
+                input.removeEventListener('change', window.updateCartTotal); // Remove any existing listeners
+                input.addEventListener('change', updateCartTotal); // Add our listener
+            });
+        } else {
+            console.log("[ADD-TO-CART] Initializing size quantity grid");
             
-            // Quantity input with +/- buttons
-            const inputContainer = document.createElement('div');
-            inputContainer.className = 'quantity-input-container';
+            // Clear existing content
+            sizeQuantityGrid.innerHTML = '';
             
-            const decreaseBtn = document.createElement('button');
-            decreaseBtn.className = 'quantity-btn decrease';
-            decreaseBtn.textContent = '-';
-            decreaseBtn.addEventListener('click', () => {
-                const input = inputContainer.querySelector('input');
-                const currentValue = parseInt(input.value) || 0;
-                if (currentValue > 0) {
-                    input.value = currentValue - 1;
+            // Get available sizes from pricing data
+            const sizes = window.dp5UniqueSizes || [];
+            if (!sizes.length) return;
+            
+            // Create input rows for each size
+            sizes.forEach(size => {
+                const row = document.createElement('div');
+                row.className = 'size-quantity-row';
+                
+                // Size label
+                const sizeLabel = document.createElement('div');
+                sizeLabel.className = 'size-label';
+                sizeLabel.textContent = size;
+                
+                // Quantity input with +/- buttons
+                const inputContainer = document.createElement('div');
+                inputContainer.className = 'quantity-input-container';
+                
+                const decreaseBtn = document.createElement('button');
+                decreaseBtn.className = 'quantity-btn decrease';
+                decreaseBtn.textContent = '-';
+                decreaseBtn.addEventListener('click', () => {
+                    const input = inputContainer.querySelector('input');
+                    const currentValue = parseInt(input.value) || 0;
+                    if (currentValue > 0) {
+                        input.value = currentValue - 1;
+                        input.dispatchEvent(new Event('change'));
+                    }
+                });
+                
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'quantity-input';
+                input.dataset.size = size;
+                input.min = '0';
+                input.value = '0';
+                input.addEventListener('change', updateCartTotal);
+                
+                const increaseBtn = document.createElement('button');
+                increaseBtn.className = 'quantity-btn increase';
+                increaseBtn.textContent = '+';
+                increaseBtn.addEventListener('click', () => {
+                    const input = inputContainer.querySelector('input');
+                    const currentValue = parseInt(input.value) || 0;
+                    input.value = currentValue + 1;
                     input.dispatchEvent(new Event('change'));
-                }
+                });
+                
+                inputContainer.appendChild(decreaseBtn);
+                inputContainer.appendChild(input);
+                inputContainer.appendChild(increaseBtn);
+                
+                // Price display for this size
+                const priceDisplay = document.createElement('div');
+                priceDisplay.className = 'size-price';
+                priceDisplay.dataset.size = size;
+                priceDisplay.textContent = '$0.00';
+                
+                // Add elements to row
+                row.appendChild(sizeLabel);
+                row.appendChild(inputContainer);
+                row.appendChild(priceDisplay);
+                
+                // Add row to grid
+                sizeQuantityGrid.appendChild(row);
             });
-            
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.className = 'quantity-input';
-            input.dataset.size = size;
-            input.min = '0';
-            input.value = '0';
-            input.addEventListener('change', updateCartTotal);
-            
-            const increaseBtn = document.createElement('button');
-            increaseBtn.className = 'quantity-btn increase';
-            increaseBtn.textContent = '+';
-            increaseBtn.addEventListener('click', () => {
-                const input = inputContainer.querySelector('input');
-                const currentValue = parseInt(input.value) || 0;
-                input.value = currentValue + 1;
-                input.dispatchEvent(new Event('change'));
-            });
-            
-            inputContainer.appendChild(decreaseBtn);
-            inputContainer.appendChild(input);
-            inputContainer.appendChild(increaseBtn);
-            
-            // Price display for this size
-            const priceDisplay = document.createElement('div');
-            priceDisplay.className = 'size-price';
-            priceDisplay.dataset.size = size;
-            priceDisplay.textContent = '$0.00';
-            
-            // Add elements to row
-            row.appendChild(sizeLabel);
-            row.appendChild(inputContainer);
-            row.appendChild(priceDisplay);
-            
-            // Add row to grid
-            sizeQuantityGrid.appendChild(row);
-        });
+        }
         
         // Initialize Add to Cart button
         const addToCartButton = document.getElementById('add-to-cart-button');
         if (addToCartButton) {
-            addToCartButton.addEventListener('click', handleAddToCart);
+            // Remove any existing click listeners
+            const newButton = addToCartButton.cloneNode(true);
+            addToCartButton.parentNode.replaceChild(newButton, addToCartButton);
+            newButton.addEventListener('click', handleAddToCart);
         }
         
         // Initial update of cart total
@@ -92,6 +112,11 @@
 
     // Function to update cart total when quantities change
     function updateCartTotal() {
+        console.log("[ADD-TO-CART] Updating cart total");
+        
+        // Make this function available globally
+        window.updateCartTotal = updateCartTotal;
+        
         // Get all quantity inputs
         const quantityInputs = document.querySelectorAll('.quantity-input');
         let totalQuantity = 0;
@@ -102,6 +127,8 @@
             const quantity = parseInt(input.value) || 0;
             totalQuantity += quantity;
         });
+        
+        console.log("[ADD-TO-CART] Total quantity:", totalQuantity);
         
         // Determine pricing tier based on total quantity
         let tierKey = '';
@@ -117,6 +144,8 @@
             tierKey = '1-11';
         }
         
+        console.log("[ADD-TO-CART] Using tier key:", tierKey);
+        
         // Check if LTM fee applies
         const ltmFeeNotice = document.querySelector('.ltm-fee-notice');
         let ltmFeeApplies = false;
@@ -127,6 +156,7 @@
             if (tierData && tierData.LTM_Fee) {
                 ltmFeeApplies = true;
                 ltmFee = tierData.LTM_Fee;
+                console.log("[ADD-TO-CART] LTM fee applies:", ltmFee);
             }
         }
         
@@ -145,6 +175,8 @@
                 const itemTotal = quantity * unitPrice;
                 totalPrice += itemTotal;
                 
+                console.log(`[ADD-TO-CART] Size ${size}: ${quantity} x $${unitPrice} = $${itemTotal.toFixed(2)}`);
+                
                 if (priceDisplay) {
                     priceDisplay.textContent = `$${itemTotal.toFixed(2)}`;
                 }
@@ -158,12 +190,14 @@
         // Add LTM fee if applicable
         if (ltmFeeApplies) {
             totalPrice += ltmFee;
+            console.log("[ADD-TO-CART] Added LTM fee:", ltmFee);
         }
         
         // Update total display
         const totalAmountDisplay = document.querySelector('.total-amount');
         if (totalAmountDisplay) {
             totalAmountDisplay.textContent = `$${totalPrice.toFixed(2)}`;
+            console.log("[ADD-TO-CART] Updated total amount:", totalPrice.toFixed(2));
         }
     }
 
@@ -291,12 +325,19 @@
         // Listen for pricing data loaded event
         window.addEventListener('pricingDataLoaded', function(event) {
             console.log("[ADD-TO-CART] Pricing data loaded event received, updating Add to Cart section");
-            initAddToCart();
+            
+            // Wait a short time to ensure other scripts have processed the event
+            setTimeout(() => {
+                initAddToCart();
+            }, 100);
         });
         
         // Apply mobile adjustments
         handleMobileAdjustments();
         window.addEventListener('resize', handleMobileAdjustments);
+        
+        // Make updateCartTotal available globally
+        window.updateCartTotal = updateCartTotal;
     }
     
     // Function to handle mobile-specific adjustments

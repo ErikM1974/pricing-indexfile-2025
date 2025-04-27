@@ -17,6 +17,9 @@
         if (initialized) return;
         console.log("[DP5-HELPER] Initializing DP5 Helper");
         
+        // Define API base URL if not already defined
+        window.API_PROXY_BASE_URL = window.API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        
         // Listen for pricing data loaded event
         window.addEventListener('pricingDataLoaded', function(event) {
             console.log("[DP5-HELPER] Pricing data loaded event received", event.detail);
@@ -24,8 +27,13 @@
             // Force extract headers from Caspio table
             extractHeadersFromCaspioTable();
             
-            // Update the custom pricing grid
-            updateCustomPricingGrid();
+            // Update the custom pricing grid only if not already updated by DIRECT-FIX
+            if (!window.directFixApplied) {
+                console.log("[DP5-HELPER] Updating custom pricing grid after pricing data loaded");
+                updateCustomPricingGrid();
+            } else {
+                console.log("[DP5-HELPER] Skipping custom pricing grid update as DIRECT-FIX already applied it");
+            }
             
             // Load inventory data if we have color information
             if (event.detail && event.detail.color) {
@@ -37,14 +45,19 @@
         const observer = new MutationObserver(function(mutations) {
             const pricingCalculator = document.getElementById('pricing-calculator');
             if (pricingCalculator && (pricingCalculator.querySelector('.matrix-price-table') ||
-                                     pricingCalculator.querySelector('.cbResultSetTable'))) {
+                                      pricingCalculator.querySelector('.cbResultSetTable'))) {
                 console.log("[DP5-HELPER] Caspio pricing table detected");
                 
                 // Force extract headers from Caspio table
                 extractHeadersFromCaspioTable();
                 
-                // Update the custom pricing grid
-                updateCustomPricingGrid();
+                // Update the custom pricing grid only if not already updated by DIRECT-FIX
+                if (!window.directFixApplied) {
+                    console.log("[DP5-HELPER] Updating custom pricing grid after Caspio table detected");
+                    updateCustomPricingGrid();
+                } else {
+                    console.log("[DP5-HELPER] Skipping custom pricing grid update as DIRECT-FIX already applied it");
+                }
                 
                 observer.disconnect();
             }
@@ -61,18 +74,26 @@
             // Force extract headers from Caspio table
             extractHeadersFromCaspioTable();
             
-            if (window.dp5GroupedHeaders && window.dp5GroupedPrices) {
+            if (window.dp5GroupedHeaders && window.dp5GroupedPrices && !window.directFixApplied) {
                 console.log("[DP5-HELPER] Pricing data found after delay");
                 updateCustomPricingGrid();
             }
         }, 3000);
         
-        // Set up periodic checks to ensure headers are extracted
+        // Set up periodic checks to ensure headers are extracted, but limit grid updates
         const checkIntervals = [1000, 2000, 5000, 8000];
+        let gridUpdated = false;
+        
         checkIntervals.forEach(interval => {
             setTimeout(() => {
                 extractHeadersFromCaspioTable();
-                updateCustomPricingGrid();
+                
+                // Only update grid if not already updated and DIRECT-FIX hasn't done it
+                if (!gridUpdated && !window.directFixApplied && window.dp5GroupedHeaders) {
+                    console.log(`[DP5-HELPER] Updating grid at ${interval}ms interval`);
+                    updateCustomPricingGrid();
+                    gridUpdated = true;
+                }
             }, interval);
         });
         
@@ -376,6 +397,12 @@
     
     // Function to update the Add to Cart section with the unique sizes
     function updateAddToCartSection(sizes) {
+        // Skip if DIRECT-FIX or ADD-TO-CART has already updated this section
+        if (window.directFixApplied || window.addToCartInitialized) {
+            console.log("[DP5-HELPER] Skipping Add to Cart section update as it's already been handled");
+            return;
+        }
+        
         console.log("[DP5-HELPER] Updating Add to Cart section with sizes:", sizes);
         
         const sizeQuantityGrid = document.getElementById('size-quantity-grid');
@@ -456,6 +483,11 @@
     
     // Function to add inventory indicator
     function addInventoryIndicator(priceCell, sizeGroup, inventoryData) {
+        // Check if the cell already has an indicator
+        if (priceCell.querySelector('.inventory-indicator')) {
+            return; // Skip if already has an indicator to prevent duplicates
+        }
+        
         // Map size group to individual sizes
         let sizesToCheck = [];
         if (sizeGroup === 'S-XL') {
@@ -464,6 +496,9 @@
             sizesToCheck = ['2XL'];
         } else if (sizeGroup === '3XL') {
             sizesToCheck = ['3XL'];
+        } else {
+            // For individual sizes or other groups
+            sizesToCheck = [sizeGroup];
         }
         
         // Check inventory for these sizes
@@ -576,72 +611,85 @@
         // Show loading message
         swatchesContainer.innerHTML = '<div class="loading-swatches">Loading color options...</div>';
         
-        // Fetch available colors for this style
-        fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/colors?styleNumber=${encodeURIComponent(styleNumber)}`)
-            .then(response => response.json())
+        // Define fallback colors in case the API fails
+        const fallbackColors = [
+            { COLOR_NAME: 'Black', CATALOG_COLOR: 'Black', HEX_CODE: '#000000' },
+            { COLOR_NAME: 'White', CATALOG_COLOR: 'White', HEX_CODE: '#FFFFFF' },
+            { COLOR_NAME: 'Navy', CATALOG_COLOR: 'Navy', HEX_CODE: '#000080' },
+            { COLOR_NAME: 'Red', CATALOG_COLOR: 'Red', HEX_CODE: '#FF0000' },
+            { COLOR_NAME: 'Royal Blue', CATALOG_COLOR: 'Royal', HEX_CODE: '#4169E1' },
+            { COLOR_NAME: 'Carolina Blue', CATALOG_COLOR: 'Carolina Blue', HEX_CODE: '#99BADD' },
+            { COLOR_NAME: 'Forest Green', CATALOG_COLOR: 'Forest', HEX_CODE: '#228B22' },
+            { COLOR_NAME: 'Purple', CATALOG_COLOR: 'Purple', HEX_CODE: '#800080' }
+        ];
+        
+        // Try to fetch from API first, but use fallback if it fails
+        fetch(`${API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com'}/api/colors?styleNumber=${encodeURIComponent(styleNumber)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+                return response.json();
+            })
             .then(colors => {
                 // Clear loading message
                 swatchesContainer.innerHTML = '';
                 
                 if (Array.isArray(colors) && colors.length > 0) {
-                    console.log("[DP5-HELPER] Found colors:", colors.length);
-                    
-                    // Get the current color from URL
-                    const currentColor = urlParams.get('COLOR');
-                    
-                    // Add color swatches
-                    colors.forEach(color => {
-                        // Create swatch element
-                        const swatch = document.createElement('div');
-                        swatch.className = 'color-swatch';
-                        swatch.style.backgroundColor = color.HEX_CODE || '#cccccc';
-                        swatch.dataset.colorName = color.COLOR_NAME;
-                        swatch.dataset.catalogColor = color.CATALOG_COLOR;
-                        
-                        // Add active class if this is the current color
-                        if (currentColor && (color.COLOR_NAME === currentColor || color.CATALOG_COLOR === currentColor)) {
-                            swatch.classList.add('active');
-                        }
-                        
-                        // Add color name
-                        const colorName = document.createElement('span');
-                        colorName.className = 'color-name';
-                        colorName.textContent = color.COLOR_NAME;
-                        swatch.appendChild(colorName);
-                        
-                        // Add click event
-                        swatch.addEventListener('click', function() {
-                            // Update URL with new color
-                            const newUrl = new URL(window.location.href);
-                            newUrl.searchParams.set('COLOR', color.CATALOG_COLOR || color.COLOR_NAME);
-                            window.location.href = newUrl.toString();
-                        });
-                        
-                        swatchesContainer.appendChild(swatch);
-                    });
+                    console.log("[DP5-HELPER] Found colors from API:", colors.length);
+                    displayColorSwatches(colors);
                 } else {
-                    console.warn("[DP5-HELPER] No colors found for style:", styleNumber);
-                    
-                    // Add a message if no colors found
-                    const message = document.createElement('p');
-                    message.textContent = 'No color options available for this style.';
-                    message.style.fontStyle = 'italic';
-                    message.style.color = '#666';
-                    swatchesContainer.appendChild(message);
+                    console.warn("[DP5-HELPER] No colors found from API, using fallback colors");
+                    displayColorSwatches(fallbackColors);
                 }
             })
             .catch(error => {
                 console.error("[DP5-HELPER] Error fetching colors:", error);
+                console.log("[DP5-HELPER] Using fallback colors");
                 
                 // Clear loading message
                 swatchesContainer.innerHTML = '';
                 
-                // Add a message if error
-                const message = document.createElement('p');
-                message.textContent = 'Unable to load color options. Please try again later.';
-                message.style.color = 'red';
-                swatchesContainer.appendChild(message);
+                // Use fallback colors
+                displayColorSwatches(fallbackColors);
             });
+            
+        // Helper function to display color swatches
+        function displayColorSwatches(colors) {
+            // Get the current color from URL
+            const currentColor = urlParams.get('COLOR');
+            
+            // Add color swatches
+            colors.forEach(color => {
+                // Create swatch element
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = color.HEX_CODE || '#cccccc';
+                swatch.dataset.colorName = color.COLOR_NAME;
+                swatch.dataset.catalogColor = color.CATALOG_COLOR;
+                
+                // Add active class if this is the current color
+                if (currentColor && (color.COLOR_NAME === currentColor || color.CATALOG_COLOR === currentColor)) {
+                    swatch.classList.add('active');
+                }
+                
+                // Add color name
+                const colorName = document.createElement('span');
+                colorName.className = 'color-name';
+                colorName.textContent = color.COLOR_NAME;
+                swatch.appendChild(colorName);
+                
+                // Add click event
+                swatch.addEventListener('click', function() {
+                    // Update URL with new color
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.set('COLOR', color.CATALOG_COLOR || color.COLOR_NAME);
+                    window.location.href = newUrl.toString();
+                });
+                
+                swatchesContainer.appendChild(swatch);
+            });
+        }
     }
     
     // Function to handle mobile-specific adjustments
