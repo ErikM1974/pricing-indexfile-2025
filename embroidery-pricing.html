@@ -144,8 +144,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log("[DIRECT-FIX] Adding direct fix for pricing display");
             
+            // Set a flag to indicate DIRECT-FIX is active
+            window.directFixApplied = false;
+            
             // Function to directly copy the Caspio table to our custom pricing grid
             function directlyCopyTable() {
+                // If already applied, don't do it again
+                if (window.directFixApplied) {
+                    console.log("[DIRECT-FIX] Already applied, skipping");
+                    return true;
+                }
+                
                 console.log("[DIRECT-FIX] Attempting to directly copy Caspio table");
                 
                 // Find the Caspio table
@@ -159,7 +168,7 @@
                     const customGrid = document.getElementById('custom-pricing-grid');
                     if (!customGrid) {
                         console.warn("[DIRECT-FIX] Custom pricing grid not found");
-                        return;
+                        return false;
                     }
                     
                     // Get the header row from Caspio table
@@ -210,7 +219,7 @@
                         const customTbody = customGrid.querySelector('tbody');
                         if (!customTbody) {
                             console.warn("[DIRECT-FIX] Custom tbody not found");
-                            return;
+                            return false;
                         }
                         
                         // Clear existing rows
@@ -256,103 +265,34 @@
                         
                         console.log("[DIRECT-FIX] Copied", caspioDataRows.length, "rows to custom grid");
                         
-                        // Update the Add to Cart section
-                        updateAddToCartSection(uniqueSizes);
+                        // Set flag to indicate DIRECT-FIX has been applied
+                        window.directFixApplied = true;
+                        
+                        // Let add-to-cart.js handle the cart section
+                        // Don't call updateAddToCartSection here
                         
                         return true;
                     }
                 } else {
                     console.log("[DIRECT-FIX] Caspio table not found yet, will retry");
-                    setTimeout(directlyCopyTable, 1000);
+                    return false;
                 }
                 
                 return false;
             }
             
-            // Function to update the Add to Cart section
-            function updateAddToCartSection(sizes) {
-                console.log("[DIRECT-FIX] Updating Add to Cart section with sizes:", sizes);
-                
-                const sizeQuantityGrid = document.getElementById('size-quantity-grid');
-                if (!sizeQuantityGrid) {
-                    console.warn("[DIRECT-FIX] Size quantity grid not found");
-                    return;
-                }
-                
-                // Clear existing content
-                sizeQuantityGrid.innerHTML = '';
-                
-                // Create a row for each size
-                sizes.forEach(size => {
-                    console.log("[DIRECT-FIX] Adding size row for:", size);
-                    
-                    const row = document.createElement('div');
-                    row.className = 'size-quantity-row';
-                    
-                    const sizeLabel = document.createElement('div');
-                    sizeLabel.className = 'size-label';
-                    sizeLabel.textContent = size;
-                    
-                    const inputContainer = document.createElement('div');
-                    inputContainer.className = 'quantity-input-container';
-                    
-                    const decreaseBtn = document.createElement('button');
-                    decreaseBtn.className = 'quantity-btn decrease';
-                    decreaseBtn.textContent = '-';
-                    decreaseBtn.onclick = function() {
-                        const input = this.parentNode.querySelector('input');
-                        const currentValue = parseInt(input.value) || 0;
-                        if (currentValue > 0) {
-                            input.value = currentValue - 1;
-                            input.dispatchEvent(new Event('change'));
-                        }
-                    };
-                    
-                    const input = document.createElement('input');
-                    input.type = 'number';
-                    input.className = 'quantity-input';
-                    input.dataset.size = size;
-                    input.min = '0';
-                    input.value = '0';
-                    input.onchange = function() {
-                        updateCartTotal();
-                    };
-                    
-                    const increaseBtn = document.createElement('button');
-                    increaseBtn.className = 'quantity-btn increase';
-                    increaseBtn.textContent = '+';
-                    increaseBtn.onclick = function() {
-                        const input = this.parentNode.querySelector('input');
-                        const currentValue = parseInt(input.value) || 0;
-                        input.value = currentValue + 1;
-                        input.dispatchEvent(new Event('change'));
-                    };
-                    
-                    inputContainer.appendChild(decreaseBtn);
-                    inputContainer.appendChild(input);
-                    inputContainer.appendChild(increaseBtn);
-                    
-                    const priceDisplay = document.createElement('div');
-                    priceDisplay.className = 'size-price';
-                    priceDisplay.dataset.size = size;
-                    priceDisplay.textContent = '$0.00';
-                    
-                    row.appendChild(sizeLabel);
-                    row.appendChild(inputContainer);
-                    row.appendChild(priceDisplay);
-                    
-                    sizeQuantityGrid.appendChild(row);
-                });
-                
-                console.log("[DIRECT-FIX] Add to Cart section updated");
-            }
-            
             // Function to manually create pricing data if needed
             function createManualPricingData() {
+                // If already applied, don't do it again
+                if (window.directFixApplied) {
+                    console.log("[DIRECT-FIX] Already applied, skipping manual creation");
+                    return true;
+                }
+                
                 // Check if we already have pricing data
                 if (document.querySelector('#custom-pricing-grid tbody tr')) {
                     console.log("[DIRECT-FIX] Pricing data already exists, skipping manual creation");
-                    return;
+                    return true;
                 }
                 
                 console.log("[DIRECT-FIX] Creating manual pricing data");
@@ -362,17 +302,66 @@
                 
                 // Define tiers
                 const tiers = [
-                    { name: '1-23', prices: [24.00, 24.00, 24.00, 24.00, 27.00, 29.00] },
+                    { name: '1-11', prices: [24.00, 24.00, 24.00, 24.00, 27.00, 29.00] },
+                    { name: '12-23', prices: [23.50, 23.50, 23.50, 23.50, 26.50, 28.50] },
                     { name: '24-47', prices: [23.00, 23.00, 23.00, 23.00, 26.00, 28.00] },
                     { name: '48-71', prices: [22.00, 22.00, 22.00, 22.00, 25.00, 27.00] },
                     { name: '72+', prices: [21.00, 21.00, 21.00, 21.00, 24.00, 26.00] }
                 ];
                 
+                // Create pricing data structure for other scripts
+                const groupedPrices = {};
+                sizes.forEach((size, index) => {
+                    groupedPrices[size] = {};
+                    tiers.forEach(tier => {
+                        groupedPrices[size][tier.name] = tier.prices[index];
+                    });
+                });
+                
+                // Create tier data structure
+                const tierData = {};
+                tiers.forEach(tier => {
+                    const tierName = tier.name;
+                    let minQuantity = 1;
+                    let maxQuantity = null;
+                    let ltmFee = 0;
+                    
+                    if (tierName === '1-11') {
+                        minQuantity = 1;
+                        maxQuantity = 11;
+                        ltmFee = 50.00;
+                    } else if (tierName === '12-23') {
+                        minQuantity = 12;
+                        maxQuantity = 23;
+                        ltmFee = 25.00;
+                    } else if (tierName === '24-47') {
+                        minQuantity = 24;
+                        maxQuantity = 47;
+                    } else if (tierName === '48-71') {
+                        minQuantity = 48;
+                        maxQuantity = 71;
+                    } else if (tierName === '72+') {
+                        minQuantity = 72;
+                    }
+                    
+                    tierData[tierName] = {
+                        MinQuantity: minQuantity,
+                        MaxQuantity: maxQuantity,
+                        LTM_Fee: ltmFee > 0 ? ltmFee : undefined
+                    };
+                });
+                
+                // Store data for other scripts
+                window.dp5GroupedHeaders = sizes;
+                window.dp5UniqueSizes = sizes;
+                window.dp5GroupedPrices = groupedPrices;
+                window.dp5ApiTierData = tierData;
+                
                 // Get our custom pricing grid
                 const customGrid = document.getElementById('custom-pricing-grid');
                 if (!customGrid) {
                     console.warn("[DIRECT-FIX] Custom pricing grid not found");
-                    return;
+                    return false;
                 }
                 
                 // Update the header row
@@ -391,15 +380,11 @@
                     });
                 }
                 
-                // Store headers for other scripts
-                window.dp5GroupedHeaders = sizes;
-                window.dp5UniqueSizes = sizes;
-                
                 // Get the tbody element
                 const customTbody = customGrid.querySelector('tbody');
                 if (!customTbody) {
                     console.warn("[DIRECT-FIX] Custom tbody not found");
-                    return;
+                    return false;
                 }
                 
                 // Clear existing rows
@@ -427,22 +412,37 @@
                     customTbody.appendChild(row);
                 });
                 
-                // Update the Add to Cart section
-                updateAddToCartSection(sizes);
+                // Set flag to indicate DIRECT-FIX has been applied
+                window.directFixApplied = true;
                 
                 console.log("[DIRECT-FIX] Manual pricing data created");
+                return true;
             }
             
-            // Start the direct copy process
+            // Start the direct copy process with a retry mechanism
             setTimeout(directlyCopyTable, 1000);
             
             // Set up periodic checks to ensure the table is copied
             const checkIntervals = [2000, 3000, 5000, 8000];
+            let tableCreated = false;
+            
             checkIntervals.forEach(interval => {
                 setTimeout(() => {
+                    // Skip if already created
+                    if (tableCreated || window.directFixApplied) {
+                        console.log(`[DIRECT-FIX] Table already created at ${interval}ms interval, skipping`);
+                        return;
+                    }
+                    
                     // Try to copy the table, and if it fails, create manual data
-                    if (!directlyCopyTable()) {
-                        createManualPricingData();
+                    if (directlyCopyTable()) {
+                        tableCreated = true;
+                        console.log(`[DIRECT-FIX] Table created at ${interval}ms interval`);
+                    } else if (interval >= 5000) { // Only create manual data after 5 seconds
+                        if (createManualPricingData()) {
+                            tableCreated = true;
+                            console.log(`[DIRECT-FIX] Manual data created at ${interval}ms interval`);
+                        }
                     }
                 }, interval);
             });
@@ -451,238 +451,24 @@
             window.addEventListener('pricingDataLoaded', function(event) {
                 console.log("[DIRECT-FIX] Pricing data loaded event received", event.detail);
                 
-                // Force copy the table again
-                setTimeout(() => {
-                    if (!directlyCopyTable()) {
-                        createManualPricingData();
-                    }
-                }, 500);
-                    
-                // Update the size-quantity-grid for Add to Cart section
-                const sizeQuantityGrid = document.getElementById('size-quantity-grid');
-                if (sizeQuantityGrid) {
-                    // Clear existing content
-                    sizeQuantityGrid.innerHTML = '';
-                    
-                    // Use dp5UniqueSizes if available
-                    if (window.dp5UniqueSizes && Array.isArray(window.dp5UniqueSizes)) {
-                        console.log("[ADD-TO-CART] Updating size quantity grid with sizes:", window.dp5UniqueSizes);
-                        
-                        // Create a row for each size
-                        window.dp5UniqueSizes.forEach(size => {
-                            console.log("[ADD-TO-CART] Adding size row for:", size);
-                            
-                            const row = document.createElement('div');
-                            row.className = 'size-quantity-row';
-                            
-                            const sizeLabel = document.createElement('div');
-                            sizeLabel.className = 'size-label';
-                            sizeLabel.textContent = size;
-                            
-                            const inputContainer = document.createElement('div');
-                            inputContainer.className = 'quantity-input-container';
-                            
-                            const decreaseBtn = document.createElement('button');
-                            decreaseBtn.className = 'quantity-btn decrease';
-                            decreaseBtn.textContent = '-';
-                            decreaseBtn.onclick = function() {
-                                const input = this.parentNode.querySelector('input');
-                                const currentValue = parseInt(input.value) || 0;
-                                if (currentValue > 0) {
-                                    input.value = currentValue - 1;
-                                    input.dispatchEvent(new Event('change'));
-                                }
-                            };
-                            
-                            const input = document.createElement('input');
-                            input.type = 'number';
-                            input.className = 'quantity-input';
-                            input.dataset.size = size;
-                            input.min = '0';
-                            input.value = '0';
-                            input.onchange = function() {
-                                updateCartTotal();
-                            };
-                            
-                            const increaseBtn = document.createElement('button');
-                            increaseBtn.className = 'quantity-btn increase';
-                            increaseBtn.textContent = '+';
-                            increaseBtn.onclick = function() {
-                                const input = this.parentNode.querySelector('input');
-                                const currentValue = parseInt(input.value) || 0;
-                                input.value = currentValue + 1;
-                                input.dispatchEvent(new Event('change'));
-                            };
-                            
-                            inputContainer.appendChild(decreaseBtn);
-                            inputContainer.appendChild(input);
-                            inputContainer.appendChild(increaseBtn);
-                            
-                            const priceDisplay = document.createElement('div');
-                            priceDisplay.className = 'size-price';
-                            priceDisplay.dataset.size = size;
-                            priceDisplay.textContent = '$0.00';
-                            
-                            row.appendChild(sizeLabel);
-                            row.appendChild(inputContainer);
-                            row.appendChild(priceDisplay);
-                            
-                            sizeQuantityGrid.appendChild(row);
-                        });
-                    } else {
-                        console.warn("[ADD-TO-CART] No unique sizes available for quantity grid");
-                    }
+                // Only update if not already done
+                if (!window.directFixApplied) {
+                    // Force copy the table again
+                    setTimeout(() => {
+                        if (!directlyCopyTable()) {
+                            createManualPricingData();
+                        }
+                    }, 500);
                 } else {
-                    console.warn("[ADD-TO-CART] Size quantity grid not found");
+                    console.log("[DIRECT-FIX] Table already created, skipping update on pricingDataLoaded event");
                 }
+                
+                // Let add-to-cart.js handle the cart section
+                // We don't need to update the size-quantity-grid here
             });
             
-            // Function to update cart total
-            window.updateCartTotal = function() {
-                const quantityInputs = document.querySelectorAll('.quantity-input');
-                let totalQuantity = 0;
-                let totalPrice = 0;
-                
-                // Calculate total quantity
-                quantityInputs.forEach(input => {
-                    const quantity = parseInt(input.value) || 0;
-                    totalQuantity += quantity;
-                });
-                
-                // Determine pricing tier based on total quantity
-                let tierKey = '';
-                if (totalQuantity >= 72) {
-                    tierKey = '72+';
-                } else if (totalQuantity >= 48) {
-                    tierKey = '48-71';
-                } else if (totalQuantity >= 24) {
-                    tierKey = '24-47';
-                } else if (totalQuantity >= 12) {
-                    tierKey = '12-23';
-                } else if (totalQuantity > 0) {
-                    tierKey = '1-11';
-                }
-                
-                // Check if LTM fee applies
-                const ltmFeeNotice = document.querySelector('.ltm-fee-notice');
-                let ltmFeeApplies = false;
-                let ltmFee = 0;
-                
-                if (totalQuantity > 0 && totalQuantity < 24 && window.dp5ApiTierData) {
-                    const tierData = window.dp5ApiTierData[tierKey];
-                    if (tierData && tierData.LTM_Fee) {
-                        ltmFeeApplies = true;
-                        ltmFee = tierData.LTM_Fee;
-                    }
-                }
-                
-                if (ltmFeeNotice) {
-                    ltmFeeNotice.style.display = ltmFeeApplies ? 'block' : 'none';
-                }
-                
-                // Calculate price for each size and update displays
-                quantityInputs.forEach(input => {
-                    const size = input.dataset.size;
-                    const quantity = parseInt(input.value) || 0;
-                    const priceDisplay = document.querySelector(`.size-price[data-size="${size}"]`);
-                    
-                    if (quantity > 0 && window.dp5GroupedPrices && window.dp5GroupedPrices[size] && window.dp5GroupedPrices[size][tierKey]) {
-                        const unitPrice = window.dp5GroupedPrices[size][tierKey];
-                        const itemTotal = quantity * unitPrice;
-                        totalPrice += itemTotal;
-                        
-                        if (priceDisplay) {
-                            priceDisplay.textContent = `$${itemTotal.toFixed(2)}`;
-                        }
-                    } else {
-                        if (priceDisplay) {
-                            priceDisplay.textContent = '$0.00';
-                        }
-                    }
-                });
-                
-                // Add LTM fee if applicable
-                if (ltmFeeApplies) {
-                    totalPrice += ltmFee;
-                }
-                
-                // Update total display
-                const totalAmountDisplay = document.querySelector('.total-amount');
-                if (totalAmountDisplay) {
-                    totalAmountDisplay.textContent = `$${totalPrice.toFixed(2)}`;
-                }
-            };
-            
-            // Initialize Add to Cart button
-            const addToCartButton = document.getElementById('add-to-cart-button');
-            if (addToCartButton) {
-                addToCartButton.addEventListener('click', function() {
-                    // Get all quantity inputs
-                    const quantityInputs = document.querySelectorAll('.quantity-input');
-                    const sizes = [];
-                    let totalQuantity = 0;
-                    
-                    // Collect size and quantity data
-                    quantityInputs.forEach(input => {
-                        const size = input.dataset.size;
-                        const quantity = parseInt(input.value) || 0;
-                        
-                        if (quantity > 0) {
-                            sizes.push({
-                                size: size,
-                                quantity: quantity
-                            });
-                            totalQuantity += quantity;
-                        }
-                    });
-                    
-                    // Check if any sizes were selected
-                    if (sizes.length === 0) {
-                        alert('Please select at least one size and quantity.');
-                        return;
-                    }
-                    
-                    // Get product info
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const styleNumber = urlParams.get('StyleNumber');
-                    const colorCode = urlParams.get('COLOR');
-                    const embType = window.detectEmbellishmentType ? window.detectEmbellishmentType() : 'embroidery';
-                    
-                    // Create product data object
-                    const productData = {
-                        styleNumber: styleNumber,
-                        color: colorCode,
-                        embellishmentType: embType,
-                        sizes: sizes
-                    };
-                    
-                    // Add to cart using NWCACart if available
-                    if (window.NWCACart && typeof window.NWCACart.addToCart === 'function') {
-                        window.NWCACart.addToCart(productData)
-                            .then(result => {
-                                if (result.success) {
-                                    // Show success message
-                                    alert('Items added to cart successfully!');
-                                    
-                                    // Reset quantity inputs
-                                    quantityInputs.forEach(input => {
-                                        input.value = '0';
-                                    });
-                                    
-                                    // Update cart total
-                                    updateCartTotal();
-                                } else {
-                                    alert('Error adding to cart: ' + (result.error || 'Unknown error'));
-                                }
-                            })
-                            .catch(error => {
-                                alert('Error adding to cart: ' + error.message);
-                            });
-                    } else {
-                        alert('Cart system not available. Please try again later.');
-                    }
-                });
-            }
+            // Let add-to-cart.js handle the cart total calculation and add to cart button
+            console.log("[DIRECT-FIX] Delegating cart functionality to add-to-cart.js");
         });
     </script>
     

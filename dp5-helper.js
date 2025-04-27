@@ -611,19 +611,7 @@
         // Show loading message
         swatchesContainer.innerHTML = '<div class="loading-swatches">Loading color options...</div>';
         
-        // Define fallback colors in case the API fails
-        const fallbackColors = [
-            { COLOR_NAME: 'Black', CATALOG_COLOR: 'Black', HEX_CODE: '#000000' },
-            { COLOR_NAME: 'White', CATALOG_COLOR: 'White', HEX_CODE: '#FFFFFF' },
-            { COLOR_NAME: 'Navy', CATALOG_COLOR: 'Navy', HEX_CODE: '#000080' },
-            { COLOR_NAME: 'Red', CATALOG_COLOR: 'Red', HEX_CODE: '#FF0000' },
-            { COLOR_NAME: 'Royal Blue', CATALOG_COLOR: 'Royal', HEX_CODE: '#4169E1' },
-            { COLOR_NAME: 'Carolina Blue', CATALOG_COLOR: 'Carolina Blue', HEX_CODE: '#99BADD' },
-            { COLOR_NAME: 'Forest Green', CATALOG_COLOR: 'Forest', HEX_CODE: '#228B22' },
-            { COLOR_NAME: 'Purple', CATALOG_COLOR: 'Purple', HEX_CODE: '#800080' }
-        ];
-        
-        // Try to fetch from API first, but use fallback if it fails
+        // Always fetch from API - no fallback to hardcoded colors
         fetch(`${API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com'}/api/colors?styleNumber=${encodeURIComponent(styleNumber)}`)
             .then(response => {
                 if (!response.ok) {
@@ -637,21 +625,34 @@
                 
                 if (Array.isArray(colors) && colors.length > 0) {
                     console.log("[DP5-HELPER] Found colors from API:", colors.length);
-                    displayColorSwatches(colors);
+                    
+                    // De-duplicate colors by COLOR_NAME to ensure unique swatches
+                    const uniqueColorsMap = new Map();
+                    colors.filter(c => c.COLOR_NAME).forEach(color => {
+                        if (!uniqueColorsMap.has(color.COLOR_NAME)) {
+                            uniqueColorsMap.set(color.COLOR_NAME, color);
+                        }
+                    });
+                    
+                    const uniqueColors = Array.from(uniqueColorsMap.values())
+                        .sort((a, b) => a.COLOR_NAME.localeCompare(b.COLOR_NAME));
+                    
+                    console.log("[DP5-HELPER] Displaying", uniqueColors.length, "unique colors");
+                    displayColorSwatches(uniqueColors);
                 } else {
-                    console.warn("[DP5-HELPER] No colors found from API, using fallback colors");
-                    displayColorSwatches(fallbackColors);
+                    console.warn("[DP5-HELPER] No colors found from API");
+                    swatchesContainer.innerHTML = '<div class="no-colors-message">No color options available for this style.</div>';
                 }
             })
             .catch(error => {
                 console.error("[DP5-HELPER] Error fetching colors:", error);
-                console.log("[DP5-HELPER] Using fallback colors");
+                swatchesContainer.innerHTML = '<div class="error-message">Error loading color options. Please try refreshing the page.</div>';
                 
-                // Clear loading message
-                swatchesContainer.innerHTML = '';
-                
-                // Use fallback colors
-                displayColorSwatches(fallbackColors);
+                // Attempt to retry the API call after a short delay
+                setTimeout(() => {
+                    console.log("[DP5-HELPER] Retrying color fetch...");
+                    initColorSwatches();
+                }, 3000);
             });
             
         // Helper function to display color swatches

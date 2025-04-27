@@ -164,28 +164,43 @@
             ltmFeeNotice.style.display = ltmFeeApplies ? 'block' : 'none';
         }
         
-        // Calculate price for each size and update displays
-        quantityInputs.forEach(input => {
-            const size = input.dataset.size;
-            const quantity = parseInt(input.value) || 0;
-            const priceDisplay = document.querySelector(`.size-price[data-size="${size}"]`);
+        // Important: Always recalculate prices based on the current tier
+        // This ensures prices update correctly when quantity changes
+        if (window.dp5GroupedPrices && tierKey) {
+            console.log("[ADD-TO-CART] Recalculating all prices based on tier:", tierKey);
             
-            if (quantity > 0 && window.dp5GroupedPrices && window.dp5GroupedPrices[size] && window.dp5GroupedPrices[size][tierKey]) {
-                const unitPrice = window.dp5GroupedPrices[size][tierKey];
-                const itemTotal = quantity * unitPrice;
-                totalPrice += itemTotal;
-                
-                console.log(`[ADD-TO-CART] Size ${size}: ${quantity} x $${unitPrice} = $${itemTotal.toFixed(2)}`);
+            // Calculate price for each size and update displays
+            quantityInputs.forEach(input => {
+                const size = input.dataset.size;
+                const quantity = parseInt(input.value) || 0;
+                const priceDisplay = document.querySelector(`.size-price[data-size="${size}"]`);
                 
                 if (priceDisplay) {
-                    priceDisplay.textContent = `$${itemTotal.toFixed(2)}`;
+                    if (quantity > 0 && window.dp5GroupedPrices[size] && window.dp5GroupedPrices[size][tierKey] !== undefined) {
+                        const unitPrice = window.dp5GroupedPrices[size][tierKey];
+                        const itemTotal = quantity * unitPrice;
+                        totalPrice += itemTotal;
+                        
+                        console.log(`[ADD-TO-CART] Size ${size}: ${quantity} x $${unitPrice} = $${itemTotal.toFixed(2)}`);
+                        priceDisplay.textContent = `$${itemTotal.toFixed(2)}`;
+                        
+                        // Add data attributes for debugging
+                        priceDisplay.dataset.quantity = quantity;
+                        priceDisplay.dataset.unitPrice = unitPrice;
+                        priceDisplay.dataset.tier = tierKey;
+                    } else {
+                        priceDisplay.textContent = '$0.00';
+                        
+                        // Clear data attributes
+                        priceDisplay.dataset.quantity = '0';
+                        priceDisplay.dataset.unitPrice = '0';
+                        priceDisplay.dataset.tier = '';
+                    }
                 }
-            } else {
-                if (priceDisplay) {
-                    priceDisplay.textContent = '$0.00';
-                }
-            }
-        });
+            });
+        } else {
+            console.warn("[ADD-TO-CART] Missing pricing data or invalid tier key");
+        }
         
         // Add LTM fee if applicable
         if (ltmFeeApplies) {
@@ -198,6 +213,9 @@
         if (totalAmountDisplay) {
             totalAmountDisplay.textContent = `$${totalPrice.toFixed(2)}`;
             console.log("[ADD-TO-CART] Updated total amount:", totalPrice.toFixed(2));
+            
+            // Add data attribute for debugging
+            totalAmountDisplay.dataset.calculatedTotal = totalPrice.toFixed(2);
         }
     }
 
