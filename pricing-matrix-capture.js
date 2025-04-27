@@ -78,11 +78,11 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded");
     
     // Capture pricing matrix data from the DOM
     function capturePricingMatrix(styleNumber, colorCode, embType) {
-        console.log("[PRICING-MATRIX:CAPTURE] Starting capture for " + styleNumber + ", " + colorCode + ", " + embType);
+        console.log("[PRICING-MATRIX:CAPTURE] Starting enhanced capture for " + styleNumber + ", " + colorCode + ", " + embType);
         
         try {
             // Get the pricing table
-            const pricingTable = document.querySelector('.matrix-price-table') || 
+            const pricingTable = document.querySelector('.matrix-price-table') ||
                                 document.querySelector('.cbResultSetTable');
             
             if (!pricingTable) {
@@ -130,23 +130,81 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded");
                 }
             });
             
-            // Create pricing data object
-            pricingData = {
-                styleNumber: styleNumber,
+            // Use a more structured approach to store the data
+            const pricingData = {
+                styleNumber,
                 color: colorCode,
                 embellishmentType: embType,
-                headers: headers,
+                headers,
                 rows: pricingRows,
                 capturedAt: new Date().toISOString()
             };
             
             console.log("[PRICING-MATRIX:CAPTURE] Pricing data found:", pricingData);
             
+            // Store the data and dispatch an event
+            window.dp5GroupedHeaders = headers;
+            window.dp5GroupedPrices = formatPriceMatrix(headers, pricingRows);
+            window.dp5ApiTierData = extractTierData(pricingRows);
+            
+            // Extract unique sizes for Add to Cart
+            const uniqueSizes = [...new Set(headers.filter(header =>
+                !header.includes('-') && !header.includes('/')))];
+            window.dp5UniqueSizes = uniqueSizes;
+            
+            // Dispatch event for other components to react
+            const event = new CustomEvent('pricingDataLoaded', {
+                detail: pricingData
+            });
+            window.dispatchEvent(event);
+            
             // Store the pricing data in the API
             storePricingData(pricingData);
+            
+            return pricingData;
         } catch (error) {
             console.error("[PRICING-MATRIX:CAPTURE-ERROR] Error capturing pricing matrix:", error);
+            return null;
         }
+    }
+    
+    // Helper function to extract tier data
+    function extractTierData(pricingRows) {
+        const tiers = {};
+        
+        pricingRows.forEach(row => {
+            const tierText = row.tier;
+            let minQuantity = 0;
+            let maxQuantity = null;
+            let ltmFee = 0;
+            
+            // Parse tier text (e.g., "1-23", "24-47", "48-71", "72+")
+            if (tierText.includes('-')) {
+                const [min, max] = tierText.split('-').map(t => parseInt(t.trim()));
+                minQuantity = min;
+                maxQuantity = max;
+                
+                // Add LTM fee for lower tiers
+                if (minQuantity === 1 && maxQuantity <= 11) {
+                    ltmFee = 50.00;
+                } else if (minQuantity <= 12 && maxQuantity <= 23) {
+                    ltmFee = 25.00;
+                }
+            } else if (tierText.includes('+')) {
+                minQuantity = parseInt(tierText.replace('+', '').trim());
+            } else {
+                // Try to parse as a single number
+                minQuantity = parseInt(tierText.trim());
+            }
+            
+            tiers[tierText] = {
+                MinQuantity: minQuantity,
+                MaxQuantity: maxQuantity,
+                LTM_Fee: ltmFee > 0 ? ltmFee : undefined
+            };
+        });
+        
+        return tiers;
     }
     
     // Helper function to format price matrix for API

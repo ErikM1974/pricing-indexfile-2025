@@ -551,6 +551,10 @@ async function initPricingPage() {
         // Decide if we should stop or continue without cart integration
         // For now, let's continue to try loading Caspio pricing
     }
+    
+    // Set up responsive adjustments
+    handleMobileAdjustments();
+    window.addEventListener('resize', handleMobileAdjustments);
 
     // Determine which Caspio DP to load
     const styleNumber = getUrlParameter('StyleNumber');
@@ -752,6 +756,316 @@ function displayContactMessage(container, embType) {
     container.appendChild(noteElement);
 
     console.log(`PricingPages: Contact message displayed for ${embType}.`);
+}
+// --- Enhanced UI Functions ---
+
+// Function to update the pricing grid responsively
+function updatePricingGrid() {
+    // Get pricing data from global variables
+    if (window.dp5GroupedHeaders && window.dp5GroupedPrices && window.dp5ApiTierData) {
+        const pricingData = {
+            headers: window.dp5GroupedHeaders,
+            prices: window.dp5GroupedPrices,
+            tiers: window.dp5ApiTierData
+        };
+        
+        // Update the custom pricing grid
+        const pricingGrid = document.getElementById('custom-pricing-grid');
+        if (!pricingGrid) return;
+        
+        // Get the tbody element
+        const tbody = pricingGrid.querySelector('tbody');
+        if (!tbody) return;
+        
+        // Clear existing rows
+        tbody.innerHTML = '';
+        
+        // Create rows for each tier
+        const tierKeys = Object.keys(pricingData.tiers);
+        tierKeys.forEach(tierKey => {
+            const tier = pricingData.tiers[tierKey];
+            const row = document.createElement('tr');
+            
+            // Create tier label cell
+            const tierCell = document.createElement('td');
+            let tierLabel = '';
+            if (tier.MaxQuantity && tier.MinQuantity) {
+                tierLabel = `${tier.MinQuantity}-${tier.MaxQuantity}`;
+            } else if (tier.MinQuantity) {
+                tierLabel = `${tier.MinQuantity}+`;
+            }
+            tierCell.textContent = tierLabel;
+            row.appendChild(tierCell);
+            
+            // Create price cells for each size group
+            pricingData.headers.forEach(sizeGroup => {
+                const priceCell = document.createElement('td');
+                priceCell.className = 'price-cell';
+                
+                // Get price for this tier and size group
+                const price = pricingData.prices[sizeGroup] ?
+                    pricingData.prices[sizeGroup][tierKey] : null;
+                
+                if (price !== null && price !== undefined) {
+                    // Format price
+                    const formattedPrice = `$${parseFloat(price).toFixed(2)}`;
+                    priceCell.innerHTML = formattedPrice;
+                    
+                    // Add inventory indicator if available
+                    if (window.inventoryData && window.inventoryData.sizes) {
+                        addInventoryIndicator(priceCell, sizeGroup, window.inventoryData);
+                    }
+                } else {
+                    priceCell.textContent = 'N/A';
+                }
+                
+                row.appendChild(priceCell);
+            });
+            
+            tbody.appendChild(row);
+        });
+        
+        // Update LTM fee information
+        updateLTMFeeDisplay(pricingData.tiers);
+    }
+}
+
+// Function to add inventory indicator
+function addInventoryIndicator(priceCell, size, inventoryData) {
+    // Check inventory for this specific size
+    const sizeIndex = inventoryData.sizes.indexOf(size);
+    let inventory = 0;
+    
+    if (sizeIndex !== -1) {
+        // Get inventory for this size
+        inventory = inventoryData.sizeTotals[sizeIndex];
+    }
+    
+    // Create inventory indicator
+    const indicator = document.createElement('span');
+    indicator.className = 'inventory-indicator';
+    
+    if (inventory === 0) {
+        indicator.classList.add('inventory-none');
+        indicator.title = 'Out of stock';
+    } else if (inventory < 10) {
+        indicator.classList.add('inventory-low');
+        indicator.title = `Low stock: ${inventory} available`;
+    } else {
+        indicator.classList.add('inventory-good');
+        indicator.title = `In stock: ${inventory} available`;
+    }
+    
+    priceCell.appendChild(indicator);
+}
+
+// Function to update LTM fee display
+function updateLTMFeeDisplay(tiers) {
+    const ltmFeeContainer = document.querySelector('.ltm-fee-container');
+    if (!ltmFeeContainer) return;
+    
+    // Clear existing content
+    ltmFeeContainer.innerHTML = '<h4>Less Than Minimum (LTM) Fees:</h4>';
+    
+    // Create list of LTM fees
+    const feeList = document.createElement('ul');
+    
+    // Check each tier for LTM fees
+    let hasLtmFees = false;
+    Object.keys(tiers).forEach(tierKey => {
+        const tier = tiers[tierKey];
+        if (tier.LTM_Fee) {
+            hasLtmFees = true;
+            const listItem = document.createElement('li');
+            listItem.textContent = `${tierKey}: $${tier.LTM_Fee.toFixed(2)} fee`;
+            feeList.appendChild(listItem);
+        }
+    });
+    
+    // If no LTM fees found, add default message
+    if (!hasLtmFees) {
+        const listItem = document.createElement('li');
+        listItem.textContent = '1-11 pieces: $50.00 fee';
+        feeList.appendChild(listItem);
+        
+        const listItem2 = document.createElement('li');
+        listItem2.textContent = '12-23 pieces: $25.00 fee';
+        feeList.appendChild(listItem2);
+    }
+    
+    ltmFeeContainer.appendChild(feeList);
+}
+
+// Function to handle color swatch click
+function handleColorSwatchClick(swatch) {
+    console.log("PricingPages: Color swatch clicked:", swatch);
+    
+    // Update selected color
+    window.selectedColor = swatch;
+    
+    // Update active swatch styling
+    const allSwatches = document.querySelectorAll('.color-swatch');
+    allSwatches.forEach(s => s.classList.remove('active'));
+    
+    // Find the swatch element that matches this color and activate it
+    const matchingSwatch = Array.from(allSwatches).find(s =>
+        s.dataset.colorName === swatch.COLOR_NAME);
+    if (matchingSwatch) {
+        matchingSwatch.classList.add('active');
+    }
+    
+    // Update product color display
+    const colorSpan = document.getElementById('product-color');
+    if (colorSpan) {
+        colorSpan.textContent = swatch.COLOR_NAME;
+    }
+    
+    // Update global variables for other scripts
+    window.selectedColorName = swatch.COLOR_NAME;
+    window.selectedCatalogColor = swatch.CATALOG_COLOR;
+    
+    // Load inventory data for this color
+    loadInventoryData(swatch.CATALOG_COLOR || swatch.COLOR_NAME);
+    
+    // Update pricing grid with this color's data
+    updatePricingGrid();
+    
+    // Update Caspio pricing data (hidden but needed for cart)
+    updateCaspioPricing(swatch.CATALOG_COLOR || swatch.COLOR_NAME);
+}
+
+// Function to handle mobile-specific adjustments
+function handleMobileAdjustments() {
+    const isMobile = window.innerWidth <= 768;
+    const isSmallMobile = window.innerWidth <= 480;
+    
+    // Adjust color swatches for mobile
+    const colorSwatches = document.querySelectorAll('.color-swatch');
+    colorSwatches.forEach(swatch => {
+        if (isSmallMobile) {
+            swatch.style.width = '45px';
+            swatch.style.height = '45px';
+        } else if (isMobile) {
+            swatch.style.width = '50px';
+            swatch.style.height = '50px';
+        } else {
+            swatch.style.width = '60px';
+            swatch.style.height = '60px';
+        }
+    });
+    
+    // Adjust pricing grid for mobile
+    const pricingGrid = document.getElementById('custom-pricing-grid');
+    if (pricingGrid) {
+        if (isMobile) {
+            pricingGrid.classList.add('mobile-view');
+            
+            // For very small screens, adjust the font size
+            if (isSmallMobile) {
+                pricingGrid.style.fontSize = '0.8em';
+            } else {
+                pricingGrid.style.fontSize = '0.9em';
+            }
+            
+            // Make the pricing grid horizontally scrollable on mobile
+            const pricingGridContainer = document.querySelector('.pricing-grid-container');
+            if (pricingGridContainer) {
+                pricingGridContainer.style.overflowX = 'auto';
+                pricingGridContainer.style.WebkitOverflowScrolling = 'touch';
+            }
+        } else {
+            pricingGrid.classList.remove('mobile-view');
+            pricingGrid.style.fontSize = '';
+        }
+    }
+    
+    // Adjust Add to Cart section for mobile
+    const sizeQuantityGrid = document.getElementById('size-quantity-grid');
+    if (sizeQuantityGrid) {
+        if (isSmallMobile) {
+            sizeQuantityGrid.style.gridTemplateColumns = '1fr';
+        } else if (isMobile) {
+            sizeQuantityGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        } else {
+            sizeQuantityGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(250px, 1fr))';
+        }
+    }
+    
+    // Adjust product context area for mobile
+    const productContext = document.querySelector('.product-context');
+    if (productContext) {
+        if (isMobile) {
+            productContext.style.flexDirection = 'column';
+            productContext.style.textAlign = 'center';
+        } else {
+            productContext.style.flexDirection = '';
+            productContext.style.textAlign = '';
+        }
+    }
+}
+
+// Function to load inventory data
+function loadInventoryData(colorCode) {
+    if (!colorCode || !window.selectedStyleNumber) return;
+    
+    console.log(`PricingPages: Loading inventory data for ${window.selectedStyleNumber}, ${colorCode}`);
+    
+    // API endpoint for inventory data
+    const apiUrl = `${API_PROXY_BASE_URL}/api/inventory?styleNumber=${encodeURIComponent(window.selectedStyleNumber)}&color=${encodeURIComponent(colorCode)}`;
+    
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && Array.isArray(data)) {
+                // Process inventory data
+                const sizes = [];
+                const sizeTotals = [];
+                
+                // Extract unique sizes and their inventory totals
+                data.forEach(item => {
+                    if (item.size) {
+                        const sizeIndex = sizes.indexOf(item.size);
+                        if (sizeIndex === -1) {
+                            sizes.push(item.size);
+                            sizeTotals.push(parseInt(item.QuantityAvailable) || 0);
+                        } else {
+                            sizeTotals[sizeIndex] += parseInt(item.QuantityAvailable) || 0;
+                        }
+                    }
+                });
+                
+                // Store inventory data globally
+                window.inventoryData = {
+                    styleNumber: window.selectedStyleNumber,
+                    color: colorCode,
+                    sizes,
+                    sizeTotals
+                };
+                
+                console.log("PricingPages: Inventory data loaded:", window.inventoryData);
+                
+                // Update pricing grid with inventory indicators
+                updatePricingGrid();
+            }
+        })
+        .catch(error => {
+            console.error("PricingPages: Error loading inventory data:", error);
+        });
+}
+
+// Function to update Caspio pricing data
+function updateCaspioPricing(colorCode) {
+    // This function would update the hidden Caspio pricing data
+    // based on the selected color
+    console.log(`PricingPages: Updating Caspio pricing data for color: ${colorCode}`);
+    
+    // For now, we'll just trigger a refresh of the pricing grid
+    updatePricingGrid();
 }
 
 
