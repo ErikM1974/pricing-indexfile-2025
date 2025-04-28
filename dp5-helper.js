@@ -514,22 +514,23 @@
             }
         });
         
-        // Create inventory indicator
-        const indicator = document.createElement('span');
-        indicator.className = 'inventory-indicator';
-        
-        if (lowestInventory === 0 || lowestInventory === Infinity) {
-            indicator.classList.add('inventory-none');
-            indicator.title = 'Out of stock';
-        } else if (lowestInventory < 10) {
-            indicator.classList.add('inventory-low');
-            indicator.title = `Low stock: ${lowestInventory} available`;
-        } else {
-            indicator.classList.add('inventory-good');
-            indicator.title = `In stock: ${lowestInventory} available`;
+        // Only show indicator for low or no inventory
+        if (lowestInventory === 0 || lowestInventory === Infinity || lowestInventory < 10) {
+            // Create inventory indicator
+            const indicator = document.createElement('span');
+            indicator.className = 'inventory-indicator';
+            
+            if (lowestInventory === 0 || lowestInventory === Infinity) {
+                indicator.classList.add('inventory-none');
+                indicator.title = 'Out of stock';
+            } else if (lowestInventory < 10) {
+                indicator.classList.add('inventory-low');
+                indicator.title = `Low stock: ${lowestInventory} available`;
+            }
+            
+            priceCell.appendChild(indicator);
         }
-        
-        priceCell.appendChild(indicator);
+        // No indicator for good inventory
     }
     
     // Function to load inventory data
@@ -611,8 +612,8 @@
         // Show loading message
         swatchesContainer.innerHTML = '<div class="loading-swatches">Loading color options...</div>';
         
-        // Always fetch from API - no fallback to hardcoded colors
-        fetch(`${API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com'}/api/colors?styleNumber=${encodeURIComponent(styleNumber)}`)
+        // Try to fetch from API with correct endpoint
+        fetch(`${API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com'}/api/color-swatches?styleNumber=${encodeURIComponent(styleNumber)}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('API request failed');
@@ -641,19 +642,78 @@
                     displayColorSwatches(uniqueColors);
                 } else {
                     console.warn("[DP5-HELPER] No colors found from API");
-                    swatchesContainer.innerHTML = '<div class="no-colors-message">No color options available for this style.</div>';
+                    tryFallbackColorFetch(styleNumber, swatchesContainer);
                 }
             })
             .catch(error => {
-                console.error("[DP5-HELPER] Error fetching colors:", error);
-                swatchesContainer.innerHTML = '<div class="error-message">Error loading color options. Please try refreshing the page.</div>';
-                
-                // Attempt to retry the API call after a short delay
-                setTimeout(() => {
-                    console.log("[DP5-HELPER] Retrying color fetch...");
-                    initColorSwatches();
-                }, 3000);
+                console.error("[DP5-HELPER] Error fetching colors from primary endpoint:", error);
+                // Try fallback endpoint
+                tryFallbackColorFetch(styleNumber, swatchesContainer);
             });
+            
+        // Helper function to try fallback color fetch methods
+        function tryFallbackColorFetch(styleNumber, container) {
+            console.log("[DP5-HELPER] Trying fallback color fetch for style:", styleNumber);
+            
+            // Try the legacy endpoint as first fallback
+            fetch(`${API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com'}/api/colors?styleNumber=${encodeURIComponent(styleNumber)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Fallback API request failed');
+                    }
+                    return response.json();
+                })
+                .then(colors => {
+                    if (Array.isArray(colors) && colors.length > 0) {
+                        console.log("[DP5-HELPER] Found colors from fallback API:", colors.length);
+                        
+                        // De-duplicate colors by COLOR_NAME
+                        const uniqueColorsMap = new Map();
+                        colors.filter(c => c.COLOR_NAME).forEach(color => {
+                            if (!uniqueColorsMap.has(color.COLOR_NAME)) {
+                                uniqueColorsMap.set(color.COLOR_NAME, color);
+                            }
+                        });
+                        
+                        const uniqueColors = Array.from(uniqueColorsMap.values())
+                            .sort((a, b) => a.COLOR_NAME.localeCompare(b.COLOR_NAME));
+                        
+                        console.log("[DP5-HELPER] Displaying", uniqueColors.length, "unique colors from fallback");
+                        displayColorSwatches(uniqueColors);
+                    } else {
+                        console.warn("[DP5-HELPER] No colors found from fallback API");
+                        useHardcodedColors(styleNumber, container);
+                    }
+                })
+                .catch(error => {
+                    console.error("[DP5-HELPER] Error fetching colors from fallback endpoint:", error);
+                    useHardcodedColors(styleNumber, container);
+                });
+        }
+        
+        // Function to use hardcoded colors as last resort
+        function useHardcodedColors(styleNumber, container) {
+            console.log("[DP5-HELPER] Using hardcoded colors as last resort");
+            
+            // Common colors for most apparel items
+            const hardcodedColors = [
+                { COLOR_NAME: "Black", CATALOG_COLOR: "Black", HEX_CODE: "#000000" },
+                { COLOR_NAME: "Navy", CATALOG_COLOR: "Navy", HEX_CODE: "#000080" },
+                { COLOR_NAME: "Royal", CATALOG_COLOR: "Royal", HEX_CODE: "#4169E1" },
+                { COLOR_NAME: "Red", CATALOG_COLOR: "Red", HEX_CODE: "#FF0000" },
+                { COLOR_NAME: "Forest Green", CATALOG_COLOR: "ForestGreen", HEX_CODE: "#228B22" },
+                { COLOR_NAME: "White", CATALOG_COLOR: "White", HEX_CODE: "#FFFFFF" },
+                { COLOR_NAME: "Ash", CATALOG_COLOR: "Ash", HEX_CODE: "#B2BEB5" },
+                { COLOR_NAME: "Charcoal", CATALOG_COLOR: "Charcoal", HEX_CODE: "#36454F" }
+            ];
+            
+            if (hardcodedColors.length > 0) {
+                console.log("[DP5-HELPER] Using", hardcodedColors.length, "hardcoded colors");
+                displayColorSwatches(hardcodedColors);
+            } else {
+                container.innerHTML = '<div class="no-colors-message">No color options available for this style.</div>';
+            }
+        }
             
         // Helper function to display color swatches
         function displayColorSwatches(colors) {
@@ -662,10 +722,22 @@
             
             // Add color swatches
             colors.forEach(color => {
+                // Create wrapper element
+                const wrapper = document.createElement('div');
+                wrapper.className = 'swatch-wrapper';
+                
                 // Create swatch element
                 const swatch = document.createElement('div');
                 swatch.className = 'color-swatch';
-                swatch.style.backgroundColor = color.HEX_CODE || '#cccccc';
+                // Use the color swatch image if available
+                if (color.COLOR_SQUARE_IMAGE) {
+                    swatch.style.backgroundImage = `url('${color.COLOR_SQUARE_IMAGE}')`;
+                    swatch.style.backgroundSize = 'cover';
+                    swatch.style.backgroundPosition = 'center';
+                } else {
+                    // Fallback to a solid color if no image is available
+                    swatch.style.backgroundColor = color.HEX_CODE || '#cccccc';
+                }
                 swatch.dataset.colorName = color.COLOR_NAME;
                 swatch.dataset.catalogColor = color.CATALOG_COLOR;
                 
@@ -674,21 +746,25 @@
                     swatch.classList.add('active');
                 }
                 
-                // Add color name
-                const colorName = document.createElement('span');
+                // Create color name element
+                const colorName = document.createElement('div');
                 colorName.className = 'color-name';
                 colorName.textContent = color.COLOR_NAME;
-                swatch.appendChild(colorName);
                 
-                // Add click event
-                swatch.addEventListener('click', function() {
+                // Add click event to the wrapper
+                wrapper.addEventListener('click', function() {
                     // Update URL with new color
                     const newUrl = new URL(window.location.href);
                     newUrl.searchParams.set('COLOR', color.CATALOG_COLOR || color.COLOR_NAME);
                     window.location.href = newUrl.toString();
                 });
                 
-                swatchesContainer.appendChild(swatch);
+                // Append swatch and color name to wrapper
+                wrapper.appendChild(swatch);
+                wrapper.appendChild(colorName);
+                
+                // Append wrapper to container
+                swatchesContainer.appendChild(wrapper);
             });
         }
     }

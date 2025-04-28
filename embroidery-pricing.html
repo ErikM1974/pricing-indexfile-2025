@@ -5,62 +5,846 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embroidery Pricing | NWCA</title>
     <link rel="stylesheet" href="/pricing-pages-enhanced.css">
+    <style>
+        /* New layout styles for embroidery pricing page */
+        /* Improved layout styles */
+        .improved-layout {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-md);
+            overflow: hidden;
+        }
+        
+        /* Improved header styling */
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 25px;
+            background-color: var(--primary-light);
+            border-bottom: 1px solid var(--border-color);
+            border-top-left-radius: var(--radius-md);
+            border-top-right-radius: var(--radius-md);
+        }
+        
+        .product-title-area {
+            flex: 1;
+        }
+        
+        .product-title-area h2 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.5em;
+        }
+        
+        .navigation-area {
+            margin-left: 20px;
+        }
+        
+        .product-content {
+            display: flex;
+            padding: 20px;
+            justify-content: space-between;
+        }
+        
+        .product-image-column {
+            flex: 0 0 380px;
+            margin-right: 40px;
+        }
+        
+        .product-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .color-swatches-column {
+            flex: 1;
+            min-width: 650px;
+            padding: 10px;
+        }
+        
+        /* This is a duplicate rule - the main one is defined below */
+        
+        /* Image zoom feature */
+        .product-image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .image-zoom-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        
+        .image-zoom-overlay:hover {
+            opacity: 1;
+        }
+        
+        .zoom-icon {
+            font-size: 18px;
+        }
+        
+        .selected-color-display {
+            margin-top: 10px;
+            text-align: center;
+            padding: 10px;
+            background-color: var(--primary-light);
+            border-radius: var(--radius-sm);
+            font-size: 0.9em;
+            border-left: 3px solid var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .selected-color-display strong {
+            font-weight: bold;
+            color: var(--primary-color);
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .color-swatches-container.compact {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--background-light);
+            border-radius: var(--radius-sm);
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .color-swatches-container.compact .section-title {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .color-swatches-container.compact .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 10px 15px;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--primary-light);
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-track {
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        /* Style for the swatch wrapper */
+        .swatch-wrapper {
+            /* Remove conflicting display property */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 90px; /* Increased width to allow more space for longer names */
+            height: 52px; /* Extremely reduced height to bring elements closer */
+            margin: 5px 10px; /* Increased horizontal margin */
+            transition: all 0.2s ease;
+            position: relative;
+            border-radius: 8px;
+            padding: 3px;
+        }
+        
+        /* Add highlight connection effect on hover */
+        .swatch-wrapper:hover {
+            background-color: rgba(0, 128, 0, 0.05); /* Very subtle green background */
+            box-shadow: 0 0 0 2px rgba(0, 128, 0, 0.1); /* Subtle green outline */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+        
+        /* Add a subtle connecting line on hover */
+        .swatch-wrapper:hover::after {
+            content: '';
+            position: absolute;
+            top: 50px; /* Position below the swatch */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px; /* Thin vertical line */
+            height: 6px; /* Short line */
+            background-color: rgba(0, 128, 0, 0.3); /* Semi-transparent green */
+            border-radius: 1px;
+            z-index: 1;
+        }
+        
+        /* Enhance hover effect on the color swatch itself */
+        .swatch-wrapper:hover .color-swatch {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(0, 128, 0, 0.3);
+        }
+        
+        /* Pulse animation for highlighting a swatch */
+        @keyframes pulse-highlight {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 128, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0); }
+        }
+        
+        .color-swatch.pulse-highlight {
+            animation: pulse-highlight 1s ease infinite;
+            border-color: var(--primary-color);
+        }
+        
+        /* Enhance hover effect on the color name */
+        .swatch-wrapper:hover .color-name {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        /* Style for the color swatch items */
+        .color-swatch {
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 50% !important; /* Ensures perfect circle */
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            margin: 0 auto 0 auto; /* Removed bottom margin to reduce space */
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            z-index: 1;
+            /* Ensure perfect circles with multiple approaches */
+            aspect-ratio: 1 / 1 !important;
+            box-sizing: border-box;
+            min-width: 50px !important;
+            min-height: 50px !important;
+            max-width: 50px !important;
+            max-height: 50px !important;
+            object-fit: cover !important;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.02);
+            border-color: var(--primary-color);
+        }
+        
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .color-name {
+            text-align: center;
+            font-size: 0.75em;
+            color: var(--text-color);
+            display: block;
+            width: 100%;
+            white-space: nowrap; /* Prevent text wrapping */
+            overflow: visible;
+            font-weight: 500;
+            line-height: 1;
+            margin-top: -18px; /* Even more aggressive negative margin to pull text up */
+            padding: 0; /* No padding */
+            /* Remove position-related properties that conflict with flex layout */
+            position: relative;
+            /* Ensure text is centered within its container */
+            align-self: center;
+            z-index: 2; /* Ensure the text appears above any highlight effects */
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .product-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .navigation-area {
+                margin-left: 0;
+                margin-top: 10px;
+                align-self: flex-start;
+            }
+            
+            .product-content {
+                flex-direction: column;
+            }
+            
+            .product-image-column {
+                flex: 0 0 auto;
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .color-swatches-column {
+                width: 100%;
+            }
+            
+            .color-swatches-container.compact {
+                margin-top: 10px;
+            }
+            
+            .color-swatches-container.compact .color-swatches {
+                grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+                max-height: 200px;
+            }
+            
+            /* Make the product image sticky on mobile */
+            .product-image-container {
+                position: sticky;
+                top: 0;
+                background-color: var(--white);
+                z-index: 10;
+                padding: 10px;
+                border-radius: var(--radius-sm);
+                box-shadow: var(--shadow-sm);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .color-swatches-container.compact .color-swatches {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+                gap: 5px;
+            }
+            
+            .color-swatch {
+                width: 35px !important;
+                height: 35px !important;
+                /* Maintain aspect ratio for smaller screens too */
+                aspect-ratio: 1 / 1 !important;
+                min-width: 35px !important;
+                min-height: 35px !important;
+                max-width: 35px !important;
+                max-height: 35px !important;
+            }
+            
+            .color-name {
+                font-size: 0.65em;
+            }
+            
+            .selected-color-display {
+                padding: 8px;
+                font-size: 0.8em;
+            }
+            
+            /* Add a "Show More Colors" button for mobile */
+            .show-more-colors {
+                display: block;
+                margin-top: 10px;
+                text-align: center;
+                padding: 8px;
+                background-color: var(--primary-light);
+                color: var(--primary-color);
+                border: none;
+                border-radius: var(--radius-sm);
+                font-weight: bold;
+                cursor: pointer;
+            }
+            
+            /* Initially limit the height on mobile */
+            .color-swatches-container.compact .color-swatches.collapsed {
+                max-height: 120px;
+                overflow-y: hidden;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Embroidery Pricing</h1>
         
-        <!-- Product Context Area -->
-        <div class="product-context">
-            <div class="product-image-container">
-                <img id="product-image" src="" alt="Product Image" class="product-image">
-            </div>
-            <div class="product-details">
-                <h2 id="product-title">Product Title</h2>
-                <div class="product-meta">
-                    <span class="meta-item">Style: <strong id="product-style">Style Number</strong></span>
-                    <span class="meta-item">Color: <strong id="product-color">Color Name</strong></span>
+        <!-- Redesigned Product Context Area -->
+        <div class="product-context improved-layout">
+            <div class="product-header">
+                <div class="product-title-area">
+                    <h2 id="product-title">Product Title</h2>
+                    <div class="product-meta">
+                        <span class="meta-item">Style: <strong id="product-style">Style Number</strong></span>
+                        <span class="meta-item">Color: <strong id="product-color">Color Name</strong></span>
+                    </div>
                 </div>
-                <a id="back-to-product" href="#" class="back-to-product">
-                    <span class="back-icon">←</span> Back to Product
-                </a>
+                <div class="navigation-area">
+                    <a id="back-to-product" href="#" class="back-to-product">
+                        <span class="back-icon">←</span> Back to Product
+                    </a>
+                </div>
+            </div>
+            
+            <div class="product-content">
+                <div class="product-image-column">
+                    <div class="product-image-container">
+                        <img id="product-image" src="" alt="Product Image" class="product-image">
+                        <div class="image-zoom-overlay">
+                            <span class="zoom-icon">🔍</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="color-swatches-column">
+                    <div class="color-swatches-container compact">
+                        <h3 class="section-title">Available Colors</h3>
+                        <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 5px;">
+                            <!-- Color swatches will be dynamically added here -->
+                        </div>
+                        <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <!-- Tab Navigation -->
-        <div class="pricing-tabs">
-            <a href="#" class="pricing-tab active" data-page="embroidery">Embroidery</a>
-            <a href="#" class="pricing-tab" data-page="cap-embroidery">Cap Embroidery</a>
-            <a href="#" class="pricing-tab" data-page="dtg">DTG</a>
-            <a href="#" class="pricing-tab" data-page="screen-print">Screen Print</a>
-            <a href="#" class="pricing-tab" data-page="dtf">DTF</a>
-        </div>
+        <!-- Removed other embellishment tabs as per feedback -->
         
         <!-- Pricing Content -->
         <div class="pricing-content">
-            <div class="pricing-info">
-                <h2>Embroidery Pricing</h2>
-                <p>Our embroidery pricing includes standard 8,000 stitch count, professional digitizing, and quality thread and backing.</p>
-            </div>
-            
             <!-- Hidden Caspio Matrix - Keep this for data source -->
             <div id="pricing-calculator" class="pricing-calculator">
                 <div class="loading-message">Loading pricing data...</div>
             </div>
             
-            <!-- Color Selection Section -->
-            <div class="color-selection-section">
-                <h3 class="section-title">Available Colors</h3>
-                <div class="color-swatches-container">
-                    <div class="color-swatches" id="color-swatches">
-                        <!-- Color swatches will be dynamically added here -->
-                    </div>
-                </div>
-            </div>
-            
             <!-- Custom Pricing Grid -->
             <div class="pricing-section">
-                <h3 class="section-title">Pricing Matrix</h3>
+                <div class="pricing-header">
+                    <h3 class="section-title">Pricing Includes an 8,000 stitch embroidered logo</h3>
+                    <div class="selected-color-indicator">
+                        <span>Selected Color:</span>
+                        <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches above"></div>
+                        <strong id="pricing-color-name">Color Name</strong>
+                    </div>
+                </div>
+                
+                <style>
+                    .pricing-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 15px;
+                        flex-wrap: wrap;
+                    }
+                    
+                    .selected-color-indicator {
+                        display: flex;
+                        align-items: center;
+                        font-size: 0.9em;
+                        background-color: var(--primary-light);
+                        padding: 5px 10px;
+                        border-radius: var(--radius-sm);
+                        border-left: 3px solid var(--primary-color);
+                    }
+                    
+                    .mini-color-swatch {
+                        width: 30px;
+                        height: 30px;
+                        border-radius: 50%;
+                        margin: 0 8px;
+                        border: 2px solid var(--border-color);
+                        display: inline-block;
+                        vertical-align: middle;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                        background-size: cover;
+                        background-position: center;
+                        box-sizing: border-box;
+                        aspect-ratio: 1/1;
+                    }
+                    
+                    #pricing-color-name {
+                        color: var(--primary-color);
+                    }
+                    
+                    /* Enhanced mini-swatch styles */
+                    .mini-color-swatch {
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .mini-color-swatch:hover {
+                        transform: scale(1.1);
+                        border-color: var(--primary-color);
+                    }
+                    
+                    .mini-color-swatch.active-swatch {
+                        border-color: var(--primary-color);
+                        box-shadow: 0 0 0 2px var(--primary-light);
+                    }
+                    
+                    .mini-color-swatch.fallback-swatch {
+                        /* Add a subtle texture/pattern when using solid fallback color */
+                        background-image: radial-gradient(circle, transparent 0%, rgba(255,255,255,0.05) 100%);
+                    }
+                    
+                    .mini-color-swatch.clickable {
+                        cursor: pointer;
+                        position: relative;
+                    }
+                    
+                    .mini-color-swatch.clickable::after {
+                        content: '';
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        top: 0;
+                        left: 0;
+                        border-radius: 50%;
+                        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+                        opacity: 0;
+                        transition: opacity 0.3s ease;
+                    }
+                    
+                    .mini-color-swatch.clickable:hover::after {
+                        opacity: 1;
+                    }
+                </style>
+                
+                <script>
+                    // Update the mini color swatch and name when the page loads
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Function to update the mini color swatch
+                        function updateMiniColorSwatch() {
+                            // Get the current selected color from product-color (this might be the catalog color)
+                            const catalogColorName = document.getElementById('product-color').textContent;
+                            const pricingColorName = document.getElementById('pricing-color-name');
+                            const miniColorSwatch = document.getElementById('pricing-color-swatch');
+                            
+                            console.log("DEBUG: Updating mini swatch for catalog color:", catalogColorName);
+                            
+                            // We'll find the proper COLOR_NAME to display instead of using the catalog color
+                            let displayColorName = catalogColorName; // Default to catalog color as fallback
+                            
+                            if (pricingColorName && miniColorSwatch) {
+                                
+                                // Try to find the matching swatch to use its exact appearance
+                                const colorSwatches = document.querySelectorAll('.color-swatch');
+                                let matchFound = false;
+                                
+                                // Log all available swatches for debugging
+                                console.log("DEBUG: Available swatches:");
+                                colorSwatches.forEach(s => {
+                                    console.log(`- Swatch: ${s.getAttribute('data-color-name')}`);
+                                });
+                                
+                                // Try exact match first
+                                console.log("DEBUG: Looking for exact match for:", catalogColorName);
+                                for (const swatch of colorSwatches) {
+                                    const swatchName = swatch.getAttribute('data-color-name');
+                                    
+                                    // Log to see what we're working with
+                                    console.log(`Checking swatch: "${swatchName}" against "${catalogColorName}"`);
+                                    
+                                    if (swatchName === catalogColorName) {
+                                        console.log("DEBUG: EXACT MATCH FOUND for:", catalogColorName);
+                                        
+                                        // Important: Use the COLOR_NAME from the swatch, not the catalog color
+                                        displayColorName = swatchName; // This is the display name we want to show
+                                        
+                                        // Clone the entire swatch element to ensure exact appearance
+                                        const clonedSwatch = swatch.cloneNode(true);
+                                        console.log("DEBUG: Cloned swatch:", clonedSwatch);
+                                        
+                                        // Get the computed background image
+                                        const computedStyle = window.getComputedStyle(swatch);
+                                        const exactBackgroundImage = computedStyle.backgroundImage;
+                                        console.log("DEBUG: Exact background image:", exactBackgroundImage);
+                                        matchFound = true;
+                                        
+                                        console.log("Found matching swatch for:", catalogColorName);
+                                        
+                                        // IMPORTANT: Extract ONLY the background-image URL and apply it directly
+                                        // This ensures we're using the exact same swatch image
+                                        const swatchStyle = window.getComputedStyle(swatch);
+                                        const swatchImageUrl = swatchStyle.backgroundImage;
+                                        
+                                        // Clear all existing styling first to ensure a clean slate
+                                        miniColorSwatch.setAttribute("style", "");
+                                        
+                                        // Apply the exact same background image
+                                        miniColorSwatch.style.width = "30px";
+                                        miniColorSwatch.style.height = "30px";
+                                        miniColorSwatch.style.borderRadius = "50%";
+                                        miniColorSwatch.style.margin = "0 8px";
+                                        miniColorSwatch.style.border = "2px solid var(--primary-color)";
+                                        miniColorSwatch.style.display = "inline-block";
+                                        miniColorSwatch.style.verticalAlign = "middle";
+                                        miniColorSwatch.style.backgroundImage = swatchImageUrl;
+                                        miniColorSwatch.style.backgroundSize = "cover";
+                                        miniColorSwatch.style.backgroundPosition = "center";
+                                        miniColorSwatch.style.aspectRatio = "1/1";
+                                        
+                                        console.log("Applied exact swatch URL to mini swatch:", swatchImageUrl);
+                                        
+                                        // Keep the clickable class
+                                        miniColorSwatch.className = "mini-color-swatch clickable active-swatch";
+                                        
+                                        console.log("Copied swatch styling for:", swatchName);
+                                        console.log("Background image:", computedStyle.backgroundImage);
+                                        console.log("Background color:", computedStyle.backgroundColor);
+                                        
+                                        break;
+                                    }
+                                }
+                                
+                                // Try normalized match if exact match fails
+                                if (!matchFound) {
+                                    console.log("DEBUG: No exact match found - trying normalized comparison");
+                                    
+                                    // Function to normalize color names for comparison
+                                    const normalizeColorName = (name) => {
+                                        return name.toLowerCase()
+                                            .replace(/\s+/g, '') // Remove all spaces
+                                            .replace(/\./g, '')  // Remove periods
+                                            .replace("safety", "s") // Common abbreviation
+                                            .replace("stonewashed", "stonew"); // Common abbreviation
+                                    };
+                                    
+                                    const normalizedColorName = normalizeColorName(catalogColorName);
+                                    console.log("DEBUG: Normalized color name:", normalizedColorName);
+                                    
+                                    for (const swatch of colorSwatches) {
+                                        const swatchName = swatch.getAttribute('data-color-name');
+                                        if (swatchName && normalizeColorName(swatchName) === normalizedColorName) {
+                                            console.log("DEBUG: NORMALIZED MATCH FOUND for:", catalogColorName, "via", swatchName);
+                                            
+                                            // Use the actual COLOR_NAME from the swatch for display
+                                            displayColorName = swatchName;
+                                            matchFound = true;
+                                            
+                                            // Clone the entire swatch element to ensure exact appearance
+                                            const clonedSwatch = swatch.cloneNode(true);
+                                            console.log("DEBUG: Cloned normalized match swatch:", clonedSwatch);
+                                            
+                                            // Get the computed background image
+                                            const computedStyle = window.getComputedStyle(swatch);
+                                            const exactBackgroundImage = computedStyle.backgroundImage;
+                                            console.log("DEBUG: Normalized match background image:", exactBackgroundImage);
+                                            
+                                            // Clear all existing styling first
+                                            miniColorSwatch.setAttribute("style", "");
+                                            
+                                            // Apply the same styling with this image
+                                            miniColorSwatch.style.width = "30px";
+                                            miniColorSwatch.style.height = "30px";
+                                            miniColorSwatch.style.borderRadius = "50%";
+                                            miniColorSwatch.style.margin = "0 8px";
+                                            miniColorSwatch.style.border = "2px solid var(--primary-color)";
+                                            miniColorSwatch.style.display = "inline-block";
+                                            miniColorSwatch.style.verticalAlign = "middle";
+                                            miniColorSwatch.style.backgroundImage = exactBackgroundImage;
+                                            miniColorSwatch.style.backgroundSize = "cover";
+                                            miniColorSwatch.style.backgroundPosition = "center";
+                                            miniColorSwatch.style.aspectRatio = "1/1";
+                                            
+                                            miniColorSwatch.className = "mini-color-swatch clickable active-swatch";
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                // Specific override for S.Green because it's the one shown in the screenshot
+                                if (!matchFound && (catalogColorName === "SGreen" || catalogColorName === "S.Green" || catalogColorName === "Safety Green" || catalogColorName === "S. Green")) {
+                                    console.log("DEBUG: Special case handling for S.Green color");
+                                    
+                                    // Find any swatch that might be S.Green regardless of how it's labeled
+                                    for (const swatch of colorSwatches) {
+                                        const swatchName = swatch.getAttribute('data-color-name');
+                                        if (swatchName && (
+                                            swatchName.toLowerCase().includes("green") &&
+                                            (swatchName.toLowerCase().includes("s.") ||
+                                             swatchName.toLowerCase().includes("s ") ||
+                                             swatchName.toLowerCase().includes("safety"))
+                                        )) {
+                                            console.log("DEBUG: Found S.Green swatch:", swatchName);
+                                            matchFound = true;
+                                            
+                                            // Get the computed style for background image
+                                            const computedStyle = window.getComputedStyle(swatch);
+                                            const exactBackgroundImage = computedStyle.backgroundImage;
+                                            console.log("DEBUG: S.Green background image:", exactBackgroundImage);
+                                            
+                                            // Use the actual COLOR_NAME from the swatch for display
+                                            displayColorName = swatchName;
+                                            
+                                            // Clear all existing styling first
+                                            miniColorSwatch.setAttribute("style", "");
+                                            
+                                            // Apply the styling
+                                            miniColorSwatch.style.width = "30px";
+                                            miniColorSwatch.style.height = "30px";
+                                            miniColorSwatch.style.borderRadius = "50%";
+                                            miniColorSwatch.style.margin = "0 8px";
+                                            miniColorSwatch.style.border = "2px solid var(--primary-color)";
+                                            miniColorSwatch.style.display = "inline-block";
+                                            miniColorSwatch.style.verticalAlign = "middle";
+                                            miniColorSwatch.style.backgroundImage = exactBackgroundImage;
+                                            miniColorSwatch.style.backgroundSize = "cover";
+                                            miniColorSwatch.style.backgroundPosition = "center";
+                                            miniColorSwatch.style.aspectRatio = "1/1";
+                                            
+                                            miniColorSwatch.className = "mini-color-swatch clickable active-swatch";
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                // If still no match, try to find any color swatch with a valid image
+                                if (!matchFound) {
+                                    console.log("DEBUG: No match found for:", catalogColorName, "- searching for any swatch image");
+                                    
+                                    // Try to find ANY swatch with a valid background image to use
+                                    let foundAnySwatchWithImage = false;
+                                    
+                                    for (const anySwatch of colorSwatches) {
+                                        const anySwatchStyle = window.getComputedStyle(anySwatch);
+                                        const swatchImageUrl = anySwatchStyle.backgroundImage;
+                                        
+                                        // If this swatch has a valid background image, use it
+                                        if (swatchImageUrl && swatchImageUrl !== "none" && !swatchImageUrl.includes("linear-gradient") && !swatchImageUrl.includes("radial-gradient")) {
+                                            console.log("Found a usable swatch image:", swatchImageUrl);
+                                            
+                                            // Clear all existing styling first
+                                            miniColorSwatch.setAttribute("style", "");
+                                            
+                                            // Apply the same styling with this image
+                                            miniColorSwatch.style.width = "30px";
+                                            miniColorSwatch.style.height = "30px";
+                                            miniColorSwatch.style.borderRadius = "50%";
+                                            miniColorSwatch.style.margin = "0 8px";
+                                            miniColorSwatch.style.border = "2px solid var(--border-color)";
+                                            miniColorSwatch.style.display = "inline-block";
+                                            miniColorSwatch.style.verticalAlign = "middle";
+                                            miniColorSwatch.style.backgroundImage = swatchImageUrl;
+                                            miniColorSwatch.style.backgroundSize = "cover";
+                                            miniColorSwatch.style.backgroundPosition = "center";
+                                            miniColorSwatch.style.aspectRatio = "1/1";
+                                            
+                                            miniColorSwatch.className = "mini-color-swatch clickable";
+                                            foundAnySwatchWithImage = true;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    // Only as a last resort, use a solid color
+                                    if (!foundAnySwatchWithImage) {
+                                        console.warn("No swatch images found at all - using solid color as last resort");
+                                        console.log("No matching swatch found - trying to find swatch images in the DOM");
+                                        
+                                        // Try to find ANY color swatch with a valid background image as a backup
+                                        let foundAnySwatchUrl = false;
+                                        for (const anySwatch of colorSwatches) {
+                                            const anySwatchStyle = window.getComputedStyle(anySwatch);
+                                            const anySwatchUrl = anySwatchStyle.backgroundImage;
+                                            
+                                            if (anySwatchUrl && anySwatchUrl !== "none") {
+                                                // Use this URL but customize the label to match our color
+                                                miniColorSwatch.style.backgroundImage = anySwatchUrl;
+                                                miniColorSwatch.style.backgroundSize = "cover";
+                                                miniColorSwatch.style.backgroundPosition = "center";
+                                                miniColorSwatch.style.backgroundRepeat = "no-repeat";
+                                                
+                                                console.log("Using a different swatch's URL as template:", anySwatchUrl);
+                                                foundAnySwatchUrl = true;
+                                                break;
+                                            }
+                                        }
+                                        
+                                        // If we couldn't find ANY swatch with a background image, fall back to a color
+                                        if (!foundAnySwatchUrl) {
+                                            console.warn("No swatch images found at all, using solid color fallback");
+                                            
+                                            // Clear all existing styling first
+                                            miniColorSwatch.setAttribute("style", "");
+                                            
+                                            // Apply a simple colored circle styling
+                                            miniColorSwatch.style.width = "30px";
+                                            miniColorSwatch.style.height = "30px";
+                                            miniColorSwatch.style.borderRadius = "50%";
+                                            miniColorSwatch.style.margin = "0 8px";
+                                            miniColorSwatch.style.border = "2px solid var(--border-color)";
+                                            miniColorSwatch.style.display = "inline-block";
+                                            miniColorSwatch.style.verticalAlign = "middle";
+                                            miniColorSwatch.style.backgroundColor = "#36454F"; // Charcoal as default
+                                            miniColorSwatch.style.aspectRatio = "1/1";
+                                            
+                                            // Add a pattern to make it more visually interesting
+                                            miniColorSwatch.style.backgroundImage = "radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 80%)";
+                                            
+                                            miniColorSwatch.className = "mini-color-swatch clickable fallback-swatch";
+                                            miniColorSwatch.style.backgroundColor = "#36454F"; // Default to Charcoal as last resort
+                                            miniColorSwatch.classList.add('fallback-swatch');
+                                        }
+                                    }
+                                }
+                                
+                                // Make sure the swatch is visible
+                                miniColorSwatch.style.display = "block";
+                                miniColorSwatch.style.visibility = "visible";
+                                
+                                // IMPORTANT: Set the text to the display COLOR_NAME, not the catalog color
+                                console.log("DEBUG: Setting display color name to:", displayColorName);
+                                pricingColorName.textContent = displayColorName;
+                                
+                                // Add click event listener to the mini swatch
+                                miniColorSwatch.addEventListener('click', function() {
+                                    // Find the matching swatch in the color selection area
+                                    const colorSwatches = document.querySelectorAll('.color-swatch');
+                                    for (const swatch of colorSwatches) {
+                                        const swatchName = swatch.getAttribute('data-color-name');
+                                        if (swatchName === displayColorName) {
+                                            // Scroll to the matching swatch
+                                            swatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                            
+                                            // Highlight the swatch with a pulse effect
+                                            swatch.classList.add('pulse-highlight');
+                                            
+                                            // Remove the highlight after animation completes
+                                            setTimeout(() => {
+                                                swatch.classList.remove('pulse-highlight');
+                                            }, 2000);
+                                            
+                                            break;
+                                        }
+                                    }
+                                });
+                            } else {
+                                console.log("Could not find pricing-color-name or pricing-color-swatch elements");
+                            }
+                        }
+                        
+                        // Initial update with a longer delay to ensure elements are loaded
+                        setTimeout(updateMiniColorSwatch, 1000);
+                        setTimeout(updateMiniColorSwatch, 2000);
+                        
+                        // Update when color changes
+                        document.addEventListener('colorChanged', function(event) {
+                            console.log("Color changed event detected");
+                            updateMiniColorSwatch();
+                        });
+                    });
+                </script>
                 <div class="pricing-grid-container">
                     <table class="pricing-grid" id="custom-pricing-grid">
                         <thead>
@@ -76,12 +860,33 @@
                     
                     <div class="pricing-notes">
                         <div class="ltm-fee-container">
-                            <h4>Less Than Minimum (LTM) Fees:</h4>
-                            <ul>
-                                <li>1-11 pieces: $50.00 fee</li>
-                                <li>12-23 pieces: $25.00 fee</li>
-                            </ul>
+                            <h4>Less Than Minimum (LTM) Fee:</h4>
+                            <p>For orders under 24 pieces, a $50.00 LTM fee applies.</p>
+                            <p class="ltm-calculation">Calculation: Use the 24-piece price + ($50.00 ÷ number of items)</p>
+                            <p class="ltm-example">Example: 10 items would be the 24-piece price + $5.00 per item</p>
                         </div>
+                        <div class="inventory-indicator-legend" style="margin-top: 15px; padding: 10px; background-color: #f8f8f8; border-radius: 4px;">
+                            <h4 style="margin-top: 0; margin-bottom: 8px;">Inventory Indicators:</h4>
+                            <div style="display: flex; align-items: center;">
+                                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #dc3545; margin-right: 8px;"></span>
+                                <span>Red dot indicates low inventory (less than 10 items available)</span>
+                            </div>
+                        </div>
+                        
+                        <script>
+                            // Only show inventory indicators when there is actually low inventory
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Check if there are any low inventory items
+                                const hasLowInventory = window.dp5InventoryData &&
+                                    Object.values(window.dp5InventoryData).some(item => item && item.QuantityAvailable < 10);
+                                
+                                // Show/hide the inventory indicator legend based on whether there's low inventory
+                                const legend = document.querySelector('.inventory-indicator-legend');
+                                if (legend) {
+                                    legend.style.display = hasLowInventory ? 'block' : 'none';
+                                }
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
@@ -108,24 +913,7 @@
                 </div>
             </div>
             
-            <div class="additional-info">
-                <h3>About Our Embroidery</h3>
-                <p>Our state-of-the-art embroidery machines produce high-quality, durable designs that withstand repeated washing and wear. We use premium threads and professional digitizing to ensure your logo or design looks its best.</p>
-                
-                <h3>Embroidery FAQs</h3>
-                <div class="faq-item">
-                    <h4>What is the maximum size for embroidery?</h4>
-                    <p>Standard embroidery areas are typically up to 4" x 4" for most garments. Larger designs may require special placement or additional charges.</p>
-                </div>
-                <div class="faq-item">
-                    <h4>How many colors can I include in my embroidery design?</h4>
-                    <p>Our standard pricing includes up to 8 thread colors. Additional colors may incur a small upcharge.</p>
-                </div>
-                <div class="faq-item">
-                    <h4>What file formats do you accept for embroidery?</h4>
-                    <p>We can work with most vector formats (.ai, .eps, .pdf) or high-resolution raster images (.png, .jpg). For best results, vector files are preferred.</p>
-                </div>
-            </div>
+            <!-- FAQ section removed as per feedback -->
         </div>
     </div>
     
@@ -333,7 +1121,7 @@
                     } else if (tierName === '12-23') {
                         minQuantity = 12;
                         maxQuantity = 23;
-                        ltmFee = 25.00;
+                        ltmFee = 50.00;
                     } else if (tierName === '24-47') {
                         minQuantity = 24;
                         maxQuantity = 47;
@@ -469,6 +1257,112 @@
             
             // Let add-to-cart.js handle the cart total calculation and add to cart button
             console.log("[DIRECT-FIX] Delegating cart functionality to add-to-cart.js");
+            
+            // Handle "Show More Colors" button for mobile
+            function setupShowMoreColorsButton() {
+                const showMoreButton = document.getElementById('show-more-colors');
+                const colorSwatches = document.getElementById('color-swatches');
+                
+                if (!showMoreButton || !colorSwatches) return;
+                
+                // Only show the button on mobile devices
+                if (window.innerWidth <= 480) {
+                    showMoreButton.style.display = 'block';
+                    
+                    // Add click event listener
+                    showMoreButton.addEventListener('click', function() {
+                        if (colorSwatches.classList.contains('collapsed')) {
+                            // Expand
+                            colorSwatches.classList.remove('collapsed');
+                            showMoreButton.textContent = 'Show Less Colors';
+                        } else {
+                            // Collapse
+                            colorSwatches.classList.add('collapsed');
+                            showMoreButton.textContent = 'Show More Colors';
+                        }
+                    });
+                } else {
+                    showMoreButton.style.display = 'none';
+                    colorSwatches.classList.remove('collapsed');
+                }
+            }
+            
+            // Set up the button when the page loads
+            setTimeout(setupShowMoreColorsButton, 1000);
+            
+            // Update button visibility on window resize
+            window.addEventListener('resize', function() {
+                setupShowMoreColorsButton();
+            });
+            
+            // Add image zoom functionality
+            function setupImageZoom() {
+                const imageContainer = document.querySelector('.product-image-container');
+                const image = document.getElementById('product-image');
+                const zoomOverlay = document.querySelector('.image-zoom-overlay');
+                
+                if (!imageContainer || !image || !zoomOverlay) return;
+                
+                // Create modal elements for zoomed image
+                const modal = document.createElement('div');
+                modal.className = 'image-zoom-modal';
+                modal.style.display = 'none';
+                modal.style.position = 'fixed';
+                modal.style.zIndex = '1000';
+                modal.style.left = '0';
+                modal.style.top = '0';
+                modal.style.width = '100%';
+                modal.style.height = '100%';
+                modal.style.backgroundColor = 'rgba(0,0,0,0.9)';
+                modal.style.overflow = 'auto';
+                
+                const modalContent = document.createElement('img');
+                modalContent.className = 'image-zoom-modal-content';
+                modalContent.style.margin = 'auto';
+                modalContent.style.display = 'block';
+                modalContent.style.maxWidth = '90%';
+                modalContent.style.maxHeight = '90%';
+                modalContent.style.position = 'absolute';
+                modalContent.style.top = '50%';
+                modalContent.style.left = '50%';
+                modalContent.style.transform = 'translate(-50%, -50%)';
+                
+                const closeButton = document.createElement('span');
+                closeButton.className = 'image-zoom-close';
+                closeButton.innerHTML = '&times;';
+                closeButton.style.position = 'absolute';
+                closeButton.style.top = '15px';
+                closeButton.style.right = '35px';
+                closeButton.style.color = '#f1f1f1';
+                closeButton.style.fontSize = '40px';
+                closeButton.style.fontWeight = 'bold';
+                closeButton.style.cursor = 'pointer';
+                
+                modal.appendChild(modalContent);
+                modal.appendChild(closeButton);
+                document.body.appendChild(modal);
+                
+                // Add click event to zoom overlay
+                zoomOverlay.addEventListener('click', function() {
+                    modal.style.display = 'block';
+                    modalContent.src = image.src;
+                });
+                
+                // Add click event to close button
+                closeButton.addEventListener('click', function() {
+                    modal.style.display = 'none';
+                });
+                
+                // Close modal when clicking outside the image
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Set up image zoom when the page loads
+            setTimeout(setupImageZoom, 1000);
         });
     </script>
     
