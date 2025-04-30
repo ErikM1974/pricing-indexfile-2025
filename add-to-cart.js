@@ -479,11 +479,17 @@
         const colorCode = getUrlParameter('COLOR') || document.getElementById('product-color-code')?.value || 'UNKNOWN_COLOR';
         const embType = detectEmbellishmentType();
 
+        // Capture the EXACT product image URL from the specific required element
+        const productImageElement = document.getElementById('product-image'); // Only use this specific ID
+        const specificImageUrl = productImageElement ? productImageElement.getAttribute('src') : '';
+        console.log("[ADD-TO-CART] Captured product image URL from #product-image:", specificImageUrl);
+
         // Construct the final payload
         const productData = {
             styleNumber: styleNumber, color: colorCode, embellishmentType: embType,
             pricingTier: tierKey, ltmFeeApplied: ltmFeeApplies, totalQuantity: totalQuantity,
             sizes: sizesForCart,
+            imageUrl: specificImageUrl, // Add the captured image URL to productData
             pricingInfo: {
                 tierKey, ltmFeeApplied: ltmFeeApplies, ltmFeeTotal, ltmFeePerItem,
                 combinedQuantity, existingCartQuantity: cartQuantity, baseUnitPrices

@@ -307,6 +307,13 @@ if (typeof window.NWCACart === 'undefined') {
           }
         }));
         
+        // Preserve existing imageUrl values, don't override with constructed URLs
+        itemsWithSizes.forEach(item => {
+          if (!item.imageUrl) {
+            item.imageUrl = ''; // Use empty string if no image URL provided
+          }
+        });
+
         cartState.items = itemsWithSizes;
         cartState.error = null;
         
@@ -428,11 +435,26 @@ if (typeof window.NWCACart === 'undefined') {
         }));
         
         // Use the server items with sizes
+        // Preserve exact image URLs, don't override with constructed URLs
+        serverItemsWithSizes.forEach(item => {
+          if (!item.imageUrl) {
+            item.imageUrl = ''; // Use empty string if no image URL provided
+          }
+        });
+        
         serverItems = serverItemsWithSizes;
       } catch (apiError) {
         console.warn('API error during sync, using localStorage only:', apiError);
         // Continue using localStorage data
-        serverItems = [];
+        // Preserve existing image URLs, never construct fallbacks
+        if (cartState.items && cartState.items.length > 0) {
+             cartState.items.forEach(item => {
+                 if (!item.imageUrl) { // Only if missing
+                     item.imageUrl = ''; // Use empty string instead of constructing URL
+                 }
+             });
+        }
+        serverItems = []; // Reset serverItems as the API call failed
       }
       
       // Simplified sync strategy:
@@ -441,6 +463,7 @@ if (typeof window.NWCACart === 'undefined') {
       
       if (serverItems.length > 0) {
         // Server has items, use them
+        // Server has items, use them (imageUrl was added above)
         cartState.items = serverItems;
         cartState.error = null;
         saveToLocalStorage();
@@ -1001,7 +1024,7 @@ if (typeof window.NWCACart === 'undefined') {
             StyleNumber: productData.styleNumber,
             Color: productData.color,
             ImprintType: productData.embellishmentType,
-            imageUrl: productData.imageUrl,
+            imageUrl: productData.imageUrl || '', // Store the specific product image URL, use empty string if missing
             EmbellishmentOptions: productData.embellishmentOptions || {}, // Keep as object
             DateAdded: cartItemData.DateAdded, // Use the date we sent
             CartStatus: 'Active',
@@ -1014,6 +1037,9 @@ if (typeof window.NWCACart === 'undefined') {
                  WarehouseSource: s.WarehouseSource
             }))
           };
+          
+          // Log the specific image being added to local state
+          console.log(`[CART:ADD] Added item to local state with specific imageUrl: ${newItemForLocalState.imageUrl || 'Not provided'}`);
           // Add to local cart state (will be overwritten/confirmed by sync)
           cartState.items.push(newItemForLocalState);
           debugCart("ADD", "Temporarily added new item to local state:", newItemForLocalState);
@@ -1512,6 +1538,27 @@ if (typeof window.NWCACart === 'undefined') {
         }
       });
     }
+  }
+
+  /**
+   * Construct the image URL for a product
+   * @param {string} styleNumber - Product style number
+   * @param {string} color - Product color name/code
+   * @returns {string|null} - Image URL or null if data is missing
+   */
+  function constructImageUrl(styleNumber, color) {
+    if (!styleNumber || !color) {
+      return null; // Cannot construct URL without style and color
+    }
+    // Basic sanitization/formatting (adjust as needed based on actual color codes)
+    const formattedStyle = styleNumber.toUpperCase().trim();
+    // Color codes might need specific formatting (e.g., replacing spaces, specific casing)
+    // This is a guess - adjust based on observed SanMar URL patterns
+    const formattedColor = color.replace(/\s+/g, '').toUpperCase().trim();
+    
+    // Use HTTPS for security
+    // Common SanMar large image pattern - VERIFY THIS PATTERN
+    return `https://www.sanmar.com/cs/images/products/large/${formattedStyle}_${formattedColor}_lrg.jpg`;
   }
 
   /**
