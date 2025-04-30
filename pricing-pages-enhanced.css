@@ -571,6 +571,80 @@ h1 {
     border-left: 4px solid var(--primary-color);
 }
 
+/* Quantity Matrix that mirrors pricing matrix */
+.quantity-matrix-container {
+    margin-bottom: var(--spacing-md);
+    overflow-x: auto;
+}
+
+.quantity-matrix {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    table-layout: fixed;
+}
+
+/* Style for active tier row */
+.quantity-matrix tr.active-tier {
+    background-color: var(--primary-light);
+}
+
+.quantity-matrix tr.active-tier td {
+    border-left: 2px solid var(--primary-color);
+    border-right: 2px solid var(--primary-color);
+}
+
+.quantity-matrix tr.active-tier td:first-child {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.quantity-matrix th {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.quantity-matrix th:first-child {
+    background-color: var(--primary-dark);
+    text-align: left;
+}
+
+.quantity-matrix tr:nth-child(odd) {
+    background-color: rgba(234, 242, 233, 0.3);
+}
+
+.quantity-matrix tr:hover {
+    background-color: var(--primary-light);
+}
+
+.quantity-matrix td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--primary-light);
+}
+
+.quantity-matrix td:first-child {
+    text-align: left;
+    font-weight: bold;
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.quantity-matrix tr:last-child td {
+    border-bottom: none;
+}
+
+/* Individual quantity input cell */
+.quantity-cell {
+    padding: 5px;
+}
+
 .size-quantity-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -603,12 +677,12 @@ h1 {
 .quantity-input-container {
     display: flex;
     align-items: center;
-    margin: 0 10px;
+    margin: 0 auto;
 }
 
 .quantity-btn {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
     border: 1px solid var(--primary-color);
     background-color: var(--white);
     color: var(--primary-color);
@@ -618,6 +692,7 @@ h1 {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    padding: 0;
 }
 
 .quantity-btn:hover {
@@ -634,13 +709,14 @@ h1 {
 }
 
 .quantity-input {
-    width: 50px;
-    height: 30px;
+    width: 40px;
+    height: 24px;
     border: 1px solid var(--primary-color);
     border-left: none;
     border-right: none;
     text-align: center;
-    font-size: 1em;
+    font-size: 0.9em;
+    padding: 0 2px;
 }
 
 .quantity-input:focus {
@@ -653,6 +729,13 @@ h1 {
     text-align: right;
     font-weight: bold;
     color: var(--primary-color);
+}
+
+/* Size price in matrix */
+.size-price-cell {
+    font-weight: bold;
+    color: var(--primary-color);
+    padding-left: 8px;
 }
 
 .cart-summary {
@@ -734,6 +817,22 @@ h1 {
     .add-to-cart-button {
         padding: 10px 20px;
     }
+    
+    .quantity-matrix th,
+    .quantity-matrix td {
+        padding: 8px 5px;
+    }
+    
+    .quantity-btn {
+        width: 22px;
+        height: 22px;
+    }
+    
+    .quantity-input {
+        width: 35px;
+        height: 22px;
+        font-size: 0.8em;
+    }
 }
 
 @media (max-width: 480px) {
@@ -742,14 +841,15 @@ h1 {
     }
     
     .quantity-btn {
-        width: 25px;
-        height: 25px;
+        width: 20px;
+        height: 20px;
+        font-size: 0.8em;
     }
     
     .quantity-input {
-        width: 40px;
-        height: 25px;
-        font-size: 0.9em;
+        width: 30px;
+        height: 20px;
+        font-size: 0.8em;
     }
     
     .size-label {
@@ -768,5 +868,14 @@ h1 {
     .add-to-cart-button {
         font-size: 1em;
         padding: 8px 16px;
+    }
+    
+    .quantity-matrix {
+        font-size: 0.8em;
+    }
+    
+    .quantity-matrix th,
+    .quantity-matrix td {
+        padding: 6px 3px;
     }
 }
