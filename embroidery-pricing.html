@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embroidery Pricing | NWCA</title>
     <link rel="stylesheet" href="/pricing-pages-enhanced.css">
+<!-- jsPDF Libraries for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         /* New layout styles for embroidery pricing page */
         /* Improved layout styles */
@@ -164,119 +167,61 @@
             border-radius: 10px;
         }
         
-        /* Style for the swatch wrapper */
+        /* Simplified Swatch Styles */
         .swatch-wrapper {
-            /* Remove conflicting display property */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            width: 90px; /* Increased width to allow more space for longer names */
-            height: 52px; /* Extremely reduced height to bring elements closer */
-            margin: 5px 10px; /* Increased horizontal margin */
-            transition: all 0.2s ease;
-            position: relative;
-            border-radius: 8px;
-            padding: 3px;
+            width: 70px; /* Adjust as needed */
+            margin: 5px;
+            cursor: pointer;
         }
-        
-        /* Add highlight connection effect on hover */
-        .swatch-wrapper:hover {
-            background-color: rgba(0, 128, 0, 0.05); /* Very subtle green background */
-            box-shadow: 0 0 0 2px rgba(0, 128, 0, 0.1); /* Subtle green outline */
-            transform: translateY(-2px); /* Slight lift effect */
+
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            margin-bottom: 4px;
+            background-size: cover;
+            background-position: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        
-        /* Add a subtle connecting line on hover */
-        .swatch-wrapper:hover::after {
-            content: '';
-            position: absolute;
-            top: 50px; /* Position below the swatch */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px; /* Thin vertical line */
-            height: 6px; /* Short line */
-            background-color: rgba(0, 128, 0, 0.3); /* Semi-transparent green */
-            border-radius: 1px;
-            z-index: 1;
-        }
-        
-        /* Enhance hover effect on the color swatch itself */
-        .swatch-wrapper:hover .color-swatch {
+
+        .color-swatch:hover {
             border-color: var(--primary-color);
-            box-shadow: 0 0 5px rgba(0, 128, 0, 0.3);
         }
-        
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .color-name {
+            font-size: 0.75em;
+            text-align: center;
+            color: var(--text-color);
+            /* white-space: nowrap; */ /* Allow wrapping */
+            /* overflow: hidden; */ /* Allow overflow */
+            /* text-overflow: ellipsis; */ /* Remove ellipsis */
+            width: 100%;
+            line-height: 1.2; /* Adjust line height for potential wrapping */
+            margin-top: 2px; /* Adjust margin */
+            padding: 0 2px; /* Add slight horizontal padding */
+            word-wrap: break-word; /* Ensure long words break */
+            overflow-wrap: break-word; /* Ensure long words break */
+        }
+
         /* Pulse animation for highlighting a swatch */
         @keyframes pulse-highlight {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0.7); }
             50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 128, 0, 0); }
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0); }
         }
-        
+
         .color-swatch.pulse-highlight {
-            animation: pulse-highlight 1s ease infinite;
+            animation: pulse-highlight 1s ease; /* Run once */
             border-color: var(--primary-color);
-        }
-        
-        /* Enhance hover effect on the color name */
-        .swatch-wrapper:hover .color-name {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-        
-        /* Style for the color swatch items */
-        .color-swatch {
-            width: 50px !important;
-            height: 50px !important;
-            border-radius: 50% !important; /* Ensures perfect circle */
-            cursor: pointer;
-            border: 2px solid var(--border-color);
-            transition: all 0.3s ease;
-            position: relative;
-            margin: 0 auto 0 auto; /* Removed bottom margin to reduce space */
-            background-size: cover;
-            background-position: center;
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            z-index: 1;
-            /* Ensure perfect circles with multiple approaches */
-            aspect-ratio: 1 / 1 !important;
-            box-sizing: border-box;
-            min-width: 50px !important;
-            min-height: 50px !important;
-            max-width: 50px !important;
-            max-height: 50px !important;
-            object-fit: cover !important;
-        }
-        
-        .color-swatch:hover {
-            transform: scale(1.02);
-            border-color: var(--primary-color);
-        }
-        
-        .color-swatch.active {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-        
-        .color-name {
-            text-align: center;
-            font-size: 0.75em;
-            color: var(--text-color);
-            display: block;
-            width: 100%;
-            white-space: nowrap; /* Prevent text wrapping */
-            overflow: visible;
-            font-weight: 500;
-            line-height: 1;
-            margin-top: -18px; /* Even more aggressive negative margin to pull text up */
-            padding: 0; /* No padding */
-            /* Remove position-related properties that conflict with flex layout */
-            position: relative;
-            /* Ensure text is centered within its container */
-            align-self: center;
-            z-index: 2; /* Ensure the text appears above any highlight effects */
         }
         
         /* Responsive adjustments */
@@ -373,6 +318,226 @@
             .color-swatches-container.compact .color-swatches.collapsed {
                 max-height: 120px;
                 overflow-y: hidden;
+            }
+        }
+    </style>
+    
+    <!-- Add to Cart Simplified UI Styles -->
+    <style>
+        /* Single row quantity layout */
+        .single-row-quantity-container {
+            margin-bottom: var(--spacing-md);
+            overflow-x: auto;
+            width: 100%;
+        }
+        
+        /* Quantity matrix table styling */
+        .quantity-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        .quantity-matrix th,
+        .quantity-matrix td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .quantity-matrix th {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .quantity-matrix th:first-child,
+        .quantity-matrix td:first-child {
+            text-align: left;
+            font-weight: bold;
+            width: 100px;
+        }
+        
+        /* Price display row styling */
+        #price-display-row td {
+            font-weight: bold;
+            color: var(--primary-color);
+            border-top: 1px solid var(--primary-light);
+            vertical-align: top;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        /* Ensure price displays are properly contained */
+        .size-price-display {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Quantity input styling */
+        .quantity-input {
+            width: 40px;
+            text-align: center;
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .quantity-btn {
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            background-color: var(--primary-light);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .quantity-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .quantity-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        /* Pricing tier info */
+        .pricing-tier-info {
+            background-color: var(--primary-light);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .tier-explanation h4,
+        .ltm-explanation h4 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.1em;
+        }
+        
+        .tier-progress {
+            margin-top: var(--spacing-sm);
+            background-color: var(--white);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-sm);
+        }
+        
+        .tier-progress-bar {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .tier-point {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .tier-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            border: 2px solid var(--primary-color);
+        }
+        
+        .tier-dot.active {
+            background-color: var(--primary-color);
+        }
+        
+        .tier-label {
+            margin-top: 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .tier-line {
+            position: absolute;
+            top: 8px;
+            height: 2px;
+            width: 100%;
+            background-color: var(--primary-light);
+            z-index: 0;
+        }
+        
+        .tier-progress-fill {
+            position: absolute;
+            top: 8px;
+            height: 2px;
+            background-color: var(--primary-color);
+            z-index: 0;
+        }
+        
+        .tier-progress-text {
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .ltm-explanation {
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .ltm-applied {
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        .ltm-per-item {
+            color: #dc3545;
+        }
+        
+        /* Responsive adjustments for the new UI */
+        @media (max-width: 768px) {
+            .pricing-tier-info {
+                padding: var(--spacing-sm);
+            }
+            
+            .tier-explanation h4,
+            .ltm-explanation h4 {
+                font-size: 1em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tier-explanation h4,
+            .ltm-explanation h4 {
+                font-size: 0.9em;
+            }
+            
+            .tier-progress-bar {
+                margin-top: 10px;
+            }
+            
+            .tier-dot {
+                width: 12px;
+                height: 12px;
+            }
+            
+            .tier-label {
+                font-size: 0.7em;
+            }
+            
+            .tier-line {
+                top: 6px;
             }
         }
     </style>
@@ -521,330 +686,7 @@
                     }
                 </style>
                 
-                <script>
-                    // Update the mini color swatch and name when the page loads
-                    document.addEventListener('DOMContentLoaded', function() {
-                        // Function to update the mini color swatch
-                        function updateMiniColorSwatch() {
-                            // Get the current selected color from product-color (this might be the catalog color)
-                            const catalogColorName = document.getElementById('product-color').textContent;
-                            const pricingColorName = document.getElementById('pricing-color-name');
-                            const miniColorSwatch = document.getElementById('pricing-color-swatch');
-                            
-                            console.log("DEBUG: Updating mini swatch for catalog color:", catalogColorName);
-                            
-                            // We'll find the proper COLOR_NAME to display instead of using the catalog color
-                            let displayColorName = catalogColorName; // Default to catalog color as fallback
-                            
-                            if (pricingColorName && miniColorSwatch) {
-                                
-                                // Try to find the matching swatch to use its exact appearance
-                                const colorSwatches = document.querySelectorAll('.color-swatch');
-                                let matchFound = false;
-                                
-                                // Log all available swatches for debugging
-                                console.log("DEBUG: Available swatches:");
-                                colorSwatches.forEach(s => {
-                                    console.log(`- Swatch: ${s.getAttribute('data-color-name')}`);
-                                });
-                                
-                                // Try exact match first
-                                console.log("DEBUG: Looking for exact match for:", catalogColorName);
-                                for (const swatch of colorSwatches) {
-                                    const swatchName = swatch.getAttribute('data-color-name');
-                                    
-                                    // Log to see what we're working with
-                                    console.log(`Checking swatch: "${swatchName}" against "${catalogColorName}"`);
-                                    
-                                    if (swatchName === catalogColorName) {
-                                        console.log("DEBUG: EXACT MATCH FOUND for:", catalogColorName);
-                                        
-                                        // Important: Use the COLOR_NAME from the swatch, not the catalog color
-                                        displayColorName = swatchName; // This is the display name we want to show
-                                        
-                                        // Clone the entire swatch element to ensure exact appearance
-                                        const clonedSwatch = swatch.cloneNode(true);
-                                        console.log("DEBUG: Cloned swatch:", clonedSwatch);
-                                        
-                                        // Get the computed background image
-                                        const computedStyle = window.getComputedStyle(swatch);
-                                        const exactBackgroundImage = computedStyle.backgroundImage;
-                                        console.log("DEBUG: Exact background image:", exactBackgroundImage);
-                                        matchFound = true;
-                                        
-                                        console.log("Found matching swatch for:", catalogColorName);
-                                        
-                                        // IMPORTANT: Extract ONLY the background-image URL and apply it directly
-                                        // This ensures we're using the exact same swatch image
-                                        const swatchStyle = window.getComputedStyle(swatch);
-                                        const swatchImageUrl = swatchStyle.backgroundImage;
-                                        
-                                        // Clear all existing styling first to ensure a clean slate
-                                        miniColorSwatch.setAttribute("style", "");
-                                        
-                                        // Apply the exact same background image
-                                        miniColorSwatch.style.width = "30px";
-                                        miniColorSwatch.style.height = "30px";
-                                        miniColorSwatch.style.borderRadius = "50%";
-                                        miniColorSwatch.style.margin = "0 8px";
-                                        miniColorSwatch.style.border = "2px solid var(--primary-color)";
-                                        miniColorSwatch.style.display = "inline-block";
-                                        miniColorSwatch.style.verticalAlign = "middle";
-                                        miniColorSwatch.style.backgroundImage = swatchImageUrl;
-                                        miniColorSwatch.style.backgroundSize = "cover";
-                                        miniColorSwatch.style.backgroundPosition = "center";
-                                        miniColorSwatch.style.aspectRatio = "1/1";
-                                        
-                                        console.log("Applied exact swatch URL to mini swatch:", swatchImageUrl);
-                                        
-                                        // Keep the clickable class
-                                        miniColorSwatch.className = "mini-color-swatch clickable active-swatch";
-                                        
-                                        console.log("Copied swatch styling for:", swatchName);
-                                        console.log("Background image:", computedStyle.backgroundImage);
-                                        console.log("Background color:", computedStyle.backgroundColor);
-                                        
-                                        break;
-                                    }
-                                }
-                                
-                                // Try normalized match if exact match fails
-                                if (!matchFound) {
-                                    console.log("DEBUG: No exact match found - trying normalized comparison");
-                                    
-                                    // Function to normalize color names for comparison
-                                    const normalizeColorName = (name) => {
-                                        return name.toLowerCase()
-                                            .replace(/\s+/g, '') // Remove all spaces
-                                            .replace(/\./g, '')  // Remove periods
-                                            .replace("safety", "s") // Common abbreviation
-                                            .replace("stonewashed", "stonew"); // Common abbreviation
-                                    };
-                                    
-                                    const normalizedColorName = normalizeColorName(catalogColorName);
-                                    console.log("DEBUG: Normalized color name:", normalizedColorName);
-                                    
-                                    for (const swatch of colorSwatches) {
-                                        const swatchName = swatch.getAttribute('data-color-name');
-                                        if (swatchName && normalizeColorName(swatchName) === normalizedColorName) {
-                                            console.log("DEBUG: NORMALIZED MATCH FOUND for:", catalogColorName, "via", swatchName);
-                                            
-                                            // Use the actual COLOR_NAME from the swatch for display
-                                            displayColorName = swatchName;
-                                            matchFound = true;
-                                            
-                                            // Clone the entire swatch element to ensure exact appearance
-                                            const clonedSwatch = swatch.cloneNode(true);
-                                            console.log("DEBUG: Cloned normalized match swatch:", clonedSwatch);
-                                            
-                                            // Get the computed background image
-                                            const computedStyle = window.getComputedStyle(swatch);
-                                            const exactBackgroundImage = computedStyle.backgroundImage;
-                                            console.log("DEBUG: Normalized match background image:", exactBackgroundImage);
-                                            
-                                            // Clear all existing styling first
-                                            miniColorSwatch.setAttribute("style", "");
-                                            
-                                            // Apply the same styling with this image
-                                            miniColorSwatch.style.width = "30px";
-                                            miniColorSwatch.style.height = "30px";
-                                            miniColorSwatch.style.borderRadius = "50%";
-                                            miniColorSwatch.style.margin = "0 8px";
-                                            miniColorSwatch.style.border = "2px solid var(--primary-color)";
-                                            miniColorSwatch.style.display = "inline-block";
-                                            miniColorSwatch.style.verticalAlign = "middle";
-                                            miniColorSwatch.style.backgroundImage = exactBackgroundImage;
-                                            miniColorSwatch.style.backgroundSize = "cover";
-                                            miniColorSwatch.style.backgroundPosition = "center";
-                                            miniColorSwatch.style.aspectRatio = "1/1";
-                                            
-                                            miniColorSwatch.className = "mini-color-swatch clickable active-swatch";
-                                            break;
-                                        }
-                                    }
-                                }
-                                
-                                // Specific override for S.Green because it's the one shown in the screenshot
-                                if (!matchFound && (catalogColorName === "SGreen" || catalogColorName === "S.Green" || catalogColorName === "Safety Green" || catalogColorName === "S. Green")) {
-                                    console.log("DEBUG: Special case handling for S.Green color");
-                                    
-                                    // Find any swatch that might be S.Green regardless of how it's labeled
-                                    for (const swatch of colorSwatches) {
-                                        const swatchName = swatch.getAttribute('data-color-name');
-                                        if (swatchName && (
-                                            swatchName.toLowerCase().includes("green") &&
-                                            (swatchName.toLowerCase().includes("s.") ||
-                                             swatchName.toLowerCase().includes("s ") ||
-                                             swatchName.toLowerCase().includes("safety"))
-                                        )) {
-                                            console.log("DEBUG: Found S.Green swatch:", swatchName);
-                                            matchFound = true;
-                                            
-                                            // Get the computed style for background image
-                                            const computedStyle = window.getComputedStyle(swatch);
-                                            const exactBackgroundImage = computedStyle.backgroundImage;
-                                            console.log("DEBUG: S.Green background image:", exactBackgroundImage);
-                                            
-                                            // Use the actual COLOR_NAME from the swatch for display
-                                            displayColorName = swatchName;
-                                            
-                                            // Clear all existing styling first
-                                            miniColorSwatch.setAttribute("style", "");
-                                            
-                                            // Apply the styling
-                                            miniColorSwatch.style.width = "30px";
-                                            miniColorSwatch.style.height = "30px";
-                                            miniColorSwatch.style.borderRadius = "50%";
-                                            miniColorSwatch.style.margin = "0 8px";
-                                            miniColorSwatch.style.border = "2px solid var(--primary-color)";
-                                            miniColorSwatch.style.display = "inline-block";
-                                            miniColorSwatch.style.verticalAlign = "middle";
-                                            miniColorSwatch.style.backgroundImage = exactBackgroundImage;
-                                            miniColorSwatch.style.backgroundSize = "cover";
-                                            miniColorSwatch.style.backgroundPosition = "center";
-                                            miniColorSwatch.style.aspectRatio = "1/1";
-                                            
-                                            miniColorSwatch.className = "mini-color-swatch clickable active-swatch";
-                                            break;
-                                        }
-                                    }
-                                }
-                                
-                                // If still no match, try to find any color swatch with a valid image
-                                if (!matchFound) {
-                                    console.log("DEBUG: No match found for:", catalogColorName, "- searching for any swatch image");
-                                    
-                                    // Try to find ANY swatch with a valid background image to use
-                                    let foundAnySwatchWithImage = false;
-                                    
-                                    for (const anySwatch of colorSwatches) {
-                                        const anySwatchStyle = window.getComputedStyle(anySwatch);
-                                        const swatchImageUrl = anySwatchStyle.backgroundImage;
-                                        
-                                        // If this swatch has a valid background image, use it
-                                        if (swatchImageUrl && swatchImageUrl !== "none" && !swatchImageUrl.includes("linear-gradient") && !swatchImageUrl.includes("radial-gradient")) {
-                                            console.log("Found a usable swatch image:", swatchImageUrl);
-                                            
-                                            // Clear all existing styling first
-                                            miniColorSwatch.setAttribute("style", "");
-                                            
-                                            // Apply the same styling with this image
-                                            miniColorSwatch.style.width = "30px";
-                                            miniColorSwatch.style.height = "30px";
-                                            miniColorSwatch.style.borderRadius = "50%";
-                                            miniColorSwatch.style.margin = "0 8px";
-                                            miniColorSwatch.style.border = "2px solid var(--border-color)";
-                                            miniColorSwatch.style.display = "inline-block";
-                                            miniColorSwatch.style.verticalAlign = "middle";
-                                            miniColorSwatch.style.backgroundImage = swatchImageUrl;
-                                            miniColorSwatch.style.backgroundSize = "cover";
-                                            miniColorSwatch.style.backgroundPosition = "center";
-                                            miniColorSwatch.style.aspectRatio = "1/1";
-                                            
-                                            miniColorSwatch.className = "mini-color-swatch clickable";
-                                            foundAnySwatchWithImage = true;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    // Only as a last resort, use a solid color
-                                    if (!foundAnySwatchWithImage) {
-                                        console.warn("No swatch images found at all - using solid color as last resort");
-                                        console.log("No matching swatch found - trying to find swatch images in the DOM");
-                                        
-                                        // Try to find ANY color swatch with a valid background image as a backup
-                                        let foundAnySwatchUrl = false;
-                                        for (const anySwatch of colorSwatches) {
-                                            const anySwatchStyle = window.getComputedStyle(anySwatch);
-                                            const anySwatchUrl = anySwatchStyle.backgroundImage;
-                                            
-                                            if (anySwatchUrl && anySwatchUrl !== "none") {
-                                                // Use this URL but customize the label to match our color
-                                                miniColorSwatch.style.backgroundImage = anySwatchUrl;
-                                                miniColorSwatch.style.backgroundSize = "cover";
-                                                miniColorSwatch.style.backgroundPosition = "center";
-                                                miniColorSwatch.style.backgroundRepeat = "no-repeat";
-                                                
-                                                console.log("Using a different swatch's URL as template:", anySwatchUrl);
-                                                foundAnySwatchUrl = true;
-                                                break;
-                                            }
-                                        }
-                                        
-                                        // If we couldn't find ANY swatch with a background image, fall back to a color
-                                        if (!foundAnySwatchUrl) {
-                                            console.warn("No swatch images found at all, using solid color fallback");
-                                            
-                                            // Clear all existing styling first
-                                            miniColorSwatch.setAttribute("style", "");
-                                            
-                                            // Apply a simple colored circle styling
-                                            miniColorSwatch.style.width = "30px";
-                                            miniColorSwatch.style.height = "30px";
-                                            miniColorSwatch.style.borderRadius = "50%";
-                                            miniColorSwatch.style.margin = "0 8px";
-                                            miniColorSwatch.style.border = "2px solid var(--border-color)";
-                                            miniColorSwatch.style.display = "inline-block";
-                                            miniColorSwatch.style.verticalAlign = "middle";
-                                            miniColorSwatch.style.backgroundColor = "#36454F"; // Charcoal as default
-                                            miniColorSwatch.style.aspectRatio = "1/1";
-                                            
-                                            // Add a pattern to make it more visually interesting
-                                            miniColorSwatch.style.backgroundImage = "radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 80%)";
-                                            
-                                            miniColorSwatch.className = "mini-color-swatch clickable fallback-swatch";
-                                            miniColorSwatch.style.backgroundColor = "#36454F"; // Default to Charcoal as last resort
-                                            miniColorSwatch.classList.add('fallback-swatch');
-                                        }
-                                    }
-                                }
-                                
-                                // Make sure the swatch is visible
-                                miniColorSwatch.style.display = "block";
-                                miniColorSwatch.style.visibility = "visible";
-                                
-                                // IMPORTANT: Set the text to the display COLOR_NAME, not the catalog color
-                                console.log("DEBUG: Setting display color name to:", displayColorName);
-                                pricingColorName.textContent = displayColorName;
-                                
-                                // Add click event listener to the mini swatch
-                                miniColorSwatch.addEventListener('click', function() {
-                                    // Find the matching swatch in the color selection area
-                                    const colorSwatches = document.querySelectorAll('.color-swatch');
-                                    for (const swatch of colorSwatches) {
-                                        const swatchName = swatch.getAttribute('data-color-name');
-                                        if (swatchName === displayColorName) {
-                                            // Scroll to the matching swatch
-                                            swatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                            
-                                            // Highlight the swatch with a pulse effect
-                                            swatch.classList.add('pulse-highlight');
-                                            
-                                            // Remove the highlight after animation completes
-                                            setTimeout(() => {
-                                                swatch.classList.remove('pulse-highlight');
-                                            }, 2000);
-                                            
-                                            break;
-                                        }
-                                    }
-                                });
-                            } else {
-                                console.log("Could not find pricing-color-name or pricing-color-swatch elements");
-                            }
-                        }
-                        
-                        // Initial update with a longer delay to ensure elements are loaded
-                        setTimeout(updateMiniColorSwatch, 1000);
-                        setTimeout(updateMiniColorSwatch, 2000);
-                        
-                        // Update when color changes
-                        document.addEventListener('colorChanged', function(event) {
-                            console.log("Color changed event detected");
-                            updateMiniColorSwatch();
-                        });
-                    });
-                </script>
+                <!-- Mini Swatch Update Script Removed - Handled by pricing-pages.js -->
                 <div class="pricing-grid-container">
                     <table class="pricing-grid" id="custom-pricing-grid">
                         <thead>
@@ -858,35 +700,109 @@
                         </tbody>
                     </table>
                     
-                    <div class="pricing-notes">
-                        <div class="ltm-fee-container">
-                            <h4>Less Than Minimum (LTM) Fee:</h4>
-                            <p>For orders under 24 pieces, a $50.00 LTM fee applies.</p>
-                            <p class="ltm-calculation">Calculation: Use the 24-piece price + ($50.00 ÷ number of items)</p>
-                            <p class="ltm-example">Example: 10 items would be the 24-piece price + $5.00 per item</p>
+                    <div class="pricing-info-tabs">
+                        <div class="tab-headers">
+                            <button class="tab-header active" data-tab="pricing-info">Pricing Info</button>
+                            <button class="tab-header" data-tab="ltm-info">LTM Fee Info</button>
+                            <button class="tab-header" data-tab="inventory-info">Inventory Info</button>
                         </div>
-                        <div class="inventory-indicator-legend" style="margin-top: 15px; padding: 10px; background-color: #f8f8f8; border-radius: 4px;">
-                            <h4 style="margin-top: 0; margin-bottom: 8px;">Inventory Indicators:</h4>
-                            <div style="display: flex; align-items: center;">
-                                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #dc3545; margin-right: 8px;"></span>
-                                <span>Red dot indicates low inventory (less than 10 items available)</span>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="pricing-info">
+                                <p>Pricing is determined by your total quantity. Add more items to reach the next tier for better pricing.</p>
+                            </div>
+                            <div class="tab-pane" id="ltm-info">
+                                <div class="ltm-fee-container">
+                                    <h4>Less Than Minimum (LTM) Fee:</h4>
+                                    <p>For orders under 24 pieces, a $50.00 LTM fee applies.</p>
+                                    <p class="ltm-calculation">Calculation: Use the 24-piece price + ($50.00 ÷ number of items)</p>
+                                    <p class="ltm-example">Example: 10 items would be the 24-piece price + $5.00 per item</p>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="inventory-info">
+                                <div class="inventory-indicator-legend">
+                                    <h4>Inventory Indicators:</h4>
+                                    <div style="display: flex; align-items: center;">
+                                        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #dc3545; margin-right: 8px;"></span>
+                                        <span>Red dot indicates low inventory (less than 10 items available)</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                    
+                    <style>
+                        /* Tab styling */
+                        .pricing-info-tabs {
+                            margin-top: 20px;
+                            border: 1px solid var(--border-color);
+                            border-radius: var(--radius-sm);
+                            overflow: hidden;
+                        }
                         
-                        <script>
-                            // Only show inventory indicators when there is actually low inventory
-                            document.addEventListener('DOMContentLoaded', function() {
-                                // Check if there are any low inventory items
-                                const hasLowInventory = window.dp5InventoryData &&
-                                    Object.values(window.dp5InventoryData).some(item => item && item.QuantityAvailable < 10);
-                                
-                                // Show/hide the inventory indicator legend based on whether there's low inventory
-                                const legend = document.querySelector('.inventory-indicator-legend');
-                                if (legend) {
-                                    legend.style.display = hasLowInventory ? 'block' : 'none';
-                                }
-                            });
-                        </script>
+                        .tab-headers {
+                            display: flex;
+                            background-color: var(--primary-light);
+                            border-bottom: 1px solid var(--border-color);
+                        }
+                        
+                        .tab-header {
+                            padding: 10px 15px;
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            font-weight: 500;
+                            color: var(--text-color);
+                            transition: all 0.2s ease;
+                            border-bottom: 3px solid transparent;
+                        }
+                        
+                        .tab-header:hover {
+                            background-color: rgba(0,0,0,0.05);
+                        }
+                        
+                        .tab-header.active {
+                            color: var(--primary-color);
+                            border-bottom-color: var(--primary-color);
+                            font-weight: 600;
+                        }
+                        
+                        .tab-content {
+                            padding: 15px;
+                        }
+                        
+                        .tab-pane {
+                            display: none;
+                        }
+                        
+                        .tab-pane.active {
+                            display: block;
+                        }
+                        
+                        /* Responsive adjustments */
+                        @media (max-width: 768px) {
+                            .tab-header {
+                                padding: 8px 12px;
+                                font-size: 0.9em;
+                            }
+                        }
+                        
+                        @media (max-width: 480px) {
+                            .tab-headers {
+                                flex-wrap: wrap;
+                            }
+                            
+                            .tab-header {
+                                flex: 1 0 auto;
+                                text-align: center;
+                                padding: 8px 8px;
+                                font-size: 0.8em;
+                            }
+                        }
+                    </style>
+                    
+                    <!-- Tab Functionality Script Removed - Handled by pricing-pages.js -->
+                        
+                        <!-- Inventory Legend Script Removed - Handled by pricing-pages.js -->
                     </div>
                 </div>
             </div>
@@ -894,14 +810,280 @@
             <!-- Add to Cart Section -->
             <div class="add-to-cart-section">
                 <h3 class="section-title">Add to Cart</h3>
-                <div class="size-quantity-grid" id="size-quantity-grid">
+                
+                <!-- Grid-based layout for add to cart -->
+                <div class="size-grid-container" id="size-grid-container">
+                    <!-- Will be populated by JavaScript with all sizes from pricing matrix -->
+                </div>
+<!-- Container for matrix layout (Added) -->
+                <div id="quantity-matrix">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                
+                <!-- Cart info display -->
+                <div class="cart-info-display" id="cart-info-display" style="margin-top: 15px; padding: 10px; background-color: #f0f8ff; border-radius: 5px; border: 1px solid #d0e3ff;">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                
+                <style>
+                    /* Enhanced Grid-based layout for add to cart */
+                    .size-grid-container {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                        gap: 15px;
+                        margin-bottom: 20px;
+                    }
+                    
+                    .size-card {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        padding: 15px;
+                        background-color: var(--primary-light);
+                        border-radius: var(--radius-sm);
+                        box-shadow: var(--shadow-sm);
+                        transition: all 0.2s ease;
+                        border: 1px solid transparent;
+                    }
+                    
+                    .size-card:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                        border-color: var(--primary-color);
+                    }
+                    
+                    .size-label {
+                        font-weight: bold;
+                        font-size: 1.2em;
+                        margin-bottom: 10px;
+                        color: var(--primary-color);
+                    }
+                    
+                    .quantity-controls {
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 10px;
+                        width: 100%;
+                        justify-content: center;
+                    }
+                    
+                    .quantity-btn {
+                        width: 30px;
+                        height: 30px;
+                        border: 1px solid var(--primary-color);
+                        background-color: white;
+                        color: var(--primary-color);
+                        font-weight: bold;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.2s ease;
+                    }
+                    
+                    .quantity-btn:hover {
+                        background-color: var(--primary-color);
+                        color: white;
+                    }
+                    
+                    .quantity-btn.decrease {
+                        border-radius: 4px 0 0 4px;
+                    }
+                    
+                    .quantity-btn.increase {
+                        border-radius: 0 4px 4px 0;
+                    }
+                    
+                    .quantity-input {
+                        width: 40px;
+                        height: 30px;
+                        border: 1px solid var(--primary-color);
+                        border-left: none;
+                        border-right: none;
+                        text-align: center;
+                        font-size: 1em;
+                    }
+                    
+                    .price-display {
+                        font-weight: bold;
+                        color: var(--primary-color);
+                        margin-top: 5px;
+                        text-align: center;
+                        min-height: 40px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    
+                    /* Enhanced cart summary styling */
+                    .cart-summary {
+                        background-color: var(--primary-light);
+                        padding: 20px;
+                        border-radius: var(--radius-sm);
+                        margin-top: 20px;
+                        border-left: 4px solid var(--primary-color);
+                    }
+                    
+                    .cart-total {
+                        display: flex;
+                        justify-content: space-between;
+                        font-size: 1.3em;
+                        font-weight: bold;
+                        margin-bottom: 15px;
+                        color: var(--primary-dark);
+                    }
+                    
+                    .ltm-fee-notice {
+                        background-color: #fff3cd;
+                        color: #856404;
+                        padding: 10px 15px;
+                        border-radius: var(--radius-sm);
+                        margin-bottom: 15px;
+                        display: flex;
+                        align-items: center;
+                        border-left: 3px solid #ffeeba;
+                    }
+                    
+                    .ltm-icon {
+                        margin-right: 10px;
+                        font-size: 1.2em;
+                    }
+                    
+                    .add-to-cart-button {
+                        background-color: var(--primary-color);
+                        color: white;
+                        border: none;
+                        border-radius: var(--radius-sm);
+                        padding: 12px 20px;
+                        font-size: 1.1em;
+                        font-weight: bold;
+                        cursor: pointer;
+                        width: 100%;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    
+                    .add-to-cart-button:hover {
+                        background-color: var(--primary-dark);
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                    }
+                    
+                    .add-to-cart-button:active {
+                        transform: translateY(0);
+                        box-shadow: none;
+                    }
+                    
+                    /* Add a cart icon to the button */
+                    .add-to-cart-button::before {
+                        content: '🛒 ';
+                        margin-right: 8px;
+                    }
+                    
+                    /* Responsive adjustments */
+                    @media (max-width: 768px) {
+                        .size-grid-container {
+                            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                            gap: 10px;
+                        }
+                        
+                        .size-card {
+                            padding: 10px;
+                        }
+                        
+                        .size-label {
+                            font-size: 1.1em;
+                            margin-bottom: 8px;
+                        }
+                        
+                        .quantity-btn {
+                            width: 25px;
+                            height: 25px;
+                        }
+                        
+                        .quantity-input {
+                            width: 35px;
+                            height: 25px;
+                        }
+                    }
+                    
+                    @media (max-width: 480px) {
+                        .size-grid-container {
+                            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                            gap: 8px;
+                        }
+                        
+                        .size-card {
+                            padding: 8px;
+                        }
+                        
+                        .size-label {
+                            font-size: 1em;
+                            margin-bottom: 5px;
+                        }
+                        
+                        .quantity-btn {
+                            width: 22px;
+                            height: 22px;
+                            font-size: 0.9em;
+                        }
+                        
+                        .quantity-input {
+                            width: 30px;
+                            height: 22px;
+                            font-size: 0.9em;
+                        }
+                    }
+                </style>
+                
+                <!-- Script to initialize the size grid -->
+                <!-- Size Grid Initialization Script Removed - Handled by add-to-cart.js -> product-quantity-ui.js -->
+                
+                <!-- Cart Contents Summary -->
+                <div id="cart-contents-info" class="cart-contents-info" style="display: none; margin-bottom: 15px; padding: 10px; background-color: #f0f8ff; border-radius: 5px; border: 1px solid #d0e3ff; font-size: 0.9em;">
+                    <!-- Will be dynamically populated by JavaScript -->
+                </div>
+                
+                <!-- Pricing tier explanation -->
+                <div class="pricing-tier-info">
+                    <div class="tier-explanation">
+                        <h4>Current Pricing Tier: <span id="current-tier-display">1-11</span></h4>
+                        <p>Pricing is determined by your total quantity. Add more items to reach the next tier for better pricing.</p>
+                        <div class="tier-progress">
+                            <div class="tier-progress-bar">
+                                <!-- Will be populated by JavaScript -->
+                                <div class="tier-line"></div>
+                                <div class="tier-progress-fill" style="width: 0%"></div>
+                                <!-- Tier points will be dynamically added here -->
+                            </div>
+                            <div class="tier-progress-text">
+                                <span id="tier-progress-message">Add more items to reach the next tier</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ltm-explanation" style="display: none;">
+                        <h4>Less Than Minimum Fee Applied</h4>
+                        <p>Orders under 24 pieces include a $50.00 LTM fee distributed across all items.</p>
+                        <p class="ltm-applied">Current LTM fee: <span class="ltm-per-item">$0.00</span> per item</p>
+                    </div>
+                </div>
+                
+                <!-- Individual size inputs as fallback/alternative (hidden) -->
+                <div class="size-quantity-grid" id="size-quantity-grid" style="display: none;">
                     <!-- Size quantity inputs will be dynamically generated based on available sizes -->
+                </div>
+                
+                <!-- Tier info display for cart summary -->
+                <div id="tier-info-display" class="tier-info-display" style="display: none; margin-bottom: 15px; padding: 10px; background-color: #f5f5f5; border-radius: 5px; border: 1px solid #e0e0e0;">
+                    <!-- Will be dynamically populated by JavaScript -->
                 </div>
                 
                 <div class="cart-summary">
                     <div class="cart-total">
                         <span class="total-label">Total:</span>
-                        <span class="total-amount">$0.00</span>
+                        <span class="total-amount" data-tier-key="" data-total-quantity="0" data-ltm-fee-applies="false">$0.00</span>
                     </div>
                     <div class="ltm-fee-notice" style="display: none;">
                         <span class="ltm-icon">⚠️</span>
@@ -910,7 +1092,12 @@
                     <button id="add-to-cart-button" class="add-to-cart-button">
                         Add to Cart
                     </button>
+<button id="download-order-pdf-button" class="download-pdf-button" style="margin-top: 10px; width: 100%; padding: 10px; background-color: #6c757d; color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 1em;">
+                        Download Order PDF
+                    </button>
                 </div>
+                
+                <!-- Add to Cart Button Script Removed - Handled by add-to-cart.js -->
             </div>
             
             <!-- FAQ section removed as per feedback -->
@@ -922,553 +1109,21 @@
     <script src="/pricing-matrix-capture.js"></script>
     <script src="/pricing-matrix-api.js"></script>
     <script src="/dp5-helper.js"></script>
+<script src="/product-quantity-ui.js"></script>
     <script src="/cart.js"></script>
     <script src="/cart-integration.js"></script>
     <script src="/cart-price-recalculator.js"></script>
     <script src="/add-to-cart.js"></script>
+<script src="/pricing-calculator.js"></script>
     
-    <!-- Direct fix for pricing display -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("[DIRECT-FIX] Adding direct fix for pricing display");
-            
-            // Set a flag to indicate DIRECT-FIX is active
-            window.directFixApplied = false;
-            
-            // Function to directly copy the Caspio table to our custom pricing grid
-            function directlyCopyTable() {
-                // If already applied, don't do it again
-                if (window.directFixApplied) {
-                    console.log("[DIRECT-FIX] Already applied, skipping");
-                    return true;
-                }
-                
-                console.log("[DIRECT-FIX] Attempting to directly copy Caspio table");
-                
-                // Find the Caspio table
-                const caspioTable = document.querySelector('.matrix-price-table') ||
-                                   document.querySelector('.cbResultSetTable');
-                
-                if (caspioTable) {
-                    console.log("[DIRECT-FIX] Found Caspio table, copying structure");
-                    
-                    // Get our custom pricing grid
-                    const customGrid = document.getElementById('custom-pricing-grid');
-                    if (!customGrid) {
-                        console.warn("[DIRECT-FIX] Custom pricing grid not found");
-                        return false;
-                    }
-                    
-                    // Get the header row from Caspio table
-                    const caspioHeaderRow = caspioTable.querySelector('tr');
-                    if (caspioHeaderRow) {
-                        // Get the header cells
-                        const caspioHeaderCells = caspioHeaderRow.querySelectorAll('th');
-                        
-                        // Extract headers
-                        const headers = [];
-                        caspioHeaderCells.forEach((cell, index) => {
-                            if (index > 0) { // Skip the first header (Quantity Tier)
-                                headers.push(cell.textContent.trim());
-                            }
-                        });
-                        
-                        console.log("[DIRECT-FIX] Extracted headers:", headers);
-                        
-                        // Update our custom header row
-                        const customHeaderRow = customGrid.querySelector('thead tr');
-                        if (customHeaderRow) {
-                            // Clear existing headers (keep the first "Quantity" header)
-                            while (customHeaderRow.children.length > 1) {
-                                customHeaderRow.removeChild(customHeaderRow.lastChild);
-                            }
-                            
-                            // Add the headers
-                            headers.forEach(header => {
-                                const th = document.createElement('th');
-                                th.textContent = header;
-                                customHeaderRow.appendChild(th);
-                            });
-                            
-                            console.log("[DIRECT-FIX] Updated custom header row");
-                        }
-                        
-                        // Store headers for other scripts
-                        window.dp5GroupedHeaders = headers;
-                        
-                        // Extract unique sizes for Add to Cart
-                        const uniqueSizes = [...new Set(headers.filter(header =>
-                            !header.includes('-') && !header.includes('/')))];
-                        window.dp5UniqueSizes = uniqueSizes;
-                        
-                        console.log("[DIRECT-FIX] Set dp5UniqueSizes to:", uniqueSizes);
-                        
-                        // Get the tbody element of our custom grid
-                        const customTbody = customGrid.querySelector('tbody');
-                        if (!customTbody) {
-                            console.warn("[DIRECT-FIX] Custom tbody not found");
-                            return false;
-                        }
-                        
-                        // Clear existing rows
-                        customTbody.innerHTML = '';
-                        
-                        // Get all data rows from Caspio table
-                        const caspioDataRows = caspioTable.querySelectorAll('tr:not(:first-child)');
-                        console.log("[DIRECT-FIX] Found", caspioDataRows.length, "data rows in Caspio table");
-                        
-                        // Copy each row
-                        caspioDataRows.forEach(caspioRow => {
-                            const customRow = document.createElement('tr');
-                            
-                            // Get all cells in the Caspio row
-                            const caspioCells = caspioRow.querySelectorAll('td');
-                            
-                            // First cell is the quantity tier
-                            if (caspioCells.length > 0) {
-                                const tierCell = document.createElement('td');
-                                tierCell.innerHTML = caspioCells[0].innerHTML;
-                                tierCell.className = 'tier-cell';
-                                customRow.appendChild(tierCell);
-                                
-                                // Create a cell for each header
-                                headers.forEach((header, index) => {
-                                    const priceCell = document.createElement('td');
-                                    
-                                    // If we have a corresponding cell in the Caspio table, use its content
-                                    if (index + 1 < caspioCells.length) {
-                                        priceCell.innerHTML = caspioCells[index + 1].innerHTML;
-                                    } else {
-                                        priceCell.textContent = 'N/A';
-                                    }
-                                    
-                                    priceCell.className = 'price-cell';
-                                    customRow.appendChild(priceCell);
-                                });
-                            }
-                            
-                            // Add the row to our custom tbody
-                            customTbody.appendChild(customRow);
-                        });
-                        
-                        console.log("[DIRECT-FIX] Copied", caspioDataRows.length, "rows to custom grid");
-                        
-                        // Set flag to indicate DIRECT-FIX has been applied
-                        window.directFixApplied = true;
-                        
-                        // Let add-to-cart.js handle the cart section
-                        // Don't call updateAddToCartSection here
-                        
-                        return true;
-                    }
-                } else {
-                    console.log("[DIRECT-FIX] Caspio table not found yet, will retry");
-                    return false;
-                }
-                
-                return false;
-            }
-            
-            // Function to manually create pricing data if needed
-            function createManualPricingData() {
-                // If already applied, don't do it again
-                if (window.directFixApplied) {
-                    console.log("[DIRECT-FIX] Already applied, skipping manual creation");
-                    return true;
-                }
-                
-                // Check if we already have pricing data
-                if (document.querySelector('#custom-pricing-grid tbody tr')) {
-                    console.log("[DIRECT-FIX] Pricing data already exists, skipping manual creation");
-                    return true;
-                }
-                
-                console.log("[DIRECT-FIX] Creating manual pricing data");
-                
-                // Define sizes
-                const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
-                
-                // Define tiers
-                const tiers = [
-                    { name: '1-11', prices: [24.00, 24.00, 24.00, 24.00, 27.00, 29.00] },
-                    { name: '12-23', prices: [23.50, 23.50, 23.50, 23.50, 26.50, 28.50] },
-                    { name: '24-47', prices: [23.00, 23.00, 23.00, 23.00, 26.00, 28.00] },
-                    { name: '48-71', prices: [22.00, 22.00, 22.00, 22.00, 25.00, 27.00] },
-                    { name: '72+', prices: [21.00, 21.00, 21.00, 21.00, 24.00, 26.00] }
-                ];
-                
-                // Create pricing data structure for other scripts
-                const groupedPrices = {};
-                sizes.forEach((size, index) => {
-                    groupedPrices[size] = {};
-                    tiers.forEach(tier => {
-                        groupedPrices[size][tier.name] = tier.prices[index];
-                    });
-                });
-                
-                // Create tier data structure
-                const tierData = {};
-                tiers.forEach(tier => {
-                    const tierName = tier.name;
-                    let minQuantity = 1;
-                    let maxQuantity = null;
-                    let ltmFee = 0;
-                    
-                    if (tierName === '1-11') {
-                        minQuantity = 1;
-                        maxQuantity = 11;
-                        ltmFee = 50.00;
-                    } else if (tierName === '12-23') {
-                        minQuantity = 12;
-                        maxQuantity = 23;
-                        ltmFee = 50.00;
-                    } else if (tierName === '24-47') {
-                        minQuantity = 24;
-                        maxQuantity = 47;
-                    } else if (tierName === '48-71') {
-                        minQuantity = 48;
-                        maxQuantity = 71;
-                    } else if (tierName === '72+') {
-                        minQuantity = 72;
-                    }
-                    
-                    tierData[tierName] = {
-                        MinQuantity: minQuantity,
-                        MaxQuantity: maxQuantity,
-                        LTM_Fee: ltmFee > 0 ? ltmFee : undefined
-                    };
-                });
-                
-                // Store data for other scripts
-                window.dp5GroupedHeaders = sizes;
-                window.dp5UniqueSizes = sizes;
-                window.dp5GroupedPrices = groupedPrices;
-                window.dp5ApiTierData = tierData;
-                
-                // Get our custom pricing grid
-                const customGrid = document.getElementById('custom-pricing-grid');
-                if (!customGrid) {
-                    console.warn("[DIRECT-FIX] Custom pricing grid not found");
-                    return false;
-                }
-                
-                // Update the header row
-                const customHeaderRow = customGrid.querySelector('thead tr');
-                if (customHeaderRow) {
-                    // Clear existing headers (keep the first "Quantity" header)
-                    while (customHeaderRow.children.length > 1) {
-                        customHeaderRow.removeChild(customHeaderRow.lastChild);
-                    }
-                    
-                    // Add the headers
-                    sizes.forEach(size => {
-                        const th = document.createElement('th');
-                        th.textContent = size;
-                        customHeaderRow.appendChild(th);
-                    });
-                }
-                
-                // Get the tbody element
-                const customTbody = customGrid.querySelector('tbody');
-                if (!customTbody) {
-                    console.warn("[DIRECT-FIX] Custom tbody not found");
-                    return false;
-                }
-                
-                // Clear existing rows
-                customTbody.innerHTML = '';
-                
-                // Create rows for each tier
-                tiers.forEach(tier => {
-                    const row = document.createElement('tr');
-                    
-                    // Add tier cell
-                    const tierCell = document.createElement('td');
-                    tierCell.textContent = tier.name;
-                    tierCell.className = 'tier-cell';
-                    row.appendChild(tierCell);
-                    
-                    // Add price cells
-                    tier.prices.forEach(price => {
-                        const priceCell = document.createElement('td');
-                        priceCell.textContent = `$${price.toFixed(2)}`;
-                        priceCell.className = 'price-cell';
-                        row.appendChild(priceCell);
-                    });
-                    
-                    // Add the row to our custom tbody
-                    customTbody.appendChild(row);
-                });
-                
-                // Set flag to indicate DIRECT-FIX has been applied
-                window.directFixApplied = true;
-                
-                console.log("[DIRECT-FIX] Manual pricing data created");
-                return true;
-            }
-            
-            // Start the direct copy process with a retry mechanism
-            setTimeout(directlyCopyTable, 1000);
-            
-            // Set up periodic checks to ensure the table is copied
-            const checkIntervals = [2000, 3000, 5000, 8000];
-            let tableCreated = false;
-            
-            checkIntervals.forEach(interval => {
-                setTimeout(() => {
-                    // Skip if already created
-                    if (tableCreated || window.directFixApplied) {
-                        console.log(`[DIRECT-FIX] Table already created at ${interval}ms interval, skipping`);
-                        return;
-                    }
-                    
-                    // Try to copy the table, and if it fails, create manual data
-                    if (directlyCopyTable()) {
-                        tableCreated = true;
-                        console.log(`[DIRECT-FIX] Table created at ${interval}ms interval`);
-                    } else if (interval >= 5000) { // Only create manual data after 5 seconds
-                        if (createManualPricingData()) {
-                            tableCreated = true;
-                            console.log(`[DIRECT-FIX] Manual data created at ${interval}ms interval`);
-                        }
-                    }
-                }, interval);
-            });
-            
-            // Also listen for pricing data loaded event
-            window.addEventListener('pricingDataLoaded', function(event) {
-                console.log("[DIRECT-FIX] Pricing data loaded event received", event.detail);
-                
-                // Only update if not already done
-                if (!window.directFixApplied) {
-                    // Force copy the table again
-                    setTimeout(() => {
-                        if (!directlyCopyTable()) {
-                            createManualPricingData();
-                        }
-                    }, 500);
-                } else {
-                    console.log("[DIRECT-FIX] Table already created, skipping update on pricingDataLoaded event");
-                }
-                
-                // Let add-to-cart.js handle the cart section
-                // We don't need to update the size-quantity-grid here
-            });
-            
-            // Let add-to-cart.js handle the cart total calculation and add to cart button
-            console.log("[DIRECT-FIX] Delegating cart functionality to add-to-cart.js");
-            
-            // Handle "Show More Colors" button for mobile
-            function setupShowMoreColorsButton() {
-                const showMoreButton = document.getElementById('show-more-colors');
-                const colorSwatches = document.getElementById('color-swatches');
-                
-                if (!showMoreButton || !colorSwatches) return;
-                
-                // Only show the button on mobile devices
-                if (window.innerWidth <= 480) {
-                    showMoreButton.style.display = 'block';
-                    
-                    // Add click event listener
-                    showMoreButton.addEventListener('click', function() {
-                        if (colorSwatches.classList.contains('collapsed')) {
-                            // Expand
-                            colorSwatches.classList.remove('collapsed');
-                            showMoreButton.textContent = 'Show Less Colors';
-                        } else {
-                            // Collapse
-                            colorSwatches.classList.add('collapsed');
-                            showMoreButton.textContent = 'Show More Colors';
-                        }
-                    });
-                } else {
-                    showMoreButton.style.display = 'none';
-                    colorSwatches.classList.remove('collapsed');
-                }
-            }
-            
-            // Set up the button when the page loads
-            setTimeout(setupShowMoreColorsButton, 1000);
-            
-            // Update button visibility on window resize
-            window.addEventListener('resize', function() {
-                setupShowMoreColorsButton();
-            });
-            
-            // Add image zoom functionality
-            function setupImageZoom() {
-                const imageContainer = document.querySelector('.product-image-container');
-                const image = document.getElementById('product-image');
-                const zoomOverlay = document.querySelector('.image-zoom-overlay');
-                
-                if (!imageContainer || !image || !zoomOverlay) return;
-                
-                // Create modal elements for zoomed image
-                const modal = document.createElement('div');
-                modal.className = 'image-zoom-modal';
-                modal.style.display = 'none';
-                modal.style.position = 'fixed';
-                modal.style.zIndex = '1000';
-                modal.style.left = '0';
-                modal.style.top = '0';
-                modal.style.width = '100%';
-                modal.style.height = '100%';
-                modal.style.backgroundColor = 'rgba(0,0,0,0.9)';
-                modal.style.overflow = 'auto';
-                
-                const modalContent = document.createElement('img');
-                modalContent.className = 'image-zoom-modal-content';
-                modalContent.style.margin = 'auto';
-                modalContent.style.display = 'block';
-                modalContent.style.maxWidth = '90%';
-                modalContent.style.maxHeight = '90%';
-                modalContent.style.position = 'absolute';
-                modalContent.style.top = '50%';
-                modalContent.style.left = '50%';
-                modalContent.style.transform = 'translate(-50%, -50%)';
-                
-                const closeButton = document.createElement('span');
-                closeButton.className = 'image-zoom-close';
-                closeButton.innerHTML = '&times;';
-                closeButton.style.position = 'absolute';
-                closeButton.style.top = '15px';
-                closeButton.style.right = '35px';
-                closeButton.style.color = '#f1f1f1';
-                closeButton.style.fontSize = '40px';
-                closeButton.style.fontWeight = 'bold';
-                closeButton.style.cursor = 'pointer';
-                
-                modal.appendChild(modalContent);
-                modal.appendChild(closeButton);
-                document.body.appendChild(modal);
-                
-                // Add click event to zoom overlay
-                zoomOverlay.addEventListener('click', function() {
-                    modal.style.display = 'block';
-                    modalContent.src = image.src;
-                });
-                
-                // Add click event to close button
-                closeButton.addEventListener('click', function() {
-                    modal.style.display = 'none';
-                });
-                
-                // Close modal when clicking outside the image
-                modal.addEventListener('click', function(event) {
-                    if (event.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
-            }
-            
-            // Set up image zoom when the page loads
-            setTimeout(setupImageZoom, 1000);
-        });
-    </script>
+    <!-- Testing Script Removed -->
+    
+    <!-- Simple Row Add To Cart Enhancements -->
+    <!-- Tier Progress/LTM Display Script Removed - Handled by pricing-pages.js -->
+    
     
     <!-- Script to fix loading message issue -->
-    <script>
-        (function() {
-            console.log("Loading message fix script initialized");
-            
-            // Function to hide the loading message
-            function hideLoadingMessage() {
-                const loadingMessages = document.querySelectorAll('.loading-message');
-                loadingMessages.forEach(function(msg) {
-                    console.log('Hiding loading message:', msg);
-                    msg.style.display = 'none';
-                });
-            }
-            
-            // Function to check if Caspio table is loaded
-            function checkCaspioTableLoaded() {
-                // Check for various indicators that Caspio content has loaded
-                const hasCaspioTable = !!document.querySelector('.matrix-price-table') ||
-                                      !!document.querySelector('.cbResultSetTable') ||
-                                      !!document.querySelector('#matrix-price-body') ||
-                                      !!document.querySelector('.cbResultSet') ||
-                                      !!document.querySelector('iframe[src*="caspio"]');
-                
-                if (hasCaspioTable) {
-                    console.log('Caspio table detected, hiding loading messages');
-                    hideLoadingMessage();
-                    return true;
-                }
-                return false;
-            }
-            
-            // Set up a MutationObserver to detect when Caspio content is added
-            const observer = new MutationObserver(function(mutations) {
-                if (checkCaspioTableLoaded()) {
-                    // If we found the table, disconnect the observer
-                    observer.disconnect();
-                }
-            });
-            
-            // Start observing the document with the configured parameters
-            observer.observe(document.body, { childList: true, subtree: true });
-            
-            // Also check immediately in case the table is already loaded
-            checkCaspioTableLoaded();
-            
-            // Set up periodic checks to ensure loading message is hidden
-            const checkIntervals = [1000, 2000, 3000, 5000, 8000, 10000];
-            checkIntervals.forEach(interval => {
-                setTimeout(() => {
-                    if (document.querySelector('.loading-message')) {
-                        console.log(`Checking for Caspio table after ${interval}ms`);
-                        if (checkCaspioTableLoaded()) {
-                            console.log(`Found Caspio table after ${interval}ms`);
-                        } else if (interval >= 5000) {
-                            // If we still have loading messages but no table after 5+ seconds,
-                            // hide them anyway as a fallback
-                            console.log(`No Caspio table found after ${interval}ms, hiding loading messages anyway`);
-                            hideLoadingMessage();
-                        }
-                    }
-                }, interval);
-            });
-            
-            // Add CSS to hide loading messages when Caspio content is present
-            const styleEl = document.createElement('style');
-            styleEl.textContent = `
-                /* Hide loading messages when Caspio content is present */
-                .matrix-price-table ~ .loading-message,
-                .cbResultSetTable ~ .loading-message,
-                #matrix-price-body ~ .loading-message,
-                .cbResultSet ~ .loading-message,
-                iframe[src*="caspio"] ~ .loading-message,
-                .loading-message:has(+ .matrix-price-table),
-                .loading-message:has(+ .cbResultSetTable),
-                .loading-message:has(+ #matrix-price-body),
-                .loading-message:has(+ .cbResultSet),
-                .loading-message:has(+ iframe[src*="caspio"]) {
-                    display: none !important;
-                }
-                
-                /* Hide loading message when pricing calculator has other content */
-                #pricing-calculator:has(table) .loading-message,
-                #pricing-calculator:has(iframe) .loading-message,
-                #pricing-calculator:has(.matrix-price-table) .loading-message,
-                #pricing-calculator:has(.cbResultSetTable) .loading-message,
-                #pricing-calculator:has(#matrix-price-body) .loading-message,
-                #pricing-calculator:has(.cbResultSet) .loading-message {
-                    display: none !important;
-                }
-            `;
-            document.head.appendChild(styleEl);
-            
-            // Simple final cleanup that only targets loading messages
-            setTimeout(function() {
-                console.log('Final targeted cleanup - only hiding .loading-message elements');
-                // Only hide elements with the specific loading-message class
-                const loadingMessages = document.querySelectorAll('.loading-message');
-                loadingMessages.forEach(function(msg) {
-                    console.log('Final cleanup hiding loading message:', msg);
-                    msg.style.display = 'none';
-                });
-            }, 8000);
-        })();
-    </script>
+    <!-- Loading Message Fix Script Removed - Handled by pricing-pages.js -->
 </body>
+<script src="/order-form-pdf.js"></script>
 </html>

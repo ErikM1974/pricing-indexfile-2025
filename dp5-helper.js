@@ -245,8 +245,18 @@
                         pricingData.prices[sizeGroup][tierKey] : null;
                     
                     if (price !== null && price !== undefined) {
-                        // Format price
-                        const formattedPrice = `$${parseFloat(price).toFixed(2)}`;
+                        // Format price: Show decimals only if necessary
+                        const priceNum = parseFloat(price);
+                        let formattedPrice;
+                        if (!isNaN(priceNum)) {
+                            if (priceNum % 1 === 0) { // Check if it's a whole number
+                                formattedPrice = `$${priceNum}`; // Format without decimals
+                            } else {
+                                formattedPrice = `$${priceNum.toFixed(2)}`; // Format with decimals
+                            }
+                        } else {
+                             formattedPrice = 'N/A'; // Fallback for non-numeric
+                        }
                         priceCell.innerHTML = formattedPrice;
                         
                         // Add inventory indicator if available
@@ -751,12 +761,19 @@
                 colorName.className = 'color-name';
                 colorName.textContent = color.COLOR_NAME;
                 
-                // Add click event to the wrapper
+                // Add click listener directly, check for function inside the handler
                 wrapper.addEventListener('click', function() {
-                    // Update URL with new color
-                    const newUrl = new URL(window.location.href);
-                    newUrl.searchParams.set('COLOR', color.CATALOG_COLOR || color.COLOR_NAME);
-                    window.location.href = newUrl.toString();
+                    console.log(`[DP5-HELPER] Swatch wrapper clicked for: ${color.COLOR_NAME}`); // Add log here
+                    if (window.PricingPageUI && typeof window.PricingPageUI.handleColorSwatchClick === 'function') {
+                        console.log("[DP5-HELPER] Found PricingPageUI.handleColorSwatchClick, calling it.");
+                        window.PricingPageUI.handleColorSwatchClick(color);
+                    } else {
+                        console.error("[DP5-HELPER] PricingPageUI.handleColorSwatchClick function not found at click time! Reloading as fallback.");
+                        // Fallback: Reload page (original behavior)
+                        const newUrl = new URL(window.location.href);
+                        newUrl.searchParams.set('COLOR', color.CATALOG_COLOR || color.COLOR_NAME);
+                        window.location.href = newUrl.toString();
+                    }
                 });
                 
                 // Append swatch and color name to wrapper

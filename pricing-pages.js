@@ -1,1096 +1,595 @@
 /**
- * Shared JavaScript for Pricing Pages v2 (Corrected Initialization Logic)
- * Handles URL parameters, navigation, and loading Caspio embedded content
- * Addresses premature failure detection in Caspio callbacks.
+ * Shared JavaScript for Pricing Pages v4 (Improved Loading & Dependencies)
+ * Handles URL parameters, navigation, Caspio loading, and general UI updates.
  */
 
-// --- Configuration ---
-const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-const FALLBACK_API_BASE_URL = 'https://caspio-pricing-proxy-backup.herokuapp.com'; // Keep for potential future use
-let usingFallbackApi = false; // Keep for potential future use
+console.log("PricingPages: Shared pricing page script loaded (v4).");
 
-// --- Global Functions Called by Caspio ---
+(function() {
+    "use strict";
 
-// Define the initDp5ApiFetch function (Called by DP5 Embroidery DataPage)
-// IMPORTANT: This function should *not* determine failure. Caspio's internal
-// scripts (HTML Blocks) handle fetching and rendering. This just acknowledges the callback.
-window.initDp5ApiFetch = function() {
-    console.log("PricingPages: initDp5ApiFetch called by Caspio DataPage (DP5). Letting Caspio manage its rendering.");
-    // DO NOT check for '.matrix-price-table' or call displayContactMessage here.
-    return true; // Indicate callback received
-};
+    // --- Configuration ---
+    const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const FALLBACK_API_BASE_URL = 'https://caspio-pricing-proxy-backup.herokuapp.com';
+    let usingFallbackApi = false;
 
-// Define the initDp7ApiFetch function (Called by DP7 Cap Embroidery DataPage)
-// IMPORTANT: Same reasoning as above. Let Caspio manage its rendering.
-window.initDp7ApiFetch = function() {
-    console.log("PricingPages: initDp7ApiFetch called by Caspio DataPage (DP7). Letting Caspio manage its rendering.");
-    // DO NOT check for '.matrix-price-table' or call displayContactMessage here.
-    return true; // Indicate callback received
-};
+    // --- Global State ---
+    window.selectedStyleNumber = null;
+    window.selectedColorName = null;
+    window.selectedCatalogColor = null;
+    window.inventoryData = null;
 
-// Define similar stub functions if other Caspio DPs (DTG, Screenprint) also call back
-window.initDp6ApiFetch = function() { // Assuming DP6 for DTG
-    console.log("PricingPages: initDp6ApiFetch called by Caspio DataPage (DP6?). Letting Caspio manage its rendering.");
-    return true;
-};
-window.initDp8ApiFetch = function() { // Assuming DP8 for Screenprint
-    console.log("PricingPages: initDp8ApiFetch called by Caspio DataPage (DP8?). Letting Caspio manage its rendering.");
-    return true;
-};
+    // --- Global Functions Called by Caspio ---
+    window.initDp5ApiFetch = function() { console.log("PricingPages: initDp5ApiFetch called (DP5)."); return true; };
+    window.initDp7ApiFetch = function() { console.log("PricingPages: initDp7ApiFetch called (DP7)."); return true; };
+    window.initDp6ApiFetch = function() { console.log("PricingPages: initDp6ApiFetch called (DP6?)."); return true; };
+    window.initDp8ApiFetch = function() { console.log("PricingPages: initDp8ApiFetch called (DP8?)."); return true; };
 
 
-// --- Helper Functions ---
+    // --- Helper Functions ---
 
-// Get URL parameters
-function getUrlParameter(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
-}
+    function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
 
-// Helper function to get the embellishment type from the URL path
-function getEmbellishmentTypeFromUrl() {
-    const currentPage = window.location.pathname.toLowerCase();
-    if (currentPage.includes('cap-embroidery')) return 'cap-embroidery';
-    if (currentPage.includes('embroidery')) return 'embroidery'; // Check after cap
-    if (currentPage.includes('dtg')) return 'dtg';
-    if (currentPage.includes('screenprint') || currentPage.includes('screen-print')) return 'screenprint'; // Allow both common spellings
-    if (currentPage.includes('dtf')) return 'dtf';
-    console.warn("PricingPages: Could not determine embellishment type from URL path:", currentPage);
-    return 'unknown'; // Default to unknown if not identifiable
-}
+    function getEmbellishmentTypeFromUrl() {
+        const currentPage = window.location.pathname.toLowerCase();
+        if (currentPage.includes('cap-embroidery')) return 'cap-embroidery';
+        if (currentPage.includes('embroidery')) return 'embroidery';
+        if (currentPage.includes('dtg')) return 'dtg';
+        if (currentPage.includes('screenprint') || currentPage.includes('screen-print')) return 'screenprint';
+        if (currentPage.includes('dtf')) return 'dtf';
+        console.warn("PricingPages: Could not determine embellishment type from URL path:", currentPage);
+        return 'unknown';
+    }
+
+    function normalizeColorName(name) {
+        if (!name) return '';
+        return name.toLowerCase()
+            .replace(/\s+/g, '')
+            .replace(/[./]/g, '')
+            .replace("safety", "s")
+            .replace("stonewashed", "stonewash");
+    }
 
 
-// --- Page Initialization Functions ---
+    // --- Page Initialization Functions ---
 
-// Update product context area (Style, Color, Title, Image)
-function updateProductContext() {
-    const styleNumber = getUrlParameter('StyleNumber');
-    const colorFromUrl = getUrlParameter('COLOR'); // Raw color parameter from URL
+    function updateProductContext() {
+        const styleNumber = getUrlParameter('StyleNumber');
+        const colorFromUrl = getUrlParameter('COLOR');
 
-    console.log(`PricingPages: DEBUG - Raw URL: ${window.location.href}`);
-    console.log(`PricingPages: DEBUG - URL Parameters: ${window.location.search}`);
-    console.log(`PricingPages: Product Context: StyleNumber=${styleNumber}, COLOR=${colorFromUrl}`);
+        console.log(`PricingPages: Product Context: StyleNumber=${styleNumber}, COLOR=${colorFromUrl}`);
 
-    // Store globally for potential use elsewhere (like loadCaspioEmbed)
-    window.selectedStyleNumber = styleNumber;
-    // Decode the color name for display, but keep raw value for consistency if needed
-    window.selectedColorName = colorFromUrl ? decodeURIComponent(colorFromUrl.replace(/\+/g, ' ')) : null;
-    
-    // Check if the color name contains a catalog color code pattern (e.g., "Atlantic Blue/ Chrome" -> "AtlBlue/Chrome")
-    // This is a common pattern where the catalog color code is an abbreviated version of the color name
-    if (window.selectedColorName) {
-        // Try to extract catalog color code from the color name
-        // For example, "Atlantic Blue/ Chrome" might correspond to catalog code "AtlBlue/Chrome"
-        // We'll make a best effort to transform it
-        const colorName = window.selectedColorName;
-        
-        // Check if we're dealing with a color that might have a catalog code
-        if (colorName.includes('Atlantic Blue') && colorName.includes('Chrome')) {
-            window.selectedCatalogColor = 'AtlBlue/Chrome';
-        } else if (colorName.includes('Black') && colorName.includes('Chrome')) {
-            window.selectedCatalogColor = 'Black/Chrome';
-        } else if (colorName.includes('Smoke Grey') && colorName.includes('Chrome')) {
-            window.selectedCatalogColor = 'Smk Gry/Chrome';
+        window.selectedStyleNumber = styleNumber;
+        window.selectedColorName = colorFromUrl ? decodeURIComponent(colorFromUrl.replace(/\+/g, ' ')) : null;
+        window.selectedCatalogColor = window.selectedColorName; // Default, might be updated by fetchProductDetails/swatch click
+
+        const styleEl = document.getElementById('product-style');
+        const colorEl = document.getElementById('product-color');
+        if (styleEl) styleEl.textContent = styleNumber || 'N/A';
+        if (colorEl) colorEl.textContent = window.selectedColorName || 'Not Selected';
+
+        const backLink = document.getElementById('back-to-product');
+        if (backLink && styleNumber) {
+            backLink.href = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorFromUrl || '')}`;
+        } else if (backLink) {
+            backLink.href = '/';
+        }
+
+        if (styleNumber) {
+            fetchProductDetails(styleNumber); // This will populate swatches and potentially update selectedCatalogColor
         } else {
-            // For other colors, use the color name as a fallback
-            window.selectedCatalogColor = colorName;
+            const titleEl = document.getElementById('product-title');
+            const imageEl = document.getElementById('product-image');
+            if (titleEl) titleEl.textContent = 'Product Not Found';
+            if (imageEl) imageEl.src = '';
         }
-    } else {
-        window.selectedCatalogColor = null;
     }
 
-    console.log(`PricingPages: Color updated from URL: Name='${window.selectedColorName}', Catalog='${window.selectedCatalogColor}'`);
+    // Fetches details for the initially selected color to display title, image etc.
+    // Relies on dp5-helper.js to fetch and populate the actual color swatches.
+    async function fetchProductDetails(styleNumber) {
+        console.log(`[fetchProductDetails] Fetching initial details for Style: ${styleNumber}`);
 
-    // Update display elements if they exist
-    const styleEl = document.getElementById('product-style');
-    const colorEl = document.getElementById('product-color');
-    if (styleEl) styleEl.textContent = styleNumber || 'N/A';
-    if (colorEl) colorEl.textContent = window.selectedColorName || 'Not Selected';
+        // Get initial color from URL - DO NOT set globals here yet, wait for API confirmation
+        const initialUrlColorName = getUrlParameter('COLOR') ? decodeURIComponent(getUrlParameter('COLOR').replace(/\+/g, ' ')) : null;
+        console.log(`[fetchProductDetails] Initial color from URL: ${initialUrlColorName}`);
 
-    // Update back to product link
-    const backLink = document.getElementById('back-to-product');
-    if (backLink && styleNumber) { // Only update if styleNumber exists
-        // Use the RAW colorFromUrl for the link to match how it was likely generated
-        backLink.href = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorFromUrl || '')}`;
-        console.log(`PricingPages: Back to product link updated using Style: ${styleNumber}, Raw COLOR: ${colorFromUrl || 'None'}`);
-    } else if (backLink) {
-        console.warn("PricingPages: Could not update back link - StyleNumber missing.");
-        backLink.href = '/'; // Default to homepage or search page
-    }
+        // Use the URL color if present, otherwise fetch without color to get defaults/first color info
+        const colorIdentifierForApi = initialUrlColorName; // Can be null
 
-    // Fetch product details (Title, Image)
-    if (styleNumber) {
-        fetchProductDetails(styleNumber);
-    } else {
-        const titleEl = document.getElementById('product-title');
-        const imageEl = document.getElementById('product-image');
-        if (titleEl) titleEl.textContent = 'Product Not Found';
-        if (imageEl) imageEl.src = ''; // Placeholder or default image
-    }
-}
-
-// Fetch product details from API
-async function fetchProductDetails(styleNumber) {
-    console.log(`PricingPages: Fetching product details for Style: ${styleNumber}`);
-    try {
-        // Use the most reliable color identifier available
-        const colorIdentifier = window.selectedCatalogColor || window.selectedColorName;
-        let detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`;
-
-        if (colorIdentifier) {
-            detailApiUrl += `&color=${encodeURIComponent(colorIdentifier)}`;
-            console.log(`PricingPages: Using color identifier for fetch: '${colorIdentifier}'`);
-        } else {
-            console.log(`PricingPages: No color identifier available for fetch.`);
-        }
-
-        const response = await fetch(detailApiUrl);
-        if (!response.ok) {
-            throw new Error(`API Error fetching details: ${response.status} ${response.statusText}`);
-        }
-
-        const details = await response.json();
-
-        // Update product title and image elements if they exist
-        const titleEl = document.getElementById('product-title');
-        const imageEl = document.getElementById('product-image');
-
-        if (titleEl) titleEl.textContent = details.PRODUCT_TITLE || styleNumber;
-
-        // Prefer FRONT_MODEL, fallback to FRONT_FLAT
-        const mainImageUrl = details.FRONT_MODEL || details.FRONT_FLAT || '';
-        if (imageEl && mainImageUrl) {
-            imageEl.src = mainImageUrl;
-            imageEl.alt = `${details.PRODUCT_TITLE || styleNumber} - ${colorIdentifier || ''}`;
-        } else if (imageEl) {
-            console.warn("PricingPages: No main image URL found in product details.");
-            imageEl.src = ''; // Set to empty or a placeholder
-            imageEl.alt = titleEl ? titleEl.textContent : styleNumber;
-        }
-
-    } catch (error) {
-        console.error('PricingPages: Error fetching product details:', error);
-        const titleEl = document.getElementById('product-title');
-        if (titleEl) titleEl.textContent = 'Error Loading Product Info';
-        // Optionally clear image or set placeholder
-        const imageEl = document.getElementById('product-image');
-         if (imageEl) imageEl.src = '';
-    }
-}
-
-// Update tab navigation based on current URL parameters
-function updateTabNavigation() {
-    const styleNumber = getUrlParameter('StyleNumber');
-    const colorCode = getUrlParameter('COLOR'); // Keep the raw URL parameter
-    const currentPage = window.location.pathname.toLowerCase();
-
-    if (!styleNumber) {
-        console.warn("PricingPages: Cannot update tabs, StyleNumber missing from URL.");
-        return;
-    }
-
-    console.log(`PricingPages: Updating Tabs: StyleNumber=${styleNumber}, Raw COLOR=${colorCode}`);
-
-    const tabs = document.querySelectorAll('.pricing-tab');
-    tabs.forEach(tab => {
-        const targetPage = tab.getAttribute('data-page'); // e.g., 'embroidery', 'cap-embroidery'
-        if (!targetPage) return;
-
-        // Build the URL with parameters, preserving raw COLOR parameter
-        const url = `/pricing/${targetPage}?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode || '')}`;
-        tab.href = url;
-
-        // console.log(`PricingPages: Tab ${targetPage} URL set to: ${url}`); // Reduce log noise
-
-        // Set active state
-        if (currentPage.includes(`/pricing/${targetPage}`)) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
-    });
-}
-
-// --- Caspio Loading and Handling ---
-
-/**
- * Loads the Caspio embed script and checks for success/failure after a delay.
- */
-function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
-    const container = document.getElementById(containerId);
-    if (!container) {
-        console.error(`PricingPages: Container element with ID "${containerId}" not found.`);
-        return; // Stop if container doesn't exist
-    }
-
-    // Ensure style number is provided
-    if (!styleNumber) {
-        console.error(`PricingPages: Style number not provided for Caspio load.`);
-        container.innerHTML = '<div class="error-message">Error: Style number missing. Cannot load pricing.</div>';
-        container.dataset.loadFailed = 'true'; // Mark as failed immediately
-        container.classList.add('pricing-unavailable');
-        return;
-    }
-
-    // Use the globally set color (prefer catalog, fallback to name)
-    const colorForCaspio = window.selectedCatalogColor || window.selectedColorName || '';
-    console.log(`PricingPages: Using color for Caspio embed: '${colorForCaspio}'`);
-
-    // Show loading message
-    container.innerHTML = '<div class="loading-message">Loading pricing data...</div>';
-    container.classList.add('loading');
-    container.classList.remove('pricing-unavailable'); // Ensure unavailable class is removed initially
-    delete container.dataset.loadFailed; // Reset failure flag
-
-    // Build the Caspio URL
-    const params = new URLSearchParams();
-    params.append('StyleNumber', styleNumber);
-    
-    // Use the COLOR parameter with the catalog color code
-    // This is the color code used in the inventory table (e.g., "AtlBlue/Chrome")
-    if (window.selectedCatalogColor) {
-        params.append('COLOR', window.selectedCatalogColor);
-        console.log(`PricingPages: Using COLOR parameter with value (catalog code): '${window.selectedCatalogColor}'`);
-    } else if (window.selectedColorName) {
-        // If we only have a color name, use COLOR parameter with the color name
-        params.append('COLOR', window.selectedColorName);
-        console.log(`PricingPages: Using COLOR parameter with value (color name): '${window.selectedColorName}'`);
-    }
-    
-    const fullUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}/emb?${params.toString()}`;
-    console.log(`PricingPages: Loading Caspio embed from URL: ${fullUrl}`);
-
-    // Create and append the script element
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = fullUrl;
-    script.async = true; // Load asynchronously
-
-    script.onload = function() {
-        console.log(`PricingPages: Caspio script ${caspioAppKey} loaded successfully from ${fullUrl}`);
-        container.classList.remove('loading'); // Remove loading class, not the message yet
-        // NOTE: Do not remove the loading message here. The Caspio DP itself should replace it.
-
-        // Check after a delay if Caspio rendered correctly.
-        // This gives Caspio's internal scripts (HTML Blocks) time to run.
-        setTimeout(() => {
-            console.log(`PricingPages: Performing check for ${caspioAppKey} after 5 seconds...`);
-
-            // Check for known Caspio-generated error messages within the container
-            const hasExplicitError = /Error:|Failed to load|Unable to load|Initializing script \(1\) not found/i.test(container.innerText);
-
-            // Check if the Caspio DataPage has loaded successfully but has no records
-            const noRecordsFound = container.innerText.includes('No records found');
-            
-            // If "No records found" is displayed, we'll consider this a successful load
-            // but we'll still want to display our contact message
-            if (noRecordsFound) {
-                console.log(`PricingPages: Caspio DataPage loaded successfully for ${caspioAppKey}, but no records found. Will display contact message.`);
-                
-                // Mark as failed so we display the contact message
-                container.dataset.loadFailed = 'true';
-                container.classList.add('pricing-unavailable');
-                
-                // Display contact message directly
-                displayContactMessage(container, getEmbellishmentTypeFromUrl());
-                
-                // Initialize fallback pricing data
-                initializeFallbackPricingData(getEmbellishmentTypeFromUrl());
-                
-                return; // Exit early
+        try {
+            // --- Step 1: Fetch details for the specific initial color (or default if none specified) ---
+            let detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`;
+            if (colorIdentifierForApi) {
+                detailApiUrl += `&color=${encodeURIComponent(colorIdentifierForApi)}`;
             }
-            
-            // Check if any table elements were rendered by Caspio's scripts
-            // This is a more lenient check that doesn't rely on specific class names or IDs
-            const hasTable = !!container.querySelector('table');
-            const hasCbResultSetTable = !!container.querySelector('.cbResultSetTable');
-            const hasMatrixPriceTable = !!container.querySelector('.matrix-price-table');
-            const hasMatrixPriceBody = !!container.querySelector('#matrix-price-body');
-            const hasCbResultSet = !!container.querySelector('.cbResultSet');
-            const hasLoadingMessage = !!container.querySelector('.loading-message');
-            const hasCbResultSetAndNoLoadingMessage = hasCbResultSet && !hasLoadingMessage;
-            
-            // Log what elements were found for debugging
-            console.log(`PricingPages: Caspio DataPage check details for ${caspioAppKey}:
-                hasTable: ${hasTable}
-                hasCbResultSetTable: ${hasCbResultSetTable}
-                hasMatrixPriceTable: ${hasMatrixPriceTable}
-                hasMatrixPriceBody: ${hasMatrixPriceBody}
-                hasCbResultSet: ${hasCbResultSet}
-                hasLoadingMessage: ${hasLoadingMessage}
-                hasCbResultSetAndNoLoadingMessage: ${hasCbResultSetAndNoLoadingMessage}
-            `);
-            
-            const hasTableElements = !!(
-                hasTable ||
-                hasCbResultSetTable ||
-                hasMatrixPriceTable ||
-                hasMatrixPriceBody ||
-                // Check for any content that indicates successful loading
-                hasCbResultSetAndNoLoadingMessage
-            );
+            console.log(`[fetchProductDetails] Fetching initial details from: ${detailApiUrl}`);
+            const response = await fetch(detailApiUrl);
+            if (!response.ok) throw new Error(`API Error (Initial Details): ${response.status}`);
+            const details = await response.json();
+            console.log("[fetchProductDetails] Received initial details:", JSON.stringify(details, null, 2));
 
-            if (hasExplicitError || !hasTableElements) {
-                console.warn(`PricingPages: Caspio DataPage check FAILED for ${caspioAppKey}. HasExplicitError: ${hasExplicitError}, HasTableElements: ${hasTableElements}.`);
-                // Log snippet of HTML for debugging
-                // console.log(`Container HTML (first 300 chars): ${container.innerHTML.substring(0, 300)}...`);
+            // --- Step 2: Update Global State with confirmed initial color ---
+            // Use the color details returned by the API as the source of truth
+            window.selectedColorName = details.COLOR_NAME || initialUrlColorName || null; // Prioritize API response
+            window.selectedCatalogColor = details.CATALOG_COLOR || null; // Use API response
+            console.log(`[fetchProductDetails] Initial Globals Set: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
 
-                // Mark as failed for the retry logic (important!)
-                container.dataset.loadFailed = 'true';
-                container.classList.add('pricing-unavailable'); // Add class for retry detection
+            // --- Step 3: Update Initial UI Elements ---
+            const titleEl = document.getElementById('product-title');
+            const imageEl = document.getElementById('product-image');
+            const colorEl = document.getElementById('product-color');
 
-                // Call displayContactMessage ONLY if this is the final state after retries (handled by tryLoadCaspioSequentially)
-                // Do NOT call displayContactMessage here directly, as it interferes with retries.
+            if (titleEl) titleEl.textContent = details.PRODUCT_TITLE || styleNumber;
 
-            } else {
-                console.log(`PricingPages: Caspio DataPage check PASSED for ${caspioAppKey}. Essential elements found.`);
-                container.classList.remove('pricing-unavailable'); // Ensure this class is removed on success
-                container.dataset.loadFailed = 'false'; // Explicitly mark as not failed
-
-                // Ensure hidden elements needed for cart integration exist IF Caspio succeeded
-                ensureHiddenCartElements(container);
-                
-                // Capture pricing matrix data for cart integration
-                const embType = getEmbellishmentTypeFromUrl();
-                if (window.dp5ApiTierData && window.dp5GroupedHeaders && window.dp5GroupedPrices) {
-                    console.log(`PricingPages: Pricing data found, dispatching pricingDataLoaded event for ${embType}`);
-                    
-                    // Dispatch a custom event to trigger pricing matrix capture
-                    const event = new CustomEvent('pricingDataLoaded', {
-                        detail: {
-                            styleNumber: window.selectedStyleNumber,
-                            color: window.selectedCatalogColor || window.selectedColorName,
-                            embellishmentType: embType
-                        }
-                    });
-                    window.dispatchEvent(event);
-                    
-                    // If the capturePricingMatrix function is available, call it directly as well
-                    if (typeof window.capturePricingMatrix === 'function') {
-                        window.capturePricingMatrix(
-                            window.selectedStyleNumber,
-                            window.selectedCatalogColor || window.selectedColorName,
-                            embType
-                        );
-                    }
-                }
+            const initialImageUrl = details.MAIN_IMAGE_URL || details.FRONT_MODEL || details.FRONT_FLAT || '';
+            if (imageEl && initialImageUrl) {
+                imageEl.src = initialImageUrl;
+                imageEl.alt = `${details.PRODUCT_TITLE || styleNumber} - ${window.selectedColorName || ''}`;
+                 console.log(`[fetchProductDetails] Set initial image src to: ${initialImageUrl}`);
+            } else if (imageEl) {
+                imageEl.src = '';
+                imageEl.alt = titleEl ? titleEl.textContent : styleNumber;
+                 console.warn("[fetchProductDetails] No initial image URL found in API response.");
             }
-        }, 5000); // 5-second delay - adjust if needed, but ensure it's longer than Caspio's internal processing
-    };
 
-    script.onerror = function() {
-        console.error(`PricingPages: Error loading Caspio script ${caspioAppKey} from ${fullUrl}`);
-        container.classList.remove('loading');
-        container.classList.add('pricing-unavailable'); // Add class for retry detection
-        container.dataset.loadFailed = 'true'; // Mark as failed
+            if (colorEl) colorEl.textContent = window.selectedColorName || 'Not Selected';
 
-        // Do NOT call displayContactMessage here directly
-    };
-
-    container.appendChild(script);
-}
-
-/**
- * Ensures hidden #matrix-title and #matrix-note elements exist
- * for cart-integration.js, adding them if necessary.
- * Should be called *after* confirming Caspio loaded successfully or when showing fallback.
- */
-function ensureHiddenCartElements(container) {
-    // Ensure #matrix-title exists (hidden)
-    if (!container.querySelector('#matrix-title')) {
-        const titleElement = document.createElement('h3');
-        titleElement.id = 'matrix-title';
-        const caspioTitle = container.querySelector('h3, h2'); // Try to grab Caspio's title
-        titleElement.textContent = caspioTitle ? caspioTitle.textContent.trim() : `${getEmbellishmentTypeFromUrl()} Pricing`;
-        titleElement.style.display = 'none';
-        container.insertBefore(titleElement, container.firstChild);
-        console.log('PricingPages: Added missing #matrix-title element (hidden).');
-    }
-
-    // Ensure #matrix-note exists (hidden)
-    if (!container.querySelector('#matrix-note')) {
-        const noteElement = document.createElement('div');
-        noteElement.id = 'matrix-note';
-        noteElement.style.display = 'none';
-        const caspioNote = container.querySelector('.cbResultSetInstructions, .cbResultSetMessage'); // Try to grab Caspio's note
-        noteElement.innerHTML = caspioNote ? caspioNote.innerHTML : '';
-        container.appendChild(noteElement); // Append at the end
-        console.log('PricingPages: Added missing #matrix-note element (hidden).');
-    }
-}
-
-// --- Cart Script Loading ---
-
-// Load cart.js script and initialize the cart
-function loadCartScript() {
-    return new Promise((resolve, reject) => {
-        if (window.NWCACart) {
-            console.log('PricingPages: NWCACart already loaded/defined.');
-            // Attempt initialization if available
-            if (typeof window.NWCACart.initializeCart === 'function') {
-                 // Use try-catch as initializeCart might fail
-                 try {
-                     window.NWCACart.initializeCart();
-                     console.log('PricingPages: NWCACart.initializeCart() called.');
-                 } catch (initError) {
-                     console.error('PricingPages: Error calling NWCACart.initializeCart():', initError);
-                 }
-            }
-            resolve();
-            return;
-        }
-
-        console.log('PricingPages: Loading cart.js...');
-        const script = document.createElement('script');
-        script.src = '/cart.js'; // Adjust path if needed
-        script.async = true;
-
-        script.onload = () => {
-            console.log('PricingPages: cart.js script loaded successfully.');
-            // Initialize the cart after loading, give it a moment
+            // --- Step 4: Update Mini Swatch (after dp5-helper likely populated swatches) ---
+            // Use a slight delay to increase chance swatches exist
             setTimeout(() => {
-                if (window.NWCACart && typeof window.NWCACart.initializeCart === 'function') {
-                     try {
-                         window.NWCACart.initializeCart();
-                         console.log('PricingPages: NWCACart initialized after script load.');
-                     } catch (initError) {
-                          console.error('PricingPages: Error initializing NWCACart after script load:', initError);
-                     }
-                } else {
-                    console.warn('PricingPages: NWCACart object or initializeCart function not available after cart.js loaded.');
-                }
-                resolve(); // Resolve even if initialization failed, let other things proceed
-            }, 100);
-        };
+                 updateMiniColorSwatch();
+                 // Also ensure the correct swatch is marked active after initial load
+                 const allSwatches = document.querySelectorAll('.color-swatch');
+                 allSwatches.forEach(s => {
+                      const isActive = (window.selectedCatalogColor && normalizeColorName(s.dataset.catalogColor) === normalizeColorName(window.selectedCatalogColor)) ||
+                                       (!window.selectedCatalogColor && window.selectedColorName && normalizeColorName(s.dataset.colorName) === normalizeColorName(window.selectedColorName));
+                      s.classList.toggle('active', isActive);
+                 });
+                 console.log("[fetchProductDetails] Applied initial active class to swatches.");
+            }, 500); // Adjust delay if needed
 
-        script.onerror = () => {
-            console.error('PricingPages: Error loading cart.js script.');
-            reject(new Error('Failed to load cart.js script'));
-        };
-        document.head.appendChild(script);
-    });
-}
+            // --- Step 5: Swatch Population is handled by dp5-helper.js ---
+            console.log("[fetchProductDetails] Swatch population will be handled by dp5-helper.js");
 
-// Load cart integration script
-function loadCartIntegrationScript() {
-    return new Promise((resolve, reject) => {
-        // Check if the script's main object/flag already exists FIRST
-        if (window.cartIntegrationInitialized) { // Assuming cart-integration sets this flag
-            console.log('PricingPages: Cart integration script already loaded/initialized.');
-            resolve(); // Already loaded, resolve successfully
-            return;
+        } catch (error) {
+            console.error('[fetchProductDetails] Error fetching initial product details:', error);
+            const titleEl = document.getElementById('product-title');
+            if (titleEl) titleEl.textContent = 'Error Loading Product Info';
+            const imageEl = document.getElementById('product-image');
+            if (imageEl) imageEl.src = '';
+            // Don't clear swatches here, let dp5-helper handle its errors
         }
-
-        console.log('PricingPages: Loading cart-integration.js...');
-        const script = document.createElement('script');
-        script.src = '/cart-integration.js'; // Adjust path if needed
-        script.async = true;
-
-        script.onload = () => {
-            console.log('PricingPages: cart-integration.js script loaded successfully.');
-            // Initialization is likely handled within cart-integration.js itself
-            // (e.g., via its own DOMContentLoaded or the initCartIntegration() call from Caspio Block 4)
-            // Set the flag here to be safe, though cart-integration.js might also set it.
-            window.cartIntegrationInitialized = true; 
-            resolve();
-        };
-
-        script.onerror = () => {
-            console.error('PricingPages: Error loading cart-integration.js script.');
-            reject(new Error('Failed to load cart-integration.js script'));
-        };
-        document.head.appendChild(script);
-    });
-}
-
-
-// --- Main Initialization ---
-
-// Load pricing matrix capture script
-function loadPricingMatrixCaptureScript() {
-    return new Promise((resolve, reject) => {
-        // Check if the script is already loaded
-        if (window.capturePricingMatrix) {
-            console.log('PricingPages: Pricing matrix capture script already loaded.');
-            resolve();
-            return;
-        }
-
-        console.log('PricingPages: Loading pricing-matrix-capture.js...');
-        const script = document.createElement('script');
-        script.src = '/pricing-matrix-capture.js';
-        script.async = true;
-
-        script.onload = () => {
-            console.log('PricingPages: pricing-matrix-capture.js loaded successfully.');
-            resolve();
-        };
-
-        script.onerror = () => {
-            console.error('PricingPages: Error loading pricing-matrix-capture.js.');
-            reject(new Error('Failed to load pricing-matrix-capture.js'));
-        };
-        document.head.appendChild(script);
-    });
-}
-
-// Initialize the page (Called on DOMContentLoaded)
-async function initPricingPage() {
-    console.log("PricingPages: Initializing pricing page...");
-    updateProductContext();
-    updateTabNavigation();
-
-    // Load cart scripts first - important they are ready before integration tries to use them
-    try {
-        await loadCartScript();
-        await loadCartIntegrationScript();
-        await loadPricingMatrixCaptureScript();
-        console.log("PricingPages: Core cart and pricing matrix scripts loaded.");
-    } catch (error) {
-        console.error('PricingPages: Error loading core scripts, subsequent functionality may be affected:', error);
-        // Decide if we should stop or continue without cart integration
-        // For now, let's continue to try loading Caspio pricing
     }
-    
-    // Set up responsive adjustments
-    handleMobileAdjustments();
-    window.addEventListener('resize', handleMobileAdjustments);
 
-    // Determine which Caspio DP to load
-    const styleNumber = getUrlParameter('StyleNumber');
-    const currentPage = window.location.pathname.toLowerCase();
-    let pricingContainerId = 'pricing-calculator'; // Default container ID
-    let appKeys = [];
-    let embType = getEmbellishmentTypeFromUrl(); // Get type early
+    function populateColorSwatches(colors) {
+        const swatchesContainer = document.getElementById('color-swatches');
+        if (!swatchesContainer) return;
+        swatchesContainer.innerHTML = '';
 
-    // --- DEFINE YOUR CASPIO APP KEYS HERE ---
+        colors.forEach(color => {
+            const swatchWrapper = document.createElement('div');
+            swatchWrapper.className = 'swatch-wrapper';
+            const swatch = document.createElement('div');
+            swatch.className = 'color-swatch';
+            swatch.dataset.colorName = color.COLOR_NAME;
+            swatch.dataset.catalogColor = color.CATALOG_COLOR;
+            swatch.title = color.COLOR_NAME;
+            if (color.COLOR_SWATCH_IMAGE_URL) {
+                swatch.style.backgroundImage = `url('${color.COLOR_SWATCH_IMAGE_URL}')`;
+            } else {
+                swatch.style.backgroundColor = color.COLOR_NAME.toLowerCase().replace(/\s+/g, '');
+            }
+
+            // Check against updated global state for active class
+            if ((window.selectedCatalogColor && normalizeColorName(color.CATALOG_COLOR) === normalizeColorName(window.selectedCatalogColor)) ||
+                (!window.selectedCatalogColor && window.selectedColorName && normalizeColorName(color.COLOR_NAME) === normalizeColorName(window.selectedColorName)))
+            {
+                swatch.classList.add('active');
+            }
+
+            swatch.addEventListener('click', () => handleColorSwatchClick(color));
+            const name = document.createElement('span');
+            name.className = 'color-name';
+            name.textContent = color.COLOR_NAME;
+            swatchWrapper.appendChild(swatch);
+            swatchWrapper.appendChild(name);
+            swatchesContainer.appendChild(swatchWrapper);
+        });
+
+        setupShowMoreColorsButton();
+    }
+
+    // Fetches details for a specific color and updates the UI accordingly
+    async function fetchAndApplyColorSpecificDetails(styleNumber, colorIdentifier) {
+         console.log(`[DEBUG] fetchAndApplyColorSpecificDetails called for Style: ${styleNumber}, Color: ${colorIdentifier}`);
+         if (!styleNumber || !colorIdentifier) {
+              console.error("[DEBUG] Missing styleNumber or colorIdentifier for fetchAndApplyColorSpecificDetails");
+              return;
+         }
+         try {
+              const detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(colorIdentifier)}`;
+              console.log(`[DEBUG] Fetching specific color details from: ${detailApiUrl}`);
+              const response = await fetch(detailApiUrl);
+              if (!response.ok) throw new Error(`API Error (Specific Color): ${response.status}`);
+              const details = await response.json();
+              console.log("[DEBUG] Received specific color details:", JSON.stringify(details, null, 2));
+
+              // Update main image using the URL from this specific response
+              updateMainProductImage(details.MAIN_IMAGE_URL || details.FRONT_MODEL || details.FRONT_FLAT || '');
+
+              // Update mini swatch (which relies on global state already set by handleColorSwatchClick)
+              updateMiniColorSwatch();
+
+         } catch (error) {
+              console.error(`[DEBUG] Error fetching specific details for color ${colorIdentifier}:`, error);
+              // Optionally handle error, e.g., show a placeholder image or message
+         }
+    }
+
+    function handleColorSwatchClick(colorData) {
+        console.log("[DEBUG] handleColorSwatchClick called with:", JSON.stringify(colorData, null, 2));
+        if (!colorData || !colorData.COLOR_NAME) {
+             console.error("[DEBUG] Invalid colorData passed to handleColorSwatchClick");
+             return;
+        }
+        const newColorName = colorData.COLOR_NAME;
+        const newCatalogColor = colorData.CATALOG_COLOR;
+        console.log(`PricingPages: Color swatch clicked: ${newColorName} (Catalog: ${newCatalogColor})`);
+
+        // --- Step 1: Update Global State ---
+        window.selectedColorName = newColorName;
+        window.selectedCatalogColor = newCatalogColor;
+        console.log(`[DEBUG] Globals updated: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
+
+        // --- Step 2: Update UI Elements Immediately Available ---
+        const colorEl = document.getElementById('product-color');
+        if (colorEl) {
+             colorEl.textContent = newColorName;
+             console.log(`[DEBUG] Updated #product-color text to: ${newColorName}`);
+        } else {
+             console.warn("[DEBUG] #product-color element not found.");
+        }
+
+        const allSwatches = document.querySelectorAll('.color-swatch');
+        console.log(`[DEBUG] Updating active class for ${allSwatches.length} swatches.`);
+        allSwatches.forEach(s => {
+            // Match primarily on CATALOG_COLOR if available, fallback to COLOR_NAME
+            const sCatalogColor = s.dataset.catalogColor;
+            const sColorName = s.dataset.colorName;
+            const isActive = (newCatalogColor && sCatalogColor && normalizeColorName(sCatalogColor) === normalizeColorName(newCatalogColor)) ||
+                             (!newCatalogColor && newColorName && sColorName && normalizeColorName(sColorName) === normalizeColorName(newColorName));
+            s.classList.toggle('active', isActive);
+        });
+
+        // --- Step 3: Fetch Specific Details for Image & Update Mini Swatch ---
+        const styleNumber = window.selectedStyleNumber;
+        // Use CATALOG_COLOR if available for the API call, otherwise use COLOR_NAME
+        const colorIdentifierForApi = newCatalogColor || newColorName;
+        fetchAndApplyColorSpecificDetails(styleNumber, colorIdentifierForApi); // Will call updateMainProductImage and updateMiniColorSwatch internally
+
+        // --- Step 4: Reload Caspio ---
+        const embType = getEmbellishmentTypeFromUrl();
+        const pricingContainerId = CONTAINER_IDS[embType] || 'pricing-calculator';
+        const appKeys = CASPIO_APP_KEYS[embType] || [];
+        if (styleNumber && appKeys.length > 0) {
+             console.log("PricingPages: Reloading Caspio embed for new color...");
+             const pricingContainer = document.getElementById(pricingContainerId);
+             if (pricingContainer) {
+                 pricingContainer.innerHTML = ''; // Clear first
+                 delete pricingContainer.dataset.loadFailed;
+                 pricingContainer.classList.remove('pricing-unavailable');
+                 // Don't await here, let it run async in the background
+                 tryLoadCaspioSequentially(pricingContainer, appKeys, styleNumber, embType);
+             }
+        } else {
+             console.warn("PricingPages: Cannot reload Caspio - missing style number or app keys.");
+        }
+
+        // --- Step 5: Dispatch Event ---
+        window.dispatchEvent(new CustomEvent('colorChanged', { detail: colorData }));
+    }
+
+    function updateMainProductImage(imageUrl) {
+        console.log(`[DEBUG] updateMainProductImage called with URL: ${imageUrl}`); // DEBUG LOG
+        const imageEl = document.getElementById('product-image');
+        if (imageEl && imageUrl) {
+            imageEl.src = imageUrl;
+            console.log(`[DEBUG] Set #product-image src to: ${imageUrl}`);
+        } else if (imageEl) {
+            console.warn("PricingPages: No image URL provided for selected color swatch. Image not updated.");
+        } else {
+             console.warn("[DEBUG] #product-image element not found.");
+        }
+    }
+
+    function updateTabNavigation() {
+        const styleNumber = getUrlParameter('StyleNumber');
+        const colorCode = getUrlParameter('COLOR');
+        const currentPage = window.location.pathname.toLowerCase();
+        if (!styleNumber) return;
+        const tabs = document.querySelectorAll('.pricing-tab');
+        tabs.forEach(tab => {
+            const targetPage = tab.getAttribute('data-page');
+            if (!targetPage) return;
+            const url = `/pricing/${targetPage}?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode || '')}`;
+            tab.href = url;
+            tab.classList.toggle('active', currentPage.includes(`/pricing/${targetPage}`));
+        });
+    }
+
+    // --- Caspio Loading and Handling ---
     const CASPIO_APP_KEYS = {
-        embroidery: ['a0e150001c7143d027a54c439c01'], // Add alternatives if needed
-        'cap-embroidery': ['a0e150004ecd0739f853449c8d7f'], // Add alternatives if needed
-        dtg: ['a0e150002eb9491a50104c1d99d7'], // !!! VERIFY THIS KEY !!!
-        screenprint: ['a0e1500026349f420e494800b43e'], // !!! VERIFY THIS KEY !!!
-        dtf: ['dtf'] // Special key to trigger 'coming soon'
+        embroidery: ['a0e150001c7143d027a54c439c01'],
+        'cap-embroidery': ['a0e150004ecd0739f853449c8d7f'],
+        dtg: ['a0e150002eb9491a50104c1d99d7'], // VERIFY
+        screenprint: ['a0e1500026349f420e494800b43e'], // VERIFY
+        dtf: ['dtf'] // Special key
     };
-    // --- Adjust container IDs if necessary ---
     const CONTAINER_IDS = {
         embroidery: 'pricing-calculator',
-        'cap-embroidery': 'pricing-calculator', // Assuming same container
-        dtg: 'pricing-calculator', // Assuming same container
-        screenprint: 'pricing-calculator', // Use the same container ID as other pages
+        'cap-embroidery': 'pricing-calculator',
+        dtg: 'pricing-calculator',
+        screenprint: 'pricing-calculator',
         dtf: 'pricing-calculator'
     };
 
-    appKeys = CASPIO_APP_KEYS[embType] || [];
-    pricingContainerId = CONTAINER_IDS[embType] || 'pricing-calculator';
-
-    const pricingContainer = document.getElementById(pricingContainerId);
-    if (!pricingContainer) {
-        console.error(`PricingPages: Pricing container #${pricingContainerId} not found for type ${embType}.`);
-        return; // Cannot proceed
+    function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
+        const container = document.getElementById(containerId);
+        if (!container) { console.error(`PricingPages: Container #${containerId} not found.`); return; }
+        if (!styleNumber) { console.error(`PricingPages: Style number missing for Caspio load.`); container.innerHTML = '<div class="error-message">Error: Style number missing.</div>'; container.dataset.loadFailed = 'true'; container.classList.add('pricing-unavailable'); return; }
+        const colorForCaspio = window.selectedCatalogColor || window.selectedColorName || '';
+        console.log(`PricingPages: Using color for Caspio embed: '${colorForCaspio}'`);
+        container.innerHTML = '<div class="loading-message">Loading pricing data...</div>';
+        container.classList.add('loading'); container.classList.remove('pricing-unavailable'); delete container.dataset.loadFailed;
+        const params = new URLSearchParams(); params.append('StyleNumber', styleNumber); if (colorForCaspio) { params.append('COLOR', colorForCaspio); }
+        const fullUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}/emb?${params.toString()}`;
+        console.log(`PricingPages: Loading Caspio embed from URL: ${fullUrl}`);
+        const script = document.createElement('script'); script.type = 'text/javascript'; script.src = fullUrl; script.async = true;
+        script.onload = function() { console.log(`PricingPages: Caspio script ${caspioAppKey} loaded from ${fullUrl}`); container.classList.remove('loading'); setTimeout(() => checkCaspioRender(container, caspioAppKey), 5000); };
+        script.onerror = function() { console.error(`PricingPages: Error loading Caspio script ${caspioAppKey} from ${fullUrl}`); container.classList.remove('loading'); container.classList.add('pricing-unavailable'); container.dataset.loadFailed = 'true'; };
+        container.appendChild(script);
     }
 
-    if (embType === 'unknown' || appKeys.length === 0) {
-        console.error(`PricingPages: Unknown page type or no AppKeys defined for ${embType}. Path: ${currentPage}`);
-        displayContactMessage(pricingContainer, embType);
-        return;
+    function checkCaspioRender(container, caspioAppKey) {
+         console.log(`PricingPages: Performing check for ${caspioAppKey} after delay...`);
+         const hasExplicitError = /Error:|Failed to load|Unable to load|Initializing script \(1\) not found/i.test(container.innerText);
+         const noRecordsFound = container.innerText.includes('No records found');
+         const hasTableContent = !!container.querySelector('table tbody tr') || !!container.querySelector('.cbResultSetTable') || !!container.querySelector('.matrix-price-table');
+         const isLoadingMessageStillPresent = !!container.querySelector('.loading-message');
+         console.log(`PricingPages: Check details - hasExplicitError: ${hasExplicitError}, noRecordsFound: ${noRecordsFound}, hasTableContent: ${hasTableContent}, isLoadingMessageStillPresent: ${isLoadingMessageStillPresent}`);
+         if (noRecordsFound) { console.log(`PricingPages: Caspio loaded for ${caspioAppKey}, but no records found. Displaying contact message.`); container.dataset.loadFailed = 'true'; container.classList.add('pricing-unavailable'); displayContactMessage(container, getEmbellishmentTypeFromUrl()); initializeFallbackPricingData(getEmbellishmentTypeFromUrl()); }
+         else if (hasExplicitError || (!hasTableContent && isLoadingMessageStillPresent)) { console.warn(`PricingPages: Caspio check FAILED for ${caspioAppKey}.`); container.dataset.loadFailed = 'true'; container.classList.add('pricing-unavailable'); }
+         else if (hasTableContent) { console.log(`PricingPages: Caspio check PASSED for ${caspioAppKey}. Table content found.`); container.classList.remove('pricing-unavailable'); container.dataset.loadFailed = 'false'; ensureHiddenCartElements(container); console.log(`PricingPages: Caspio content detected, pricing-matrix-capture.js should handle data extraction.`); const loadingMsg = container.querySelector('.loading-message'); if (loadingMsg) loadingMsg.style.display = 'none'; }
+         else { console.warn(`PricingPages: Caspio check AMBIGUOUS for ${caspioAppKey}. Treating as 'No Records'.`); container.dataset.loadFailed = 'true'; container.classList.add('pricing-unavailable'); displayContactMessage(container, getEmbellishmentTypeFromUrl()); initializeFallbackPricingData(getEmbellishmentTypeFromUrl()); }
     }
 
-    // Handle DTF separately - show contact message directly
-    if (embType === 'dtf') {
-        console.log("PricingPages: Handling DTF page (coming soon).");
-        // Display contact message directly instead of trying to load Caspio
-        displayContactMessage(pricingContainer, embType);
-        initializeFallbackPricingData(embType); // Init fallback for cart integration consistency
-        return;
-    }
-
-    // Try loading the appropriate Caspio DataPage sequentially using the defined keys
-    await tryLoadCaspioSequentially(pricingContainer, appKeys, styleNumber, embType);
-}
-
-/**
- * Tries loading Caspio DataPages sequentially using a list of AppKeys.
- * Waits after each attempt to check for success using the flag set by loadCaspioEmbed.
- */
-async function tryLoadCaspioSequentially(container, appKeys, styleNumber, embType) {
-    console.log(`PricingPages: Starting sequential load for ${embType} with keys:`, appKeys);
-    let loadedSuccessfully = false;
-
-    for (let i = 0; i < appKeys.length; i++) {
-        const currentKey = appKeys[i];
-        console.log(`PricingPages: Attempting load for ${embType} with key #${i + 1}: ${currentKey}`);
-
-        // Load the embed script
-        loadCaspioEmbed(container.id, currentKey, styleNumber);
-
-        // Wait for the check inside loadCaspioEmbed to complete (plus a buffer)
-        // The check runs after 5 seconds, so we wait 6 seconds total.
-        await new Promise(resolve => setTimeout(resolve, 6000));
-
-        // Check the result flag set by loadCaspioEmbed's internal check
-        const loadFailed = container.dataset.loadFailed === 'true';
-
-        if (!loadFailed) {
-            console.log(`PricingPages: Successfully loaded ${embType} pricing with key: ${currentKey}`);
-            loadedSuccessfully = true;
-            // Note: ensureHiddenCartElements is called inside loadCaspioEmbed on success check
-            break; // Exit loop on success
-        } else {
-            console.warn(`PricingPages: Failed to load ${embType} pricing with key: ${currentKey}.`);
-            if (i < appKeys.length - 1) {
-                console.log("PricingPages: Trying next key...");
-            }
+    async function tryLoadCaspioSequentially(container, appKeys, styleNumber, embType) {
+        console.log(`PricingPages: Starting sequential load for ${embType} with keys:`, appKeys);
+        let loadedSuccessfully = false;
+        for (let i = 0; i < appKeys.length; i++) {
+            const currentKey = appKeys[i];
+            console.log(`PricingPages: Attempting load for ${embType} with key #${i + 1}: ${currentKey}`);
+            loadCaspioEmbed(container.id, currentKey, styleNumber);
+            await new Promise(resolve => setTimeout(resolve, 6000));
+            const loadFailed = container.dataset.loadFailed === 'true';
+            if (!loadFailed) { console.log(`PricingPages: Successfully loaded ${embType} pricing with key: ${currentKey}`); loadedSuccessfully = true; break; }
+            else { console.warn(`PricingPages: Failed to load ${embType} pricing with key: ${currentKey}.`); if (i < appKeys.length - 1) console.log("PricingPages: Trying next key..."); }
         }
+        if (!loadedSuccessfully) { console.error(`PricingPages: All attempts to load ${embType} pricing failed.`); displayContactMessage(container, embType); initializeFallbackPricingData(embType); }
     }
 
-    if (!loadedSuccessfully) {
-        console.error(`PricingPages: All attempts to load ${embType} pricing failed using keys:`, appKeys);
-        // Display contact message as the final fallback
-        displayContactMessage(container, embType);
-        // Initialize fallback pricing data AFTER confirming all attempts failed
-        initializeFallbackPricingData(embType);
-    }
-}
-
-
-// --- Fallback Mechanisms ---
-
-/**
- * Initializes fallback global pricing variables if Caspio fails.
- * Prevents errors in cart-integration.js when it tries to read pricing.
- */
-function initializeFallbackPricingData(embType) {
-    console.warn(`PricingPages: Initializing FALLBACK pricing data for ${embType}. Caspio DP failed to load.`);
-
-    // Define fallback structures - ADJUST THESE VALUES AS NEEDED
-    let headers = ['S-XL', '2XL', '3XL'];
-    let prices = {
-        'S-XL': { 'Tier1': 20.00, 'Tier2': 19.00, 'Tier3': 18.00, 'Tier4': 17.00 },
-        '2XL': { 'Tier1': 22.00, 'Tier2': 21.00, 'Tier3': 20.00, 'Tier4': 19.00 },
-        '3XL': { 'Tier1': 23.00, 'Tier2': 22.00, 'Tier3': 21.00, 'Tier4': 20.00 },
-    };
-    let tiers = {
-        'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11, LTM_Fee: 50 },
-        'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23, LTM_Fee: 25 },
-        'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 },
-        'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 10000 },
-    };
-    let uniqueSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL']; // Match headers
-
-    // Customize fallbacks per type if necessary
-    if (embType === 'cap-embroidery') {
-        headers = ['One Size'];
-        prices = { 'One Size': { 'Tier1': 22.99, 'Tier2': 21.99, 'Tier3': 20.99, 'Tier4': 19.99 } };
-        uniqueSizes = ['OS'];
-    } else if (embType === 'dtg') {
-        // Use default or define specific DTG fallback
-    } else if (embType === 'screenprint') {
-        // Use default or define specific Screenprint fallback
-    } else if (embType === 'dtf') {
-         // DTF should show coming soon, but provide fallback data just in case
+    function ensureHiddenCartElements(container) {
+        if (!container.querySelector('#matrix-title')) { const titleElement = document.createElement('h3'); titleElement.id = 'matrix-title'; const caspioTitle = container.querySelector('h3, h2'); titleElement.textContent = caspioTitle ? caspioTitle.textContent.trim() : `${getEmbellishmentTypeFromUrl()} Pricing`; titleElement.style.display = 'none'; container.insertBefore(titleElement, container.firstChild); }
+        if (!container.querySelector('#matrix-note')) { const noteElement = document.createElement('div'); noteElement.id = 'matrix-note'; noteElement.style.display = 'none'; const caspioNote = container.querySelector('.cbResultSetInstructions, .cbResultSetMessage'); noteElement.innerHTML = caspioNote ? caspioNote.innerHTML : ''; container.appendChild(noteElement); }
     }
 
-    // Set global variables expected by cart-integration.js getPrice()
-    // Use generic dp5 names as cart-integration seems hardcoded to them
-    window.dp5GroupedHeaders = headers;
-    window.dp5GroupedPrices = prices;
-    window.dp5ApiTierData = tiers;
-    // Also set potentially needed dp5UniqueSizes if cart integration uses it
-    window.dp5UniqueSizes = uniqueSizes;
+    // --- Script Loading Helper ---
 
-    console.log('PricingPages: Fallback pricing global variables initialized.');
+    async function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            let alreadyLoaded = false;
+            // Check based on known global objects/flags
+            if (src.includes('cart.js') && window.NWCACart) alreadyLoaded = true;
+            else if (src.includes('cart-integration.js') && window.cartIntegrationInitialized) alreadyLoaded = true;
+            else if (src.includes('pricing-matrix-capture.js') && window.PricingMatrixCapture) alreadyLoaded = true;
+            else if (src.includes('pricing-calculator.js') && window.NWCAPricingCalculator) alreadyLoaded = true;
+            else if (src.includes('product-quantity-ui.js') && window.ProductQuantityUI) alreadyLoaded = true;
+            else if (src.includes('add-to-cart.js') && window.addToCartInitialized) alreadyLoaded = true;
+            else if (src.includes('order-form-pdf.js') && window.NWCAOrderFormPDF) alreadyLoaded = true;
 
-    // Optionally, build a simplified fallback table visually?
-    // For now, displayContactMessage handles the UI.
-}
-
-
-/**
- * Displays a standard contact message when pricing cannot be loaded.
- */
-function displayContactMessage(container, embType) {
-    if (!container) {
-        console.error("PricingPages: Cannot display contact message - container not found.");
-        return;
-    }
-    console.log(`PricingPages: Displaying contact message for ${embType} pricing in container #${container.id}`);
-
-    // Clear the container and remove loading state
-    container.innerHTML = '';
-    container.classList.remove('loading');
-    container.classList.add('pricing-unavailable'); // Ensure class is added
-
-    // Add hidden title element needed by cart integration
-    const titleElement = document.createElement('h3');
-    titleElement.id = 'matrix-title';
-    titleElement.textContent = `${embType.charAt(0).toUpperCase() + embType.slice(1)} Pricing`;
-    titleElement.style.display = 'none';
-    container.appendChild(titleElement);
-
-    // Add message content
-    const messageElement = document.createElement('div');
-    messageElement.style.textAlign = 'center';
-    messageElement.style.padding = '30px 20px';
-    messageElement.style.backgroundColor = '#f8f9fa';
-    messageElement.style.borderRadius = '8px';
-    messageElement.style.border = '1px solid #dee2e6';
-    messageElement.style.margin = '20px 0';
-    messageElement.innerHTML = `
-        <h3 style="color: #0056b3; margin-bottom: 15px;">Pricing Currently Unavailable</h3>
-        <p style="font-size: 16px; color: #495057; margin-bottom: 20px;">
-            We apologize, but the pricing details for this item are currently unavailable.
-        </p>
-        <p style="font-size: 16px; color: #495057; margin-bottom: 20px;">
-            Please call <strong style="color: #0056b3; font-size: 18px;">253-922-5793</strong> for an accurate quote.
-        </p>
-        <p style="font-size: 14px; color: #6c757d;">
-            Our team is ready to assist you.
-        </p>
-    `;
-    container.appendChild(messageElement);
-
-    // Add hidden note element needed by cart integration
-    const noteElement = document.createElement('div');
-    noteElement.id = 'matrix-note';
-    noteElement.style.display = 'none';
-    container.appendChild(noteElement);
-
-    console.log(`PricingPages: Contact message displayed for ${embType}.`);
-}
-// --- Enhanced UI Functions ---
-
-// Function to update the pricing grid responsively
-function updatePricingGrid() {
-    // Get pricing data from global variables
-    if (window.dp5GroupedHeaders && window.dp5GroupedPrices && window.dp5ApiTierData) {
-        const pricingData = {
-            headers: window.dp5GroupedHeaders,
-            prices: window.dp5GroupedPrices,
-            tiers: window.dp5ApiTierData
-        };
-        
-        // Update the custom pricing grid
-        const pricingGrid = document.getElementById('custom-pricing-grid');
-        if (!pricingGrid) return;
-        
-        // Get the tbody element
-        const tbody = pricingGrid.querySelector('tbody');
-        if (!tbody) return;
-        
-        // Clear existing rows
-        tbody.innerHTML = '';
-        
-        // Create rows for each tier
-        const tierKeys = Object.keys(pricingData.tiers);
-        tierKeys.forEach(tierKey => {
-            const tier = pricingData.tiers[tierKey];
-            const row = document.createElement('tr');
-            
-            // Create tier label cell
-            const tierCell = document.createElement('td');
-            let tierLabel = '';
-            if (tier.MaxQuantity && tier.MinQuantity) {
-                tierLabel = `${tier.MinQuantity}-${tier.MaxQuantity}`;
-            } else if (tier.MinQuantity) {
-                tierLabel = `${tier.MinQuantity}+`;
+            if (alreadyLoaded) {
+                console.log(`PricingPages: Script ${src} already loaded.`);
+                resolve(); return;
             }
-            tierCell.textContent = tierLabel;
-            row.appendChild(tierCell);
-            
-            // Create price cells for each size group
-            pricingData.headers.forEach(sizeGroup => {
-                const priceCell = document.createElement('td');
-                priceCell.className = 'price-cell';
-                
-                // Get price for this tier and size group
-                const price = pricingData.prices[sizeGroup] ?
-                    pricingData.prices[sizeGroup][tierKey] : null;
-                
-                if (price !== null && price !== undefined) {
-                    // Format price
-                    const formattedPrice = `$${parseFloat(price).toFixed(2)}`;
-                    priceCell.innerHTML = formattedPrice;
-                    
-                    // Add inventory indicator if available
-                    if (window.inventoryData && window.inventoryData.sizes) {
-                        addInventoryIndicator(priceCell, sizeGroup, window.inventoryData);
-                    }
+
+            console.log(`PricingPages: Loading script ${src}...`);
+            const script = document.createElement('script');
+            script.src = src;
+            script.async = false; // Ensure sequential execution relative to other scripts added this way
+
+            script.onload = () => {
+                console.log(`PricingPages: Script ${src} loaded successfully.`);
+                if (src.includes('cart.js')) {
+                     setTimeout(() => { // Give cart.js a moment
+                         if (window.NWCACart?.initializeCart) {
+                              try { window.NWCACart.initializeCart(); } catch (e) { console.error('Error initializing NWCACart:', e); }
+                         }
+                         resolve();
+                     }, 50);
                 } else {
-                    priceCell.textContent = 'N/A';
+                     resolve();
                 }
-                
-                row.appendChild(priceCell);
+            };
+            script.onerror = () => { console.error(`PricingPages: Error loading script ${src}.`); reject(new Error(`Failed to load script ${src}`)); };
+            document.body.appendChild(script); // Append to body to ensure execution order after HTML
+        });
+    }
+
+
+    // --- UI Update Functions (Consolidated) ---
+
+    function updatePriceDisplayForSize(size, quantity, unitPrice, displayPrice, itemTotal, ltmFeeApplies, ltmFeePerItem, combinedQuantity, ltmFee) {
+        const matrixPriceDisplay = document.querySelector(`#quantity-matrix .price-display[data-size="${size}"]`); if (matrixPriceDisplay) { matrixPriceDisplay.dataset.unitPrice = unitPrice.toFixed(2); if (quantity <= 0) { matrixPriceDisplay.innerHTML = `$${unitPrice.toFixed(2)}`; matrixPriceDisplay.style.backgroundColor = ''; matrixPriceDisplay.style.padding = ''; matrixPriceDisplay.style.border = ''; } else { if (ltmFeeApplies) { matrixPriceDisplay.innerHTML = `<div class="price-card" style="font-size:0.9em;box-shadow:0 1px 3px rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;max-width:100%;"><div style="background-color:#ffc107;color:#212529;font-weight:bold;padding:3px 0;text-align:center;font-size:0.8em;">⚠️ LTM FEE</div><div style="padding:4px;background-color:#fff3cd;"><div style="display:flex;justify-content:space-between;font-size:0.85em;"><span>Base:</span><span>$${unitPrice.toFixed(2)}</span></div><div style="display:flex;justify-content:space-between;color:#dc3545;font-weight:bold;font-size:0.85em;"><span>LTM:</span><span>+$${ltmFeePerItem.toFixed(2)}</span></div><div style="display:flex;justify-content:space-between;border-top:1px dashed #ffc107;padding-top:2px;font-weight:bold;"><span>Unit:</span><span>$${displayPrice.toFixed(2)}</span></div><div style="text-align:center;background-color:#f8f9fa;margin-top:3px;padding:2px;border-radius:3px;font-weight:bold;">$${itemTotal.toFixed(2)} total (${quantity})</div></div></div>`; matrixPriceDisplay.style.backgroundColor = ''; matrixPriceDisplay.style.padding = '0'; matrixPriceDisplay.style.border = 'none'; } else { matrixPriceDisplay.innerHTML = `<div class="price-card" style="font-size:0.9em;box-shadow:0 1px 3px rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;max-width:100%;"><div style="background-color:#0056b3;color:white;font-weight:bold;padding:3px 0;text-align:center;font-size:0.8em;">STANDARD</div><div style="padding:4px;background-color:#f8f9fa;"><div style="display:flex;justify-content:space-between;font-weight:bold;"><span>Unit:</span><span>$${unitPrice.toFixed(2)}</span></div><div style="text-align:center;background-color:#e6f7ff;margin-top:3px;padding:2px;border-radius:3px;font-weight:bold;">$${itemTotal.toFixed(2)} total (${quantity})</div></div></div>`; matrixPriceDisplay.style.backgroundColor = ''; matrixPriceDisplay.style.padding = '0'; matrixPriceDisplay.style.border = 'none'; } } matrixPriceDisplay.dataset.quantity = quantity; matrixPriceDisplay.dataset.displayPrice = displayPrice; matrixPriceDisplay.dataset.tier = window.cartItemData?.tierKey || ''; }
+        const gridPriceDisplay = document.querySelector(`#size-quantity-grid-container .size-price[data-size="${size}"]`); if (gridPriceDisplay) { if (quantity <= 0) { gridPriceDisplay.textContent = `$${unitPrice.toFixed(2)}`; gridPriceDisplay.style.backgroundColor = ''; gridPriceDisplay.style.padding = ''; gridPriceDisplay.style.borderRadius = ''; gridPriceDisplay.style.border = ''; gridPriceDisplay.style.boxShadow = ''; } else { if (ltmFeeApplies) { gridPriceDisplay.innerHTML = `<div style="font-weight:bold;color:#212529;background-color:#ffc107;margin-bottom:5px;padding:3px;border-radius:4px;text-align:center;">⚠️ LTM FEE ⚠️</div><div>$${unitPrice.toFixed(2)} + <strong style="color:#663c00">$${ltmFeePerItem.toFixed(2)}</strong> LTM</div><div><strong style="font-size:1.1em;">$${itemTotal.toFixed(2)}</strong></div><div style="background-color:#fff3cd;padding:3px;margin-top:3px;border-radius:3px;"><small>($${ltmFee.toFixed(2)} fee ÷ ${combinedQuantity} items)</small></div>`; gridPriceDisplay.style.backgroundColor = '#fff3cd'; gridPriceDisplay.style.padding = '8px'; gridPriceDisplay.style.borderRadius = '4px'; gridPriceDisplay.style.border = '2px solid #dc3545'; gridPriceDisplay.style.boxShadow = '0 0 5px rgba(220, 53, 69, 0.3)'; } else { gridPriceDisplay.textContent = `$${itemTotal.toFixed(2)}`; gridPriceDisplay.style.backgroundColor = ''; gridPriceDisplay.style.padding = ''; gridPriceDisplay.style.borderRadius = ''; gridPriceDisplay.style.border = ''; gridPriceDisplay.style.boxShadow = ''; } } gridPriceDisplay.dataset.quantity = quantity; gridPriceDisplay.dataset.unitPrice = unitPrice; gridPriceDisplay.dataset.displayPrice = displayPrice; gridPriceDisplay.dataset.tier = window.cartItemData?.tierKey || ''; }
+    }
+
+    function updateCartInfoDisplay(newQuantity, combinedQuantity, currentTierKey) {
+        const cartInfoDisplay = document.getElementById('cart-info-display'); const cartContentsInfo = document.getElementById('cart-contents-info'); if (cartInfoDisplay) { if (newQuantity > 0) { cartInfoDisplay.innerHTML = `<div id="adding-info">Adding <strong><span id="new-items-count">${newQuantity}</span></strong> item(s).</div><div id="combined-total" style="margin-top: 5px;">Combined total for pricing: <strong><span id="combined-items-count">${combinedQuantity}</span></strong> item(s).</div><div id="current-tier" style="margin-top: 5px;">Current Pricing Tier: <strong><span id="tier-name">${currentTierKey || 'N/A'}</span></strong></div>`; cartInfoDisplay.style.display = 'block'; } else { cartInfoDisplay.innerHTML = ''; cartInfoDisplay.style.display = 'none'; } } if (cartContentsInfo) { if (newQuantity > 0) { let summaryHtml = '<strong>Items to Add:</strong><ul>'; const sizeQuantities = window.cartItemData?.items || {}; Object.entries(sizeQuantities).forEach(([size, item]) => { if (item.quantity > 0) { summaryHtml += `<li>${size}: ${item.quantity} @ $${item.displayUnitPrice.toFixed(2)}</li>`; } }); summaryHtml += '</ul>'; cartContentsInfo.innerHTML = summaryHtml; cartContentsInfo.style.display = 'block'; } else { cartContentsInfo.innerHTML = ''; cartContentsInfo.style.display = 'none'; } }
+    }
+
+    function updateTierInfoDisplay(tierKey, nextTier, quantityForNextTier, combinedQuantity) {
+        let tierInfoContainer = document.getElementById('tier-info-display'); try { if (!tierInfoContainer) { tierInfoContainer = document.createElement('div'); tierInfoContainer.id = 'tier-info-display'; tierInfoContainer.className = 'tier-info-display pricing-tier-info'; const cartSummary = document.querySelector('.cart-summary'); if (cartSummary?.parentNode) { cartSummary.parentNode.insertBefore(tierInfoContainer, cartSummary); } else { document.querySelector('.add-to-cart-section')?.appendChild(tierInfoContainer); } } if (!combinedQuantity || combinedQuantity <= 0 || !tierKey) { tierInfoContainer.innerHTML = ''; tierInfoContainer.style.display = 'none'; return; } tierInfoContainer.style.display = 'block'; const sourceTierData = window.nwcaPricingData?.tierData || window.dp5ApiTierData; if (!sourceTierData) { tierInfoContainer.innerHTML = '<p>Tier data unavailable.</p>'; return; } let explanationHTML = `<div class="tier-explanation"><h4>Current Pricing Tier: <span id="current-tier-display">${tierKey}</span></h4><p>Pricing is based on ${combinedQuantity} total ${getEmbellishmentTypeFromUrl().replace('-', ' ')} items (including cart).</p></div>`; let progressHTML = ''; const sortedTiers = Object.keys(sourceTierData).sort((a, b) => (sourceTierData[a].MinQuantity || 0) - (sourceTierData[b].MinQuantity || 0)); const tierPoints = sortedTiers.map(t => ({ tier: t, min: sourceTierData[t].MinQuantity || 0 })); const currentTierIndex = tierPoints.findIndex(p => p.tier === tierKey); let progressPercent = 0; let progressMessage = 'You are at this pricing tier.'; if (currentTierIndex >= 0 && currentTierIndex < tierPoints.length - 1) { const nextTierPoint = tierPoints[currentTierIndex + 1]; const currentMin = tierPoints[currentTierIndex].min; const nextMin = nextTierPoint.min; if (nextMin > currentMin) { progressPercent = Math.min(100, Math.max(0, ((combinedQuantity - currentMin) / (nextMin - currentMin)) * 100)); } if (quantityForNextTier > 0) { progressMessage = `Add <strong>${quantityForNextTier}</strong> more item${quantityForNextTier !== 1 ? 's' : ''} to reach the <strong>${nextTier}</strong> tier (${nextMin}+ items).`; } } else if (currentTierIndex === tierPoints.length - 1) { progressPercent = 100; progressMessage = 'You have reached the highest pricing tier!'; } progressHTML = `<div class="tier-progress"><div class="tier-progress-bar" style="position: relative; display: flex; justify-content: space-between; margin-top: 15px; margin-bottom: 10px;"><div class="tier-line" style="position: absolute; top: 8px; height: 2px; width: 100%; background-color: var(--primary-light); z-index: 0;"></div><div class="tier-progress-fill" style="position: absolute; top: 8px; height: 2px; background-color: var(--primary-color); z-index: 0; width: ${progressPercent}%; transition: width 0.5s ease;"></div>${tierPoints.map((point, index) => `<div class="tier-point" data-tier="${point.tier}" style="display: flex; flex-direction: column; align-items: center; z-index: 1; position: relative;"><div class="tier-dot ${index <= currentTierIndex ? 'active' : ''}" style="width: 16px; height: 16px; border-radius: 50%; background-color: ${index <= currentTierIndex ? 'var(--primary-color)' : 'var(--primary-light)'}; border: 2px solid var(--primary-color);"></div><div class="tier-label" style="margin-top: 5px; font-size: 0.8em; font-weight: bold;">${point.tier}</div></div>`).join('')}</div><div class="tier-progress-text" style="text-align: center; font-size: 0.9em; margin-top: 10px;"><span id="tier-progress-message">${progressMessage}</span></div></div>`; const ltmFeeApplies = window.cartItemData?.ltmFeeApplies || false; const ltmFeePerItem = window.cartItemData?.ltmFeePerItem || 0; let ltmHTML = `<div class="ltm-explanation" style="display: ${ltmFeeApplies ? 'block' : 'none'}; margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid rgba(0,0,0,0.1);"><h4>Less Than Minimum Fee Applied</h4><p>Orders under 24 pieces include a $${(window.cartItemData?.ltmFeeTotal || 50).toFixed(2)} LTM fee distributed across all items.</p><p class="ltm-applied">Current LTM fee: <span class="ltm-per-item" style="color: #dc3545;">$${ltmFeePerItem.toFixed(2)}</span> per item</p></div>`; tierInfoContainer.innerHTML = explanationHTML + progressHTML + ltmHTML; } catch (error) { console.error("[UI] Error updating tier info display:", error); if (tierInfoContainer) tierInfoContainer.innerHTML = `<p style="color: red;">Error displaying tier info.</p>`; }
+    }
+
+    function showSuccessWithViewCartButton(productData) {
+        const existingContainer = document.getElementById('cart-notification-container'); if (existingContainer) document.body.removeChild(existingContainer); const notificationContainer = document.createElement('div'); notificationContainer.id = 'cart-notification-container'; notificationContainer.style.position = 'fixed'; notificationContainer.style.top = '20px'; notificationContainer.style.right = '20px'; notificationContainer.style.zIndex = '9999'; notificationContainer.style.width = '300px'; notificationContainer.style.maxWidth = '90%'; const ltmFeeApplied = productData?.pricingInfo?.ltmFeeApplied || false; if (ltmFeeApplied) { const ltmInfoBadge = document.createElement('div'); ltmInfoBadge.className = 'ltm-info-badge'; ltmInfoBadge.style.position = 'absolute'; ltmInfoBadge.style.top = '-15px'; ltmInfoBadge.style.right = '10px'; ltmInfoBadge.style.backgroundColor = '#ffc107'; ltmInfoBadge.style.color = '#212529'; ltmInfoBadge.style.padding = '3px 10px'; ltmInfoBadge.style.borderRadius = '15px'; ltmInfoBadge.style.fontSize = '0.75em'; ltmInfoBadge.style.fontWeight = 'bold'; ltmInfoBadge.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'; ltmInfoBadge.textContent = '⚠️ LTM Fee Applied'; notificationContainer.appendChild(ltmInfoBadge); } document.body.appendChild(notificationContainer); const notification = document.createElement('div'); notification.className = 'cart-notification'; notification.style.backgroundColor = '#fff'; notification.style.borderRadius = '8px'; notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'; notification.style.marginBottom = '10px'; notification.style.overflow = 'hidden'; notification.style.animation = 'slideIn 0.3s ease-out forwards'; if (!document.getElementById('cart-notification-styles')) { const styleEl = document.createElement('style'); styleEl.id = 'cart-notification-styles'; styleEl.textContent = `@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } } @keyframes fadeOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } } .cart-notification.removing { animation: fadeOut 0.3s ease-in forwards; } .ltm-fee-notification { box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3); border: 1px solid #ffc107; } .ltm-info-badge { animation: pulse 2s infinite; } @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }`; document.head.appendChild(styleEl); } const styleNumber = productData?.styleNumber || 'N/A'; const colorCode = productData?.color || 'N/A'; const embType = productData?.embellishmentType || 'N/A'; const totalQuantity = productData?.totalQuantity || 0; const sizes = productData?.sizes || []; const sizeText = sizes.map(size => `${size.size}: ${size.quantity}`).join(', '); const totalPrice = sizes.reduce((sum, size) => sum + (size.totalPrice || 0), 0); let statusBgColor = '#28a745'; let statusIcon = '✓'; let statusMessage = 'Added to Cart'; let textColor = 'white'; if (ltmFeeApplied) { statusBgColor = '#ffc107'; statusIcon = '⚠️'; statusMessage = 'Added with LTM Fee'; textColor = '#212529'; notification.classList.add('ltm-fee-notification'); } notification.innerHTML = `<div style="background-color:${statusBgColor};color:${textColor};padding:10px;display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;"><span style="font-size:16px;margin-right:8px;">${statusIcon}</span><span style="font-weight:bold;">${statusMessage}</span></div><button class="close-notification" style="background:none;border:none;color:${textColor};font-size:18px;cursor:pointer;padding:0;line-height:1;">×</button></div><div style="padding:15px;"><div style="margin-bottom:10px;font-weight:bold;font-size:16px;">Item Added</div><div style="display:flex;margin-bottom:12px;"><div style="flex:0 0 60px;height:60px;background-color:#f8f9fa;border:1px solid #e9ecef;margin-right:10px;display:flex;align-items:center;justify-content:center;font-size:11px;text-align:center;color:#6c757d; flex-direction: column;"><span>${styleNumber}</span><span>${colorCode}</span></div><div style="flex:1;"><div style="margin-bottom:4px;font-weight:bold;">Style #${styleNumber}</div><div style="margin-bottom:4px;color:#6c757d;">Color: ${colorCode}</div><div style="margin-bottom:4px;color:#6c757d; text-transform: capitalize;">${embType.replace('-', ' ')}</div></div></div><div style="background-color:${ltmFeeApplied ? '#fff3cd' : '#f8f9fa'};padding:8px;border-radius:4px;margin-bottom:12px;border:${ltmFeeApplied ? '1px solid #ffc107' : '1px solid #eee'};"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Quantity:</span><span>${totalQuantity}</span></div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Sizes:</span><span style="text-align:right;max-width:70%;">${sizeText || 'N/A'}</span></div><div style="display:flex;justify-content:space-between;font-weight:bold;"><span>Total:</span><span>$${totalPrice.toFixed(2)}</span></div></div><div style="display:flex;justify-content:space-between;"><button class="continue-shopping" style="padding:8px 16px;background-color:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;cursor:pointer;">Continue Shopping</button><button class="view-cart" style="padding:8px 16px;background-color:${ltmFeeApplied ? '#ffc107' : '#0056b3'};color:${ltmFeeApplied ? '#212529' : 'white'};border:none;border-radius:4px;cursor:pointer;font-weight:bold;">View Cart</button></div></div>`; function removeNotification(notif) { if (!notif || !notif.parentNode || notif.classList.contains('removing')) return; notif.classList.add('removing'); notif.addEventListener('animationend', function() { if (notif.parentNode) { notif.parentNode.removeChild(notif); if (notificationContainer.children.length === 0 && notificationContainer.parentNode) { notificationContainer.parentNode.removeChild(notificationContainer); } } }); setTimeout(() => { if (notif.parentNode) { notif.parentNode.removeChild(notif); if (notificationContainer.children.length === 0 && notificationContainer.parentNode) { notificationContainer.parentNode.removeChild(notificationContainer); } } }, 500); } notification.querySelector('.close-notification').addEventListener('click', () => removeNotification(notification)); notification.querySelector('.continue-shopping').addEventListener('click', () => removeNotification(notification)); notification.querySelector('.view-cart').addEventListener('click', () => { if (window.NWCACart?.openCart) window.NWCACart.openCart(); else window.location.href = '/cart'; removeNotification(notification); }); notificationContainer.appendChild(notification); setTimeout(() => removeNotification(notification), 6000);
+    }
+
+    function handleMobileAdjustments() {
+        const isMobile = window.innerWidth <= 768; const isSmallMobile = window.innerWidth <= 480; const useGrid = window.ProductQuantityUI ? determineLayoutPreference() : false; console.log(`PricingPages: Handling mobile adjustments. isMobile: ${isMobile}, isSmallMobile: ${isSmallMobile}, useGridPreference: ${useGrid}`); const colorSwatches = document.querySelectorAll('.color-swatch'); colorSwatches.forEach(swatch => { const size = isSmallMobile ? '45px' : (isMobile ? '50px' : '60px'); swatch.style.width = size; swatch.style.height = size; }); const pricingGrid = document.getElementById('custom-pricing-grid'); if (pricingGrid) { pricingGrid.classList.toggle('mobile-view', isMobile); pricingGrid.style.fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : ''); const pricingGridContainer = document.querySelector('.pricing-grid-container'); if (pricingGridContainer) { pricingGridContainer.style.overflowX = isMobile ? 'auto' : ''; pricingGridContainer.style.WebkitOverflowScrolling = isMobile ? 'touch' : ''; } } const productContext = document.querySelector('.product-context'); if (productContext) { productContext.style.flexDirection = isMobile ? 'column' : ''; productContext.style.textAlign = isMobile ? 'center' : ''; } const quantityMatrixContainer = document.getElementById('quantity-matrix'); const sizeQuantityGridContainer = document.getElementById('size-quantity-grid-container'); if (quantityMatrixContainer) { quantityMatrixContainer.style.display = (!useGrid && !isSmallMobile) ? 'block' : 'none'; if (!useGrid && !isSmallMobile) { const matrixTable = quantityMatrixContainer.querySelector('.quantity-input-table'); if (matrixTable) matrixTable.classList.toggle('mobile-view', isMobile); } } if (sizeQuantityGridContainer) { sizeQuantityGridContainer.style.display = (useGrid || isSmallMobile) ? 'grid' : 'none'; if (useGrid || isSmallMobile) { sizeQuantityGridContainer.style.gridTemplateColumns = isSmallMobile ? '1fr' : (isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(200px, 1fr))'); } } const visibleContainerSelector = (useGrid || isSmallMobile) ? '#size-quantity-grid-container' : '#quantity-matrix'; const visibleContainer = document.querySelector(visibleContainerSelector); if (visibleContainer) { visibleContainer.querySelectorAll('.quantity-btn').forEach(btn => { const size = isSmallMobile ? '22px' : (isMobile ? '24px' : '26px'); const fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : '1em'); btn.style.width = size; btn.style.height = size; btn.style.fontSize = fontSize; }); visibleContainer.querySelectorAll('.quantity-input').forEach(input => { const width = isSmallMobile ? '30px' : (isMobile ? '35px' : '40px'); const height = isSmallMobile ? '22px' : (isMobile ? '24px' : '26px'); const fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : '1em'); input.style.width = width; input.style.height = height; input.style.fontSize = fontSize; }); if (visibleContainerSelector === '#size-quantity-grid-container') { visibleContainer.querySelectorAll('.size-quantity-item').forEach(item => { item.style.padding = isSmallMobile ? '8px' : '10px'; }); } else if (visibleContainerSelector === '#quantity-matrix') { visibleContainer.querySelectorAll('th, td').forEach(cell => { cell.style.padding = isSmallMobile ? '4px' : (isMobile ? '6px' : '8px'); }); } } const cartSummary = document.querySelector('.cart-summary'); if (cartSummary) { cartSummary.style.padding = isMobile ? '15px' : '20px'; const addToCartButton = cartSummary.querySelector('#add-to-cart-button'); if (addToCartButton) { addToCartButton.style.padding = isSmallMobile ? '8px 16px' : '12px 24px'; addToCartButton.style.fontSize = isSmallMobile ? '1em' : '1.1em'; } const tierInfoDisplay = cartSummary.querySelector('#tier-info-display'); if (tierInfoDisplay) { tierInfoDisplay.style.padding = isSmallMobile ? '8px' : '10px'; tierInfoDisplay.style.fontSize = isSmallMobile ? '0.85em' : '0.9em'; const progressBar = tierInfoDisplay.querySelector('.tier-progress'); if(progressBar) progressBar.style.height = isSmallMobile ? '6px' : '8px'; const progressBarFill = tierInfoDisplay.querySelector('.tier-progress-fill'); if(progressBarFill) progressBarFill.style.height = isSmallMobile ? '6px' : '8px'; } } const tierInfoBox = document.getElementById('tier-info-display'); if (tierInfoBox && tierInfoBox !== cartSummary?.querySelector('#tier-info-display')) { tierInfoBox.style.padding = isMobile ? '10px' : '15px'; tierInfoBox.style.fontSize = isSmallMobile ? '0.85em' : '0.9em'; } setupShowMoreColorsButton();
+    }
+
+    // --- UI Initialization Functions (Moved from inline scripts) ---
+
+    function setupTabs() {
+        const tabHeaders = document.querySelectorAll('.tab-header'); const tabPanes = document.querySelectorAll('.tab-pane'); if (!tabHeaders.length || !tabPanes.length) return; tabHeaders.forEach(header => { header.addEventListener('click', function() { tabHeaders.forEach(h => h.classList.remove('active')); tabPanes.forEach(p => p.classList.remove('active')); this.classList.add('active'); const tabId = this.getAttribute('data-tab'); const targetPane = document.getElementById(tabId); if (targetPane) targetPane.classList.add('active'); }); }); console.log("PricingPages: Tab functionality initialized.");
+    }
+
+    function setupInventoryLegend() {
+        const hasLowInventory = window.inventoryData && window.inventoryData.sizeTotals && window.inventoryData.sizeTotals.some(qty => qty > 0 && qty < 10); const legend = document.querySelector('.inventory-indicator-legend'); if (legend) { legend.style.display = hasLowInventory ? 'block' : 'none'; console.log(`PricingPages: Inventory legend display set to ${hasLowInventory ? 'block' : 'none'}.`); }
+    }
+
+    function setupImageZoom() {
+        const imageContainer = document.querySelector('.product-image-container'); const image = document.getElementById('product-image'); const zoomOverlay = document.querySelector('.image-zoom-overlay'); if (!imageContainer || !image || !zoomOverlay) return; if (document.querySelector('.image-zoom-modal')) return; const modal = document.createElement('div'); modal.className = 'image-zoom-modal'; modal.style.cssText = 'display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); overflow:auto;'; const modalContent = document.createElement('img'); modalContent.className = 'image-zoom-modal-content'; modalContent.style.cssText = 'margin:auto; display:block; max-width:90%; max-height:90%; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);'; const closeButton = document.createElement('span'); closeButton.className = 'image-zoom-close'; closeButton.innerHTML = '&times;'; closeButton.style.cssText = 'position:absolute; top:15px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer;'; modal.appendChild(modalContent); modal.appendChild(closeButton); document.body.appendChild(modal); zoomOverlay.addEventListener('click', () => { modal.style.display = 'block'; modalContent.src = image.src; }); closeButton.addEventListener('click', () => { modal.style.display = 'none'; }); modal.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; }); console.log("PricingPages: Image zoom functionality initialized.");
+    }
+
+    function setupShowMoreColorsButton() {
+        const showMoreButton = document.getElementById('show-more-colors'); const colorSwatchesContainer = document.getElementById('color-swatches'); if (!showMoreButton || !colorSwatchesContainer) return; const shouldShow = window.innerWidth <= 480; showMoreButton.style.display = shouldShow ? 'block' : 'none'; colorSwatchesContainer.classList.toggle('collapsed', shouldShow); if (!showMoreButton.dataset.listenerAttached) { showMoreButton.addEventListener('click', function() { const isCollapsed = colorSwatchesContainer.classList.toggle('collapsed'); showMoreButton.textContent = isCollapsed ? 'Show More Colors' : 'Show Less Colors'; }); showMoreButton.dataset.listenerAttached = 'true'; } showMoreButton.textContent = colorSwatchesContainer.classList.contains('collapsed') ? 'Show More Colors' : 'Show Less Colors';
+    }
+
+    function updateMiniColorSwatch() {
+        const pricingColorNameEl = document.getElementById('pricing-color-name'); const miniColorSwatchEl = document.getElementById('pricing-color-swatch'); const mainColorName = window.selectedColorName || document.getElementById('product-color')?.textContent || 'N/A'; if (!pricingColorNameEl || !miniColorSwatchEl) { console.warn("PricingPages: Mini swatch elements not found."); return; } console.log(`PricingPages: Updating mini swatch for color: ${mainColorName}`); pricingColorNameEl.textContent = mainColorName; const allSwatches = document.querySelectorAll('.color-swatch'); let matchedSwatch = null; for (const swatch of allSwatches) { const swatchName = swatch.dataset.colorName; const catalogColor = swatch.dataset.catalogColor; if ( (window.selectedCatalogColor && normalizeColorName(catalogColor) === normalizeColorName(window.selectedCatalogColor)) || (!window.selectedCatalogColor && normalizeColorName(swatchName) === normalizeColorName(mainColorName)) ) { matchedSwatch = swatch; break; } } miniColorSwatchEl.className = 'mini-color-swatch clickable'; miniColorSwatchEl.style.backgroundImage = ''; miniColorSwatchEl.style.backgroundColor = '#ccc'; if (matchedSwatch) { const computedStyle = window.getComputedStyle(matchedSwatch); miniColorSwatchEl.style.backgroundImage = computedStyle.backgroundImage; miniColorSwatchEl.style.backgroundColor = computedStyle.backgroundColor; miniColorSwatchEl.classList.add('active-swatch'); console.log("PricingPages: Applied style from matched swatch."); } else { miniColorSwatchEl.classList.add('fallback-swatch'); console.warn("PricingPages: No matching swatch found for mini swatch, using fallback style."); } if (!miniColorSwatchEl.dataset.listenerAttached) { miniColorSwatchEl.addEventListener('click', function() { const targetSwatch = Array.from(allSwatches).find(s => s.dataset.colorName === mainColorName || s.dataset.catalogColor === window.selectedCatalogColor ); if (targetSwatch) { targetSwatch.scrollIntoView({ behavior: 'smooth', block: 'center' }); targetSwatch.classList.add('pulse-highlight'); setTimeout(() => targetSwatch.classList.remove('pulse-highlight'), 2000); } }); miniColorSwatchEl.dataset.listenerAttached = 'true'; }
+    }
+
+    // Helper function to determine layout preference (grid vs matrix) based on container presence
+    // Moved from add-to-cart.js to fix scope issue
+    function determineLayoutPreference() {
+        const gridContainer = document.getElementById('size-quantity-grid-container');
+        const matrixContainer = document.getElementById('quantity-matrix');
+        if (gridContainer && window.getComputedStyle(gridContainer).display !== 'none') return true; // Check if visible
+        if (matrixContainer && window.getComputedStyle(matrixContainer).display !== 'none') return false; // Check if visible
+        // Fallback if neither is explicitly visible (e.g., during initial load)
+        if (gridContainer) return true; // Default to grid if element exists
+        if (matrixContainer) return false; // Default to matrix if element exists
+        console.warn('[PricingPageUI] Could not determine preferred layout container (grid/matrix). Defaulting to matrix layout.');
+        return false; // Final fallback
+    }
+
+
+    // --- Main Initialization ---
+
+    async function initPricingPage() {
+        console.log("PricingPages: Initializing pricing page (v4)...");
+        updateProductContext();
+        updateTabNavigation();
+
+        // Load dependent scripts sequentially
+        try {
+            await loadScript('/cart.js');
+            await loadScript('/cart-integration.js');
+            await loadScript('/pricing-matrix-capture.js');
+            await loadScript('/pricing-calculator.js');
+            await loadScript('/product-quantity-ui.js');
+            await loadScript('/add-to-cart.js');
+            await loadScript('/order-form-pdf.js'); // Load PDF script too
+            console.log("PricingPages: Core scripts loaded sequentially.");
+        } catch (error) {
+            console.error('PricingPages: Critical error loading core scripts:', error);
+            const body = document.querySelector('body');
+            if (body) body.insertAdjacentHTML('afterbegin', '<div style="background-color:red;color:white;padding:10px;text-align:center;font-weight:bold;">Error loading essential page components. Please refresh.</div>');
+            return; // Stop initialization if core scripts fail
+        }
+
+        // Setup UI elements
+        setupTabs();
+        setupImageZoom();
+        handleMobileAdjustments();
+        window.addEventListener('resize', handleMobileAdjustments);
+
+        // Determine Caspio DP to load
+        const styleNumber = window.selectedStyleNumber;
+        const embType = getEmbellishmentTypeFromUrl();
+        const pricingContainerId = CONTAINER_IDS[embType] || 'pricing-calculator';
+        const appKeys = CASPIO_APP_KEYS[embType] || [];
+        const pricingContainer = document.getElementById(pricingContainerId);
+
+        if (!pricingContainer) { console.error(`PricingPages: Pricing container #${pricingContainerId} not found.`); return; }
+        if (embType === 'unknown' || (embType !== 'dtf' && appKeys.length === 0)) { console.error(`PricingPages: Unknown page type or no AppKeys for ${embType}.`); displayContactMessage(pricingContainer, embType); return; }
+        if (embType === 'dtf') { console.log("PricingPages: Handling DTF page (coming soon)."); displayContactMessage(pricingContainer, embType); initializeFallbackPricingData(embType); return; }
+
+        // Try loading Caspio
+        await tryLoadCaspioSequentially(pricingContainer, appKeys, styleNumber, embType);
+
+        // Final UI setup
+        setupInventoryLegend();
+        updateMiniColorSwatch();
+
+        // Attach listener for PDF download button
+        const downloadPdfButton = document.getElementById('download-order-pdf-button');
+        if (downloadPdfButton) {
+            downloadPdfButton.addEventListener('click', function() {
+                if (window.NWCAOrderFormPDF && typeof window.NWCAOrderFormPDF.generate === 'function') {
+                    window.NWCAOrderFormPDF.generate();
+                } else {
+                    console.error("PDF Generation function not found.");
+                    alert("Sorry, the PDF generation feature is currently unavailable.");
+                }
             });
-            
-            tbody.appendChild(row);
-        });
-        
-        // Update LTM fee information
-        updateLTMFeeDisplay(pricingData.tiers);
-    }
-}
-
-// Function to add inventory indicator
-function addInventoryIndicator(priceCell, size, inventoryData) {
-    // Check inventory for this specific size
-    const sizeIndex = inventoryData.sizes.indexOf(size);
-    let inventory = 0;
-    
-    if (sizeIndex !== -1) {
-        // Get inventory for this size
-        inventory = inventoryData.sizeTotals[sizeIndex];
-    }
-    
-    // Create inventory indicator
-    const indicator = document.createElement('span');
-    indicator.className = 'inventory-indicator';
-    
-    if (inventory === 0) {
-        indicator.classList.add('inventory-none');
-        indicator.title = 'Out of stock';
-    } else if (inventory < 10) {
-        indicator.classList.add('inventory-low');
-        indicator.title = `Low stock: ${inventory} available`;
-    } else {
-        indicator.classList.add('inventory-good');
-        indicator.title = `In stock: ${inventory} available`;
-    }
-    
-    priceCell.appendChild(indicator);
-}
-
-// Function to update LTM fee display
-function updateLTMFeeDisplay(tiers) {
-    const ltmFeeContainer = document.querySelector('.ltm-fee-container');
-    if (!ltmFeeContainer) return;
-    
-    // Clear existing content
-    ltmFeeContainer.innerHTML = '<h4>Less Than Minimum (LTM) Fees:</h4>';
-    
-    // Create list of LTM fees
-    const feeList = document.createElement('ul');
-    
-    // Check each tier for LTM fees
-    let hasLtmFees = false;
-    Object.keys(tiers).forEach(tierKey => {
-        const tier = tiers[tierKey];
-        if (tier.LTM_Fee) {
-            hasLtmFees = true;
-            const listItem = document.createElement('li');
-            listItem.textContent = `${tierKey}: $${tier.LTM_Fee.toFixed(2)} fee`;
-            feeList.appendChild(listItem);
+            console.log("PricingPages: PDF Download button listener attached.");
+        } else {
+            console.warn("PricingPages: PDF Download button not found.");
         }
+
+        console.log("PricingPages: Initialization sequence complete.");
+    }
+
+    // --- Fallback Mechanisms ---
+
+    function initializeFallbackPricingData(embType) {
+        if (window.nwcaPricingData) return; // Don't overwrite if data was somehow captured
+        console.warn(`PricingPages: Initializing FALLBACK pricing data for ${embType}.`); let headers = ['S-XL', '2XL', '3XL']; let prices = { 'S-XL': { 'Tier1': 20.00, 'Tier2': 19.00, 'Tier3': 18.00, 'Tier4': 17.00 }, '2XL': { 'Tier1': 22.00, 'Tier2': 21.00, 'Tier3': 20.00, 'Tier4': 19.00 }, '3XL': { 'Tier1': 23.00, 'Tier2': 22.00, 'Tier3': 21.00, 'Tier4': 20.00 }, }; let tiers = { 'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11, LTM_Fee: 50 }, 'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23, LTM_Fee: 25 }, 'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 }, 'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 10000 }, }; let uniqueSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL']; if (embType === 'cap-embroidery') { headers = ['One Size']; prices = { 'One Size': { 'Tier1': 22.99, 'Tier2': 21.99, 'Tier3': 20.99, 'Tier4': 19.99 } }; uniqueSizes = ['OS']; } window.nwcaPricingData = { styleNumber: window.selectedStyleNumber || 'FALLBACK', color: window.selectedColorName || 'FALLBACK', embellishmentType: embType, headers: headers, prices: prices, tierData: tiers, uniqueSizes: uniqueSizes, capturedAt: new Date().toISOString(), isFallback: true }; window.availableSizesFromTable = headers; console.log('PricingPages: Fallback pricing global variables initialized.', window.nwcaPricingData); window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData }));
+    }
+
+    function displayContactMessage(container, embType) {
+        if (!container) return; console.log(`PricingPages: Displaying contact message for ${embType} in #${container.id}`); container.innerHTML = ''; container.classList.remove('loading'); container.classList.add('pricing-unavailable'); ensureHiddenCartElements(container); const messageElement = document.createElement('div'); messageElement.style.textAlign = 'center'; messageElement.style.padding = '30px 20px'; messageElement.style.backgroundColor = '#f8f9fa'; messageElement.style.borderRadius = '8px'; messageElement.style.border = '1px solid #dee2e6'; messageElement.style.margin = '20px 0'; messageElement.innerHTML = `<h3 style="color: #0056b3; margin-bottom: 15px;">Pricing Currently Unavailable</h3><p style="font-size: 16px; color: #495057; margin-bottom: 20px;">We apologize, but the pricing details for this item are currently unavailable.</p><p style="font-size: 16px; color: #495057; margin-bottom: 20px;">Please call <strong style="color: #0056b3; font-size: 18px;">253-922-5793</strong> for an accurate quote.</p><p style="font-size: 14px; color: #6c757d;">Our team is ready to assist you.</p>`; container.appendChild(messageElement);
+    }
+
+    // --- Global UI Object ---
+    window.PricingPageUI = {
+        updatePriceDisplayForSize: updatePriceDisplayForSize,
+        updateCartInfoDisplay: updateCartInfoDisplay,
+        updateTierInfoDisplay: updateTierInfoDisplay,
+        showSuccessNotification: showSuccessWithViewCartButton,
+        handleMobileAdjustments: handleMobileAdjustments,
+        updateMiniColorSwatch: updateMiniColorSwatch,
+        determineLayoutPreference: determineLayoutPreference // Added function reference
+    };
+
+
+    // Dispatch event after UI object is assigned
+    console.log("PricingPages: PricingPageUI object created.");
+    window.dispatchEvent(new CustomEvent('pricingPageUIReady'));
+    console.log("PricingPages: Dispatched 'pricingPageUIReady' event.");
+
+    // --- Event Listeners ---
+    document.addEventListener('DOMContentLoaded', initPricingPage);
+
+    window.addEventListener('error', function(event) {
+        console.error('PricingPages: Global error caught:', event.message, event.error);
     });
-    
-    // If no LTM fees found, add default message
-    if (!hasLtmFees) {
-        const listItem = document.createElement('li');
-        listItem.textContent = '1-11 pieces: $50.00 fee';
-        feeList.appendChild(listItem);
-        
-        const listItem2 = document.createElement('li');
-        listItem2.textContent = '12-23 pieces: $25.00 fee';
-        feeList.appendChild(listItem2);
-    }
-    
-    ltmFeeContainer.appendChild(feeList);
-}
 
-// Function to handle color swatch click
-function handleColorSwatchClick(swatch) {
-    console.log("PricingPages: Color swatch clicked:", swatch);
-    
-    // Update selected color
-    window.selectedColor = swatch;
-    
-    // Update active swatch styling
-    const allSwatches = document.querySelectorAll('.color-swatch');
-    allSwatches.forEach(s => s.classList.remove('active'));
-    
-    // Find the swatch element that matches this color and activate it
-    const matchingSwatch = Array.from(allSwatches).find(s =>
-        s.dataset.colorName === swatch.COLOR_NAME);
-    if (matchingSwatch) {
-        matchingSwatch.classList.add('active');
-    }
-    
-    // Update product color display
-    const colorSpan = document.getElementById('product-color');
-    if (colorSpan) {
-        colorSpan.textContent = swatch.COLOR_NAME;
-    }
-    
-    // Update global variables for other scripts
-    window.selectedColorName = swatch.COLOR_NAME;
-    window.selectedCatalogColor = swatch.CATALOG_COLOR;
-    
-    // Load inventory data for this color
-    loadInventoryData(swatch.CATALOG_COLOR || swatch.COLOR_NAME);
-    
-    // Update pricing grid with this color's data
-    updatePricingGrid();
-    
-    // Update Caspio pricing data (hidden but needed for cart)
-    updateCaspioPricing(swatch.CATALOG_COLOR || swatch.COLOR_NAME);
-}
-
-// Function to handle mobile-specific adjustments
-function handleMobileAdjustments() {
-    const isMobile = window.innerWidth <= 768;
-    const isSmallMobile = window.innerWidth <= 480;
-    
-    // Adjust color swatches for mobile
-    const colorSwatches = document.querySelectorAll('.color-swatch');
-    colorSwatches.forEach(swatch => {
-        if (isSmallMobile) {
-            swatch.style.width = '45px';
-            swatch.style.height = '45px';
-        } else if (isMobile) {
-            swatch.style.width = '50px';
-            swatch.style.height = '50px';
-        } else {
-            swatch.style.width = '60px';
-            swatch.style.height = '60px';
-        }
-    });
-    
-    // Adjust pricing grid for mobile
-    const pricingGrid = document.getElementById('custom-pricing-grid');
-    if (pricingGrid) {
-        if (isMobile) {
-            pricingGrid.classList.add('mobile-view');
-            
-            // For very small screens, adjust the font size
-            if (isSmallMobile) {
-                pricingGrid.style.fontSize = '0.8em';
-            } else {
-                pricingGrid.style.fontSize = '0.9em';
-            }
-            
-            // Make the pricing grid horizontally scrollable on mobile
-            const pricingGridContainer = document.querySelector('.pricing-grid-container');
-            if (pricingGridContainer) {
-                pricingGridContainer.style.overflowX = 'auto';
-                pricingGridContainer.style.WebkitOverflowScrolling = 'touch';
-            }
-        } else {
-            pricingGrid.classList.remove('mobile-view');
-            pricingGrid.style.fontSize = '';
-        }
-    }
-    
-    // Adjust Add to Cart section for mobile
-    const sizeQuantityGrid = document.getElementById('size-quantity-grid');
-    if (sizeQuantityGrid) {
-        if (isSmallMobile) {
-            sizeQuantityGrid.style.gridTemplateColumns = '1fr';
-        } else if (isMobile) {
-            sizeQuantityGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        } else {
-            sizeQuantityGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(250px, 1fr))';
-        }
-    }
-    
-    // Adjust product context area for mobile
-    const productContext = document.querySelector('.product-context');
-    if (productContext) {
-        if (isMobile) {
-            productContext.style.flexDirection = 'column';
-            productContext.style.textAlign = 'center';
-        } else {
-            productContext.style.flexDirection = '';
-            productContext.style.textAlign = '';
-        }
-    }
-}
-
-// Function to load inventory data
-function loadInventoryData(colorCode) {
-    if (!colorCode || !window.selectedStyleNumber) return;
-    
-    console.log(`PricingPages: Loading inventory data for ${window.selectedStyleNumber}, ${colorCode}`);
-    
-    // API endpoint for inventory data
-    const apiUrl = `${API_PROXY_BASE_URL}/api/inventory?styleNumber=${encodeURIComponent(window.selectedStyleNumber)}&color=${encodeURIComponent(colorCode)}`;
-    
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`API Error: ${response.status} ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data && Array.isArray(data)) {
-                // Process inventory data
-                const sizes = [];
-                const sizeTotals = [];
-                
-                // Extract unique sizes and their inventory totals
-                data.forEach(item => {
-                    if (item.size) {
-                        const sizeIndex = sizes.indexOf(item.size);
-                        if (sizeIndex === -1) {
-                            sizes.push(item.size);
-                            sizeTotals.push(parseInt(item.QuantityAvailable) || 0);
-                        } else {
-                            sizeTotals[sizeIndex] += parseInt(item.QuantityAvailable) || 0;
-                        }
-                    }
-                });
-                
-                // Store inventory data globally
-                window.inventoryData = {
-                    styleNumber: window.selectedStyleNumber,
-                    color: colorCode,
-                    sizes,
-                    sizeTotals
-                };
-                
-                console.log("PricingPages: Inventory data loaded:", window.inventoryData);
-                
-                // Update pricing grid with inventory indicators
-                updatePricingGrid();
-            }
-        })
-        .catch(error => {
-            console.error("PricingPages: Error loading inventory data:", error);
-        });
-}
-
-// Function to update Caspio pricing data
-function updateCaspioPricing(colorCode) {
-    // This function would update the hidden Caspio pricing data
-    // based on the selected color
-    console.log(`PricingPages: Updating Caspio pricing data for color: ${colorCode}`);
-    
-    // For now, we'll just trigger a refresh of the pricing grid
-    updatePricingGrid();
-}
-
-
-// --- Event Listeners ---
-
-// Run initialization when DOM is loaded
-document.addEventListener('DOMContentLoaded', initPricingPage);
-
-// Add a global error handler as a safety net
-window.addEventListener('error', function(event) {
-    console.error('PricingPages: Global error caught:', event.message, event.error);
-
-    // Attempt recovery if it seems Caspio-related and pricing isn't already marked unavailable
-    const pricingContainer = document.getElementById('pricing-calculator') || document.getElementById('screenprint-pricing-calculator'); // Check both common IDs
-    if (pricingContainer && !pricingContainer.classList.contains('pricing-unavailable')) {
-        if (event.message.toLowerCase().includes('caspio') ||
-            event.message.toLowerCase().includes('datapage') ||
-            event.filename.toLowerCase().includes('caspio.com') ||
-            (event.error && event.error.stack && event.error.stack.toLowerCase().includes('caspio')))
-        {
-            console.warn('PricingPages: Attempting recovery from Caspio-related error by displaying contact message.');
-            displayContactMessage(pricingContainer, getEmbellishmentTypeFromUrl());
-            initializeFallbackPricingData(getEmbellishmentTypeFromUrl()); // Init fallback data too
-        }
-    }
-});
-
-console.log("PricingPages: Shared pricing page script loaded.");
+})(); // End of IIFE

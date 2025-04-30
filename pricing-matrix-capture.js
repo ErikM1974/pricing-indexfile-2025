@@ -1,527 +1,189 @@
 // pricing-matrix-capture.js - Captures pricing matrix data from Caspio tables
-console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded");
+console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resilient)");
 
 (function() {
     "use strict";
-    
-    // Configuration
-    const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
-    const ENDPOINTS = {
-        pricingMatrix: {
-            get: (styleNumber, color, embType) => 
-                `/pricing-matrix?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color)}&embType=${encodeURIComponent(embType)}`,
-            create: `/pricing-matrix`,
-            update: (id) => `/pricing-matrix/${id}`
-        }
-    };
-    
+
     // State
     let initialized = false;
-    let pricingData = null;
-    
-    // Initialize the pricing matrix capture system
+    let captureInterval = null;
+    let captureAttempts = 0;
+    const MAX_CAPTURE_ATTEMPTS = 40; // Further increased attempts (80 seconds)
+    const CHECK_INTERVAL_MS = 2000;
+    let captureCompleted = false; // Flag to prevent multiple captures/event dispatches
+
     function initialize() {
         if (initialized) return;
         console.log("[PRICING-MATRIX:INIT] Initializing pricing matrix capture system");
-        
-        // Set up interval to check for pricing data
-        setInterval(checkForPricingData, 2000);
-        
+        if (captureInterval) clearInterval(captureInterval);
+        captureAttempts = 0;
+        captureCompleted = false; // Reset flag on init
+        captureInterval = setInterval(checkForPricingData, CHECK_INTERVAL_MS);
+        checkForPricingData(); // Initial check
         initialized = true;
     }
-    
-    // Check for pricing data in the DOM
+
     function checkForPricingData() {
-        // Check if we have a pricing table
-        const pricingTable = document.querySelector('.matrix-price-table') || 
+        if (captureCompleted) {
+            // console.log("[PRICING-MATRIX:CHECK] Capture already completed, stopping interval.");
+            if (captureInterval) clearInterval(captureInterval);
+            captureInterval = null;
+            return;
+        }
+
+        captureAttempts++;
+        // console.log(`[PRICING-MATRIX:CHECK] Checking for pricing table (Attempt ${captureAttempts}/${MAX_CAPTURE_ATTEMPTS})`);
+
+        const pricingTable = document.querySelector('.matrix-price-table') ||
                             document.querySelector('.cbResultSetTable');
-        
+
         if (pricingTable) {
-            // Get product info from URL
+            console.log("[PRICING-MATRIX:CHECK] Pricing table found. Attempting capture.");
             const urlParams = new URLSearchParams(window.location.search);
             const styleNumber = urlParams.get('StyleNumber');
-            const colorCode = urlParams.get('COLOR');
-            const embType = detectEmbellishmentType();
-            
+            const colorCode = urlParams.get('COLOR'); // Use the raw URL param
+            const embType = detectEmbellishmentType(); // Assuming this helper exists in pricing-pages.js
+
             if (styleNumber && colorCode && embType) {
-                console.log("[PRICING-MATRIX:CHECK] Pricing data found during interval check");
-                capturePricingMatrix(styleNumber, colorCode, embType);
+                const capturedData = capturePricingMatrix(pricingTable, styleNumber, colorCode, embType);
+                if (capturedData) {
+                    console.log("[PRICING-MATRIX:CHECK] Capture successful. Stopping interval check.");
+                    // captureCompleted flag is set inside capturePricingMatrix on success
+                    clearInterval(captureInterval);
+                    captureInterval = null;
+                } else {
+                    console.warn("[PRICING-MATRIX:CHECK] Table found, but capture failed. Will retry.");
+                }
+            } else {
+                console.warn("[PRICING-MATRIX:CHECK] Pricing table found, but missing StyleNumber, COLOR, or Embellishment Type.");
+            }
+        } else if (captureAttempts >= MAX_CAPTURE_ATTEMPTS) {
+            console.error(`[PRICING-MATRIX:CHECK] Max attempts (${MAX_CAPTURE_ATTEMPTS}) reached. Pricing table not found. Stopping interval check.`);
+            clearInterval(captureInterval);
+            captureInterval = null;
+            if (!captureCompleted) { // Only dispatch error if not already successful
+                 window.dispatchEvent(new CustomEvent('pricingDataError', { detail: { message: 'Pricing table not found after multiple attempts.' } }));
+                 // Initialize fallback data if capture fails completely
+                 initializeFallbackPricingData(detectEmbellishmentType());
             }
         }
     }
-    
-    // Detect embellishment type based on URL or page content
+
+    // Detect embellishment type (copied from pricing-pages.js for self-containment if needed, but assumes it exists globally)
     function detectEmbellishmentType() {
-        // Try to detect from URL or page title
-        const url = window.location.href.toLowerCase();
-        const title = document.title.toLowerCase();
-        
-        if (url.includes('cap-embroidery') || title.includes('cap embroidery')) {
-            return 'cap-embroidery';
+        if (typeof getEmbellishmentTypeFromUrl === 'function') {
+            return getEmbellishmentTypeFromUrl();
         }
-        if (url.includes('embroidery') || title.includes('embroidery')) {
-            return 'embroidery';
-        }
-        if (url.includes('dtg') || title.includes('dtg')) {
-            return 'dtg';
-        }
-        if (url.includes('screen-print') || url.includes('screenprint') || title.includes('screen print')) {
-            return 'screen-print';
-        }
-        if (url.includes('dtf') || title.includes('dtf')) {
-            return 'dtf';
-        }
-        
-        // Default if we can't detect
-        return 'embroidery';
+        // Fallback logic if global function isn't available (less ideal)
+        console.warn("[PRICING-MATRIX:DETECT] getEmbellishmentTypeFromUrl not found globally, using fallback detection.");
+        const url = window.location.href.toLowerCase(); const titleElement = document.querySelector('h1, h2, title'); const title = titleElement ? titleElement.textContent.toLowerCase() : document.title.toLowerCase(); if (url.includes('cap-embroidery') || title.includes('cap embroidery')) return 'cap-embroidery'; if (url.includes('embroidery') || title.includes('embroidery')) return 'embroidery'; if (url.includes('dtg') || title.includes('dtg')) return 'dtg'; if (url.includes('screen-print') || url.includes('screenprint') || title.includes('screen print')) return 'screen-print'; if (url.includes('dtf') || title.includes('dtf')) return 'dtf'; const matrixTitle = document.getElementById('matrix-title')?.textContent.toLowerCase(); if (matrixTitle) { if (matrixTitle.includes('cap embroidery')) return 'cap-embroidery'; if (matrixTitle.includes('embroidery')) return 'embroidery'; if (matrixTitle.includes('dtg')) return 'dtg'; if (matrixTitle.includes('screen print')) return 'screen-print'; if (matrixTitle.includes('dtf')) return 'dtf'; } console.warn("[PRICING-MATRIX:DETECT-FALLBACK] Could not detect embellishment type, defaulting to 'embroidery'"); return 'embroidery';
     }
-    
-    // Capture pricing matrix data from the DOM
-    function capturePricingMatrix(styleNumber, colorCode, embType) {
-        console.log("[PRICING-MATRIX:CAPTURE] Starting enhanced capture for " + styleNumber + ", " + colorCode + ", " + embType);
-        
+
+
+    function capturePricingMatrix(pricingTable, styleNumber, colorCode, embType) {
+        if (captureCompleted) {
+             console.log("[PRICING-MATRIX:CAPTURE] Capture already completed, skipping redundant capture.");
+             return window.nwcaPricingData;
+        }
+        console.log(`[PRICING-MATRIX:CAPTURE] Capturing data for ${styleNumber}, ${colorCode}, ${embType}`);
         try {
-            // Get the pricing table
-            const pricingTable = document.querySelector('.matrix-price-table') ||
-                                document.querySelector('.cbResultSetTable');
-            
-            if (!pricingTable) {
-                console.error("[PRICING-MATRIX:CAPTURE-ERROR] No pricing table found");
-                return;
-            }
-            
-            // Extract headers (sizes)
             const headers = [];
             const headerRow = pricingTable.querySelector('tr');
-            if (headerRow) {
-                const headerCells = headerRow.querySelectorAll('th');
-                headerCells.forEach((cell, index) => {
-                    if (index > 0) { // Skip the first header (Quantity Tier)
-                        headers.push(cell.textContent.trim());
-                    }
-                });
-            }
-            
-            // Extract pricing data
-            const pricingRows = [];
+            if (!headerRow) { console.error("[PRICING-MATRIX:CAPTURE-ERROR] Header row not found."); return null; }
+            const headerCells = headerRow.querySelectorAll('th');
+            if (headerCells.length <= 1) { console.error("[PRICING-MATRIX:CAPTURE-ERROR] Header cells not found/insufficient."); return null; }
+            headerCells.forEach((cell, index) => { if (index > 0) headers.push(cell.textContent.trim()); });
+            if (headers.length === 0) { console.error("[PRICING-MATRIX:CAPTURE-ERROR] No size headers extracted."); return null; }
+            console.log("[PRICING-MATRIX:DEBUG] Setting window.availableSizesFromTable:", headers); // DEBUG LOG
+            window.availableSizesFromTable = headers; // Set this early for UI builders
+
+            const priceMatrix = {};
+            const tierData = {};
             const dataRows = pricingTable.querySelectorAll('tr:not(:first-child)');
+            if (dataRows.length === 0) { console.error("[PRICING-MATRIX:CAPTURE-ERROR] No data rows found."); return null; }
+
             dataRows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                if (cells.length > 0) {
-                    const tierCell = cells[0];
-                    const tier = tierCell.textContent.trim();
-                    
-                    const prices = {};
+                if (cells.length > 1) {
+                    const tierText = cells[0].textContent.trim();
+                    if (!tierText) return;
+                    const parsedTier = parseTierText(tierText);
+                    if (parsedTier) tierData[tierText] = parsedTier;
                     for (let i = 1; i < cells.length; i++) {
                         if (i - 1 < headers.length) {
                             const size = headers[i - 1];
                             const priceText = cells[i].textContent.trim();
-                            const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+                            const price = parseFloat(priceText.replace(/[$,]/g, ''));
                             if (!isNaN(price)) {
-                                prices[size] = price;
+                                if (!priceMatrix[size]) priceMatrix[size] = {};
+                                priceMatrix[size][tierText] = price;
+                            } else {
+                                console.warn(`[PRICING-MATRIX:CAPTURE] Could not parse price "${priceText}" for Size: ${size}, Tier: ${tierText}`);
                             }
                         }
                     }
-                    
-                    pricingRows.push({
-                        tier: tier,
-                        prices: prices
-                    });
                 }
             });
-            
-            // Use a more structured approach to store the data
-            const pricingData = {
-                styleNumber,
-                color: colorCode,
-                embellishmentType: embType,
-                headers,
-                rows: pricingRows,
+
+             if (Object.keys(priceMatrix).length === 0 || Object.keys(tierData).length === 0) {
+                 console.error("[PRICING-MATRIX:CAPTURE-ERROR] Failed to extract valid price matrix or tier data.");
+                 return null;
+             }
+
+            console.log("[PRICING-MATRIX:DEBUG] Preparing to set window.nwcaPricingData"); // DEBUG LOG
+            window.nwcaPricingData = {
+                styleNumber, color: colorCode, embellishmentType: embType,
+                headers, prices: priceMatrix, tierData,
+                uniqueSizes: [...new Set(headers.filter(h => !h.includes('-') && !h.includes('/')))],
                 capturedAt: new Date().toISOString()
             };
-            
-            console.log("[PRICING-MATRIX:CAPTURE] Pricing data found:", pricingData);
-            
-            // Store the data and dispatch an event
-            window.dp5GroupedHeaders = headers;
-            window.dp5GroupedPrices = formatPriceMatrix(headers, pricingRows);
-            window.dp5ApiTierData = extractTierData(pricingRows);
-            
-            // Extract unique sizes for Add to Cart
-            const uniqueSizes = [...new Set(headers.filter(header =>
-                !header.includes('-') && !header.includes('/')))];
-            window.dp5UniqueSizes = uniqueSizes;
-            
-            // Dispatch event for other components to react
-            const event = new CustomEvent('pricingDataLoaded', {
-                detail: pricingData
-            });
+
+            console.log("[PRICING-MATRIX:CAPTURE] Data captured successfully. Value:", JSON.stringify(window.nwcaPricingData, null, 2)); // DEBUG LOG (Stringified)
+            captureCompleted = true; // Set flag *after* successful capture and data assignment
+
+            const event = new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData });
+            console.log("[PRICING-MATRIX:DEBUG] Dispatching 'pricingDataLoaded' event."); // DEBUG LOG
             window.dispatchEvent(event);
-            
-            // Store the pricing data in the API
-            storePricingData(pricingData);
-            
-            return pricingData;
+            console.log("[PRICING-MATRIX:CAPTURE] 'pricingDataLoaded' event dispatched.");
+
+            return window.nwcaPricingData;
+
         } catch (error) {
-            console.error("[PRICING-MATRIX:CAPTURE-ERROR] Error capturing pricing matrix:", error);
+            console.error("[PRICING-MATRIX:CAPTURE-ERROR] Error during capture:", error);
+            console.log("[PRICING-MATRIX:DEBUG] Setting pricing data to null due to error."); // DEBUG LOG
+            window.nwcaPricingData = null; window.availableSizesFromTable = null;
+            window.dispatchEvent(new CustomEvent('pricingDataError', { detail: { message: 'Error capturing pricing data.', error: error } }));
             return null;
         }
     }
-    
-    // Helper function to extract tier data
-    function extractTierData(pricingRows) {
-        const tiers = {};
-        
-        pricingRows.forEach(row => {
-            const tierText = row.tier;
-            let minQuantity = 0;
-            let maxQuantity = null;
-            let ltmFee = 0;
-            
-            // Parse tier text (e.g., "1-23", "24-47", "48-71", "72+")
-            if (tierText.includes('-')) {
-                const [min, max] = tierText.split('-').map(t => parseInt(t.trim()));
-                minQuantity = min;
-                maxQuantity = max;
-                
-                // Add LTM fee for lower tiers
-                if (minQuantity === 1 && maxQuantity <= 11) {
-                    ltmFee = 50.00;
-                } else if (minQuantity <= 12 && maxQuantity <= 23) {
-                    ltmFee = 25.00;
-                }
-            } else if (tierText.includes('+')) {
-                minQuantity = parseInt(tierText.replace('+', '').trim());
-            } else {
-                // Try to parse as a single number
-                minQuantity = parseInt(tierText.trim());
-            }
-            
-            tiers[tierText] = {
-                MinQuantity: minQuantity,
-                MaxQuantity: maxQuantity,
-                LTM_Fee: ltmFee > 0 ? ltmFee : undefined
-            };
-        });
-        
-        return tiers;
+
+    function parseTierText(tierText) {
+        if (!tierText) return null; let minQuantity = 0; let maxQuantity = undefined; let ltmFee = 0; const rangeMatch = tierText.match(/^(\d+)\s*-\s*(\d+)$/); const plusMatch = tierText.match(/^(\d+)\s*\+$/); const singleMatch = tierText.match(/^(\d+)$/); if (rangeMatch) { minQuantity = parseInt(rangeMatch[1], 10); maxQuantity = parseInt(rangeMatch[2], 10); } else if (plusMatch) { minQuantity = parseInt(plusMatch[1], 10); maxQuantity = undefined; } else if (singleMatch) { minQuantity = parseInt(singleMatch[1], 10); if (minQuantity === 1) maxQuantity = 11; } else { console.warn(`[PRICING-MATRIX:PARSE-TIER] Could not parse tier text: "${tierText}"`); return null; } if (minQuantity > 0 && (maxQuantity === undefined || maxQuantity < 24)) { ltmFee = 50.00; } return { MinQuantity: minQuantity, MaxQuantity: maxQuantity, LTM_Fee: ltmFee > 0 ? ltmFee : undefined };
     }
-    
-    // Helper function to format price matrix for API
-    function formatPriceMatrix(headers, rows) {
-        const result = {};
-        
-        // Create an object with size groups as keys
-        headers.forEach(header => {
-            result[header] = {};
-        });
-        
-        // Add prices for each tier
-        rows.forEach(row => {
-            const tier = row.tier;
-            
-            // For each size group, add the price for this tier
-            Object.keys(row.prices).forEach(size => {
-                if (result[size]) {
-                    result[size][tier] = row.prices[size];
-                }
-            });
-        });
-        
-        return result;
+
+    // Fallback data initialization (called if capture fails after max attempts)
+    function initializeFallbackPricingData(embType) {
+        if (window.nwcaPricingData || captureCompleted) return; // Don't overwrite if data was captured
+        console.warn(`[PRICING-MATRIX] Initializing FALLBACK pricing data for ${embType}.`);
+        let headers = ['S-XL', '2XL', '3XL']; let prices = { 'S-XL': { 'Tier1': 20.00, 'Tier2': 19.00, 'Tier3': 18.00, 'Tier4': 17.00 }, '2XL': { 'Tier1': 22.00, 'Tier2': 21.00, 'Tier3': 20.00, 'Tier4': 19.00 }, '3XL': { 'Tier1': 23.00, 'Tier2': 22.00, 'Tier3': 21.00, 'Tier4': 20.00 }, }; let tiers = { 'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11, LTM_Fee: 50 }, 'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23, LTM_Fee: 25 }, 'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 }, 'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 10000 }, }; let uniqueSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL']; if (embType === 'cap-embroidery') { headers = ['One Size']; prices = { 'One Size': { 'Tier1': 22.99, 'Tier2': 21.99, 'Tier3': 20.99, 'Tier4': 19.99 } }; uniqueSizes = ['OS']; }
+        window.nwcaPricingData = { styleNumber: window.selectedStyleNumber || 'FALLBACK', color: window.selectedColorName || 'FALLBACK', embellishmentType: embType, headers: headers, prices: prices, tierData: tiers, uniqueSizes: uniqueSizes, capturedAt: new Date().toISOString(), isFallback: true };
+        window.availableSizesFromTable = headers;
+        console.log('PricingPages: Fallback pricing global variables initialized.', JSON.stringify(window.nwcaPricingData, null, 2)); // DEBUG LOG (Stringified)
+        // Dispatch event so other components know data (even fallback) is ready
+        console.log("[PRICING-MATRIX:DEBUG] Dispatching 'pricingDataLoaded' event (Fallback)."); // DEBUG LOG
+        window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData }));
+        captureCompleted = true; // Mark as completed even with fallback
     }
-    
-    // Store pricing data in the API
-    async function storePricingData(data) {
-        try {
-            console.log("[PRICING-MATRIX:CAPTURE] Sending data to API:", data);
-            
-            // Format the data for the API
-            const apiData = {
-                StyleNumber: data.styleNumber,
-                Color: data.color,
-                EmbellishmentType: data.embellishmentType,
-                CaptureDate: new Date().toISOString(),
-                SessionID: localStorage.getItem('nwca_cart_session_id') || 'sess_' + Math.random().toString(36).substring(2, 10),
-                SizeGroups: JSON.stringify(data.headers),
-                PriceMatrix: JSON.stringify(formatPriceMatrix(data.headers, data.rows))
-            };
-            
-            console.log("[PRICING-MATRIX:CAPTURE] Formatted API data:", apiData);
-            
-            // Use the specific endpoint that we know works
-            try {
-                // Update existing pricing data at ID 5
-                const updateResponse = await fetch(`${API_BASE_URL}/pricing-matrix/5`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(apiData)
-                });
-                
-                if (updateResponse.ok) {
-                    console.log("[PRICING-MATRIX:CAPTURE-SUCCESS] Pricing matrix updated successfully", await updateResponse.json());
-                } else {
-                    console.error("[PRICING-MATRIX:CAPTURE-ERROR] Failed to update pricing matrix:", await updateResponse.text());
-                    
-                    // Try to create new pricing data as fallback
-                    const createResponse = await fetch(`${API_BASE_URL}/pricing-matrix`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(apiData)
-                    });
-                    
-                    if (createResponse.ok) {
-                        console.log("[PRICING-MATRIX:CAPTURE-SUCCESS] Pricing matrix captured and stored successfully", await createResponse.json());
-                    } else {
-                        console.error("[PRICING-MATRIX:CAPTURE-ERROR] Failed to store pricing matrix:", await createResponse.text());
-                    }
-                }
-            } catch (error) {
-                console.error("[PRICING-MATRIX:CAPTURE-ERROR] Error updating pricing matrix:", error);
-            }
-            
-            // Store the pricing data in localStorage as a backup
-            localStorage.setItem('nwca_pricing_matrix_' + data.styleNumber + '_' + data.color + '_' + data.embellishmentType,
-                JSON.stringify({
-                    styleNumber: data.styleNumber,
-                    color: data.color,
-                    embellishmentType: data.embellishmentType,
-                    headers: data.headers,
-                    rows: data.rows,
-                    capturedAt: new Date().toISOString()
-                })
-            );
-            console.log("[PRICING-MATRIX:CAPTURE] Pricing matrix stored in localStorage as backup");
-        } catch (error) {
-            console.error("[PRICING-MATRIX:CAPTURE-ERROR] Error storing pricing matrix:", error);
-        }
+
+
+     if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initialize);
+    } else {
+        initialize();
     }
-    
-    // Get pricing data from the API
-    async function getPricingData(styleNumber, color, embType) {
-        try {
-            // First try to get from the specific endpoint we know works
-            const response = await fetch(`${API_BASE_URL}/pricing-matrix/5`);
-            
-            if (response.ok) {
-                const data = await response.json();
-                
-                // Check if this data matches our style/color/embType
-                if (data &&
-                    data.StyleNumber === styleNumber &&
-                    data.Color === color &&
-                    data.EmbellishmentType === embType) {
-                    
-                    // Convert the API data format to our internal format
-                    const priceMatrix = JSON.parse(data.PriceMatrix);
-                    const sizeGroups = JSON.parse(data.SizeGroups);
-                    
-                    // Convert to our internal format
-                    const rows = [];
-                    
-                    // Get all tier keys from the first size group
-                    const firstSizeGroup = Object.keys(priceMatrix)[0];
-                    const tiers = Object.keys(priceMatrix[firstSizeGroup]);
-                    
-                    // For each tier, create a row
-                    tiers.forEach(tier => {
-                        const prices = {};
-                        
-                        // For each size group, get the price for this tier
-                        sizeGroups.forEach(sizeGroup => {
-                            prices[sizeGroup] = priceMatrix[sizeGroup][tier];
-                        });
-                        
-                        rows.push({
-                            tier: tier,
-                            prices: prices
-                        });
-                    });
-                    
-                    return {
-                        styleNumber: data.StyleNumber,
-                        color: data.Color,
-                        embellishmentType: data.EmbellishmentType,
-                        headers: sizeGroups,
-                        rows: rows,
-                        capturedAt: data.CaptureDate
-                    };
-                }
-            }
-            
-            // If not found or doesn't match, try to get from localStorage
-            const localData = localStorage.getItem('nwca_pricing_matrix_' + styleNumber + '_' + color + '_' + embType);
-            if (localData) {
-                return JSON.parse(localData);
-            }
-            
-            return null;
-        } catch (error) {
-            console.error("[PRICING-MATRIX:GET-ERROR] Error getting pricing matrix:", error);
-            
-            // Try to get from localStorage as fallback
-            try {
-                const localData = localStorage.getItem('nwca_pricing_matrix_' + styleNumber + '_' + color + '_' + embType);
-                if (localData) {
-                    return JSON.parse(localData);
-                }
-            } catch (e) {
-                console.error("[PRICING-MATRIX:GET-ERROR] Error getting pricing matrix from localStorage:", e);
-            }
-            
-            return null;
-        }
-    }
-    
-    // Get price for a specific size and quantity
-    function getPrice(styleNumber, color, embType, size, quantity) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                console.log(`[PRICING-MATRIX:PRICE] Getting price for ${styleNumber}, ${color}, ${embType}, ${size}, ${quantity}`);
-                
-                // Try to get pricing data from the API
-                const data = await getPricingData(styleNumber, color, embType);
-                
-                if (data) {
-                    console.log(`[PRICING-MATRIX:PRICE] Found pricing data:`, data);
-                    
-                    // Find the appropriate quantity tier
-                    let tier = null;
-                    
-                    for (const row of data.rows) {
-                        const tierText = row.tier;
-                        
-                        // Parse tier ranges
-                        if (tierText.includes('-')) {
-                            const [min, max] = tierText.split('-').map(t => parseInt(t.trim()));
-                            
-                            if (quantity >= min && quantity <= max) {
-                                tier = row;
-                                break;
-                            }
-                        } else if (tierText.includes('+')) {
-                            const min = parseInt(tierText.replace('+', '').trim());
-                            
-                            if (quantity >= min) {
-                                tier = row;
-                                break;
-                            }
-                        } else {
-                            // Single number or other format
-                            const min = parseInt(tierText.trim());
-                            
-                            if (!isNaN(min) && quantity >= min) {
-                                tier = row;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (tier) {
-                        console.log(`[PRICING-MATRIX:PRICE] Found tier:`, tier);
-                        
-                        // Find the price for this size
-                        let sizeKey = size;
-                        
-                        // Handle size ranges (e.g., XS-XL)
-                        if (!tier.prices[size]) {
-                            // Define size order for comparison
-                            const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
-                            const sizeIdx = sizeOrder.indexOf(size.toUpperCase());
-                            
-                            if (sizeIdx !== -1) {
-                                for (const key in tier.prices) {
-                                    if (key.includes('-')) {
-                                        const [start, end] = key.split('-').map(s => s.trim().toUpperCase());
-                                        const startIdx = sizeOrder.indexOf(start);
-                                        const endIdx = sizeOrder.indexOf(end);
-                                        
-                                        if (startIdx !== -1 && endIdx !== -1 &&
-                                            sizeIdx >= startIdx && sizeIdx <= endIdx) {
-                                            sizeKey = key;
-                                            console.log(`[PRICING-MATRIX:PRICE] Size ${size} matches range ${key}`);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        const price = tier.prices[sizeKey];
-                        
-                        if (price) {
-                            console.log(`[PRICING-MATRIX:PRICE] Found price for ${size} (using key ${sizeKey}): $${price}`);
-                            resolve(price);
-                            return;
-                        } else {
-                            console.log(`[PRICING-MATRIX:PRICE] No price found for ${size} (tried key ${sizeKey})`);
-                        }
-                    } else {
-                        console.log(`[PRICING-MATRIX:PRICE] No tier found for quantity ${quantity}`);
-                    }
-                } else {
-                    console.log(`[PRICING-MATRIX:PRICE] No pricing data found for ${styleNumber}, ${color}, ${embType}`);
-                }
-                
-                // Fallback to default pricing
-                const defaultPrice = getDefaultPrice(size, quantity, embType);
-                console.log(`[PRICING-MATRIX:PRICE] Using default price: $${defaultPrice}`);
-                resolve(defaultPrice);
-            } catch (error) {
-                console.error("[PRICING-MATRIX:PRICE-ERROR] Error getting price:", error);
-                const defaultPrice = getDefaultPrice(size, quantity, embType);
-                console.log(`[PRICING-MATRIX:PRICE] Using default price after error: $${defaultPrice}`);
-                resolve(defaultPrice);
-            }
-        });
-    }
-    
-    // Get default price when pricing data is not available
-    function getDefaultPrice(size, quantity, embType) {
-        // Base price by size
-        let basePrice = 18.00; // Default for S-XL
-        const upperSize = size.toUpperCase();
-        
-        if (upperSize === '2XL' || upperSize === 'XXL') {
-            basePrice = 22.00;
-        } else if (upperSize === '3XL') {
-            basePrice = 23.00;
-        } else if (upperSize === '4XL') {
-            basePrice = 25.00;
-        }
-        
-        // Apply quantity discount
-        if (quantity >= 72) {
-            basePrice -= 2.00;
-        } else if (quantity >= 48) {
-            basePrice -= 1.00;
-        }
-        
-        // Add embellishment cost
-        let embCost = 0;
-        
-        if (embType === 'embroidery' || embType === 'cap-embroidery') {
-            embCost = 3.50;
-        } else if (embType === 'dtg' || embType === 'dtf') {
-            embCost = 4.00;
-        } else if (embType === 'screen-print') {
-            embCost = 2.50;
-        }
-        
-        return basePrice + embCost;
-    }
-    
-    // Initialize the system
-    initialize();
-    
-    // Expose public API
-    window.PricingMatrix = {
-        getPrice: getPrice,
-        getPricingData: getPricingData,
-        capturePricingMatrix: capturePricingMatrix
+
+    window.PricingMatrixCapture = {
+        getCurrentData: () => window.nwcaPricingData
     };
+
 })();
