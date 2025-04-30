@@ -203,15 +203,20 @@ h1 {
 }
 
 .color-name {
-    position: absolute;
-    bottom: -25px;
-    left: 50%;
-    transform: translateX(-50%);
+    /* position: absolute; */ /* Removed */
+    /* bottom: -25px; */ /* Removed */
+    /* left: 50%; */ /* Removed */
+    /* transform: translateX(-50%); */ /* Removed */
     font-size: 0.75em;
-    white-space: nowrap;
+    /* white-space: nowrap; */ /* Allow wrapping - handled in HTML style */
     color: var(--text-color);
     text-align: center;
-    width: 80px;
+    width: 100%; /* Let it take the width of the wrapper */
+    display: block; /* Ensure it behaves as a block */
+    margin-top: 4px; /* Add some space below the swatch */
+    line-height: 1.2; /* Allow for wrapping */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 /* Pricing Section */
