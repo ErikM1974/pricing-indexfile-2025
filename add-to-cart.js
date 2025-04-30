@@ -130,17 +130,27 @@
             }
 
             // 3. Get existing cart quantity for the current embellishment type
-            const cartContents = window.cartContents || { embroideryItems: 0, totalItems: 0, items: [] };
+            // const cartContents = window.cartContents || { embroideryItems: 0, totalItems: 0, items: [] }; // No longer rely on pre-fetched cartContents for count
             const currentEmbType = detectEmbellishmentType();
+
+            // --- FIX: Calculate existing quantity directly from NWCACart ---
             let existingEmbroideryItems = 0;
-            if (cartContents.items && Array.isArray(cartContents.items)) {
-                cartContents.items.forEach(item => {
-                    if (item.embellishmentType === currentEmbType && Array.isArray(item.sizes)) {
-                        existingEmbroideryItems += item.sizes.reduce((sum, size) => sum + (parseInt(size.quantity) || 0), 0);
-                    }
-                });
+            if (window.NWCACart && typeof window.NWCACart.getCartItems === 'function') {
+                const activeCartItems = window.NWCACart.getCartItems('Active'); // Get current active items
+                if (activeCartItems && Array.isArray(activeCartItems)) {
+                    activeCartItems.forEach(item => {
+                        // Use ImprintType as per cart.js structure
+                        if (item.ImprintType === currentEmbType && item.CartStatus === 'Active' && Array.isArray(item.sizes)) {
+                            existingEmbroideryItems += item.sizes.reduce((sum, size) => sum + (parseInt(size.Quantity) || 0), 0);
+                        }
+                    });
+                }
+                 console.log(`[ADD-TO-CART] Calculated existing ${currentEmbType} items directly from NWCACart: ${existingEmbroideryItems}`); // New log
+            } else {
+                 console.warn("[ADD-TO-CART] NWCACart.getCartItems not available to calculate existing quantity.");
             }
-            console.log(`[ADD-TO-CART] Existing ${currentEmbType} items in cart: ${existingEmbroideryItems}`);
+            // --- END FIX ---
+
 
             // 4. Get pricing data (captured by pricing-matrix-capture.js)
             const pricingData = window.nwcaPricingData;
@@ -159,11 +169,25 @@
                  updatingCartTotal = false;
                  return;
             }
+            // --- Verification Log ---
+            console.log("[ADD-TO-CART] Data for Pricing Calculator:", {
+                sizeQuantities: JSON.parse(JSON.stringify(sizeQuantities)), // Log deep copy
+                existingCartQuantity: existingEmbroideryItems, // Use the newly calculated value
+                pricingDataAvailable: !!pricingData
+            });
+            // --- End Verification Log ---
+
             const calculatedPricing = window.NWCAPricingCalculator.calculatePricing(
                 sizeQuantities,
-                existingEmbroideryItems,
+                existingEmbroideryItems, // Pass the correctly calculated value
                 pricingData
             );
+
+            // --- LTM Discrepancy Investigation Log ---
+            // Log the full result immediately after calculation to compare with UI updates
+             console.log("[ADD-TO-CART] Full calculatedPricing result:", JSON.parse(JSON.stringify(calculatedPricing || {})));
+            // --- End LTM Log ---
+
 
             if (!calculatedPricing) {
                 console.error("[ADD-TO-CART] Pricing calculation failed.");
