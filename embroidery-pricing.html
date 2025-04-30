@@ -173,8 +173,10 @@
             flex-direction: column;
             align-items: center;
             width: 70px; /* Adjust as needed */
+            min-height: 75px; /* Ensure enough space for swatch + name */
             margin: 5px;
             cursor: pointer;
+            justify-content: flex-start; /* Align items to the top */
         }
 
         .color-swatch {
@@ -201,15 +203,13 @@
             font-size: 0.75em;
             text-align: center;
             color: var(--text-color);
-            /* white-space: nowrap; */ /* Allow wrapping */
-            /* overflow: hidden; */ /* Allow overflow */
-            /* text-overflow: ellipsis; */ /* Remove ellipsis */
-            width: 100%;
-            line-height: 1.2; /* Adjust line height for potential wrapping */
-            margin-top: 2px; /* Adjust margin */
-            padding: 0 2px; /* Add slight horizontal padding */
-            word-wrap: break-word; /* Ensure long words break */
-            overflow-wrap: break-word; /* Ensure long words break */
+            width: 100%; /* Take full width of wrapper */
+            line-height: normal; /* Use default line height */
+            /* margin-top: 2px; */ /* Remove margin-top, rely on swatch margin-bottom */
+            padding: 0 2px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            display: block; /* Ensure it's a block element */
         }
 
         /* Pulse animation for highlighting a swatch */
@@ -1094,6 +1094,9 @@
                     </button>
 <button id="download-order-pdf-button" class="download-pdf-button" style="margin-top: 10px; width: 100%; padding: 10px; background-color: #6c757d; color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 1em;">
                         Download Order PDF
+                    </button>
+<button id="view-cart-summary-button" class="view-cart-button" style="display: none; margin-top: 10px; width: 100%; padding: 10px; background-color: #17a2b8; color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 1em;">
+                        View Cart (<span class="cart-count-display">0</span>)
                     </button>
                 </div>
                 

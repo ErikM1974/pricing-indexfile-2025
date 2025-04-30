@@ -884,3 +884,29 @@ h1 {
         padding: 6px 3px;
     }
 }
+/* View Cart Button in Summary */
+.view-cart-button {
+    background-color: #17a2b8; /* Teal/Info color */
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.view-cart-button:hover {
+    background-color: #117a8b; /* Darker teal */
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.view-cart-button:disabled {
+    background-color: #adb5bd;
+    cursor: not-allowed;
+}
