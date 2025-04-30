@@ -84,7 +84,7 @@
         updatingCartTotal = true;
 
         try {
-            console.log("[ADD-TO-CART] Updating cart total (Refactored v3)");
+            console.log("[ADD-TO-CART] Updating cart total (Refactored v4 - Dynamic Pricing)");
             window.updateCartTotal = updateCartTotal; // Ensure global access
 
             // 1. Gather current quantities from UI inputs
@@ -140,7 +140,7 @@
                     }
                 });
             }
-            // console.log(`[ADD-TO-CART] Existing ${currentEmbType} items in cart:`, existingEmbroideryItems);
+            console.log(`[ADD-TO-CART] Existing ${currentEmbType} items in cart: ${existingEmbroideryItems}`);
 
             // 4. Get pricing data (captured by pricing-matrix-capture.js)
             const pricingData = window.nwcaPricingData;
@@ -152,7 +152,8 @@
                 return;
             }
 
-            // 5. Call the Pricing Calculator
+            // 5. Call the Pricing Calculator with PROSPECTIVE calculation
+            // This is the key change: we always use the combined quantity to determine pricing tier
             if (!window.NWCAPricingCalculator || typeof window.NWCAPricingCalculator.calculatePricing !== 'function') {
                  console.error("[ADD-TO-CART] NWCAPricingCalculator is not available!");
                  updatingCartTotal = false;
@@ -176,14 +177,21 @@
             window.cartItemData = {
                 ...calculatedPricing,
                 cartQuantity: existingEmbroideryItems,
-                totalQuantity: newQuantityTotal // Explicitly store quantity being added now
+                totalQuantity: newQuantityTotal, // Explicitly store quantity being added now
+                prospectiveTotal: calculatedPricing.combinedQuantity // Store the prospective total
             };
-            // console.log("[ADD-TO-CART] Stored calculated pricing data:", window.cartItemData);
+            console.log("[ADD-TO-CART] Prospective total calculation:", {
+                new: newQuantityTotal,
+                existing: existingEmbroideryItems,
+                combined: calculatedPricing.combinedQuantity,
+                tier: calculatedPricing.tierKey,
+                ltmApplies: calculatedPricing.ltmFeeApplies
+            });
 
 
             // 7. Update UI Elements using PricingPageUI module
 
-            // Update LTM fee notice display (using PricingPageUI indirectly via updateTierInfoDisplay)
+            // Update LTM fee notice display with prospective calculation info
             const ltmFeeNotice = document.querySelector('.ltm-fee-notice');
             if (ltmFeeNotice) {
                 ltmFeeNotice.style.display = calculatedPricing.ltmFeeApplies ? 'block' : 'none';
@@ -202,6 +210,9 @@
                             </div>
                             ${ltmQuantityNeeded > 0 ? `<div style="font-size:0.9em;font-style:italic;margin-top:5px;padding-top:5px;border-top:1px dashed #ffc107;">
                                 Add ${ltmQuantityNeeded} more items to reach 24 pieces and eliminate this fee
+                            </div>` : ''}
+                            ${existingEmbroideryItems > 0 ? `<div style="font-size:0.9em;background-color:#e8f4ff;padding:5px;margin-top:5px;border-radius:4px;border-left:3px solid #0d6efd;">
+                                <span style="font-weight:bold;">Prospective Pricing:</span> Includes ${existingEmbroideryItems} items already in cart.
                             </div>` : ''}
                         `;
                     }
@@ -244,7 +255,7 @@
             });
 
 
-            // Update final total display in the cart summary
+            // Update final total display in the cart summary with enhanced prospective pricing info
             const totalAmountDisplay = document.querySelector('.total-amount');
             if (totalAmountDisplay) {
                  if (calculatedPricing.ltmFeeApplies && newQuantityTotal > 0) {
@@ -253,9 +264,30 @@
                                          .filter(item => item.quantity > 0)
                                          .reduce((sum, item) => sum + (item.baseUnitPrice * item.quantity || 0), 0);
 
+                     let prospectiveInfoHtml = '';
+                     if (existingEmbroideryItems > 0) {
+                         prospectiveInfoHtml = `
+                             <div class="prospective-pricing-info" style="background-color:#e8f4ff;padding:6px;margin:5px 0;border-radius:4px;border-left:4px solid #0d6efd;font-size:0.9em;">
+                                 <div style="font-weight:bold;margin-bottom:3px;">Prospective Pricing Calculation:</div>
+                                 <div style="display:flex;justify-content:space-between;">
+                                     <span>Items being added:</span>
+                                     <span>${newQuantityTotal}</span>
+                                 </div>
+                                 <div style="display:flex;justify-content:space-between;">
+                                     <span>Items in cart:</span>
+                                     <span>${existingEmbroideryItems}</span>
+                                 </div>
+                                 <div style="display:flex;justify-content:space-between;border-top:1px dashed #0d6efd;padding-top:3px;margin-top:3px;font-weight:bold;">
+                                     <span>Combined total:</span>
+                                     <span>${calculatedPricing.combinedQuantity} → ${calculatedPricing.tierKey} tier</span>
+                                 </div>
+                             </div>`;
+                     }
+
                      totalAmountDisplay.innerHTML = `
                          <div class="total-breakdown">
                              <div style="text-align:center;background-color:#ffc107;color:#212529;padding:5px;margin-bottom:8px;border-radius:4px;font-weight:bold;font-size:1.1em;">⚠️ LTM FEE APPLIED TO ORDER ⚠️</div>
+                             ${prospectiveInfoHtml}
                              <div class="base-price" style="margin-bottom:5px;">Base Price (${calculatedPricing.tierKey} tier): $${baseTotalPrice.toFixed(2)}</div>
                              <div class="ltm-fee" style="background-color:#fff3cd;padding:6px;margin:5px 0;border-radius:4px;border-left:4px solid #ffc107;">
                                  <strong>LTM Fee:</strong> $${calculatedPricing.ltmFeeTotal.toFixed(2)} ÷ ${calculatedPricing.combinedQuantity} items = <span style="color:#663c00;font-weight:bold;">$${calculatedPricing.ltmFeePerItem.toFixed(2)}/item</span>
@@ -263,14 +295,40 @@
                              <div class="total-with-ltm" style="margin-top:8px;font-size:1.2em;"><strong>Total: $${calculatedPricing.totalPrice.toFixed(2)}</strong></div>
                          </div>`;
                  } else {
-                     totalAmountDisplay.textContent = `$${calculatedPricing.totalPrice.toFixed(2)}`;
+                     // Standard pricing display with prospective info if needed
+                     if (existingEmbroideryItems > 0 && newQuantityTotal > 0) {
+                         totalAmountDisplay.innerHTML = `
+                             <div class="total-breakdown">
+                                 <div class="prospective-pricing-info" style="background-color:#e8f4ff;padding:6px;margin-bottom:8px;border-radius:4px;border-left:4px solid #0d6efd;font-size:0.9em;">
+                                     <div style="font-weight:bold;margin-bottom:3px;">Prospective Pricing Calculation:</div>
+                                     <div style="display:flex;justify-content:space-between;">
+                                         <span>Items being added:</span>
+                                         <span>${newQuantityTotal}</span>
+                                     </div>
+                                     <div style="display:flex;justify-content:space-between;">
+                                         <span>Items in cart:</span>
+                                         <span>${existingEmbroideryItems}</span>
+                                     </div>
+                                     <div style="display:flex;justify-content:space-between;border-top:1px dashed #0d6efd;padding-top:3px;margin-top:3px;font-weight:bold;">
+                                         <span>Combined total:</span>
+                                         <span>${calculatedPricing.combinedQuantity} → ${calculatedPricing.tierKey} tier</span>
+                                     </div>
+                                 </div>
+                                 <div class="total-with-tier" style="font-size:1.2em;"><strong>Total: $${calculatedPricing.totalPrice.toFixed(2)}</strong></div>
+                             </div>`;
+                     } else {
+                         totalAmountDisplay.textContent = `$${calculatedPricing.totalPrice.toFixed(2)}`;
+                     }
                  }
+                 
                  // Store calculated values in dataset
                  totalAmountDisplay.dataset.calculatedTotal = calculatedPricing.totalPrice.toFixed(2);
                  totalAmountDisplay.dataset.totalQuantity = newQuantityTotal;
                  totalAmountDisplay.dataset.tierKey = calculatedPricing.tierKey;
                  totalAmountDisplay.dataset.ltmFeeApplies = calculatedPricing.ltmFeeApplies;
                  totalAmountDisplay.dataset.ltmFee = calculatedPricing.ltmFeeTotal;
+                 totalAmountDisplay.dataset.prospectiveTotal = calculatedPricing.combinedQuantity;
+                 totalAmountDisplay.dataset.existingCartQty = existingEmbroideryItems;
             }
 
             // Dispatch event for other components

@@ -438,11 +438,212 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     }
 
     function updateCartInfoDisplay(newQuantity, combinedQuantity, currentTierKey) {
-        const cartInfoDisplay = document.getElementById('cart-info-display'); const cartContentsInfo = document.getElementById('cart-contents-info'); if (cartInfoDisplay) { if (newQuantity > 0) { cartInfoDisplay.innerHTML = `<div id="adding-info">Adding <strong><span id="new-items-count">${newQuantity}</span></strong> item(s).</div><div id="combined-total" style="margin-top: 5px;">Combined total for pricing: <strong><span id="combined-items-count">${combinedQuantity}</span></strong> item(s).</div><div id="current-tier" style="margin-top: 5px;">Current Pricing Tier: <strong><span id="tier-name">${currentTierKey || 'N/A'}</span></strong></div>`; cartInfoDisplay.style.display = 'block'; } else { cartInfoDisplay.innerHTML = ''; cartInfoDisplay.style.display = 'none'; } } if (cartContentsInfo) { if (newQuantity > 0) { let summaryHtml = '<strong>Items to Add:</strong><ul>'; const sizeQuantities = window.cartItemData?.items || {}; Object.entries(sizeQuantities).forEach(([size, item]) => { if (item.quantity > 0) { summaryHtml += `<li>${size}: ${item.quantity} @ $${item.displayUnitPrice.toFixed(2)}</li>`; } }); summaryHtml += '</ul>'; cartContentsInfo.innerHTML = summaryHtml; cartContentsInfo.style.display = 'block'; } else { cartContentsInfo.innerHTML = ''; cartContentsInfo.style.display = 'none'; } }
+        const cartInfoDisplay = document.getElementById('cart-info-display');
+        const cartContentsInfo = document.getElementById('cart-contents-info');
+        // Get cart quantity from global state
+        const cartQuantity = window.cartItemData?.cartQuantity || 0;
+        
+        if (cartInfoDisplay) {
+            if (newQuantity > 0) {
+                let infoHtml = `<div id="adding-info">Adding <strong><span id="new-items-count">${newQuantity}</span></strong> item(s).</div>`;
+                
+                // Add prospective calculation info if there are items in cart
+                if (cartQuantity > 0) {
+                    infoHtml += `
+                    <div id="prospective-calculation" style="margin-top: 10px; background-color: #e8f4ff; padding: 8px; border-radius: 5px; border-left: 3px solid #0d6efd;">
+                        <div style="font-weight: bold; margin-bottom: 5px;">📊 Prospective Pricing Calculation:</div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Items being added:</span>
+                            <span><strong>${newQuantity}</strong></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Items already in cart:</span>
+                            <span><strong>${cartQuantity}</strong></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-top: 1px dashed #0d6efd; margin-top: 5px; padding-top: 5px;">
+                            <span>Combined total for pricing:</span>
+                            <span><strong id="combined-items-count">${combinedQuantity}</strong></span>
+                        </div>
+                    </div>`;
+                } else {
+                    infoHtml += `<div id="combined-total" style="margin-top: 5px;">Combined total for pricing: <strong><span id="combined-items-count">${combinedQuantity}</span></strong> item(s).</div>`;
+                }
+                
+                infoHtml += `<div id="current-tier" style="margin-top: 5px;">Current Pricing Tier: <strong><span id="tier-name">${currentTierKey || 'N/A'}</span></strong></div>`;
+                
+                // Show LTM threshold info if applicable
+                if (combinedQuantity < 24) {
+                    const itemsNeededForNoLTM = 24 - combinedQuantity;
+                    infoHtml += `
+                    <div id="ltm-threshold-info" style="margin-top: 8px; background-color: #fff3cd; padding: 8px; border-radius: 5px; font-size: 0.9em;">
+                        <span style="font-weight: bold;">⚠️ LTM Fee Applied:</span> Add ${itemsNeededForNoLTM} more item(s) to reach the 24-item threshold and eliminate the LTM fee.
+                    </div>`;
+                }
+                
+                cartInfoDisplay.innerHTML = infoHtml;
+                cartInfoDisplay.style.display = 'block';
+            } else {
+                cartInfoDisplay.innerHTML = '';
+                cartInfoDisplay.style.display = 'none';
+            }
+        }
+        
+        if (cartContentsInfo) {
+            if (newQuantity > 0) {
+                let summaryHtml = '<strong>Items to Add:</strong><ul>';
+                const sizeQuantities = window.cartItemData?.items || {};
+                Object.entries(sizeQuantities).forEach(([size, item]) => {
+                    if (item.quantity > 0) {
+                        summaryHtml += `<li>${size}: ${item.quantity} @ $${item.displayUnitPrice.toFixed(2)}</li>`;
+                    }
+                });
+                summaryHtml += '</ul>';
+                
+                // Add cart contents info if there are items in cart
+                if (cartQuantity > 0) {
+                    const embType = getEmbellishmentTypeFromUrl();
+                    summaryHtml += `
+                    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #dee2e6;">
+                        <strong>Already in Cart:</strong> ${cartQuantity} ${embType.replace('-', ' ')} items
+                    </div>`;
+                }
+                
+                cartContentsInfo.innerHTML = summaryHtml;
+                cartContentsInfo.style.display = 'block';
+            } else {
+                cartContentsInfo.innerHTML = '';
+                cartContentsInfo.style.display = 'none';
+            }
+        }
     }
 
     function updateTierInfoDisplay(tierKey, nextTier, quantityForNextTier, combinedQuantity) {
-        let tierInfoContainer = document.getElementById('tier-info-display'); try { if (!tierInfoContainer) { tierInfoContainer = document.createElement('div'); tierInfoContainer.id = 'tier-info-display'; tierInfoContainer.className = 'tier-info-display pricing-tier-info'; const cartSummary = document.querySelector('.cart-summary'); if (cartSummary?.parentNode) { cartSummary.parentNode.insertBefore(tierInfoContainer, cartSummary); } else { document.querySelector('.add-to-cart-section')?.appendChild(tierInfoContainer); } } if (!combinedQuantity || combinedQuantity <= 0 || !tierKey) { tierInfoContainer.innerHTML = ''; tierInfoContainer.style.display = 'none'; return; } tierInfoContainer.style.display = 'block'; const sourceTierData = window.nwcaPricingData?.tierData || window.dp5ApiTierData; if (!sourceTierData) { tierInfoContainer.innerHTML = '<p>Tier data unavailable.</p>'; return; } let explanationHTML = `<div class="tier-explanation"><h4>Current Pricing Tier: <span id="current-tier-display">${tierKey}</span></h4><p>Pricing is based on ${combinedQuantity} total ${getEmbellishmentTypeFromUrl().replace('-', ' ')} items (including cart).</p></div>`; let progressHTML = ''; const sortedTiers = Object.keys(sourceTierData).sort((a, b) => (sourceTierData[a].MinQuantity || 0) - (sourceTierData[b].MinQuantity || 0)); const tierPoints = sortedTiers.map(t => ({ tier: t, min: sourceTierData[t].MinQuantity || 0 })); const currentTierIndex = tierPoints.findIndex(p => p.tier === tierKey); let progressPercent = 0; let progressMessage = 'You are at this pricing tier.'; if (currentTierIndex >= 0 && currentTierIndex < tierPoints.length - 1) { const nextTierPoint = tierPoints[currentTierIndex + 1]; const currentMin = tierPoints[currentTierIndex].min; const nextMin = nextTierPoint.min; if (nextMin > currentMin) { progressPercent = Math.min(100, Math.max(0, ((combinedQuantity - currentMin) / (nextMin - currentMin)) * 100)); } if (quantityForNextTier > 0) { progressMessage = `Add <strong>${quantityForNextTier}</strong> more item${quantityForNextTier !== 1 ? 's' : ''} to reach the <strong>${nextTier}</strong> tier (${nextMin}+ items).`; } } else if (currentTierIndex === tierPoints.length - 1) { progressPercent = 100; progressMessage = 'You have reached the highest pricing tier!'; } progressHTML = `<div class="tier-progress"><div class="tier-progress-bar" style="position: relative; display: flex; justify-content: space-between; margin-top: 15px; margin-bottom: 10px;"><div class="tier-line" style="position: absolute; top: 8px; height: 2px; width: 100%; background-color: var(--primary-light); z-index: 0;"></div><div class="tier-progress-fill" style="position: absolute; top: 8px; height: 2px; background-color: var(--primary-color); z-index: 0; width: ${progressPercent}%; transition: width 0.5s ease;"></div>${tierPoints.map((point, index) => `<div class="tier-point" data-tier="${point.tier}" style="display: flex; flex-direction: column; align-items: center; z-index: 1; position: relative;"><div class="tier-dot ${index <= currentTierIndex ? 'active' : ''}" style="width: 16px; height: 16px; border-radius: 50%; background-color: ${index <= currentTierIndex ? 'var(--primary-color)' : 'var(--primary-light)'}; border: 2px solid var(--primary-color);"></div><div class="tier-label" style="margin-top: 5px; font-size: 0.8em; font-weight: bold;">${point.tier}</div></div>`).join('')}</div><div class="tier-progress-text" style="text-align: center; font-size: 0.9em; margin-top: 10px;"><span id="tier-progress-message">${progressMessage}</span></div></div>`; const ltmFeeApplies = window.cartItemData?.ltmFeeApplies || false; const ltmFeePerItem = window.cartItemData?.ltmFeePerItem || 0; let ltmHTML = `<div class="ltm-explanation" style="display: ${ltmFeeApplies ? 'block' : 'none'}; margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid rgba(0,0,0,0.1);"><h4>Less Than Minimum Fee Applied</h4><p>Orders under 24 pieces include a $${(window.cartItemData?.ltmFeeTotal || 50).toFixed(2)} LTM fee distributed across all items.</p><p class="ltm-applied">Current LTM fee: <span class="ltm-per-item" style="color: #dc3545;">$${ltmFeePerItem.toFixed(2)}</span> per item</p></div>`; tierInfoContainer.innerHTML = explanationHTML + progressHTML + ltmHTML; } catch (error) { console.error("[UI] Error updating tier info display:", error); if (tierInfoContainer) tierInfoContainer.innerHTML = `<p style="color: red;">Error displaying tier info.</p>`; }
+        let tierInfoContainer = document.getElementById('tier-info-display');
+        
+        try {
+            if (!tierInfoContainer) {
+                tierInfoContainer = document.createElement('div');
+                tierInfoContainer.id = 'tier-info-display';
+                tierInfoContainer.className = 'tier-info-display pricing-tier-info';
+                const cartSummary = document.querySelector('.cart-summary');
+                if (cartSummary?.parentNode) {
+                    cartSummary.parentNode.insertBefore(tierInfoContainer, cartSummary);
+                } else {
+                    document.querySelector('.add-to-cart-section')?.appendChild(tierInfoContainer);
+                }
+            }
+            
+            if (!combinedQuantity || combinedQuantity <= 0 || !tierKey) {
+                tierInfoContainer.innerHTML = '';
+                tierInfoContainer.style.display = 'none';
+                return;
+            }
+            
+            tierInfoContainer.style.display = 'block';
+            const sourceTierData = window.nwcaPricingData?.tierData || window.dp5ApiTierData;
+            
+            if (!sourceTierData) {
+                tierInfoContainer.innerHTML = '<p>Tier data unavailable.</p>';
+                return;
+            }
+            
+            // Determine if we're using cart quantities for prospective pricing
+            const cartQuantity = window.cartItemData?.cartQuantity || 0;
+            const newQuantity = window.cartItemData?.totalQuantity || 0;
+            const isProspectivePricing = cartQuantity > 0;
+            
+            // Enhanced title with prospective pricing indication
+            let explanationHTML = `<div class="tier-explanation">`;
+            
+            if (isProspectivePricing) {
+                explanationHTML += `
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <h4 style="margin: 0;">Current Pricing Tier: <span id="current-tier-display">${tierKey}</span></h4>
+                        <span style="background-color: #0d6efd; color: white; font-size: 0.75em; padding: 2px 6px; border-radius: 10px; margin-left: 8px;">PROSPECTIVE</span>
+                    </div>
+                    <div style="background-color: #e8f4ff; padding: 8px; border-radius: 5px; margin-bottom: 10px; border-left: 3px solid #0d6efd;">
+                        <div style="font-weight: bold; margin-bottom: 5px;">Prospective Pricing Summary:</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9em;">
+                            <span>Items being added:</span>
+                            <span>${newQuantity}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9em;">
+                            <span>Items already in cart:</span>
+                            <span>${cartQuantity}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-top: 1px dashed #0d6efd; margin-top: 5px; padding-top: 5px; font-weight: bold;">
+                            <span>Combined total:</span>
+                            <span>${combinedQuantity}</span>
+                        </div>
+                    </div>`;
+            } else {
+                explanationHTML += `<h4>Current Pricing Tier: <span id="current-tier-display">${tierKey}</span></h4>`;
+            }
+            
+            explanationHTML += `<p>Pricing is based on ${combinedQuantity} total ${getEmbellishmentTypeFromUrl().replace('-', ' ')} items${isProspectivePricing ? ' (including cart)' : ''}.</p></div>`;
+            
+            // Progress bar section
+            let progressHTML = '';
+            const sortedTiers = Object.keys(sourceTierData).sort((a, b) => (sourceTierData[a].MinQuantity || 0) - (sourceTierData[b].MinQuantity || 0));
+            const tierPoints = sortedTiers.map(t => ({ tier: t, min: sourceTierData[t].MinQuantity || 0 }));
+            const currentTierIndex = tierPoints.findIndex(p => p.tier === tierKey);
+            let progressPercent = 0;
+            let progressMessage = 'You are at this pricing tier.';
+            
+            if (currentTierIndex >= 0 && currentTierIndex < tierPoints.length - 1) {
+                const nextTierPoint = tierPoints[currentTierIndex + 1];
+                const currentMin = tierPoints[currentTierIndex].min;
+                const nextMin = nextTierPoint.min;
+                
+                if (nextMin > currentMin) {
+                    progressPercent = Math.min(100, Math.max(0, ((combinedQuantity - currentMin) / (nextMin - currentMin)) * 100));
+                }
+                
+                if (quantityForNextTier > 0) {
+                    progressMessage = `Add <strong>${quantityForNextTier}</strong> more item${quantityForNextTier !== 1 ? 's' : ''} to reach the <strong>${nextTier}</strong> tier (${nextMin}+ items).`;
+                }
+            } else if (currentTierIndex === tierPoints.length - 1) {
+                progressPercent = 100;
+                progressMessage = 'You have reached the highest pricing tier!';
+            }
+            
+            progressHTML = `
+            <div class="tier-progress">
+                <div class="tier-progress-bar" style="position: relative; display: flex; justify-content: space-between; margin-top: 15px; margin-bottom: 10px;">
+                    <div class="tier-line" style="position: absolute; top: 8px; height: 2px; width: 100%; background-color: var(--primary-light); z-index: 0;"></div>
+                    <div class="tier-progress-fill" style="position: absolute; top: 8px; height: 2px; background-color: var(--primary-color); z-index: 0; width: ${progressPercent}%; transition: width 0.5s ease;"></div>
+                    ${tierPoints.map((point, index) => `
+                        <div class="tier-point" data-tier="${point.tier}" style="display: flex; flex-direction: column; align-items: center; z-index: 1; position: relative;">
+                            <div class="tier-dot ${index <= currentTierIndex ? 'active' : ''}" style="width: 16px; height: 16px; border-radius: 50%; background-color: ${index <= currentTierIndex ? 'var(--primary-color)' : 'var(--primary-light)'}; border: 2px solid var(--primary-color);"></div>
+                            <div class="tier-label" style="margin-top: 5px; font-size: 0.8em; font-weight: bold;">${point.tier}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="tier-progress-text" style="text-align: center; font-size: 0.9em; margin-top: 10px;">
+                    <span id="tier-progress-message">${progressMessage}</span>
+                </div>
+            </div>`;
+            
+            // LTM fee section
+            const ltmFeeApplies = window.cartItemData?.ltmFeeApplies || false;
+            const ltmFeePerItem = window.cartItemData?.ltmFeePerItem || 0;
+            
+            let ltmHTML = `
+            <div class="ltm-explanation" style="display: ${ltmFeeApplies ? 'block' : 'none'}; margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid rgba(0,0,0,0.1);">
+                <h4>Less Than Minimum Fee Applied</h4>
+                <p>Orders under 24 pieces include a $${(window.cartItemData?.ltmFeeTotal || 50).toFixed(2)} LTM fee distributed across all items.</p>
+                <p class="ltm-applied">Current LTM fee: <span class="ltm-per-item" style="color: #dc3545;">$${ltmFeePerItem.toFixed(2)}</span> per item</p>
+                ${isProspectivePricing && ltmFeeApplies ? `
+                <div style="font-size: 0.9em; font-style: italic; margin-top: 5px; background-color: #f8f9fa; padding: 5px; border-radius: 4px;">
+                    This fee is calculated based on your prospective total of ${combinedQuantity} items.
+                </div>` : ''}
+            </div>`;
+            
+            tierInfoContainer.innerHTML = explanationHTML + progressHTML + ltmHTML;
+        } catch (error) {
+            console.error("[UI] Error updating tier info display:", error);
+            if (tierInfoContainer) tierInfoContainer.innerHTML = `<p style="color: red;">Error displaying tier info.</p>`;
+        }
     }
 
     function showSuccessWithViewCartButton(productData) {
