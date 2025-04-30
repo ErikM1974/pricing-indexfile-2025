@@ -350,11 +350,11 @@ const NWCACartUI = (function() {
         </div>
         <div class="cart-item-details row">
           ${item.imageUrl ? `
-            <div class="col-md-3 item-image-container">
-                 <img src="${item.imageUrl}" alt="${item.styleNumber}" class="item-image img-fluid rounded border">
+            <div class="col-md-3 item-image-container mb-2 mb-md-0"> {/* Added bottom margin for small screens */}
+                 <img src="${item.imageUrl}" alt="${item.styleNumber} - ${item.color}" class="item-image img-fluid rounded border" style="max-height: 150px; object-fit: contain;"> {/* Added alt text, max-height and object-fit */}
             </div>
-          ` : ''}
-          <div class="col-md-9">
+          ` : '<div class="col-md-3 item-image-container mb-2 mb-md-0"><div class="img-placeholder border rounded bg-light d-flex align-items-center justify-content-center" style="height: 150px; width: 100%;"><small class="text-muted">No Image</small></div></div>' /* Placeholder if no image */}
+          <div class="${item.imageUrl ? 'col-md-9' : 'col-md-9'}"> {/* Adjust column width based on image presence - kept as 9 for consistency with placeholder */}
               <div class="cart-item-options mb-2">
                 ${renderEmbellishmentOptions(item.embellishmentOptions)}
               </div>

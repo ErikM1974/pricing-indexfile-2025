@@ -729,259 +729,344 @@ if (typeof window.NWCACart === 'undefined') {
       }
       debugCart("ADD", "Inventory validated, valid sizes:", validSizes);
 
+      // --- Check for existing item ---
+      const existingItemIndex = cartState.items.findIndex(item =>
+          item.StyleNumber === productData.styleNumber &&
+          item.Color === productData.color &&
+          item.ImprintType === productData.embellishmentType &&
+          item.CartStatus === 'Active' // Only consider active items
+      );
 
-      // Create cart item
-      const cartItemData = {
-        SessionID: cartState.sessionId,
-        ProductID: productData.productId || productData.ProductID || `${productData.styleNumber}_${productData.color}`, // Ensure ProductID is included
-        StyleNumber: productData.styleNumber,
-        Color: productData.color,
-        ImprintType: productData.embellishmentType,
-        imageUrl: productData.imageUrl, // Add the imageUrl property from the input productData
-        EmbellishmentOptions: JSON.stringify(productData.embellishmentOptions || {}),
-        DateAdded: new Date().toISOString(),
-        CartStatus: 'Active'
-      };
+      if (existingItemIndex > -1) {
+          // --- Update Existing Item ---
+          debugCart("ADD", "Found existing item, updating quantities");
+          const existingItem = cartState.items[existingItemIndex];
+          const existingCartItemID = existingItem.CartItemID;
 
-      debugCart("ADD", "Creating cart item on server with data:", cartItemData);
-      
-      const response = await fetch(ENDPOINTS.cartItems.create, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(cartItemData)
-      });
-
-      // Log the raw response status and text/json for debugging
-      const responseText = await response.text(); 
-      debugCart(`[CART:ADD] Raw response status: ${response.status}`);
-      debugCart(`[CART:ADD] Raw response text: ${responseText}`);
-
-      let responseData;
-      try {
-        responseData = JSON.parse(responseText); // Try parsing the logged text
-        debugCart(`[CART:ADD] Parsed API response data for cart item creation:`, responseData);
-      } catch (e) {
-        debugCart(`[CART:ADD] Failed to parse JSON response: ${e}`);
-        debugCart(`[CART:ADD] Response text was: ${responseText}`);
-        // Even if parsing fails, try to proceed if status was ok, maybe it's not JSON?
-        if (!response.ok) {
-          throw new Error(`API Error: ${response.status} ${response.statusText}`);
-        }
-        responseData = { status: 'success', message: 'Non-JSON response received', raw: responseText }; // Provide a fallback object
-      }
-
-      // debugCart(`[CART:ADD] API success response for cart item creation:`, responseData);
-      if (!response.ok) {
-        debugCart(`[CART:ADD] API Error creating cart item:`, responseData);
-      }
-
-      // Attempt to extract CartItemID - ADJUST THIS based on actual response structure
-      // Common patterns: responseData.CartItemID, responseData.id, responseData.data.CartItemID, etc.
-      // Corrected access based on the actual API response structure
-      const cartItemID = responseData?.cartItem?.CartItemID;
-      debugCart(`[CART:ADD] Attempted extraction of CartItemID yields: ${cartItemID}`);
-
-      let extractedCartItemID;
-      if (!cartItemID) {
-        // Fallback only if extraction truly fails
-        const generatedId = Date.now(); // Use timestamp as a fallback ID
-        debugCart(`[CART:ADD] No CartItemID found in API response, using generated numeric ID: ${generatedId}`);
-        // throw new Error('CartItemID not found in API response'); 
-        // For now, let's keep the fallback but log it clearly
-        extractedCartItemID = generatedId;
-      } else {
-        extractedCartItemID = cartItemID;
-      }
-
-      debugCart(`[CART:ADD] Extracted CartItemID: ${extractedCartItemID}`);
-      debugCart(`[CART:ADD] Received CartItemID from API processing: ${extractedCartItemID}`);
-      debugCart(`[CART:ADD] Using CartItemID for sizes: ${extractedCartItemID}`);
-
-      // Add sizes
-      debugCart("ADD", "Adding sizes for CartItemID:", extractedCartItemID, "Sizes:", validSizes);
-      const sizes = [];
-      const sizeErrors = [];
-
-      // Process sizes in parallel for better performance
-      await Promise.all(validSizes.map(async (sizeData) => {
-        try {
-          // Create payload, ensuring we don't include SizeItemID which is an Autonumber field in Caspio
-          const sizeDataPayload = {
-            CartItemID: extractedCartItemID,
-            Size: sizeData.size,
-            Quantity: sizeData.quantity,
-            UnitPrice: sizeData.unitPrice
-          };
-          
-          // Only add WarehouseSource if it exists
-          if (sizeData.warehouseSource) {
-            sizeDataPayload.WarehouseSource = sizeData.warehouseSource;
+          // Fetch existing sizes for the item to get SizeItemIDs and current quantities
+          let existingSizesData = [];
+          try {
+              const existingSizesResponse = await fetch(ENDPOINTS.cartItemSizes.getByCartItem(existingCartItemID));
+              if (!existingSizesResponse.ok) {
+                  const errorText = await existingSizesResponse.text();
+                  throw new Error(`Failed to fetch existing sizes for item ${existingCartItemID}: ${existingSizesResponse.status} ${errorText}`);
+              }
+              existingSizesData = await existingSizesResponse.json();
+              if (!Array.isArray(existingSizesData)) {
+                  debugCart("ADD-WARN", "Received non-array for existing sizes, treating as empty", existingSizesData);
+                  existingSizesData = [];
+              }
+              debugCart("ADD", `Fetched ${existingSizesData.length} existing sizes for item ${existingCartItemID}`);
+          } catch (fetchError) {
+              console.error("Error fetching existing sizes:", fetchError);
+              throw new Error(`Network error fetching existing sizes for item ${existingCartItemID}: ${fetchError.message}`);
           }
-          debugCart("ADD", "Creating size on server with data:", sizeDataPayload);
+
+          const existingSizesMap = new Map(existingSizesData.map(s => [s.Size, s])); // Map Size -> SizeItem object
+
+          const sizeUpdatePromises = validSizes.map(async (newSizeData) => {
+              const existingSize = existingSizesMap.get(newSizeData.size);
+              
+              if (existingSize) {
+                  // --- Update existing size ---
+                  const newQuantity = (parseInt(existingSize.Quantity) || 0) + (parseInt(newSizeData.quantity) || 0);
+                  debugCart("ADD", `Updating size ${newSizeData.size} for item ${existingCartItemID}. Old Qty: ${existingSize.Quantity}, Add Qty: ${newSizeData.quantity}, New Qty: ${newQuantity}`);
+                  
+                  // Prepare payload for update
+                  const updatePayload = {
+                      // Include all fields expected by the API for update, even if not changing
+                      CartItemID: existingCartItemID,
+                      Size: existingSize.Size,
+                      Quantity: newQuantity,
+                      UnitPrice: existingSize.UnitPrice // Assuming price doesn't change when quantity is added
+                  };
+                  if (existingSize.WarehouseSource) { // Preserve warehouse if it exists
+                      updatePayload.WarehouseSource = existingSize.WarehouseSource;
+                  }
+
+                  const updateResponse = await fetch(ENDPOINTS.cartItemSizes.update(existingSize.SizeItemID), {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(updatePayload)
+                  });
+                  if (!updateResponse.ok) {
+                      const errorText = await updateResponse.text();
+                      throw new Error(`Failed to update size ${newSizeData.size}: ${updateResponse.status} ${errorText}`);
+                  }
+                  return await updateResponse.json(); // Return updated size data
+              } else {
+                  // --- Create new size for existing item ---
+                  debugCart("ADD", `Creating new size ${newSizeData.size} with quantity ${newSizeData.quantity} for item ${existingCartItemID}`);
+                  const sizeDataPayload = {
+                      CartItemID: existingCartItemID,
+                      Size: newSizeData.size,
+                      Quantity: newSizeData.quantity,
+                      UnitPrice: newSizeData.unitPrice // Use unit price from the new item data
+                  };
+                  if (newSizeData.warehouseSource) {
+                      sizeDataPayload.WarehouseSource = newSizeData.warehouseSource;
+                  }
+                  const createResponse = await fetch(ENDPOINTS.cartItemSizes.create, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(sizeDataPayload)
+                  });
+                  if (!createResponse.ok) {
+                      const errorText = await createResponse.text();
+                      throw new Error(`Failed to create size ${newSizeData.size}: ${createResponse.status} ${errorText}`);
+                  }
+                  return await createResponse.json(); // Return created size data
+              }
+          });
+
+          // Wait for all size updates/creations to complete
+          const updatedSizesResults = await Promise.allSettled(sizeUpdatePromises);
+
+          const successfulUpdates = updatedSizesResults
+              .filter(result => result.status === 'fulfilled')
+              .map(result => result.value);
+          const failedUpdates = updatedSizesResults
+              .filter(result => result.status === 'rejected');
+
+          if (failedUpdates.length > 0) {
+              const errorMessages = failedUpdates.map(f => f.reason.message || f.reason).join('\n');
+              console.error("Errors updating/creating sizes:", errorMessages);
+              // Throw an error to prevent inconsistent state
+              throw new Error(`Failed to update/create some sizes:\n${errorMessages}`);
+          }
+
+          // Reload ALL cart items from the server to refresh local state accurately
+          debugCart("ADD", "Sizes updated/created, reloading cart items from server...");
+          await loadCartItems(); // This refreshes cartState.items
+          debugCart("ADD", "Cart items reloaded after update");
+
+      } else {
+          // --- Create New Item (Original Logic) ---
+          debugCart("ADD", "No existing item found, creating new item");
           
-          // Try up to 3 times to create the size
-          let attempt = 0;
-          let sizeResponse;
-          let errorText;
+          const cartItemData = {
+            SessionID: cartState.sessionId,
+            ProductID: productData.productId || productData.ProductID || `${productData.styleNumber}_${productData.color}`, // Ensure ProductID is included
+            StyleNumber: productData.styleNumber,
+            Color: productData.color,
+            ImprintType: productData.embellishmentType,
+            imageUrl: productData.imageUrl, // Add the imageUrl property from the input productData
+            EmbellishmentOptions: JSON.stringify(productData.embellishmentOptions || {}),
+            DateAdded: new Date().toISOString(),
+            CartStatus: 'Active'
+          };
+
+          debugCart("ADD", "Creating cart item on server with data:", cartItemData);
           
-          while (attempt < 3) {
+          const response = await fetch(ENDPOINTS.cartItems.create, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cartItemData)
+          });
+
+          // Log the raw response status and text/json for debugging
+          const responseText = await response.text();
+          debugCart(`[CART:ADD] Raw response status: ${response.status}`);
+          debugCart(`[CART:ADD] Raw response text: ${responseText}`);
+
+          let responseData;
+          try {
+            responseData = JSON.parse(responseText); // Try parsing the logged text
+            debugCart(`[CART:ADD] Parsed API response data for cart item creation:`, responseData);
+          } catch (e) {
+            debugCart(`[CART:ADD] Failed to parse JSON response: ${e}`);
+            debugCart(`[CART:ADD] Response text was: ${responseText}`);
+            if (!response.ok) {
+              throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+            responseData = { status: 'success', message: 'Non-JSON response received', raw: responseText };
+          }
+
+          if (!response.ok) {
+            debugCart(`[CART:ADD] API Error creating cart item:`, responseData);
+             throw new Error(`API Error creating cart item: ${response.status} ${responseData.message || responseText}`);
+          }
+
+          // Attempt to extract CartItemID directly from the response
+          let extractedCartItemID = responseData?.cartItem?.CartItemID;
+          debugCart(`[CART:ADD] Attempted direct extraction of CartItemID yields: ${extractedCartItemID}`);
+
+          // If CartItemID wasn't found directly, try reloading and finding it
+          if (!extractedCartItemID) {
+              console.warn("[CART:ADD] CartItemID not found directly in response. Attempting reload and search...");
+              debugCart("ADD", "Reloading cart items to find the newly created item's ID.");
+              await loadCartItems(); // Refresh local state from server
+
+              // Try to find the item we just added in the refreshed list
+              // Match based on key properties. Using DateAdded might be unreliable, focus on content.
+              const newItemInState = cartState.items.find(item =>
+                  item.StyleNumber === productData.styleNumber &&
+                  item.Color === productData.color &&
+                  item.ImprintType === productData.embellishmentType &&
+                  item.CartStatus === 'Active' &&
+                  // Add a check to ensure it has sizes matching what we intended to add (or is missing sizes initially)
+                  // This helps differentiate if multiple identical items were added rapidly before syncs completed.
+                  // A more robust check might involve comparing EmbellishmentOptions if they are detailed.
+                  // For now, assume the latest matching item without a previously known ID is the one.
+                  // Or, if loadCartItems is fast, the one added most recently.
+                  // Let's refine the search: find the *last* matching item in the array.
+                  true // Placeholder for a potentially better matching condition if needed
+              );
+
+              // Find the last matching item
+              const matchingItems = cartState.items.filter(item =>
+                  item.StyleNumber === productData.styleNumber &&
+                  item.Color === productData.color &&
+                  item.ImprintType === productData.embellishmentType &&
+                  item.CartStatus === 'Active'
+              );
+
+              if (matchingItems.length > 0) {
+                  // Assume the last one in the array is the most recently added
+                  extractedCartItemID = matchingItems[matchingItems.length - 1].CartItemID;
+                  debugCart(`[CART:ADD] Found CartItemID ${extractedCartItemID} after reloading and searching.`);
+              } else {
+                  // If still not found after reload, something is wrong.
+                  console.error("[CART:ADD] CRITICAL: Could not find the newly created item's CartItemID even after reloading.");
+                  debugCart("ADD-ERROR", "Failed to find CartItemID after reload for item:", productData);
+                  throw new Error('Failed to retrieve CartItemID for the new item after creation.');
+              }
+          }
+
+          debugCart(`[CART:ADD] Using CartItemID: ${extractedCartItemID} for adding sizes.`);
+
+          // Add sizes for the new item
+          debugCart("ADD", "Adding sizes for new CartItemID:", extractedCartItemID, "Sizes:", validSizes);
+          const sizes = [];
+          const sizeErrors = [];
+
+          await Promise.all(validSizes.map(async (sizeData) => {
             try {
-              sizeResponse = await fetch(ENDPOINTS.cartItemSizes.create, {
+              const sizeDataPayload = {
+                CartItemID: extractedCartItemID,
+                Size: sizeData.size,
+                Quantity: sizeData.quantity,
+                UnitPrice: sizeData.unitPrice
+              };
+              if (sizeData.warehouseSource) {
+                sizeDataPayload.WarehouseSource = sizeData.warehouseSource;
+              }
+              debugCart("ADD", "Creating size on server with data:", sizeDataPayload);
+              
+              // Simplified: Assume single attempt is enough for now, add retries if needed
+              const sizeResponse = await fetch(ENDPOINTS.cartItemSizes.create, {
                 method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(sizeDataPayload)
               });
-              
-              if (sizeResponse.ok) {
-                // Success, break out of retry loop
-                break;
+
+              if (!sizeResponse.ok) {
+                const errorText = await sizeResponse.text();
+                debugCart("ADD-ERROR", `API error creating size ${sizeData.size}:`, {status: sizeResponse.status, text: errorText});
+                throw new Error(`Failed to add size ${sizeData.size}: ${sizeResponse.status} ${errorText}`);
               }
-              
-              // Not successful, get error text for logging
-              errorText = await sizeResponse.text();
-              debugCart("ADD-WARNING", `API error creating size ${sizeData.size} (attempt ${attempt + 1}/3):`, {status: sizeResponse.status, text: errorText});
-              
-              // Wait before retrying (exponential backoff)
-              await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, attempt)));
-              attempt++;
-            } catch (fetchError) {
-              // Network error or other fetch error
-              debugCart("ADD-WARNING", `Fetch error creating size ${sizeData.size} (attempt ${attempt + 1}/3):`, fetchError);
-              
-              // Wait before retrying (exponential backoff)
-              await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, attempt)));
-              attempt++;
+
+              const newSize = await sizeResponse.json();
+              debugCart("ADD", `API success response for size ${sizeData.size}:`, newSize);
+              sizes.push(newSize);
+            } catch (sizeError) {
+              console.error('Error creating size:', sizeError);
+              sizeErrors.push(sizeError.message);
             }
-          }
-          
-          // Check if any of the attempts were successful
-          if (!sizeResponse || !sizeResponse.ok) {
-            debugCart("ADD-ERROR", `API error creating size ${sizeData.size} after ${attempt} attempts:`, {status: sizeResponse?.status, text: errorText});
-            throw new Error(`Failed to add size ${sizeData.size}: ${sizeResponse?.status || 'Network Error'} ${errorText || ''}`);
-          }
+          }));
 
-          const newSize = await sizeResponse.json();
-          debugCart("ADD", `API success response for size ${sizeData.size}:`, newSize);
-          sizes.push(newSize);
-        } catch (sizeError) {
-          console.error('Error syncing size:', sizeError); // Keep console.error for visibility
-          sizeErrors.push(sizeError.message);
-        }
-      }));
-
-      // If there were errors adding sizes
-      if (sizeErrors.length > 0) {
-        debugCart("ADD-ERROR", "Errors occurred while adding sizes", sizeErrors);
-        
-        // If all sizes failed, delete the cart item and throw an error
-        if (sizeErrors.length === validSizes.length) {
-          debugCart("ADD", "All sizes failed, deleting cart item:", extractedCartItemID);
-          try {
-            await fetch(ENDPOINTS.cartItems.delete(extractedCartItemID), {
-              method: 'DELETE'
-            });
-          } catch (deleteError) {
-            debugCart("ADD-WARNING", "Error deleting cart item after size errors:", deleteError);
-            // Continue even if delete fails
+          if (sizeErrors.length > 0) {
+            debugCart("ADD-ERROR", "Errors occurred while adding sizes for new item", sizeErrors);
+            // If sizes failed, attempt to delete the parent cart item for cleanup
+            if (extractedCartItemID) {
+                debugCart("ADD", "Attempting to delete cart item due to size errors:", extractedCartItemID);
+                try {
+                    await fetch(ENDPOINTS.cartItems.delete(extractedCartItemID), { method: 'DELETE' });
+                } catch (deleteError) {
+                    debugCart("ADD-WARNING", "Error deleting cart item after size errors:", deleteError);
+                }
+            }
+            throw new Error(`Failed to add sizes for new item:\n${sizeErrors.join('\n')}`);
           }
-          
-          throw new Error(`Failed to add sizes:\n${sizeErrors.join('\n')}`);
-        } else {
-          // Some sizes succeeded, some failed - log warning but continue
-          debugCart("ADD-WARNING", `${sizeErrors.length} of ${validSizes.length} sizes failed to add, but continuing with successful ones`);
-          console.warn(`${sizeErrors.length} of ${validSizes.length} sizes failed to add, but continuing with successful ones`);
-        }
+          debugCart("ADD", "All sizes added successfully for new item");
+
+          // Manually construct the item to add to local state temporarily
+          // Note: loadCartItems() will be called later via syncWithServer() to get the definitive state
+          const newItemForLocalState = {
+            CartItemID: extractedCartItemID,
+            SessionID: cartState.sessionId,
+            ProductID: productData.productId || productData.ProductID || `${productData.styleNumber}_${productData.color}`,
+            StyleNumber: productData.styleNumber,
+            Color: productData.color,
+            ImprintType: productData.embellishmentType,
+            imageUrl: productData.imageUrl,
+            EmbellishmentOptions: productData.embellishmentOptions || {}, // Keep as object
+            DateAdded: cartItemData.DateAdded, // Use the date we sent
+            CartStatus: 'Active',
+            sizes: sizes.map(s => ({ // Map server response size format
+                 SizeItemID: s.SizeItemID,
+                 CartItemID: s.CartItemID,
+                 size: s.Size,
+                 quantity: s.Quantity,
+                 unitPrice: s.UnitPrice,
+                 WarehouseSource: s.WarehouseSource
+            }))
+          };
+          // Add to local cart state (will be overwritten/confirmed by sync)
+          cartState.items.push(newItemForLocalState);
+          debugCart("ADD", "Temporarily added new item to local state:", newItemForLocalState);
       }
-      debugCart("ADD", "All sizes added successfully");
 
-      // Get the full item with sizes to add to local state
-      const itemWithSizes = {
-        CartItemID: extractedCartItemID,
-        SessionID: cartState.sessionId,
-        ProductID: productData.productId || '',
-        StyleNumber: productData.styleNumber,
-        Color: productData.color,
-        ImprintType: productData.embellishmentType,
-        EmbellishmentOptions: productData.embellishmentOptions || {}, // Keep as object
-        DateAdded: new Date().toISOString(),
-        CartStatus: 'Active',
-        sizes: sizes.map(s => ({ // Map server response size format to local state format
-             SizeItemID: s.SizeItemID,
-             CartItemID: s.CartItemID,
-             size: s.Size, // Use 'size' key for consistency with productData
-             quantity: s.Quantity, // Use 'quantity' key
-             unitPrice: s.UnitPrice, // Use 'unitPrice' key
-             WarehouseSource: s.WarehouseSource
-        }))
-      };
-
-      // Add to local cart state
-      debugCart("ADD", "Adding item to cartState.items:", itemWithSizes);
-      console.log("Adding item to cart state:", itemWithSizes);
-      cartState.items.push(itemWithSizes);
+      // --- Common Logic (After Update or Create) ---
       
-      // Recalculate prices based on total quantity for this embellishment type
+      // Recalculate prices based on the potentially updated total quantity
       try {
           if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
-              debugCart("ADD", `Recalculating prices for ${productData.embellishmentType}`);
-              
-              // Calculate total quantity for this embellishment type
-              let totalQuantity = 0;
-              cartState.items.forEach(item => {
-                  if (item.ImprintType === productData.embellishmentType && item.CartStatus === 'Active') {
-                      if (item.sizes && Array.isArray(item.sizes)) {
-                          item.sizes.forEach(size => {
-                              totalQuantity += parseInt(size.Quantity) || 0;
-                          });
-                      }
-                  }
-              });
-              
-              console.log(`[CART:RECALC] Total quantity for ${productData.embellishmentType}: ${totalQuantity}`);
-              
-              // Call the recalculation function
+              debugCart("ADD", `Recalculating prices for ${productData.embellishmentType} after add/update`);
               await window.recalculatePricesForEmbellishmentType(productData.embellishmentType);
           } else {
               debugCart("ADD-WARN", "recalculatePricesForEmbellishmentType function not available");
           }
         
-        // Dispatch event for cart item added
-        const event = new CustomEvent('cartItemAdded', {
+        // Dispatch event for cart item added/updated
+        const event = new CustomEvent('cartItemAdded', { // Keep same event name for simplicity
           detail: {
             embellishmentType: productData.embellishmentType,
             styleNumber: productData.styleNumber,
-            color: productData.color
+            color: productData.color,
+            updatedExisting: existingItemIndex > -1 // Add flag indicating if it was an update
           }
         });
         window.dispatchEvent(event);
+        debugCart("ADD", "Dispatched cartItemAdded event");
+
       } catch (recalcError) {
         debugCart("ADD-ERROR", "Error recalculating prices:", recalcError);
-        // Continue even if recalculation fails
+        // Continue even if recalculation fails, but log it
+        console.error("Error recalculating prices after cart update:", recalcError);
       }
       
-      // Force a sync with the server to ensure everything is up to date
+      // Sync with the server to ensure local state matches DB after all operations
       try {
-          console.log("Syncing with server after adding item...");
-          await syncWithServer();
-          console.log("Cart synced with server after adding item");
+          debugCart("ADD", "Syncing with server after add/update operation...");
+          await syncWithServer(); // This calls loadCartItems internally if needed
+          debugCart("ADD", "Cart synced with server after add/update operation");
       } catch (syncError) {
-          console.warn("Error syncing with server after adding item:", syncError);
-          // Continue even if sync fails, as the item is already in local state
+          console.warn("Error syncing with server after adding/updating item:", syncError);
+          // Continue even if sync fails, local state might be slightly off until next sync/reload
       }
 
-      // Save to localStorage
+      // Save final state to localStorage
       saveToLocalStorage();
-      debugCart("ADD", "Cart state saved to localStorage");
+      debugCart("ADD", "Final cart state saved to localStorage");
 
-      // Success!
+      // Final success state
       cartState.error = null;
       cartState.loading = false;
       triggerEvent('cartUpdated');
-      debugCart("ADD", "Item added successfully, cart updated");
+      debugCart("ADD", "Add to cart process completed successfully, cart updated");
 
       return { success: true, error: null };
     } catch (error) {

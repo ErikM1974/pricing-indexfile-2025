@@ -406,21 +406,40 @@
         }
 
         // 2. Ensure latest prices are calculated and stored
+        console.log("[ADD-TO-CART] Step 2: Forcing price recalculation..."); // ADDED LOG
         updateCartTotal(); // Force recalculation
+        console.log("[ADD-TO-CART] Step 2: Price recalculation complete. Checking window.cartItemData:", JSON.parse(JSON.stringify(window.cartItemData || {}))); // ADDED LOG + Deep copy for logging
         if (!window.cartItemData || !window.cartItemData.items) {
-             console.error("[ADD-TO-CART] Price calculation failed before add. Aborting.");
+             console.error("[ADD-TO-CART] Price calculation failed or window.cartItemData is invalid before add. Aborting."); // Enhanced log
              alert("Could not calculate final prices. Please refresh and try again.");
               if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
              return;
         }
+        console.log("[ADD-TO-CART] Step 2: window.cartItemData seems valid."); // ADDED LOG
 
         // 3. Validate prices
-        if (!validatePricesBeforeAddingToCart()) {
+        console.log("[ADD-TO-CART] Step 3: Starting price validation..."); // ADDED LOG
+        let pricesAreValid = false;
+        try {
+            pricesAreValid = validatePricesBeforeAddingToCart();
+        } catch (validationError) {
+            console.error("[ADD-TO-CART] CRITICAL ERROR during price validation:", validationError);
+            alert("A critical error occurred during price validation. Please refresh.");
             if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
             return;
         }
+        console.log(`[ADD-TO-CART] Step 3: Price validation result: ${pricesAreValid}`); // ADDED LOG
+
+        if (!pricesAreValid) {
+            console.log("[ADD-TO-CART] Step 3: Price validation failed. Aborting add to cart."); // ADDED LOG
+            // Alert is shown inside validatePricesBeforeAddingToCart
+            if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
+            return; // Exit if validation failed
+        }
+        console.log("[ADD-TO-CART] Step 3: Price validation passed."); // ADDED LOG
 
         // 4. Collect final data using validated window.cartItemData
+        console.log("[ADD-TO-CART] Step 4: Collecting final product data..."); // ADDED LOG
         const {
             tierKey, ltmFeeApplies, totalQuantity, items: calculatedItems,
             ltmFeeTotal, ltmFeePerItem, combinedQuantity, cartQuantity, baseUnitPrices
@@ -482,12 +501,13 @@
         // 5. Send to Cart API
         if (window.NWCACart && typeof window.NWCACart.addToCart === 'function') {
             if (addToCartButton) addToCartButton.textContent = 'Adding...';
-            console.log("[ADD-TO-CART] Sending final product data to cart:", JSON.parse(JSON.stringify(productData)));
+            console.log("[ADD-TO-CART] Step 5: Preparing to call NWCACart.addToCart with data:", JSON.parse(JSON.stringify(productData))); // MODIFIED LOG
 
-            window.NWCACart.addToCart(productData)
+            window.NWCACart.addToCart(productData) // <<< THE CALL
                 .then(result => {
-                    console.log("[ADD-TO-CART] Cart API response:", result);
+                    console.log("[ADD-TO-CART] Step 5: NWCACart.addToCart call completed. Result:", result); // ADDED LOG
                     if (result && result.success) {
+                        console.log("[ADD-TO-CART] Step 5: Add to cart reported SUCCESS."); // ADDED LOG
                         // Call the success notification function from PricingPageUI
                         if (window.PricingPageUI && typeof window.PricingPageUI.showSuccessNotification === 'function') {
                             window.PricingPageUI.showSuccessNotification(productData);
@@ -593,7 +613,7 @@
          syncSizesWithPricingMatrix(); // Should now have data
 
          // Initialize Add to Cart button listener
-         initAddToCartButton(); // Renamed from initAddToCart
+         // initAddToCartButton(); // REMOVED - Listener attached via delegation now
 
          // Perform initial total calculation
          updateCartTotal(); // Should now have data
@@ -644,6 +664,10 @@
                  // Listen for the events
                  window.addEventListener('pricingDataLoaded', handlePricingDataReady, { once: true });
                  window.addEventListener('pricingDataError', handlePricingDataError, { once: true });
+
+                 // Attach delegated event listener ONCE during initial setup
+                 attachDelegatedAddToCartListener();
+
             }
 
         }).catch(error => {
@@ -790,33 +814,7 @@
 
     // == UI Update Functions REMOVED ==
     // showSuccessWithViewCartButton (Now handled by PricingPageUI.showSuccessNotification)
-    // initAddToCartButton (Helper for initializeUIAndListeners)
-    function initAddToCartButton() {
-        const addToCartButton = document.getElementById('add-to-cart-button');
-        if (addToCartButton) {
-            try {
-                // Clone to remove old listeners before adding new one
-                const newButton = addToCartButton.cloneNode(true);
-                if (addToCartButton.parentNode) {
-                    addToCartButton.parentNode.replaceChild(newButton, addToCartButton);
-                    newButton.addEventListener('click', handleAddToCart);
-                    console.log("[ADD-TO-CART] Add to Cart button listener attached.");
-                } else {
-                     // Fallback if parentNode is null for some reason
-                     addToCartButton.removeEventListener('click', handleAddToCart); // Remove potential old listener
-                     addToCartButton.addEventListener('click', handleAddToCart);
-                     console.warn("[ADD-TO-CART] Add to Cart button parent not found, attached listener directly.");
-                }
-            } catch (error) {
-                console.error("[ADD-TO-CART] Error setting up Add to Cart button:", error);
-                 // Fallback: try adding listener directly
-                 addToCartButton.removeEventListener('click', handleAddToCart);
-                 addToCartButton.addEventListener('click', handleAddToCart);
-            }
-        } else {
-            console.warn("[ADD-TO-CART] Add to Cart button not found during init.");
-        }
-    }
+    // initAddToCartButton REMOVED - Replaced with event delegation below
 
     // =========================================================================
     // == Initialization Trigger ==
@@ -847,5 +845,29 @@
              setTimeout(testAddToCartMatrix, 1500);
          });
      }
+
+    // Function to attach the delegated listener
+    function attachDelegatedAddToCartListener() {
+        // Find a suitable static parent container. Use body as a fallback.
+        // Let's try a container likely wrapping the add-to-cart section
+        const parentContainer = document.getElementById('add-to-cart-controls') || document.getElementById('quantity-section') || document.body;
+        console.log(`[ADD-TO-CART] Attaching delegated click listener to: ${parentContainer.id || 'document.body'}`);
+
+        // Remove listener first to ensure it's only attached once, even if initialize runs multiple times
+        parentContainer.removeEventListener('click', delegatedClickListener);
+        parentContainer.addEventListener('click', delegatedClickListener);
+    }
+
+    // The actual delegated listener function
+    function delegatedClickListener(event) {
+        // Check if the clicked element *is* or *is inside* the add-to-cart button
+        const button = event.target.closest('#add-to-cart-button');
+        if (button) {
+            console.log("[ADD-TO-CART] Delegated click listener detected click on #add-to-cart-button");
+            // Prevent default if the button is inside a form or link
+            event.preventDefault();
+            handleAddToCart(); // Call the original handler
+        }
+    }
 
 })(); // End of IIFE
