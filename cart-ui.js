@@ -349,10 +349,10 @@ const NWCACartUI = (function() {
             <button class="remove-item-btn btn btn-sm btn-outline-danger" data-item-id="${item.id}">&times;</button>
         </div>
         <div class="cart-item-details row">
-            <div class="col-md-3 item-image-container mb-2 mb-md-0"> {/* Added bottom margin for small screens */}
-                 <img src="${item.imageUrl || ''}" alt="${item.styleNumber} - ${item.color}" class="item-image img-fluid rounded border" style="max-height: 150px; object-fit: contain;" onerror="this.style.display='none'; this.parentElement.innerHTML = '<div class=\'img-placeholder border rounded bg-light d-flex align-items-center justify-content-center\' style=\'height: 150px; width: 100%;\'><small class=\'text-muted\'>Image Error</small></div>';"> {/* Removed fallback to constructImageUrl */}
+            <div class="col-md-3 item-image-container mb-2 mb-md-0">
+                 <img src="${item.imageUrl || ''}" alt="${item.styleNumber} - ${item.color}" class="item-image img-fluid rounded border" style="max-height: 150px; object-fit: contain;" onerror="this.style.display='none'; this.parentElement.innerHTML = '<div class=\'img-placeholder border rounded bg-light d-flex align-items-center justify-content-center\' style=\'height: 150px; width: 100%;\'><small class=\'text-muted\'>Image Error</small></div>';">
             </div>
-          <div class="col-md-9"> {/* Image is expected, so details take up remaining width */}
+          <div class="col-md-9">
               <div class="cart-item-options mb-2">
                 ${renderEmbellishmentOptions(item.embellishmentOptions)}
               </div>

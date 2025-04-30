@@ -1189,6 +1189,19 @@ if (typeof window.NWCACart === 'undefined') {
             throw new Error(removeResult.error || 'Failed to remove item after deleting last size');
           }
         } else {
+          // Recalculate prices for the affected embellishment type *before* saving/triggering update
+          try {
+            if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
+              debugCart("UPDATE_QTY", `Recalculating prices for ${item.ImprintType} after removing size ${size}`);
+              await window.recalculatePricesForEmbellishmentType(item.ImprintType);
+            } else {
+              debugCart("UPDATE_QTY-WARN", "recalculatePricesForEmbellishmentType function not available");
+            }
+          } catch (recalcError) {
+            console.error(`[CART:UPDATE_QTY] Error recalculating prices after removing size ${size}:`, recalcError);
+            // Continue even if recalculation fails, but log it
+          }
+          
           // Save to localStorage
           saveToLocalStorage();
           
@@ -1221,6 +1234,19 @@ if (typeof window.NWCACart === 'undefined') {
         
         // Update local state
         item.sizes[sizeIndex].Quantity = quantity;
+        
+        // Recalculate prices for the affected embellishment type *before* saving/triggering update
+        try {
+          if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
+            debugCart("UPDATE_QTY", `Recalculating prices for ${item.ImprintType} after updating quantity for size ${size}`);
+            await window.recalculatePricesForEmbellishmentType(item.ImprintType);
+          } else {
+            debugCart("UPDATE_QTY-WARN", "recalculatePricesForEmbellishmentType function not available");
+          }
+        } catch (recalcError) {
+          console.error(`[CART:UPDATE_QTY] Error recalculating prices after updating quantity for size ${size}:`, recalcError);
+          // Continue even if recalculation fails, but log it
+        }
         
         // Save to localStorage
         saveToLocalStorage();
