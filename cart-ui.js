@@ -18,6 +18,7 @@ const NWCACartUI = (function() {
     savedItemsList: document.getElementById('saved-items-list'),
     proceedToCheckoutBtn: document.getElementById('proceed-to-checkout-btn'),
     saveForLaterBtn: document.getElementById('save-for-later-btn'),
+    downloadQuotePdfBtn: document.getElementById('download-quote-pdf-btn'), // Added PDF button
 
     // Step 2: Shipping
     shippingFormContainer: document.getElementById('shipping-form-container'),
@@ -159,6 +160,10 @@ const NWCACartUI = (function() {
 
     if (elements.submitOrderBtn) {
       elements.submitOrderBtn.addEventListener('click', handleSubmitQuoteRequest);
+    }
+
+    if (elements.downloadQuotePdfBtn) {
+      elements.downloadQuotePdfBtn.addEventListener('click', window.NWCAOrderFormPDF.generate); // Call the global function directly
     }
 
     // Listen for cart updates

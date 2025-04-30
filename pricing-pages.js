@@ -739,22 +739,6 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         setupInventoryLegend();
         updateMiniColorSwatch();
 
-        // Attach listener for PDF download button
-        const downloadPdfButton = document.getElementById('download-order-pdf-button');
-        if (downloadPdfButton) {
-            downloadPdfButton.addEventListener('click', function() {
-                if (window.NWCAOrderFormPDF && typeof window.NWCAOrderFormPDF.generate === 'function') {
-                    window.NWCAOrderFormPDF.generate();
-                } else {
-                    console.error("PDF Generation function not found.");
-                    alert("Sorry, the PDF generation feature is currently unavailable.");
-                }
-            });
-            console.log("PricingPages: PDF Download button listener attached.");
-        } else {
-            console.warn("PricingPages: PDF Download button not found.");
-        }
-
         console.log("PricingPages: Initialization sequence complete.");
     }
 
