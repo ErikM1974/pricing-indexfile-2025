@@ -5,6 +5,9 @@
  * Handles rendering and interaction with the shopping cart UI
  */
 const NWCACartUI = (function() {
+  // Flag to prevent multiple simultaneous renders
+  let isRendering = false;
+  
   // DOM elements
   const elements = {
     cartItemsContainer: document.getElementById('cart-items-container'),
@@ -163,7 +166,12 @@ const NWCACartUI = (function() {
     }
 
     // Listen for cart updates
-    NWCACart.addEventListener('cartUpdated', renderCart);
+    NWCACart.addEventListener('cartUpdated', () => {
+      // Only render if we're not already rendering
+      if (!isRendering) {
+        renderCart();
+      }
+    });
 
     // Force a sync with the server before initial render
     console.log("Initializing cart UI, syncing with server...");
@@ -186,6 +194,16 @@ const NWCACartUI = (function() {
    * Render the cart
    */
   async function renderCart() { // <-- Make renderCart async
+    // If already rendering, don't start another render
+    if (isRendering) {
+      debugCartUI("RENDER-WARN", "Render already in progress, skipping this render call");
+      return;
+    }
+    
+    // Set rendering flag
+    isRendering = true;
+    
+    try {
     // Get cart items - **ADJUST based on how NWCACart provides items**
     // Assuming NWCACart now returns items matching the new function's expectations
     // (e.g., using 'id', 'styleNumber', 'embellishmentType', 'unitPrice')
@@ -331,7 +349,11 @@ const NWCACartUI = (function() {
         debugCartUI("RENDER-WARN", "PDF download button element not found.");
     }
 
-     debugCartUI("RENDER", "Finished renderCart function."); // Added debug
+      debugCartUI("RENDER", "Finished renderCart function."); // Added debug
+    } finally {
+      // Clear rendering flag when done, even if there was an error
+      isRendering = false;
+    }
   }
 
 
