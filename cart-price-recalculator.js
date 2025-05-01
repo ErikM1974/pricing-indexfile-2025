@@ -5,6 +5,7 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
     "use strict";
     
     // Constants
+    const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api'; // Same as in pricing-matrix-api.js
     const LTM_FEE = 50.00; // Less Than Minimum fee
     const LTM_THRESHOLD = 24; // Threshold for LTM fee (applies when quantity < this value)
     
@@ -76,18 +77,25 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
     }
     
     // Recalculate prices for a specific embellishment type
-    async function recalculatePricesForEmbellishmentType(embellishmentType) {
-        console.log("[PRICE-RECALC:START] Recalculating prices for", embellishmentType);
+    // Accepts an optional second argument `itemsToProcess` to use a specific item list
+    async function recalculatePricesForEmbellishmentType(embellishmentType, itemsToProcess = null) {
+        console.log("[PRICE-RECALC:START] Recalculating prices for", embellishmentType, itemsToProcess ? "(using provided items)" : "(fetching items)");
         
         try {
-            // Check if NWCACart is available
-            if (!window.NWCACart) {
-                console.error("[PRICE-RECALC:ERROR] NWCACart not available");
-                return false;
+            let cartItems;
+            if (itemsToProcess && Array.isArray(itemsToProcess)) {
+                 console.log("[PRICE-RECALC:INFO] Using provided item list:", itemsToProcess);
+                 cartItems = itemsToProcess;
+            } else {
+                 // Check if NWCACart is available
+                 if (!window.NWCACart) {
+                     console.error("[PRICE-RECALC:ERROR] NWCACart not available and no items provided");
+                     return false;
+                 }
+                 // Get all active cart items using the standard method
+                 cartItems = window.NWCACart.getCartItems('Active');
+                 console.log("[PRICE-RECALC:INFO] Fetched items using NWCACart.getCartItems:", cartItems);
             }
-            
-            // Get all active cart items
-            const cartItems = window.NWCACart.getCartItems('Active');
             
             // Filter items by embellishment type
             const itemsOfType = cartItems.filter(item => item.ImprintType === embellishmentType);
@@ -149,19 +157,49 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                 // Get pricing data for each item individually
                 if (window.PricingMatrix && typeof window.PricingMatrix.getPricingData === 'function') {
                     try {
-                        // Get the PricingMatrixID stored with the cart item
-                        const matrixId = item.PricingMatrixID; // Assuming this field exists on the cart item
-                        
-                        if (!matrixId) {
-                            console.error(`[PRICE-RECALC:ERROR] Missing PricingMatrixID for item ${item.StyleNumber} ${item.Color}. Cannot recalculate price.`);
-                            continue; // Skip this item if ID is missing
+                        // Validate that the necessary components exist before proceeding
+                        if (!item.StyleNumber || !item.Color || !item.ImprintType) {
+                             console.error(`[PRICE-RECALC:ERROR] Missing StyleNumber, Color, or ImprintType for item. Cannot lookup pricing matrix.`, item);
+                             continue; // Skip this item if key info is missing
                         }
 
-                        console.log(`[PRICE-RECALC:FETCH] Fetching pricing matrix for ID: ${matrixId}`);
+                        // Get the session ID if available
+                        const sessionID = window.NWCACart && typeof window.NWCACart.getSessionID === 'function'
+                                        ? window.NWCACart.getSessionID()
+                                        : null;
                         
-                        // Get pricing data using the specific matrix ID
-                        // Ensure the correct namespace is used (PricingMatrixAPI based on the api file)
-                        const pricingData = await window.PricingMatrixAPI.getPricingData(matrixId);
+                        // Construct the lookup URL with query parameters
+                        let lookupUrl = `${API_BASE_URL}/pricing-matrix/lookup?styleNumber=${encodeURIComponent(item.StyleNumber)}&color=${encodeURIComponent(item.Color)}&embellishmentType=${encodeURIComponent(item.ImprintType)}`;
+                        
+                        // Add sessionID if available
+                        if (sessionID) {
+                            lookupUrl += `&sessionID=${encodeURIComponent(sessionID)}`;
+                        }
+                        
+                        console.log(`[PRICE-RECALC:LOOKUP] Looking up numeric PricingMatrixID for ${item.StyleNumber} ${item.Color} ${item.ImprintType}`);
+                        console.log(`[PRICE-RECALC:LOOKUP] Requesting URL: ${lookupUrl}`);
+                        
+                        // Fetch the numeric PricingMatrixID from the lookup endpoint
+                        const lookupResponse = await fetch(lookupUrl);
+                        
+                        if (!lookupResponse.ok) {
+                            console.error(`[PRICE-RECALC:LOOKUP-ERROR] Failed to lookup PricingMatrixID: ${lookupResponse.status} ${lookupResponse.statusText}`);
+                            continue; // Skip this item if lookup fails
+                        }
+                        
+                        const lookupData = await lookupResponse.json();
+                        
+                        if (!lookupData || !lookupData.pricingMatrixId) {
+                            console.error(`[PRICE-RECALC:LOOKUP-ERROR] Invalid response from lookup endpoint:`, lookupData);
+                            continue; // Skip this item if response is invalid
+                        }
+                        
+                        const numericPricingMatrixId = lookupData.pricingMatrixId;
+                        console.log(`[PRICE-RECALC:LOOKUP] Successfully retrieved numeric PricingMatrixID: ${numericPricingMatrixId}`);
+                        
+                        // Get pricing data using the numeric PricingMatrixID
+                        console.log(`[PRICE-RECALC:FETCH] Fetching pricing matrix data using numeric ID: ${numericPricingMatrixId}`);
+                        const pricingData = await window.PricingMatrixAPI.getPricingData(numericPricingMatrixId);
                                                 
                         if (pricingData) {
                             // Find the appropriate quantity tier

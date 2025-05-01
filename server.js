@@ -380,6 +380,54 @@ app.put('/api/pricing-matrix/:id', async (req, res) => {
   }
 });
 
+// Pricing Matrix Lookup API - NEW ENDPOINT
+app.get('/api/pricing-matrix/lookup', async (req, res) => {
+  try {
+    const { styleNumber, color, embellishmentType, sessionID } = req.query;
+    
+    if (!styleNumber || !color || !embellishmentType) {
+      return res.status(400).json({
+        error: 'Missing required parameters',
+        message: 'styleNumber, color, and embellishmentType are required query parameters'
+      });
+    }
+    
+    // Build the filter based on required parameters
+    let filter = `StyleNumber='${styleNumber}' AND Color='${color}' AND EmbellishmentType='${embellishmentType}'`;
+    
+    // Add sessionID to filter if provided
+    if (sessionID) {
+      filter += ` AND SessionID='${sessionID}'`;
+    }
+    
+    // Query the pricing matrix table with the filter
+    // Order by CaptureDate DESC to get the most recent entry if multiple exist
+    const data = await makeApiRequest(`/pricing-matrix?filter=${filter}&sort=CaptureDate DESC&limit=1`);
+    
+    // Check if any records were found
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      return res.status(404).json({
+        error: 'Pricing matrix not found',
+        message: `No pricing matrix found for styleNumber=${styleNumber}, color=${color}, embellishmentType=${embellishmentType}${sessionID ? `, sessionID=${sessionID}` : ''}`
+      });
+    }
+    
+    // Return the PricingMatrixID (PK_ID) of the found record
+    const pricingMatrix = data[0];
+    res.json({
+      pricingMatrixId: pricingMatrix.PK_ID,
+      message: 'Pricing matrix found'
+    });
+    
+  } catch (error) {
+    console.error('Error in pricing matrix lookup:', error);
+    res.status(500).json({
+      error: 'Failed to lookup pricing matrix',
+      message: error.message
+    });
+  }
+});
+
 // Serve cart-integration.js for Caspio DataPages
 app.get('/api/cart-integration.js', (req, res) => {
   res.setHeader('Content-Type', 'application/javascript');
