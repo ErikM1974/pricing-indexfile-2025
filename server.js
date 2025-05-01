@@ -393,30 +393,62 @@ app.get('/api/pricing-matrix/lookup', async (req, res) => {
     }
     
     // Build the filter based on required parameters
-    let filter = `StyleNumber='${styleNumber}' AND Color='${color}' AND EmbellishmentType='${embellishmentType}'`;
+    let filter = encodeURIComponent(`StyleNumber='${styleNumber}' AND Color='${color}' AND EmbellishmentType='${embellishmentType}'`);
     
     // Add sessionID to filter if provided
     if (sessionID) {
-      filter += ` AND SessionID='${sessionID}'`;
+      filter = encodeURIComponent(`StyleNumber='${styleNumber}' AND Color='${color}' AND EmbellishmentType='${embellishmentType}' AND SessionID='${sessionID}'`);
     }
     
     // Query the pricing matrix table with the filter
     // Order by CaptureDate DESC to get the most recent entry if multiple exist
-    const data = await makeApiRequest(`/pricing-matrix?filter=${filter}&sort=CaptureDate DESC&limit=1`);
-    
+    const requestUrl = `${API_BASE_URL}/pricing-matrix?filter=${filter}&sort=CaptureDate%20DESC&limit=1`;
+    console.log(`[Pricing Matrix Lookup] Requesting URL: ${requestUrl}`);
+    console.log(`[Pricing Matrix Lookup] Using filter: ${decodeURIComponent(filter)}`); // Decode for readability
+    const data = await makeApiRequest(`/pricing-matrix?filter=${filter}&sort=CaptureDate%20DESC&limit=1`);
+    console.log('[Pricing Matrix Lookup] Raw API Response Data:', JSON.stringify(data, null, 2)); // Log raw data
+
     // Check if any records were found
     if (!data || !Array.isArray(data) || data.length === 0) {
-      return res.status(404).json({
-        error: 'Pricing matrix not found',
-        message: `No pricing matrix found for styleNumber=${styleNumber}, color=${color}, embellishmentType=${embellishmentType}${sessionID ? `, sessionID=${sessionID}` : ''}`
-      });
+        console.log(`[Pricing Matrix Lookup] No records found for ${styleNumber}, ${color}, ${embellishmentType}`);
+        return res.status(404).json({
+            error: 'Pricing matrix not found',
+            message: `No pricing matrix found for styleNumber=${styleNumber}, color=${color}, embellishmentType=${embellishmentType}${sessionID ? `, sessionID=${sessionID}` : ''}`
+        });
     }
     
-    // Return the PricingMatrixID (PK_ID) of the found record
-    const pricingMatrix = data[0];
+    // Search through all returned records for an exact match
+    let matchingRecord = null;
+    for (const record of data) {
+        if (record.StyleNumber === styleNumber &&
+            record.Color === color &&
+            record.EmbellishmentType === embellishmentType) {
+            matchingRecord = record;
+            console.log(`[Pricing Matrix Lookup] Found exact match: ID ${record.PK_ID} for (${styleNumber}, ${color}, ${embellishmentType})`);
+            break;
+        }
+    }
+    
+    // If no exact match was found
+    if (!matchingRecord) {
+        console.log('[Pricing Matrix Lookup] No exact match found in returned records');
+        console.warn(`[Pricing Matrix Lookup] API returned ${data.length} records, but none matched (${styleNumber}, ${color}, ${embellishmentType})`);
+        
+        // Log the first record for debugging
+        if (data.length > 0) {
+            console.warn(`[Pricing Matrix Lookup] First record was: (${data[0].StyleNumber}, ${data[0].Color}, ${data[0].EmbellishmentType}) with ID ${data[0].PK_ID}`);
+        }
+        
+        return res.status(404).json({
+            error: 'Pricing matrix not found',
+            message: `No exact pricing matrix found for styleNumber=${styleNumber}, color=${color}, embellishmentType=${embellishmentType}${sessionID ? `, sessionID=${sessionID}` : ''}`
+        });
+    }
+
+    // If we reach here, matchingRecord exists and matches the request
     res.json({
-      pricingMatrixId: pricingMatrix.PK_ID,
-      message: 'Pricing matrix found'
+        pricingMatrixId: matchingRecord.PK_ID,
+        message: 'Exact pricing matrix found'
     });
     
   } catch (error) {
@@ -425,6 +457,16 @@ app.get('/api/pricing-matrix/lookup', async (req, res) => {
       error: 'Failed to lookup pricing matrix',
       message: error.message
     });
+  }
+});
+
+// Get specific pricing matrix by ID
+app.get('/api/pricing-matrix/:id', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/pricing-matrix/${req.params.id}`);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch pricing matrix by ID' });
   }
 });
 
