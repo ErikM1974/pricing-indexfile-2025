@@ -1189,26 +1189,27 @@ if (typeof window.NWCACart === 'undefined') {
             throw new Error(removeResult.error || 'Failed to remove item after deleting last size');
           }
         } else {
-          // Recalculate prices for the affected embellishment type *before* saving/triggering update
+          // Local state updated (size removed)
+          
+          // Save to localStorage *before* recalculation which might depend on saved state
+          saveToLocalStorage();
+          
+          // Recalculate prices *after* local state is saved and *before* triggering final update
           try {
             if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
               debugCart("UPDATE_QTY", `Recalculating prices for ${item.ImprintType} after removing size ${size}`);
               await window.recalculatePricesForEmbellishmentType(item.ImprintType);
             } else {
-              debugCart("UPDATE_QTY-WARN", "recalculatePricesForEmbellishmentType function not available");
+              debugCart("UPDATE_QTY-WARN", "recalculatePricesForEmbellishmentType function not available when removing size");
             }
           } catch (recalcError) {
             console.error(`[CART:UPDATE_QTY] Error recalculating prices after removing size ${size}:`, recalcError);
-            // Continue even if recalculation fails, but log it
           }
-          
-          // Save to localStorage
-          saveToLocalStorage();
           
           // Success!
           cartState.error = null;
           cartState.loading = false;
-          triggerEvent('cartUpdated');
+          triggerEvent('cartUpdated'); // Final update trigger
         }
         
         return { success: true, error: null };
@@ -1235,26 +1236,25 @@ if (typeof window.NWCACart === 'undefined') {
         // Update local state
         item.sizes[sizeIndex].Quantity = quantity;
         
-        // Recalculate prices for the affected embellishment type *before* saving/triggering update
+        // Save to localStorage *before* recalculation
+        saveToLocalStorage();
+        
+        // Recalculate prices *after* local state is saved and *before* triggering final update
         try {
           if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
             debugCart("UPDATE_QTY", `Recalculating prices for ${item.ImprintType} after updating quantity for size ${size}`);
             await window.recalculatePricesForEmbellishmentType(item.ImprintType);
           } else {
-            debugCart("UPDATE_QTY-WARN", "recalculatePricesForEmbellishmentType function not available");
+            debugCart("UPDATE_QTY-WARN", "recalculatePricesForEmbellishmentType function not available when updating quantity");
           }
         } catch (recalcError) {
           console.error(`[CART:UPDATE_QTY] Error recalculating prices after updating quantity for size ${size}:`, recalcError);
-          // Continue even if recalculation fails, but log it
         }
-        
-        // Save to localStorage
-        saveToLocalStorage();
         
         // Success!
         cartState.error = null;
         cartState.loading = false;
-        triggerEvent('cartUpdated');
+        triggerEvent('cartUpdated'); // Final update trigger
         
         return { success: true, error: null };
       }

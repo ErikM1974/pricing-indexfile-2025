@@ -11,6 +11,70 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
     const MAX_CAPTURE_ATTEMPTS = 40; // Further increased attempts (80 seconds)
     const CHECK_INTERVAL_MS = 2000;
     let captureCompleted = false; // Flag to prevent multiple captures/event dispatches
+// --- Configuration ---
+    // Use the same base URL as other scripts for consistency
+    const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+
+    // --- Helper Function to Save Matrix ---
+    async function savePricingMatrixToServer(capturedData) {
+        if (!capturedData || !capturedData.styleNumber || !capturedData.color || !capturedData.embellishmentType) {
+            console.error("[PRICING-MATRIX:SAVE-ERROR] Invalid or incomplete data provided for saving.");
+            return;
+        }
+
+        // Attempt to get the current SessionID from NWCACart
+        let currentSessionId = null;
+        if (window.NWCACart && typeof window.NWCACart.getCartState === 'function') {
+            currentSessionId = window.NWCACart.getCartState().sessionId;
+        }
+
+        if (!currentSessionId) {
+             console.error("[PRICING-MATRIX:SAVE-ERROR] Cannot save matrix: SessionID is missing or NWCACart not ready.");
+             // Optionally, you could try to initialize the cart here or queue the save,
+             // but for now, we'll just prevent the save attempt.
+             return;
+        }
+
+        const payload = {
+            StyleNumber: capturedData.styleNumber,
+            Color: capturedData.color, // Use the colorCode passed during capture
+            EmbellishmentType: capturedData.embellishmentType,
+            PriceMatrix: JSON.stringify(capturedData.prices || {}), // Ensure it's stringified JSON
+            SizeGroups: JSON.stringify(capturedData.headers || []), // Ensure it's stringified JSON
+            CaptureDate: capturedData.capturedAt || new Date().toISOString(), // Use captured date or now
+            SessionID: currentSessionId // Include the SessionID
+        };
+
+        console.log("[PRICING-MATRIX:SAVE] Attempting to save pricing matrix to server (with SessionID):", payload);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/pricing-matrix`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`[PRICING-MATRIX:SAVE-ERROR] API Error (${response.status}): ${errorText}`);
+                throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+            }
+
+            const result = await response.json();
+            console.log("[PRICING-MATRIX:SAVE-SUCCESS] Pricing matrix saved successfully:", result);
+            // Optionally store the returned ID back into the captured data if needed elsewhere
+            if (window.nwcaPricingData && result && result.PK_ID) {
+                 window.nwcaPricingData.matrixId = result.PK_ID;
+                 console.log(`[PRICING-MATRIX:SAVE] Stored matrix ID ${result.PK_ID} in window.nwcaPricingData`);
+            }
+
+        } catch (error) {
+            console.error("[PRICING-MATRIX:SAVE-ERROR] Failed to save pricing matrix:", error);
+            // Decide if you want to notify the user or just log the error
+        }
+    }
 
     function initialize() {
         if (initialized) return;
@@ -145,6 +209,8 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
             console.log("[PRICING-MATRIX:DEBUG] Dispatching 'pricingDataLoaded' event."); // DEBUG LOG
             window.dispatchEvent(event);
             console.log("[PRICING-MATRIX:CAPTURE] 'pricingDataLoaded' event dispatched.");
+// Call the save function asynchronously after dispatching the event
+            savePricingMatrixToServer(window.nwcaPricingData);
 
             return window.nwcaPricingData;
 

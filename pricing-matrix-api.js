@@ -5,7 +5,7 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
     "use strict";
     
     // Configuration
-    const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+    const API_BASE_URL = '/api';
     
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', initialize);

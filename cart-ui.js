@@ -168,24 +168,24 @@ const NWCACartUI = (function() {
     // Force a sync with the server before initial render
     console.log("Initializing cart UI, syncing with server...");
     NWCACart.syncWithServer()
-      .then(() => {
-        console.log("Cart sync complete, rendering cart..."); // This log might be premature
-        // renderCart(); // <-- Removed direct call
+      .then(async () => { // <-- Make anonymous function async
+        console.log("Cart sync complete, rendering cart...");
+        await renderCart(); // <-- Await the async renderCart
 
         // Initialize progress steps
         goToStep(1);
       })
-      .catch(error => {
+      .catch(async error => { // <-- Make anonymous function async
         console.error("Error syncing cart:", error);
         // Render anyway even if sync fails
-        renderCart();
+        await renderCart(); // <-- Await the async renderCart
       });
   }
 
   /**
    * Render the cart
    */
-  function renderCart() {
+  async function renderCart() { // <-- Make renderCart async
     // Get cart items - **ADJUST based on how NWCACart provides items**
     // Assuming NWCACart now returns items matching the new function's expectations
     // (e.g., using 'id', 'styleNumber', 'embellishmentType', 'unitPrice')
@@ -272,7 +272,7 @@ const NWCACartUI = (function() {
       }
 
       // Still need to render saved items if any
-      renderSavedItems(savedItems); // Pass adapted savedItems
+      await renderSavedItems(savedItems); // Pass adapted savedItems and await
 
       return;
     }
@@ -282,15 +282,19 @@ const NWCACartUI = (function() {
       elements.cartItemsContainer.innerHTML = '';
       debugCartUI("RENDER", `Rendering ${activeItems.length} active items.`); // Added debug
 
-      activeItems.forEach(item => {
-        // Pass the adapted item to the new renderCartItem
-        const itemElement = renderCartItem(item); // Use the NEW function
-        if (itemElement) { // Check if renderCartItem returned an element
-             elements.cartItemsContainer.appendChild(itemElement);
-        } else {
-            debugCartUI("RENDER-WARN", "renderCartItem returned null for item:", item);
-        }
+      // Handle async rendering of items
+      const itemElementsPromises = activeItems.map(item => renderCartItem(item)); // This now returns promises
+      const itemElements = await Promise.all(itemElementsPromises); // Wait for all items to be rendered
+
+      itemElements.forEach(itemElement => {
+          if (itemElement) {
+              elements.cartItemsContainer.appendChild(itemElement);
+          } else {
+              // Handle cases where renderCartItem returned null (e.g., invalid item)
+              debugCartUI("RENDER-WARN", "renderCartItem returned null for an item.");
+          }
       });
+
 
       if (elements.emptyCartMessage) {
         elements.emptyCartMessage.style.display = 'none';
@@ -302,7 +306,7 @@ const NWCACartUI = (function() {
     }
 
     // Render saved items (using a separate helper function for clarity)
-    renderSavedItems(savedItems); // Pass adapted savedItems
+    await renderSavedItems(savedItems); // Pass adapted savedItems and await
 
     // Update cart summary
     updateCartSummary();
@@ -333,10 +337,10 @@ const NWCACartUI = (function() {
 
   // --- START OF REPLACEMENT ---
   // Renders a single item in the cart
-  function renderCartItem(item) {
+  async function renderCartItem(item) { // <-- Make renderCartItem async
     // Added check for item validity
-    if (!item || !item.id) {
-        debugCartUI("RENDER-ERROR", "Invalid item passed to renderCartItem", item);
+    if (!item || !item.id || !item.styleNumber || !item.color || !item.embellishmentType) { // Added more checks for required fields
+        debugCartUI("RENDER-ERROR", "Invalid or incomplete item passed to renderCartItem", item);
         return null; // Don't render if item is invalid
     }
     debugCartUI("RENDER", "Rendering cart item:", item);
@@ -394,7 +398,44 @@ const NWCACartUI = (function() {
 
         if (validSizes.length > 0) {
              sizesContainer.innerHTML = '<h6 class="sizes-header" style="background-color: #e9ecef; padding: 5px 10px; border-radius: 4px; margin-bottom: 10px;">Sizes & Quantities</h6>'; // Clear previous sizes but keep header
-             validSizes.forEach(sizeInfo => {
+
+             // --- Fetch Pricing Matrix ID and Size Order ---
+             let sizeGroupsOrder = []; // Default to empty array
+             try {
+                 debugCartUI("FETCH", `Looking up PricingMatrixID for ${item.styleNumber}/${item.color}/${item.embellishmentType}`);
+                 const lookupUrl = `/api/pricing-matrix/lookup?styleNumber=${encodeURIComponent(item.styleNumber)}&color=${encodeURIComponent(item.color)}&embellishmentType=${encodeURIComponent(item.embellishmentType)}`;
+                 const lookupResponse = await fetch(lookupUrl);
+
+                 if (lookupResponse.ok) {
+                     const lookupResult = await lookupResponse.json();
+                     const pricingMatrixId = lookupResult.pricingMatrixId;
+                     debugCartUI("FETCH", `Found PricingMatrixID: ${pricingMatrixId}`);
+
+                     if (pricingMatrixId && window.PricingMatrixAPI) {
+                         const pricingData = await window.PricingMatrixAPI.getPricingData(pricingMatrixId);
+                         if (pricingData && Array.isArray(pricingData.headers)) {
+                             sizeGroupsOrder = pricingData.headers; // Use 'headers' which contains the parsed SizeGroups
+                             debugCartUI("FETCH", `Using SizeGroups order for item ${item.id}:`, sizeGroupsOrder);
+                         } else {
+                             debugCartUI("FETCH-WARN", `No valid size order (headers) found in pricing data for matrix ID ${pricingMatrixId}. Using default sort.`);
+                         }
+                     } else {
+                          debugCartUI("FETCH-WARN", `No PricingMatrixID found or PricingMatrixAPI not available for item ${item.id}. Using default sort.`);
+                     }
+                 } else {
+                     debugCartUI("FETCH-ERROR", `Failed to lookup PricingMatrixID for item ${item.id}. Status: ${lookupResponse.status}. Using default sort.`);
+                 }
+             } catch (error) {
+                 console.error(`[CartUI] Error fetching size order for item ${item.id}:`, error);
+                 debugCartUI("FETCH-ERROR", `Exception during size order fetch for item ${item.id}. Using default sort.`, error);
+             }
+             // --- End Fetch ---
+
+             // Sort sizes according to the fetched group order
+             const sortedSizes = sortSizesByGroupOrder(validSizes, sizeGroupsOrder);
+             debugCartUI("RENDER", `Sorted sizes for item ${item.id} using group order: ${sortedSizes.map(s => s.size).join(', ')}`);
+
+             sortedSizes.forEach(sizeInfo => {
                  const sizeElement = renderSizeItem(sizeInfo, item.id); // Use item.id here
                  if (sizeElement) {
                      sizesContainer.appendChild(sizeElement);
@@ -552,6 +593,42 @@ function renderSizeItem(sizeInfo, itemId) {
 
    // --- START: Added Helper Functions based on New Code ---
 
+   /* Helper function to sort sizes based on a specific group order */
+   function sortSizesByGroupOrder(sizesToSort, groupOrder) {
+       if (!Array.isArray(groupOrder) || groupOrder.length === 0) {
+           debugCartUI("SORT-WARN", "No valid groupOrder provided, returning original order.");
+           // Fallback: Sort alphabetically or by a standard order if no groupOrder
+           return [...sizesToSort].sort((a, b) => a.size.localeCompare(b.size)); // Example: Alphabetical fallback
+       }
+
+       // Create a map for quick lookup of order index
+       const orderMap = new Map(groupOrder.map((size, index) => [size.toUpperCase(), index])); // Store uppercase for case-insensitive match
+
+       return [...sizesToSort].sort((a, b) => {
+           const sizeA = a.size.toUpperCase();
+           const sizeB = b.size.toUpperCase();
+           const indexA = orderMap.get(sizeA);
+           const indexB = orderMap.get(sizeB);
+
+           // Both sizes are in the groupOrder
+           if (indexA !== undefined && indexB !== undefined) {
+               return indexA - indexB;
+           }
+           // Only size A is in the groupOrder (comes first)
+           if (indexA !== undefined) {
+               return -1;
+           }
+           // Only size B is in the groupOrder (comes first)
+           if (indexB !== undefined) {
+               return 1;
+           }
+           // Neither size is in the groupOrder, maintain relative order or sort alphabetically
+           // return 0; // Maintain original relative order
+            return sizeA.localeCompare(sizeB); // Sort unknown sizes alphabetically (case-insensitive)
+       });
+   }
+
+
    // Helper to render embellishment options (similar to original but simplified)
    function renderEmbellishmentOptions(options) {
        if (!options || typeof options !== 'object' || Object.keys(options).length === 0) {
@@ -594,23 +671,29 @@ function renderSizeItem(sizeInfo, itemId) {
 
 
    // Helper function to render saved items section
-   function renderSavedItems(savedItems) {
+   async function renderSavedItems(savedItems) { // <-- Make renderSavedItems async
      debugCartUI("RENDER", `Rendering ${savedItems?.length || 0} saved items.`);
      if (elements.savedItemsContainer && elements.savedItemsList) {
        if (savedItems && savedItems.length > 0) {
          elements.savedItemsContainer.style.display = 'block';
          elements.savedItemsList.innerHTML = ''; // Clear previous
 
-         savedItems.forEach(item => {
-           // Ensure the item has the 'isSaved' flag or adapt here
-           const adaptedItem = item.isSaved ? item : { ...item, isSaved: true };
-           const itemElement = renderCartItem(adaptedItem); // Use the NEW renderCartItem
-           if (itemElement) {
-               elements.savedItemsList.appendChild(itemElement);
-           } else {
-                debugCartUI("RENDER-WARN", "renderCartItem returned null for saved item:", adaptedItem);
-           }
+         // Handle async rendering of saved items
+         const itemElementsPromises = savedItems.map(item => {
+             // Ensure the item has the 'isSaved' flag or adapt here
+             const adaptedItem = item.isSaved ? item : { ...item, isSaved: true };
+             return renderCartItem(adaptedItem); // Returns a promise
          });
+         const itemElements = await Promise.all(itemElementsPromises); // Wait for all saved items
+
+         itemElements.forEach(itemElement => {
+             if (itemElement) {
+                 elements.savedItemsList.appendChild(itemElement);
+             } else {
+                 debugCartUI("RENDER-WARN", "renderCartItem returned null for a saved item.");
+             }
+         });
+
        } else {
          elements.savedItemsContainer.style.display = 'none';
        }

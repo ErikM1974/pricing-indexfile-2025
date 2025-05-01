@@ -5,7 +5,7 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
     "use strict";
     
     // Constants
-    const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api'; // Same as in pricing-matrix-api.js
+    const API_BASE_URL = '/api'; // Use relative URL to hit the local Express server instead of direct Caspio URL
     const LTM_FEE = 50.00; // Less Than Minimum fee
     const LTM_THRESHOLD = 24; // Threshold for LTM fee (applies when quantity < this value)
     
@@ -325,6 +325,13 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                                             }
                                         }
                                         
+// Add detailed logging before price calculation
+                                console.log(`[PRICE-RECALC:DEBUG] --- Processing Size: ${size.Size} for Item: ${item.StyleNumber} ${item.Color} ---`);
+                                console.log(`[PRICE-RECALC:DEBUG] Retrieved Pricing Data:`, JSON.stringify(pricingData, null, 2));
+                                console.log(`[PRICE-RECALC:DEBUG] Determined Tier Object:`, JSON.stringify(tier, null, 2));
+                                console.log(`[PRICE-RECALC:DEBUG] Size Key for Lookup: ${sizeKey}`);
+                                console.log(`[PRICE-RECALC:DEBUG] Raw Price from Tier Data (tier.prices[${sizeKey}]):`, tier.prices[sizeKey]);
+                                console.log(`[PRICE-RECALC:DEBUG] LTM Applies: ${ltmFeeApplies}, LTM Fee Per Item: ${ltmFeePerItem}`);
                                         let price = tier.prices[sizeKey];
                                         
                                         // Log the price lookup result
@@ -332,22 +339,30 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                                         
                                         if (price !== undefined && price !== null) {
                                             // Apply LTM fee if applicable
-                                            let finalPrice = price;
+                                            // Ensure price is treated as a number for calculation
+                                            let basePrice = parseFloat(price);
+                                            if (isNaN(basePrice)) {
+                                                console.error(`[PRICE-RECALC:ERROR] Price retrieved for size key '${sizeKey}' is not a valid number:`, price);
+                                                continue; // Skip this size if price is invalid
+                                            }
+                                            
+                                            let finalPrice = basePrice;
                                             let ltmFeeMessage = '';
                                             
                                             if (ltmFeeApplies) {
-                                                finalPrice = price + ltmFeePerItem;
-                                                ltmFeeMessage = ` (base price $${price.toFixed(2)} + LTM fee $${ltmFeePerItem.toFixed(2)})`;
+                                                finalPrice = basePrice + ltmFeePerItem;
+                                                ltmFeeMessage = ` (base price $${basePrice.toFixed(2)} + LTM fee $${ltmFeePerItem.toFixed(2)})`;
                                             }
+console.log(`[PRICE-RECALC:DEBUG] Calculated Base Price: ${basePrice.toFixed(2)}, Final Price: ${finalPrice.toFixed(2)}`); // Log calculated prices
                                             
                                             console.log(`[PRICE-RECALC:UPDATE] Updating price for ${item.StyleNumber}, ${item.Color}, ${size.Size} from $${size.UnitPrice} to $${finalPrice.toFixed(2)}${ltmFeeMessage}`);
                                             
                                             // Update price in cart and in the database
-                                            size.UnitPrice = finalPrice;
+                                            size.UnitPrice = finalPrice; // Use the calculated finalPrice
                                             
                                             // Update the price in the database
                                             try {
-                                                const updateUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/cart-item-sizes/${size.SizeItemID}`;
+                                                const updateUrl = `${API_BASE_URL}/cart-item-sizes/${size.SizeItemID}`;
                                                 fetch(updateUrl, {
                                                     method: 'PUT',
                                                     headers: {
