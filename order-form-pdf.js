@@ -110,14 +110,16 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
         const { jsPDF } = jspdf;
 
         try {
-            // 1. Get Cart Contents
-            if (!window.NWCACart || typeof window.NWCACart.getCartContents !== 'function') {
-                throw new Error("Cart system (NWCACart) not available.");
+            // 1. Get Cart Contents (Active Items)
+            if (!window.NWCACart || typeof window.NWCACart.getCartItems !== 'function') {
+                 // Check for the correct method getCartItems
+                throw new Error("Cart system (NWCACart) or getCartItems method not available.");
             }
-            const cartContents = window.NWCACart.getCartContents();
-            if (!cartContents || !cartContents.items || cartContents.items.length === 0) {
-                alert("Your cart is empty. Add items before generating a quote.");
-                throw new Error("Cart is empty.");
+            // Fetch only 'Active' items for the quote
+            const activeCartItems = window.NWCACart.getCartItems('Active');
+            if (!activeCartItems || !Array.isArray(activeCartItems) || activeCartItems.length === 0) {
+                alert("Your cart is empty or contains no active items. Add items before generating a quote.");
+                throw new Error("Cart is empty or contains no active items.");
             }
 
             // 2. Initialize PDF Document
@@ -130,11 +132,11 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
             let subtotal = 0;
             let totalLtmFee = 0; // Calculate total LTM fee across all applicable types
 
-            // Group items by embellishment type to calculate LTM correctly
-            const itemsByEmbellishment = cartContents.items.reduce((acc, item) => {
-                const type = item.embellishmentType || 'Unknown';
+            // Group items by embellishment type (using ImprintType from cart data) to calculate LTM correctly
+            const itemsByEmbellishment = activeCartItems.reduce((acc, item) => {
+                const type = item.ImprintType || 'Unknown'; // Use ImprintType from cart data
                 if (!acc[type]) acc[type] = [];
-                acc[type].push(item);
+                acc[type].push(item); // Push the original cart item structure
                 return acc;
             }, {});
 
@@ -156,31 +158,34 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
                 }
             }
 
-            // Populate table body
-            cartContents.items.forEach(item => {
-                if (!item || !item.styleNumber || !item.sizes || item.sizes.length === 0) {
+            // Populate table body using activeCartItems
+            activeCartItems.forEach(item => {
+                // Use original cart item structure (StyleNumber, Color, sizes array with Size, Quantity, UnitPrice)
+                if (!item || !item.StyleNumber || !item.sizes || !Array.isArray(item.sizes) || item.sizes.length === 0) {
                     console.warn("[PDF-GEN:SKIP] Skipping invalid item:", item);
                     return;
                 }
 
-                const itemLtmFeeApplies = ltmFeesApplied[item.embellishmentType || 'Unknown'] > 0;
+                const itemLtmFeeApplies = ltmFeesApplied[item.ImprintType || 'Unknown'] > 0;
 
                 item.sizes.forEach(sizeDetail => {
-                    if (!sizeDetail || typeof sizeDetail.quantity === 'undefined') return;
-                    const qty = parseInt(sizeDetail.quantity) || 0;
+                    // Use original size detail structure (Size, Quantity, UnitPrice)
+                    if (!sizeDetail || typeof sizeDetail.Quantity === 'undefined') return;
+                    const qty = parseInt(sizeDetail.Quantity) || 0;
                     if (qty === 0) return;
 
-                    const unitPrice = parseFloat(sizeDetail.unitPrice) || 0; // Price including LTM if applicable
-                    const lineTotal = parseFloat(sizeDetail.totalPrice) || (qty * unitPrice);
+                    const unitPrice = parseFloat(sizeDetail.UnitPrice) || 0; // Use UnitPrice
+                    // Calculate line total directly as Caspio might not provide it pre-calculated
+                    const lineTotal = qty * unitPrice;
                     subtotal += lineTotal; // Add to subtotal
 
                     tableBody.push([
-                        item.styleNumber || 'N/A',
-                        item.color || 'N/A',
-                        sizeDetail.size || 'N/A',
-                        qty,
-                        formatCurrency(unitPrice),
-                        formatCurrency(lineTotal)
+                        item.StyleNumber || 'N/A', // Use StyleNumber
+                        item.Color || 'N/A',       // Use Color
+                        sizeDetail.Size || 'N/A',   // Use Size
+                        qty,                        // Use parsed quantity
+                        formatCurrency(unitPrice),  // Use UnitPrice
+                        formatCurrency(lineTotal)   // Use calculated line total
                     ]);
                 });
             });

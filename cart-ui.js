@@ -162,10 +162,6 @@ const NWCACartUI = (function() {
       elements.submitOrderBtn.addEventListener('click', handleSubmitQuoteRequest);
     }
 
-    if (elements.downloadQuotePdfBtn) {
-      elements.downloadQuotePdfBtn.addEventListener('click', window.NWCAOrderFormPDF.generate); // Call the global function directly
-    }
-
     // Listen for cart updates
     NWCACart.addEventListener('cartUpdated', renderCart);
 
@@ -310,6 +306,27 @@ const NWCACartUI = (function() {
 
     // Update cart summary
     updateCartSummary();
+
+    // Attach PDF download listener *after* cart is rendered and summary is updated
+    // Use cloning to prevent duplicate listeners if renderCart is called multiple times
+    if (elements.downloadQuotePdfBtn) {
+        const newPdfButton = elements.downloadQuotePdfBtn.cloneNode(true);
+        elements.downloadQuotePdfBtn.parentNode.replaceChild(newPdfButton, elements.downloadQuotePdfBtn);
+        elements.downloadQuotePdfBtn = newPdfButton; // Update reference in elements object
+
+        // Only add listener if the cart is not empty
+        if (activeItems && activeItems.length > 0) {
+             elements.downloadQuotePdfBtn.disabled = false; // Ensure button is enabled
+             elements.downloadQuotePdfBtn.addEventListener('click', window.NWCAOrderFormPDF.generate);
+             debugCartUI("RENDER", "PDF download button listener attached.");
+        } else {
+             elements.downloadQuotePdfBtn.disabled = true; // Disable button if cart is empty
+             debugCartUI("RENDER", "PDF download button disabled (cart empty).");
+        }
+    } else {
+        debugCartUI("RENDER-WARN", "PDF download button element not found.");
+    }
+
      debugCartUI("RENDER", "Finished renderCart function."); // Added debug
   }
 
