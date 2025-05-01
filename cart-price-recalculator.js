@@ -149,13 +149,20 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
                 // Get pricing data for each item individually
                 if (window.PricingMatrix && typeof window.PricingMatrix.getPricingData === 'function') {
                     try {
-                        // Get pricing data for this specific item
-                        const pricingData = await window.PricingMatrix.getPricingData(
-                            item.StyleNumber,
-                            item.Color,
-                            item.ImprintType
-                        );
+                        // Get the PricingMatrixID stored with the cart item
+                        const matrixId = item.PricingMatrixID; // Assuming this field exists on the cart item
                         
+                        if (!matrixId) {
+                            console.error(`[PRICE-RECALC:ERROR] Missing PricingMatrixID for item ${item.StyleNumber} ${item.Color}. Cannot recalculate price.`);
+                            continue; // Skip this item if ID is missing
+                        }
+
+                        console.log(`[PRICE-RECALC:FETCH] Fetching pricing matrix for ID: ${matrixId}`);
+                        
+                        // Get pricing data using the specific matrix ID
+                        // Ensure the correct namespace is used (PricingMatrixAPI based on the api file)
+                        const pricingData = await window.PricingMatrixAPI.getPricingData(matrixId);
+                                                
                         if (pricingData) {
                             // Find the appropriate quantity tier
                             let tier = null;
