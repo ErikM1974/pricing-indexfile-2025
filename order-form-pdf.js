@@ -4,44 +4,121 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
 (function() {
     "use strict";
 
-    const LOGO_PLACEHOLDER_TEXT = "Northwest Custom Apparel"; // Placeholder if no image
-    const COMPANY_INFO = "123 NWCA Lane, Tacoma, WA 98424 | (253) 922-5793 | sales@nwcustomapparel.com"; // Placeholder
+    // Company information
+    const COMPANY_LOGO_URL = "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1";
+    const COMPANY_NAME = "Northwest Custom Apparel";
+    const COMPANY_ADDRESS = "2025 Freeman Road East Milton, WA 98354";
+    const COMPANY_PHONE = "253-922-5793";
+    const COMPANY_WEBSITE = "www.nwcustomapparel.com";
+    const COMPANY_EMAIL = "sales@nwcustomapparel.com";
+    const COMPANY_INFO = `${COMPANY_ADDRESS} | ${COMPANY_PHONE} | ${COMPANY_EMAIL}`;
 
     /**
      * Adds a header to the PDF page.
      * @param {jsPDF} doc - The jsPDF document instance.
      * @param {object} options - Header options (logo path, title).
      */
-    function addHeader(doc, options = {}) {
-        const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
-        const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-        const margin = 15;
-
-        // Placeholder for Logo (replace with image loading if available)
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'normal');
-        doc.setTextColor(150); // Light gray for placeholder
-        doc.text(LOGO_PLACEHOLDER_TEXT, margin, margin + 5);
-        doc.setTextColor(0); // Reset color
-
-        // Title
-        doc.setFontSize(22);
-        doc.setFont(undefined, 'bold');
-        doc.text(options.title || "Quote", pageWidth / 2, margin + 7, { align: 'center' });
-
-        // Date Generated
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'normal');
-        const generatedDate = `Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
-        doc.text(generatedDate, pageWidth - margin, margin + 5, { align: 'right' });
-
-        // Header line
-        doc.setLineWidth(0.2);
-        doc.line(margin, margin + 15, pageWidth - margin, margin + 15);
-
-        return margin + 25; // Return starting Y position for content below header
+    /**
+     * Loads an image and returns a promise that resolves with the base64 data
+     * @param {string} url - The URL of the image to load
+     * @returns {Promise<string>} - Promise resolving with base64 data
+     */
+    function loadImage(url) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";  // Handle CORS if needed
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                try {
+                    const dataURL = canvas.toDataURL('image/png');
+                    resolve(dataURL);
+                } catch (e) {
+                    reject(new Error("Failed to convert image to data URL: " + e.message));
+                }
+            };
+            img.onerror = function() {
+                reject(new Error("Failed to load image via proxy from URL: " + url)); // Updated error message
+            };
+            // Construct the proxy URL
+            const encodedUrl = encodeURIComponent(url);
+            const proxyUrl = `/api/image-proxy?url=${encodedUrl}`;
+            console.log(`[PDF-GEN:IMG] Loading image via proxy: ${proxyUrl}`); // Log proxy usage
+            img.src = proxyUrl; // Use the proxy URL
+        });
     }
 
+    /**
+     * Adds a header to the PDF page.
+     * @param {jsPDF} doc - The jsPDF document instance.
+     * @param {object} options - Header options (logo path, title).
+     */
+    async function addHeader(doc, options = {}) {
+            const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+            const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+            const margin = 15;
+            
+            try {
+                // Add company logo with more compact proportions
+                const logoData = await loadImage(COMPANY_LOGO_URL);
+                const logoHeight = 20; // Further reduced height
+                const logoWidth = 48; // Further reduced width
+                doc.addImage(logoData, 'PNG', margin, margin, logoWidth, logoHeight);
+            } catch (error) {
+                console.error("[PDF-GEN:ERROR] Failed to load logo:", error);
+                // Fallback to text if image fails to load
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text(COMPANY_NAME, margin, margin + 10);
+            }
+    
+            // Title with slightly smaller font
+            doc.setFontSize(18); // Reduced from 22
+            doc.setFont(undefined, 'bold');
+            doc.text("Quote", pageWidth / 2, margin + 12, { align: 'center' });
+    
+            // Quote Number and Date - more compact
+            doc.setFontSize(9); // Reduced from 10
+            doc.setFont(undefined, 'normal');
+            const quoteNumber = `Quote #: Q-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const generatedDate = `Date: ${new Date().toLocaleDateString()}`;
+            const validUntil = `Valid Until: ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString()}`; // 30 days from now
+            
+            // Quote details aligned right
+            doc.text(quoteNumber, pageWidth - margin, margin + 5, { align: 'right' });
+            doc.text(generatedDate, pageWidth - margin, margin + 10, { align: 'right' });
+            doc.text(validUntil, pageWidth - margin, margin + 15, { align: 'right' });
+            
+            // Add space for customer information (left side, below logo)
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'bold');
+            doc.text("Customer:", margin, margin + 30);
+            doc.setFont(undefined, 'normal');
+            doc.text("_____________________________", margin + 25, margin + 30);
+            
+            // Reference/PO field
+            doc.setFont(undefined, 'bold');
+            doc.text("PO/Ref:", margin, margin + 38);
+            doc.setFont(undefined, 'normal');
+            doc.text("_____________________________", margin + 25, margin + 38);
+    
+            // Header line
+            doc.setLineWidth(0.1); // Thinner line
+            doc.line(margin, margin + 42, pageWidth - margin, margin + 42);
+    
+            // Return starting Y position for content below header
+            return margin + 48; // Less padding after header
+    }
+
+    /**
+     * Adds a footer to the PDF page.
+     * @param {jsPDF} doc - The jsPDF document instance.
+     * @param {number} pageNumber - Current page number.
+     * @param {number} totalPages - Total number of pages.
+     */
     /**
      * Adds a footer to the PDF page.
      * @param {jsPDF} doc - The jsPDF document instance.
@@ -55,15 +132,21 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
         const footerY = pageHeight - margin;
 
         // Footer line
-        doc.setLineWidth(0.2);
-        doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+        doc.setLineWidth(0.1); // Thinner line
+        doc.line(margin, footerY - 8, pageWidth - margin, footerY - 8);
 
-        // Company Info
-        doc.setFontSize(8);
+        // Company Info - more compact
+        doc.setFontSize(7); // Reduced from 8
         doc.setFont(undefined, 'normal');
-        doc.text(COMPANY_INFO, margin, footerY);
+        const fullCompanyInfo = `${COMPANY_ADDRESS} | Ph: ${COMPANY_PHONE} | Em: ${COMPANY_EMAIL} | Web: ${COMPANY_WEBSITE}`;
+        doc.text(fullCompanyInfo, margin, footerY - 4);
+
+        // Mini disclaimer
+        doc.setFontSize(6); // Very small text
+        doc.text("Prices subject to change. Shipping and taxes not included.", margin, footerY);
 
         // Page Number
+        doc.setFontSize(7);
         const pageNumText = `Page ${pageNumber} of ${totalPages}`;
         doc.text(pageNumText, pageWidth - margin, footerY, { align: 'right' });
     }
@@ -79,6 +162,161 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
             return '$?.??';
         }
         return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(numericAmount);
+    }
+    
+    /**
+     * Sorts sizes in standard apparel order.
+     * @param {Array} sizes - Array of size objects.
+     * @returns {Array} - Sorted array of size objects.
+     */
+    function sortSizes(sizes) {
+        const sizeOrder = {
+            'S': 10,
+            'M': 20,
+            'L': 30,
+            'XL': 40,
+            '2XL': 50,
+            '3XL': 60,
+            '4XL': 70,
+            '5XL': 80
+        };
+        
+        return [...sizes].sort((a, b) => {
+            const sizeA = a.size || a.Size;
+            const sizeB = b.size || b.Size;
+            
+            // Use the defined order or default to 100 (end) if size not found
+            return (sizeOrder[sizeA] || 100) - (sizeOrder[sizeB] || 100);
+        });
+    }
+
+    /**
+     * Generates and triggers download of a quote PDF.
+     * Assumes NWCACart is available globally.
+     */
+    /**
+     * Adds product images to the PDF.
+     * @param {jsPDF} doc - The jsPDF document instance.
+     * @param {Array} items - Cart items with image URLs.
+     * @param {number} startY - Starting Y position.
+     * @returns {Promise<number>} - Promise resolving with the new Y position after adding images.
+     */
+    async function addProductImages(doc, items, startY) {
+        const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+        const margin = 15;
+        let yPos = startY;
+        
+        // Add section title
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text("Product Images", margin, yPos);
+        yPos += 10;
+        
+        // Set up improved image grid parameters (larger images, better spacing)
+        const imageWidth = 70; // Slightly larger images
+        const imageHeight = 70;
+        const imagesPerRow = 2; // 2 images per row for better layout
+        const horizontalSpacing = (pageWidth - 2 * margin - imagesPerRow * imageWidth) / (imagesPerRow - 1);
+        const verticalSpacing = 5; // Reduced vertical spacing
+        const captionHeight = 25; // Slightly smaller caption area
+        
+        // Get unique products (by StyleNumber and Color)
+        const uniqueProducts = [];
+        const uniqueKeys = new Set();
+        
+        items.forEach(item => {
+            if (!item.StyleNumber || !item.Color) return;
+            
+            const key = `${item.StyleNumber}-${item.Color}`;
+            if (!uniqueKeys.has(key)) {
+                uniqueKeys.add(key);
+                uniqueProducts.push(item);
+            }
+        });
+        
+        // Add images in a grid layout
+        let currentX = margin;
+        let currentY = yPos;
+        let itemsInCurrentRow = 0;
+        
+        for (let i = 0; i < uniqueProducts.length; i++) {
+            const item = uniqueProducts[i];
+            
+            // Check if we need to start a new row
+            if (itemsInCurrentRow === imagesPerRow) {
+                currentX = margin;
+                currentY += imageHeight + captionHeight + verticalSpacing;
+                itemsInCurrentRow = 0;
+            }
+            
+            // Check if we need to start a new page
+            if (currentY + imageHeight + captionHeight > pageHeight - margin) {
+                doc.addPage();
+                addFooter(doc, doc.internal.getNumberOfPages(), doc.internal.getNumberOfPages());
+                currentY = margin + 20;
+                currentX = margin;
+                itemsInCurrentRow = 0;
+            }
+            
+            // Try to add the image if available
+            if (item.imageUrl) {
+                try {
+                    const imageData = await loadImage(item.imageUrl);
+                    doc.addImage(imageData, 'JPEG', currentX, currentY, imageWidth, imageHeight);
+                } catch (error) {
+                    console.warn(`[PDF-GEN:WARN] Failed to load image for ${item.StyleNumber}:`, error);
+                    // Draw a placeholder rectangle
+                    doc.setDrawColor(200);
+                    doc.setFillColor(240);
+                    doc.rect(currentX, currentY, imageWidth, imageHeight, 'FD');
+                    doc.setFontSize(8);
+                    doc.setTextColor(100);
+                    doc.text("Image Not Available", currentX + imageWidth/2, currentY + imageHeight/2, { align: 'center' });
+                    doc.setTextColor(0);
+                }
+            } else {
+                // Draw a placeholder rectangle
+                doc.setDrawColor(200);
+                doc.setFillColor(240);
+                doc.rect(currentX, currentY, imageWidth, imageHeight, 'FD');
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("No Image", currentX + imageWidth/2, currentY + imageHeight/2, { align: 'center' });
+                doc.setTextColor(0);
+            }
+            
+            // Add caption with style number, color, and pricing - more compact
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'bold');
+            doc.text(item.StyleNumber || 'N/A', currentX + imageWidth/2, currentY + imageHeight + 5, { align: 'center' });
+            doc.setFont(undefined, 'normal');
+            doc.text(item.Color || 'N/A', currentX + imageWidth/2, currentY + imageHeight + 12, { align: 'center' });
+            
+            // Add pricing information
+            const unitPrice = item.sizes && item.sizes[0] ? item.sizes[0].UnitPrice : 'N/A';
+            const priceText = unitPrice !== 'N/A' ? formatCurrency(unitPrice) : 'Price: N/A';
+            doc.setFontSize(7);
+            doc.text(priceText, currentX + imageWidth/2, currentY + imageHeight + 18, { align: 'center' });
+            
+            // Move to next position
+            currentX += imageWidth + horizontalSpacing;
+            itemsInCurrentRow++;
+        }
+        
+        // Return the new Y position
+        return currentY + imageHeight + captionHeight + 10;
+    }
+
+    /**
+     * Adds embellishment information to the PDF.
+     * This function is maintained for backward compatibility but has been
+     * replaced by inline embellishment info in the main generation function.
+     */
+    function addEmbellishmentInfo(doc, items, startY) {
+        console.log("[PDF-GEN:INFO] Using inline embellishment info instead of separate section");
+        // This function is now just a stub - embellishment info is handled inline
+        return startY;
     }
 
     /**
@@ -122,12 +360,13 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
                 throw new Error("Cart is empty or contains no active items.");
             }
 
-            // 2. Initialize PDF Document
+            // 2. Initialize PDF Document (Portrait for better fitting)
             const doc = new jsPDF();
-            let yPos = addHeader(doc, { title: "Quote" }); // Add header and get starting Y
+            console.log("[PDF-GEN:INFO] Creating 2-page professional quote layout");
+            let yPos = await addHeader(doc, { title: "Quote" }); // Simplified title
 
             // 3. Prepare Table Data
-            const tableHeaders = ["Style Number", "Color", "Size", "Quantity", "Unit Price", "Line Total"];
+            const tableHeaders = ["Style Number", "Color", "Embellishment", "Size", "Quantity", "Unit Price", "Line Total"];
             const tableBody = [];
             let subtotal = 0;
             let totalLtmFee = 0; // Calculate total LTM fee across all applicable types
@@ -180,12 +419,13 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
                     subtotal += lineTotal; // Add to subtotal
 
                     tableBody.push([
-                        item.StyleNumber || 'N/A', // Use StyleNumber
-                        item.Color || 'N/A',       // Use Color
-                        sizeDetail.Size || 'N/A',   // Use Size
-                        qty,                        // Use parsed quantity
-                        formatCurrency(unitPrice),  // Use UnitPrice
-                        formatCurrency(lineTotal)   // Use calculated line total
+                        item.StyleNumber || 'N/A',    // Use StyleNumber
+                        item.Color || 'N/A',          // Use Color
+                        item.ImprintType || 'N/A',    // Add embellishment type
+                        sizeDetail.Size || 'N/A',     // Use Size
+                        qty,                          // Use parsed quantity
+                        formatCurrency(unitPrice),    // Use UnitPrice
+                        formatCurrency(lineTotal)     // Use calculated line total
                     ]);
                 });
             });
@@ -196,46 +436,116 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
             // For simplicity, we'll assume line totals are final and calculate subtotal from them.
             // The displayed LTM fee below will be the total fee amount.
 
-            // 4. Add Items Table
-            if (tableBody.length > 0) {
+            // Group items by style number to make the table more compact
+            const groupedTableBody = [];
+            const groupedItems = {};
+            
+            tableBody.forEach(row => {
+                const styleNumber = row[0];
+                const color = row[1];
+                const embellishment = row[2];
+                const styleColorEmb = `${styleNumber}-${color}-${embellishment}`;
+                
+                if (!groupedItems[styleColorEmb]) {
+                    groupedItems[styleColorEmb] = {
+                        styleNumber,
+                        color,
+                        embellishment,
+                        sizes: []
+                    };
+                }
+                
+                groupedItems[styleColorEmb].sizes.push({
+                    size: row[3],
+                    quantity: row[4],
+                    unitPrice: row[5],
+                    lineTotal: row[6]
+                });
+            });
+            
+            // Create grouped table rows
+            Object.values(groupedItems).forEach(item => {
+                // Sort sizes in standard order (S, M, L, XL, 2XL, etc.)
+                const sortedSizes = sortSizes(item.sizes);
+                
+                // For each size, show the style number, color, and embellishment
+                sortedSizes.forEach((size, index) => {
+                    groupedTableBody.push([
+                        item.styleNumber, // Always show style number
+                        item.color,       // Always show color
+                        item.embellishment, // Always show embellishment
+                        size.size,
+                        size.quantity,
+                        size.unitPrice,
+                        size.lineTotal
+                    ]);
+                });
+                
+                // Add a subtle separator row after each style group (except the last one)
+                if (sortedSizes.length > 0) {
+                    // Use a lightweight separator instead of a completely empty row
+                    groupedTableBody.push([
+                        "---", "", "", "", "", "", ""
+                    ]);
+                }
+            });
+            
+            // Remove the last separator row if it exists (to prevent extra space at the end)
+            if (groupedTableBody.length > 0 && groupedTableBody[groupedTableBody.length-1][0] === "---") {
+                groupedTableBody.pop();
+            }
+
+            // 4. Add Items Table with more compact settings
+            if (groupedTableBody.length > 0) {
                 doc.autoTable({
                     head: [tableHeaders],
-                    body: tableBody,
+                    body: groupedTableBody,
                     startY: yPos,
+                    margin: { left: 30, right: 30 }, // Increased margins to center the table
                     theme: 'grid',
-                    headStyles: { fillColor: [0, 86, 179], textColor: 255, fontStyle: 'bold' }, // NWCA Blue Header
-                    styles: { fontSize: 9, cellPadding: 2, valign: 'middle' },
+                    headStyles: { fillColor: [0, 86, 179], textColor: 255, fontStyle: 'bold', fontSize: 8 }, // NWCA Blue Header
+                    styles: { fontSize: 8, cellPadding: 2, valign: 'middle', lineWidth: 0.1 }, // Slightly increased padding
+                    // Custom row styling for separator rows
+                    createdRow: function(row, data, index) {
+                        if (data[0] === "---") {
+                            // Make separator rows more subtle
+                            doc.setTextColor(200, 200, 200); // Light gray
+                            doc.setFontSize(6); // Smaller text
+                            // Replace the "---" with a thin line indication
+                            data[0] = ""; // Clear the text
+                        }
+                    },
                     columnStyles: {
-                        0: { cellWidth: 30 }, // Style
-                        1: { cellWidth: 35 }, // Color
-                        2: { cellWidth: 20 }, // Size
-                        3: { cellWidth: 20, halign: 'right' }, // Quantity
-                        4: { cellWidth: 30, halign: 'right' }, // Unit Price
-                        5: { cellWidth: 30, halign: 'right' }  // Line Total
+                        0: { cellWidth: 22 },                  // Style
+                        1: { cellWidth: 22 },                  // Color
+                        2: { cellWidth: 27 },                  // Embellishment
+                        3: { cellWidth: 13 },                  // Size
+                        4: { cellWidth: 13, halign: 'right' }, // Quantity
+                        5: { cellWidth: 22, halign: 'right' }, // Unit Price
+                        6: { cellWidth: 24, halign: 'right' }  // Line Total - increased width slightly
                     },
                     didDrawPage: function (data) {
                         // Add Footer to each page
                         addFooter(doc, data.pageNumber, doc.internal.getNumberOfPages());
                     }
                 });
-                yPos = doc.lastAutoTable.finalY + 10; // Update yPos after table
+                yPos = doc.lastAutoTable.finalY + 5; // Reduced spacing after table
             } else {
                  doc.text("No items with quantity found in the cart.", 15, yPos);
                  yPos += 10;
             }
 
-            // 5. Add Summary Section
-            const summaryX = 140; // X position for summary labels/values
+            // 5. Add Summary and Embellishment Information side by side
+            const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+            const summaryX = 150; // Adjusted X position for summary labels/values to align with Line Total column
             const summaryWidth = 55; // Width for alignment
             const grandTotal = subtotal; // Grand total is the sum of line totals
-
-            doc.setFontSize(10);
+            
+            // Left side: Summary
+            const initialYPos = yPos; // Store initial Y position
+            
+            doc.setFontSize(9);
             doc.setFont(undefined, 'normal');
-
-            // Subtotal (calculated from line totals)
-            // doc.text("Subtotal:", summaryX, yPos, { align: 'right', maxWidth: summaryWidth });
-            // doc.text(formatCurrency(subtotal - totalLtmFee), summaryX + summaryWidth, yPos, { align: 'right' }); // If line totals include LTM
-            // yPos += 6;
 
             // Less Than Minimum Fee
             if (totalLtmFee > 0) {
@@ -247,13 +557,83 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
             }
 
             // Grand Total
-            doc.setFontSize(12);
+            doc.setFontSize(11); // Slightly smaller font
             doc.setFont(undefined, 'bold');
             doc.text("Grand Total:", summaryX, yPos, { align: 'right', maxWidth: summaryWidth });
             doc.text(formatCurrency(grandTotal), summaryX + summaryWidth, yPos, { align: 'right' });
-            yPos += 10;
-
-            // 6. Save PDF
+            yPos += 8;
+            
+            // Right side: Embellishment Information (more compact version)
+            yPos = initialYPos; // Reset Y position
+            const embX = 15; // Left side of page
+            
+            // Add compact embellishment info
+            // Group items by embellishment type
+            const embellishmentTypes = {};
+            activeCartItems.forEach(item => {
+                const type = item.ImprintType || 'Unknown';
+                if (!embellishmentTypes[type]) {
+                    embellishmentTypes[type] = [];
+                }
+                embellishmentTypes[type].push(item);
+            });
+            
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'bold');
+            doc.text("Embellishment Information:", embX, yPos);
+            yPos += 6;
+            
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            
+            for (const type in embellishmentTypes) {
+                const items = embellishmentTypes[type];
+                let totalQuantity = 0;
+                
+                items.forEach(item => {
+                    if (item.sizes && Array.isArray(item.sizes)) {
+                        item.sizes.forEach(size => {
+                            totalQuantity += parseInt(size.Quantity) || 0;
+                        });
+                    }
+                });
+                
+                doc.text(`${type}: ${items.length} product(s), ${totalQuantity} pcs`, embX, yPos);
+                yPos += 5; // Reduced line spacing
+            }
+            
+            // Move to the greatest Y position after both sections
+            yPos = Math.max(yPos, initialYPos + 15);
+            
+            // 6. Add condensed Terms and Conditions at the bottom of page 1
+            yPos += 5;
+            doc.setLineWidth(0.1);
+            doc.line(15, yPos, pageWidth - 15, yPos);
+            yPos += 5;
+            
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'bold');
+            doc.text("Terms and Conditions", 15, yPos);
+            yPos += 5;
+            
+            doc.setFontSize(7);
+            doc.setFont(undefined, 'normal');
+            
+            // More condensed terms format
+            const terms = "This quote is valid for 30 days from the date of issue. Prices are subject to change without notice after the validity period. " +
+                          "Shipping, taxes, and additional fees are not included in this quote. Production time begins after approval of artwork and payment. " +
+                          "Please review all details carefully before placing your order. Thank you for your business!";
+            
+            // Use multiline text with max width
+            const splitTerms = doc.splitTextToSize(terms, pageWidth - 30);
+            doc.text(splitTerms, 15, yPos);
+            
+            // 7. Add Product Images on a new page
+            doc.addPage();
+            addFooter(doc, doc.internal.getNumberOfPages(), doc.internal.getNumberOfPages());
+            yPos = await addProductImages(doc, activeCartItems, 15);
+            
+            // 9. Save PDF
             const filename = `NWCA_Quote_${new Date().toISOString().slice(0, 10)}.pdf`;
             doc.save(filename);
             console.log(`[PDF-GEN:SUCCESS] Quote PDF "${filename}" generated.`);

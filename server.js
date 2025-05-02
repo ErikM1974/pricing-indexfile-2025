@@ -470,6 +470,46 @@ app.get('/api/pricing-matrix/:id', async (req, res) => {
   }
 });
 
+// NEW: Image Proxy Endpoint
+app.get('/api/image-proxy', async (req, res) => {
+  const imageUrl = req.query.url;
+
+  if (!imageUrl) {
+    return res.status(400).send('Missing image URL parameter');
+  }
+
+  try {
+    // Basic validation to prevent fetching non-http URLs (could be enhanced)
+    if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+        return res.status(400).send('Invalid image URL protocol');
+    }
+
+    console.log(`[Image Proxy] Fetching: ${imageUrl}`);
+    const externalResponse = await fetch(imageUrl);
+
+    if (!externalResponse.ok) {
+      console.error(`[Image Proxy] Failed to fetch ${imageUrl}: Status ${externalResponse.status}`);
+      // Forward the status code if it's an error code, otherwise use 500
+      const statusCode = externalResponse.status >= 400 ? externalResponse.status : 500;
+      return res.status(statusCode).send(`Failed to fetch image: ${externalResponse.statusText}`);
+    }
+
+    const contentType = externalResponse.headers.get('content-type');
+    if (contentType) {
+      res.setHeader('Content-Type', contentType);
+      console.log(`[Image Proxy] Proxying ${imageUrl} with Content-Type: ${contentType}`);
+    } else {
+      console.warn(`[Image Proxy] Content-Type header missing for ${imageUrl}. Sending without Content-Type.`);
+    }
+
+    // Pipe the image data directly to the client response
+    externalResponse.body.pipe(res);
+
+  } catch (error) {
+    console.error(`[Image Proxy] Error fetching ${imageUrl}:`, error);
+    res.status(500).send('Error fetching image');
+  }
+});
 // Serve cart-integration.js for Caspio DataPages
 app.get('/api/cart-integration.js', (req, res) => {
   res.setHeader('Content-Type', 'application/javascript');
