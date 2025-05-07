@@ -92,25 +92,12 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
             doc.text(generatedDate, pageWidth - margin, margin + 10, { align: 'right' });
             doc.text(validUntil, pageWidth - margin, margin + 15, { align: 'right' });
             
-            // Add space for customer information (left side, below logo)
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'bold');
-            doc.text("Customer:", margin, margin + 30);
-            doc.setFont(undefined, 'normal');
-            doc.text("_____________________________", margin + 25, margin + 30);
-            
-            // Reference/PO field
-            doc.setFont(undefined, 'bold');
-            doc.text("PO/Ref:", margin, margin + 38);
-            doc.setFont(undefined, 'normal');
-            doc.text("_____________________________", margin + 25, margin + 38);
-    
             // Header line
             doc.setLineWidth(0.1); // Thinner line
-            doc.line(margin, margin + 42, pageWidth - margin, margin + 42);
+            doc.line(margin, margin + 30, pageWidth - margin, margin + 30);
     
             // Return starting Y position for content below header
-            return margin + 48; // Less padding after header
+            return margin + 36; // Less padding after header
     }
 
     /**
@@ -537,7 +524,7 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
 
             // 5. Add Summary and Embellishment Information side by side
             const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-            const summaryX = 150; // Adjusted X position for summary labels/values to align with Line Total column
+            const summaryX = 115; // Adjusted X position further left for Sub Total centering
             const summaryWidth = 55; // Width for alignment
             const grandTotal = subtotal; // Grand total is the sum of line totals
             
@@ -556,10 +543,10 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
                 yPos += 6;
             }
 
-            // Grand Total
+            // Sub Total
             doc.setFontSize(11); // Slightly smaller font
             doc.setFont(undefined, 'bold');
-            doc.text("Grand Total:", summaryX, yPos, { align: 'right', maxWidth: summaryWidth });
+            doc.text("Sub Total:", summaryX, yPos, { align: 'right', maxWidth: summaryWidth });
             doc.text(formatCurrency(grandTotal), summaryX + summaryWidth, yPos, { align: 'right' });
             yPos += 8;
             
