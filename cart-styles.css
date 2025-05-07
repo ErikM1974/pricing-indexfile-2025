@@ -2,9 +2,9 @@
 
 /* General Styles */
 body {
-    font-family: Arial, sans-serif;
-    color: #333;
-    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Aligned with pricing-pages.css */
+    color: #333; /* var(--text-color) */
+    background-color: #f8f9fa; /* var(--background-light) */
 }
 
 .container {
@@ -103,25 +103,76 @@ h1, h2, h3, h4, h5, h6 {
 /* Cart Items */
 .cart-item {
     margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    border: 1px solid #ddd; /* var(--border-color) */
+    border-radius: 8px; /* var(--radius-md) */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* var(--shadow-sm) */
+    /* Note: Bootstrap .card-body handles padding. The inline border-left from JS remains. */
 }
 
 .cart-item-image {
     max-width: 100%;
     height: auto;
     border: 1px solid #eee;
+.cart-item-image:hover {
+    opacity: 0.9;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+.img-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+.item-embellishment.badge { /* Be specific to override Bootstrap if needed */
+    padding: 0.35em 0.6em; /* Slightly more padding than default Bootstrap badge */
+    font-size: 0.8rem;
+    border-radius: 6px; /* Softer radius */
+    /* color: white; is set inline, which is fine */
+    /* background-color is set inline, which is fine */
+    font-weight: 500;
+}
+    height: 150px; /* Match image height */
+    background-color: #f0f0f0; /* Lighter than bg-light */
+    border: 1px solid #ddd; /* var(--border-color) */
+    border-radius: 5px; /* var(--radius-sm) */
+    text-align: center;
+    color: #888; /* Darker text-muted */
+.embellishment-options-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 0;
+    font-size: 0.85em; /* Slightly smaller for options */
+    color: #555; /* Slightly darker than default #666 */
+}
+
+.embellishment-options-list .embellishment-option-item {
+    margin-bottom: 4px; /* Increased spacing slightly */
+    padding-left: 5px; /* Small indent for items */
+}
+
+.embellishment-options-list .embellishment-option-item strong {
+    color: #333; /* Darker color for the option name */
+}
+}
+
+.img-placeholder small {
+    font-size: 0.85em;
+}
     border-radius: 5px;
 }
 
 .cart-item-title {
     font-weight: bold;
     margin-bottom: 10px;
+    color: #212529; /* Bootstrap's default dark heading color, or var(--primary-color) if available */
+    font-size: 1.1rem; /* Slightly larger than default h5 if needed */
 }
 
 .cart-item-style,
 .cart-item-color,
 .cart-item-embellishment-type {
+.cart-item-sizes .cart-item-size-row:nth-child(even) {
+    background-color: #f0f0f0; /* A slightly different shade for even rows */
+}
     margin-bottom: 5px;
     font-size: 14px;
 }
@@ -134,13 +185,23 @@ h1, h2, h3, h4, h5, h6 {
 
 .cart-item-embellishment-options p {
     margin-bottom: 3px;
+.cart-item-sizes {
+    margin-top: 15px; /* Add some top margin for spacing */
+    padding-top: 15px; /* Add some padding above the header */
+    border-top: 1px solid #eee; /* A light border for separation */
+}
 }
 
 /* Size and Quantity Controls */
-.size-item {
+.cart-item-size-row { /* Renamed from .size-item to match cart-ui.js */
     margin-bottom: 10px;
-    padding: 5px 0;
+    padding: 8px 5px; /* Increased padding slightly */
     border-bottom: 1px solid #eee;
+    background-color: #f8f9fa; /* Moved from inline style */
+}
+#cart-summary #cart-total {
+    font-size: 1.25rem; /* Larger font size */
+    color: #0056b3; /* Simulating var(--primary-color) */
 }
 
 .size-label {
@@ -154,9 +215,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .quantity-input {
-    width: 60px;
+    width: 70px; /* Slightly wider for better touch targets / readability */
     text-align: center;
     margin: 0 5px;
+    padding: 0.25rem 0.5rem; /* Bootstrap .form-control-sm like padding */
+    border: 1px solid #ced4da; /* Bootstrap default border color */
+    border-radius: 0.2rem; /* Bootstrap default border-radius */
+    font-size: 0.9rem;
+    height: auto; /* Ensure it sizes with padding */
 }
 
 .size-price {
@@ -167,8 +233,11 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Cart Summary */
 #cart-summary {
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
+    background-color: #e6f0ff; /* Simulating var(--primary-light) */
+    border: 1px solid #cce0ff; /* A slightly darker shade of the background */
+    border-left: 4px solid #0056b3; /* Simulating var(--primary-color) */
+    padding: 15px; /* Ensure padding is applied if card-body is removed or overridden */
+    border-radius: 8px; /* var(--radius-md) */
 }
 
 .cart-actions {
