@@ -549,6 +549,8 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
             }
 
             // --- Summary Section ---
+            const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+            const margin = 15; // Ensure margin is defined in this scope
             const summaryStartY = yPos;
             const summaryBlockWidth = 70; // Width of the summary block
             const summaryBlockX = pageWidth - margin - summaryBlockWidth; // Align to right
