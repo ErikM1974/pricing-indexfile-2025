@@ -482,145 +482,162 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
                 groupedTableBody.pop();
             }
 
-            // 4. Add Items Table with more compact settings
+            // 4. Add Items Table with modern styling
             if (groupedTableBody.length > 0) {
+                const tableStartY = yPos;
                 doc.autoTable({
                     head: [tableHeaders],
                     body: groupedTableBody,
-                    startY: yPos,
-                    margin: { left: 30, right: 30 }, // Increased margins to center the table
-                    theme: 'grid',
-                    headStyles: { fillColor: [0, 86, 179], textColor: 255, fontStyle: 'bold', fontSize: 8 }, // NWCA Blue Header
-                    styles: { fontSize: 8, cellPadding: 2, valign: 'middle', lineWidth: 0.1 }, // Slightly increased padding
-                    // Custom row styling for separator rows
-                    createdRow: function(row, data, index) {
-                        if (data[0] === "---") {
-                            // Make separator rows more subtle
-                            doc.setTextColor(200, 200, 200); // Light gray
-                            doc.setFontSize(6); // Smaller text
-                            // Replace the "---" with a thin line indication
-                            data[0] = ""; // Clear the text
+                    startY: tableStartY,
+                    margin: { left: 15, right: 15 }, // Use standard margins
+                    theme: 'striped', // Use striped theme for modern look
+                    headStyles: {
+                        fillColor: [41, 128, 185], // Professional blue
+                        textColor: 255,
+                        fontStyle: 'bold',
+                        fontSize: 9, // Slightly larger header font
+                        halign: 'center'
+                    },
+                    styles: {
+                        fontSize: 8,
+                        font: 'helvetica', // Consistent font
+                        cellPadding: 3, // More padding
+                        valign: 'middle',
+                        lineWidth: 0.1,
+                        lineColor: [220, 220, 220] // Lighter grid lines
+                    },
+                    alternateRowStyles: {
+                        fillColor: [245, 245, 245] // Light gray for striping
+                    },
+                    // Custom styling for separator rows (now handled differently)
+                    willDrawCell: function(data) {
+                        // Remove the visual separator row content if it exists
+                        if (data.row.raw[0] === "---") {
+                            // Instead of drawing text, maybe draw a thin line or just skip
+                            // For now, let's just make the text white to hide it
+                            doc.setTextColor(255, 255, 255);
+                            // Or prevent drawing the cell content entirely if possible
                         }
                     },
+                    didParseCell: function(data) {
+                        // Hide the separator row content cleanly
+                         if (data.row.raw[0] === "---") {
+                             data.cell.text = ''; // Clear text
+                             // Optionally set styles to make it blend
+                             data.cell.styles.fillColor = '#ffffff'; // White background
+                             data.cell.styles.lineWidth = 0; // No border
+                         }
+                    },
                     columnStyles: {
-                        0: { cellWidth: 22 },                  // Style
-                        1: { cellWidth: 22 },                  // Color
-                        2: { cellWidth: 27 },                  // Embellishment
-                        3: { cellWidth: 13 },                  // Size
-                        4: { cellWidth: 13, halign: 'right' }, // Quantity
-                        5: { cellWidth: 22, halign: 'right' }, // Unit Price
-                        6: { cellWidth: 24, halign: 'right' }  // Line Total - increased width slightly
+                        // Adjust widths for better balance - total width approx 180 (pageWidth - 2*margin)
+                        0: { cellWidth: 25, fontStyle: 'bold' }, // Style (slightly wider, bold)
+                        1: { cellWidth: 25 },                  // Color
+                        2: { cellWidth: 30 },                  // Embellishment
+                        3: { cellWidth: 15, halign: 'center' }, // Size (centered)
+                        4: { cellWidth: 20, halign: 'right' }, // Quantity
+                        5: { cellWidth: 30, halign: 'right' }, // Unit Price
+                        6: { cellWidth: 35, halign: 'right', fontStyle: 'bold' } // Line Total (wider, bold)
                     },
                     didDrawPage: function (data) {
-                        // Add Footer to each page
                         addFooter(doc, data.pageNumber, doc.internal.getNumberOfPages());
                     }
                 });
-                yPos = doc.lastAutoTable.finalY + 5; // Reduced spacing after table
+                yPos = doc.lastAutoTable.finalY + 10; // More spacing after table
             } else {
                  doc.text("No items with quantity found in the cart.", 15, yPos);
                  yPos += 10;
             }
 
-            // 5. Add Summary and Embellishment Information side by side
-            const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-            const summaryX = 115; // Adjusted X position further left for Sub Total centering
-            const summaryWidth = 55; // Width for alignment
-            const grandTotal = subtotal; // Grand total is the sum of line totals
-            
-            // Left side: Summary
-            const initialYPos = yPos; // Store initial Y position
-            
+            // --- Summary Section ---
+            const summaryStartY = yPos;
+            const summaryBlockWidth = 70; // Width of the summary block
+            const summaryBlockX = pageWidth - margin - summaryBlockWidth; // Align to right
+            const summaryLineHeight = 6;
+
+            doc.setFont('helvetica', 'normal');
             doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
+
+            // Sub Total
+            doc.text("Sub Total:", summaryBlockX, summaryStartY);
+            doc.text(formatCurrency(subtotal), summaryBlockX + summaryBlockWidth, summaryStartY, { align: 'right' });
+            yPos = summaryStartY + summaryLineHeight;
 
             // Less Than Minimum Fee
             if (totalLtmFee > 0) {
                 doc.setTextColor(220, 53, 69); // Red for LTM
-                doc.text("Less Than Minimum Fee:", summaryX, yPos, { align: 'right', maxWidth: summaryWidth });
-                doc.text(formatCurrency(totalLtmFee), summaryX + summaryWidth, yPos, { align: 'right' });
+                doc.text("Less Than Minimum Fee:", summaryBlockX, yPos);
+                doc.text(formatCurrency(totalLtmFee), summaryBlockX + summaryBlockWidth, yPos, { align: 'right' });
                 doc.setTextColor(0); // Reset color
-                yPos += 6;
+                yPos += summaryLineHeight;
             }
 
-            // Sub Total
-            doc.setFontSize(11); // Slightly smaller font
-            doc.setFont(undefined, 'bold');
-            doc.text("Sub Total:", summaryX, yPos, { align: 'right', maxWidth: summaryWidth });
-            doc.text(formatCurrency(grandTotal), summaryX + summaryWidth, yPos, { align: 'right' });
-            yPos += 8;
-            
-            // Right side: Embellishment Information (more compact version)
-            yPos = initialYPos; // Reset Y position
-            const embX = 15; // Left side of page
-            
-            // Add compact embellishment info
-            // Group items by embellishment type
+            // Separator Line before Final Total (if needed, or just use spacing)
+            doc.setDrawColor(180, 180, 180);
+            doc.setLineWidth(0.2);
+            doc.line(summaryBlockX, yPos, summaryBlockX + summaryBlockWidth, yPos);
+            yPos += 3; // Space after line
+
+            // Final Total (Currently same as Subtotal, adjust if taxes/shipping added later)
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Total:", summaryBlockX, yPos);
+            doc.text(formatCurrency(subtotal + totalLtmFee), summaryBlockX + summaryBlockWidth, yPos, { align: 'right' });
+            yPos += summaryLineHeight + 2; // Extra space after total
+
+            // --- Embellishment Info (Below Summary or elsewhere if needed) ---
+            const embX = margin; // Position on left
+            let embY = summaryStartY; // Align top with summary block
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Embellishment Information:", embX, embY);
+            embY += summaryLineHeight;
+
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
             const embellishmentTypes = {};
             activeCartItems.forEach(item => {
                 const type = item.ImprintType || 'Unknown';
-                if (!embellishmentTypes[type]) {
-                    embellishmentTypes[type] = [];
+                if (!embellishmentTypes[type]) embellishmentTypes[type] = { count: 0, quantity: 0 };
+                embellishmentTypes[type].count++; // Count unique items per type if needed, or just total quantity
+                if (item.sizes && Array.isArray(item.sizes)) {
+                    item.sizes.forEach(size => {
+                        embellishmentTypes[type].quantity += parseInt(size.Quantity) || 0;
+                    });
                 }
-                embellishmentTypes[type].push(item);
             });
-            
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'bold');
-            doc.text("Embellishment Information:", embX, yPos);
-            yPos += 6;
-            
-            doc.setFontSize(8);
-            doc.setFont(undefined, 'normal');
-            
+
             for (const type in embellishmentTypes) {
-                const items = embellishmentTypes[type];
-                let totalQuantity = 0;
-                
-                items.forEach(item => {
-                    if (item.sizes && Array.isArray(item.sizes)) {
-                        item.sizes.forEach(size => {
-                            totalQuantity += parseInt(size.Quantity) || 0;
-                        });
-                    }
-                });
-                
-                doc.text(`${type}: ${items.length} product(s), ${totalQuantity} pcs`, embX, yPos);
-                yPos += 5; // Reduced line spacing
+                 doc.text(`${type}: ${embellishmentTypes[type].quantity} pcs`, embX, embY);
+                 embY += summaryLineHeight -1; // Tighter spacing
             }
-            
-            // Move to the greatest Y position after both sections
-            yPos = Math.max(yPos, initialYPos + 15);
-            
-            // 6. Add condensed Terms and Conditions at the bottom of page 1
-            yPos += 5;
-            doc.setLineWidth(0.1);
-            doc.line(15, yPos, pageWidth - 15, yPos);
-            yPos += 5;
-            
-            doc.setFontSize(8);
-            doc.setFont(undefined, 'bold');
-            doc.text("Terms and Conditions", 15, yPos);
-            yPos += 5;
-            
-            doc.setFontSize(7);
-            doc.setFont(undefined, 'normal');
-            
-            // More condensed terms format
+
+            // Ensure yPos is below both summary and embellishment info
+            yPos = Math.max(yPos, embY) + 10; // Space before terms
+
+            // --- Terms and Conditions ---
+            const termsStartY = yPos;
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Terms and Conditions", margin, termsStartY);
+            yPos = termsStartY + 5;
+
+            doc.setFontSize(7); // Smaller font for terms
+            doc.setFont('helvetica', 'normal');
             const terms = "This quote is valid for 30 days from the date of issue. Prices are subject to change without notice after the validity period. " +
                           "Shipping, taxes, and additional fees are not included in this quote. Production time begins after approval of artwork and payment. " +
                           "Please review all details carefully before placing your order. Thank you for your business!";
-            
-            // Use multiline text with max width
-            const splitTerms = doc.splitTextToSize(terms, pageWidth - 30);
-            doc.text(splitTerms, 15, yPos);
-            
-            // 7. Add Product Images on a new page
+            const splitTerms = doc.splitTextToSize(terms, pageWidth - (2 * margin)); // Use full width minus margins
+            doc.text(splitTerms, margin, yPos);
+            yPos += (splitTerms.length * 3.5); // Adjust Y based on number of lines
+
+            // --- Product Images Page ---
             doc.addPage();
-            addFooter(doc, doc.internal.getNumberOfPages(), doc.internal.getNumberOfPages());
-            yPos = await addProductImages(doc, activeCartItems, 15);
-            
-            // 9. Save PDF
+            addFooter(doc, doc.internal.getNumberOfPages(), doc.internal.getNumberOfPages()); // Add footer to new page
+            // Start images slightly lower
+            await addProductImages(doc, activeCartItems, margin + 10); // Pass margin + space
+
+            // --- Save PDF ---
             const filename = `NWCA_Quote_${new Date().toISOString().slice(0, 10)}.pdf`;
             doc.save(filename);
             console.log(`[PDF-GEN:SUCCESS] Quote PDF "${filename}" generated.`);
@@ -630,17 +647,16 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
             console.error("[PDF-GEN:ERROR] Failed to generate Quote PDF:", error);
             alert(`Error generating Quote PDF: ${error.message}`);
         } finally {
-            // Re-enable button
             if (generateButton) {
                 generateButton.disabled = false;
-                generateButton.textContent = 'Download Quote PDF'; // Update text
+                generateButton.textContent = 'Download Quote PDF';
             }
         }
     }
 
     // Expose the generation function globally
     window.NWCAOrderFormPDF = {
-        generate: generateQuotePDF // Point to the new function name
+        generate: generateQuotePDF
     };
 
 })();
