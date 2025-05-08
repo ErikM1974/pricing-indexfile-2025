@@ -566,17 +566,25 @@
         const specificImageUrl = productImageElement ? productImageElement.getAttribute('src') : '';
         console.log("[ADD-TO-CART] Captured product image URL from #product-image:", specificImageUrl);
 
+        // Capture current page URL information for navigation back from cart
+        const currentPageUrl = window.location.href;
+        const currentPagePath = window.location.pathname;
+        
         // Construct the final payload
         const productData = {
             styleNumber: styleNumber, color: colorCode, embellishmentType: embType,
             pricingTier: tierKey, ltmFeeApplied: ltmFeeApplies, totalQuantity: totalQuantity,
             sizes: sizesForCart,
             imageUrl: specificImageUrl, // Add the captured image URL to productData
+            sourceUrl: currentPageUrl, // Store the complete URL of the current page
+            sourcePage: currentPagePath, // Store just the page path for reference
             pricingInfo: {
                 tierKey, ltmFeeApplied: ltmFeeApplies, ltmFeeTotal, ltmFeePerItem,
                 combinedQuantity, existingCartQuantity: cartQuantity, baseUnitPrices
             }
         };
+        
+        console.log("[ADD-TO-CART] Storing source URL with item:", currentPageUrl);
 
         // Final data validation
         if (!productData.styleNumber || productData.styleNumber === 'UNKNOWN_STYLE' || !productData.color || productData.color === 'UNKNOWN_COLOR' || productData.sizes.length === 0) {

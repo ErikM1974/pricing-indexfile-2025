@@ -164,6 +164,9 @@ const NWCACartUI = (function() {
     if (elements.submitOrderBtn) {
       elements.submitOrderBtn.addEventListener('click', handleSubmitQuoteRequest);
     }
+    
+    // Initialize image zoom modal functionality
+    initImageZoomModal();
 
     // Listen for cart updates
     NWCACart.addEventListener('cartUpdated', () => {
@@ -385,7 +388,9 @@ const NWCACartUI = (function() {
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-2">
             <div>
-                 <h5 class="card-title item-title mb-1">${item.styleNumber} - ${item.color}</h5>
+                 <h5 class="card-title item-title mb-1">
+                   <a href="${createProductUrl(item)}" class="item-link" title="View product details">${item.styleNumber} - ${item.color}</a>
+                 </h5>
                  <span class="item-embellishment badge" style="background-color: ${getEmbellishmentColor(item.embellishmentType)}; color: white;">${formattedEmbType}</span>
                  <div class="mt-1">
                     <small class="text-muted">Total ${formattedEmbType} Quantity: <span class="font-weight-bold">${totalQuantityForType}</span> (${pricingTier} pricing tier)</small>
@@ -529,7 +534,133 @@ const NWCACartUI = (function() {
     }
      // --- End Saved Item Specific Logic ---
 
+    // Add click event listener to the product image
+    const itemImage = itemElement.querySelector('.item-image');
+    if (itemImage) {
+        itemImage.addEventListener('click', (event) => {
+            event.preventDefault();
+            openImageZoomModal(itemImage.src, `${item.styleNumber} - ${item.color}`);
+        });
+        
+        // Add visual cue that image is clickable
+        itemImage.title = "Click to zoom";
+    }
+
     return itemElement;
+}
+
+/**
+ * Initialize image zoom modal functionality
+ */
+function initImageZoomModal() {
+    debugCartUI("INIT", "Initializing image zoom modal");
+    
+    // Get modal elements
+    const modal = document.getElementById('image-zoom-modal');
+    const closeBtn = document.querySelector('.close-modal');
+    const modalOverlay = document.querySelector('.modal-overlay');
+    const zoomedImage = document.getElementById('zoomed-image');
+    
+    if (!modal || !closeBtn || !modalOverlay || !zoomedImage) {
+        debugCartUI("INIT-ERROR", "Could not find all required modal elements");
+        return;
+    }
+    
+    // Create an additional text close button
+    const textCloseBtn = document.createElement('button');
+    textCloseBtn.className = 'btn btn-danger modal-close-button';
+    textCloseBtn.textContent = 'Close';
+    textCloseBtn.setAttribute('aria-label', 'Close image');
+    textCloseBtn.style.position = 'absolute';
+    textCloseBtn.style.bottom = '70px';
+    textCloseBtn.style.left = '50%';
+    textCloseBtn.style.transform = 'translateX(-50%)';
+    textCloseBtn.style.zIndex = '1053';
+    modal.querySelector('.modal-content').appendChild(textCloseBtn);
+    
+    // Close modal when clicking the close button
+    closeBtn.addEventListener('click', closeImageZoomModal);
+    
+    // Close modal when clicking the text close button
+    textCloseBtn.addEventListener('click', closeImageZoomModal);
+    
+    // Close modal when clicking outside the image (on the overlay)
+    modalOverlay.addEventListener('click', closeImageZoomModal);
+    
+    // Close modal when pressing ESC key
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+            closeImageZoomModal();
+        }
+    });
+}
+
+/**
+ * Open the image zoom modal with the specified image
+ * @param {string} imageSrc - Source URL of the image to display
+ * @param {string} imageAlt - Alt text for the image
+ */
+function openImageZoomModal(imageSrc, imageAlt = 'Product Image') {
+    debugCartUI("MODAL", `Opening image zoom modal for: ${imageSrc}`);
+    
+    const modal = document.getElementById('image-zoom-modal');
+    const zoomedImage = document.getElementById('zoomed-image');
+    
+    if (!modal || !zoomedImage) {
+        debugCartUI("MODAL-ERROR", "Could not find modal elements");
+        return;
+    }
+    
+    // Set the image source and alt text
+    zoomedImage.src = imageSrc;
+    zoomedImage.alt = imageAlt;
+    
+    // Add close hint if it doesn't exist
+    let closeHint = modal.querySelector('.modal-close-hint');
+    if (!closeHint) {
+        closeHint = document.createElement('div');
+        closeHint.className = 'modal-close-hint';
+        closeHint.textContent = 'Click the X button, click outside, or press ESC to close';
+        modal.querySelector('.modal-content').appendChild(closeHint);
+    }
+    
+    // Display the modal
+    modal.style.display = 'block';
+    
+    // Add animation class after a small delay to trigger the transition
+    setTimeout(() => {
+        zoomedImage.classList.add('show');
+    }, 10);
+    
+    // Prevent page scrolling while modal is open
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Close the image zoom modal
+ */
+function closeImageZoomModal() {
+    debugCartUI("MODAL", "Closing image zoom modal");
+    
+    const modal = document.getElementById('image-zoom-modal');
+    const zoomedImage = document.getElementById('zoomed-image');
+    
+    if (!modal || !zoomedImage) {
+        debugCartUI("MODAL-ERROR", "Could not find modal elements");
+        return;
+    }
+    
+    // Remove the animation class first
+    zoomedImage.classList.remove('show');
+    
+    // Hide the modal after the animation completes
+    setTimeout(() => {
+        modal.style.display = 'none';
+        zoomedImage.src = ''; // Clear the image source
+    }, 300); // Match the transition duration
+    
+    // Re-enable page scrolling
+    document.body.style.overflow = '';
 }
 
 
@@ -679,6 +810,9 @@ function renderSizeItem(sizeInfo, itemId) {
             color: originalItem.Color, // Map Color to color
             embellishmentType: originalItem.ImprintType, // Map ImprintType to embellishmentType
             imageUrl: originalItem.imageUrl || null, // Use existing imageUrl if present
+            // Include source URL information for navigation back to product
+            sourceUrl: originalItem.sourceUrl || null, // URL stored during add-to-cart
+            sourcePage: originalItem.sourcePage || null, // Page path stored during add-to-cart
             // Parse EmbellishmentOptions if they exist and are a string
             embellishmentOptions: typeof originalItem.EmbellishmentOptions === 'string' ? JSON.parse(originalItem.EmbellishmentOptions || '{}') : (originalItem.EmbellishmentOptions || {}),
             // Map sizes array, ensuring size/quantity/unitPrice format
@@ -1092,7 +1226,7 @@ function renderSizeItem(sizeInfo, itemId) {
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div>
              <!-- Use adapted item properties -->
-            <h5 class="mb-1">${item.styleNumber} - ${item.color}</h5>
+            <h5 class="mb-1"><a href="${createProductUrl(item)}" class="item-link" title="View product details">${item.styleNumber} - ${item.color}</a></h5>
             <p class="mb-1">Embellishment: ${formatEmbellishmentType(item.embellishmentType)}</p>
             <p class="mb-1"><small class="text-muted">Total ${formatEmbellishmentType(item.embellishmentType)} Quantity: <span class="font-weight-bold">${totalQuantityForType}</span> (${pricingTier} pricing tier)</small></p>
             ${hasLtmFee ?
@@ -1456,6 +1590,45 @@ function renderSizeItem(sizeInfo, itemId) {
 
     // Default: return value as string
     return String(value);
+  }
+  
+  /**
+   * Create a product page URL based on item data
+   * @param {Object} item - Cart item data
+   * @returns {string} - URL to the product page
+   */
+  function createProductUrl(item) {
+    // First check if the item has a stored sourceUrl (from add-to-cart.js)
+    if (item.sourceUrl) {
+      return item.sourceUrl;
+    }
+    
+    // Handle custom page paths for different embellishment types
+    let pagePath = 'embroidery-pricing.html';
+    
+    // Determine the correct pricing page based on embellishment type
+    if (item.embellishmentType) {
+      const embType = item.embellishmentType.toLowerCase();
+      if (embType === 'dtg') {
+        pagePath = 'dtg-pricing.html';
+      } else if (embType === 'screen-print' || embType === 'screenprint') {
+        pagePath = 'screen-print-pricing.html';
+      } else if (embType === 'cap-embroidery') {
+        pagePath = 'cap-embroidery-pricing.html';
+      } else if (embType === 'dtf') {
+        pagePath = 'dtf-pricing.html';
+      }
+    }
+    
+    // Construct URL with style number and color
+    let url = `${pagePath}?StyleNumber=${encodeURIComponent(item.styleNumber)}`;
+    
+    // Add color parameter if available
+    if (item.color) {
+      url += `&COLOR=${encodeURIComponent(item.color)}`;
+    }
+    
+    return url;
   }
 
   // Public API
