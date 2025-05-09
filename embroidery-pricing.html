@@ -879,10 +879,6 @@
                             <!-- Will be populated by JavaScript -->
                         </div>
                         
-                        <div class="cart-info-display" id="cart-info-display" style="margin-top: 15px; padding: 10px; background-color: #f0f8ff; border-radius: 5px; border: 1px solid #d0e3ff;">
-                            <!-- Will be populated by JavaScript -->
-                        </div>
-                        
                         <style>
                             /* Enhanced Grid-based layout for add to cart */
                             .size-grid-container {
@@ -1103,31 +1099,9 @@
                             <!-- Will be dynamically populated by JavaScript -->
                         </div>
                         
-                        <div class="pricing-tier-info">
-                            <div class="tier-explanation">
-                                <h4>Current Pricing Tier: <span id="current-tier-display">1-11</span></h4>
-                                <p>Pricing is determined by your total quantity. Add more items to reach the next tier for better pricing.</p>
-                                <div class="tier-progress">
-                                    <div class="tier-progress-bar">
-                                        <div class="tier-line"></div>
-                                        <div class="tier-progress-fill" style="width: 0%"></div>
-                                    </div>
-                                    <div class="tier-progress-text">
-                                        <span id="tier-progress-message">Add more items to reach the next tier</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="ltm-explanation" style="display: none;">
-                                <h4>Less Than Minimum Fee Applied</h4>
-                                <p>Orders under 24 pieces include a $50.00 LTM fee distributed across all items.</p>
-                                <p class="ltm-applied">Current LTM fee: <span class="ltm-per-item">$0.00</span> per item</p>
-                            </div>
-                        </div>
+                        <!-- The "pricing-tier-info" div that was here has been removed as per user request -->
                         
                         <div class="size-quantity-grid" id="size-quantity-grid" style="display: none;">
-                        </div>
-                        
-                        <div id="tier-info-display" class="tier-info-display" style="display: none; margin-bottom: 15px; padding: 10px; background-color: #f5f5f5; border-radius: 5px; border: 1px solid #e0e0e0;">
                         </div>
                         
                         <!-- This .cart-summary will be the sticky summary -->
@@ -1170,7 +1144,7 @@
     <script src="/cart-price-recalculator.js"></script>
     <script src="/add-to-cart.js"></script>
     <script src="/pricing-calculator.js"></script>
-    <script src="/product-pricing-ui.js" defer></script> <!-- Added new script -->
+    <script src="/product-pricing-ui.js"></script> <!-- Added new script, removed defer -->
     
 </body>
 <script src="/order-form-pdf.js"></script>

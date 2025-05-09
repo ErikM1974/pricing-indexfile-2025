@@ -19,8 +19,16 @@ const NWCAProductPricingUI = (function() {
         stickyTotalQuantityDisplay: null,
         stickyTotalPriceDisplay: null,
         stickyAddToCartButton: null,
-        // Tier info display elements
-        tierProgressDisplay: null, // e.g., the .pricing-tier-info container
+        // Tier info display elements (within .pricing-tier-info)
+        pricingTierInfoSection: null,
+        dynamicPricingSummaryHeading: null,
+        combinedItemsMessage: null,
+        currentTierNameDisplay: null,
+        currentTierPriceDisplay: null,
+        tierProgressFill: null,
+        tierProgressMessage: null,
+        ltmExplanationSection: null,
+        ltmPerItemDisplay: null,
         // Collapsible section toggles/containers
         collapsibleSectionToggles: [],
         collapsibleSections: []
@@ -28,13 +36,16 @@ const NWCAProductPricingUI = (function() {
 
     // Configuration (example)
     const config = {
-        ltmFee: 50.00,
+        ltmFee: 50.00, // Standard LTM fee amount
+        ltmThreshold: 24, // Default LTM quantity threshold (e.g., less than 24 pieces)
         pricingTiers: [ // Example structure, actual tiers come from pricing data
             { minQty: 1, maxQty: 23, label: "1-23" },
             { minQty: 24, maxQty: 47, label: "24-47" },
             { minQty: 48, maxQty: 71, label: "48-71" },
             { minQty: 72, maxQty: Infinity, label: "72+" }
-        ]
+        ],
+        // This would ideally be fetched or configured elsewhere
+        productSpecificPricing: null // To store fetched pricing data for the current product
     };
 
     function debugProductUI(level, message, data = null) {
@@ -44,11 +55,13 @@ const NWCAProductPricingUI = (function() {
     /**
      * Initializes the product pricing UI enhancements.
      */
-    function initialize() {
+    async function initialize() {
         debugProductUI("INFO", "Initializing Product Pricing UI.");
         _cacheDOMElements();
         _bindEventListeners();
-        _initialRenderUpdates(); // Perform any initial UI updates based on page load
+        // It's better to fetch pricing data first if possible, or have it passed.
+        // For now, _initialRenderUpdates will use example data or try to fetch.
+        await _initialRenderUpdates();
     }
 
     /**
@@ -56,26 +69,35 @@ const NWCAProductPricingUI = (function() {
      */
     function _cacheDOMElements() {
         debugProductUI("INFO", "Caching DOM elements.");
-        // Example for embroidery-pricing.html structure
         elements.pricingGrid = document.getElementById('custom-pricing-grid');
-        elements.sizeQuantityInputs = document.querySelectorAll('.size-card .quantity-input'); // Adjust selector if structure changes
-        
-        // For dynamic price display, assume a structure like:
-        // <div class="size-card">...<span class="dynamic-unit-price">$0.00</span></div>
-        elements.sizePriceDisplays = document.querySelectorAll('.size-card .dynamic-unit-price'); // Placeholder selector
+        elements.sizeQuantityInputs = document.querySelectorAll('.size-card .quantity-input');
+        elements.sizePriceDisplays = document.querySelectorAll('.size-card .dynamic-unit-price');
 
-        elements.stickyCartSummaryContainer = document.getElementById('sticky-product-cart-summary'); // Assuming a new ID for this
+        elements.stickyCartSummaryContainer = document.getElementById('sticky-product-cart-summary');
         if (elements.stickyCartSummaryContainer) {
             elements.stickyTotalQuantityDisplay = elements.stickyCartSummaryContainer.querySelector('.total-quantity');
             elements.stickyTotalPriceDisplay = elements.stickyCartSummaryContainer.querySelector('.total-price');
-            elements.stickyAddToCartButton = elements.stickyCartSummaryContainer.querySelector('.add-to-cart-button'); // Assuming it's reused or similar
+            elements.stickyAddToCartButton = elements.stickyCartSummaryContainer.querySelector('.add-to-cart-button');
         }
         
-        elements.tierProgressDisplay = document.querySelector('.pricing-tier-info'); // From embroidery-pricing.html
-
-        // Example for collapsible sections (if implemented with toggles)
-        // elements.collapsibleSectionToggles = document.querySelectorAll('.collapsible-toggle');
-        // elements.collapsibleSections = document.querySelectorAll('.collapsible-content');
+        elements.pricingTierInfoSection = document.querySelector('.pricing-tier-info');
+        if (elements.pricingTierInfoSection) {
+            elements.dynamicPricingSummaryHeading = elements.pricingTierInfoSection.querySelector('#dynamic-pricing-summary');
+            elements.combinedItemsMessage = elements.pricingTierInfoSection.querySelector('#combined-items-message');
+            elements.currentTierNameDisplay = elements.pricingTierInfoSection.querySelector('#current-tier-name-display');
+            elements.currentTierPriceDisplay = elements.pricingTierInfoSection.querySelector('#current-tier-price-display');
+            
+            const tierProgressDiv = elements.pricingTierInfoSection.querySelector('.tier-progress');
+            if (tierProgressDiv) {
+                elements.tierProgressFill = tierProgressDiv.querySelector('.tier-progress-fill');
+                elements.tierProgressMessage = tierProgressDiv.querySelector('#tier-progress-message'); // Corrected from tierProgressDiv
+            }
+            
+            elements.ltmExplanationSection = elements.pricingTierInfoSection.querySelector('.ltm-explanation');
+            if (elements.ltmExplanationSection) {
+                elements.ltmPerItemDisplay = elements.ltmExplanationSection.querySelector('.ltm-per-item');
+            }
+        }
 
         debugProductUI("INFO", "DOM elements cached:", elements);
     }
@@ -87,111 +109,169 @@ const NWCAProductPricingUI = (function() {
         debugProductUI("INFO", "Binding event listeners.");
         elements.sizeQuantityInputs.forEach(input => {
             input.addEventListener('change', handleQuantityChangeOnProductPage);
-            input.addEventListener('input', handleQuantityChangeOnProductPage); // For more immediate feedback
+            input.addEventListener('input', handleQuantityChangeOnProductPage);
         });
-
-        // elements.collapsibleSectionToggles.forEach(toggle => {
-        //     toggle.addEventListener('click', (event) => toggleMobileCollapsibleSection(event.target));
-        // });
     }
 
     /**
      * Performs initial UI updates on page load.
      */
-    function _initialRenderUpdates() {
+    async function _initialRenderUpdates() {
         debugProductUI("INFO", "Performing initial render updates.");
-        // Example: Calculate initial total quantity and update UI
-        const initialTotalQuantity = _calculateTotalQuantity();
-        updateDynamicPriceDisplays(initialTotalQuantity);
-        highlightActivePricingTier(initialTotalQuantity);
-        updateStickyCartSummary(initialTotalQuantity);
+        // In a real scenario, fetch actual product pricing data and cart data here
+        // config.productSpecificPricing = await NWCALocalStorage.getItem('currentProductPricingData'); // Example
+        // config.pricingTiers = config.productSpecificPricing ? mapPricingDataToTiers(config.productSpecificPricing) : config.pricingTiers;
+        
+        const itemsCurrentlyAdding = _calculateTotalQuantityFromInputs();
+        const itemsFromCart = await _getCartItemCountForCurrentProduct(); // Placeholder for actual cart integration
+        
+        updateAllPricingDisplays(itemsCurrentlyAdding, itemsFromCart);
     }
 
     /**
-     * Calculates the total quantity from all size inputs.
-     * @returns {number} The total quantity.
+     * Calculates the total quantity from all size inputs on the current page.
+     * @returns {number} The total quantity being added.
      */
-    function _calculateTotalQuantity() {
+    function _calculateTotalQuantityFromInputs() {
         let totalQuantity = 0;
         elements.sizeQuantityInputs.forEach(input => {
             totalQuantity += parseInt(input.value, 10) || 0;
         });
-        debugProductUI("CALC", "Calculated total quantity:", totalQuantity);
+        debugProductUI("CALC", "Calculated total quantity from inputs:", totalQuantity);
         return totalQuantity;
+    }
+
+    /**
+     * Placeholder: Gets the count of the current product already in the cart.
+     * This needs to integrate with the actual cart system (e.g., NWCACart).
+     * @returns {Promise<number>}
+     */
+    async function _getCartItemCountForCurrentProduct() {
+        // const currentProductId = document.body.dataset.productId; // Assuming product ID is available
+        // if (window.NWCACart && currentProductId) {
+        //     const cartItems = await NWCACart.getCartItems();
+        //     const productInCart = cartItems.find(item => item.id === currentProductId);
+        //     return productInCart ? productInCart.quantity : 0;
+        // }
+        return 0; // Mock: No items in cart
     }
 
     /**
      * Handles quantity changes on the product page.
      * @param {Event} event - The input or change event.
      */
-    function handleQuantityChangeOnProductPage(event) {
+    async function handleQuantityChangeOnProductPage(event) {
         const input = event.target;
         const newQuantity = parseInt(input.value, 10);
 
         if (isNaN(newQuantity) || newQuantity < 0) {
-            // Optionally reset to a valid value or show a small validation message
-            input.value = input.dataset.previousValue || '0'; // Revert if invalid
+            input.value = input.dataset.previousValue || '0';
             debugProductUI("WARN", "Invalid quantity entered.", { value: input.value });
-            // Potentially show a small inline error message next to the input
             return;
         }
-        input.dataset.previousValue = newQuantity; // Store current valid value
+        input.dataset.previousValue = newQuantity;
 
-        const totalQuantity = _calculateTotalQuantity();
+        const itemsCurrentlyAdding = _calculateTotalQuantityFromInputs();
+        const itemsFromCart = await _getCartItemCountForCurrentProduct();
         
-        updateDynamicPriceDisplays(totalQuantity);
-        highlightActivePricingTier(totalQuantity);
-        updateStickyCartSummary(totalQuantity);
-        // Potentially update tier progress display as well
-        if (window.updateTierProgressDisplay) { // Check if global function from pricing-pages.js exists
-            window.updateTierProgressDisplay(totalQuantity);
+        updateAllPricingDisplays(itemsCurrentlyAdding, itemsFromCart);
+    }
+
+    /**
+     * Central function to update all dynamic pricing related displays.
+     * @param {number} itemsCurrentlyAdding - Quantity from page inputs.
+     * @param {number} itemsFromCart - Quantity of this item already in cart.
+     */
+    function updateAllPricingDisplays(itemsCurrentlyAdding, itemsFromCart, calculatedPricingData = null) {
+        if (!calculatedPricingData) {
+            debugProductUI("WARN", "updateAllPricingDisplays called without calculatedPricingData. UI might not be accurate.");
+            // Attempt to fallback or simply return if critical data is missing
+            // For now, let's try to proceed with what product-pricing-ui can derive, but this indicates an issue.
+            const combinedTotalQuantityFallback = itemsCurrentlyAdding + itemsFromCart;
+            const currentProductPricingFallback = config.productSpecificPricing || {};
+            const pricingTiersToUseFallback = currentProductPricingFallback.tiers || config.pricingTiers;
+            const currentTierFallback = getCurrentPricingTier(combinedTotalQuantityFallback, pricingTiersToUseFallback);
+            const unitPriceAtCurrentTierFallback = getUnitPriceForTier(currentTierFallback, currentProductPricingFallback);
+
+            updateDynamicPriceDisplaysPerSize(combinedTotalQuantityFallback, currentTierFallback, currentProductPricingFallback); // This will use mocks if no real data
+            highlightActivePricingTierInGrid(combinedTotalQuantityFallback, currentTierFallback);
+            // updateStickyCartSummary is handled by add-to-cart.js now
+            updateComprehensiveTierInfo(itemsCurrentlyAdding, itemsFromCart, {
+                combinedQuantity: combinedTotalQuantityFallback,
+                tierKey: currentTierFallback ? currentTierFallback.label : null,
+                tierObject: currentTierFallback,
+                // items: {}, // No specific item prices in this fallback path
+                ltmFeeApplies: combinedTotalQuantityFallback > 0 && combinedTotalQuantityFallback < (config.productSpecificPricing?.ltmThreshold || config.ltmThreshold),
+                // nextTier, quantityForNextTier would be hard to get here without full calc data
+            }, unitPriceAtCurrentTierFallback, pricingTiersToUseFallback);
+            return;
         }
+
+        debugProductUI("INFO", "updateAllPricingDisplays called with calculatedPricingData:", calculatedPricingData);
+
+        const { combinedQuantity, tierKey, items, ltmFeeApplies, ltmFeePerItem, nextTierDetails, tierObject } = calculatedPricingData;
+        const pricingTiersToUse = config.productSpecificPricing?.tiers || config.pricingTiers; // Still need all tiers for progress bar
+        
+        // Determine a representative unit price. If items exist, use the first one. Otherwise, null.
+        let representativeUnitPrice = null;
+        if (items && Object.keys(items).length > 0) {
+            const firstSizeWithData = Object.keys(items)[0];
+            if (items[firstSizeWithData] && items[firstSizeWithData].displayUnitPrice !== undefined) {
+                representativeUnitPrice = items[firstSizeWithData].displayUnitPrice;
+            }
+        }
+        
+        // The currentTier object should ideally come from calculatedPricingData.tierObject
+        // If not, derive it from tierKey and pricingTiersToUse
+        const currentTierFull = tierObject || getCurrentPricingTier(combinedQuantity, pricingTiersToUse);
+
+
+        updateDynamicPriceDisplaysPerSize(calculatedPricingData); // Pass the whole object
+        highlightActivePricingTierInGrid(combinedQuantity, currentTierFull);
+        // updateStickyCartSummary is now primarily handled by add-to-cart.js
+        // updateComprehensiveTierInfo call removed as the target HTML section is deleted.
+        debugProductUI("INFO", "Skipping updateComprehensiveTierInfo as its HTML section was removed.");
     }
 
     /**
      * Updates the price displayed next to each size's quantity input.
-     * This function will need access to the product's pricing matrix/data.
-     * @param {number} totalQuantity - The current total quantity for the item.
+     * @param {number} combinedTotalQuantity - For determining the tier.
+     * @param {object} calculatedPricingData - The comprehensive pricing data object from pricing-calculator.
      */
-    function updateDynamicPriceDisplays(totalQuantity) {
-        debugProductUI("UI-UPDATE", "Updating dynamic price displays for total quantity:", totalQuantity);
-        const currentTier = getCurrentPricingTier(totalQuantity);
+    function updateDynamicPriceDisplaysPerSize(calculatedPricingData) {
+        if (!calculatedPricingData || !calculatedPricingData.items) {
+            debugProductUI("WARN", "updateDynamicPriceDisplaysPerSize: Missing calculatedPricingData or items.", calculatedPricingData);
+            elements.sizeQuantityInputs.forEach(input => {
+                const priceDisplayElement = input.closest('.size-card')?.querySelector('.dynamic-unit-price');
+                if (priceDisplayElement) priceDisplayElement.textContent = "N/A";
+            });
+            return;
+        }
+        debugProductUI("UI-UPDATE", "Updating dynamic price displays per size using calculatedPricingData.items", calculatedPricingData.items);
         
-        // This is a placeholder. Actual pricing logic will be complex.
-        // It needs to:
-        // 1. Get the base pricing matrix for the product.
-        // 2. Determine the correct price column based on `currentTier`.
-        // 3. For each size input, find its corresponding price in that column.
-        // 4. Update the `dynamic-unit-price` span for that size.
-
-        elements.sizeQuantityInputs.forEach((input, index) => {
-            const size = input.dataset.size; // Assuming data-size attribute exists
-            const priceDisplayElement = input.closest('.size-card').querySelector('.dynamic-unit-price'); // Adjust selector
+        elements.sizeQuantityInputs.forEach((input) => {
+            const size = input.dataset.size;
+            const priceDisplayElement = input.closest('.size-card')?.querySelector('.dynamic-unit-price');
 
             if (priceDisplayElement) {
-                // Placeholder: Fetch actual price for this size at this tier
-                // This would involve calling a function that has access to the pricing data,
-                // similar to how pricing-calculator.js or pricing-matrix-api.js works.
-                // For now, let's simulate:
-                let unitPrice = "N/A"; 
-                if (currentTier) {
-                    // Example: const productPricingData = NWCALocalStorage.getItem('currentProductPricingData');
-                    // unitPrice = getPriceForSizeAndTier(size, currentTier.label, productPricingData);
-                    // For demonstration, let's use a mock price.
-                    // This needs to be replaced with actual price lookup logic.
-                    const mockBasePrice = parseFloat(input.dataset.basePrice || "10.00"); // Assume a base price for demo
-                    unitPrice = calculateTieredPrice(mockBasePrice, currentTier.label); // Simplified mock
+                let unitPriceText = "N/A";
+                if (calculatedPricingData.items[size] && calculatedPricingData.items[size].displayUnitPrice !== undefined) {
+                    const unitPrice = parseFloat(calculatedPricingData.items[size].displayUnitPrice);
+                    if (!isNaN(unitPrice)) {
+                        unitPriceText = `$${unitPrice.toFixed(2)}`;
+                    }
                 }
-                
-                priceDisplayElement.textContent = unitPrice !== "N/A" ? `$${unitPrice.toFixed(2)}` : "N/A";
+                priceDisplayElement.textContent = unitPriceText;
             }
         });
     }
     
     /**
-     * MOCK: Calculates a tiered price. Replace with actual logic.
+     * MOCK: Calculates a tiered price. Replace with actual logic from pricing data.
      */
     function calculateTieredPrice(basePrice, tierLabel) {
+        // This function should ideally not be needed if productPricingData is comprehensive.
+        // It's a fallback.
         if (tierLabel === "72+") return basePrice * 0.8;
         if (tierLabel === "48-71") return basePrice * 0.85;
         if (tierLabel === "24-47") return basePrice * 0.9;
@@ -199,12 +279,38 @@ const NWCAProductPricingUI = (function() {
     }
 
     /**
-     * Updates the content of the sticky cart summary.
-     * @param {number} totalQuantity - The current total quantity for the item.
+     * Placeholder: Gets the unit price for a given tier from product pricing data.
+     * This is a simplified version. Real logic would depend on productPricingData structure.
+     * @param {object} tier - The current tier object.
+     * @param {object} productPricingData - The product's pricing data.
+     * @returns {number|null}
      */
-    function updateStickyCartSummary(totalQuantity) {
+    function getUnitPriceForTier(tier, productPricingData) {
+        if (!tier || !productPricingData) return null;
+        // This is a MAJOR simplification. Assumes a general price for the tier.
+        // In reality, price can vary by size even within the same tier.
+        // The `updateDynamicPriceDisplaysPerSize` is more accurate for individual size prices.
+        // This function might return an "average" or "starting at" price for the tier if needed for summary.
+        // For now, let's use the first size's price at that tier as a representative.
+        if (productPricingData.sizes) {
+            const firstSizeKey = Object.keys(productPricingData.sizes)[0];
+            if (firstSizeKey && productPricingData.sizes[firstSizeKey].prices_by_tier_label) {
+                const price = productPricingData.sizes[firstSizeKey].prices_by_tier_label[tier.label];
+                return price !== undefined ? parseFloat(price) : null;
+            }
+        }
+        return calculateTieredPrice(10.00, tier.label); // Fallback to mock
+    }
+
+    /**
+     * Updates the content of the sticky cart summary.
+     * @param {number} itemsCurrentlyAdding - Quantity from page inputs.
+     * @param {number|null} unitPriceAtCurrentTier - Representative unit price for the current tier.
+     * @param {number} combinedTotalQuantity - Combined quantity for LTM check.
+     */
+    function updateStickyCartSummary(itemsCurrentlyAdding, unitPriceAtCurrentTier, combinedTotalQuantity) {
         if (!elements.stickyCartSummaryContainer) return;
-        debugProductUI("UI-UPDATE", "Updating sticky cart summary for total quantity:", totalQuantity);
+        debugProductUI("UI-UPDATE", "Updating sticky cart summary for items adding:", itemsCurrentlyAdding);
 
         let estimatedTotalPrice = 0;
         // Calculate estimated total price based on individual size quantities and their dynamic prices
@@ -219,57 +325,161 @@ const NWCAProductPricingUI = (function() {
             }
         });
         
-        // Handle LTM fee if applicable (this logic might be more complex)
-        const ltmFeeApplies = totalQuantity > 0 && totalQuantity < getLtmThreshold(); // e.g., 24
+        const ltmFeeThreshold = config.productSpecificPricing?.ltmThreshold || config.ltmThreshold;
+        const ltmFeeAmount = config.productSpecificPricing?.ltmFee || config.ltmFee;
+        const ltmFeeApplies = combinedTotalQuantity > 0 && combinedTotalQuantity < ltmFeeThreshold;
+        
         if (ltmFeeApplies) {
-            estimatedTotalPrice += config.ltmFee; 
-            // TODO: Show LTM fee notice in sticky summary
+            estimatedTotalPrice += ltmFeeAmount;
+        }
+        // Update LTM notice in sticky summary (assuming an element exists, e.g., .ltm-fee-notice)
+        const ltmNoticeElement = elements.stickyCartSummaryContainer.querySelector('.ltm-fee-notice');
+        if (ltmNoticeElement) {
+            ltmNoticeElement.style.display = ltmFeeApplies ? 'flex' : 'none';
         }
 
-
         if (elements.stickyTotalQuantityDisplay) {
-            elements.stickyTotalQuantityDisplay.textContent = totalQuantity;
+            elements.stickyTotalQuantityDisplay.textContent = itemsCurrentlyAdding; // Show only items being added now
         }
         if (elements.stickyTotalPriceDisplay) {
             elements.stickyTotalPriceDisplay.textContent = `$${estimatedTotalPrice.toFixed(2)}`;
         }
         if (elements.stickyAddToCartButton) {
-            elements.stickyAddToCartButton.disabled = totalQuantity === 0;
+            elements.stickyAddToCartButton.disabled = itemsCurrentlyAdding === 0;
         }
     }
     
-    function getLtmThreshold() {
-        // Find the start of the first tier that doesn't have LTM
-        // This assumes tiers are sorted by minQty
-        const firstNonLtmTier = config.pricingTiers.find(tier => tier.minQty >= 24); // Example threshold
-        return firstNonLtmTier ? firstNonLtmTier.minQty : 24;
-    }
+    /**
+     * Updates the comprehensive pricing tier information display.
+     * @param {number} itemsCurrentlyAdding - Quantity from page inputs.
+     * @param {number} itemsFromCart - Quantity of this item already in cart.
+     * @param {number} itemsCurrentlyAdding - Quantity from page inputs.
+     * @param {number} itemsFromCart - Quantity of this item already in cart.
+     * @param {object} calculatedPricingData - The comprehensive pricing data from pricing-calculator.
+     * @param {number|null} representativeUnitPrice - A representative unit price for the current tier (can be null).
+     * @param {Array} allPricingTiersForProgress - Array of all tier objects, primarily for progress bar.
+     */
+    // function updateComprehensiveTierInfo(itemsCurrentlyAdding, itemsFromCart, calculatedPricingData, representativeUnitPrice, allPricingTiersForProgress) {
+    //     // This function is no longer called as its target HTML section was removed.
+    //     // Keeping the function definition commented out for now in case parts of its logic are needed elsewhere,
+    //     // or if the section is reinstated later.
+    //     /*
+    //     if (!elements.pricingTierInfoSection || !calculatedPricingData) {
+    //         debugProductUI("WARN", "updateComprehensiveTierInfo: Missing elements or calculatedPricingData.", {
+    //             hasElements: !!elements.pricingTierInfoSection,
+    //             hasData: !!calculatedPricingData
+    //         });
+    //         return;
+    //     }
 
+    //     const { combinedQuantity, tierKey, ltmFeeApplies, ltmFeePerItem, nextTierDetails, tierObject } = calculatedPricingData;
+    //     const currentTierToDisplay = tierObject || getCurrentPricingTier(combinedQuantity, allPricingTiersForProgress);
+
+    //     debugProductUI("UI-UPDATE", "Updating comprehensive tier info with data:", { itemsCurrentlyAdding, itemsFromCart, ...calculatedPricingData });
+
+    //     if (elements.combinedItemsMessage) {
+    //         let message = `You are considering ${itemsCurrentlyAdding} item(s). `;
+    //         if (itemsFromCart > 0) {
+    //             message += `With ${itemsFromCart} item(s) already in your cart, your `;
+    //         } else {
+    //             message += `Your `;
+    //         }
+    //         message += `combined total of ${combinedQuantity} item(s) qualifies you for `;
+    //         if (tierKey) {
+    //             message += `the <strong>${tierKey}</strong> pricing.`;
+    //         } else {
+    //             message += `the base pricing.`; // Or some other default if tierKey is missing
+    //         }
+    //         elements.combinedItemsMessage.innerHTML = message;
+    //     }
+
+    //     if (elements.currentTierNameDisplay) {
+    //         elements.currentTierNameDisplay.textContent = tierKey || 'N/A';
+    //     }
+
+    //     if (elements.currentTierPriceDisplay) {
+    //         if (combinedQuantity === 0) {
+    //             elements.currentTierPriceDisplay.textContent = 'N/A';
+    //         } else if (representativeUnitPrice !== null && !isNaN(representativeUnitPrice)) {
+    //             elements.currentTierPriceDisplay.textContent = `$${parseFloat(representativeUnitPrice).toFixed(2)}`;
+    //         } else {
+    //              // Try to get a price from the first item in calculatedPricingData.items if representativeUnitPrice is null
+    //             let foundPrice = null;
+    //             if (calculatedPricingData.items && Object.keys(calculatedPricingData.items).length > 0) {
+    //                 const firstSizeKey = Object.keys(calculatedPricingData.items)[0];
+    //                 const item = calculatedPricingData.items[firstSizeKey];
+    //                 if (item && item.displayUnitPrice !== undefined) {
+    //                     foundPrice = parseFloat(item.displayUnitPrice);
+    //                 }
+    //             }
+    //             elements.currentTierPriceDisplay.textContent = (foundPrice !== null && !isNaN(foundPrice)) ? `$${foundPrice.toFixed(2)}` : 'N/A';
+    //         }
+    //     }
+
+    //     // Tier Progress Bar Logic
+    //     if (elements.tierProgressFill && elements.tierProgressMessage && currentTierToDisplay && allPricingTiersForProgress) {
+    //         const currentTierIndex = allPricingTiersForProgress.findIndex(t => t.label === currentTierToDisplay.label);
+    //         let progressPercent = 0;
+    //         let progressMessageText = `You are in the ${currentTierToDisplay.label} tier.`;
+
+    //         if (nextTierDetails && nextTierDetails.tier && nextTierDetails.quantityNeeded > 0) {
+    //             progressMessageText = `Add ${nextTierDetails.quantityNeeded} more item(s) to reach the ${nextTierDetails.tier.label} tier for better pricing.`;
+    //             const rangeForCurrentTier = (nextTierDetails.tier.minQty -1) - currentTierToDisplay.minQty;
+    //             const progressInCurrentTier = combinedQuantity - currentTierToDisplay.minQty;
+    //             if (rangeForCurrentTier > 0) {
+    //                 progressPercent = Math.min(100, (progressInCurrentTier / rangeForCurrentTier) * 100);
+    //             } else if (combinedQuantity >= currentTierToDisplay.minQty) {
+    //                 progressPercent = 100; // If it's the last tier or range is 0 but in tier
+    //             }
+    //         } else if (currentTierIndex === allPricingTiersForProgress.length - 1) { // Last tier
+    //             progressMessageText = `You've reached the best pricing tier (${currentTierToDisplay.label})!`;
+    //             progressPercent = 100;
+    //         } else if (currentTierIndex === -1 && combinedQuantity < allPricingTiersForProgress[0]?.minQty && combinedQuantity > 0) { // Below first tier (LTM usually)
+    //              progressMessageText = `Add ${allPricingTiersForProgress[0].minQty - combinedQuantity} more item(s) to reach the ${allPricingTiersForProgress[0].label} tier.`;
+    //              progressPercent = (combinedQuantity / (allPricingTiersForProgress[0].minQty -1)) * 100;
+
+    //         } else if (combinedQuantity === 0) {
+    //             progressMessageText = `Add items to see pricing tiers.`;
+    //             progressPercent = 0;
+    //         }
+
+
+    //         elements.tierProgressFill.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
+    //         elements.tierProgressMessage.textContent = progressMessageText;
+    //     }
+
+
+    //     if (elements.ltmExplanationSection) {
+    //         elements.ltmExplanationSection.style.display = ltmFeeApplies ? 'block' : 'none';
+    //         if (ltmFeeApplies && elements.ltmPerItemDisplay && combinedQuantity > 0) {
+    //             elements.ltmPerItemDisplay.textContent = `$${parseFloat(ltmFeePerItem || 0).toFixed(2)}`;
+    //         } else if (elements.ltmPerItemDisplay) {
+    //             elements.ltmPerItemDisplay.textContent = '$0.00';
+    //         }
+    //     }
+    //     */
+    // }
 
     /**
      * Highlights the active pricing tier in the main pricing grid.
-     * @param {number} totalQuantity - The current total quantity for the item.
+     * @param {number} combinedTotalQuantity - The current total quantity for the item.
+     * @param {object|null} currentTier - The active pricing tier object.
      */
-    function highlightActivePricingTier(totalQuantity) {
+    function highlightActivePricingTierInGrid(combinedTotalQuantity, currentTier) {
         if (!elements.pricingGrid) return;
-        debugProductUI("UI-UPDATE", "Highlighting active pricing tier for total quantity:", totalQuantity);
+        debugProductUI("UI-UPDATE", "Highlighting active pricing tier in grid for combined quantity:", combinedTotalQuantity);
 
-        const currentTier = getCurrentPricingTier(totalQuantity);
         if (!currentTier) return;
 
-        // Remove highlight from all tier headers/columns first
         elements.pricingGrid.querySelectorAll('th.active-tier-highlight, td.active-tier-highlight').forEach(el => {
             el.classList.remove('active-tier-highlight');
         });
 
-        // Add highlight to the current tier's header and cells
-        // This assumes TH elements have a data-tier-label attribute matching tier.label
         const tierHeader = elements.pricingGrid.querySelector(`thead th[data-tier-label="${currentTier.label}"]`);
         if (tierHeader) {
             tierHeader.classList.add('active-tier-highlight');
         }
 
-        // And for all td cells in that column (assuming a similar data-tier-label or index)
         const columnIndex = tierHeader ? Array.from(tierHeader.parentNode.children).indexOf(tierHeader) : -1;
         if (columnIndex !== -1) {
             elements.pricingGrid.querySelectorAll(`tbody tr`).forEach(row => {
@@ -284,15 +494,21 @@ const NWCAProductPricingUI = (function() {
     /**
      * Gets the current pricing tier object based on total quantity.
      * @param {number} totalQuantity - The total quantity.
+     * @param {Array} tiersToUse - The array of tier objects to check against.
      * @returns {object|null} The tier object or null if not found.
      */
-    function getCurrentPricingTier(totalQuantity) {
-        for (const tier of config.pricingTiers) {
+    function getCurrentPricingTier(totalQuantity, tiersToUse) {
+        tiersToUse = tiersToUse || config.pricingTiers; // Fallback to default config if not provided
+        for (const tier of tiersToUse) {
             if (totalQuantity >= tier.minQty && totalQuantity <= tier.maxQty) {
                 return tier;
             }
         }
-        return config.pricingTiers[0]; // Default to the first tier if something goes wrong or qty is 0
+        // If quantity is 0 or doesn't fit, default to the first tier or handle as LTM case explicitly
+        if (totalQuantity === 0 && tiersToUse.length > 0) return tiersToUse[0];
+        // If LTM is handled by the first tier (e.g. 1-23), this is fine.
+        // Otherwise, might need specific logic for quantities below the first defined tier's minQty.
+        return tiersToUse.length > 0 ? tiersToUse[0] : null;
     }
 
     /**
@@ -300,10 +516,10 @@ const NWCAProductPricingUI = (function() {
      * @param {HTMLElement} toggleButton - The button that was clicked.
      */
     function toggleMobileCollapsibleSection(toggleButton) {
-        const targetId = toggleButton.dataset.target; // Assuming button has data-target="#sectionId"
+        const targetId = toggleButton.dataset.target;
         const section = document.querySelector(targetId);
         if (section) {
-            section.classList.toggle('is-expanded'); // CSS will handle the show/hide
+            section.classList.toggle('is-expanded');
             toggleButton.setAttribute('aria-expanded', section.classList.contains('is-expanded'));
             debugProductUI("UI-ACTION", "Toggled collapsible section:", { targetId, expanded: section.classList.contains('is-expanded') });
         }
@@ -311,15 +527,15 @@ const NWCAProductPricingUI = (function() {
 
     // Public API
     return {
-        initialize
+        initialize,
+        // Expose for potential external updates if cart changes elsewhere
+        updateAllPricingDisplays
     };
 
 })();
 
-// Initialize when DOM is loaded and other necessary scripts (like pricing-matrix-api) are ready
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Ensure NWCACart (if needed for product page context) and other dependencies are loaded
-    // For now, just initialize directly. Dependencies can be checked if complex interactions arise.
     if (document.getElementById('custom-pricing-grid')) { // Check if on a product pricing page
         NWCAProductPricingUI.initialize();
     }

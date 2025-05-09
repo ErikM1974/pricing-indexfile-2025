@@ -188,11 +188,25 @@
                 }
             }
 
-            if (window.PricingPageUI) {
-                window.PricingPageUI.updateTierInfoDisplay(calculatedPricing.tierKey, calculatedPricing.nextTier, calculatedPricing.quantityForNextTier, calculatedPricing.combinedQuantity);
-                window.PricingPageUI.updateCartInfoDisplay(newQuantityTotal, calculatedPricing.combinedQuantity, calculatedPricing.tierKey);
+            if (window.NWCAProductPricingUI && typeof window.NWCAProductPricingUI.updateAllPricingDisplays === 'function') {
+                // updateAllPricingDisplays internally calls updateComprehensiveTierInfo
+                // It needs itemsCurrentlyAdding and itemsFromCart
+                // itemsCurrentlyAdding is newQuantityTotal
+                // itemsFromCart is existingEmbroideryItems
+                // Pass the whole calculatedPricing object
+                window.NWCAProductPricingUI.updateAllPricingDisplays(newQuantityTotal, existingEmbroideryItems, calculatedPricing);
+                console.log("[ADD-TO-CART] Called NWCAProductPricingUI.updateAllPricingDisplays with calculatedPricing.");
+            } else if (window.PricingPageUI) {
+                 // Fallback for older structure if still present, though this path should ideally not be hit.
+                console.warn("[ADD-TO-CART] NWCAProductPricingUI not found, attempting legacy PricingPageUI calls (which are likely removed).");
+                if (typeof window.PricingPageUI.updateTierInfoDisplay === 'function') {
+                    window.PricingPageUI.updateTierInfoDisplay(calculatedPricing.tierKey, calculatedPricing.nextTier, calculatedPricing.quantityForNextTier, calculatedPricing.combinedQuantity);
+                }
+                if (typeof window.PricingPageUI.updateCartInfoDisplay === 'function') {
+                    window.PricingPageUI.updateCartInfoDisplay(newQuantityTotal, calculatedPricing.combinedQuantity, calculatedPricing.tierKey);
+                }
             } else {
-                console.error("[ADD-TO-CART] PricingPageUI not available for UI updates.");
+                console.error("[ADD-TO-CART] Neither NWCAProductPricingUI nor PricingPageUI available for UI updates.");
             }
 
             const allAvailableSizes = Object.keys(calculatedPricing.baseUnitPrices || {});
@@ -213,74 +227,36 @@
                 }
             });
 
-            const totalAmountDisplay = document.querySelector('.total-amount');
+            const totalAmountDisplay = document.querySelector('#sticky-product-cart-summary .total-amount');
+            const totalQuantityDisplay = document.querySelector('#sticky-product-cart-summary .total-quantity');
+            const ltmFeeNoticeInStickySummary = document.querySelector('#sticky-product-cart-summary .ltm-fee-notice');
+
+            if (totalQuantityDisplay) {
+                totalQuantityDisplay.textContent = newQuantityTotal;
+            }
+
             if (totalAmountDisplay) {
-                 if (calculatedPricing.ltmFeeApplies && newQuantityTotal > 0) {
-                     let baseTotalPrice = 0;
-                      baseTotalPrice = Object.values(calculatedPricing.items)
-                                         .filter(item => item.quantity > 0)
-                                         .reduce((sum, item) => sum + (item.baseUnitPrice * item.quantity || 0), 0);
-                     let prospectiveInfoHtml = '';
-                     if (existingEmbroideryItems > 0) {
-                         prospectiveInfoHtml = `
-                             <div class="prospective-pricing-info" style="background-color:#e8f4ff;padding:6px;margin:5px 0;border-radius:4px;border-left:4px solid #0d6efd;font-size:0.9em;">
-                                 <div style="font-weight:bold;margin-bottom:3px;">Prospective Pricing Calculation:</div>
-                                 <div style="display:flex;justify-content:space-between;">
-                                     <span>Items being added:</span>
-                                     <span>${newQuantityTotal}</span>
-                                 </div>
-                                 <div style="display:flex;justify-content:space-between;">
-                                     <span>Items in cart:</span>
-                                     <span>${existingEmbroideryItems}</span>
-                                 </div>
-                                 <div style="display:flex;justify-content:space-between;border-top:1px dashed #0d6efd;padding-top:3px;margin-top:3px;font-weight:bold;">
-                                     <span>Combined total:</span>
-                                     <span>${calculatedPricing.combinedQuantity} → ${calculatedPricing.tierKey} tier</span>
-                                 </div>
-                             </div>`;
-                     }
-                     totalAmountDisplay.innerHTML = `
-                         <div class="total-breakdown">
-                             <div style="text-align:center;background-color:#ffc107;color:#212529;padding:5px;margin-bottom:8px;border-radius:4px;font-weight:bold;font-size:1.1em;">⚠️ LTM FEE APPLIED TO ORDER ⚠️</div>
-                             ${prospectiveInfoHtml}
-                             <div class="base-price" style="margin-bottom:5px;">Base Price (${calculatedPricing.tierKey} tier): $${baseTotalPrice.toFixed(2)}</div>
-                             <div class="ltm-fee" style="background-color:#fff3cd;padding:6px;margin:5px 0;border-radius:4px;border-left:4px solid #ffc107;">
-                                 <strong>LTM Fee:</strong> $${calculatedPricing.ltmFeeTotal.toFixed(2)} ÷ ${calculatedPricing.combinedQuantity} items = <span style="color:#663c00;font-weight:bold;">$${calculatedPricing.ltmFeePerItem.toFixed(2)}/item</span>
-                             </div>
-                             <div class="total-with-ltm" style="margin-top:8px;font-size:1.2em;"><strong>Total: $${calculatedPricing.totalPrice.toFixed(2)}</strong></div>
-                         </div>`;
-                 } else {
-                     if (existingEmbroideryItems > 0 && newQuantityTotal > 0) {
-                         totalAmountDisplay.innerHTML = `
-                             <div class="total-breakdown">
-                                 <div class="prospective-pricing-info" style="background-color:#e8f4ff;padding:6px;margin-bottom:8px;border-radius:4px;border-left:4px solid #0d6efd;font-size:0.9em;">
-                                     <div style="font-weight:bold;margin-bottom:3px;">Prospective Pricing Calculation:</div>
-                                     <div style="display:flex;justify-content:space-between;">
-                                         <span>Items being added:</span>
-                                         <span>${newQuantityTotal}</span>
-                                     </div>
-                                     <div style="display:flex;justify-content:space-between;">
-                                         <span>Items in cart:</span>
-                                         <span>${existingEmbroideryItems}</span>
-                                     </div>
-                                     <div style="display:flex;justify-content:space-between;border-top:1px dashed #0d6efd;padding-top:3px;margin-top:3px;font-weight:bold;">
-                                         <span>Combined total:</span>
-                                         <span>${calculatedPricing.combinedQuantity} → ${calculatedPricing.tierKey} tier</span>
-                                     </div>
-                                 </div>
-                                 <div class="total-with-tier" style="font-size:1.2em;"><strong>Total: $${calculatedPricing.totalPrice.toFixed(2)}</strong></div>
-                             </div>`;
-                     } else {
-                         totalAmountDisplay.textContent = `$${calculatedPricing.totalPrice.toFixed(2)}`;
-                     }
-                 }
-                 totalAmountDisplay.dataset.calculatedTotal = calculatedPricing.totalPrice.toFixed(2);
-                 totalAmountDisplay.dataset.totalQuantity = newQuantityTotal;
-                 totalAmountDisplay.dataset.tierKey = calculatedPricing.tierKey;
-                 totalAmountDisplay.dataset.ltmFeeApplies = calculatedPricing.ltmFeeApplies;
-                 totalAmountDisplay.dataset.ltmFee = calculatedPricing.ltmFeeTotal;
-                 totalAmountDisplay.dataset.prospectiveTotal = calculatedPricing.combinedQuantity;
-                 totalAmountDisplay.dataset.existingCartQty = existingEmbroideryItems;
+                totalAmountDisplay.textContent = `$${calculatedPricing.totalPrice.toFixed(2)}`;
+                // Store data attributes for other scripts if needed, but keep display simple
+                totalAmountDisplay.dataset.calculatedTotal = calculatedPricing.totalPrice.toFixed(2);
+                totalAmountDisplay.dataset.totalQuantity = newQuantityTotal; // items being added
+                totalAmountDisplay.dataset.tierKey = calculatedPricing.tierKey;
+                totalAmountDisplay.dataset.ltmFeeApplies = calculatedPricing.ltmFeeApplies;
+                totalAmountDisplay.dataset.ltmFeeTotal = calculatedPricing.ltmFeeTotal.toFixed(2);
+                totalAmountDisplay.dataset.combinedQuantity = calculatedPricing.combinedQuantity;
+                totalAmountDisplay.dataset.existingCartQty = existingEmbroideryItems;
+            }
+
+            if (ltmFeeNoticeInStickySummary) {
+                if (calculatedPricing.ltmFeeApplies && newQuantityTotal > 0) {
+                    ltmFeeNoticeInStickySummary.style.display = 'flex'; // Or 'block' depending on its CSS
+                    const ltmTextElement = ltmFeeNoticeInStickySummary.querySelector('.ltm-text');
+                    if (ltmTextElement) {
+                        ltmTextElement.textContent = `LTM Fee Applied ($${calculatedPricing.ltmFeeTotal.toFixed(2)})`;
+                    }
+                } else {
+                    ltmFeeNoticeInStickySummary.style.display = 'none';
+                }
             }
             document.dispatchEvent(new Event('cartTotalUpdated'));
             
