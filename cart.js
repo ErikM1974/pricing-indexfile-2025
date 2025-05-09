@@ -124,6 +124,11 @@ if (typeof window.NWCACart === 'undefined') {
       console.log("Cart initialization complete, triggering cartUpdated event");
       triggerEvent('cartUpdated');
       
+      // Set initialized flag and dispatch custom event
+      window.NWCACart.isInitialized = true;
+      document.dispatchEvent(new CustomEvent('nwcacartInitialized'));
+      console.log("[CART:INIT] NWCACart initialized and event dispatched");
+      
       // Recalculate prices for all embellishment types in the cart
       try {
         const embTypes = getEmbellishmentTypes();
@@ -307,11 +312,28 @@ if (typeof window.NWCACart === 'undefined') {
           }
         }));
         
-        // Preserve existing imageUrl values, don't override with constructed URLs
+        // Handle both imageUrl (lowercase) and ImageURL (uppercase) values
         itemsWithSizes.forEach(item => {
-          if (!item.imageUrl) {
-            item.imageUrl = ''; // Use empty string if no image URL provided
+          console.log(`[CART:LOAD_ITEMS] Item ${item.CartItemID} imageUrl before: '${item.imageUrl}', ImageURL: '${item.ImageURL}'`);
+          
+          // If ImageURL exists (Caspio format), use that value for both properties
+          if (item.ImageURL) {
+            item.imageUrl = item.ImageURL; // Ensure lowercase version has the value too
+            console.log(`[CART:LOAD_ITEMS] Using ImageURL value: '${item.ImageURL}'`);
           }
+          // If only lowercase exists, use it for both
+          else if (item.imageUrl) {
+            item.ImageURL = item.imageUrl; // Ensure uppercase version has the value too
+            console.log(`[CART:LOAD_ITEMS] Using imageUrl value: '${item.imageUrl}'`);
+          }
+          // If neither exists, set both to empty string
+          else {
+            item.imageUrl = '';
+            item.ImageURL = '';
+            console.log(`[CART:LOAD_ITEMS] No image URL found, using empty string`);
+          }
+          
+          console.log(`[CART:LOAD_ITEMS] Item ${item.CartItemID} final imageUrl: '${item.imageUrl}', ImageURL: '${item.ImageURL}'`);
         });
 
         cartState.items = itemsWithSizes;
@@ -435,22 +457,49 @@ if (typeof window.NWCACart === 'undefined') {
         }));
         
         // Use the server items with sizes
-        // Preserve exact image URLs, don't override with constructed URLs
+        // Handle both imageUrl (lowercase) and ImageURL (uppercase) values
         serverItemsWithSizes.forEach(item => {
-          if (!item.imageUrl) {
-            item.imageUrl = ''; // Use empty string if no image URL provided
+          console.log(`[CART:SYNC] Item ${item.CartItemID} imageUrl before: '${item.imageUrl}', ImageURL: '${item.ImageURL}'`);
+          
+          // If ImageURL exists (Caspio format), use that value for both properties
+          if (item.ImageURL) {
+            item.imageUrl = item.ImageURL; // Ensure lowercase version has the value too
+            console.log(`[CART:SYNC] Using ImageURL value: '${item.ImageURL}'`);
           }
+          // If only lowercase exists, use it for both
+          else if (item.imageUrl) {
+            item.ImageURL = item.imageUrl; // Ensure uppercase version has the value too
+            console.log(`[CART:SYNC] Using imageUrl value: '${item.imageUrl}'`);
+          }
+          // If neither exists, set both to empty string
+          else {
+            item.imageUrl = '';
+            item.ImageURL = '';
+            console.log(`[CART:SYNC] No image URL found, using empty string`);
+          }
+          
+          console.log(`[CART:SYNC] Item ${item.CartItemID} final imageUrl: '${item.imageUrl}', ImageURL: '${item.ImageURL}'`);
         });
         
         serverItems = serverItemsWithSizes;
       } catch (apiError) {
         console.warn('API error during sync, using localStorage only:', apiError);
         // Continue using localStorage data
-        // Preserve existing image URLs, never construct fallbacks
+        // Handle both imageUrl and ImageURL formats for local items
         if (cartState.items && cartState.items.length > 0) {
              cartState.items.forEach(item => {
-                 if (!item.imageUrl) { // Only if missing
-                     item.imageUrl = ''; // Use empty string instead of constructing URL
+                 // If ImageURL exists (Caspio format), use that value for both properties
+                 if (item.ImageURL) {
+                     item.imageUrl = item.ImageURL; // Ensure lowercase version has the value too
+                 }
+                 // If only lowercase exists, use it for both
+                 else if (item.imageUrl) {
+                     item.ImageURL = item.imageUrl; // Ensure uppercase version has the value too
+                 }
+                 // If neither exists, set both to empty string
+                 else {
+                     item.imageUrl = '';
+                     item.ImageURL = '';
                  }
              });
         }
@@ -492,11 +541,21 @@ if (typeof window.NWCACart === 'undefined') {
               StyleNumber: item.StyleNumber,
               Color: item.Color,
               ImprintType: item.ImprintType,
+              ImageURL: item.ImageURL || item.imageUrl || '', // Include ImageURL property with fallback to imageUrl
+              imageUrl: item.imageUrl || item.ImageURL || '', // Keep imageUrl for consistency
+              PRODUCT_TITLE: item.PRODUCT_TITLE || `${item.StyleNumber} - ${item.Color}`, // Include product title
               EmbellishmentOptions: JSON.stringify(item.EmbellishmentOptions || {}),
               DateAdded: item.DateAdded || new Date().toISOString(),
               CartStatus: item.CartStatus || 'Active',
               OrderID: item.OrderID || null
             };
+            
+            // Log the image URL being synced to server
+            console.log(`[CART:SYNC_IMAGE] Syncing item ${item.StyleNumber} ${item.Color} with image URL:`, {
+              hasImageURL: !!itemData.ImageURL,
+              hasImageUrl: !!itemData.imageUrl,
+              imageValue: itemData.imageUrl || itemData.ImageURL || 'MISSING'
+            });
             
             const createResponse = await fetch(ENDPOINTS.cartItems.create, {
               method: 'POST',
@@ -867,44 +926,46 @@ if (typeof window.NWCACart === 'undefined') {
           // --- Create New Item (Original Logic) ---
           debugCart("ADD", "No existing item found, creating new item");
           
+          // Create the cart item data
+
           const cartItemData = {
             SessionID: cartState.sessionId,
-            ProductID: productData.productId || productData.ProductID || `${productData.styleNumber}_${productData.color}`, // Ensure ProductID is included
+            ProductID: productData.productId || productData.ProductID || `${productData.styleNumber}_${productData.color}`,
             StyleNumber: productData.styleNumber,
             Color: productData.color,
             ImprintType: productData.embellishmentType,
-            imageUrl: productData.imageUrl, // Add the imageUrl property from the input productData
+            ImageURL: productData.imageUrl || '', // Use capital 'URL' format for Caspio compatibility
+            imageUrl: productData.imageUrl || '', // Keep lowercase version for local use
+            PRODUCT_TITLE: productData.PRODUCT_TITLE || `${productData.styleNumber} - ${productData.color}`, // Include product title
             EmbellishmentOptions: JSON.stringify(productData.embellishmentOptions || {}),
             DateAdded: new Date().toISOString(),
             CartStatus: 'Active'
           };
+          
 
           debugCart("ADD", "Creating cart item on server with data:", cartItemData);
           
+          // Prepare the request body
+          const requestBody = JSON.stringify(cartItemData);
+            
           const response = await fetch(ENDPOINTS.cartItems.create, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(cartItemData)
+            body: requestBody
           });
 
-          // Log the raw response status and text/json for debugging
+          // Process the response
           const responseText = await response.text();
-          debugCart(`[CART:ADD] Raw response status: ${response.status}`);
-          debugCart(`[CART:ADD] Raw response text: ${responseText}`);
-
           let responseData;
           try {
-            responseData = JSON.parse(responseText); // Try parsing the logged text
-            debugCart(`[CART:ADD] Parsed API response data for cart item creation:`, responseData);
+            responseData = JSON.parse(responseText);
           } catch (e) {
-            debugCart(`[CART:ADD] Failed to parse JSON response: ${e}`);
-            debugCart(`[CART:ADD] Response text was: ${responseText}`);
             if (!response.ok) {
               throw new Error(`API Error: ${response.status} ${response.statusText}`);
             }
-            responseData = { status: 'success', message: 'Non-JSON response received', raw: responseText };
+            responseData = { status: 'success', message: 'Non-JSON response received' };
           }
 
           if (!response.ok) {
@@ -1025,6 +1086,8 @@ if (typeof window.NWCACart === 'undefined') {
             Color: productData.color,
             ImprintType: productData.embellishmentType,
             imageUrl: productData.imageUrl || '', // Store the specific product image URL, use empty string if missing
+            ImageURL: productData.imageUrl || '', // Add uppercase version for Caspio compatibility
+            PRODUCT_TITLE: productData.PRODUCT_TITLE || `${productData.styleNumber} - ${productData.color}`, // Include product title from the DOM element
             EmbellishmentOptions: productData.embellishmentOptions || {}, // Keep as object
             DateAdded: cartItemData.DateAdded, // Use the date we sent
             CartStatus: 'Active',
@@ -1038,8 +1101,6 @@ if (typeof window.NWCACart === 'undefined') {
             }))
           };
           
-          // Log the specific image being added to local state
-          console.log(`[CART:ADD] Added item to local state with specific imageUrl: ${newItemForLocalState.imageUrl || 'Not provided'}`);
           // Add to local cart state (will be overwritten/confirmed by sync)
           cartState.items.push(newItemForLocalState);
           debugCart("ADD", "Temporarily added new item to local state:", newItemForLocalState);
@@ -1762,6 +1823,7 @@ if (typeof window.NWCACart === 'undefined') {
     getCartState, // Add the getCartState method to the public API
     clearCart, // Add the clearCart method to the public API
     submitQuoteRequest, // Expose the new function
+    isInitialized: false, // Flag to indicate if cart has been initialized
     recalculatePrices: async function(embellishmentType) {
       // Call the recalculate function if available
       if (typeof window.recalculatePricesForEmbellishmentType === 'function') {
@@ -1773,6 +1835,16 @@ if (typeof window.NWCACart === 'undefined') {
     }
   };
   })();
+
+  /**
+   * Function to remove any test buttons that might be in the DOM
+   */
+  function removeTestButton() {
+    const testButton = document.querySelector('button[onclick="testDirectApiCall()"]');
+    if (testButton) {
+      testButton.remove();
+    }
+  }
 
   // Initialize cart when DOM is loaded
   document.addEventListener('DOMContentLoaded', function() {
@@ -1792,6 +1864,9 @@ if (typeof window.NWCACart === 'undefined') {
     
     // Initial update
     updateCartCount();
+    
+    // Remove any test buttons that might be in the DOM
+    removeTestButton();
   });
 } else {
   console.log("NWCACart already defined, skipping initialization");

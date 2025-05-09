@@ -910,3 +910,170 @@ h1 {
     background-color: #adb5bd;
     cursor: not-allowed;
 }
+/* Styles for Two-Column Product Page Layout */
+.product-page-columns-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px; /* Adjust gap as needed */
+    margin-top: var(--spacing-lg); /* Add some top margin */
+}
+
+.product-context-column {
+    flex: 0 0 350px; /* Adjust width as needed, e.g., 300px, 400px */
+    /* For sticky behavior, uncomment and adjust: */
+    /* position: sticky; 
+    top: 20px;  */
+    /* Consider max-height if content can be very long and you want internal scroll for this column */
+    /* height: calc(100vh - 40px); /* Example: full viewport height minus some padding */
+    /* overflow-y: auto; */
+    background-color: var(--white);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.product-interactive-column {
+    flex: 1;
+    min-width: 0; /* Prevents flexbox overflow issues with nested flex/grid items */
+    background-color: var(--white);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.product-image-container-context img { /* Styles for the image in the new context column */
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-md);
+}
+.product-image-container-context .image-zoom-overlay { /* Ensure zoom overlay is positioned correctly */
+    position: absolute; /* If not already, or adjust as needed */
+}
+
+
+/* Highlight for active pricing tier in the pricing grid */
+.pricing-grid th.active-tier-highlight,
+.pricing-grid td.active-tier-highlight {
+    background-color: var(--primary-extralight, #e6f3ff) !important; /* A lighter shade of primary */
+    font-weight: bold;
+    color: var(--primary-dark, #003366) !important; /* Darker primary color for text */
+    border: 1px solid var(--primary-color, #007bff); /* Optional: border to emphasize */
+}
+.pricing-grid th.active-tier-highlight {
+    border-bottom: 2px solid var(--primary-color, #007bff) !important;
+}
+
+
+/* Styling for the sticky cart summary at the bottom of the interactive column */
+#sticky-product-cart-summary {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--white);
+    padding: var(--spacing-md);
+    border-top: 2px solid var(--primary-color);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    z-index: 100; /* Ensure it's above other content in the column */
+}
+
+#sticky-product-cart-summary .cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+#sticky-product-cart-summary .cart-total > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+#sticky-product-cart-summary .total-label {
+    font-size: 0.9em;
+    color: var(--text-muted);
+}
+#sticky-product-cart-summary .total-quantity,
+#sticky-product-cart-summary .total-price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--primary-dark);
+}
+#sticky-product-cart-summary .add-to-cart-button,
+#sticky-product-cart-summary .view-cart-button {
+    width: 100%;
+    margin-top: var(--spacing-sm);
+}
+
+
+/* Responsive adjustments for the two-column layout */
+@media (max-width: 1024px) { /* Adjust this breakpoint as needed */
+    .product-page-columns-container {
+        flex-direction: column;
+    }
+    .product-context-column {
+        flex: 0 0 auto; /* Reset flex basis for stacked layout */
+        position: static; /* Remove sticky behavior when stacked */
+        height: auto; /* Reset height */
+        overflow-y: visible; /* Reset overflow */
+        margin-bottom: var(--spacing-lg);
+    }
+    #sticky-product-cart-summary {
+        position: static; /* Non-sticky on smaller screens, part of normal flow */
+        border-top: 1px solid var(--border-color);
+        box-shadow: none;
+    }
+}
+
+/* Ensure .price-display and .dynamic-unit-price are styled if not already globally */
+.price-display {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-top: 5px;
+    text-align: center;
+    min-height: 20px; /* Adjust if needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9em; 
+}
+.price-display .dynamic-unit-price { 
+    margin-left: 5px;
+    font-weight: normal; /* Or bold if preferred */
+    color: var(--text-color); /* Or var(--primary-color) */
+}
+
+/* Ensure .product-header in the context column is styled appropriately */
+.product-context-column .product-header {
+    padding: var(--spacing-sm) 0; /* Adjust padding if needed */
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: var(--spacing-md);
+}
+.product-context-column .product-title-area h2 {
+    font-size: 1.3em; /* Adjust as needed */
+}
+.product-context-column .product-meta {
+    font-size: 0.9em;
+}
+.product-context-column .product-meta .mini-color-swatch {
+    width: 20px;
+    height: 20px;
+    margin-left: 0;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Collapsible sections for mobile (example) */
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+.collapsible-content.is-expanded {
+    max-height: 1000px; /* Adjust to a sufficiently large value */
+    transition: max-height 0.5s ease-in;
+}
+.collapsible-toggle { /* Style for the button/link that toggles */
+    cursor: pointer;
+    /* Add other styling as needed */
+}

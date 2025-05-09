@@ -159,6 +159,44 @@ app.get('/api/cart-items/session/:sessionId', async (req, res) => {
     const itemsWithSizes = await Promise.all(itemsData.map(async (item) => {
       try {
         const sizesData = await makeApiRequest(`/cart-item-sizes?filter=CartItemID=${item.CartItemID}`);
+        
+        // Reconstruct PRODUCT_TITLE from stored fields if it doesn't exist
+        if (!item.PRODUCT_TITLE) {
+          console.log(`[CART_ITEMS_GET] Reconstructing PRODUCT_TITLE for item ${item.CartItemID}`);
+          
+          // Option 1: Try to get from Description field
+          if (item.Description) {
+            item.PRODUCT_TITLE = item.Description;
+            console.log(`[CART_ITEMS_GET] Using Description field: ${item.Description}`);
+          }
+          // Option 2: Try to get from Notes field
+          else if (item.Notes) {
+            item.PRODUCT_TITLE = item.Notes;
+            console.log(`[CART_ITEMS_GET] Using Notes field: ${item.Notes}`);
+          }
+          // Option 3: Try to extract from EmbellishmentOptions
+          else if (item.EmbellishmentOptions) {
+            try {
+              const embOptions = typeof item.EmbellishmentOptions === 'string'
+                ? JSON.parse(item.EmbellishmentOptions)
+                : item.EmbellishmentOptions;
+              
+              if (embOptions.productTitle) {
+                item.PRODUCT_TITLE = embOptions.productTitle;
+                console.log(`[CART_ITEMS_GET] Extracted from EmbellishmentOptions: ${embOptions.productTitle}`);
+              }
+            } catch (jsonError) {
+              console.error(`[CART_ITEMS_GET] Error parsing EmbellishmentOptions for item ${item.CartItemID}:`, jsonError);
+            }
+          }
+          
+          // Fallback: Generate a title from StyleNumber and Color
+          if (!item.PRODUCT_TITLE && item.StyleNumber && item.Color) {
+            item.PRODUCT_TITLE = `${item.StyleNumber} - ${item.Color}`;
+            console.log(`[CART_ITEMS_GET] Generated fallback title: ${item.PRODUCT_TITLE}`);
+          }
+        }
+        
         return {
           ...item,
           sizes: sizesData || []
@@ -185,7 +223,52 @@ app.get('/api/cart-items/session/:sessionId', async (req, res) => {
 
 app.post('/api/cart-items', async (req, res) => {
   try {
-    const data = await makeApiRequest('/cart-items', 'POST', req.body);
+    // Clone the request body to avoid modifying the original
+    const modifiedBody = { ...req.body };
+    
+    // Check if PRODUCT_TITLE exists in the request
+    if (modifiedBody.PRODUCT_TITLE) {
+      console.log('[CART_ITEMS] PRODUCT_TITLE found in request:', modifiedBody.PRODUCT_TITLE);
+      
+      // Store PRODUCT_TITLE in a field that might exist in Caspio
+      // Option 1: Try to use a Description field if it exists
+      modifiedBody.Description = modifiedBody.PRODUCT_TITLE;
+      
+      // Option 2: Store in Notes field if it exists
+      modifiedBody.Notes = modifiedBody.PRODUCT_TITLE;
+      
+      // Option 3: Append to EmbellishmentOptions JSON if it exists
+      if (modifiedBody.EmbellishmentOptions) {
+        try {
+          let embOptions = modifiedBody.EmbellishmentOptions;
+          
+          // If EmbellishmentOptions is a string (JSON), parse it
+          if (typeof embOptions === 'string') {
+            embOptions = JSON.parse(embOptions);
+          }
+          
+          // Add PRODUCT_TITLE to the options
+          embOptions.productTitle = modifiedBody.PRODUCT_TITLE;
+          
+          // Stringify back to JSON
+          modifiedBody.EmbellishmentOptions = JSON.stringify(embOptions);
+          console.log('[CART_ITEMS] Added PRODUCT_TITLE to EmbellishmentOptions');
+        } catch (jsonError) {
+          console.error('[CART_ITEMS] Error adding PRODUCT_TITLE to EmbellishmentOptions:', jsonError);
+        }
+      }
+    }
+    
+    // Log the modified body being sent to the API
+    console.log('[CART_ITEMS] Sending modified request body to API:', JSON.stringify(modifiedBody));
+    
+    const data = await makeApiRequest('/cart-items', 'POST', modifiedBody);
+    
+    // Store the original PRODUCT_TITLE in the response for client-side use
+    if (req.body.PRODUCT_TITLE) {
+      data.PRODUCT_TITLE = req.body.PRODUCT_TITLE;
+    }
+    
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create cart item' });
@@ -194,7 +277,52 @@ app.post('/api/cart-items', async (req, res) => {
 
 app.put('/api/cart-items/:id', async (req, res) => {
   try {
-    const data = await makeApiRequest(`/cart-items/${req.params.id}`, 'PUT', req.body);
+    // Clone the request body to avoid modifying the original
+    const modifiedBody = { ...req.body };
+    
+    // Check if PRODUCT_TITLE exists in the request
+    if (modifiedBody.PRODUCT_TITLE) {
+      console.log('[CART_ITEMS_UPDATE] PRODUCT_TITLE found in request:', modifiedBody.PRODUCT_TITLE);
+      
+      // Store PRODUCT_TITLE in a field that might exist in Caspio
+      // Option 1: Try to use a Description field if it exists
+      modifiedBody.Description = modifiedBody.PRODUCT_TITLE;
+      
+      // Option 2: Store in Notes field if it exists
+      modifiedBody.Notes = modifiedBody.PRODUCT_TITLE;
+      
+      // Option 3: Append to EmbellishmentOptions JSON if it exists
+      if (modifiedBody.EmbellishmentOptions) {
+        try {
+          let embOptions = modifiedBody.EmbellishmentOptions;
+          
+          // If EmbellishmentOptions is a string (JSON), parse it
+          if (typeof embOptions === 'string') {
+            embOptions = JSON.parse(embOptions);
+          }
+          
+          // Add PRODUCT_TITLE to the options
+          embOptions.productTitle = modifiedBody.PRODUCT_TITLE;
+          
+          // Stringify back to JSON
+          modifiedBody.EmbellishmentOptions = JSON.stringify(embOptions);
+          console.log('[CART_ITEMS_UPDATE] Added PRODUCT_TITLE to EmbellishmentOptions');
+        } catch (jsonError) {
+          console.error('[CART_ITEMS_UPDATE] Error adding PRODUCT_TITLE to EmbellishmentOptions:', jsonError);
+        }
+      }
+    }
+    
+    // Log the modified body being sent to the API
+    console.log('[CART_ITEMS_UPDATE] Sending modified request body to API:', JSON.stringify(modifiedBody));
+    
+    const data = await makeApiRequest(`/cart-items/${req.params.id}`, 'PUT', modifiedBody);
+    
+    // Store the original PRODUCT_TITLE in the response for client-side use
+    if (req.body.PRODUCT_TITLE) {
+      data.PRODUCT_TITLE = req.body.PRODUCT_TITLE;
+    }
+    
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update cart item' });

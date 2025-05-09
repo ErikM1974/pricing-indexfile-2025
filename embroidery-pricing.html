@@ -545,585 +545,633 @@
 <body>
     <div class="container">
         <h1>Embroidery Pricing</h1>
-        
-        <!-- Redesigned Product Context Area -->
-        <div class="product-context improved-layout">
-            <div class="product-header">
-                <div class="product-title-area">
-                    <h2 id="product-title">Product Title</h2>
-                    <div class="product-meta">
-                        <span class="meta-item">Style: <strong id="product-style">Style Number</strong></span>
-                        <span class="meta-item">Color: <strong id="product-color">Color Name</strong></span>
-                    </div>
-                </div>
-                <div class="navigation-area">
-                    <a id="back-to-product" href="#" class="back-to-product">
-                        <span class="back-icon">←</span> Back to Product
-                    </a>
-                </div>
-            </div>
-            
-            <div class="product-content">
-                <div class="product-image-column">
-                    <div class="product-image-container">
-                        <img id="product-image" src="" alt="Product Image" class="product-image">
-                        <div class="image-zoom-overlay">
-                            <span class="zoom-icon">🔍</span>
+
+        <!-- New Two-Column Layout Container -->
+        <div class="product-page-columns-container">
+
+            <!-- Left Column: Product Context (Potentially Sticky) -->
+            <div class="product-context-column">
+                <div class="product-header"> <!-- Re-using existing header for product title area -->
+                    <div class="product-title-area">
+                        <h2 id="product-title-context">Product Title</h2> <!-- New ID to avoid conflict if original #product-title is used elsewhere by JS -->
+                        <div class="product-meta">
+                            <span class="meta-item">Style: <strong id="product-style-context">Style Number</strong></span>
+                            <span class="meta-item">Selected Color: <strong id="product-color-context">Color Name</strong></span>
+                            <div id="selected-color-swatch-context" class="mini-color-swatch" style="margin-top: 5px;"></div>
                         </div>
                     </div>
+                    <div class="navigation-area">
+                        <a id="back-to-product" href="#" class="back-to-product">
+                            <span class="back-icon">←</span> Back to Product
+                        </a>
+                    </div>
                 </div>
-                
+                <div class="product-image-container-context"> <!-- Renamed to avoid conflict if original is used by JS -->
+                    <img id="product-image-context" src="" alt="Product Image" class="product-image"> <!-- New ID -->
+                    <div class="image-zoom-overlay">
+                        <span class="zoom-icon">🔍</span>
+                    </div>
+                </div>
+                <div class="static-product-info" style="padding:15px; background-color: var(--background-light); border-radius: var(--radius-sm); margin-top:15px;">
+                    <p>Pricing Includes an 8,000 stitch embroidered logo.</p>
+                    <!-- Other static info can go here -->
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Elements (Scrollable) -->
+            <div class="product-interactive-column">
+                <!-- Color Swatches moved here -->
                 <div class="color-swatches-column">
                     <div class="color-swatches-container compact">
                         <h3 class="section-title">Available Colors</h3>
                         <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 5px;">
-                            <!-- Color swatches will be dynamically added here -->
+                            <!-- Color swatches will be dynamically added here by pricing-pages.js -->
                         </div>
                         <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Removed other embellishment tabs as per feedback -->
-        
-        <!-- Pricing Content -->
-        <div class="pricing-content">
-            <!-- Hidden Caspio Matrix - Keep this for data source -->
-            <div id="pricing-calculator" class="pricing-calculator">
-                <div class="loading-message">Loading pricing data...</div>
-            </div>
-            
-            <!-- Custom Pricing Grid -->
-            <div class="pricing-section">
-                <div class="pricing-header">
-                    <h3 class="section-title">Pricing Includes an 8,000 stitch embroidered logo</h3>
-                    <div class="selected-color-indicator">
-                        <span>Selected Color:</span>
-                        <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches above"></div>
-                        <strong id="pricing-color-name">Color Name</strong>
-                    </div>
-                </div>
+
+                <!-- Original .product-context and .pricing-content are now effectively merged or reorganized -->
+                <!-- The content of .pricing-content (pricing grid, add to cart) goes into this right column -->
                 
-                <style>
-                    .pricing-header {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        margin-bottom: 15px;
-                        flex-wrap: wrap;
-                    }
-                    
-                    .selected-color-indicator {
-                        display: flex;
-                        align-items: center;
-                        font-size: 0.9em;
-                        background-color: var(--primary-light);
-                        padding: 5px 10px;
-                        border-radius: var(--radius-sm);
-                        border-left: 3px solid var(--primary-color);
-                    }
-                    
-                    .mini-color-swatch {
-                        width: 30px;
-                        height: 30px;
-                        border-radius: 50%;
-                        margin: 0 8px;
-                        border: 2px solid var(--border-color);
-                        display: inline-block;
-                        vertical-align: middle;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                        background-size: cover;
-                        background-position: center;
-                        box-sizing: border-box;
-                        aspect-ratio: 1/1;
-                    }
-                    
-                    #pricing-color-name {
-                        color: var(--primary-color);
-                    }
-                    
-                    /* Enhanced mini-swatch styles */
-                    .mini-color-swatch {
-                        transition: all 0.3s ease;
-                    }
-                    
-                    .mini-color-swatch:hover {
-                        transform: scale(1.1);
-                        border-color: var(--primary-color);
-                    }
-                    
-                    .mini-color-swatch.active-swatch {
-                        border-color: var(--primary-color);
-                        box-shadow: 0 0 0 2px var(--primary-light);
-                    }
-                    
-                    .mini-color-swatch.fallback-swatch {
-                        /* Add a subtle texture/pattern when using solid fallback color */
-                        background-image: radial-gradient(circle, transparent 0%, rgba(255,255,255,0.05) 100%);
-                    }
-                    
-                    .mini-color-swatch.clickable {
-                        cursor: pointer;
-                        position: relative;
-                    }
-                    
-                    .mini-color-swatch.clickable::after {
-                        content: '';
-                        position: absolute;
-                        width: 100%;
-                        height: 100%;
-                        top: 0;
-                        left: 0;
-                        border-radius: 50%;
-                        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-                        opacity: 0;
-                        transition: opacity 0.3s ease;
-                    }
-                    
-                    .mini-color-swatch.clickable:hover::after {
-                        opacity: 1;
-                    }
-                </style>
-                
-                <!-- Mini Swatch Update Script Removed - Handled by pricing-pages.js -->
-                <div class="pricing-grid-container">
-                    <table class="pricing-grid" id="custom-pricing-grid">
-                        <thead>
-                            <tr id="pricing-header-row">
-                                <th>Quantity</th>
-                                <!-- Size headers will be dynamically populated from Caspio data -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Pricing data will be dynamically added here -->
-                        </tbody>
-                    </table>
-                    
-                    <div class="pricing-info-tabs">
-                        <div class="tab-headers">
-                            <button class="tab-header active" data-tab="pricing-info">Pricing Info</button>
-                            <button class="tab-header" data-tab="ltm-info">LTM Fee Info</button>
-                            <button class="tab-header" data-tab="inventory-info">Inventory Info</button>
-                        </div>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="pricing-info">
-                                <p>Pricing is determined by your total quantity. Add more items to reach the next tier for better pricing.</p>
-                            </div>
-                            <div class="tab-pane" id="ltm-info">
-                                <div class="ltm-fee-container">
-                                    <h4>Less Than Minimum (LTM) Fee:</h4>
-                                    <p>For orders under 24 pieces, a $50.00 LTM fee applies.</p>
-                                    <p class="ltm-calculation">Calculation: Use the 24-piece price + ($50.00 ÷ number of items)</p>
-                                    <p class="ltm-example">Example: 10 items would be the 24-piece price + $5.00 per item</p>
-                                </div>
-                            </div>
-                            <div class="tab-pane" id="inventory-info">
-                                <div class="inventory-indicator-legend">
-                                    <h4>Inventory Indicators:</h4>
-                                    <div style="display: flex; align-items: center;">
-                                        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #dc3545; margin-right: 8px;"></span>
-                                        <span>Red dot indicates low inventory (less than 10 items available)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Pricing Content (Grid, Tabs, Add to Cart Section) -->
+                <div class="pricing-content-interactive"> <!-- New wrapper for clarity -->
+                    <!-- Hidden Caspio Matrix - Keep this for data source -->
+                    <div id="pricing-calculator" class="pricing-calculator">
+                        <div class="loading-message">Loading pricing data...</div>
                     </div>
                     
-                    <style>
-                        /* Tab styling */
-                        .pricing-info-tabs {
-                            margin-top: 20px;
-                            border: 1px solid var(--border-color);
-                            border-radius: var(--radius-sm);
-                            overflow: hidden;
-                        }
+                    <!-- Custom Pricing Grid -->
+                    <div class="pricing-section">
+                        <div class="pricing-header">
+                            <!-- Title moved to left static column, selected color also shown there -->
+                            <!-- This header can now be simpler or focus on other aspects if needed -->
+                             <h3 class="section-title">Detailed Pricing per Quantity Tier</h3>
+                             <div class="selected-color-indicator"> <!-- Kept for redundancy or different styling if desired -->
+                                <span>Selected Color:</span>
+                                <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches above"></div>
+                                <strong id="pricing-color-name">Color Name</strong>
+                            </div>
+                        </div>
                         
-                        .tab-headers {
-                            display: flex;
-                            background-color: var(--primary-light);
-                            border-bottom: 1px solid var(--border-color);
-                        }
-                        
-                        .tab-header {
-                            padding: 10px 15px;
-                            background: none;
-                            border: none;
-                            cursor: pointer;
-                            font-weight: 500;
-                            color: var(--text-color);
-                            transition: all 0.2s ease;
-                            border-bottom: 3px solid transparent;
-                        }
-                        
-                        .tab-header:hover {
-                            background-color: rgba(0,0,0,0.05);
-                        }
-                        
-                        .tab-header.active {
-                            color: var(--primary-color);
-                            border-bottom-color: var(--primary-color);
-                            font-weight: 600;
-                        }
-                        
-                        .tab-content {
-                            padding: 15px;
-                        }
-                        
-                        .tab-pane {
-                            display: none;
-                        }
-                        
-                        .tab-pane.active {
-                            display: block;
-                        }
-                        
-                        /* Responsive adjustments */
-                        @media (max-width: 768px) {
-                            .tab-header {
-                                padding: 8px 12px;
-                                font-size: 0.9em;
+                        <style>
+                            /* Styles for .product-page-columns-container, .product-context-column, .product-interactive-column */
+                            /* These would go into pricing-pages-enhanced.css */
+                            .product-page-columns-container {
+                                display: flex;
+                                flex-direction: row;
+                                gap: 20px;
                             }
-                        }
-                        
-                        @media (max-width: 480px) {
-                            .tab-headers {
+                            .product-context-column {
+                                flex: 0 0 350px; /* Adjust width as needed */
+                                /* position: sticky; top: 20px; /* Example for sticky */
+                                /* height: calc(100vh - 40px); overflow-y: auto; */
+                            }
+                            .product-interactive-column {
+                                flex: 1;
+                                min-width: 0; /* Prevents flexbox overflow issues */
+                            }
+                            .product-image-container-context img {
+                                width: 100%;
+                                height: auto;
+                                display: block;
+                                border-radius: var(--radius-sm);
+                                box-shadow: var(--shadow-sm);
+                            }
+                             /* Highlight for active pricing tier */
+                            .active-tier-highlight {
+                                background-color: var(--primary-light) !important;
+                                font-weight: bold;
+                                color: var(--primary-color) !important;
+                            }
+
+                            @media (max-width: 1024px) { /* Breakpoint for stacking columns */
+                                .product-page-columns-container {
+                                    flex-direction: column;
+                                }
+                                .product-context-column {
+                                    flex: 0 0 auto; /* Reset flex basis */
+                                    position: static; /* Reset sticky for stacked view */
+                                    height: auto;
+                                    margin-bottom: 20px;
+                                }
+                            }
+
+                            /* Original pricing-header styles - can be adjusted */
+                            .pricing-header {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                margin-bottom: 15px;
                                 flex-wrap: wrap;
                             }
                             
-                            .tab-header {
-                                flex: 1 0 auto;
-                                text-align: center;
-                                padding: 8px 8px;
-                                font-size: 0.8em;
+                            .selected-color-indicator {
+                                display: flex;
+                                align-items: center;
+                                font-size: 0.9em;
+                                background-color: var(--primary-light);
+                                padding: 5px 10px;
+                                border-radius: var(--radius-sm);
+                                border-left: 3px solid var(--primary-color);
                             }
-                        }
-                    </style>
-                    
-                    <!-- Tab Functionality Script Removed - Handled by pricing-pages.js -->
+                            
+                            .mini-color-swatch {
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 50%;
+                                margin: 0 8px;
+                                border: 2px solid var(--border-color);
+                                display: inline-block;
+                                vertical-align: middle;
+                                box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                                background-size: cover;
+                                background-position: center;
+                                box-sizing: border-box;
+                                aspect-ratio: 1/1;
+                            }
+                            
+                            #pricing-color-name {
+                                color: var(--primary-color);
+                            }
+                            
+                            /* Enhanced mini-swatch styles */
+                            .mini-color-swatch {
+                                transition: all 0.3s ease;
+                            }
+                            
+                            .mini-color-swatch:hover {
+                                transform: scale(1.1);
+                                border-color: var(--primary-color);
+                            }
+                            
+                            .mini-color-swatch.active-swatch {
+                                border-color: var(--primary-color);
+                                box-shadow: 0 0 0 2px var(--primary-light);
+                            }
+                            
+                            .mini-color-swatch.fallback-swatch {
+                                background-image: radial-gradient(circle, transparent 0%, rgba(255,255,255,0.05) 100%);
+                            }
+                            
+                            .mini-color-swatch.clickable {
+                                cursor: pointer;
+                                position: relative;
+                            }
+                            
+                            .mini-color-swatch.clickable::after {
+                                content: '';
+                                position: absolute;
+                                width: 100%;
+                                height: 100%;
+                                top: 0;
+                                left: 0;
+                                border-radius: 50%;
+                                background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+                                opacity: 0;
+                                transition: opacity 0.3s ease;
+                            }
+                            
+                            .mini-color-swatch.clickable:hover::after {
+                                opacity: 1;
+                            }
+                        </style>
                         
-                        <!-- Inventory Legend Script Removed - Handled by pricing-pages.js -->
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Add to Cart Section -->
-            <div class="add-to-cart-section">
-                <h3 class="section-title">Add to Cart</h3>
-                
-                <!-- Grid-based layout for add to cart -->
-                <div class="size-grid-container" id="size-grid-container">
-                    <!-- Will be populated by JavaScript with all sizes from pricing matrix -->
-                </div>
-<!-- Container for matrix layout (Added) -->
-                <div id="quantity-matrix">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-                
-                <!-- Cart info display -->
-                <div class="cart-info-display" id="cart-info-display" style="margin-top: 15px; padding: 10px; background-color: #f0f8ff; border-radius: 5px; border: 1px solid #d0e3ff;">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-                
-                <style>
-                    /* Enhanced Grid-based layout for add to cart */
-                    .size-grid-container {
-                        display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                        gap: 15px;
-                        margin-bottom: 20px;
-                    }
-                    
-                    .size-card {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        padding: 15px;
-                        background-color: var(--primary-light);
-                        border-radius: var(--radius-sm);
-                        box-shadow: var(--shadow-sm);
-                        transition: all 0.2s ease;
-                        border: 1px solid transparent;
-                    }
-                    
-                    .size-card:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-                        border-color: var(--primary-color);
-                    }
-                    
-                    .size-label {
-                        font-weight: bold;
-                        font-size: 1.2em;
-                        margin-bottom: 10px;
-                        color: var(--primary-color);
-                    }
-                    
-                    .quantity-controls {
-                        display: flex;
-                        align-items: center;
-                        margin-bottom: 10px;
-                        width: 100%;
-                        justify-content: center;
-                    }
-                    
-                    .quantity-btn {
-                        width: 30px;
-                        height: 30px;
-                        border: 1px solid var(--primary-color);
-                        background-color: white;
-                        color: var(--primary-color);
-                        font-weight: bold;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        transition: all 0.2s ease;
-                    }
-                    
-                    .quantity-btn:hover {
-                        background-color: var(--primary-color);
-                        color: white;
-                    }
-                    
-                    .quantity-btn.decrease {
-                        border-radius: 4px 0 0 4px;
-                    }
-                    
-                    .quantity-btn.increase {
-                        border-radius: 0 4px 4px 0;
-                    }
-                    
-                    .quantity-input {
-                        width: 40px;
-                        height: 30px;
-                        border: 1px solid var(--primary-color);
-                        border-left: none;
-                        border-right: none;
-                        text-align: center;
-                        font-size: 1em;
-                    }
-                    
-                    .price-display {
-                        font-weight: bold;
-                        color: var(--primary-color);
-                        margin-top: 5px;
-                        text-align: center;
-                        min-height: 40px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    
-                    /* Enhanced cart summary styling */
-                    .cart-summary {
-                        background-color: var(--primary-light);
-                        padding: 20px;
-                        border-radius: var(--radius-sm);
-                        margin-top: 20px;
-                        border-left: 4px solid var(--primary-color);
-                    }
-                    
-                    .cart-total {
-                        display: flex;
-                        justify-content: space-between;
-                        font-size: 1.3em;
-                        font-weight: bold;
-                        margin-bottom: 15px;
-                        color: var(--primary-dark);
-                    }
-                    
-                    .ltm-fee-notice {
-                        background-color: #fff3cd;
-                        color: #856404;
-                        padding: 10px 15px;
-                        border-radius: var(--radius-sm);
-                        margin-bottom: 15px;
-                        display: flex;
-                        align-items: center;
-                        border-left: 3px solid #ffeeba;
-                    }
-                    
-                    .ltm-icon {
-                        margin-right: 10px;
-                        font-size: 1.2em;
-                    }
-                    
-                    .add-to-cart-button {
-                        background-color: var(--primary-color);
-                        color: white;
-                        border: none;
-                        border-radius: var(--radius-sm);
-                        padding: 12px 20px;
-                        font-size: 1.1em;
-                        font-weight: bold;
-                        cursor: pointer;
-                        width: 100%;
-                        transition: all 0.3s ease;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    
-                    .add-to-cart-button:hover {
-                        background-color: var(--primary-dark);
-                        transform: translateY(-2px);
-                        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-                    }
-                    
-                    .add-to-cart-button:active {
-                        transform: translateY(0);
-                        box-shadow: none;
-                    }
-                    
-                    /* Add a cart icon to the button */
-                    .add-to-cart-button::before {
-                        content: '🛒 ';
-                        margin-right: 8px;
-                    }
-                    
-                    /* Responsive adjustments */
-                    @media (max-width: 768px) {
-                        .size-grid-container {
-                            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-                            gap: 10px;
-                        }
-                        
-                        .size-card {
-                            padding: 10px;
-                        }
-                        
-                        .size-label {
-                            font-size: 1.1em;
-                            margin-bottom: 8px;
-                        }
-                        
-                        .quantity-btn {
-                            width: 25px;
-                            height: 25px;
-                        }
-                        
-                        .quantity-input {
-                            width: 35px;
-                            height: 25px;
-                        }
-                    }
-                    
-                    @media (max-width: 480px) {
-                        .size-grid-container {
-                            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-                            gap: 8px;
-                        }
-                        
-                        .size-card {
-                            padding: 8px;
-                        }
-                        
-                        .size-label {
-                            font-size: 1em;
-                            margin-bottom: 5px;
-                        }
-                        
-                        .quantity-btn {
-                            width: 22px;
-                            height: 22px;
-                            font-size: 0.9em;
-                        }
-                        
-                        .quantity-input {
-                            width: 30px;
-                            height: 22px;
-                            font-size: 0.9em;
-                        }
-                    }
-                </style>
-                
-                <!-- Script to initialize the size grid -->
-                <!-- Size Grid Initialization Script Removed - Handled by add-to-cart.js -> product-quantity-ui.js -->
-                
-                <!-- Cart Contents Summary -->
-                <div id="cart-contents-info" class="cart-contents-info" style="display: none; margin-bottom: 15px; padding: 10px; background-color: #f0f8ff; border-radius: 5px; border: 1px solid #d0e3ff; font-size: 0.9em;">
-                    <!-- Will be dynamically populated by JavaScript -->
-                </div>
-                
-                <!-- Pricing tier explanation -->
-                <div class="pricing-tier-info">
-                    <div class="tier-explanation">
-                        <h4>Current Pricing Tier: <span id="current-tier-display">1-11</span></h4>
-                        <p>Pricing is determined by your total quantity. Add more items to reach the next tier for better pricing.</p>
-                        <div class="tier-progress">
-                            <div class="tier-progress-bar">
-                                <!-- Will be populated by JavaScript -->
-                                <div class="tier-line"></div>
-                                <div class="tier-progress-fill" style="width: 0%"></div>
-                                <!-- Tier points will be dynamically added here -->
+                        <div class="pricing-grid-container">
+                            <table class="pricing-grid" id="custom-pricing-grid">
+                                <thead>
+                                    <tr id="pricing-header-row">
+                                        <th>Quantity</th>
+                                        <!-- Size headers will be dynamically populated. JS needs to add data-tier-label to these THs. -->
+                                        <!-- Example: <th data-tier-label="1-23">1-23</th> -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Pricing data will be dynamically added here -->
+                                </tbody>
+                            </table>
+                            
+                            <div class="pricing-info-tabs">
+                                <div class="tab-headers">
+                                    <button class="tab-header active" data-tab="pricing-info">Pricing Info</button>
+                                    <button class="tab-header" data-tab="ltm-info">LTM Fee Info</button>
+                                    <button class="tab-header" data-tab="inventory-info">Inventory Info</button>
+                                </div>
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="pricing-info">
+                                        <p>Pricing is determined by your total quantity. Add more items to reach the next tier for better pricing.</p>
+                                    </div>
+                                    <div class="tab-pane" id="ltm-info">
+                                        <div class="ltm-fee-container">
+                                            <h4>Less Than Minimum (LTM) Fee:</h4>
+                                            <p>For orders under 24 pieces, a $50.00 LTM fee applies.</p>
+                                            <p class="ltm-calculation">Calculation: Use the 24-piece price + ($50.00 ÷ number of items)</p>
+                                            <p class="ltm-example">Example: 10 items would be the 24-piece price + $5.00 per item</p>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="inventory-info">
+                                        <div class="inventory-indicator-legend">
+                                            <h4>Inventory Indicators:</h4>
+                                            <div style="display: flex; align-items: center;">
+                                                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #dc3545; margin-right: 8px;"></span>
+                                                <span>Red dot indicates low inventory (less than 10 items available)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="tier-progress-text">
-                                <span id="tier-progress-message">Add more items to reach the next tier</span>
-                            </div>
+                            
+                            <style>
+                                /* Tab styling */
+                                .pricing-info-tabs {
+                                    margin-top: 20px;
+                                    border: 1px solid var(--border-color);
+                                    border-radius: var(--radius-sm);
+                                    overflow: hidden;
+                                }
+                                
+                                .tab-headers {
+                                    display: flex;
+                                    background-color: var(--primary-light);
+                                    border-bottom: 1px solid var(--border-color);
+                                }
+                                
+                                .tab-header {
+                                    padding: 10px 15px;
+                                    background: none;
+                                    border: none;
+                                    cursor: pointer;
+                                    font-weight: 500;
+                                    color: var(--text-color);
+                                    transition: all 0.2s ease;
+                                    border-bottom: 3px solid transparent;
+                                }
+                                
+                                .tab-header:hover {
+                                    background-color: rgba(0,0,0,0.05);
+                                }
+                                
+                                .tab-header.active {
+                                    color: var(--primary-color);
+                                    border-bottom-color: var(--primary-color);
+                                    font-weight: 600;
+                                }
+                                
+                                .tab-content {
+                                    padding: 15px;
+                                }
+                                
+                                .tab-pane {
+                                    display: none;
+                                }
+                                
+                                .tab-pane.active {
+                                    display: block;
+                                }
+                                
+                                /* Responsive adjustments */
+                                @media (max-width: 768px) {
+                                    .tab-header {
+                                        padding: 8px 12px;
+                                        font-size: 0.9em;
+                                    }
+                                }
+                                
+                                @media (max-width: 480px) {
+                                    .tab-headers {
+                                        flex-wrap: wrap;
+                                    }
+                                    
+                                    .tab-header {
+                                        flex: 1 0 auto;
+                                        text-align: center;
+                                        padding: 8px 8px;
+                                        font-size: 0.8em;
+                                    }
+                                }
+                            </style>
+                            
                         </div>
                     </div>
-                    <div class="ltm-explanation" style="display: none;">
-                        <h4>Less Than Minimum Fee Applied</h4>
-                        <p>Orders under 24 pieces include a $50.00 LTM fee distributed across all items.</p>
-                        <p class="ltm-applied">Current LTM fee: <span class="ltm-per-item">$0.00</span> per item</p>
+                    
+                    <!-- Add to Cart Section -->
+                    <div class="add-to-cart-section">
+                        <h3 class="section-title">Add to Cart</h3>
+                        
+                        <div class="size-grid-container" id="size-grid-container">
+                            <!-- Populated by product-quantity-ui.js or similar.
+                                 Each size card needs a place for dynamic unit price.
+                            Example of a size card structure that JS will populate:
+                            <div class="size-card">
+                                <div class="size-label">M</div>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn decrease" aria-label="Decrease quantity">-</button>
+                                    <input type="number" class="quantity-input" value="0" min="0" data-size="M" data-base-price="15.99">
+                                    <button class="quantity-btn increase" aria-label="Increase quantity">+</button>
+                                </div>
+                                <div class="price-display">
+                                    Unit Price: <span class="dynamic-unit-price">$0.00</span>
+                                </div>
+                            </div>
+                             -->
+                        </div>
+                        <div id="quantity-matrix">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        
+                        <div class="cart-info-display" id="cart-info-display" style="margin-top: 15px; padding: 10px; background-color: #f0f8ff; border-radius: 5px; border: 1px solid #d0e3ff;">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        
+                        <style>
+                            /* Enhanced Grid-based layout for add to cart */
+                            .size-grid-container {
+                                display: grid;
+                                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                                gap: 15px;
+                                margin-bottom: 20px;
+                            }
+                            
+                            .size-card {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                padding: 15px;
+                                background-color: var(--primary-light);
+                                border-radius: var(--radius-sm);
+                                box-shadow: var(--shadow-sm);
+                                transition: all 0.2s ease;
+                                border: 1px solid transparent;
+                            }
+                            
+                            .size-card:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                                border-color: var(--primary-color);
+                            }
+                            
+                            .size-label {
+                                font-weight: bold;
+                                font-size: 1.2em;
+                                margin-bottom: 10px;
+                                color: var(--primary-color);
+                            }
+                            
+                            .quantity-controls {
+                                display: flex;
+                                align-items: center;
+                                margin-bottom: 10px;
+                                width: 100%;
+                                justify-content: center;
+                            }
+                            
+                            .quantity-btn {
+                                width: 30px;
+                                height: 30px;
+                                border: 1px solid var(--primary-color);
+                                background-color: white;
+                                color: var(--primary-color);
+                                font-weight: bold;
+                                cursor: pointer;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                transition: all 0.2s ease;
+                            }
+                            
+                            .quantity-btn:hover {
+                                background-color: var(--primary-color);
+                                color: white;
+                            }
+                            
+                            .quantity-btn.decrease {
+                                border-radius: 4px 0 0 4px;
+                            }
+                            
+                            .quantity-btn.increase {
+                                border-radius: 0 4px 4px 0;
+                            }
+                            
+                            .quantity-input {
+                                width: 40px;
+                                height: 30px;
+                                border: 1px solid var(--primary-color);
+                                border-left: none;
+                                border-right: none;
+                                text-align: center;
+                                font-size: 1em;
+                            }
+                            
+                            .price-display {
+                                font-weight: bold;
+                                color: var(--primary-color);
+                                margin-top: 5px;
+                                text-align: center;
+                                min-height: 40px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 0.9em;
+                            }
+                            .price-display .dynamic-unit-price {
+                                margin-left: 5px;
+                                font-weight: normal;
+                            }
+                            
+                            /* Enhanced cart summary styling */
+                            .cart-summary { /* This will be part of the sticky summary */
+                                background-color: var(--primary-light);
+                                padding: 20px;
+                                border-radius: var(--radius-sm);
+                                margin-top: 20px;
+                                border-left: 4px solid var(--primary-color);
+                            }
+                            
+                            .cart-total {
+                                display: flex;
+                                justify-content: space-between;
+                                font-size: 1.3em;
+                                font-weight: bold;
+                                margin-bottom: 15px;
+                                color: var(--primary-dark);
+                            }
+                            
+                            .ltm-fee-notice {
+                                background-color: #fff3cd;
+                                color: #856404;
+                                padding: 10px 15px;
+                                border-radius: var(--radius-sm);
+                                margin-bottom: 15px;
+                                display: flex;
+                                align-items: center;
+                                border-left: 3px solid #ffeeba;
+                            }
+                            
+                            .ltm-icon {
+                                margin-right: 10px;
+                                font-size: 1.2em;
+                            }
+                            
+                            .add-to-cart-button {
+                                background-color: var(--primary-color);
+                                color: white;
+                                border: none;
+                                border-radius: var(--radius-sm);
+                                padding: 12px 20px;
+                                font-size: 1.1em;
+                                font-weight: bold;
+                                cursor: pointer;
+                                width: 100%;
+                                transition: all 0.3s ease;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+                            
+                            .add-to-cart-button:hover {
+                                background-color: var(--primary-dark);
+                                transform: translateY(-2px);
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                            }
+                            
+                            .add-to-cart-button:active {
+                                transform: translateY(0);
+                                box-shadow: none;
+                            }
+                            
+                            .add-to-cart-button::before {
+                                content: '🛒 ';
+                                margin-right: 8px;
+                            }
+                            
+                            @media (max-width: 768px) {
+                                .size-grid-container {
+                                    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                                    gap: 10px;
+                                }
+                                
+                                .size-card {
+                                    padding: 10px;
+                                }
+                                
+                                .size-label {
+                                    font-size: 1.1em;
+                                    margin-bottom: 8px;
+                                }
+                                
+                                .quantity-btn {
+                                    width: 25px;
+                                    height: 25px;
+                                }
+                                
+                                .quantity-input {
+                                    width: 35px;
+                                    height: 25px;
+                                }
+                            }
+                            
+                            @media (max-width: 480px) {
+                                .size-grid-container {
+                                    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                                    gap: 8px;
+                                }
+                                
+                                .size-card {
+                                    padding: 8px;
+                                }
+                                
+                                .size-label {
+                                    font-size: 1em;
+                                    margin-bottom: 5px;
+                                }
+                                
+                                .quantity-btn {
+                                    width: 22px;
+                                    height: 22px;
+                                    font-size: 0.9em;
+                                }
+                                
+                                .quantity-input {
+                                    width: 30px;
+                                    height: 22px;
+                                    font-size: 0.9em;
+                                }
+                            }
+                        </style>
+                        
+                        <div id="cart-contents-info" class="cart-contents-info" style="display: none; margin-bottom: 15px; padding: 10px; background-color: #f0f8ff; border-radius: 5px; border: 1px solid #d0e3ff; font-size: 0.9em;">
+                            <!-- Will be dynamically populated by JavaScript -->
+                        </div>
+                        
+                        <div class="pricing-tier-info">
+                            <div class="tier-explanation">
+                                <h4>Current Pricing Tier: <span id="current-tier-display">1-11</span></h4>
+                                <p>Pricing is determined by your total quantity. Add more items to reach the next tier for better pricing.</p>
+                                <div class="tier-progress">
+                                    <div class="tier-progress-bar">
+                                        <div class="tier-line"></div>
+                                        <div class="tier-progress-fill" style="width: 0%"></div>
+                                    </div>
+                                    <div class="tier-progress-text">
+                                        <span id="tier-progress-message">Add more items to reach the next tier</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ltm-explanation" style="display: none;">
+                                <h4>Less Than Minimum Fee Applied</h4>
+                                <p>Orders under 24 pieces include a $50.00 LTM fee distributed across all items.</p>
+                                <p class="ltm-applied">Current LTM fee: <span class="ltm-per-item">$0.00</span> per item</p>
+                            </div>
+                        </div>
+                        
+                        <div class="size-quantity-grid" id="size-quantity-grid" style="display: none;">
+                        </div>
+                        
+                        <div id="tier-info-display" class="tier-info-display" style="display: none; margin-bottom: 15px; padding: 10px; background-color: #f5f5f5; border-radius: 5px; border: 1px solid #e0e0e0;">
+                        </div>
+                        
+                        <!-- This .cart-summary will be the sticky summary -->
+                        <div class="cart-summary" id="sticky-product-cart-summary">
+                            <div class="cart-total">
+                                <div>
+                                    <span class="total-label">Total Quantity:</span> <span class="total-quantity">0</span>
+                                </div>
+                                <div>
+                                    <span class="total-label">Est. Total:</span>
+                                    <span class="total-amount total-price" data-tier-key="" data-total-quantity="0" data-ltm-fee-applies="false">$0.00</span>
+                                </div>
+                            </div>
+                            <div class="ltm-fee-notice" style="display: none;">
+                                <span class="ltm-icon">⚠️</span>
+                                <span class="ltm-text">Less Than Minimum fee applies</span>
+                            </div>
+                            <button id="add-to-cart-button" class="add-to-cart-button">
+                                Add to Cart
+                            </button>
+                            <button id="view-cart-summary-button" class="view-cart-button" style="display: none; margin-top: 10px; width: 100%; padding: 10px; background-color: #17a2b8; color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 1em;">
+                                View Cart (<span class="cart-count-display">0</span>)
+                            </button>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Individual size inputs as fallback/alternative (hidden) -->
-                <div class="size-quantity-grid" id="size-quantity-grid" style="display: none;">
-                    <!-- Size quantity inputs will be dynamically generated based on available sizes -->
-                </div>
-                
-                <!-- Tier info display for cart summary -->
-                <div id="tier-info-display" class="tier-info-display" style="display: none; margin-bottom: 15px; padding: 10px; background-color: #f5f5f5; border-radius: 5px; border: 1px solid #e0e0e0;">
-                    <!-- Will be dynamically populated by JavaScript -->
-                </div>
-                
-                <div class="cart-summary">
-                    <div class="cart-total">
-                        <span class="total-label">Total:</span>
-                        <span class="total-amount" data-tier-key="" data-total-quantity="0" data-ltm-fee-applies="false">$0.00</span>
-                    </div>
-                    <div class="ltm-fee-notice" style="display: none;">
-                        <span class="ltm-icon">⚠️</span>
-                        <span class="ltm-text">Less Than Minimum fee applies</span>
-                    </div>
-                    <button id="add-to-cart-button" class="add-to-cart-button">
-                        Add to Cart
-                    </button>
-<button id="view-cart-summary-button" class="view-cart-button" style="display: none; margin-top: 10px; width: 100%; padding: 10px; background-color: #17a2b8; color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 1em;">
-                        View Cart (<span class="cart-count-display">0</span>)
-                    </button>
-                </div>
-                
-                <!-- Add to Cart Button Script Removed - Handled by add-to-cart.js -->
-            </div>
-            
-            <!-- FAQ section removed as per feedback -->
-        </div>
-    </div>
+                </div> <!-- End .pricing-content-interactive -->
+            </div> <!-- End .product-interactive-column -->
+        </div> <!-- End .product-page-columns-container -->
+    </div> <!-- End .container -->
     
     <!-- JavaScript Files -->
     <script src="/pricing-pages.js"></script>
+    <script src="/utils.js"></script> <!-- Moved up and removed defer -->
     <script src="/pricing-matrix-capture.js"></script>
     <script src="/pricing-matrix-api.js"></script>
     <script src="/dp5-helper.js"></script>
-<script src="/product-quantity-ui.js"></script>
+    <script src="/product-quantity-ui.js"></script>
     <script src="/cart.js"></script>
     <script src="/cart-integration.js"></script>
     <script src="/cart-price-recalculator.js"></script>
     <script src="/add-to-cart.js"></script>
-<script src="/pricing-calculator.js"></script>
+    <script src="/pricing-calculator.js"></script>
+    <script src="/product-pricing-ui.js" defer></script> <!-- Added new script -->
     
-    <!-- Testing Script Removed -->
-    
-    <!-- Simple Row Add To Cart Enhancements -->
-    <!-- Tier Progress/LTM Display Script Removed - Handled by pricing-pages.js -->
-    
-    
-    <!-- Script to fix loading message issue -->
-    <!-- Loading Message Fix Script Removed - Handled by pricing-pages.js -->
 </body>
 <script src="/order-form-pdf.js"></script>
 </html>

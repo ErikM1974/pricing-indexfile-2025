@@ -284,36 +284,48 @@
     const priceTable = document.querySelector('table.matrix-price-table');
     // Find the note div using any of the known IDs
     const noteDiv = document.querySelector('#matrix-note, #cap-matrix-note, #dtg-matrix-note, #sp-matrix-note');
-    // Find a suitable insertion point for the View Cart link (e.g., the navigation area)
-    const navigationArea = document.querySelector('.navigation-area');
-    // Keep looking for the noteDiv for the Add to Cart button placement
-    // const titleElement = document.querySelector('#matrix-title, #cap-matrix-title, #dtg-matrix-title, #sp-matrix-title'); // No longer needed for View Cart link
+    
+    // More flexible way to find a suitable insertion point for the View Cart link
+    let navigationArea = document.querySelector('.navigation-area');
+    
+    // If we can't find the standard navigation area, try alternative locations
+    if (!navigationArea) {
+        // Try to find the back button or any header navigation
+        navigationArea = document.querySelector('.back-link, .product-navigation, header .nav');
+        debugCart("CHECK", "Standard navigation area not found, using alternative:", navigationArea);
+    }
+    
+    // If still no navigation area, create one at the top of the page
+    if (!navigationArea) {
+        debugCart("CHECK", "No navigation area found, will create one when adding View Cart link");
+    }
 
     debugCart("CHECK", "Price Table Found:", !!priceTable);
     debugCart("CHECK", "Note Div Found:", !!noteDiv, noteDiv ? noteDiv.id : 'Not Found');
-    debugCart("CHECK", "Navigation Area Found:", !!navigationArea); // Check for the new target
+    debugCart("CHECK", "Navigation Area Found:", !!navigationArea);
 
-    if (priceTable && noteDiv && navigationArea) { // Check for navigationArea instead of titleElement
-        debugCart("CHECK", "Required elements found, proceeding to add button and link.");
+    // We'll add the Add to Cart button if we have both the price table and note div
+    // For the View Cart link, we'll be more flexible and add it even if we don't have a navigation area
+    if (priceTable && noteDiv) {
+        debugCart("CHECK", "Required elements found for Add to Cart button.");
         // Prevent adding multiple times by checking if container exists
         if (!document.getElementById('cart-button-container')) {
             addCartButton(noteDiv);         // Pass the found noteDiv
         } else {
             debugCart("CHECK", "Cart button container already exists, skipping addCartButton call.");
         }
-        // Prevent adding multiple times by checking if link exists
-        if (!document.getElementById('view-cart-link')) {
-            addViewCartLink(navigationArea);  // Pass the navigationArea as the insertion point
-        } else {
-            debugCart("CHECK", "View cart link already exists, skipping addViewCartLink call.");
-        }
     } else {
-      debugCart("CHECK", "Required elements not found, attempting retry via init logic.");
-      // Optional: Add more specific logging about which element is missing
-      if (!priceTable) debugCart("CHECK", "Missing: table.matrix-price-table");
-      if (!noteDiv) debugCart("CHECK", "Missing: A note div (#matrix-note, #cap-matrix-note, etc.)");
-      if (!titleElement) debugCart("CHECK", "Missing: A title element (#matrix-title, #cap-matrix-title, etc.)");
-      // NOTE: Relying on the initialization retry in initCartIntegration, removed the direct retry here
+        debugCart("CHECK", "Required elements for Add to Cart button not found.");
+        if (!priceTable) debugCart("CHECK", "Missing: table.matrix-price-table");
+        if (!noteDiv) debugCart("CHECK", "Missing: A note div (#matrix-note, #cap-matrix-note, etc.)");
+    }
+    
+    // Always try to add the View Cart link, even if we couldn't add the Add to Cart button
+    // This ensures the View Cart button appears regardless of other elements
+    if (!document.getElementById('view-cart-link')) {
+        addViewCartLink(navigationArea);  // Pass the navigationArea as the insertion point (may be null)
+    } else {
+        debugCart("CHECK", "View cart link already exists, skipping addViewCartLink call.");
     }
   }
 
@@ -936,13 +948,15 @@
                 // Save the corrected data back to localStorage
                 localStorage.setItem(this.storageKeys.cartItems, JSON.stringify(cartData));
               }
-              // Ensure session ID matches (basic check)
-              if (cartData.sessionId === sessionId) {
-                 return { success: true, items: cartData.items };
-              } else {
-                 debugCart("CART-GET", "Stored cart session ID mismatch, returning empty cart.");
-                 return { success: true, items: [] }; // Session mismatch, treat as empty
+              // Session ID mismatch handling - use the current items but update the stored sessionId
+              if (cartData.sessionId !== sessionId) {
+                 debugCart("CART-GET", "Stored cart session ID mismatch, updating to current sessionId");
+                 // Update the sessionId in local storage
+                 cartData.sessionId = sessionId;
+                 // Save the updated session ID back to localStorage
+                 localStorage.setItem(window.DirectCartAPI.storageKeys.cartItems, JSON.stringify(cartData));
               }
+              return { success: true, items: cartData.items };
 
             }
           } catch (e) {
@@ -2141,72 +2155,113 @@ async function handleAddToCart() {
            return;
       }
   
-  
       // Clear any existing interval
       if (window.cartUpdateInterval) {
         clearInterval(window.cartUpdateInterval);
         window.cartUpdateInterval = null;
       }
+      
+      // If no valid insertion point was found, create a navigation bar at the top of the page
+      let actualInsertionPoint = insertionPointElement;
+      if (!insertionPointElement || !insertionPointElement.appendChild) {
+          debugCart("VIEW-CART", "Creating custom navigation bar for View Cart link");
+          const customNav = document.createElement('div');
+          customNav.className = 'custom-navigation-area';
+          customNav.style.display = 'flex';
+          customNav.style.justifyContent = 'space-between';
+          customNav.style.padding = '10px 15px';
+          customNav.style.backgroundColor = '#f8f9fa';
+          customNav.style.borderBottom = '1px solid #e9ecef';
+          customNav.style.marginBottom = '15px';
+          
+          // Try to find a good place to insert it at the top of page
+          const pageHeader = document.querySelector('header, .header, #header, .page-header, h1');
+          if (pageHeader && pageHeader.parentNode) {
+              pageHeader.parentNode.insertBefore(customNav, pageHeader);
+          } else {
+              // If no header found, add it to the start of the body
+              document.body.insertBefore(customNav, document.body.firstChild);
+          }
+          actualInsertionPoint = customNav;
+      }
   
-      // Create link container (use a span for inline behavior)
-      const linkContainer = document.createElement('span'); // Changed to span
-      linkContainer.id = 'view-cart-link';
-      // linkContainer.style.textAlign = 'right'; // Remove text-align
-      linkContainer.style.marginLeft = '15px'; // Add some space from the "Back" link
-      // linkContainer.style.padding = '10px'; // Remove padding
-      // linkContainer.style.marginBottom = '10px'; // Remove margin-bottom
+      // Create a more prominent "View Cart" button rather than just a link
+      const viewCartButton = document.createElement('div');
+      viewCartButton.id = 'view-cart-link';
+      viewCartButton.style.display = 'inline-block';
+      viewCartButton.style.marginLeft = '15px';
+      
+      // Create button instead of a simple link
+      const button = document.createElement('button');
+      button.className = 'view-cart-button';
+      button.style.backgroundColor = '#0056b3';
+      button.style.color = 'white';
+      button.style.border = 'none';
+      button.style.borderRadius = '4px';
+      button.style.padding = '6px 12px';
+      button.style.cursor = 'pointer';
+      button.style.fontWeight = 'bold';
+      button.style.fontSize = '0.9em';
+      button.style.display = 'flex';
+      button.style.alignItems = 'center';
+      
+      // Add shopping cart icon
+      const cartIcon = document.createElement('span');
+      cartIcon.innerHTML = '🛒'; // Simple cart emoji, could use SVG or icon font instead
+      cartIcon.style.marginRight = '5px';
+      
+      // Add text label
+      const buttonText = document.createElement('span');
+      buttonText.textContent = 'View Cart';
+      buttonText.className = 'view-cart-text';
+      
+      // Assemble button
+      button.appendChild(cartIcon);
+      button.appendChild(buttonText);
+      viewCartButton.appendChild(button);
   
-      // Create link
-      const link = document.createElement('a');
-      link.href = config.urls.cart; // Set initial href
-      link.textContent = 'View Cart';
-      link.style.color = '#0056b3'; // Use a slightly darker blue
-      link.style.textDecoration = 'underline'; // Add underline for clarity
-      link.style.fontWeight = 'bold';
-      link.style.cursor = 'pointer'; // Indicate it's clickable
-      link.style.fontSize = '0.9em'; // Match "Back to Product" link size
-  
-      // Function to update cart count for BOTH links/buttons
+      // Function to update cart count
       async function updateCartCount() {
           let count = 0;
           try {
-              const cartSystem = detectAvailableCartSystem(); // Detect which cart system to use
+              const cartSystem = detectAvailableCartSystem();
   
               if (cartSystem && typeof cartSystem.api.getCartCount === 'function') {
                   try {
-                      // Use await as getCartCount might be async
                       count = await cartSystem.api.getCartCount();
                       debugCart("VIEW-CART", `Got count from ${cartSystem.source} system:`, count);
                   } catch (countError) {
                        debugCart("VIEW-CART-ERROR", `Error getting count from ${cartSystem.source}:`, countError);
-                       count = 0; // Default to 0 on error
+                       count = 0;
                   }
               } else {
                    debugCart("VIEW-CART-WARN", "No cart system found or getCartCount method missing.");
-                   count = 0; // Default to 0 if no system found
+                   count = 0;
               }
           } catch (e) {
               debugCart("VIEW-CART-ERROR", "Error getting cart count:", e);
-              count = 0; // Default on error
+              count = 0;
           }
   
-          // Update header link text
+          // Update button text
           if (count > 0) {
-              link.textContent = `View Cart (${count})`;
+              buttonText.textContent = `View Cart (${count})`;
+              // Highlight the button when items are in cart
+              button.style.backgroundColor = '#28a745'; // Green to draw attention
           } else {
-              link.textContent = 'View Cart';
+              buttonText.textContent = 'View Cart';
+              button.style.backgroundColor = '#0056b3'; // Default blue
           }
   
-          // Update summary button visibility and text
+          // Update floating cart button if it exists
           const summaryButton = document.getElementById('view-cart-summary-button');
           if (summaryButton) {
               const countDisplay = summaryButton.querySelector('.cart-count-display');
               if (count > 0) {
-                  summaryButton.style.display = 'block'; // Show button
+                  summaryButton.style.display = 'block';
                   if (countDisplay) {
                       countDisplay.textContent = count;
                   }
-                   // Add click listener if not already added
                    if (!summaryButton.hasAttribute('data-listener-added')) {
                        summaryButton.addEventListener('click', function(event) {
                            event.preventDefault();
@@ -2215,11 +2270,10 @@ async function handleAddToCart() {
                        summaryButton.setAttribute('data-listener-added', 'true');
                    }
               } else {
-                  summaryButton.style.display = 'none'; // Hide button
+                  summaryButton.style.display = 'none';
               }
           }
       }
-  
   
       // Initial update
       updateCartCount();
@@ -2231,9 +2285,7 @@ async function handleAddToCart() {
       function navigateToCart() {
           try {
               if (window.parent && window.parent !== window) {
-                  // Try to access parent location safely
                   try {
-                      // Check if parent location is accessible before assigning
                       if (window.parent.location.href) {
                           window.parent.location.href = config.urls.cart;
                       } else {
@@ -2244,34 +2296,82 @@ async function handleAddToCart() {
                       window.location.href = config.urls.cart;
                   }
               } else {
-                  // Fallback to current window if parent is not accessible or same window
                   window.location.href = config.urls.cart;
               }
           } catch (e) {
               debugCart("VIEW-CART-ERROR", "Error navigating to cart:", e);
-              // Fallback to current window
               window.location.href = config.urls.cart;
           }
       }
   
-      // Add click event to header link
-      link.addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent default link behavior
+      // Add click event
+      button.addEventListener('click', function(event) {
+        event.preventDefault();
         navigateToCart();
       });
   
-      linkContainer.appendChild(link);
+      // Add to page using our actual insertion point (either the original or our created one)
+      actualInsertionPoint.appendChild(viewCartButton);
+      debugCart("VIEW-CART", "View Cart button added successfully");
+      
+      // Also add a floating cart button for mobile/responsive views
+      addFloatingCartButton(navigateToCart);
+  }
   
-      // Add to page - use the passed insertionPointElement
-      if (insertionPointElement && insertionPointElement.appendChild) { // Check if it's a valid element
-        // Append the link container *inside* the found navigation area
-        insertionPointElement.appendChild(linkContainer);
-        debugCart("VIEW-CART", "View Cart link appended to:", insertionPointElement.className || insertionPointElement.id);
-      } else {
-        // Fallback - add to top of body if insertion point wasn't valid
-        debugCart("VIEW-CART-WARN", "Insertion point element not provided or invalid, adding View Cart link to body start.");
-        document.body.insertBefore(linkContainer, document.body.firstChild);
+  // Add a floating "View Cart" button that's always visible at the bottom of the screen
+  function addFloatingCartButton(navigateCallback) {
+      // Don't add if it already exists
+      if (document.getElementById('floating-cart-button')) {
+          return;
       }
+      
+      const floatingButton = document.createElement('div');
+      floatingButton.id = 'floating-cart-button';
+      floatingButton.style.position = 'fixed';
+      floatingButton.style.bottom = '20px';
+      floatingButton.style.right = '20px';
+      floatingButton.style.zIndex = '1000';
+      floatingButton.style.backgroundColor = '#28a745';
+      floatingButton.style.color = 'white';
+      floatingButton.style.width = '60px';
+      floatingButton.style.height = '60px';
+      floatingButton.style.borderRadius = '50%';
+      floatingButton.style.display = 'flex';
+      floatingButton.style.justifyContent = 'center';
+      floatingButton.style.alignItems = 'center';
+      floatingButton.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+      floatingButton.style.cursor = 'pointer';
+      floatingButton.style.fontSize = '24px';
+      floatingButton.innerHTML = '🛒';
+      floatingButton.title = 'View Cart';
+      
+      // Add badge for item count
+      const countBadge = document.createElement('div');
+      countBadge.className = 'cart-count-badge';
+      countBadge.style.position = 'absolute';
+      countBadge.style.top = '-5px';
+      countBadge.style.right = '-5px';
+      countBadge.style.backgroundColor = '#dc3545';
+      countBadge.style.color = 'white';
+      countBadge.style.fontSize = '14px';
+      countBadge.style.fontWeight = 'bold';
+      countBadge.style.padding = '2px 8px';
+      countBadge.style.borderRadius = '10px';
+      countBadge.style.display = 'none'; // Hide initially
+      
+      floatingButton.appendChild(countBadge);
+      
+      // Add click handler
+      floatingButton.addEventListener('click', function() {
+          if (typeof navigateCallback === 'function') {
+              navigateCallback();
+          } else {
+              window.location.href = config.urls.cart;
+          }
+      });
+      
+      document.body.appendChild(floatingButton);
+      debugCart("VIEW-CART", "Floating cart button added");
   }
 
 
@@ -2279,40 +2379,39 @@ async function handleAddToCart() {
   async function initializeCartSystems() {
     debugCart("INIT", "Starting cart systems initialization");
 
-    // First try to initialize NWCACart if it's available but not initialized
-    if (window.NWCACart && typeof window.NWCACart.initializeCart === 'function') {
-      try {
-        debugCart("INIT", "Initializing NWCACart in current window");
-        await window.NWCACart.initializeCart();
-        debugCart("INIT", "NWCACart initialization complete");
-      } catch (e) {
-        debugCart("INIT-ERROR", "Error initializing NWCACart:", e);
+    // Setup cart integration when NWCACart is ready
+    function setupCartIntegration() {
+      debugCart("INIT", "NWCACart ready, setting up integration components");
+      
+      // Then initialize our direct integration (if not already done)
+      if (!window.cartIntegrationInitialized) {
+        debugCart("INIT", "Initializing cart integration UI components");
+        window.initCartIntegration(); // This sets the flag and adds UI
       }
+      
+      // Try to synchronize carts
+      try {
+        debugCart("INIT", "Attempting cart synchronization");
+        synchronizeCartSystems().then(result => {
+          debugCart("INIT", `Cart synchronization ${result ? 'successful' : 'failed'}`);
+        });
+      } catch (e) {
+        debugCart("INIT-ERROR", "Error during cart synchronization:", e);
+      }
+    }
+
+    function onNwcacartReady() {
+      document.removeEventListener('nwcacartInitialized', onNwcacartReady);
+      setupCartIntegration();
+    }
+
+    // Check if NWCACart is already initialized
+    if (window.NWCACart && window.NWCACart.isInitialized) {
+      debugCart("INIT", "NWCACart already initialized, proceeding with setup");
+      setupCartIntegration();
     } else {
-      debugCart("INIT", "NWCACart not available for initialization");
-
-      // Try to find NWCACart in the global scope after a short delay
-      setTimeout(async () => {
-        if (window.NWCACart && typeof window.NWCACart.initializeCart === 'function') {
-          try {
-            debugCart("INIT", "Initializing NWCACart after delay");
-            await window.NWCACart.initializeCart();
-            debugCart("INIT", "Delayed NWCACart initialization complete");
-
-            // Try to synchronize again after successful initialization
-            try {
-              const syncResult = await synchronizeCartSystems();
-              debugCart("INIT", `Delayed cart synchronization ${syncResult ? 'successful' : 'failed'}`);
-            } catch (syncError) {
-              debugCart("INIT-ERROR", "Error during delayed cart synchronization:", syncError);
-            }
-          } catch (e) {
-            debugCart("INIT-ERROR", "Error in delayed NWCACart initialization:", e);
-          }
-        } else {
-            debugCart("INIT", "NWCACart still not found after delay.");
-        }
-      }, 1000);
+      debugCart("INIT", "Waiting for NWCACart to be initialized...");
+      document.addEventListener('nwcacartInitialized', onNwcacartReady);
     }
 
     // Then initialize our direct integration (if not already done)

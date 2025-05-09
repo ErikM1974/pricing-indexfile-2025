@@ -4,7 +4,6 @@
 
     console.log("[ADD-TO-CART] Initializing add to cart functionality (v3 Refactored)");
 
-    // Function to fetch current cart contents
     async function fetchCartContents() {
         console.log("[ADD-TO-CART] Fetching current cart contents");
         try {
@@ -18,7 +17,6 @@
                 console.warn("[ADD-TO-CART] Failed to get cart items or no items returned");
                 return { embroideryItems: 0, totalItems: 0, items: [] };
             }
-
             const currentEmbType = detectEmbellishmentType();
             let embroideryItemCount = 0;
             let totalItemCount = 0;
@@ -43,56 +41,21 @@
         }
     }
 
-    // Function to initialize the Add to Cart section
-    function initAddToCart() {
-        if (window.addToCartInitialized) {
-            console.log("[ADD-TO-CART] Already initialized, just updating cart total");
-            updateCartTotal();
-            return;
-        }
-        window.addToCartInitialized = true;
-
-        const addToCartButton = document.getElementById('add-to-cart-button');
-        if (addToCartButton) {
-            try {
-                const newButton = addToCartButton.cloneNode(true);
-                if (addToCartButton.parentNode) {
-                    addToCartButton.parentNode.replaceChild(newButton, addToCartButton);
-                    newButton.addEventListener('click', handleAddToCart);
-                    console.log("[ADD-TO-CART] Add to Cart button listener attached.");
-                }
-            } catch (error) {
-                console.error("[ADD-TO-CART] Error setting up Add to Cart button:", error);
-                addToCartButton.addEventListener('click', handleAddToCart);
-            }
-        } else {
-            console.warn("[ADD-TO-CART] Add to Cart button not found.");
-        }
-        updateCartTotal(); // Initial calculation
-    }
-
-    // Flag to prevent recursive updateCartTotal calls
     let updatingCartTotal = false;
 
-    // Function to update cart total when quantities change
-    // REFACTORED: Uses NWCAPricingCalculator and PricingPageUI
     function updateCartTotal() {
         if (updatingCartTotal) {
-            // console.log("[ADD-TO-CART] Already updating cart total, skipping recursive call");
             return;
         }
         updatingCartTotal = true;
-
         try {
             console.log("[ADD-TO-CART] Updating cart total (Refactored v4 - Dynamic Pricing)");
-            window.updateCartTotal = updateCartTotal; // Ensure global access
-
-            // 1. Gather current quantities from UI inputs
+            window.updateCartTotal = updateCartTotal; 
             let quantityInputs = [];
-            const sizeQuantities = {}; // { size: quantity } for items being added *now*
+            const sizeQuantities = {}; 
             let newQuantityTotal = 0;
             try {
-                const useGrid = window.PricingPageUI?.determineLayoutPreference ? window.PricingPageUI.determineLayoutPreference() : false; // Use PricingPageUI version
+                const useGrid = window.PricingPageUI?.determineLayoutPreference ? window.PricingPageUI.determineLayoutPreference() : false; 
                 const containerSelector = useGrid ? '#size-quantity-grid-container' : '#quantity-matrix';
                 const container = document.querySelector(containerSelector);
                 if (container) {
@@ -106,7 +69,6 @@
                             sizeQuantities[size] = quantity;
                         }
                     });
-                    // console.log(`[ADD-TO-CART] Found ${quantityInputs.length} inputs in ${containerSelector}. New Qty: ${newQuantityTotal}`);
                 } else {
                      console.warn(`[ADD-TO-CART] Could not find container ${containerSelector}. Cannot get quantities.`);
                 }
@@ -114,45 +76,36 @@
                 console.error("[ADD-TO-CART] Error getting quantity inputs:", err);
             }
 
-            // 2. Ensure cart contents are loaded (async fetch if needed)
             if (!window.cartContents) {
                 console.log("[ADD-TO-CART] Cart contents not available, fetching...");
-                updatingCartTotal = false; // Release lock before async call
+                updatingCartTotal = false; 
                 fetchCartContents().then(contents => {
                     window.cartContents = contents;
-                    updateCartTotal(); // Re-run with fetched contents
+                    updateCartTotal(); 
                 }).catch(error => {
                     console.error("[ADD-TO-CART] Error fetching cart contents:", error);
-                    window.cartContents = { embroideryItems: 0, totalItems: 0, items: [] }; // Provide default empty cart
-                    updateCartTotal(); // Continue with empty cart contents
+                    window.cartContents = { embroideryItems: 0, totalItems: 0, items: [] }; 
+                    updateCartTotal(); 
                 });
-                return; // Exit and wait for fetch
+                return; 
             }
 
-            // 3. Get existing cart quantity for the current embellishment type
-            // const cartContents = window.cartContents || { embroideryItems: 0, totalItems: 0, items: [] }; // No longer rely on pre-fetched cartContents for count
             const currentEmbType = detectEmbellishmentType();
-
-            // --- FIX: Calculate existing quantity directly from NWCACart ---
             let existingEmbroideryItems = 0;
             if (window.NWCACart && typeof window.NWCACart.getCartItems === 'function') {
-                const activeCartItems = window.NWCACart.getCartItems('Active'); // Get current active items
+                const activeCartItems = window.NWCACart.getCartItems('Active'); 
                 if (activeCartItems && Array.isArray(activeCartItems)) {
                     activeCartItems.forEach(item => {
-                        // Use ImprintType as per cart.js structure
                         if (item.ImprintType === currentEmbType && item.CartStatus === 'Active' && Array.isArray(item.sizes)) {
                             existingEmbroideryItems += item.sizes.reduce((sum, size) => sum + (parseInt(size.Quantity) || 0), 0);
                         }
                     });
                 }
-                 console.log(`[ADD-TO-CART] Calculated existing ${currentEmbType} items directly from NWCACart: ${existingEmbroideryItems}`); // New log
+                 console.log(`[ADD-TO-CART] Calculated existing ${currentEmbType} items directly from NWCACart: ${existingEmbroideryItems}`);
             } else {
                  console.warn("[ADD-TO-CART] NWCACart.getCartItems not available to calculate existing quantity.");
             }
-            // --- END FIX ---
-
-
-            // 4. Get pricing data (captured by pricing-matrix-capture.js)
+            
             const pricingData = window.nwcaPricingData;
             if (!pricingData) {
                 console.error("[ADD-TO-CART] Pricing data (window.nwcaPricingData) not available. Cannot calculate prices.");
@@ -162,33 +115,24 @@
                 return;
             }
 
-            // 5. Call the Pricing Calculator with PROSPECTIVE calculation
-            // This is the key change: we always use the combined quantity to determine pricing tier
             if (!window.NWCAPricingCalculator || typeof window.NWCAPricingCalculator.calculatePricing !== 'function') {
                  console.error("[ADD-TO-CART] NWCAPricingCalculator is not available!");
                  updatingCartTotal = false;
                  return;
             }
-            // --- Verification Log ---
             console.log("[ADD-TO-CART] Data for Pricing Calculator:", {
-                sizeQuantities: JSON.parse(JSON.stringify(sizeQuantities)), // Log deep copy
-                existingCartQuantity: existingEmbroideryItems, // Use the newly calculated value
+                sizeQuantities: JSON.parse(JSON.stringify(sizeQuantities)), 
+                existingCartQuantity: existingEmbroideryItems, 
                 pricingDataAvailable: !!pricingData
             });
-            // --- End Verification Log ---
-
+            
             const calculatedPricing = window.NWCAPricingCalculator.calculatePricing(
                 sizeQuantities,
-                existingEmbroideryItems, // Pass the correctly calculated value
+                existingEmbroideryItems, 
                 pricingData
             );
-
-            // --- LTM Discrepancy Investigation Log ---
-            // Log the full result immediately after calculation to compare with UI updates
-             console.log("[ADD-TO-CART] Full calculatedPricing result:", JSON.parse(JSON.stringify(calculatedPricing || {})));
-            // --- End LTM Log ---
-
-
+            console.log("[ADD-TO-CART] Full calculatedPricing result:", JSON.parse(JSON.stringify(calculatedPricing || {})));
+            
             if (!calculatedPricing) {
                 console.error("[ADD-TO-CART] Pricing calculation failed.");
                  const totalAmountDisplay = document.querySelector('.total-amount');
@@ -197,12 +141,11 @@
                 return;
             }
 
-            // 6. Store the detailed calculation result globally
             window.cartItemData = {
                 ...calculatedPricing,
                 cartQuantity: existingEmbroideryItems,
-                totalQuantity: newQuantityTotal, // Explicitly store quantity being added now
-                prospectiveTotal: calculatedPricing.combinedQuantity // Store the prospective total
+                totalQuantity: newQuantityTotal, 
+                prospectiveTotal: calculatedPricing.combinedQuantity 
             };
             console.log("[ADD-TO-CART] Prospective total calculation:", {
                 new: newQuantityTotal,
@@ -212,10 +155,6 @@
                 ltmApplies: calculatedPricing.ltmFeeApplies
             });
 
-
-            // 7. Update UI Elements using PricingPageUI module
-
-            // Update LTM fee notice display with prospective calculation info
             const ltmFeeNotice = document.querySelector('.ltm-fee-notice');
             if (ltmFeeNotice) {
                 ltmFeeNotice.style.display = calculatedPricing.ltmFeeApplies ? 'block' : 'none';
@@ -240,7 +179,6 @@
                             </div>` : ''}
                         `;
                     }
-                    // Apply notice styling
                     ltmFeeNotice.style.backgroundColor = '#fff3cd';
                     ltmFeeNotice.style.border = '1px solid #ffeeba';
                     ltmFeeNotice.style.padding = '12px';
@@ -250,7 +188,6 @@
                 }
             }
 
-            // Update Tier progress and Cart info summary using PricingPageUI
             if (window.PricingPageUI) {
                 window.PricingPageUI.updateTierInfoDisplay(calculatedPricing.tierKey, calculatedPricing.nextTier, calculatedPricing.quantityForNextTier, calculatedPricing.combinedQuantity);
                 window.PricingPageUI.updateCartInfoDisplay(newQuantityTotal, calculatedPricing.combinedQuantity, calculatedPricing.tierKey);
@@ -258,13 +195,11 @@
                 console.error("[ADD-TO-CART] PricingPageUI not available for UI updates.");
             }
 
-            // Update individual price displays for each size input field using PricingPageUI
             const allAvailableSizes = Object.keys(calculatedPricing.baseUnitPrices || {});
             allAvailableSizes.forEach(size => {
                 const quantity = sizeQuantities[size] || 0;
                 const itemData = calculatedPricing.items[size];
                 const baseUnitPrice = calculatedPricing.baseUnitPrices[size] || 0;
-
                 if (window.PricingPageUI && typeof window.PricingPageUI.updatePriceDisplayForSize === 'function') {
                     window.PricingPageUI.updatePriceDisplayForSize(
                         size, quantity, baseUnitPrice,
@@ -278,8 +213,6 @@
                 }
             });
 
-
-            // Update final total display in the cart summary with enhanced prospective pricing info
             const totalAmountDisplay = document.querySelector('.total-amount');
             if (totalAmountDisplay) {
                  if (calculatedPricing.ltmFeeApplies && newQuantityTotal > 0) {
@@ -287,7 +220,6 @@
                       baseTotalPrice = Object.values(calculatedPricing.items)
                                          .filter(item => item.quantity > 0)
                                          .reduce((sum, item) => sum + (item.baseUnitPrice * item.quantity || 0), 0);
-
                      let prospectiveInfoHtml = '';
                      if (existingEmbroideryItems > 0) {
                          prospectiveInfoHtml = `
@@ -307,7 +239,6 @@
                                  </div>
                              </div>`;
                      }
-
                      totalAmountDisplay.innerHTML = `
                          <div class="total-breakdown">
                              <div style="text-align:center;background-color:#ffc107;color:#212529;padding:5px;margin-bottom:8px;border-radius:4px;font-weight:bold;font-size:1.1em;">⚠️ LTM FEE APPLIED TO ORDER ⚠️</div>
@@ -319,7 +250,6 @@
                              <div class="total-with-ltm" style="margin-top:8px;font-size:1.2em;"><strong>Total: $${calculatedPricing.totalPrice.toFixed(2)}</strong></div>
                          </div>`;
                  } else {
-                     // Standard pricing display with prospective info if needed
                      if (existingEmbroideryItems > 0 && newQuantityTotal > 0) {
                          totalAmountDisplay.innerHTML = `
                              <div class="total-breakdown">
@@ -344,8 +274,6 @@
                          totalAmountDisplay.textContent = `$${calculatedPricing.totalPrice.toFixed(2)}`;
                      }
                  }
-                 
-                 // Store calculated values in dataset
                  totalAmountDisplay.dataset.calculatedTotal = calculatedPricing.totalPrice.toFixed(2);
                  totalAmountDisplay.dataset.totalQuantity = newQuantityTotal;
                  totalAmountDisplay.dataset.tierKey = calculatedPricing.tierKey;
@@ -354,10 +282,19 @@
                  totalAmountDisplay.dataset.prospectiveTotal = calculatedPricing.combinedQuantity;
                  totalAmountDisplay.dataset.existingCartQty = existingEmbroideryItems;
             }
-
-            // Dispatch event for other components
             document.dispatchEvent(new Event('cartTotalUpdated'));
-
+            
+            // Enable/disable the Add to Cart button based on quantity
+            const addToCartButton = document.getElementById('add-to-cart-button');
+            if (addToCartButton) {
+                if (newQuantityTotal > 0) {
+                    addToCartButton.disabled = false;
+                    console.log("[ADD-TO-CART] Enabling Add to Cart button - quantities selected:", newQuantityTotal);
+                } else {
+                    addToCartButton.disabled = true;
+                    console.log("[ADD-TO-CART] Add to Cart button remains disabled - no quantities selected");
+                }
+            }
         } catch (error) {
             console.error("[ADD-TO-CART] Error in updateCartTotal (Refactored v3):", error);
         } finally {
@@ -365,78 +302,54 @@
         }
     }
 
-    // == UI Update Functions REMOVED ==
-    // updatePriceDisplayForSize, updateCartInfoDisplay, updateTierInfoDisplay
-    // These are now expected to be in pricing-pages.js and accessed via window.PricingPageUI
-
-
-    // Function to validate prices before adding to cart
-    // REFACTORED: Uses NWCAPricingCalculator result (window.cartItemData) and captured data (window.nwcaPricingData)
     function validatePricesBeforeAddingToCart() {
         console.log("[ADD-TO-CART] Validating prices before adding to cart (Refactored)");
-
-        // Check if we have calculated cartItemData from the calculator
         if (!window.cartItemData || !window.cartItemData.items || !window.cartItemData.tierKey) {
             console.error("[ADD-TO-CART:VALIDATION] No calculated cartItemData available for validation. Triggering recalculation.");
-            updateCartTotal(); // Attempt recalculation
+            updateCartTotal(); 
             if (!window.cartItemData || !window.cartItemData.items || !window.cartItemData.tierKey) {
                  console.error("[ADD-TO-CART:VALIDATION] Recalculation failed. Cannot validate prices.");
                  alert("Price calculation error. Please refresh the page and try again.");
                  return false;
             }
         }
-
-        // Check if we have the source pricing data
         const sourcePricingData = window.nwcaPricingData;
         if (!sourcePricingData || !sourcePricingData.prices || !sourcePricingData.tierData) {
              console.error("[ADD-TO-CART:VALIDATION] Cannot validate prices: Missing source pricing data (window.nwcaPricingData).");
              alert("Pricing data is missing or invalid. Please refresh the page.");
              return false;
         }
-
         const { tierKey, ltmFeeApplies, ltmFeePerItem, items: calculatedItems } = window.cartItemData;
         const sourcePrices = sourcePricingData.prices;
         const sourceTierData = sourcePricingData.tierData;
-
         let allPricesValid = true;
         let invalidSizes = [];
-
-        // Determine the reference tier for LTM lookup
         let ltmReferenceTier = null;
         if (ltmFeeApplies) {
              ltmReferenceTier = Object.keys(sourceTierData).find(t => {
                  const td = sourceTierData[t];
                  return (td.MinQuantity || 0) <= 24 && (td.MaxQuantity === undefined || td.MaxQuantity >= 24);
-             }) || tierKey; // Fallback
+             }) || tierKey; 
         }
-
         for (const size in calculatedItems) {
             const itemData = calculatedItems[size];
             const quantity = itemData.quantity;
-            if (quantity <= 0) continue; // Skip items not being added
-
+            if (quantity <= 0) continue; 
             let expectedBasePrice = 0;
             const pricingTierForLookup = ltmFeeApplies ? ltmReferenceTier : tierKey;
-
-            // Find expected base price from source data
             if (sourcePrices[size] && sourcePrices[size][pricingTierForLookup] !== undefined) {
                 expectedBasePrice = parseFloat(sourcePrices[size][pricingTierForLookup]);
             } else if (size === 'OSFA' && sourcePrices['OSFA'] && sourcePrices['OSFA'][pricingTierForLookup] !== undefined) {
-                 expectedBasePrice = parseFloat(sourcePrices['OSFA'][pricingTierForLookup]); // OSFA fallback check
+                 expectedBasePrice = parseFloat(sourcePrices['OSFA'][pricingTierForLookup]); 
             } else {
                 console.warn(`[ADD-TO-CART:VALIDATION] Could not find source price for Size: ${size}, Tier: ${pricingTierForLookup}. Validation might be inaccurate.`);
-                expectedBasePrice = itemData.baseUnitPrice; // Use calculated base as fallback
+                expectedBasePrice = itemData.baseUnitPrice; 
             }
-
             expectedBasePrice = isNaN(expectedBasePrice) ? 0 : expectedBasePrice;
             let expectedDisplayPrice = expectedBasePrice + (ltmFeeApplies ? ltmFeePerItem : 0);
-
             const actualDisplayPrice = itemData.displayUnitPrice;
-            const tolerance = 0.011; // ~1 cent tolerance
+            const tolerance = 0.011; 
             const priceDifference = Math.abs(expectedDisplayPrice - actualDisplayPrice);
-
-            // console.log(`[ADD-TO-CART:VALIDATION] Size ${size}: Expected Display $${expectedDisplayPrice.toFixed(2)}, Actual Display $${actualDisplayPrice.toFixed(2)}, Diff: $${priceDifference.toFixed(2)}`);
-
             if (priceDifference > tolerance) {
                 allPricesValid = false;
                 invalidSizes.push({
@@ -446,61 +359,51 @@
                 });
             }
         }
-
         if (!allPricesValid) {
             console.error("[ADD-TO-CART:VALIDATION] Price validation failed:", invalidSizes);
             const errorMessage = `Price synchronization error detected. The following sizes have incorrect prices:\n${invalidSizes.map(item => `${item.size}: Expected $${item.expected}, Found $${item.actual}`).join('\n')}\n\nPlease refresh the page or contact support if the issue persists.`;
             alert(errorMessage);
             return false;
         }
-
         console.log("[ADD-TO-CART:VALIDATION] All prices are valid");
         return true;
     }
 
-    // Function to handle Add to Cart button click
     function handleAddToCart() {
-        console.log("[ADD-TO-CART] Add to Cart button clicked");
+        console.log("[ADD-TO-CART] Add to Cart button clicked"); 
         const addToCartButton = document.getElementById('add-to-cart-button');
-
         if (addToCartButton) {
              if (addToCartButton.disabled) {
                  console.log("[ADD-TO-CART] Button already processing, ignoring click");
-                 return;
+                 return; 
              }
              addToCartButton.disabled = true;
              addToCartButton._originalText = addToCartButton.textContent;
              addToCartButton.textContent = 'Processing...';
         }
-
-        // 1. Ensure cart contents are loaded
         if (!window.cartContents) {
             console.log("[ADD-TO-CART] Cart contents not available, fetching before adding...");
             fetchCartContents().then(contents => {
                 window.cartContents = contents;
-                handleAddToCart(); // Re-call
+                handleAddToCart(); 
             }).catch(error => {
                 console.error("[ADD-TO-CART] Error fetching cart contents before add:", error);
                 alert("Could not verify cart contents. Please try adding again.");
                 if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
             });
-            return;
+            return; 
         }
-
-        // 2. Ensure latest prices are calculated and stored
-        console.log("[ADD-TO-CART] Step 2: Forcing price recalculation..."); // ADDED LOG
-        updateCartTotal(); // Force recalculation
-        console.log("[ADD-TO-CART] Step 2: Price recalculation complete. Checking window.cartItemData:", JSON.parse(JSON.stringify(window.cartItemData || {}))); // ADDED LOG + Deep copy for logging
+        console.log("[ADD-TO-CART] Step 2: Forcing price recalculation..."); 
+        updateCartTotal(); 
+        console.log("[ADD-TO-CART] Step 2: Price recalculation complete. Checking window.cartItemData:", JSON.parse(JSON.stringify(window.cartItemData || {}))); 
         if (!window.cartItemData || !window.cartItemData.items) {
-             console.error("[ADD-TO-CART] Price calculation failed or window.cartItemData is invalid before add. Aborting."); // Enhanced log
+             console.error("[ADD-TO-CART] Price calculation failed or window.cartItemData is invalid before add. Aborting."); 
              alert("Could not calculate final prices. Please refresh and try again.");
               if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
-             return;
+             return; 
         }
-        console.log("[ADD-TO-CART] Step 2: window.cartItemData seems valid."); // ADDED LOG
-
-        // 3. Validate prices
-        console.log("[ADD-TO-CART] Step 3: Starting price validation..."); // ADDED LOG
+        console.log("[ADD-TO-CART] Step 2: window.cartItemData seems valid."); 
+        console.log("[ADD-TO-CART] Step 3: Starting price validation..."); 
         let pricesAreValid = false;
         try {
             pricesAreValid = validatePricesBeforeAddingToCart();
@@ -510,32 +413,24 @@
             if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
             return;
         }
-        console.log(`[ADD-TO-CART] Step 3: Price validation result: ${pricesAreValid}`); // ADDED LOG
-
+        console.log(`[ADD-TO-CART] Step 3: Price validation result: ${pricesAreValid}`); 
         if (!pricesAreValid) {
-            console.log("[ADD-TO-CART] Step 3: Price validation failed. Aborting add to cart."); // ADDED LOG
-            // Alert is shown inside validatePricesBeforeAddingToCart
+            console.log("[ADD-TO-CART] Step 3: Price validation failed. Aborting add to cart."); 
             if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
-            return; // Exit if validation failed
+            return; 
         }
-        console.log("[ADD-TO-CART] Step 3: Price validation passed."); // ADDED LOG
-
-        // 4. Collect final data using validated window.cartItemData
-        console.log("[ADD-TO-CART] Step 4: Collecting final product data..."); // ADDED LOG
+        console.log("[ADD-TO-CART] Step 3: Price validation passed."); 
+        console.log("[ADD-TO-CART] Step 4: Collecting final product data..."); 
         const {
             tierKey, ltmFeeApplies, totalQuantity, items: calculatedItems,
             ltmFeeTotal, ltmFeePerItem, combinedQuantity, cartQuantity, baseUnitPrices
         } = window.cartItemData;
-
         console.log(`[ADD-TO-CART] Handle Add: Using Tier: ${tierKey}, LTM Applies: ${ltmFeeApplies} from validated cartItemData`);
-
         if (totalQuantity === 0) {
             alert('Please select at least one size and quantity.');
             if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
             return;
         }
-
-        // Format sizes for the cart API payload
         const sizesForCart = [];
         try {
             Object.keys(calculatedItems).forEach(size => {
@@ -555,64 +450,194 @@
               if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
              return;
         }
-
-        // Get product info
         const styleNumber = getUrlParameter('StyleNumber') || document.getElementById('product-style-number')?.value || 'UNKNOWN_STYLE';
         const colorCode = getUrlParameter('COLOR') || document.getElementById('product-color-code')?.value || 'UNKNOWN_COLOR';
         const embType = detectEmbellishmentType();
-
-        // Capture the EXACT product image URL from the specific required element
-        const productImageElement = document.getElementById('product-image'); // Only use this specific ID
-        const specificImageUrl = productImageElement ? productImageElement.getAttribute('src') : '';
-        console.log("[ADD-TO-CART] Captured product image URL from #product-image:", specificImageUrl);
-
-        // Capture current page URL information for navigation back from cart
+        // Get the product image URL with improved fallback handling
+        let specificImageUrl = '';
+        
+        // Try to get product title
+        let productTitle = '';
+        
+        // Get product title from the specific element with ID 'product-title-context'
+        const productTitleElement = document.getElementById('product-title-context');
+        if (productTitleElement && productTitleElement.textContent) {
+            productTitle = productTitleElement.textContent.trim();
+            console.log('[ADD-TO-CART] Found product title from #product-title-context:', productTitle);
+        } else {
+            console.log('[ADD-TO-CART] Could not find #product-title-context element, using fallbacks');
+            
+            // First check if it's in window.productContext
+            if (window.productContext && window.productContext.PRODUCT_TITLE) {
+                productTitle = window.productContext.PRODUCT_TITLE;
+                console.log("[ADD-TO-CART] Captured product title from window.productContext:", productTitle);
+            } else {
+                // Try to get from page elements
+                const titleSelectors = [
+                    'h1.product-title', 'h2.product-title', '.product-name h1',
+                    '#product-title', '.product-title', 'h1', 'title'
+                ];
+                
+                for (const selector of titleSelectors) {
+                    const titleElement = document.querySelector(selector);
+                    if (titleElement && titleElement.textContent.trim()) {
+                        productTitle = titleElement.textContent.trim();
+                        console.log(`[ADD-TO-CART] Captured product title from ${selector}:`, productTitle);
+                        break;
+                    }
+                }
+                
+                // If still no title, use style number and color
+                if (!productTitle) {
+                    const style = getUrlParameter('StyleNumber') || document.getElementById('product-style-number')?.value;
+                    const color = getUrlParameter('COLOR') || document.getElementById('product-color-code')?.value;
+                    if (style && color) {
+                        productTitle = `${style} - ${color}`;
+                        console.log("[ADD-TO-CART] Created product title from style and color:", productTitle);
+                    }
+                }
+            }
+        }
+        
+        // Log product title capture result
+        console.log(`[ADD-TO-CART:TITLE] Final product title: '${productTitle}'`);
+        
+        // Try main product image first
+        const productImageElement = document.getElementById('product-image');
+        if (productImageElement && productImageElement.getAttribute('src')) {
+            specificImageUrl = productImageElement.getAttribute('src');
+            console.log("[ADD-TO-CART] Captured product image URL from #product-image:", specificImageUrl);
+        } else {
+            console.warn("[ADD-TO-CART:IMAGE] No product image URL found in #product-image element or src is empty");
+            
+            // Try window.productContext first (common source of product data)
+            if (window.productContext) {
+                const contextImageProps = ['IMAGE_URL_FRONT', 'FRONT_MODEL', 'imageUrl', 'ImageURL'];
+                for (const prop of contextImageProps) {
+                    if (window.productContext[prop]) {
+                        specificImageUrl = window.productContext[prop];
+                        console.log(`[ADD-TO-CART:IMAGE] Found image URL in window.productContext.${prop}:`, specificImageUrl);
+                        break;
+                    }
+                }
+            }
+            
+            // If still no image, try alternative image sources
+            if (!specificImageUrl) {
+                const altSelectors = [
+                    '.product-image', 'img.product', '.main-product-image',
+                    '.product-thumbnail', '#main-product-image', 'img[alt*="product"]',
+                    '#ProductImg', '.product-single__photo', '.featured-image'
+                ];
+                
+                // Join selectors for a single query
+                const altImages = document.querySelectorAll(altSelectors.join(', '));
+                
+                if (altImages.length > 0) {
+                    for (let i = 0; i < altImages.length; i++) {
+                        const altUrl = altImages[i].src || altImages[i].getAttribute('src');
+                        if (altUrl) {
+                            specificImageUrl = altUrl;
+                            console.log(`[ADD-TO-CART:IMAGE] Found alternative image from selector at index ${i}:`, altUrl);
+                            break; // Use the first valid image URL found
+                        }
+                    }
+                }
+                
+                // Try SanMar URL construction if still no image
+                if (!specificImageUrl) {
+                    const style = getUrlParameter('StyleNumber') || document.getElementById('product-style-number')?.value;
+                    const color = getUrlParameter('COLOR') || document.getElementById('product-color-code')?.value;
+                    
+                    if (style && color) {
+                        // Try to construct a SanMar URL based on known patterns
+                        specificImageUrl = `https://cdnm.sanmar.com/imglib/mresjpg/2014/f19/${style}_${color.toLowerCase()}_model_front_082010.jpg`;
+                        console.log(`[ADD-TO-CART:IMAGE] Constructed SanMar URL as fallback:`, specificImageUrl);
+                    }
+                }
+            }
+        }
+        
+        // Enhanced image URL logging for debugging
+        console.log(`[ADD-TO-CART:IMAGE] Final image URL details - Type: ${typeof specificImageUrl}, Length: ${specificImageUrl.length}, Value: '${specificImageUrl}'`);
         const currentPageUrl = window.location.href;
         const currentPagePath = window.location.pathname;
+        // Ensure product title is explicitly set
+        if (!productTitle) {
+            console.warn("[ADD-TO-CART] No product title found, creating one from style and color");
+            productTitle = `${styleNumber} - ${colorCode}`;
+        }
+        console.log("[ADD-TO-CART] Setting PRODUCT_TITLE before adding to cart:", productTitle);
         
-        // Construct the final payload
         const productData = {
             styleNumber: styleNumber, color: colorCode, embellishmentType: embType,
             pricingTier: tierKey, ltmFeeApplied: ltmFeeApplies, totalQuantity: totalQuantity,
             sizes: sizesForCart,
-            imageUrl: specificImageUrl, // Add the captured image URL to productData
-            sourceUrl: currentPageUrl, // Store the complete URL of the current page
-            sourcePage: currentPagePath, // Store just the page path for reference
+            imageUrl: specificImageUrl,
+            PRODUCT_TITLE: productTitle, // Explicitly set PRODUCT_TITLE with exact casing
+            productTitle: productTitle, // Also include as productTitle for backward compatibility
+            sourceUrl: currentPageUrl,
+            sourcePage: currentPagePath,
             pricingInfo: {
-                tierKey, ltmFeeApplied: ltmFeeApplies, ltmFeeTotal, ltmFeePerItem,
+                tierKey, ltmFeeApplies, ltmFeeTotal, ltmFeePerItem,
                 combinedQuantity, existingCartQuantity: cartQuantity, baseUnitPrices
             }
         };
         
+        // Explicitly ensure the image URL and product title are captured in the logs just before cart addition
+        console.log("[ADD-TO-CART:FINAL] Product data for cart:", {
+            imageUrl: specificImageUrl ? `'${specificImageUrl}'` : "MISSING",
+            productTitle: productTitle ? `'${productTitle}'` : "MISSING",
+            PRODUCT_TITLE: productData.PRODUCT_TITLE ? `'${productData.PRODUCT_TITLE}'` : "MISSING"
+        });
+        
+        // Double-check that PRODUCT_TITLE is set properly
+        if (!productData.PRODUCT_TITLE) {
+            console.warn("[ADD-TO-CART:FINAL] PRODUCT_TITLE is missing, explicitly setting it");
+            productData.PRODUCT_TITLE = productTitle || `${styleNumber} - ${colorCode}`;
+            console.log("[ADD-TO-CART:FINAL] Set PRODUCT_TITLE to:", productData.PRODUCT_TITLE);
+        }
         console.log("[ADD-TO-CART] Storing source URL with item:", currentPageUrl);
-
-        // Final data validation
         if (!productData.styleNumber || productData.styleNumber === 'UNKNOWN_STYLE' || !productData.color || productData.color === 'UNKNOWN_COLOR' || productData.sizes.length === 0) {
             console.error("[ADD-TO-CART] Invalid final product data:", productData);
             alert('Error: Required product style or color information is missing.');
              if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
             return;
         }
-
-        // 5. Send to Cart API
         if (window.NWCACart && typeof window.NWCACart.addToCart === 'function') {
             if (addToCartButton) addToCartButton.textContent = 'Adding...';
-            console.log("[ADD-TO-CART] Step 5: Preparing to call NWCACart.addToCart with data:", JSON.parse(JSON.stringify(productData))); // MODIFIED LOG
-
-            window.NWCACart.addToCart(productData) // <<< THE CALL
+            console.log("[ADD-TO-CART] Step 5: Preparing to call NWCACart.addToCart with data:", JSON.parse(JSON.stringify(productData)));
+            
+            // Add a test function to verify and fix the API payload
+            const verifyPayload = (data) => {
+                console.log("[ADD-TO-CART:TEST] Verifying payload structure before sending to API:");
+                console.log("[ADD-TO-CART:TEST] PRODUCT_TITLE present:", !!data.PRODUCT_TITLE);
+                console.log("[ADD-TO-CART:TEST] PRODUCT_TITLE value:", data.PRODUCT_TITLE);
+                
+                // Ensure PRODUCT_TITLE is set
+                if (!data.PRODUCT_TITLE) {
+                    console.warn("[ADD-TO-CART:TEST] PRODUCT_TITLE missing from payload, adding it");
+                    data.PRODUCT_TITLE = data.productTitle || `${data.styleNumber} - ${data.color}`;
+                    console.log("[ADD-TO-CART:TEST] Added PRODUCT_TITLE:", data.PRODUCT_TITLE);
+                }
+                
+                // Log the image URL for debugging
+                console.log("[ADD-TO-CART:TEST] Image URL being sent:", data.imageUrl || "MISSING");
+                console.log("[ADD-TO-CART:TEST] PRODUCT_TITLE being sent:", data.PRODUCT_TITLE || "MISSING");
+                
+                return data;
+            };
+            
+            // Call the verification function before sending to API
+            window.NWCACart.addToCart(verifyPayload(productData))
                 .then(result => {
-                    console.log("[ADD-TO-CART] Step 5: NWCACart.addToCart call completed. Result:", result); // ADDED LOG
+                    console.log("[ADD-TO-CART] Step 5: NWCACart.addToCart call completed. Result:", result); 
                     if (result && result.success) {
-                        console.log("[ADD-TO-CART] Step 5: Add to cart reported SUCCESS."); // ADDED LOG
-                        // Call the success notification function from PricingPageUI
-                        if (window.PricingPageUI && typeof window.PricingPageUI.showSuccessNotification === 'function') {
-                            window.PricingPageUI.showSuccessNotification(productData);
-                        } else {
-                            console.error("[ADD-TO-CART] PricingPageUI.showSuccessNotification not available.");
-                            alert('Items added to cart successfully!'); // Fallback alert
-                        }
-                        // Refresh cart contents state AFTER successful add
-                        return fetchCartContents(); // Chain the promise
+                        console.log("[ADD-TO-CART] Step 5: Add to cart reported SUCCESS."); 
+                        // Use our direct implementation that shows product image rather than check for two systems
+                        // This ensures we only ever show one notification modal with the product image
+                        showSuccessWithImageAndTitle(productData);
+                        return fetchCartContents(); 
                     } else {
                         console.error("[ADD-TO-CART] Cart API reported failure:", result);
                         let errorMessage = 'Error adding to cart' + ((result?.error || result?.message) ? `: ${result.error || result.message}` : ': Unknown error.');
@@ -623,7 +648,7 @@
                  .then(newCartContents => {
                      window.cartContents = newCartContents;
                      console.log("[ADD-TO-CART] Cart contents refreshed after successful add.");
-                     updateCartTotal(); // Re-run update to reflect new state
+                     updateCartTotal(); 
                      if (window.NWCACart?.recalculatePrices) {
                          console.log("[ADD-TO-CART] Triggering price recalculation after successful add");
                          window.NWCACart.recalculatePrices(embType).catch(err => console.error("Error during post-add recalculation:", err));
@@ -643,8 +668,6 @@
         }
     }
 
-
-    // Helper function to get URL parameter
     function getUrlParameter(name) {
         try {
             const urlParams = new URLSearchParams(window.location.search);
@@ -655,18 +678,15 @@
         }
     }
 
-    // Helper function to detect embellishment type
     function detectEmbellishmentType() {
         const url = window.location.href.toLowerCase();
         const titleElement = document.querySelector('h1, h2, title');
         const title = titleElement ? titleElement.textContent.toLowerCase() : document.title.toLowerCase();
-
         if (url.includes('cap-embroidery') || title.includes('cap embroidery')) return 'cap-embroidery';
         if (url.includes('embroidery') || title.includes('embroidery')) return 'embroidery';
         if (url.includes('dtg') || title.includes('dtg')) return 'dtg';
         if (url.includes('screen-print') || url.includes('screenprint') || title.includes('screen print')) return 'screen-print';
         if (url.includes('dtf') || title.includes('dtf')) return 'dtf';
-
         const matrixTitle = document.getElementById('matrix-title')?.textContent.toLowerCase();
         if (matrixTitle) {
              if (matrixTitle.includes('cap embroidery')) return 'cap-embroidery';
@@ -675,52 +695,73 @@
              if (matrixTitle.includes('screen print')) return 'screen-print';
              if (matrixTitle.includes('dtf')) return 'dtf';
         }
-
         console.warn("[ADD-TO-CART] Could not detect embellishment type, defaulting to 'embroidery'");
         return 'embroidery';
     }
 
-    // Flag to prevent multiple initializations
     let isInitializing = false;
-    let uiInitialized = false; // Add flag for UI/listener init
+    let uiInitialized = false; 
 
-    // Function to run after pricing data is confirmed available
     function handlePricingDataReady(event) {
-         if (uiInitialized) return; // Prevent double init
-         console.log("[ADD-TO-CART] 'pricingDataLoaded' event received or data found. Initializing UI and listeners.", event?.detail);
-         initializeUIAndListeners();
+         if (uiInitialized) return;
+         console.log("[ADD-TO-CART] 'pricingDataLoaded' event received or data found. Checking NWCACart status...", event?.detail);
+         
+         // Check for NWCACart initialization status
+         if (window.NWCACart && window.NWCACart.isInitialized) {
+             console.log("[ADD-TO-CART] NWCACart is already initialized. Proceeding with UI initialization.");
+             initializeUIAndListeners();
+         } else {
+             console.log("[ADD-TO-CART] NWCACart not yet initialized. Waiting for nwcacartInitialized event.");
+             document.addEventListener('nwcacartInitialized', function onNwcacartReadyForAddToCart() {
+                 document.removeEventListener('nwcacartInitialized', onNwcacartReadyForAddToCart);
+                 console.log("[ADD-TO-CART] NWCACart ready event received. Proceeding with UI initialization.");
+                 initializeUIAndListeners();
+             });
+         }
     }
 
-    // Separated UI/Listener initialization
     function initializeUIAndListeners() {
          if (uiInitialized) { console.log("[ADD-TO-CART] UI and Listeners already initialized."); return; }
-
-         // Ensure pricing data is actually available before proceeding
          if (!window.nwcaPricingData || !window.availableSizesFromTable) {
              console.error("[ADD-TO-CART:INIT-UI] Pricing data or available sizes missing. Aborting UI initialization.");
              handlePricingDataError({ detail: { message: 'Pricing data missing during UI initialization.' } });
              return;
          }
-         uiInitialized = true; // Set flag *after* check
+         uiInitialized = true;
+         console.log("[ADD-TO-CART:INIT-UI] Proceeding with UI initialization. NWCACart is initialized and ready.");
+         syncSizesWithPricingMatrix();
 
-         console.log("[ADD-TO-CART:INIT-UI] Proceeding with UI initialization.");
+        const buttonElement = document.getElementById('add-to-cart-button');
+        console.log("[ADD-TO-CART:INIT-UI] Attempting to find #add-to-cart-button. Found:", buttonElement);
 
-         // Sync sizes and create UI elements (uses window.availableSizesFromTable)
-         syncSizesWithPricingMatrix(); // Should now have data
-
-         // Initialize Add to Cart button listener
-         // initAddToCartButton(); // REMOVED - Listener attached via delegation now
-
-         // Perform initial total calculation
-         updateCartTotal(); // Should now have data
-
-         // Attach listeners for quantity changes AFTER inputs are created
+        if (buttonElement) {
+            if (buttonElement.dataset.listenerAttached !== 'true') {
+                console.log("[ADD-TO-CART:INIT-UI] #add-to-cart-button found, listener not yet attached. Proceeding to attach.");
+                const buttonParent = buttonElement.parentNode;
+                const newButtonInstance = buttonElement.cloneNode(true);
+                
+                console.log("[ADD-TO-CART:INIT-UI] About to attach 'click' event listener to the new button instance.");
+                newButtonInstance.addEventListener('click', handleAddToCart);
+                newButtonInstance.dataset.listenerAttached = 'true'; 
+                console.log("[ADD-TO-CART:INIT-UI] 'click' event listener for handleAddToCart supposedly attached.");
+                
+                if (buttonParent) {
+                    buttonParent.replaceChild(newButtonInstance, buttonElement);
+                    console.log("[ADD-TO-CART:INIT-UI] Add to Cart button listener attached by replacing node. New button is now in DOM.");
+                } else {
+                    console.warn("[ADD-TO-CART:INIT-UI] Add to Cart button parentNode not found. Listener attached to cloned button, but it might not be in DOM correctly.");
+                }
+            } else {
+                console.log("[ADD-TO-CART:INIT-UI] Add to Cart button listener was already marked as attached.");
+            }
+        } else {
+            console.warn("[ADD-TO-CART:INIT-UI] Add to Cart button (#add-to-cart-button) not found during UI initialization phase.");
+        }
+ 
+         updateCartTotal(); 
          attachQuantityChangeListeners();
-
-         // Apply mobile adjustments (Call function from PricingPageUI)
          if (window.PricingPageUI?.handleMobileAdjustments) {
              window.PricingPageUI.handleMobileAdjustments();
-             // Add resize listener only once
              if (!window.hasMobileResizeListener) {
                   window.addEventListener('resize', window.PricingPageUI.handleMobileAdjustments);
                   window.hasMobileResizeListener = true;
@@ -728,13 +769,11 @@
          } else {
               console.error("[ADD-TO-CART] PricingPageUI.handleMobileAdjustments not available.");
          }
-
          console.log("[ADD-TO-CART] UI and Listeners Initialized.");
-         isInitializing = false; // Mark main init process as complete
-         window.addToCartInitialized = true; // Set the original flag
+         isInitializing = false; 
+         window.addToCartInitialized = true; 
     }
 
-    // Main initialization function
     function initialize() {
         if (isInitializing || window.addToCartInitialized) {
             console.log("[ADD-TO-CART] Initialization already in progress or completed.");
@@ -742,57 +781,48 @@
         }
         isInitializing = true;
         console.log("[ADD-TO-CART] DOM ready, starting initialization...");
-
-        // Fetch cart contents first (less critical dependency)
-        fetchCartContents().then(cartContents => {
+        
+        // Setup function to handle when both cart contents and pricing data are ready
+        function setupWhenDataReady(cartContents) {
             window.cartContents = cartContents;
             console.log("[ADD-TO-CART] Initial cart contents fetched.");
-
-            // Now, check for pricing data and wait if necessary
             console.log("[ADD-TO-CART] Checking for pricing data...");
             if (window.nwcaPricingData && window.availableSizesFromTable) {
-                 console.log("[ADD-TO-CART] Pricing data already available. Proceeding with UI init.");
-                 // Use setTimeout to ensure this runs after the current execution stack clears,
-                 // allowing other initializations (like PricingPageUI) to potentially finish.
+                 console.log("[ADD-TO-CART] Pricing data already available. Proceeding with NWCACart check.");
                  setTimeout(handlePricingDataReady, 0);
             } else {
                  console.log("[ADD-TO-CART] Pricing data not yet available. Waiting for 'pricingDataLoaded' or 'pricingDataError' event.");
-                 // Listen for the events
                  window.addEventListener('pricingDataLoaded', handlePricingDataReady, { once: true });
                  window.addEventListener('pricingDataError', handlePricingDataError, { once: true });
-
-                 // Attach delegated event listener ONCE during initial setup
-                 attachDelegatedAddToCartListener();
-
             }
-
-        }).catch(error => {
+        }
+        
+        // Start by fetching cart contents
+        fetchCartContents().then(setupWhenDataReady).catch(error => {
             console.error("[ADD-TO-CART] Initialization failed during cart fetch:", error);
-            // Display an error message but don't proceed with pricing-dependent UI
             const errorDisplay = document.getElementById('cart-error-display');
             if(errorDisplay) errorDisplay.textContent = "Error loading cart data. Pricing may be inaccurate.";
             isInitializing = false;
-            // Do not set uiInitialized or addToCartInitialized here, let the pricing data error handler manage that state.
+        }).catch(error => {
+            console.error("[ADD-TO-CART] Initialization failed during cart fetch:", error);
+            const errorDisplay = document.getElementById('cart-error-display');
+            if(errorDisplay) errorDisplay.textContent = "Error loading cart data. Pricing may be inaccurate.";
+            isInitializing = false;
         });
     }
 
-    // Handler for pricing data error
     function handlePricingDataError(event) {
-        // Ensure this doesn't run if UI init already succeeded somehow
         if (uiInitialized) return;
-
         console.error("[ADD-TO-CART] Received 'pricingDataError' event:", event?.detail?.message);
-        // Display an error message in the quantity section
         const quantitySection = document.getElementById('quantity-section') || document.getElementById('size-quantity-grid-container') || document.getElementById('quantity-matrix');
         if (quantitySection) {
             quantitySection.innerHTML = `<p style="color: red; font-weight: bold; padding: 10px; border: 1px solid red; background-color: #ffeeee;">Error: Could not load pricing data. ${event?.detail?.message || 'Pricing table not found or failed to load.'}</p>`;
         }
          isInitializing = false;
-         uiInitialized = true; // Prevent further UI init attempts
-         window.addToCartInitialized = true; // Mark as 'done' even though failed
+         uiInitialized = true; 
+         window.addToCartInitialized = true; 
     }
 
-    // Function to (re)attach event listeners to quantity inputs
     function attachQuantityChangeListeners() {
         console.log("[ADD-TO-CART] Attaching/Re-attaching listeners to quantity inputs...");
         const quantityInputs = document.querySelectorAll('.quantity-input');
@@ -801,7 +831,6 @@
             input.removeEventListener('input', updateCartTotal);
             input.addEventListener('change', updateCartTotal);
             input.addEventListener('input', updateCartTotal);
-
             const controlDiv = input.closest('.quantity-control') || input.closest('.size-quantity-item');
              if (controlDiv) {
                  const decreaseBtn = controlDiv.querySelector('.decrease-btn');
@@ -819,12 +848,10 @@
         console.log(`[ADD-TO-CART] Attached listeners to ${quantityInputs.length} inputs.`);
     }
 
-    // Handler for +/- button clicks
     function handleQuantityButtonClick(event) {
         const button = event.currentTarget;
         const controlDiv = button.closest('.quantity-control') || button.closest('.size-quantity-item');
         const input = controlDiv ? controlDiv.querySelector('.quantity-input') : null;
-
         if (input) {
             let currentValue = parseInt(input.value) || 0;
             if (button.classList.contains('decrease-btn')) {
@@ -834,26 +861,13 @@
             }
             input.value = currentValue;
             input.dispatchEvent(new Event('change', { bubbles: true }));
-            updateCartTotal(); // Ensure immediate update
+            updateCartTotal(); 
         }
     }
 
-    // == UI Update Functions REMOVED ==
-    // handleMobileAdjustments (This function itself is removed, call is updated below)
-    // This is now expected to be in pricing-pages.js and accessed via window.PricingPageUI
-
-    // =========================================================================
-    // == UI CREATION MOVED TO product-quantity-ui.js ==
-    // =========================================================================
-
-    // Function to synchronize sizes shown in the Add to Cart section with the pricing matrix
-    // MODIFIED: Uses window.availableSizesFromTable and calls ProductQuantityUI module
     function syncSizesWithPricingMatrix() {
         console.log("[ADD-TO-CART] Syncing sizes with pricing matrix...");
-
-        // Prioritize parsed sizes from the table (set by pricing-matrix-capture.js)
         const availableSizes = window.availableSizesFromTable;
-
         if (!availableSizes || availableSizes.length === 0) {
             console.error("[ADD-TO-CART] Cannot sync sizes: No sizes available from parsed table data (window.availableSizesFromTable).");
             const quantitySection = document.getElementById('quantity-section') || document.getElementById('size-quantity-grid-container') || document.getElementById('quantity-matrix');
@@ -862,11 +876,8 @@
             }
             return;
         }
-
         console.log("[ADD-TO-CART] Sizes to use for UI:", availableSizes);
-
-        // Determine preferred layout and create the appropriate UI using the external module
-        const useGrid = window.PricingPageUI?.determineLayoutPreference ? window.PricingPageUI.determineLayoutPreference() : false; // Use PricingPageUI version
+        const useGrid = window.PricingPageUI?.determineLayoutPreference ? window.PricingPageUI.determineLayoutPreference() : false; 
         let uiCreated = false;
         if (useGrid) {
             console.log("[ADD-TO-CART] Using grid layout for quantity inputs.");
@@ -887,83 +898,220 @@
                  console.error("[ADD-TO-CART] ProductQuantityUI.createQuantityMatrix function not found!");
             }
         }
-
         if (uiCreated) {
-             // Apply mobile adjustments AFTER creating the UI elements (Call moved to initializeUIAndListeners)
-
-             // Re-attach listeners AFTER creating the UI elements
              attachQuantityChangeListeners();
         } else {
              console.error("[ADD-TO-CART] Failed to create quantity UI.");
         }
     }
 
-    // == determineLayoutPreference function REMOVED (Moved to pricing-pages.js) ==
-
-    // == UI Creation Functions REMOVED (createQuantityMatrix, createSizeQuantityGrid) ==
-
-
-    // =========================================================================
-    // == END OF UI CREATION REFACTOR ==
-    // =========================================================================
-
-
-    // == UI Update Functions REMOVED ==
-    // showSuccessWithViewCartButton (Now handled by PricingPageUI.showSuccessNotification)
-    // initAddToCartButton REMOVED - Replaced with event delegation below
-
-    // =========================================================================
-    // == Initialization Trigger ==
-    // =========================================================================
-    // Safely initialize when DOM is ready
     try {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initialize);
         } else {
-            initialize(); // DOM already loaded
+            initialize(); 
         }
     } catch (error) {
         console.error("[ADD-TO-CART] Critical error during initialization setup:", error);
     }
-
-    // =========================================================================
-    // == Test Functions (Keep for debugging/development) ==
-    // =========================================================================
-    function testAddToCartMatrix() { console.log("[TEST] testAddToCartMatrix function placeholder."); }
-    function testMatrixInitialization() { console.log("[TEST] testMatrixInitialization function placeholder."); return true;}
-    function testPricingCalculations() { console.log("[TEST] testPricingCalculations function placeholder."); return true;}
-    function testAddToCartButton() { console.log("[TEST] testAddToCartButton function placeholder."); return true;}
-    function setupMockCartIntegration() { console.log("[TEST] setupMockCartIntegration function placeholder."); }
-
-     if (window.location.search.includes('test=add-to-cart')) {
-         console.log("[TEST] Scheduling add-to-cart tests...");
-         document.addEventListener('DOMContentLoaded', () => {
-             setTimeout(testAddToCartMatrix, 1500);
-         });
-     }
-
-    // Function to attach the delegated listener
-    function attachDelegatedAddToCartListener() {
-        // Find a suitable static parent container. Use body as a fallback.
-        // Let's try a container likely wrapping the add-to-cart section
-        const parentContainer = document.getElementById('add-to-cart-controls') || document.getElementById('quantity-section') || document.body;
-        console.log(`[ADD-TO-CART] Attaching delegated click listener to: ${parentContainer.id || 'document.body'}`);
-
-        // Remove listener first to ensure it's only attached once, even if initialize runs multiple times
-        parentContainer.removeEventListener('click', delegatedClickListener);
-        parentContainer.addEventListener('click', delegatedClickListener);
-    }
-
-    // The actual delegated listener function
-    function delegatedClickListener(event) {
-        // Check if the clicked element *is* or *is inside* the add-to-cart button
-        const button = event.target.closest('#add-to-cart-button');
-        if (button) {
-            console.log("[ADD-TO-CART] Delegated click listener detected click on #add-to-cart-button");
-            // Prevent default if the button is inside a form or link
-            event.preventDefault();
-            handleAddToCart(); // Call the original handler
+    // Function to show success notification with product image and title
+    function showSuccessWithImageAndTitle(productData) {
+        console.log("[ADD-TO-CART] Showing success notification with image and title");
+        console.log(`[ADD-TO-CART:SUCCESS] Product data:`, {
+            imageUrl: productData.imageUrl || "none",
+            productTitle: productData.PRODUCT_TITLE || "none"
+        });
+        
+        // Remove any existing notification
+        const existingNotification = document.querySelector('.success-notification-modal');
+        if (existingNotification) {
+            existingNotification.remove();
         }
+        
+        // Create notification container
+        const notification = document.createElement('div');
+        notification.className = 'success-notification-modal';
+        notification.style.position = 'fixed';
+        notification.style.top = '50%';
+        notification.style.left = '50%';
+        notification.style.transform = 'translate(-50%, -50%)';
+        notification.style.backgroundColor = 'white';
+        notification.style.padding = '20px';
+        notification.style.borderRadius = '8px';
+        notification.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+        notification.style.zIndex = '1050';
+        notification.style.minWidth = '300px';
+        notification.style.maxWidth = '90%';
+        notification.style.display = 'flex';
+        notification.style.flexDirection = 'column';
+        notification.style.alignItems = 'center';
+        
+        // Add success header
+        const header = document.createElement('h4');
+        header.textContent = 'Item Added to Cart';
+        header.style.color = '#28a745';
+        header.style.marginBottom = '15px';
+        notification.appendChild(header);
+        
+        // Add product image
+        // Create image container regardless of imageUrl presence - we'll show fallback if needed
+        const imageContainer = document.createElement('div');
+        imageContainer.style.marginBottom = '15px';
+        imageContainer.style.width = '100%';
+        imageContainer.style.textAlign = 'center';
+        
+        if (productData.imageUrl) {
+            console.log(`[ADD-TO-CART:SUCCESS] Using image URL in modal: '${productData.imageUrl}'`);
+            
+            const image = document.createElement('img');
+            image.src = productData.imageUrl;
+            image.alt = `${productData.styleNumber} - ${productData.color}`;
+            image.className = 'product-thumbnail';
+            image.style.maxWidth = '150px';
+            image.style.maxHeight = '150px';
+            image.style.objectFit = 'contain';
+            image.style.border = '1px solid #ddd';
+            image.style.borderRadius = '4px';
+            image.style.padding = '5px';
+            
+            // Add onerror handler to show fallback when image fails to load
+            image.onerror = function() {
+                console.warn(`[ADD-TO-CART:SUCCESS] Image failed to load: '${productData.imageUrl}'`);
+                this.src = ''; // Clear the src
+                this.style.display = 'none';
+                createFallbackImage(imageContainer, productData);
+            };
+            
+            imageContainer.appendChild(image);
+        } else {
+            console.warn(`[ADD-TO-CART:SUCCESS] No image URL available for product ${productData.styleNumber}`);
+            createFallbackImage(imageContainer, productData);
+        }
+        
+        notification.appendChild(imageContainer);
+        
+        // Helper function to create fallback image display
+        function createFallbackImage(container, data) {
+            const fallback = document.createElement('div');
+            fallback.className = 'image-fallback';
+            fallback.style.width = '150px';
+            fallback.style.height = '150px';
+            fallback.style.margin = '0 auto';
+            fallback.style.backgroundColor = '#f8f9fa';
+            fallback.style.display = 'flex';
+            fallback.style.alignItems = 'center';
+            fallback.style.justifyContent = 'center';
+            fallback.style.border = '1px solid #ddd';
+            fallback.style.borderRadius = '4px';
+            fallback.style.padding = '10px';
+            fallback.style.textAlign = 'center';
+            
+            const content = document.createElement('div');
+            content.innerHTML = `
+                <div style="font-weight:bold;margin-bottom:5px;">${data.styleNumber}</div>
+                <div>${data.color}</div>
+            `;
+            fallback.appendChild(content);
+            container.appendChild(fallback);
+        }
+        
+        // Add product details
+        const details = document.createElement('div');
+        details.style.marginBottom = '15px';
+        details.style.width = '100%';
+        details.style.textAlign = 'center';
+        
+        // Use PRODUCT_TITLE if available, otherwise fall back to style-color
+        const productName = document.createElement('p');
+        productName.textContent = productData.PRODUCT_TITLE || `${productData.styleNumber} - ${productData.color}`;
+        productName.style.fontWeight = 'bold';
+        productName.style.marginBottom = '5px';
+        details.appendChild(productName);
+        
+        // Add style-color as a secondary line if we have a product title
+        if (productData.PRODUCT_TITLE && productData.PRODUCT_TITLE !== `${productData.styleNumber} - ${productData.color}`) {
+            const styleColor = document.createElement('p');
+            styleColor.textContent = `${productData.styleNumber} - ${productData.color}`;
+            styleColor.style.fontSize = '0.9em';
+            styleColor.style.color = '#666';
+            styleColor.style.marginBottom = '5px';
+            details.appendChild(styleColor);
+        }
+        
+        const embType = document.createElement('p');
+        embType.textContent = `Embellishment: ${productData.embellishmentType.replace(/-/g, ' ')}`;
+        embType.style.fontSize = '0.9em';
+        embType.style.marginBottom = '5px';
+        details.appendChild(embType);
+        
+        const qtyAdded = document.createElement('p');
+        qtyAdded.textContent = `Quantity: ${productData.totalQuantity}`;
+        qtyAdded.style.fontSize = '0.9em';
+        details.appendChild(qtyAdded);
+        
+        notification.appendChild(details);
+        
+        // Add buttons
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.justifyContent = 'space-between';
+        buttonContainer.style.width = '100%';
+        buttonContainer.style.marginTop = '10px';
+        
+        const viewCartBtn = document.createElement('button');
+        viewCartBtn.textContent = 'View Cart';
+        viewCartBtn.style.backgroundColor = '#0056b3';
+        viewCartBtn.style.color = 'white';
+        viewCartBtn.style.border = 'none';
+        viewCartBtn.style.borderRadius = '4px';
+        viewCartBtn.style.padding = '8px 16px';
+        viewCartBtn.style.cursor = 'pointer';
+        viewCartBtn.style.marginRight = '10px';
+        viewCartBtn.addEventListener('click', () => {
+            notification.remove();
+            window.location.href = '/cart.html';
+        });
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = 'Continue Shopping';
+        closeBtn.style.backgroundColor = '#6c757d';
+        closeBtn.style.color = 'white';
+        closeBtn.style.border = 'none';
+        closeBtn.style.borderRadius = '4px';
+        closeBtn.style.padding = '8px 16px';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.addEventListener('click', () => {
+            notification.remove();
+        });
+        
+        buttonContainer.appendChild(viewCartBtn);
+        buttonContainer.appendChild(closeBtn);
+        notification.appendChild(buttonContainer);
+        
+        // Add overlay
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        overlay.style.zIndex = '1040';
+        overlay.addEventListener('click', () => {
+            notification.remove();
+            overlay.remove();
+        });
+        
+        // Add to DOM
+        document.body.appendChild(overlay);
+        document.body.appendChild(notification);
+        
+        // Auto-close after 5 seconds
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                notification.remove();
+                overlay.remove();
+            }
+        }, 5000);
     }
-
-})(); // End of IIFE
+})();
