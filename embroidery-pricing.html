@@ -576,20 +576,21 @@
                     <p>Pricing Includes an 8,000 stitch embroidered logo.</p>
                     <!-- Other static info can go here -->
                 </div>
-            </div>
-
-            <!-- Right Column: Interactive Elements (Scrollable) -->
-            <div class="product-interactive-column">
-                <!-- Color Swatches moved here -->
-                <div class="color-swatches-column">
+                
+                <!-- Color Swatches moved to left column below product image -->
+                <div class="color-swatches-left-column" style="margin-top:15px;">
                     <div class="color-swatches-container compact">
                         <h3 class="section-title">Available Colors</h3>
-                        <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 5px;">
+                        <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 5px; max-height: 300px;">
                             <!-- Color swatches will be dynamically added here by pricing-pages.js -->
                         </div>
                         <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
                     </div>
                 </div>
+            </div>
+
+            <!-- Right Column: Interactive Elements (Scrollable) -->
+            <div class="product-interactive-column">
 
                 <!-- Original .product-context and .pricing-content are now effectively merged or reorganized -->
                 <!-- The content of .pricing-content (pricing grid, add to cart) goes into this right column -->
@@ -601,15 +602,14 @@
                         <div class="loading-message">Loading pricing data...</div>
                     </div>
                     
-                    <!-- Custom Pricing Grid -->
+                    <!-- Custom Pricing Grid - Enhanced now that it's at the top -->
                     <div class="pricing-section">
-                        <div class="pricing-header">
-                            <!-- Title moved to left static column, selected color also shown there -->
-                            <!-- This header can now be simpler or focus on other aspects if needed -->
-                             <h3 class="section-title">Detailed Pricing per Quantity Tier</h3>
-                             <div class="selected-color-indicator"> <!-- Kept for redundancy or different styling if desired -->
+                        <div class="pricing-header" style="margin-bottom: 20px;">
+                            <!-- Enhanced header with more prominence -->
+                             <h3 class="section-title" style="font-size: 1.3em; margin: 0;">Detailed Pricing per Quantity Tier</h3>
+                             <div class="selected-color-indicator">
                                 <span>Selected Color:</span>
-                                <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches above"></div>
+                                <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches"></div>
                                 <strong id="pricing-color-name">Color Name</strong>
                             </div>
                         </div>
@@ -631,6 +631,21 @@
                                 flex: 1;
                                 min-width: 0; /* Prevents flexbox overflow issues */
                             }
+                            
+                            /* Improved styling for color swatches in left column */
+                            .color-swatches-left-column .color-swatches-container {
+                                border: 1px solid var(--border-light);
+                            }
+                            
+                            .color-swatches-left-column .swatch-wrapper {
+                                width: 60px; /* Slightly smaller to fit better in left column */
+                                min-height: 70px;
+                            }
+                            
+                            .color-swatches-left-column .color-swatch {
+                                width: 45px;
+                                height: 45px;
+                            }
                             .product-image-container-context img {
                                 width: 100%;
                                 height: auto;
@@ -645,6 +660,23 @@
                                 color: var(--primary-color) !important;
                             }
 
+                            /* Enhanced pricing grid styling */
+                            .pricing-grid {
+                                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                                border-radius: var(--radius-sm);
+                                overflow: hidden;
+                            }
+                            
+                            .pricing-grid th {
+                                background-color: var(--primary-color);
+                                color: white;
+                                padding: 12px 8px;
+                            }
+                            
+                            .pricing-grid td {
+                                padding: 10px 8px;
+                            }
+                            
                             @media (max-width: 1024px) { /* Breakpoint for stacking columns */
                                 .product-page-columns-container {
                                     flex-direction: column;
@@ -654,6 +686,11 @@
                                     position: static; /* Reset sticky for stacked view */
                                     height: auto;
                                     margin-bottom: 20px;
+                                }
+                                
+                                /* Adjust color swatches for mobile */
+                                .color-swatches-left-column .color-swatches {
+                                    max-height: 200px;
                                 }
                             }
 
@@ -750,6 +787,11 @@
                                     <!-- Pricing data will be dynamically added here -->
                                 </tbody>
                             </table>
+                            
+                            <!-- Added helpful pricing explanation -->
+                            <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                                <p><strong>Note:</strong> Prices shown are per item and include an 8,000 stitch embroidered logo.</p>
+                            </div>
                             
                             <div class="pricing-info-tabs">
                                 <div class="tab-headers">
@@ -854,9 +896,9 @@
                         </div>
                     </div>
                     
-                    <!-- Add to Cart Section -->
+                    <!-- Add to Cart Section - Enhanced UI -->
                     <div class="add-to-cart-section">
-                        <h3 class="section-title">Add to Cart</h3>
+                        <h3 class="section-title" style="font-size: 1.3em; margin-top: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light);">Add to Cart</h3>
                         
                         <div class="size-grid-container" id="size-grid-container">
                             <!-- Populated by product-quantity-ui.js or similar.
@@ -885,7 +927,8 @@
                                 display: grid;
                                 grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
                                 gap: 15px;
-                                margin-bottom: 20px;
+                                margin: 15px 0 25px 0;
+                                padding: 5px;
                             }
                             
                             .size-card {
@@ -898,6 +941,23 @@
                                 box-shadow: var(--shadow-sm);
                                 transition: all 0.2s ease;
                                 border: 1px solid transparent;
+                                position: relative;
+                                overflow: hidden;
+                            }
+                            
+                            /* Add subtle pattern to size cards */
+                            .size-card::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background-image: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.1) 75%, transparent 75%, transparent);
+                                background-size: 10px 10px;
+                                opacity: 0.5;
+                                z-index: 0;
+                                pointer-events: none;
                             }
                             
                             .size-card:hover {
@@ -911,6 +971,8 @@
                                 font-size: 1.2em;
                                 margin-bottom: 10px;
                                 color: var(--primary-color);
+                                position: relative;
+                                z-index: 1;
                             }
                             
                             .quantity-controls {
@@ -919,6 +981,8 @@
                                 margin-bottom: 10px;
                                 width: 100%;
                                 justify-content: center;
+                                position: relative;
+                                z-index: 1;
                             }
                             
                             .quantity-btn {
@@ -968,6 +1032,11 @@
                                 align-items: center;
                                 justify-content: center;
                                 font-size: 0.9em;
+                                position: relative;
+                                z-index: 1;
+                                background-color: rgba(255, 255, 255, 0.5);
+                                padding: 3px 8px;
+                                border-radius: 4px;
                             }
                             .price-display .dynamic-unit-price {
                                 margin-left: 5px;
@@ -981,6 +1050,7 @@
                                 border-radius: var(--radius-sm);
                                 margin-top: 20px;
                                 border-left: 4px solid var(--primary-color);
+                                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
                             }
                             
                             .cart-total {
@@ -1013,7 +1083,7 @@
                                 color: white;
                                 border: none;
                                 border-radius: var(--radius-sm);
-                                padding: 12px 20px;
+                                padding: 14px 20px;
                                 font-size: 1.1em;
                                 font-weight: bold;
                                 cursor: pointer;
@@ -1022,6 +1092,8 @@
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
+                                letter-spacing: 0.5px;
+                                text-transform: uppercase;
                             }
                             
                             .add-to-cart-button:hover {
@@ -1091,6 +1163,27 @@
                                     width: 30px;
                                     height: 22px;
                                     font-size: 0.9em;
+                                }
+                                
+                                /* Further adjust color swatches for mobile */
+                                .color-swatches-left-column .color-swatches {
+                                    max-height: 180px;
+                                    gap: 5px;
+                                }
+                                
+                                .color-swatches-left-column .swatch-wrapper {
+                                    width: 50px;
+                                    min-height: 60px;
+                                    margin: 3px;
+                                }
+                                
+                                .color-swatches-left-column .color-swatch {
+                                    width: 35px;
+                                    height: 35px;
+                                }
+                                
+                                .color-swatches-left-column .color-name {
+                                    font-size: 0.7em;
                                 }
                             }
                         </style>
