@@ -103,10 +103,10 @@
 
         // Second validation: After potentially switching to global data, check again
         if (!dataToUse || !dataToUse.headers || !dataToUse.prices || !dataToUse.tiers) {
-            console.error("[DP5-HELPER] updateCustomPricingGrid: Pricing data (either passed or global) is still not available or incomplete. Cannot update grid.");
+            console.warn("[DP5-HELPER] updateCustomPricingGrid: Pricing data (passed or global) still not fully available or incomplete. Grid update deferred. This may resolve via 'pricingDataLoaded' event.");
             // DO NOT recursively call updateCustomPricingGrid here to prevent infinite loops.
             // The final setTimeout in initialize() is the last resort.
-            return; 
+            return;
         }
         
         console.log("[DP5-HELPER] Using data for pricing grid. Headers:", dataToUse.headers);

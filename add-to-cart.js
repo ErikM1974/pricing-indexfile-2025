@@ -101,7 +101,7 @@
                         }
                     });
                 }
-                 console.log(`[ADD-TO-CART] Calculated existing ${currentEmbType} items directly from NWCACart: ${existingEmbroideryItems}`);
+                 console.log(`[ADD-TO-CART:DEBUG] Calculated existing ${currentEmbType} items directly from NWCACart: ${existingEmbroideryItems}. Active cart items found:`, activeCartItems);
             } else {
                  console.warn("[ADD-TO-CART] NWCACart.getCartItems not available to calculate existing quantity.");
             }
@@ -188,25 +188,32 @@
                 }
             }
 
-            if (window.NWCAProductPricingUI && typeof window.NWCAProductPricingUI.updateAllPricingDisplays === 'function') {
-                // updateAllPricingDisplays internally calls updateComprehensiveTierInfo
-                // It needs itemsCurrentlyAdding and itemsFromCart
-                // itemsCurrentlyAdding is newQuantityTotal
-                // itemsFromCart is existingEmbroideryItems
-                // Pass the whole calculatedPricing object
-                window.NWCAProductPricingUI.updateAllPricingDisplays(newQuantityTotal, existingEmbroideryItems, calculatedPricing);
-                console.log("[ADD-TO-CART] Called NWCAProductPricingUI.updateAllPricingDisplays with calculatedPricing.");
-            } else if (window.PricingPageUI) {
-                 // Fallback for older structure if still present, though this path should ideally not be hit.
-                console.warn("[ADD-TO-CART] NWCAProductPricingUI not found, attempting legacy PricingPageUI calls (which are likely removed).");
-                if (typeof window.PricingPageUI.updateTierInfoDisplay === 'function') {
-                    window.PricingPageUI.updateTierInfoDisplay(calculatedPricing.tierKey, calculatedPricing.nextTier, calculatedPricing.quantityForNextTier, calculatedPricing.combinedQuantity);
+            const callUpdateAllPricingDisplays = () => {
+                if (window.NWCAProductPricingUI && typeof window.NWCAProductPricingUI.updateAllPricingDisplays === 'function') {
+                    try {
+                        window.NWCAProductPricingUI.updateAllPricingDisplays(newQuantityTotal, existingEmbroideryItems, calculatedPricing);
+                        console.log("[ADD-TO-CART] Successfully called NWCAProductPricingUI.updateAllPricingDisplays with calculatedPricing.");
+                    } catch (uiError) {
+                        console.error("[ADD-TO-CART] Error calling NWCAProductPricingUI.updateAllPricingDisplays:", uiError, calculatedPricing);
+                    }
+                } else {
+                    if (!window.NWCAProductPricingUI) {
+                        console.warn("[ADD-TO-CART] NWCAProductPricingUI object not found on window when attempting to call updateAllPricingDisplays.");
+                    } else {
+                        console.warn("[ADD-TO-CART] NWCAProductPricingUI.updateAllPricingDisplays function not found when attempting to call.");
+                    }
                 }
-                if (typeof window.PricingPageUI.updateCartInfoDisplay === 'function') {
-                    window.PricingPageUI.updateCartInfoDisplay(newQuantityTotal, calculatedPricing.combinedQuantity, calculatedPricing.tierKey);
-                }
+            };
+
+            if (window.isNWCAProductPricingUIReady) {
+                callUpdateAllPricingDisplays();
             } else {
-                console.error("[ADD-TO-CART] Neither NWCAProductPricingUI nor PricingPageUI available for UI updates.");
+                console.warn("[ADD-TO-CART] NWCAProductPricingUI not yet ready. Listening for 'nwcaProductPricingUIReady' event.");
+                document.addEventListener('nwcaProductPricingUIReady', function onUIReady() {
+                    console.log("[ADD-TO-CART] 'nwcaProductPricingUIReady' event received. Attempting to call updateAllPricingDisplays.");
+                    document.removeEventListener('nwcaProductPricingUIReady', onUIReady); // Listen only once
+                    callUpdateAllPricingDisplays();
+                }, { once: true });
             }
 
             const allAvailableSizes = Object.keys(calculatedPricing.baseUnitPrices || {});
@@ -251,9 +258,27 @@
                 if (calculatedPricing.ltmFeeApplies && newQuantityTotal > 0) {
                     ltmFeeNoticeInStickySummary.style.display = 'flex'; // Or 'block' depending on its CSS
                     const ltmTextElement = ltmFeeNoticeInStickySummary.querySelector('.ltm-text');
+                    let ltmDetailElement = ltmFeeNoticeInStickySummary.querySelector('.ltm-detail-text');
+
                     if (ltmTextElement) {
                         ltmTextElement.textContent = `LTM Fee Applied ($${calculatedPricing.ltmFeeTotal.toFixed(2)})`;
                     }
+
+                    if (!ltmDetailElement) {
+                        ltmDetailElement = document.createElement('div');
+                        ltmDetailElement.className = 'ltm-detail-text';
+                        ltmDetailElement.style.fontSize = '0.85em';
+                        ltmDetailElement.style.marginTop = '5px';
+                        ltmDetailElement.style.color = '#6c757d'; // A slightly softer color for the detail
+                        // Insert after the main ltm-text, or at the end of the notice
+                        if(ltmTextElement && ltmTextElement.parentNode === ltmFeeNoticeInStickySummary) {
+                            ltmTextElement.insertAdjacentElement('afterend', ltmDetailElement);
+                        } else {
+                            ltmFeeNoticeInStickySummary.appendChild(ltmDetailElement);
+                        }
+                    }
+                    
+                    ltmDetailElement.innerHTML = `<small>Orders under 24 pcs incur a $50 LTM fee, added to the 24-pc price and distributed per item. (e.g., 10 items: 24-pc price + $5.00/item).</small>`;
                 } else {
                     ltmFeeNoticeInStickySummary.style.display = 'none';
                 }

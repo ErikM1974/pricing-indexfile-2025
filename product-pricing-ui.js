@@ -60,8 +60,14 @@ const NWCAProductPricingUI = (function() {
         _cacheDOMElements();
         _bindEventListeners();
         // It's better to fetch pricing data first if possible, or have it passed.
-        // For now, _initialRenderUpdates will use example data or try to fetch.
-        await _initialRenderUpdates();
+        // The initial call to updateAllPricingDisplays will now be driven by add-to-cart.js
+        // once it has all necessary data (cart, pricing, etc.)
+        // await _initialRenderUpdates(); // REMOVED - Let add-to-cart.js trigger the first full update.
+        
+        debugProductUI("INFO", "NWCAProductPricingUI Initialized (DOM cached, listeners bound).");
+        window.isNWCAProductPricingUIReady = true; // Set flag
+        document.dispatchEvent(new CustomEvent('nwcaProductPricingUIReady'));
+        debugProductUI("INFO", "'nwcaProductPricingUIReady' event dispatched.");
     }
 
     /**
@@ -227,6 +233,7 @@ const NWCAProductPricingUI = (function() {
 
 
         updateDynamicPriceDisplaysPerSize(calculatedPricingData); // Pass the whole object
+        debugProductUI("HIGHLIGHT-CHECK", "Calling highlightActivePricingTierInGrid with Combined Qty:", combinedQuantity, "Target Tier:", currentTierFull?.label);
         highlightActivePricingTierInGrid(combinedQuantity, currentTierFull);
         // updateStickyCartSummary is now primarily handled by add-to-cart.js
         // updateComprehensiveTierInfo call removed as the target HTML section is deleted.
@@ -471,24 +478,41 @@ const NWCAProductPricingUI = (function() {
 
         if (!currentTier) return;
 
-        elements.pricingGrid.querySelectorAll('th.active-tier-highlight, td.active-tier-highlight').forEach(el => {
+        // Remove previous row highlight
+        elements.pricingGrid.querySelectorAll('tbody tr.current-pricing-level-highlight').forEach(row => {
+            row.classList.remove('current-pricing-level-highlight');
+        });
+        // Remove previous column header highlight (if any, from old logic)
+        elements.pricingGrid.querySelectorAll('thead th.active-tier-highlight').forEach(el => {
             el.classList.remove('active-tier-highlight');
         });
 
-        const tierHeader = elements.pricingGrid.querySelector(`thead th[data-tier-label="${currentTier.label}"]`);
-        if (tierHeader) {
-            tierHeader.classList.add('active-tier-highlight');
+
+        if (!currentTier || !currentTier.label) {
+            debugProductUI("WARN", "highlightActivePricingTierInGrid: currentTier or currentTier.label is undefined.", currentTier);
+            return;
         }
 
-        const columnIndex = tierHeader ? Array.from(tierHeader.parentNode.children).indexOf(tierHeader) : -1;
-        if (columnIndex !== -1) {
-            elements.pricingGrid.querySelectorAll(`tbody tr`).forEach(row => {
-                const cell = row.children[columnIndex];
-                if (cell) {
-                    cell.classList.add('active-tier-highlight');
+        // Highlight the row in tbody
+        const rows = elements.pricingGrid.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const firstCell = row.querySelector('td:first-child');
+            if (firstCell) {
+                const cellText = firstCell.textContent.trim();
+                const tierLabelToMatch = currentTier.label;
+                // Ensure tierLabelToMatch is also a string and trimmed, though it should be from tierKey
+                const safeTierLabelToMatch = String(tierLabelToMatch || '').trim();
+
+                debugProductUI("MATCH-DETAIL", `Comparing cell content: "'${cellText}'" with target tier label: "'${safeTierLabelToMatch}'"`);
+                
+                if (cellText === safeTierLabelToMatch) {
+                    row.classList.add('current-pricing-level-highlight');
+                    debugProductUI("UI-UPDATE", `Applied .current-pricing-level-highlight to row for tier: ${currentTier.label}`);
                 }
-            });
-        }
+            } else {
+                debugProductUI("WARN", "A row in pricing grid tbody is missing its first td.", row);
+            }
+        });
     }
 
     /**
@@ -537,6 +561,14 @@ const NWCAProductPricingUI = (function() {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('custom-pricing-grid')) { // Check if on a product pricing page
-        NWCAProductPricingUI.initialize();
+        // Ensure the module is assigned to window if not already (e.g. if script is bundled differently later)
+        if (!window.NWCAProductPricingUI) {
+            window.NWCAProductPricingUI = NWCAProductPricingUI;
+        }
+        window.NWCAProductPricingUI.initialize();
     }
 });
+// Also, ensure the IIFE result is assigned to window if this script is loaded directly
+if (NWCAProductPricingUI && !window.NWCAProductPricingUI) {
+    window.NWCAProductPricingUI = NWCAProductPricingUI;
+}
