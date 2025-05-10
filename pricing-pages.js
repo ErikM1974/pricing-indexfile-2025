@@ -493,217 +493,45 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // --- UI Update Functions (Consolidated) ---
 
     function updatePriceDisplayForSize(size, quantity, unitPrice, displayPrice, itemTotal, ltmFeeApplies, ltmFeePerItem, combinedQuantity, ltmFee) {
-        const matrixPriceDisplay = document.querySelector(`#quantity-matrix .price-display[data-size="${size}"]`); if (matrixPriceDisplay) { matrixPriceDisplay.dataset.unitPrice = unitPrice.toFixed(2); if (quantity <= 0) { matrixPriceDisplay.innerHTML = `$${unitPrice.toFixed(2)}`; matrixPriceDisplay.style.backgroundColor = ''; matrixPriceDisplay.style.padding = ''; matrixPriceDisplay.style.border = ''; } else { if (ltmFeeApplies) { matrixPriceDisplay.innerHTML = `<div class="price-card" style="font-size:0.9em;box-shadow:0 1px 3px rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;max-width:100%;"><div style="background-color:#ffc107;color:#212529;font-weight:bold;padding:3px 0;text-align:center;font-size:0.8em;">⚠️ LTM FEE</div><div style="padding:4px;background-color:#fff3cd;"><div style="display:flex;justify-content:space-between;font-size:0.85em;"><span>Base:</span><span>$${unitPrice.toFixed(2)}</span></div><div style="display:flex;justify-content:space-between;color:#dc3545;font-weight:bold;font-size:0.85em;"><span>LTM:</span><span>+$${ltmFeePerItem.toFixed(2)}</span></div><div style="display:flex;justify-content:space-between;border-top:1px dashed #ffc107;padding-top:2px;font-weight:bold;"><span>Unit:</span><span>$${displayPrice.toFixed(2)}</span></div><div style="text-align:center;background-color:#f8f9fa;margin-top:3px;padding:2px;border-radius:3px;font-weight:bold;">$${itemTotal.toFixed(2)} total (${quantity})</div></div></div>`; matrixPriceDisplay.style.backgroundColor = ''; matrixPriceDisplay.style.padding = '0'; matrixPriceDisplay.style.border = 'none'; } else { matrixPriceDisplay.innerHTML = `<div class="price-card" style="font-size:0.9em;box-shadow:0 1px 3px rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;max-width:100%;"><div style="background-color:#0056b3;color:white;font-weight:bold;padding:3px 0;text-align:center;font-size:0.8em;">STANDARD</div><div style="padding:4px;background-color:#f8f9fa;"><div style="display:flex;justify-content:space-between;font-weight:bold;"><span>Unit:</span><span>$${unitPrice.toFixed(2)}</span></div><div style="text-align:center;background-color:#e6f7ff;margin-top:3px;padding:2px;border-radius:3px;font-weight:bold;">$${itemTotal.toFixed(2)} total (${quantity})</div></div></div>`; matrixPriceDisplay.style.backgroundColor = ''; matrixPriceDisplay.style.padding = '0'; matrixPriceDisplay.style.border = 'none'; } } matrixPriceDisplay.dataset.quantity = quantity; matrixPriceDisplay.dataset.displayPrice = displayPrice; matrixPriceDisplay.dataset.tier = window.cartItemData?.tierKey || ''; }
+        const matrixPriceDisplay = document.querySelector(`#quantity-matrix .price-display[data-size="${size}"]`);
+        if (matrixPriceDisplay) {
+            matrixPriceDisplay.dataset.unitPrice = unitPrice.toFixed(2);
+            if (quantity <= 0) {
+                matrixPriceDisplay.innerHTML = `$${unitPrice.toFixed(2)}`;
+                matrixPriceDisplay.className = 'price-display'; // Reset classes
+                matrixPriceDisplay.style.backgroundColor = '';
+                matrixPriceDisplay.style.padding = '';
+                matrixPriceDisplay.style.border = '';
+            } else {
+                let cardHtml = '';
+                if (ltmFeeApplies) {
+                    cardHtml = `
+                        <div class="price-breakdown-card ltm-active">
+                            <div class="price-breakdown-header">LTM Fee Applied</div>
+                            <div class="price-breakdown-row"><span>Base:</span> <span>$${unitPrice.toFixed(2)}</span></div>
+                            <div class="price-breakdown-row"><span>LTM:</span> <span>+$${ltmFeePerItem.toFixed(2)}</span></div>
+                            <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${displayPrice.toFixed(2)}</span></div>
+                            <div class="price-breakdown-row total-price"><span>Total (${quantity}):</span> <span>$${itemTotal.toFixed(2)}</span></div>
+                        </div>`;
+                } else {
+                    cardHtml = `
+                        <div class="price-breakdown-card standard">
+                            <div class="price-breakdown-header">Standard Price</div>
+                            <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${unitPrice.toFixed(2)}</span></div>
+                            <div class="price-breakdown-row total-price"><span>Total (${quantity}):</span> <span>$${itemTotal.toFixed(2)}</span></div>
+                        </div>`;
+                }
+                matrixPriceDisplay.innerHTML = cardHtml;
+                matrixPriceDisplay.className = 'price-display has-breakdown'; // Add class to indicate it has the card
+                matrixPriceDisplay.style.backgroundColor = '';
+                matrixPriceDisplay.style.padding = '0';
+                matrixPriceDisplay.style.border = 'none';
+            }
+            matrixPriceDisplay.dataset.quantity = quantity;
+            matrixPriceDisplay.dataset.displayPrice = displayPrice;
+            matrixPriceDisplay.dataset.tier = window.cartItemData?.tierKey || '';
+        }
         const gridPriceDisplay = document.querySelector(`#size-quantity-grid-container .size-price[data-size="${size}"]`); if (gridPriceDisplay) { if (quantity <= 0) { gridPriceDisplay.textContent = `$${unitPrice.toFixed(2)}`; gridPriceDisplay.style.backgroundColor = ''; gridPriceDisplay.style.padding = ''; gridPriceDisplay.style.borderRadius = ''; gridPriceDisplay.style.border = ''; gridPriceDisplay.style.boxShadow = ''; } else { if (ltmFeeApplies) { gridPriceDisplay.innerHTML = `<div style="font-weight:bold;color:#212529;background-color:#ffc107;margin-bottom:5px;padding:3px;border-radius:4px;text-align:center;">⚠️ LTM FEE ⚠️</div><div>$${unitPrice.toFixed(2)} + <strong style="color:#663c00">$${ltmFeePerItem.toFixed(2)}</strong> LTM</div><div><strong style="font-size:1.1em;">$${itemTotal.toFixed(2)}</strong></div><div style="background-color:#fff3cd;padding:3px;margin-top:3px;border-radius:3px;"><small>($${ltmFee.toFixed(2)} fee ÷ ${combinedQuantity} items)</small></div>`; gridPriceDisplay.style.backgroundColor = '#fff3cd'; gridPriceDisplay.style.padding = '8px'; gridPriceDisplay.style.borderRadius = '4px'; gridPriceDisplay.style.border = '2px solid #dc3545'; gridPriceDisplay.style.boxShadow = '0 0 5px rgba(220, 53, 69, 0.3)'; } else { gridPriceDisplay.textContent = `$${displayPrice.toFixed(2)}`; gridPriceDisplay.style.backgroundColor = ''; gridPriceDisplay.style.padding = ''; gridPriceDisplay.style.borderRadius = ''; gridPriceDisplay.style.border = ''; gridPriceDisplay.style.boxShadow = ''; } } gridPriceDisplay.dataset.quantity = quantity; gridPriceDisplay.dataset.unitPrice = unitPrice; gridPriceDisplay.dataset.displayPrice = displayPrice; gridPriceDisplay.dataset.tier = window.cartItemData?.tierKey || ''; }
-    }
-
-    function updateCartInfoDisplay(newQuantity, combinedQuantity, currentTierKey) {
-        const cartInfoDisplay = document.getElementById('cart-info-display');
-        const cartContentsInfo = document.getElementById('cart-contents-info');
-        // Get cart quantity from global state
-        const cartQuantity = window.cartItemData?.cartQuantity || 0;
-        
-        if (cartInfoDisplay) {
-            if (newQuantity > 0) {
-                let infoHtml = `<div id="adding-info">Adding <strong><span id="new-items-count">${newQuantity}</span></strong> item(s).</div>`;
-                
-                // Add prospective calculation info if there are items in cart
-                if (cartQuantity > 0) {
-                    infoHtml += `
-                    <div id="prospective-calculation" style="margin-top: 10px; background-color: #e8f4ff; padding: 8px; border-radius: 5px; border-left: 3px solid #0d6efd;">
-                        <div style="font-weight: bold; margin-bottom: 5px;">📊 Prospective Pricing Calculation:</div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>Items being added:</span>
-                            <span><strong>${newQuantity}</strong></span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>Items already in cart:</span>
-                            <span><strong>${cartQuantity}</strong></span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; border-top: 1px dashed #0d6efd; margin-top: 5px; padding-top: 5px;">
-                            <span>Combined total for pricing:</span>
-                            <span><strong id="combined-items-count">${combinedQuantity}</strong></span>
-                        </div>
-                    </div>`;
-                } else {
-                    infoHtml += `<div id="combined-total" style="margin-top: 5px;">Combined total for pricing: <strong><span id="combined-items-count">${combinedQuantity}</span></strong> item(s).</div>`;
-                }
-                
-                infoHtml += `<div id="current-tier" style="margin-top: 5px;">Current Pricing Tier: <strong><span id="tier-name">${currentTierKey || 'N/A'}</span></strong></div>`;
-                
-                // Show LTM threshold info if applicable
-                if (combinedQuantity < 24) {
-                    const itemsNeededForNoLTM = 24 - combinedQuantity;
-                    infoHtml += `
-                    <div id="ltm-threshold-info" style="margin-top: 8px; background-color: #fff3cd; padding: 8px; border-radius: 5px; font-size: 0.9em;">
-                        <span style="font-weight: bold;">⚠️ LTM Fee Applied:</span> Add ${itemsNeededForNoLTM} more item(s) to reach the 24-item threshold and eliminate the LTM fee.
-                    </div>`;
-                }
-                
-                cartInfoDisplay.innerHTML = infoHtml;
-                cartInfoDisplay.style.display = 'block';
-            } else {
-                cartInfoDisplay.innerHTML = '';
-                cartInfoDisplay.style.display = 'none';
-            }
-        }
-        
-        if (cartContentsInfo) {
-            if (newQuantity > 0) {
-                let summaryHtml = '<strong>Items to Add:</strong><ul>';
-                const sizeQuantities = window.cartItemData?.items || {};
-                Object.entries(sizeQuantities).forEach(([size, item]) => {
-                    if (item.quantity > 0) {
-                        summaryHtml += `<li>${size}: ${item.quantity} @ $${item.displayUnitPrice.toFixed(2)}</li>`;
-                    }
-                });
-                summaryHtml += '</ul>';
-                
-                // Add cart contents info if there are items in cart
-                if (cartQuantity > 0) {
-                    const embType = getEmbellishmentTypeFromUrl();
-                    summaryHtml += `
-                    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #dee2e6;">
-                        <strong>Already in Cart:</strong> ${cartQuantity} ${embType.replace('-', ' ')} items
-                    </div>`;
-                }
-                
-                cartContentsInfo.innerHTML = summaryHtml;
-                cartContentsInfo.style.display = 'block';
-            } else {
-                cartContentsInfo.innerHTML = '';
-                cartContentsInfo.style.display = 'none';
-            }
-        }
-    }
-
-    function updateTierInfoDisplay(tierKey, nextTier, quantityForNextTier, combinedQuantity) {
-        let tierInfoContainer = document.getElementById('tier-info-display');
-        
-        try {
-            if (!tierInfoContainer) {
-                tierInfoContainer = document.createElement('div');
-                tierInfoContainer.id = 'tier-info-display';
-                tierInfoContainer.className = 'tier-info-display pricing-tier-info';
-                const cartSummary = document.querySelector('.cart-summary');
-                if (cartSummary?.parentNode) {
-                    cartSummary.parentNode.insertBefore(tierInfoContainer, cartSummary);
-                } else {
-                    document.querySelector('.add-to-cart-section')?.appendChild(tierInfoContainer);
-                }
-            }
-            
-            if (!combinedQuantity || combinedQuantity <= 0 || !tierKey) {
-                tierInfoContainer.innerHTML = '';
-                tierInfoContainer.style.display = 'none';
-                return;
-            }
-            
-            tierInfoContainer.style.display = 'block';
-            const sourceTierData = window.nwcaPricingData?.tierData || window.dp5ApiTierData;
-            
-            if (!sourceTierData) {
-                tierInfoContainer.innerHTML = '<p>Tier data unavailable.</p>';
-                return;
-            }
-            
-            // Determine if we're using cart quantities for prospective pricing
-            const cartQuantity = window.cartItemData?.cartQuantity || 0;
-            const newQuantity = window.cartItemData?.totalQuantity || 0;
-            const isProspectivePricing = cartQuantity > 0;
-            
-            // Enhanced title with prospective pricing indication
-            let explanationHTML = `<div class="tier-explanation">`;
-            
-            if (isProspectivePricing) {
-                explanationHTML += `
-                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                        <h4 style="margin: 0;">Current Pricing Tier: <span id="current-tier-display">${tierKey}</span></h4>
-                        <span style="background-color: #0d6efd; color: white; font-size: 0.75em; padding: 2px 6px; border-radius: 10px; margin-left: 8px;">PROSPECTIVE</span>
-                    </div>
-                    <div style="background-color: #e8f4ff; padding: 8px; border-radius: 5px; margin-bottom: 10px; border-left: 3px solid #0d6efd;">
-                        <div style="font-weight: bold; margin-bottom: 5px;">Prospective Pricing Summary:</div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.9em;">
-                            <span>Items being added:</span>
-                            <span>${newQuantity}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.9em;">
-                            <span>Items already in cart:</span>
-                            <span>${cartQuantity}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; border-top: 1px dashed #0d6efd; margin-top: 5px; padding-top: 5px; font-weight: bold;">
-                            <span>Combined total:</span>
-                            <span>${combinedQuantity}</span>
-                        </div>
-                    </div>`;
-            } else {
-                explanationHTML += `<h4>Current Pricing Tier: <span id="current-tier-display">${tierKey}</span></h4>`;
-            }
-            
-            explanationHTML += `<p>Pricing is based on ${combinedQuantity} total ${getEmbellishmentTypeFromUrl().replace('-', ' ')} items${isProspectivePricing ? ' (including cart)' : ''}.</p></div>`;
-            
-            // Progress bar section
-            let progressHTML = '';
-            const sortedTiers = Object.keys(sourceTierData).sort((a, b) => (sourceTierData[a].MinQuantity || 0) - (sourceTierData[b].MinQuantity || 0));
-            const tierPoints = sortedTiers.map(t => ({ tier: t, min: sourceTierData[t].MinQuantity || 0 }));
-            const currentTierIndex = tierPoints.findIndex(p => p.tier === tierKey);
-            let progressPercent = 0;
-            let progressMessage = 'You are at this pricing tier.';
-            
-            if (currentTierIndex >= 0 && currentTierIndex < tierPoints.length - 1) {
-                const nextTierPoint = tierPoints[currentTierIndex + 1];
-                const currentMin = tierPoints[currentTierIndex].min;
-                const nextMin = nextTierPoint.min;
-                
-                if (nextMin > currentMin) {
-                    progressPercent = Math.min(100, Math.max(0, ((combinedQuantity - currentMin) / (nextMin - currentMin)) * 100));
-                }
-                
-                if (quantityForNextTier > 0) {
-                    progressMessage = `Add <strong>${quantityForNextTier}</strong> more item${quantityForNextTier !== 1 ? 's' : ''} to reach the <strong>${nextTier}</strong> tier (${nextMin}+ items).`;
-                }
-            } else if (currentTierIndex === tierPoints.length - 1) {
-                progressPercent = 100;
-                progressMessage = 'You have reached the highest pricing tier!';
-            }
-            
-            progressHTML = `
-            <div class="tier-progress">
-                <div class="tier-progress-bar" style="position: relative; display: flex; justify-content: space-between; margin-top: 15px; margin-bottom: 10px;">
-                    <div class="tier-line" style="position: absolute; top: 8px; height: 2px; width: 100%; background-color: var(--primary-light); z-index: 0;"></div>
-                    <div class="tier-progress-fill" style="position: absolute; top: 8px; height: 2px; background-color: var(--primary-color); z-index: 0; width: ${progressPercent}%; transition: width 0.5s ease;"></div>
-                    ${tierPoints.map((point, index) => `
-                        <div class="tier-point" data-tier="${point.tier}" style="display: flex; flex-direction: column; align-items: center; z-index: 1; position: relative;">
-                            <div class="tier-dot ${index <= currentTierIndex ? 'active' : ''}" style="width: 16px; height: 16px; border-radius: 50%; background-color: ${index <= currentTierIndex ? 'var(--primary-color)' : 'var(--primary-light)'}; border: 2px solid var(--primary-color);"></div>
-                            <div class="tier-label" style="margin-top: 5px; font-size: 0.8em; font-weight: bold;">${point.tier}</div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="tier-progress-text" style="text-align: center; font-size: 0.9em; margin-top: 10px;">
-                    <span id="tier-progress-message">${progressMessage}</span>
-                </div>
-            </div>`;
-            
-            // LTM fee section
-            const ltmFeeApplies = window.cartItemData?.ltmFeeApplies || false;
-            const ltmFeePerItem = window.cartItemData?.ltmFeePerItem || 0;
-            
-            let ltmHTML = `
-            <div class="ltm-explanation" style="display: ${ltmFeeApplies ? 'block' : 'none'}; margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid rgba(0,0,0,0.1);">
-                <h4>Less Than Minimum Fee Applied</h4>
-                <p>Orders under 24 pieces include a $${(window.cartItemData?.ltmFeeTotal || 50).toFixed(2)} LTM fee distributed across all items.</p>
-                <p class="ltm-applied">Current LTM fee: <span class="ltm-per-item" style="color: #dc3545;">$${ltmFeePerItem.toFixed(2)}</span> per item</p>
-                ${isProspectivePricing && ltmFeeApplies ? `
-                <div style="font-size: 0.9em; font-style: italic; margin-top: 5px; background-color: #f8f9fa; padding: 5px; border-radius: 4px;">
-                    This fee is calculated based on your prospective total of ${combinedQuantity} items.
-                </div>` : ''}
-            </div>`;
-            
-            tierInfoContainer.innerHTML = explanationHTML + progressHTML + ltmHTML;
-        } catch (error) {
-            console.error("[UI] Error updating tier info display:", error);
-            if (tierInfoContainer) tierInfoContainer.innerHTML = `<p style="color: red;">Error displaying tier info.</p>`;
-        }
     }
 
     function showSuccessWithViewCartButton(productData) {
@@ -711,7 +539,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     }
 
     function handleMobileAdjustments() {
-        const isMobile = window.innerWidth <= 768; const isSmallMobile = window.innerWidth <= 480; const useGrid = window.ProductQuantityUI ? determineLayoutPreference() : false; console.log(`PricingPages: Handling mobile adjustments. isMobile: ${isMobile}, isSmallMobile: ${isSmallMobile}, useGridPreference: ${useGrid}`); const colorSwatches = document.querySelectorAll('.color-swatch'); colorSwatches.forEach(swatch => { const size = isSmallMobile ? '45px' : (isMobile ? '50px' : '60px'); swatch.style.width = size; swatch.style.height = size; }); const pricingGrid = document.getElementById('custom-pricing-grid'); if (pricingGrid) { pricingGrid.classList.toggle('mobile-view', isMobile); pricingGrid.style.fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : ''); const pricingGridContainer = document.querySelector('.pricing-grid-container'); if (pricingGridContainer) { pricingGridContainer.style.overflowX = isMobile ? 'auto' : ''; pricingGridContainer.style.WebkitOverflowScrolling = isMobile ? 'touch' : ''; } } const productContext = document.querySelector('.product-context'); if (productContext) { productContext.style.flexDirection = isMobile ? 'column' : ''; productContext.style.textAlign = isMobile ? 'center' : ''; } const quantityMatrixContainer = document.getElementById('quantity-matrix'); const sizeQuantityGridContainer = document.getElementById('size-quantity-grid-container'); if (quantityMatrixContainer) { quantityMatrixContainer.style.display = (!useGrid && !isSmallMobile) ? 'block' : 'none'; if (!useGrid && !isSmallMobile) { const matrixTable = quantityMatrixContainer.querySelector('.quantity-input-table'); if (matrixTable) matrixTable.classList.toggle('mobile-view', isMobile); } } if (sizeQuantityGridContainer) { sizeQuantityGridContainer.style.display = (useGrid || isSmallMobile) ? 'grid' : 'none'; if (useGrid || isSmallMobile) { sizeQuantityGridContainer.style.gridTemplateColumns = isSmallMobile ? '1fr' : (isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(200px, 1fr))'); } } const visibleContainerSelector = (useGrid || isSmallMobile) ? '#size-quantity-grid-container' : '#quantity-matrix'; const visibleContainer = document.querySelector(visibleContainerSelector); if (visibleContainer) { visibleContainer.querySelectorAll('.quantity-btn').forEach(btn => { const size = isSmallMobile ? '22px' : (isMobile ? '24px' : '26px'); const fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : '1em'); btn.style.width = size; btn.style.height = size; btn.style.fontSize = fontSize; }); visibleContainer.querySelectorAll('.quantity-input').forEach(input => { const width = isSmallMobile ? '30px' : (isMobile ? '35px' : '40px'); const height = isSmallMobile ? '22px' : (isMobile ? '24px' : '26px'); const fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : '1em'); input.style.width = width; input.style.height = height; input.style.fontSize = fontSize; }); if (visibleContainerSelector === '#size-quantity-grid-container') { visibleContainer.querySelectorAll('.size-quantity-item').forEach(item => { item.style.padding = isSmallMobile ? '8px' : '10px'; }); } else if (visibleContainerSelector === '#quantity-matrix') { visibleContainer.querySelectorAll('th, td').forEach(cell => { cell.style.padding = isSmallMobile ? '4px' : (isMobile ? '6px' : '8px'); }); } } const cartSummary = document.querySelector('.cart-summary'); if (cartSummary) { cartSummary.style.padding = isMobile ? '15px' : '20px'; const addToCartButton = cartSummary.querySelector('#add-to-cart-button'); if (addToCartButton) { addToCartButton.style.padding = isSmallMobile ? '8px 16px' : '12px 24px'; addToCartButton.style.fontSize = isSmallMobile ? '1em' : '1.1em'; } const tierInfoDisplay = cartSummary.querySelector('#tier-info-display'); if (tierInfoDisplay) { tierInfoDisplay.style.padding = isSmallMobile ? '8px' : '10px'; tierInfoDisplay.style.fontSize = isSmallMobile ? '0.85em' : '0.9em'; const progressBar = tierInfoDisplay.querySelector('.tier-progress'); if(progressBar) progressBar.style.height = isSmallMobile ? '6px' : '8px'; const progressBarFill = tierInfoDisplay.querySelector('.tier-progress-fill'); if(progressBarFill) progressBarFill.style.height = isSmallMobile ? '6px' : '8px'; } } const tierInfoBox = document.getElementById('tier-info-display'); if (tierInfoBox && tierInfoBox !== cartSummary?.querySelector('#tier-info-display')) { tierInfoBox.style.padding = isMobile ? '10px' : '15px'; tierInfoBox.style.fontSize = isSmallMobile ? '0.85em' : '0.9em'; } setupShowMoreColorsButton();
+        const isMobile = window.innerWidth <= 768; const isSmallMobile = window.innerWidth <= 480; const useGrid = window.ProductQuantityUI ? determineLayoutPreference() : false; console.log(`PricingPages: Handling mobile adjustments. isMobile: ${isMobile}, isSmallMobile: ${isSmallMobile}, useGridPreference: ${useGrid}`); const colorSwatches = document.querySelectorAll('.color-swatch'); colorSwatches.forEach(swatch => { const size = isSmallMobile ? '45px' : (isMobile ? '50px' : '60px'); swatch.style.width = size; swatch.style.height = size; }); const pricingGrid = document.getElementById('custom-pricing-grid'); if (pricingGrid) { pricingGrid.classList.toggle('mobile-view', isMobile); pricingGrid.style.fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : ''); const pricingGridContainer = document.querySelector('.pricing-grid-container'); if (pricingGridContainer) { pricingGridContainer.style.overflowX = isMobile ? 'auto' : ''; pricingGridContainer.style.WebkitOverflowScrolling = isMobile ? 'touch' : ''; } } const productContext = document.querySelector('.product-context'); if (productContext) { productContext.style.flexDirection = isMobile ? 'column' : ''; productContext.style.textAlign = isMobile ? 'center' : ''; } const quantityMatrixContainer = document.getElementById('quantity-matrix'); const sizeQuantityGridContainer = document.getElementById('size-quantity-grid-container'); if (quantityMatrixContainer) { quantityMatrixContainer.style.display = (!useGrid && !isSmallMobile) ? 'block' : 'none'; if (!useGrid && !isSmallMobile) { const matrixTable = quantityMatrixContainer.querySelector('.quantity-input-table'); if (matrixTable) matrixTable.classList.toggle('mobile-view', isMobile); } } if (sizeQuantityGridContainer) { sizeQuantityGridContainer.style.display = (useGrid || isSmallMobile) ? 'grid' : 'none'; if (useGrid || isSmallMobile) { sizeQuantityGridContainer.style.gridTemplateColumns = isSmallMobile ? '1fr' : (isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(200px, 1fr))'); } } const visibleContainerSelector = (useGrid || isSmallMobile) ? '#size-quantity-grid-container' : '#quantity-matrix'; const visibleContainer = document.querySelector(visibleContainerSelector); if (visibleContainer) { visibleContainer.querySelectorAll('.quantity-btn').forEach(btn => { const size = isSmallMobile ? '22px' : (isMobile ? '24px' : '26px'); const fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : '1em'); btn.style.width = size; btn.style.height = size; btn.style.fontSize = fontSize; }); visibleContainer.querySelectorAll('.quantity-input').forEach(input => { const width = isSmallMobile ? '30px' : (isMobile ? '35px' : '40px'); const height = isSmallMobile ? '22px' : (isMobile ? '24px' : '26px'); const fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : '1em'); input.style.width = width; input.style.height = height; input.style.fontSize = fontSize; }); if (visibleContainerSelector === '#size-quantity-grid-container') { visibleContainer.querySelectorAll('.size-quantity-item').forEach(item => { item.style.padding = isSmallMobile ? '8px' : '10px'; }); } else if (visibleContainerSelector === '#quantity-matrix') { visibleContainer.querySelectorAll('th, td').forEach(cell => { cell.style.padding = isSmallMobile ? '4px' : (isMobile ? '6px' : '8px'); }); } } const cartSummary = document.querySelector('.cart-summary'); if (cartSummary) { cartSummary.style.padding = isMobile ? '15px' : '20px'; const addToCartButton = cartSummary.querySelector('#add-to-cart-button'); if (addToCartButton) { addToCartButton.style.padding = isSmallMobile ? '8px 16px' : '12px 24px'; addToCartButton.style.fontSize = isSmallMobile ? '1em' : '1.1em'; } const tierInfoDisplayInSummary = cartSummary.querySelector('.pricing-tier-info'); if (tierInfoDisplayInSummary) { tierInfoDisplayInSummary.style.padding = isSmallMobile ? '8px' : '10px'; tierInfoDisplayInSummary.style.fontSize = isSmallMobile ? '0.85em' : '0.9em'; const progressBar = tierInfoDisplayInSummary.querySelector('.tier-progress'); if(progressBar) { /* Optional: progressBar.style.height = isSmallMobile ? '6px' : '8px'; */ } const progressBarFill = tierInfoDisplayInSummary.querySelector('.tier-progress-fill'); if(progressBarFill) { /* Optional: progressBarFill.style.height = isSmallMobile ? '6px' : '8px'; */ } } } const mainPricingTierInfo = document.querySelector('.product-interactive-column .pricing-tier-info'); if (mainPricingTierInfo && mainPricingTierInfo !== cartSummary?.querySelector('.pricing-tier-info')) { mainPricingTierInfo.style.padding = isMobile ? '10px' : '15px'; mainPricingTierInfo.style.fontSize = isSmallMobile ? '0.85em' : '0.9em'; } setupShowMoreColorsButton();
     }
 
     // --- UI Initialization Functions (Moved from inline scripts) ---
@@ -816,12 +644,12 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // --- Global UI Object ---
     window.PricingPageUI = {
         updatePriceDisplayForSize: updatePriceDisplayForSize,
-        updateCartInfoDisplay: updateCartInfoDisplay,
-        updateTierInfoDisplay: updateTierInfoDisplay,
+        // updateCartInfoDisplay and updateTierInfoDisplay are removed as their functionality
+        // is now integrated into product-pricing-ui.js (updateComprehensiveTierInfo)
         showSuccessNotification: showSuccessWithViewCartButton,
         handleMobileAdjustments: handleMobileAdjustments,
         updateMiniColorSwatch: updateMiniColorSwatch,
-        determineLayoutPreference: determineLayoutPreference // Added function reference
+        determineLayoutPreference: determineLayoutPreference
     };
 
 
