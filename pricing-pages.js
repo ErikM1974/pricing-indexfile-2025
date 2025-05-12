@@ -52,6 +52,15 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         const styleNumber = getUrlParameter('StyleNumber');
         const colorFromUrl = getUrlParameter('COLOR');
 
+        // --- DIAGNOSIS: Check for placeholder values ---
+        if (styleNumber === '{styleNumber}' || colorFromUrl === '{colorCode}' || !styleNumber) { // Also check if styleNumber is missing
+            console.error("PricingPages: ERROR - URL contains placeholder values or is missing style. Aborting initialization.", { styleNumber, colorFromUrl });
+            // Display an error message to the user
+            document.body.innerHTML = '<div class="error-message" style="padding: 20px; text-align: center; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px; margin: 20px;"><strong>Error:</strong> Invalid product link parameters. Please go back to the product page, ensure a style and color are selected, wait a moment for links to update, and then try the pricing link again.</div>';
+            return; // Stop further processing
+        }
+        // --- End Diagnosis Check ---
+
         console.log(`PricingPages: Product Context: StyleNumber=${styleNumber}, COLOR=${colorFromUrl}`);
 
         window.selectedStyleNumber = styleNumber;

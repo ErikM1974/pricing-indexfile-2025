@@ -1,0 +1,886 @@
+/* --- CSS Variables for Theming --- */
+:root {
+    /* Green Theme */
+    --primary-color: #2f661e;
+    --primary-dark: #1e4d0f;
+    --primary-light: #eaf2e9;
+    --secondary-color: #5cb85c; /* Keep secondary for potential accents */
+    --secondary-light: #eaffea; /* Keep secondary for potential accents */
+    --text-color: #333;
+    --text-light: #666;
+    --border-color: #d8e0d6; /* Adjusted border color */
+    --border-light: #eaf2e9; /* Use primary light for lighter borders */
+    --background-color: #fff;
+    --background-light: #f9fbf8; /* Slightly adjusted light background */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --spacing-xs: 0.25rem; /* 4px */
+    --spacing-sm: 0.5rem;  /* 8px */
+    --spacing-md: 1rem;    /* 16px */
+    --spacing-lg: 1.5rem;  /* 24px */
+    --spacing-xl: 2rem;    /* 32px */
+    --font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+}
+
+/* --- General & Search CSS --- */
+body {
+    font-family: var(--font-family);
+    padding: var(--spacing-md);
+    font-size: 14px;
+    color: var(--text-color);
+    line-height: 1.5;
+    background-color: var(--background-light);
+    margin: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: var(--background-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-md);
+}
+
+h1, h2, h3, h4 {
+    color: var(--primary-color); /* Apply primary color to all headings */
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+h1 {
+    font-size: 1.8em;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--primary-light);
+}
+
+h2 {
+    font-size: 1.5em;
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--primary-light); /* Consistent border */
+}
+
+h3 {
+    font-size: 1.25em;
+}
+
+h4 {
+    font-size: 1.1em;
+    color: var(--primary-dark); /* Darker for sub-headings */
+}
+
+/* Remove default hr styles, use classes instead */
+hr { display: none; }
+
+.section-divider {
+    margin: var(--spacing-xl) 0; /* Use larger spacing */
+    border: 0;
+    border-top: 1px solid var(--border-color); /* Use themed border color */
+}
+
+.style-search-container {
+    position: relative;
+    margin-bottom: var(--spacing-md);
+    max-width: 450px;
+    display: flex;
+    align-items: center;
+    background-color: var(--background-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-sm);
+}
+
+.style-search-container label {
+    margin-right: var(--spacing-sm);
+    font-weight: bold;
+    font-size: 0.95em;
+    color: var(--primary-dark); /* Darker green for label */
+}
+
+#style-search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid var(--border-color); /* Use themed border */
+    border-radius: var(--radius-sm);
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color var(--transition-fast);
+}
+
+#style-search-input:focus {
+    outline: none;
+    border-color: var(--primary-color); /* Use themed primary */
+    box-shadow: 0 0 0 2px var(--primary-light); /* Use themed light */
+}
+
+#search-button {
+    padding: 10px 20px;
+    background-color: var(--primary-color); /* Use themed primary */
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 1em;
+    margin-left: var(--spacing-sm);
+    transition: background-color var(--transition-fast);
+}
+
+#search-button:hover {
+    background-color: var(--primary-dark); /* Use themed dark */
+}
+
+#style-suggestions-list {
+    position: absolute;
+    border: 1px solid var(--border-color); /* Use themed border */
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+}
+
+.suggestions-hidden { display: none; }
+.suggestions-visible { display: block; }
+
+#style-suggestions-list div {
+    padding: 10px 15px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid var(--border-color); /* Use themed border */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.95em;
+    transition: background-color var(--transition-fast);
+}
+
+#style-suggestions-list div:last-child { border-bottom: none; }
+#style-suggestions-list div:hover { background-color: var(--primary-light); /* Use themed light */ }
+
+/* --- Back to Gallery Button --- */
+.back-to-gallery-btn {
+    display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-lg);
+    transition: background-color var(--transition-fast);
+    font-weight: 500;
+}
+
+.back-to-gallery-btn:hover {
+    background-color: var(--primary-dark);
+    color: white;
+}
+
+/* --- Product Info & Gallery CSS --- */
+.product-gallery-container-dp2 {
+    padding: var(--spacing-md) 0;
+    box-sizing: border-box;
+    margin-top: var(--spacing-md);
+}
+
+.product-info-wrapper-dp2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    align-items: flex-start;
+}
+
+.product-image-area-dp2 {
+    flex: 0 0 400px;
+    max-width: 100%;
+    min-width: 300px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-image-wrapper-dp2 {
+    width: 100%;
+    margin-bottom: var(--spacing-md);
+    border: 1px solid var(--border-color); /* Use themed border */
+    min-height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: white;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+}
+
+#main-product-image-dp2 {
+    display: block;
+    max-width: 100%;
+    max-height: 500px;
+    height: auto;
+    background-color: #fff;
+    transition: transform var(--transition-normal);
+}
+
+.main-image-wrapper-dp2:hover #main-product-image-dp2 {
+    transform: scale(1.03);
+}
+
+.additional-images-dp2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    padding-top: var(--spacing-md);
+}
+
+.product-thumbnail-dp2 {
+    width: 80px;
+    height: 80px;
+    border: 2px solid var(--border-color); /* Use themed border */
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    opacity: 0.8;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+}
+
+.product-thumbnail-dp2:hover {
+    opacity: 1.0;
+    border-color: var(--primary-color); /* Use themed primary */
+    box-shadow: var(--shadow-md);
+}
+
+.product-thumbnail-dp2.active-thumbnail {
+    opacity: 1.0;
+    border: 2px solid var(--primary-color); /* Use themed primary */
+    box-shadow: 0 0 0 3px var(--primary-light); /* Use themed light */
+    transform: scale(1.05);
+}
+
+.product-details-area-dp2 {
+    flex: 1;
+    min-width: 300px;
+    box-sizing: border-box;
+    padding: var(--spacing-sm);
+    background-color: var(--background-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Updated h2 style is handled globally now */
+/* .product-details-area-dp2 h2 { ... } */
+
+.product-details-area-dp2 p {
+    margin: 0 0 var(--spacing-md) 0; /* Increased bottom margin */
+    font-size: 1em;
+    color: var(--text-color);
+    line-height: 1.7; /* Increased line height */
+}
+
+.product-details-area-dp2 p.style-number {
+    color: var(--primary-dark); /* Use dark primary color */
+    font-size: 0.9em;
+    background-color: var(--primary-light); /* Use light primary background */
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm); /* Use spacing variables */
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-sm); /* Add some margin below */
+}
+
+.product-details-area-dp2 p.selected-color {
+    font-weight: bold;
+    color: var(--text-color);
+    font-size: 1.1em;
+    margin-top: var(--spacing-sm);
+}
+
+.product-details-area-dp2 p.product-description {
+    color: var(--text-color);
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md); /* Increased padding */
+    border-top: 1px solid var(--border-color); /* Use themed border */
+    line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+    .product-info-wrapper-dp2 {
+        flex-direction: column;
+    }
+
+    .product-image-area-dp2 {
+        order: 1;
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+    }
+
+    .product-details-area-dp2 {
+        order: 2;
+        width: 100%;
+    }
+}
+
+.loading-message, .error-message {
+    padding: var(--spacing-lg);
+    text-align: center;
+    font-style: italic;
+    color: var(--text-light);
+    background-color: var(--background-light);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-md) 0;
+}
+
+.error-message {
+    color: #c00;
+    font-weight: bold;
+    background-color: #fff0f0;
+    border: 1px solid #ffcccc;
+}
+
+/* --- Swatch Styles --- */
+#swatch-area, #inline-swatch-area, .product-swatches {
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md);
+    background-color: var(--background-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+#inline-swatch-area {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background-color: var(--background-light); /* Use themed light bg */
+    border-radius: var(--radius-sm);
+    border-top: 1px solid var(--border-color); /* Use themed border */
+    box-shadow: none;
+}
+
+#swatch-area p, #inline-swatch-area p {
+    text-align: left;
+    margin-bottom: var(--spacing-md);
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--primary-color); /* Use themed primary */
+    border-bottom: 1px solid var(--border-color); /* Use themed border */
+    padding-bottom: var(--spacing-xs);
+}
+
+#inline-swatch-area p {
+    margin-bottom: var(--spacing-sm);
+    font-size: 1em;
+}
+
+.swatch-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--spacing-md);
+    justify-content: center;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    background-color: var(--background-light); /* Use themed light bg */
+}
+
+/* Webkit Scrollbar Styles */
+.swatch-container::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+.swatch-container::-webkit-scrollbar-track {
+    background: var(--background-light); /* Track color */
+    border-radius: 4px;
+}
+
+.swatch-container::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color); /* Thumb color */
+    border-radius: 4px;
+    border: 2px solid var(--background-light); /* Creates padding around thumb */
+}
+
+.swatch-container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-dark); /* Thumb color on hover */
+}
+
+/* Firefox Scrollbar Styles */
+.swatch-container {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-light);
+}
+
+
+#inline-swatch-area .swatch-container, .product-swatches .swatch-container {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: var(--spacing-sm);
+    max-height: 200px;
+    background-color: transparent;
+    padding: 0;
+}
+
+.product-swatches {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background-color: var(--background-light); /* Use themed light bg */
+    border-radius: var(--radius-sm);
+    border-top: 1px solid var(--border-color); /* Use themed border */
+}
+
+.swatch-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* width: 80px; Let grid handle width */
+    transition: transform var(--transition-fast);
+    text-align: center; /* Center the name below */
+}
+
+#inline-swatch-area .swatch-wrapper, .product-swatches .swatch-wrapper {
+    width: 70px;
+}
+
+.swatch-wrapper:hover {
+    transform: translateY(-3px);
+}
+
+.color-swatch-item {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--border-color); /* Use themed border */
+    border-radius: 50%;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    transition: all var(--transition-fast);
+    display: inline-block;
+    overflow: hidden;
+    margin-bottom: var(--spacing-xs);
+    box-shadow: var(--shadow-sm);
+}
+
+#inline-swatch-area .color-swatch-item, .product-swatches .color-swatch-item {
+    width: 50px;
+    height: 50px;
+}
+
+.color-swatch-item:hover {
+    transform: scale(1.1);
+    border-color: var(--primary-color); /* Use themed primary */
+    box-shadow: 0 0 0 3px var(--primary-light); /* Use themed light */
+}
+
+.color-swatch-item.active-swatch {
+    border-color: var(--primary-color); /* Use themed primary */
+    transform: scale(1.1);
+    /* Use a subtle shadow with primary color */
+    box-shadow: 0 0 8px 1px rgba(47, 102, 30, 0.4); /* Adjusted shadow */
+}
+
+.color-name {
+    font-size: 0.8em;
+    text-align: center;
+    color: var(--text-color);
+    /* max-width: 80px; Let wrapper/grid control width */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* white-space: nowrap; Allow wrapping */
+    line-height: 1.3; /* Allow for two lines */
+    height: 2.6em; /* Reserve space for two lines */
+    display: block; /* Ensure block display */
+    margin-top: var(--spacing-xs);
+    font-weight: 500;
+    width: 100%; /* Take full width of wrapper */
+}
+
+#inline-swatch-area .color-name, .product-swatches .color-name {
+    max-width: 70px;
+    font-size: 0.75em;
+}
+
+/* --- Tab Styles --- */
+.tabs-container {
+    margin-top: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    background-color: var(--background-color);
+}
+
+.tab-nav {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background-color: var(--primary-light); /* Use light primary for tab nav bg */
+    position: relative;
+}
+
+.tab-link {
+    padding: 15px 20px;
+    cursor: pointer;
+    background-color: transparent;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1em;
+    text-align: center;
+    flex-grow: 1;
+    transition: all var(--transition-fast);
+    position: relative;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+}
+
+.tab-link:hover {
+    background-color: var(--primary-light); /* Use themed light on hover */
+    color: var(--primary-dark); /* Use themed dark text on hover */
+}
+
+.tab-link.active {
+    color: var(--primary-color); /* Use themed primary */
+    font-weight: bold;
+    border-bottom: 3px solid var(--primary-color); /* Use themed primary */
+    background-color: var(--background-color); /* White background for active tab */
+}
+
+.tab-content-panel {
+    padding: var(--spacing-lg);
+    border-top: none;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+    transition: opacity var(--transition-normal);
+}
+
+.tab-content-panel.active {
+    visibility: visible;
+    height: auto;
+    overflow: visible;
+    opacity: 1;
+    position: static;
+    z-index: 1;
+}
+
+/* Special style to hide raw JavaScript code in embroidery panel */
+#embroidery-panel pre,
+#embroidery-panel code,
+#embroidery-panel > *:not(iframe):not(.loading-message):not(#dp5-wrapper) {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Ensure iframe is visible */
+#embroidery-panel iframe {
+    display: block !important;
+    visibility: visible !important;
+    height: 600px !important;
+    width: 100% !important;
+    border: none !important;
+}
+
+/* Hide script tags and code blocks in tab content */
+.tab-content-panel script,
+.tab-content-panel pre,
+.tab-content-panel code,
+pre:contains("new function"),
+pre:contains("this.appKey"),
+pre:contains("function requestDataPage"),
+/* More aggressive selectors to hide script content */
+.tab-content-panel > div:not(.loading-message):not(.iframe-container):not([id$="-wrapper"]):not(.error-message),
+.tab-content-panel > div > div:not(.loading-message):not(.iframe-container):not([id$="-wrapper"]):not(.error-message),
+.tab-content-panel:has(pre:contains("new function")),
+.tab-content-panel:has(pre:contains("this.appKey")),
+.tab-content-panel:has(pre:contains("function requestDataPage")),
+.tab-content-panel:has(pre:contains("subdomain")),
+.tab-content-panel:has(pre:contains("appKey")),
+.tab-content-panel:has(pre:contains("userQuery")),
+/* Hide any text that looks like JavaScript code */
+.tab-content-panel > :not(iframe):contains("new function"),
+.tab-content-panel > :not(iframe):contains("this.appKey"),
+.tab-content-panel > :not(iframe):contains("function requestDataPage"),
+.tab-content-panel > :not(iframe):contains("subdomain"),
+.tab-content-panel > :not(iframe):contains("appKey"),
+.tab-content-panel > :not(iframe):contains("userQuery"),
+/* Extremely aggressive selectors to hide specific JavaScript code */
+.tab-content-panel > *:not(#dp5-wrapper):not(#dp6-wrapper):not(#dp7-wrapper):not(#dp8-wrapper),
+#embroidery-panel > *:not(#dp5-wrapper),
+#cap-emb-panel > *:not(#dp7-wrapper),
+#dtg-panel > *:not(#dp6-wrapper),
+#screenprint-panel > *:not(#dp8-wrapper),
+/* Target the specific JavaScript code that's being displayed */
+.tab-content-panel pre[style*="background-color: rgb(0, 0, 0)"],
+.tab-content-panel div[style*="background-color: rgb(0, 0, 0)"],
+.tab-content-panel pre:contains("new function"),
+.tab-content-panel div:contains("new function"),
+.tab-content-panel pre:contains("this.appKey"),
+.tab-content-panel div:contains("this.appKey"),
+.tab-content-panel pre:contains("function requestDataPage"),
+.tab-content-panel div:contains("function requestDataPage"),
+.tab-content-panel pre:contains("subdomain"),
+.tab-content-panel div:contains("subdomain"),
+.tab-content-panel pre:contains("appKey"),
+.tab-content-panel div:contains("appKey"),
+.tab-content-panel pre:contains("userQuery"),
+.tab-content-panel div:contains("userQuery"),
+.tab-content-panel pre:contains("isDotNet"),
+.tab-content-panel div:contains("isDotNet"),
+.tab-content-panel pre:contains("targetScript"),
+.tab-content-panel div:contains("targetScript"),
+.tab-content-panel pre:contains("document.getElementsByTagName"),
+.tab-content-panel div:contains("document.getElementsByTagName"),
+.tab-content-panel pre:contains("document.createElement"),
+.tab-content-panel div:contains("document.createElement") {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Add a style to ensure iframes are visible */
+.tab-content-panel iframe {
+    display: block !important;
+    visibility: visible !important;
+    height: 600px !important;
+    width: 100% !important;
+    border: none !important;
+    margin-top: 15px !important;
+}
+
+/* Style for iframe containers */
+.iframe-container {
+    width: 100%;
+    min-height: 600px;
+    border: none;
+    margin-top: 15px;
+}
+
+/* Special styles for embroidery panels to hide script content */
+#embroidery-panel, #cap-emb-panel, #dtg-panel, #screenprint-panel {
+    position: relative;
+}
+
+#embroidery-panel > *:not(#dp5-wrapper),
+#cap-emb-panel > *:not(#dp7-wrapper),
+#dtg-panel > *:not(#dp6-wrapper),
+#screenprint-panel > *:not(#dp8-wrapper) {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Extremely aggressive styles for embroidery panel */
+#embroidery-panel {
+    position: relative;
+    overflow: hidden;
+}
+
+#embroidery-panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: white;
+    z-index: 1;
+}
+
+#embroidery-panel #dp5-wrapper {
+    position: relative;
+    z-index: 2;
+}
+
+#embroidery-panel #dp5-wrapper .loading-message,
+#embroidery-panel #dp5-wrapper .iframe-container,
+#embroidery-panel #dp5-wrapper iframe {
+    position: relative;
+    z-index: 3;
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Hide all direct text nodes in the panel */
+#embroidery-panel > :not(#dp5-wrapper) {
+    font-size: 0 !important;
+    color: transparent !important;
+    background: transparent !important;
+}
+
+/* Ensure wrapper divs are visible */
+#dp5-wrapper, #dp6-wrapper, #dp7-wrapper, #dp8-wrapper {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    min-height: 600px !important;
+}
+
+/* --- Custom Inventory Table Styles --- */
+#inventory-area h4 {
+    margin-bottom: var(--spacing-md);
+    font-size: 1.2em;
+    color: var(--primary-color); /* Use themed primary */
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-color); /* Use themed border */
+}
+
+#inventory-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border-color); /* Use themed border */
+    font-size: 0.95em;
+    margin-top: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+#inventory-table th,
+#inventory-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color); /* Use themed border */
+    text-align: left;
+    vertical-align: middle;
+}
+
+#inventory-table th {
+    background-color: var(--primary-color); /* Use themed primary */
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    position: sticky;
+    top: 0;
+}
+
+#inventory-table th:first-child {
+    text-align: left;
+    border-top-left-radius: var(--radius-sm);
+}
+
+#inventory-table th:last-child {
+    border-top-right-radius: var(--radius-sm);
+}
+
+#inventory-table td:nth-child(n+2) {
+    text-align: center;
+}
+
+#inventory-table tbody tr:nth-child(even) {
+    background-color: var(--primary-light); /* Use themed light */
+}
+
+#inventory-table tbody tr:hover {
+    background-color: var(--secondary-light); /* Use secondary light for hover */
+}
+
+#inventory-table tfoot td {
+    font-weight: bold;
+    background-color: var(--primary-light); /* Use themed light */
+    border-top: 2px solid var(--primary-color); /* Use themed primary */
+    color: var(--primary-dark); /* Darker text for footer */
+}
+
+#inventory-table tfoot td:first-child {
+    text-align: left;
+}
+
+/* --- Pricing Options Section --- */
+.pricing-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.pricing-option-card {
+    display: block; /* Make the link a block element */
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--background-light);
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    text-align: center;
+}
+
+.pricing-option-card:hover,
+.pricing-option-card:focus {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+    color: var(--primary-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-sm);
+}
+
+.pricing-option-card h4 { /* Style heading within the card */
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-dark);
+    font-size: 1.1em;
+}
+
+.pricing-option-card p { /* Style paragraph within the card */
+    font-size: 0.9em;
+    color: var(--text-light);
+    margin-bottom: 0;
+}
+
+
+/* --- Embedded DP Styles --- */
+ #inventory-panel > #inventory-area { padding: 0; margin-top: 0; }
+ .tab-content-panel > div[id$="-wrapper"] { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;}
+ .tab-content-panel > div[id$="-wrapper"]:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+
+/* Gallery item styling from index.html */
+a.gallery-item-link {
+    display: block;           /* Make the link behave like a block/box */
+    text-align: center;       /* Center the product title text */
+    text-decoration: none;    /* Remove underline from text */
+    color: #333333;          /* Set text color (dark grey) */
+    font-size: 0.9em;         /* Adjust font size */
+    line-height: 1.3;         /* Adjust line spacing */
+    padding: 5px;             /* Add a little padding inside the link area */
+    height: 100%;             /* Make link fill its container vertically */
+    box-sizing: border-box;   /* Include padding in height/width */
+}
+
+/* Style the image specifically within this link */
+a.gallery-item-link img {
+    display: block !important;            /* Make image a block */
+    margin: 0 auto 10px auto !important;  /* FORCE center image horizontally, add 10px space below */
+    max-width: 100% !important;           /* FORCE image to fit container width */
+    height: auto !important;              /* FORCE height to adjust automatically */
+    width: auto !important;               /* FORCE override of inline width */
+    border-radius: 3px;                   /* Optional: slightly rounded image corners */
+}
+/* Style to disable pricing links visually and functionally */
+.pricing-option-card.pricing-link-disabled {
+    pointer-events: none; /* Prevent clicks */
+    opacity: 0.6;         /* Visually indicate disabled state */
+    cursor: not-allowed;  /* Change cursor on hover */
+}

@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.selectedStyleNumber = null;
                 window.selectedColorName = null;
                 window.selectedCatalogColor = null;
-        
+                window.arePricingLinksReady = false; // Flag to control clickability
+
                 // --- API URL ---
                 const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
                 console.log("API Base URL:", API_PROXY_BASE_URL);
@@ -20,8 +21,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tabNav = document.querySelector('.tab-nav');
                 const tabLinks = document.querySelectorAll('.tab-link');
                 const tabContentPanels = document.querySelectorAll('.tab-content-panel');
-        
+                const pricingLinks = document.querySelectorAll('.pricing-option-card'); // Select all pricing links globally
+                setPricingLinksState(true); // <<< ADDED: Ensure links are disabled immediately on load
+
+                // Add click prevention listeners
+                document.querySelectorAll('.pricing-option-card').forEach(link => { // Re-query to be safe
+                    link.addEventListener('click', function(event) {
+                        if (!window.arePricingLinksReady) {
+                            event.preventDefault();
+                            // Optionally, briefly show a message to the user
+                            // alert("Pricing options are still loading. Please wait a moment.");
+                        } else {
+                        }
+                    });
+                });
+
                 // --- Helper Functions ---
+                // --- Helper Functions ---
+                // (Assuming getUrlParameter and debounce are defined elsewhere or not needed for this specific change)
+                // (Assuming DOM element references like pricingLinks are defined in the parent scope)
+
+                function setPricingLinksState(disabled) {
+                    const pricingLinksNodeList = document.querySelectorAll('.pricing-option-card'); // Re-query DOM
+                    const globalStyleInvalid = !window.selectedStyleNumber || String(window.selectedStyleNumber).includes('{');
+                    const globalColorInvalid = !window.selectedCatalogColor || String(window.selectedCatalogColor).includes('{');
+
+                    if (!disabled && (globalStyleInvalid || globalColorInvalid)) {
+                        console.warn(`setPricingLinksState: Attempted to enable links, but global state is invalid (Style: ${window.selectedStyleNumber}, Color: ${window.selectedCatalogColor}). Forcing disable.`);
+                        disabled = true;
+                    }
+
+                    console.log(`Setting pricing links state to: ${disabled ? 'disabled' : 'enabled (if individually validated)'}`);
+                    if (disabled) {
+                        window.arePricingLinksReady = false; // Set flag when disabling
+                    }
+                    // Note: Enabling is handled by updatePricingLinks which sets arePricingLinksReady = true
+
+                    pricingLinksNodeList.forEach(link => {
+                        if (disabled) {
+                            if (!link.classList.contains('pricing-link-disabled')) {
+                                link.classList.add('pricing-link-disabled');
+                            }
+                            // Optional: Reset href to a placeholder if disabling globally
+                            // const basePath = (link.getAttribute('href') || '').split('?')[0];
+                            // if (basePath) {
+                            //    link.setAttribute('href', `${basePath}?StyleNumber={styleNumber}&COLOR={colorCode}`);
+                            // }
+                        }
+                        // *** REMOVED redundant 'else' block. Enabling is solely handled by updatePricingLinks. ***
+                    });
+                }
                 function debounce(func, wait) { let timeout; return function executedFunction(...args) { const later = () => { clearTimeout(timeout); func(...args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; }
                 function sortSizesLogical(sizes) { const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', 'OSFM']; const knownSizes = sizes.filter(s => s && sizeOrder.includes(s.toUpperCase())).sort((a, b) => sizeOrder.indexOf(a.toUpperCase()) - sizeOrder.indexOf(b.toUpperCase())); const numericSizes = sizes.filter(s => s && !isNaN(parseInt(s))).sort((a, b) => parseInt(a) - parseInt(b)); const otherSizes = sizes.filter(s => s && isNaN(parseInt(s)) && !sizeOrder.includes(s.toUpperCase())).sort(); return [...knownSizes, ...numericSizes, ...otherSizes]; }
         
@@ -455,58 +504,72 @@ document.addEventListener('DOMContentLoaded', () => {
                  }
                  
                  // --- Update Pricing Links Function ---
-                 function updatePricingLinks(styleNumber, colorCode) {
-                     console.log(`Updating pricing links for Style=${styleNumber}, Color=${colorCode || 'N/A'}`);
-                     
+                 // --- Update Pricing Links Function ---
+                 function updatePricingLinks(styleNumber, colorCode) { // colorCode here is actually COLOR_NAME
+                     const pricingLinksNodeList = document.querySelectorAll('.pricing-option-card'); // Re-query DOM
+                     console.log(`Updating pricing links for Style=${styleNumber}, Color Name (colorCode arg): ${colorCode || 'N/A'}. Found ${pricingLinksNodeList.length} links.`);
+                     let allLinksNowValidAndReady = true; // Initialize flag for readiness check
+
                      if (!styleNumber) {
-                         console.warn("Cannot update pricing links: No style number provided");
+                         console.warn("Cannot update pricing links: No style number provided. Disabling links.");
+                         setPricingLinksState(true);
                          return;
                      }
-                     
-                     // Make sure we're using the current selected color if one isn't provided
-                     if (!colorCode && window.selectedColorName) {
-                         colorCode = window.selectedColorName;
-                         console.log(`No color code provided, using selected color name: ${colorCode}`);
+
+                     // *** MODIFIED: Strictly require window.selectedCatalogColor for links ***
+                     const catalogColorToUse = window.selectedCatalogColor; // Use only the globally set catalog color
+
+                     if (!catalogColorToUse || String(catalogColorToUse).includes('{')) { // Also check if it's a placeholder
+                         console.warn(`Cannot update pricing links: Required 'window.selectedCatalogColor' is invalid or missing (${catalogColorToUse}). Disabling links.`);
+                         setPricingLinksState(true); // Ensure links remain disabled (this also sets arePricingLinksReady = false)
+                         return;
                      }
-                     
-                     // Always prefer the catalog color code over the color name for better compatibility with Caspio
-                     const colorToUse = window.selectedCatalogColor || colorCode;
-                     console.log(`Using color for pricing links: ${colorToUse}`);
-                     
-                     const pricingLinks = document.querySelectorAll('.pricing-link');
-                     pricingLinks.forEach(link => {
-                         // Get the link's base path (e.g., "/pricing/embroidery")
-                         const currentHref = link.getAttribute('href');
-                         const urlParts = currentHref.split('?');
-                         const basePath = urlParts[0]; // This should be like "/pricing/embroidery", "/pricing/dtg", etc.
-                         
-                         // Reconstruct the new href with the current style and selected color
-                         // Ensure styleNumber and colorToUse are properly encoded for URLs
-                         const newHref = `${basePath}?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorToUse || '')}`;
-                         
-                         // Log the constructed URL for debugging
-                         console.log(`DEBUG - Pricing link for ${basePath}: ${newHref}`);
-                         
-                         // Set the updated href attribute on the link
-                         link.setAttribute('href', newHref);
-                         
-                         // Add hover effect
-                         link.addEventListener('mouseover', function() {
-                             this.style.transform = 'translateY(-5px)';
-                             this.style.boxShadow = 'var(--shadow-md)';
-                             this.style.borderColor = 'var(--primary-color)';
-                         });
-                         
-                         link.addEventListener('mouseout', function() {
-                             this.style.transform = 'translateY(0)';
-                             this.style.boxShadow = 'var(--shadow-sm)';
-                             this.style.borderColor = 'var(--border-color)';
-                         });
+                     console.log(`Valid data found (Style: ${styleNumber}, Catalog Color: ${catalogColorToUse}). Updating links.`);
+                     // Ensure links are disabled by default while updating hrefs
+                     pricingLinksNodeList.forEach(link => {
+                         if (!link.classList.contains('pricing-link-disabled')) {
+                             link.classList.add('pricing-link-disabled');
+                         }
                      });
-                     
-                     console.log("Pricing links updated successfully");
+
+                     // Removed redundant initialization of allLinksNowValid, using allLinksNowValidAndReady instead
+
+                     pricingLinksNodeList.forEach(link => {
+                         const currentHref = link.getAttribute('href') || '';
+                         const urlParts = currentHref.split('?');
+                         const basePath = urlParts[0];
+
+                         if (!basePath) {
+                             console.warn(`Skipping link with invalid base path: ${currentHref}`);
+                             allLinksNowValidAndReady = false; // Mark as not ready if any link is bad
+                             return;
+                         }
+             
+                         const newHref = `${basePath}?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(catalogColorToUse)}`;
+                         link.setAttribute('href', newHref);
+                         console.log(`Set href for ${basePath}: ${newHref}`);
+             
+                         if (newHref.includes('{styleNumber}') || newHref.includes('{colorCode}') || !styleNumber || !catalogColorToUse || String(styleNumber).includes('{') || String(catalogColorToUse).includes('{')) {
+                               allLinksNowValidAndReady = false; // Mark as not ready
+                               if (!link.classList.contains('pricing-link-disabled')) { // Should already be disabled, but double-check
+                                  link.classList.add('pricing-link-disabled');
+                              }
+                         } else {
+                              console.log(`Link ${basePath} is valid. Enabling.`);
+                               if (link.classList.contains('pricing-link-disabled')) {
+                                  link.classList.remove('pricing-link-disabled');
+                               }
+                          }
+                     });
+
+                     // After iterating through all links, set the global readiness flag
+                     if (allLinksNowValidAndReady) {
+                         window.arePricingLinksReady = true;
+                     } else {
+                         window.arePricingLinksReady = false; // Ensure it's false if any link failed validation
+                     }
                  }
-         
+
                 // --- New Product Data Loading Function ---
                 async function loadProductData(styleNumber) {
                     console.log(`ProductData: Loading data for Style: ${styleNumber}`);
@@ -743,6 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.selectedColorName = null;
                     window.selectedCatalogColor = null;
                     window.currentProductData = null; // Reset product data
+                    setPricingLinksState(true); // Disable pricing links when starting a new style search
                     
                     console.log("Global variables reset:", {
                         selectedStyleNumber: window.selectedStyleNumber,
@@ -1110,7 +1174,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  document.addEventListener('click', (e) => { if (styleSearchInput && suggestionsList && !styleSearchInput.contains(e.target) && !suggestionsList.contains(e.target)) { clearSuggestions(); } });
         
                  setupTabs(); // Initialize tab switching functionality
-        
+         
                  // --- Add this code to handle incoming StyleNumber from URL ---
                  try {
                      console.log("Checking for StyleNumber parameter in URL...");
