@@ -974,3 +974,70 @@ a.gallery-item-link img {
     transform: none; /* Prevent hover effect */
     box-shadow: none; /* Remove hover shadow */
 }
+
+/* --- Image Modal/Lightbox Styles --- */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.image-modal.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    margin: auto;
+    padding: 0;
+    animation: zoom 0.3s ease-in-out;
+}
+
+@keyframes zoom {
+    from {transform: scale(0.8); opacity: 0;}
+    to {transform: scale(1); opacity: 1;}
+}
+
+#modal-image {
+    display: block;
+    max-width: 100%;
+    max-height: 90vh;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    border: 5px solid white;
+    background-color: white;
+}
+
+.close-modal {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+    z-index: 1001;
+}
+
+.close-modal:hover {
+    color: var(--primary-color);
+}
+
+/* Make product images clickable */
+#main-product-image-dp2,
+.product-thumbnail-dp2 {
+    cursor: zoom-in;
+}

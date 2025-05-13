@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                      ${createThumbnailHtml(thumb3, altText)}
                                  `;
                                  setupImageGallery(); // Re-setup gallery listeners
+                                 setupImageModal(); // Re-setup modal listeners
                              }
                              console.log("ProductInfo: Images updated for new color.");
         
@@ -191,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                          </div>`;
                          
                          setupImageGallery();
+                         setupImageModal();
                      } catch (error) {
                          console.error("ProductInfo: Failed to load initial details:", error);
                          if (productInfoArea) productInfoArea.innerHTML = `<div class="error-message">Error loading product details: ${error.message}</div>`;
@@ -224,6 +226,191 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         console.log('ImageGallery: Main image updated.');
                     }
+                }
+                
+                // Helper function to create thumbnail HTML
+                function createThumbnailHtml(imageUrl, altText) {
+                    if (!imageUrl || imageUrl.trim() === '') {
+                        return '';
+                    }
+                    return `<img class="product-thumbnail-dp2" src="${imageUrl}" alt="${altText}" onerror="this.style.display='none';">`;
+                }
+                
+                // Function to set up image gallery click events
+                function setupImageGallery() {
+                    console.log('ImageGallery: Setting up gallery functionality');
+                    
+                    // Add click events to all thumbnails
+                    const thumbnails = document.querySelectorAll('.product-thumbnail-dp2');
+                    thumbnails.forEach(thumbnail => {
+                        thumbnail.addEventListener('click', handleThumbnailClick);
+                    });
+                    
+                    console.log('ImageGallery: Gallery setup complete');
+                }
+
+                // --- Image Modal/Lightbox Functions ---
+                function setupImageModal() {
+                    console.log('ImageModal: Setting up modal functionality');
+                    
+                    // Get modal elements
+                    const modal = document.getElementById('image-modal');
+                    const modalImg = document.getElementById('modal-image');
+                    const closeBtn = document.querySelector('.close-modal');
+                    
+                    if (!modal) {
+                        console.error('ImageModal: Modal element not found in DOM');
+                        return;
+                    }
+                    
+                    if (!modalImg) {
+                        console.error('ImageModal: Modal image element not found in DOM');
+                        return;
+                    }
+                    
+                    if (!closeBtn) {
+                        console.error('ImageModal: Close button element not found in DOM');
+                        return;
+                    }
+                    
+                    console.log('ImageModal: All required modal elements found in DOM');
+                    
+                    // Add click event to main product image
+                    const mainImage = document.getElementById('main-product-image-dp2');
+                    if (mainImage) {
+                        console.log('ImageModal: Main image found, adding click event');
+                        
+                        // Remove any existing click listeners to avoid duplicates
+                        mainImage.removeEventListener('click', mainImageClickHandler);
+                        
+                        // Add the click event listener
+                        mainImage.addEventListener('click', mainImageClickHandler);
+                        
+                        // Add cursor style to indicate it's clickable
+                        mainImage.style.cursor = 'pointer';
+                    } else {
+                        console.error('ImageModal: Main image element not found in DOM');
+                    }
+                    
+                    // Function to handle main image click
+                    function mainImageClickHandler() {
+                        console.log('ImageModal: Main image clicked');
+                        openImageModal(this.src, this.alt);
+                    }
+                    
+                    // Add click events to all thumbnails for modal opening
+                    const thumbnails = document.querySelectorAll('.product-thumbnail-dp2');
+                    if (thumbnails.length > 0) {
+                        console.log(`ImageModal: Found ${thumbnails.length} thumbnails, adding click events`);
+                        
+                        thumbnails.forEach(thumbnail => {
+                            // Add dblclick event to open modal directly from thumbnail
+                            thumbnail.removeEventListener('dblclick', thumbnailDblClickHandler);
+                            thumbnail.addEventListener('dblclick', thumbnailDblClickHandler);
+                            
+                            // Add cursor style to indicate it's clickable
+                            thumbnail.style.cursor = 'pointer';
+                        });
+                    } else {
+                        console.log('ImageModal: No thumbnails found');
+                    }
+                    
+                    // Function to handle thumbnail double-click
+                    function thumbnailDblClickHandler(e) {
+                        console.log('ImageModal: Thumbnail double-clicked');
+                        openImageModal(this.src, this.alt);
+                    }
+                    
+                    // Close modal when clicking the close button
+                    closeBtn.removeEventListener('click', closeImageModal);
+                    closeBtn.addEventListener('click', closeImageModal);
+                    
+                    // Close modal when clicking outside the image
+                    modal.removeEventListener('click', modalClickHandler);
+                    modal.addEventListener('click', modalClickHandler);
+                    
+                    function modalClickHandler(e) {
+                        if (e.target === modal) {
+                            console.log('ImageModal: Clicked outside image, closing modal');
+                            closeImageModal();
+                        }
+                    }
+                    
+                    // Close modal when pressing ESC key
+                    document.removeEventListener('keydown', keydownHandler);
+                    document.addEventListener('keydown', keydownHandler);
+                    
+                    function keydownHandler(e) {
+                        if (e.key === 'Escape' && modal.classList.contains('show')) {
+                            console.log('ImageModal: ESC key pressed, closing modal');
+                            closeImageModal();
+                        }
+                    }
+                    
+                    console.log('ImageModal: Modal setup complete');
+                }
+                
+                function openImageModal(imgSrc, imgAlt) {
+                    console.log('ImageModal: Opening modal with image:', imgSrc);
+                    
+                    const modal = document.getElementById('image-modal');
+                    const modalImg = document.getElementById('modal-image');
+                    
+                    if (!modal) {
+                        console.error('ImageModal: Modal element not found when trying to open');
+                        return;
+                    }
+                    
+                    if (!modalImg) {
+                        console.error('ImageModal: Modal image element not found when trying to open');
+                        return;
+                    }
+                    
+                    // Set the image source and alt text
+                    console.log('ImageModal: Setting image source and alt text');
+                    modalImg.src = imgSrc;
+                    modalImg.alt = imgAlt || 'Enlarged product image';
+                    
+                    // Display the modal
+                    console.log('ImageModal: Setting display to flex');
+                    modal.style.display = 'flex';
+                    
+                    // Use setTimeout to ensure the transition works
+                    console.log('ImageModal: Adding show class after delay');
+                    setTimeout(() => {
+                        modal.classList.add('show');
+                        console.log('ImageModal: Show class added');
+                    }, 10);
+                    
+                    // Prevent scrolling on the body
+                    document.body.style.overflow = 'hidden';
+                    console.log('ImageModal: Body scrolling disabled');
+                }
+                
+                function closeImageModal() {
+                    console.log('ImageModal: Closing modal');
+                    
+                    const modal = document.getElementById('image-modal');
+                    
+                    if (!modal) {
+                        console.error('ImageModal: Modal element not found when trying to close');
+                        return;
+                    }
+                    
+                    // Hide the modal with transition
+                    console.log('ImageModal: Removing show class');
+                    modal.classList.remove('show');
+                    
+                    // Wait for transition to complete before removing display
+                    console.log('ImageModal: Setting display to none after delay');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        console.log('ImageModal: Display set to none');
+                    }, 300); // Match the transition duration
+                    
+                    // Restore scrolling on the body
+                    document.body.style.overflow = '';
+                    console.log('ImageModal: Body scrolling restored');
                 }
         
                 // --- Swatch Functions ---
@@ -795,6 +982,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             firstThumb.style.border = '2px solid #007bff';
                         }
                     }
+                    setupImageGallery(); // Ensure gallery interactions are set up
+                    setupImageModal();   // Ensure modal interactions are set up
+                    console.log('ProductDisplay: Image gallery and modal setup after color update.');
                 }
 
                 // --- Main Orchestration Function ---
@@ -1213,5 +1403,9 @@ document.addEventListener('DOMContentLoaded', () => {
                  // --- End of code to handle incoming StyleNumber ---
         
                  console.log("Page Initialization Complete.");
-        
-            }); // End DOMContentLoaded listener
+                 
+                 // Initialize image modal functionality directly
+                 // setupImageModal(); // MOVED to be called after images are loaded, e.g., in updateProductDisplayForColor
+                 // console.log("Image modal initialized directly."); // MOVED
+ 
+             }); // End DOMContentLoaded listener
