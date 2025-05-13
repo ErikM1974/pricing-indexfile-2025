@@ -1857,6 +1857,21 @@ if (typeof window.NWCACart === 'undefined') {
       if (cartCountElement) {
         cartCountElement.textContent = window.NWCACart.getCartCount();
       }
+      
+      // Also update cart count in the header View Cart button
+      const headerCartCountElement = document.getElementById('cart-item-count-header');
+      if (headerCartCountElement) {
+        headerCartCountElement.textContent = window.NWCACart.getCartCount();
+      }
+      
+      // Update any other elements with the cart-count-display class
+      const cartCountDisplayElements = document.querySelectorAll('.cart-count-display');
+      if (cartCountDisplayElements.length > 0) {
+        const count = window.NWCACart.getCartCount();
+        cartCountDisplayElements.forEach(element => {
+          element.textContent = count;
+        });
+      }
     };
     
     // Listen for cart updates
