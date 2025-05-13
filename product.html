@@ -22,54 +22,62 @@
     </div>
 
     <div class="style-search-container">
-        <label for="style-search-input">Search Style:</label>
-        <input type="text" id="style-search-input" placeholder="Enter Style (e.g., PC61)" autocomplete="off">
-        <button id="search-button">Search</button>
+        <div class="search-controls">
+            <label for="style-search-input">Search Style:</label>
+            <input type="text" id="style-search-input" placeholder="Enter Style (e.g., PC61)" autocomplete="off">
+            <button id="search-button">Search</button>
+        </div>
+        <a href="/cart.html" class="view-cart-btn-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px; vertical-align: text-bottom;">
+                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            View Cart (<span id="cart-item-count-header" class="cart-count-display">0</span>)
+        </a>
         <div id="style-suggestions-list" class="suggestions-hidden"></div>
     </div>
 
-    <hr>
+    <div class="section-divider"></div> <!-- Replaced hr with styled div -->
+
+    <!-- Pricing Options -->
+    <div class="pricing-options" style="padding: var(--spacing-lg); margin-top: var(--spacing-lg); border-top: 1px solid var(--border-color);"> <!-- Removed inline styles, used variables -->
+        <h3>Embellishment Options</h3> <!-- Removed inline styles, rely on global h3 style -->
+        <p>Click on any option below to view detailed pricing information:</p> <!-- Removed inline style -->
+        
+        <div class="pricing-links"> <!-- Removed inline styles, rely on CSS class -->
+            <a href="/pricing/embroidery?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card"> <!-- Removed inline styles, added class -->
+                <div class="pricing-icon">🧵</div>
+                <h4>Embroidery Pricing</h4> <!-- Changed to h4 for better semantics -->
+            </a>
+            <a href="/pricing/cap-embroidery?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card"> <!-- Removed inline styles, added class -->
+                <div class="pricing-icon">🧢</div>
+                <h4>Cap Embroidery Pricing</h4> <!-- Changed to h4 -->
+            </a>
+            <a href="/pricing/dtg?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card"> <!-- Removed inline styles, added class -->
+                <div class="pricing-icon">👕</div>
+                <h4>DTG Pricing</h4> <!-- Changed to h4 -->
+            </a>
+            <a href="/pricing/screen-print?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card"> <!-- Removed inline styles, added class -->
+                <div class="pricing-icon">🖨️</div>
+                <h4>Screen Print Pricing</h4> <!-- Changed to h4 -->
+            </a>
+            <a href="/pricing/dtf?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card coming-soon"> <!-- Removed inline styles, added class -->
+                <div class="pricing-icon">🎨</div>
+                <h4>DTF Pricing (Coming Soon)</h4> <!-- Changed to h4 -->
+            </a>
+        </div>
+    </div>
 
     <div id="product-info-area"></div>
     <div id="swatch-area" style="display: none;"></div> <!-- Hidden but kept for backward compatibility -->
     <!-- Swatch area moved into product-info-area via JavaScript -->
 
-    <hr>
+    <div class="section-divider"></div> <!-- Replaced hr with styled div -->
 
     <div class="tabs-container">
         <div class="tab-nav">
             <a href="#" class="tab-link active" data-tab-target="#inventory-panel">Inventory</a>
         </div>
         
-        <!-- Pricing Options -->
-        <div class="pricing-options" style="padding: 20px; margin-top: 20px; border-top: 1px solid #ddd;">
-            <h3 style="margin-top: 0; color: var(--primary-color); font-size: 1.4em; margin-bottom: 15px;">Pricing Options</h3>
-            <p style="margin-bottom: 20px;">Click on any option below to view detailed pricing information:</p>
-            
-            <div class="pricing-links" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
-                <a href="/pricing/embroidery?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-link" style="display: flex; flex-direction: column; align-items: center; width: 150px; padding: 20px; background-color: var(--background-light); border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.3s; border: 1px solid var(--border-color);">
-                    <div class="pricing-icon" style="font-size: 2em; margin-bottom: 10px;">🧵</div>
-                    <div class="pricing-name" style="font-weight: bold; text-align: center;">Embroidery</div>
-                </a>
-                <a href="/pricing/cap-embroidery?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-link" style="display: flex; flex-direction: column; align-items: center; width: 150px; padding: 20px; background-color: var(--background-light); border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.3s; border: 1px solid var(--border-color);">
-                    <div class="pricing-icon" style="font-size: 2em; margin-bottom: 10px;">🧢</div>
-                    <div class="pricing-name" style="font-weight: bold; text-align: center;">Cap Embroidery</div>
-                </a>
-                <a href="/pricing/dtg?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-link" style="display: flex; flex-direction: column; align-items: center; width: 150px; padding: 20px; background-color: var(--background-light); border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.3s; border: 1px solid var(--border-color);">
-                    <div class="pricing-icon" style="font-size: 2em; margin-bottom: 10px;">👕</div>
-                    <div class="pricing-name" style="font-weight: bold; text-align: center;">DTG</div>
-                </a>
-                <a href="/pricing/screen-print?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-link" style="display: flex; flex-direction: column; align-items: center; width: 150px; padding: 20px; background-color: var(--background-light); border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.3s; border: 1px solid var(--border-color);">
-                    <div class="pricing-icon" style="font-size: 2em; margin-bottom: 10px;">🖨️</div>
-                    <div class="pricing-name" style="font-weight: bold; text-align: center;">Screen Print</div>
-                </a>
-                <a href="/pricing/dtf?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-link" style="display: flex; flex-direction: column; align-items: center; width: 150px; padding: 20px; background-color: var(--background-light); border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.3s; border: 1px solid var(--border-color);">
-                    <div class="pricing-icon" style="font-size: 2em; margin-bottom: 10px;">🎨</div>
-                    <div class="pricing-name" style="font-weight: bold; text-align: center;">DTF</div>
-                </a>
-            </div>
-        </div>
-
         <div class="tab-content">
             <div id="inventory-panel" class="tab-content-panel active">
                 <div id="inventory-area">
@@ -146,7 +154,8 @@
             </div>
         </div>
     </div>
+<script src="cart.js" defer></script>
     <script src="product-page-logic.js" defer></script>
-    <script src="product-page-cleanup.js" defer></script>
+    <!-- <script src="product-page-cleanup.js" defer></script> -->
 </body>
 </html>

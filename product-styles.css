@@ -85,9 +85,11 @@ hr { display: none; }
 .style-search-container {
     position: relative;
     margin-bottom: var(--spacing-md);
-    max-width: 450px;
+    /* max-width: 450px; Consider removing or adjusting if it needs to be wider for cart button, or set to a larger value like 600px or 100% if it should span more. */
     display: flex;
+    /* justify-content: space-between; Removed to use margin-left: auto on cart button */
     align-items: center;
+    gap: var(--spacing-md); /* Retained for overall spacing between search controls and cart button if not pushed by auto margin */
     background-color: var(--background-color);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
@@ -163,6 +165,62 @@ hr { display: none; }
 }
 
 #style-suggestions-list div:last-child { border-bottom: none; }
+/* Styles for the div wrapping search input and button */
+.search-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm); /* e.g., 8px */
+    /* flex-grow: 1; Removed to allow it to take only needed space */
+}
+
+/* Styles for the "View Cart" button in the header */
+.view-cart-btn-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px; /* Space between icon, text, and badge */
+    padding: var(--spacing-sm) var(--spacing-md); /* e.g., 8px 16px */
+    background-color: var(--primary-color);
+    color: white; /* Assuming --button-text-color is white or not defined */
+    text-decoration: none;
+    border-radius: var(--radius-md); /* Updated for modern look, e.g. 8px */
+    font-weight: 600; /* Slightly bolder */
+    border: none;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+    margin-left: auto; /* Pushes button to the far right */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
+}
+
+.view-cart-btn-header:hover {
+    background-color: var(--primary-dark); /* Or var(--primary-hover-color) if defined */
+    color: white;
+    box-shadow: 0 3px 7px rgba(0,0,0,0.15); /* Enhanced shadow on hover */
+}
+
+.view-cart-btn-header svg {
+    /* margin-right: var(--spacing-xs); Gap property on parent handles this now */
+    width: 1em; /* Adjust size as needed, relative to font */
+    height: 1em; /* Adjust size as needed, relative to font */
+    fill: currentColor; /* SVG inherits text color */
+    vertical-align: middle; /* Better alignment with text in a flex container */
+}
+
+#cart-item-count-header {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff; /* White background for the badge */
+    color: var(--primary-color); /* Text color same as button's base, or a contrasting dark */
+    border-radius: 50%; /* Circular badge */
+    min-width: 22px;
+    height: 22px;
+    font-size: 0.75rem; /* 12px */
+    font-weight: bold;
+    padding: 0 4px; /* Horizontal padding for numbers > 9 */
+    line-height: 1; /* Helps center text vertically */
+    /* margin-left: 4px; Replaced by gap on parent .view-cart-btn-header */
+}
+
 #style-suggestions-list div:hover { background-color: var(--primary-light); /* Use themed light */ }
 
 /* --- Back to Gallery Button --- */
@@ -810,22 +868,28 @@ pre:contains("function requestDataPage"),
 
 /* --- Pricing Options Section --- */
 .pricing-links {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--spacing-md);
+    display: flex; /* Changed from grid */
+    flex-wrap: nowrap; /* Prevent wrapping */
+    gap: 10px; /* Adjusted gap */
     margin-top: var(--spacing-md);
+    justify-content: space-between; /* Distribute space evenly */
 }
 
 .pricing-option-card {
     display: block; /* Make the link a block element */
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm); /* Reduced padding to 8px */
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    background-color: var(--background-light);
+    border-radius: var(--radius-md); /* e.g., 8px */
+    background-color: var(--background-light); /* var(--card-bg-color) or light neutral */
     color: var(--text-color);
     text-decoration: none;
     transition: all var(--transition-fast);
     text-align: center;
+    flex-basis: calc(20% - 8px); /* For 5 cards with 10px gap (4 gaps * 10px = 40px; 40px / 5 = 8px) */
+    flex-grow: 0;   /* Prevent growing */
+    flex-shrink: 0; /* Prevent shrinking */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    box-shadow: var(--shadow-sm); /* e.g., 0 1px 3px rgba(0,0,0,0.05); */
 }
 
 .pricing-option-card:hover,
@@ -834,20 +898,29 @@ pre:contains("function requestDataPage"),
     border-color: var(--primary-color);
     color: var(--primary-dark);
     transform: translateY(-3px);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md); /* Slightly stronger shadow on hover for better effect */
 }
 
 .pricing-option-card h4 { /* Style heading within the card */
     margin-top: 0;
     margin-bottom: var(--spacing-sm);
     color: var(--primary-dark);
-    font-size: 1.1em;
+    font-size: 0.8rem; /* Further reduced font size */
+    line-height: 1.2; /* Added line-height */
+    text-align: center; /* Ensure text is centered */
+    overflow-wrap: break-word; /* Helps with text overflow */
+    word-break: break-word; /* Prevent overflow for long names */
 }
 
 .pricing-option-card p { /* Style paragraph within the card */
     font-size: 0.9em;
     color: var(--text-light);
     margin-bottom: 0;
+}
+.pricing-icon {
+    font-size: 1.5em; /* Reduced icon size */
+    margin-bottom: var(--spacing-xs); /* Adjusted margin to 4px */
+    /* Add any other necessary base styles for the icon container if needed */
 }
 
 
@@ -883,4 +956,21 @@ a.gallery-item-link img {
     pointer-events: none; /* Prevent clicks */
     opacity: 0.6;         /* Visually indicate disabled state */
     cursor: not-allowed;  /* Change cursor on hover */
+}
+/* Style for 'Coming Soon' cards */
+.pricing-option-card.coming-soon {
+    opacity: 0.6; /* Adjusted opacity */
+    cursor: not-allowed;
+    background-color: #e9ecef; /* Updated background color */
+    border-color: #ced4da; /* Updated border color */
+    pointer-events: none; /* Reinforce non-interactivity */
+}
+
+.pricing-option-card.coming-soon:hover,
+.pricing-option-card.coming-soon:focus {
+    background-color: #e9ecef; /* Keep background gray on hover - updated */
+    border-color: #ced4da; /* Keep border gray on hover - updated */
+    color: var(--text-light); /* Keep text muted */
+    transform: none; /* Prevent hover effect */
+    box-shadow: none; /* Remove hover shadow */
 }
