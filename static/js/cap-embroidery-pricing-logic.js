@@ -2,9 +2,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const stitchCountSelectExt = document.getElementById('cap-stitch-count-select');
     const pricingTableContainerExt = document.getElementById('cap-pricing-table-container');
-    const quantityInputExt = document.getElementById('cap-quantity');
-    const addToCartButtonExt = document.getElementById('add-to-cart-button'); // Changed ID here
-    const selectedPriceDisplayExt = document.getElementById('cap-selected-price-display');
+    // quantityInputExt, addToCartButtonExt, and selectedPriceDisplayExt are removed
+    // as these will be handled by shared scripts (product-quantity-ui.js, add-to-cart.js)
 
     // Stitch counts for our external dropdown - should match options in Caspio's internal dropdown
     // if you want their labels to be identical. The 'value' must match what Caspio expects.
@@ -57,13 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!profiles || !groupedHeaders || !groupedPrices || !tierInfo || Object.keys(tierInfo).length === 0) {
             pricingTableContainerExt.innerHTML = '<p>Pricing data not yet fully available from Caspio engine.</p>';
-            updateExternalSelectedPriceDisplay(null);
+            // updateExternalSelectedPriceDisplay(null); // Removed
             return;
         }
         
         if (groupedHeaders.length === 0 && Object.keys(groupedPrices).length === 0) {
              pricingTableContainerExt.innerHTML = '<p>No pricing information available for this selection.</p>';
-             updateExternalSelectedPriceDisplay(null);
+             // updateExternalSelectedPriceDisplay(null); // Removed
              return;
         }
 
@@ -96,7 +95,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         tableHTML += '</tbody></table>';
         pricingTableContainerExt.innerHTML = tableHTML;
-        updateExternalSelectedPriceDisplay(); 
+        // updateExternalSelectedPriceDisplay(); // Removed - will be handled by shared scripts after quantity matrix is built
+
+        // After rendering the table, attempt to create the quantity matrix
+        if (window.ProductQuantityUI && typeof window.ProductQuantityUI.createQuantityMatrix === 'function' && groupedHeaders) {
+            console.log("[cap-embroidery-logic] Calling ProductQuantityUI.createQuantityMatrix with headers:", groupedHeaders);
+            const quantityMatrixCreated = window.ProductQuantityUI.createQuantityMatrix(groupedHeaders);
+            if (quantityMatrixCreated) {
+                // Trigger an update for add-to-cart.js to re-scan for quantity inputs and update totals
+                if (typeof window.updateCartTotal === 'function') {
+                    console.log("[cap-embroidery-logic] Triggering updateCartTotal after quantity matrix creation.");
+                    window.updateCartTotal();
+                }
+                 // Also, re-attach listeners if add-to-cart.js has a function for it
+                if (window.AddToCart && typeof window.AddToCart.attachQuantityChangeListeners === 'function') {
+                    // This function might not exist on AddToCart global, it's usually internal to add-to-cart.js
+                    // window.AddToCart.attachQuantityChangeListeners();
+                } else if (typeof attachQuantityChangeListeners === 'function') {
+                    // If it's a global function from add-to-cart.js (less likely)
+                    // attachQuantityChangeListeners();
+                }
+
+            } else {
+                console.warn("[cap-embroidery-logic] ProductQuantityUI.createQuantityMatrix did not return true (matrix might not have been created).");
+            }
+        } else {
+            console.warn("[cap-embroidery-logic] ProductQuantityUI.createQuantityMatrix not available or no headers to process.");
+        }
     }
     
     function formatTierLabelWithLTM(currentTierData, tierLabel) {
@@ -138,25 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return matchedPrice;
     }
 
-    function updateExternalSelectedPriceDisplay() {
-        if (!selectedPriceDisplayExt || !quantityInputExt || !currentExternalStitchValue) return;
-        const quantity = parseInt(quantityInputExt.value, 10);
-
-        if (isNaN(quantity) || quantity < 1) {
-            selectedPriceDisplayExt.textContent = 'Please enter a valid quantity.';
-            return;
-        }
-        const capSizeForPricing = caspioCalculatedData.groupedHeaders && caspioCalculatedData.groupedHeaders.length > 0 ? caspioCalculatedData.groupedHeaders[0] : "OSFA";
-        const unitPrice = getExternalPriceForQuantity(currentExternalStitchValue, quantity, capSizeForPricing);
-
-        if (unitPrice !== null) {
-            const totalPrice = unitPrice * quantity;
-            selectedPriceDisplayExt.textContent = 
-                `Selected: ${quantity} x $${unitPrice.toFixed(2)}/cap = $${totalPrice.toFixed(2)}`;
-        } else {
-            selectedPriceDisplayExt.textContent = 'Price not available for this quantity.';
-        }
-    }
+    // updateExternalSelectedPriceDisplay is removed as shared scripts will handle price display updates.
     
     // Listener for when Caspio finishes its calculations
     document.addEventListener('caspioCapPricingCalculated', (event) => {
@@ -165,17 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
             caspioCalculatedData.profiles = event.detail.profiles;
             caspioCalculatedData.groupedHeaders = event.detail.groupedHeaders;
             caspioCalculatedData.groupedPrices = event.detail.groupedPrices;
-            // tierInfo is already global via window.dp7ApiTierData, confirmed by Caspio scripts
             
-            // Ensure the currentExternalStitchValue matches what Caspio calculated for,
-            // especially on initial load.
             if (event.detail.stitchCount && stitchCountSelectExt.value !== event.detail.stitchCount) {
                 console.log(`External JS: Aligning external dropdown to Caspio's calculated stitch count: ${event.detail.stitchCount}`);
                 currentExternalStitchValue = event.detail.stitchCount;
                 stitchCountSelectExt.value = currentExternalStitchValue;
             }
-            renderExternalPricingTable();
-            updateExternalSelectedPriceDisplay();
+            renderExternalPricingTable(); // This will now also attempt to call createQuantityMatrix
+            // updateExternalSelectedPriceDisplay(); // Removed
         } else {
             console.error("External JS: Caspio calculation reported an error or no data.");
             if(pricingTableContainerExt) pricingTableContainerExt.innerHTML = "<p>Error loading pricing from Caspio engine.</p>";
@@ -188,6 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("External dropdown changed to:", currentExternalStitchValue);
             if (typeof window.updateCaspioCapPricingForStitchCount === 'function') {
                 if(pricingTableContainerExt) pricingTableContainerExt.innerHTML = '<div class="loading-message">Updating prices for new stitch count...</div>';
+                // Clear old quantity matrix before Caspio recalculates and new one is built
+                const qtyMatrixContainer = document.getElementById('quantity-matrix');
+                if (qtyMatrixContainer) qtyMatrixContainer.innerHTML = '<p class="loading-message">Loading quantity inputs...</p>';
+                
                 window.updateCaspioCapPricingForStitchCount(currentExternalStitchValue);
                 // Now we wait for the 'caspioCapPricingCalculated' event
             } else {
@@ -196,43 +204,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (quantityInputExt) {
-        quantityInputExt.addEventListener('input', updateExternalSelectedPriceDisplay);
-    }
+    // quantityInputExt listener is removed. Shared add-to-cart.js will handle quantity input changes from the matrix.
 
-    if (addToCartButtonExt) {
-        addToCartButtonExt.addEventListener('click', () => {
-            const stitchOption = activeStitchOptions.find(opt => opt.value === currentExternalStitchValue);
-            const selectedStitchLabel = stitchOption ? stitchOption.label : "N/A";
-            const quantity = parseInt(quantityInputExt.value, 10);
-            const capSizeForCart = caspioCalculatedData.groupedHeaders && caspioCalculatedData.groupedHeaders.length > 0 ? caspioCalculatedData.groupedHeaders[0] : "OSFA";
-            const unitPrice = getExternalPriceForQuantity(currentExternalStitchValue, quantity, capSizeForCart);
-
-            if (!currentExternalStitchValue) { alert('Please select a stitch count.'); return; }
-            if (isNaN(quantity) || quantity < 1) { alert('Please enter a valid quantity.'); return; }
-            if (unitPrice === null) { alert('Pricing is not available. Please check quantity.'); return; }
-
-            const cartItem = {
-                productId: document.getElementById('product-style')?.textContent.trim() || 'CAP_PRODUCT_ID_FALLBACK', 
-                productName: document.getElementById('product-title')?.textContent.trim() || 'Custom Cap Fallback', 
-                stitchCount: selectedStitchLabel,
-                size: capSizeForCart, 
-                quantity: quantity,
-                unitPrice: unitPrice,
-                totalPrice: unitPrice * quantity,
-                embellishmentType: "cap-embroidery"
-            };
-            console.log('Adding to cart (External):', cartItem);
-            
-            if (typeof NWCACart !== 'undefined' && typeof NWCACart.addItem === 'function') {
-                NWCACart.addItem(cartItem);
-                 alert('Item added to your cart!');
-            } else {
-                console.error('NWCACart or NWCACart.addItem function is not available.');
-                 alert('Cart system not available. Item not added. (Simulated add)');
-            }
-        });
-    }
+    // The main 'add-to-cart.js' script will handle the click event for '#add-to-cart-button'.
+    // This script ('cap-embroidery-pricing-logic.js') ensures that when the shared
+    // 'add-to-cart.js' reads the quantity and triggers price calculation,
+    // the correct pricing data (based on selected stitch count) is available via
+    // window.nwcaPricingData (which is populated by pricing-matrix-capture.js from the table we render).
+    
+    // console.log("Add to cart button event listener in cap-embroidery-pricing-logic.js is now REMOVED.");
+    // console.log("Shared add-to-cart.js should now be the primary handler for #add-to-cart-button.");
 
     // Initial setup
     populateExternalStitchDropdown();

@@ -51,16 +51,17 @@
                     <div class="loading-message">Loading pricing data...</div>
                 </div>
 
-                <!-- Add to Cart Section -->
-                <div id="cap-add-to-cart-section" style="margin-top: 20px; padding: 15px; border: 1px solid #eee; border-radius: 5px;">
-                    <h4>Select Quantity & Add to Cart</h4>
-                    <label for="cap-quantity">Quantity:</label>
-                    <input type="number" id="cap-quantity" name="quantity" min="1" value="12" style="width: 70px; padding: 5px; margin-right: 10px;">
-                    <button id="add-to-cart-button" class="cta-button">Add to Cart</button>
-                    <div id="cap-selected-price-display" style="margin-top: 10px; font-weight: bold; font-size: 1.1em;">
-                        <!-- Selected price will be shown here -->
-                    </div>
+                <!-- Placeholder for Quantity Matrix -->
+                <!-- ProductQuantityUI.createQuantityMatrix will populate this if #quantity-matrix exists -->
+                <!-- Or ProductQuantityUI.createSizeQuantityGrid if #size-quantity-grid-container exists -->
+                <div id="quantity-matrix" style="margin-top: 20px;">
+                    <!-- Quantity inputs per size will be generated here by product-quantity-ui.js -->
+                    <p class="loading-message">Loading quantity inputs...</p>
                 </div>
+                
+                <!-- The main add-to-cart.js script will handle creating/managing the actual add to cart button -->
+                <!-- and total displays, often in a sticky summary or specific cart sections. -->
+                <!-- We remove the specific cap-add-to-cart-section as it will be superseded. -->
             </div>
             
             <div class="additional-info">

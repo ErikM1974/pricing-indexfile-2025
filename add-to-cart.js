@@ -55,7 +55,7 @@
             const sizeQuantities = {}; 
             let newQuantityTotal = 0;
             try {
-                const useGrid = window.PricingPageUI?.determineLayoutPreference ? window.PricingPageUI.determineLayoutPreference() : false; 
+                const useGrid = window.PricingPageUI?.determineLayoutPreference ? window.PricingPageUI.determineLayoutPreference() : false;
                 const containerSelector = useGrid ? '#size-quantity-grid-container' : '#quantity-matrix';
                 const container = document.querySelector(containerSelector);
                 if (container) {
