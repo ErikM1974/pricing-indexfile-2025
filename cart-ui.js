@@ -230,6 +230,7 @@ const NWCACartUI = (function() {
                       onerror="console.warn('[CART-UI] Image failed to load for item ${item.id}: ' + this.src); this.style.display='none'; this.parentElement.innerHTML = '<div class=\'img-placeholder border rounded bg-light d-flex align-items-center justify-content-center\' style=\'height: 150px; width: 100%;\'><div class=\'text-center\'><small class=\'text-muted\'>Image Unavailable</small><br><small>${item.styleNumber} - ${item.color}</small></div></div>';">
             </div>
           <div class="col-md-9">
+              <p class="cart-item-color text-muted mb-1">Color: <span class="font-weight-bold text-body">${item.color || 'N/A'}</span></p>
               <div class="cart-item-options mb-2">
                 ${renderEmbellishmentOptions(item.embellishmentOptions)}
               </div>
@@ -672,22 +673,22 @@ function closeImageZoomModal() {
         });
       }
     });
-    let ltmFeeAmount = 0;
-    const embellishmentTypes = [...new Set(activeItems.map(item => item.ImprintType))];
-    embellishmentTypes.forEach(embType => {
-      let totalQuantity = 0;
-      activeItems.filter(item => item.ImprintType === embType).forEach(item => {
-        if (item.sizes && Array.isArray(item.sizes)) {
-          item.sizes.forEach(size => {
-            totalQuantity += parseInt(size.Quantity) || 0;
-          });
-        }
-      });
-      if (totalQuantity > 0 && totalQuantity < 24) {
-        ltmFeeAmount += 50.00; 
-      }
-    });
-    const total = subtotal + ltmFeeAmount;
+    let ltmFeeAmount = 0; // LTM fee is already included in subtotal via item prices
+    // const embellishmentTypes = [...new Set(activeItems.map(item => item.ImprintType))];
+    // embellishmentTypes.forEach(embType => {
+    //   let totalQuantity = 0;
+    //   activeItems.filter(item => item.ImprintType === embType).forEach(item => {
+    //     if (item.sizes && Array.isArray(item.sizes)) {
+    //       item.sizes.forEach(size => {
+    //         totalQuantity += parseInt(size.Quantity) || 0;
+    //       });
+    //     }
+    //   });
+    //   if (totalQuantity > 0 && totalQuantity < 24) {
+    //     ltmFeeAmount += 50.00;
+    //   }
+    // });
+    const total = subtotal; // LTM fee is part of subtotal, so total is just subtotal
     debugCartUI("SUMMARY", `Updating summary: Subtotal=${subtotal}, LTM Fee=${ltmFeeAmount}, Total=${total}`);
 
     if (elements.cartSubtotal) elements.cartSubtotal.textContent = NWCAUtils.formatCurrency(subtotal); 
