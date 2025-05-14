@@ -4,179 +4,1314 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DTG Pricing | NWCA</title>
-    <link rel="stylesheet" href="/pricing-pages.css">
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+<!-- jsPDF Libraries for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        /* New layout styles for embroidery pricing page */
+        /* Improved layout styles */
+        .improved-layout {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-md);
+            overflow: hidden;
+        }
+        
+        /* Improved header styling */
+        .product-header { /* Applies to both left and right column headers if not overridden */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px; /* Adjusted padding */
+            background-color: var(--white); /* Changed background */
+            border: 1px solid var(--border-color); /* Added full border */
+            border-radius: var(--radius-md); /* Apply to all corners */
+            /* box-shadow: var(--shadow-sm); /* Optional: add a light shadow */
+            margin-bottom: 15px; /* Add some space below this header */
+        }
+        /* Specific override for the left column's product header if needed, but general might be fine */
+        .product-context-column .product-header {
+             background-color: var(--background-light, #f8f9fa); /* Or a very light grey */
+             /* border-bottom: 1px solid var(--border-color); */ /* Keep only bottom border or full */
+        }
+        
+        .product-title-area {
+            flex: 1;
+        }
+        
+        .product-title-area h2 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.5em;
+        }
+        
+        .navigation-area {
+            margin-left: 20px;
+        }
+        
+        .product-content {
+            display: flex;
+            padding: 20px;
+            justify-content: space-between;
+        }
+        
+        .product-image-column {
+            flex: 0 0 380px;
+            margin-right: 40px;
+        }
+        
+        .product-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .color-swatches-column {
+            flex: 1;
+            min-width: 650px;
+            padding: 10px;
+        }
+        
+        /* This is a duplicate rule - the main one is defined below */
+        
+        /* Image zoom feature */
+        .product-image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .image-zoom-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        
+        .image-zoom-overlay:hover {
+            opacity: 1;
+        }
+        
+        .zoom-icon {
+            font-size: 18px;
+        }
+        
+        .selected-color-display {
+            margin-top: 10px;
+            text-align: center;
+            padding: 10px;
+            background-color: var(--primary-light);
+            border-radius: var(--radius-sm);
+            font-size: 0.9em;
+            border-left: 3px solid var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .selected-color-display strong {
+            font-weight: bold;
+            color: var(--primary-color);
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .color-swatches-container.compact {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--background-light);
+            border-radius: var(--radius-sm);
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .color-swatches-container.compact .section-title {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .color-swatches-container.compact .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 10px 15px;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--primary-light);
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-track {
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        /* Simplified Swatch Styles */
+        .swatch-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70px; /* Adjust as needed */
+            min-height: 75px; /* Ensure enough space for swatch + name */
+            margin: 5px;
+            cursor: pointer;
+            justify-content: flex-start; /* Align items to the top */
+        }
+
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            margin-bottom: 4px;
+            background-size: cover;
+            background-position: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .color-swatch:hover {
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .color-name {
+            font-size: 0.75em;
+            text-align: center;
+            color: var(--text-color);
+            width: 100%; /* Take full width of wrapper */
+            line-height: normal; /* Use default line height */
+            /* margin-top: 2px; */ /* Remove margin-top, rely on swatch margin-bottom */
+            padding: 0 2px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            display: block; /* Ensure it's a block element */
+        }
+
+        /* Pulse animation for highlighting a swatch */
+        @keyframes pulse-highlight {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 128, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0); }
+        }
+
+        .color-swatch.pulse-highlight {
+            animation: pulse-highlight 1s ease; /* Run once */
+            border-color: var(--primary-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .product-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .navigation-area {
+                margin-left: 0;
+                margin-top: 10px;
+                align-self: flex-start;
+            }
+            
+            .product-content {
+                flex-direction: column;
+            }
+            
+            .product-image-column {
+                flex: 0 0 auto;
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .color-swatches-column {
+                width: 100%;
+            }
+            
+            .color-swatches-container.compact {
+                margin-top: 10px;
+            }
+            
+            .color-swatches-container.compact .color-swatches {
+                grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+                max-height: 200px;
+            }
+            
+            /* Make the product image sticky on mobile */
+            .product-image-container {
+                position: sticky;
+                top: 0;
+                background-color: var(--white);
+                z-index: 10;
+                padding: 10px;
+                border-radius: var(--radius-sm);
+                box-shadow: var(--shadow-sm);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .color-swatches-container.compact .color-swatches {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+                gap: 5px;
+            }
+            
+            .color-swatch {
+                width: 35px !important;
+                height: 35px !important;
+                /* Maintain aspect ratio for smaller screens too */
+                aspect-ratio: 1 / 1 !important;
+                min-width: 35px !important;
+                min-height: 35px !important;
+                max-width: 35px !important;
+                max-height: 35px !important;
+            }
+            
+            .color-name {
+                font-size: 0.65em;
+            }
+            
+            .selected-color-display {
+                padding: 8px;
+                font-size: 0.8em;
+            }
+            
+            /* Add a "Show More Colors" button for mobile */
+            .show-more-colors {
+                display: block;
+                margin-top: 10px;
+                text-align: center;
+                padding: 8px;
+                background-color: var(--primary-light);
+                color: var(--primary-color);
+                border: none;
+                border-radius: var(--radius-sm);
+                font-weight: bold;
+                cursor: pointer;
+            }
+            
+            /* Initially limit the height on mobile */
+            .color-swatches-container.compact .color-swatches.collapsed {
+                max-height: 120px;
+                overflow-y: hidden;
+            }
+        }
+    </style>
+    
+    <!-- Add to Cart Simplified UI Styles -->
+    <style>
+        /* Single row quantity layout */
+        .single-row-quantity-container {
+            margin-bottom: var(--spacing-md);
+            overflow-x: auto;
+            width: 100%;
+        }
+        
+        /* Quantity matrix table styling */
+        .quantity-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        .quantity-matrix th,
+        .quantity-matrix td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .quantity-matrix th {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .quantity-matrix th:first-child,
+        .quantity-matrix td:first-child {
+            text-align: left;
+            font-weight: bold;
+            width: 100px;
+        }
+        
+        /* Price display row styling */
+        #price-display-row td {
+            font-weight: bold;
+            color: var(--primary-color);
+            border-top: 1px solid var(--primary-light);
+            vertical-align: top;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        /* Ensure price displays are properly contained */
+        .size-price-display {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Quantity input styling */
+        .quantity-input {
+            width: 40px;
+            text-align: center;
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .quantity-btn {
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            background-color: var(--primary-light);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .quantity-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .quantity-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        /* Pricing tier info */
+        .pricing-tier-info {
+            background-color: var(--primary-light);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .tier-explanation h4,
+        .ltm-explanation h4 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.1em;
+        }
+        
+        .tier-progress {
+            margin-top: var(--spacing-sm);
+            background-color: var(--white);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-sm);
+        }
+        
+        .tier-progress-bar {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .tier-point {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .tier-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            border: 2px solid var(--primary-color);
+        }
+        
+        .tier-dot.active {
+            background-color: var(--primary-color);
+        }
+        
+        .tier-label {
+            margin-top: 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .tier-line {
+            position: absolute;
+            top: 8px;
+            height: 2px;
+            width: 100%;
+            background-color: var(--primary-light);
+            z-index: 0;
+        }
+        
+        .tier-progress-fill {
+            position: absolute;
+            top: 8px;
+            height: 2px;
+            background-color: var(--primary-color);
+            z-index: 0;
+        }
+        
+        .tier-progress-text {
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .ltm-explanation {
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .ltm-applied {
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        .ltm-per-item {
+            color: #dc3545;
+        }
+        
+        /* Responsive adjustments for the new UI */
+        @media (max-width: 768px) {
+            .pricing-tier-info {
+                padding: var(--spacing-sm);
+            }
+            
+            .tier-explanation h4,
+            .ltm-explanation h4 {
+                font-size: 1em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tier-explanation h4,
+            .ltm-explanation h4 {
+                font-size: 0.9em;
+            }
+            
+            .tier-progress-bar {
+                margin-top: 10px;
+            }
+            
+            .tier-dot {
+                width: 12px;
+                height: 12px;
+            }
+            
+            .tier-label {
+                font-size: 0.7em;
+            }
+            
+            .tier-line {
+                top: 6px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Direct-to-Garment (DTG) Printing Pricing</h1>
-        
-        <!-- Product Context Area -->
-        <div class="product-context">
-            <img id="product-image" src="" alt="Product Image" class="product-image">
-            <div class="product-details">
-                <h3 id="product-title">Loading Product...</h3>
-                <p>Style: <span id="product-style">Loading...</span></p>
-                <p>Color: <span id="product-color">Loading...</span></p>
-            </div>
-            <a id="back-to-product" href="#" class="back-to-product">Back to Product</a>
-        </div>
-        
-        <!-- Tab Navigation -->
-        <div class="pricing-tabs">
-            <a href="#" class="pricing-tab" data-page="embroidery">Embroidery</a>
-            <a href="#" class="pricing-tab" data-page="cap-embroidery">Cap Embroidery</a>
-            <a href="#" class="pricing-tab active" data-page="dtg">DTG</a>
-            <a href="#" class="pricing-tab" data-page="screen-print">Screen Print</a>
-            <a href="#" class="pricing-tab" data-page="dtf">DTF</a>
-        </div>
-        
-        <!-- Pricing Content -->
-        <div class="pricing-content">
-            <div class="pricing-info">
-                <h2>DTG Printing Pricing</h2>
-                <p>Our Direct-to-Garment (DTG) printing offers full-color, photorealistic prints with no minimum order quantity. Perfect for complex designs, photographs, and small runs.</p>
-            </div>
-            
-            <div id="pricing-calculator" class="pricing-calculator">
-                <div class="loading-message">Loading pricing data...</div>
-            </div>
-            
-            <div class="additional-info">
-                <h3>About Our DTG Printing</h3>
-                <p>Direct-to-Garment printing uses specialized inkjet technology to print designs directly onto garments. This method allows for incredible detail, smooth color gradients, and photorealistic images. DTG is ideal for small orders and complex, multi-colored designs.</p>
+        <h1>DTG Pricing</h1>
+
+        <!-- New Two-Column Layout Container -->
+        <div class="product-page-columns-container">
+
+            <!-- Left Column: Product Context (Potentially Sticky) -->
+            <div class="product-context-column">
+                <div class="product-header"> <!-- Re-using existing header for product title area -->
+                    <div class="product-title-area">
+                        <h2 id="product-title-context">Product Title</h2> <!-- New ID to avoid conflict if original #product-title is used elsewhere by JS -->
+                        <div class="product-meta" style="padding-top: 8px; margin-bottom: 5px;"> <!-- Adjusted padding/margin -->
+                            <span class="meta-item">Style: <strong id="product-style-context">Style Number</strong></span>
+                            <!-- Selected Color display removed from here, will rely on the one in the right column -->
+                        </div>
+                    </div>
+                    <div class="navigation-area">
+                        <a id="back-to-product" href="#" class="back-to-product">
+                            <span class="back-icon">←</span> Back to Product
+                        </a>
+                    </div>
+                </div>
+                <div class="product-image-container-context"> <!-- Renamed to avoid conflict if original is used by JS -->
+                    <img id="product-image-context" src="" alt="Product Image" class="product-image"> <!-- New ID -->
+                    <div class="image-zoom-overlay">
+                        <span class="zoom-icon">🔍</span>
+                    </div>
+                </div>
+                <div class="static-product-info" style="padding:15px; background-color: var(--background-light); border-radius: var(--radius-sm); margin-top:15px;">
+                    <p>Pricing Includes a full-color DTG print on one location.</p>
+                    <!-- Other static info can go here -->
+                </div>
                 
-                <h3>DTG Printing FAQs</h3>
-                <div class="faq-item">
-                    <h4>What is the maximum print size for DTG?</h4>
-                    <p>Our standard DTG print area is up to 14" x 16" for most garments. Larger prints may be available for certain items.</p>
-                </div>
-                <div class="faq-item">
-                    <h4>Does DTG work better on certain garment colors?</h4>
-                    <p>DTG prints best on white and light-colored garments. For dark garments, we use a white underbase layer which may add to the cost and slightly affect the hand feel.</p>
-                </div>
-                <div class="faq-item">
-                    <h4>What file formats do you accept for DTG printing?</h4>
-                    <p>For best results, we recommend high-resolution PNG files (300 dpi) with transparent backgrounds. We also accept JPG, PDF, AI, and PSD files.</p>
-                </div>
-                <div class="faq-item">
-                    <h4>How durable are DTG prints?</h4>
-                    <p>With proper care, DTG prints are quite durable. We recommend washing garments inside-out in cold water and air drying or using low heat to maximize print life.</p>
+                <!-- Color Swatches moved to left column below product image -->
+                <div class="color-swatches-left-column" style="margin-top:15px;">
+                    <div class="color-swatches-container compact">
+                        <h3 class="section-title">Available Colors</h3>
+                        <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 5px; max-height: 300px;">
+                            <!-- Color swatches will be dynamically added here by pricing-pages.js -->
+                        </div>
+                        <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <!-- Right Column: Interactive Elements (Scrollable) -->
+            <div class="product-interactive-column">
+
+                <!-- Original .product-context and .pricing-content are now effectively merged or reorganized -->
+                <!-- The content of .pricing-content (pricing grid, add to cart) goes into this right column -->
+                
+                <!-- Pricing Content (Grid, Tabs, Add to Cart Section) -->
+                <div class="pricing-content-interactive"> <!-- New wrapper for clarity -->
+                    <!-- Hidden Caspio Matrix - Keep this for data source -->
+                    <div id="pricing-calculator" class="pricing-calculator">
+                        <div class="loading-message">Loading pricing data...</div>
+                    </div>
+                    
+                    <!-- Custom Pricing Grid - Enhanced now that it's at the top -->
+                    <div class="pricing-section">
+                        <div class="pricing-header" style="margin-bottom: 20px;">
+                            <!-- Enhanced header with more prominence -->
+                             <h3 class="section-title" style="font-size: 1.3em; margin: 0;">Detailed Pricing per Quantity Tier</h3>
+                             <div class="selected-color-indicator">
+                                <span>Selected Color:</span>
+                                <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches"></div>
+                                <strong id="pricing-color-name">Color Name</strong>
+                            </div>
+                        </div>
+                        
+                        <style>
+                            /* Styles for .product-page-columns-container, .product-context-column, .product-interactive-column */
+                            /* These would go into pricing-pages-enhanced.css */
+                            .product-page-columns-container {
+                                display: flex;
+                                flex-direction: row;
+                                gap: 20px;
+                            }
+                            .product-context-column {
+                                flex: 0 0 350px; /* Adjust width as needed */
+                                /* position: sticky; top: 20px; /* Example for sticky */
+                                /* height: calc(100vh - 40px); overflow-y: auto; */
+                            }
+                            .product-interactive-column {
+                                flex: 1;
+                                min-width: 0; /* Prevents flexbox overflow issues */
+                            }
+                            
+                            /* Improved styling for color swatches in left column */
+                            .color-swatches-left-column .color-swatches-container {
+                                border: 1px solid var(--border-light);
+                            }
+                            
+                            .color-swatches-left-column .swatch-wrapper {
+                                width: 60px; /* Slightly smaller to fit better in left column */
+                                min-height: 70px;
+                            }
+                            
+                            .color-swatches-left-column .color-swatch {
+                                width: 45px;
+                                height: 45px;
+                            }
+                            .product-image-container-context img {
+                                width: 100%;
+                                height: auto;
+                                display: block;
+                                border-radius: var(--radius-sm);
+                                box-shadow: var(--shadow-sm);
+                            }
+                             /* Highlight for active pricing tier */
+                            .active-tier-highlight {
+                                background-color: var(--primary-light) !important;
+                                font-weight: bold;
+                                color: var(--primary-color) !important;
+                            }
+
+                            /* Enhanced pricing grid styling */
+                            .pricing-grid {
+                                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                                border-radius: var(--radius-sm);
+                                overflow: hidden;
+                            }
+                            
+                            .pricing-grid th {
+                                background-color: var(--primary-color);
+                                color: white;
+                                padding: 12px 8px;
+                            }
+                            
+                            .pricing-grid td {
+                                padding: 10px 8px;
+                                text-align: center; /* Ensure prices are centered, or use right for currency */
+                                transition: background-color 0.3s ease; /* Smooth transition for highlight */
+                            }
+                            .pricing-grid tbody tr:nth-child(even) {
+                                background-color: var(--background-ultralight, #fdfdfd);
+                            }
+                            .pricing-grid th:first-child, .pricing-grid td:first-child { /* Quantity column */
+                                text-align: left;
+                                padding-left: 15px;
+                            }
+                            /* Styling for the currently applicable pricing tier row based on cart + page quantity */
+                            #custom-pricing-grid tbody tr.current-pricing-level-highlight td {
+                                background-color: var(--primary-extralight, #e6f7ff) !important; /* Use !important if needed to override even/odd styling */
+                                font-weight: bold;
+                            }
+                            #custom-pricing-grid tbody tr.current-pricing-level-highlight td:first-child {
+                                color: var(--primary-dark, #004170);
+                                /* Optional: Add a visual cue like a border */
+                                /* border-left: 3px solid var(--primary-color); */
+                            }
+                            
+                            @media (max-width: 1024px) { /* Breakpoint for stacking columns */
+                                .product-page-columns-container {
+                                    flex-direction: column;
+                                }
+                                .product-context-column {
+                                    flex: 0 0 auto; /* Reset flex basis */
+                                    position: static; /* Reset sticky for stacked view */
+                                    height: auto;
+                                    margin-bottom: 20px;
+                                }
+                                
+                                /* Adjust color swatches for mobile */
+                                .color-swatches-left-column .color-swatches {
+                                    max-height: 200px;
+                                }
+                            }
+
+                            /* Original pricing-header styles - can be adjusted */
+                            .pricing-header {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                margin-bottom: 15px;
+                                flex-wrap: wrap;
+                            }
+                            
+                            .selected-color-indicator {
+                                display: flex;
+                                align-items: center;
+                                font-size: 0.9em;
+                                background-color: var(--primary-light);
+                                padding: 8px 12px; /* Slightly increased padding */
+                                border-radius: var(--radius-sm);
+                                border-left: 3px solid var(--primary-color);
+                                box-shadow: var(--shadow-xs);
+                            }
+                            
+                            .mini-color-swatch {
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 50%;
+                                margin: 0 8px;
+                                border: 2px solid var(--border-color);
+                                display: inline-block;
+                                vertical-align: middle;
+                                box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                                background-size: cover;
+                                background-position: center;
+                                box-sizing: border-box;
+                                aspect-ratio: 1/1;
+                            }
+                            
+                            #pricing-color-name {
+                                color: var(--primary-color);
+                            }
+                            
+                            /* Enhanced mini-swatch styles */
+                            .mini-color-swatch {
+                                transition: all 0.3s ease;
+                            }
+                            
+                            .mini-color-swatch:hover {
+                                transform: scale(1.1);
+                                border-color: var(--primary-color);
+                            }
+                            
+                            .mini-color-swatch.active-swatch {
+                                border-color: var(--primary-color);
+                                box-shadow: 0 0 0 2px var(--primary-light);
+                            }
+                            
+                            .mini-color-swatch.fallback-swatch {
+                                background-image: radial-gradient(circle, transparent 0%, rgba(255,255,255,0.05) 100%);
+                            }
+                            
+                            .mini-color-swatch.clickable {
+                                cursor: pointer;
+                                position: relative;
+                            }
+                            
+                            .mini-color-swatch.clickable::after {
+                                content: '';
+                                position: absolute;
+                                width: 100%;
+                                height: 100%;
+                                top: 0;
+                                left: 0;
+                                border-radius: 50%;
+                                background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+                                opacity: 0;
+                                transition: opacity 0.3s ease;
+                            }
+                            
+                            .mini-color-swatch.clickable:hover::after {
+                                opacity: 1;
+                            }
+                        </style>
+                        
+                        <div class="pricing-grid-container">
+                            <table class="pricing-grid" id="custom-pricing-grid">
+                                <thead>
+                                    <tr id="pricing-header-row">
+                                        <th>Quantity</th>
+                                        <!-- Size headers will be dynamically populated. JS needs to add data-tier-label to these THs. -->
+                                        <!-- Example: <th data-tier-label="1-23">1-23</th> -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Pricing data will be dynamically added here -->
+                                </tbody>
+                            </table>
+                            
+                            <!-- Added helpful pricing explanation -->
+                            <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                                <p><strong>Note:</strong> Prices shown are per item and include an 8,000 stitch embroidered logo.</p>
+                            </div>
+                            
+                            <!-- Pricing info tabs removed as per user request -->
+                            
+                            <style>
+                                /* Tab styling */
+                                .pricing-info-tabs {
+                                    margin-top: 20px;
+                                    border: 1px solid var(--border-color);
+                                    border-radius: var(--radius-sm);
+                                    overflow: hidden;
+                                }
+                                
+                                .tab-headers {
+                                    display: flex;
+                                    background-color: var(--primary-light);
+                                    border-bottom: 1px solid var(--border-color);
+                                }
+                                
+                                .tab-header {
+                                    padding: 10px 15px;
+                                    background: none;
+                                    border: none;
+                                    cursor: pointer;
+                                    font-weight: 500;
+                                    color: var(--text-color);
+                                    transition: all 0.2s ease;
+                                    border-bottom: 3px solid transparent;
+                                }
+                                
+                                .tab-header:hover {
+                                    background-color: rgba(0,0,0,0.05);
+                                }
+                                
+                                .tab-header.active {
+                                    color: var(--primary-color);
+                                    border-bottom-color: var(--primary-color);
+                                    font-weight: 600;
+                                }
+                                
+                                .tab-content {
+                                    padding: 15px;
+                                }
+                                
+                                .tab-pane {
+                                    display: none;
+                                }
+                                
+                                .tab-pane.active {
+                                    display: block;
+                                }
+                                
+                                /* Responsive adjustments */
+                                @media (max-width: 768px) {
+                                    .tab-header {
+                                        padding: 8px 12px;
+                                        font-size: 0.9em;
+                                    }
+                                }
+                                
+                                @media (max-width: 480px) {
+                                    .tab-headers {
+                                        flex-wrap: wrap;
+                                    }
+                                    
+                                    .tab-header {
+                                        flex: 1 0 auto;
+                                        text-align: center;
+                                        padding: 8px 8px;
+                                        font-size: 0.8em;
+                                    }
+                                }
+                            </style>
+                            
+                        </div>
+                    </div>
+                    
+                    <!-- Add to Cart Section - Enhanced UI -->
+                    <div class="add-to-cart-section">
+                        <h3 class="section-title" style="font-size: 1.3em; margin-top: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light);">Add to Cart</h3>
+                        
+                        <div class="size-grid-container" id="size-grid-container">
+                            <!-- Populated by product-quantity-ui.js or similar.
+                                 Each size card needs a place for dynamic unit price.
+                            Example of a size card structure that JS will populate:
+                            <div class="size-card">
+                                <div class="size-label">M</div>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn decrease" aria-label="Decrease quantity">-</button>
+                                    <input type="number" class="quantity-input" value="0" min="0" data-size="M" data-base-price="15.99">
+                                    <button class="quantity-btn increase" aria-label="Increase quantity">+</button>
+                                </div>
+                                <div class="price-display">
+                                    Unit Price: <span class="dynamic-unit-price">$0.00</span>
+                                </div>
+                            </div>
+                             -->
+                        </div>
+                        <div id="quantity-matrix">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        
+                        <style>
+                            /* Price Breakdown Card Styles */
+                            .price-breakdown-card {
+                                font-size: 0.85em;
+                                border-radius: var(--radius-sm);
+                                overflow: hidden;
+                                box-shadow: var(--shadow-sm);
+                                border: 1px solid var(--border-light);
+                                margin: 5px auto; /* Center card if cell is wider */
+                                width: 100%; /* Make card fill cell width */
+                                box-sizing: border-box; /* Include padding and border in width */
+                                min-width: 110px; /* Prevent it from becoming too narrow */
+                                max-width: 150px; /* Still constrain max width if cell is very wide */
+                                text-align: left;
+                            }
+                            .price-breakdown-card .price-breakdown-header {
+                                color: white;
+                                font-weight: bold;
+                                padding: 4px 8px;
+                                text-align: center;
+                                font-size: 0.9em;
+                            }
+                            .price-breakdown-card.ltm-active .price-breakdown-header {
+                                background-color: var(--info-color, #17a2b8); /* Softer blue/teal for LTM header */
+                            }
+                            .price-breakdown-card.standard .price-breakdown-header {
+                                background-color: var(--secondary-color, #6c757d); /* Consistent neutral header */
+                            }
+                            .price-breakdown-card .price-breakdown-row {
+                                display: flex;
+                                justify-content: space-between;
+                                padding: 4px 8px; /* Increased padding slightly */
+                                border-bottom: 1px solid var(--border-extralight, #f0f0f0);
+                                line-height: 1.3; /* Improve line height */
+                            }
+                            .price-breakdown-card .price-breakdown-row:last-child {
+                                border-bottom: none;
+                            }
+                            .price-breakdown-card .price-breakdown-row span:first-child { /* Label */
+                                color: var(--text-muted, #6c757d);
+                                margin-right: auto; /* Pushes value to the right */
+                                padding-right: 5px; /* Space between label and value */
+                            }
+                            .price-breakdown-card .price-breakdown-row span:last-child { /* Value */
+                                font-weight: bold;
+                                white-space: nowrap; /* Prevent price from wrapping if possible */
+                            }
+                             .price-breakdown-row.total-price span { /* For the 'Total $X (Y)' line */
+                                font-size: 0.95em; /* Slightly smaller if needed */
+                            }
+                            .price-breakdown-card.ltm-active {
+                                background-color: var(--info-light, #e8f4ff); /* Light blue background for LTM card */
+                            }
+                             .price-breakdown-card.ltm-active .price-breakdown-row.unit-price span:last-child,
+                             .price-breakdown-card.ltm-active .price-breakdown-row.total-price span:last-child {
+                                color: var(--info-dark, #004085);
+                            }
+                            .price-breakdown-card.standard {
+                                background-color: var(--background-light, #f8f9fa);
+                            }
+                            .price-breakdown-card.standard .price-breakdown-row.unit-price span:last-child,
+                            .price-breakdown-card.standard .price-breakdown-row.total-price span:last-child {
+                                color: var(--primary-color);
+                            }
+                            .price-breakdown-row.total-price {
+                                background-color: rgba(0,0,0,0.03);
+                                font-size: 1.05em;
+                            }
+                            /* Ensure .price-display cell in matrix can hold the card without extra padding */
+                            #quantity-matrix td.price-display.has-breakdown {
+                                padding: 5px !important; /* Override default table cell padding */
+                                vertical-align: top;
+                            }
+
+
+                            /* Enhanced Grid-based layout for add to cart */
+                            .size-grid-container {
+                                display: grid;
+                                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                                gap: 15px;
+                                margin: 15px 0 25px 0;
+                                padding: 5px;
+                            }
+                            
+                            .size-card {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                padding: 15px;
+                                background-color: var(--primary-light);
+                                border-radius: var(--radius-sm);
+                                box-shadow: var(--shadow-sm);
+                                transition: all 0.2s ease;
+                                border: 1px solid transparent;
+                                position: relative;
+                                overflow: hidden;
+                            }
+                            
+                            /* Add subtle pattern to size cards */
+                            .size-card::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background-image: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.1) 75%, transparent 75%, transparent);
+                                background-size: 10px 10px;
+                                opacity: 0.5;
+                                z-index: 0;
+                                pointer-events: none;
+                            }
+                            
+                            .size-card:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                                border-color: var(--primary-color);
+                            }
+                            
+                            .size-label {
+                                font-weight: bold;
+                                font-size: 1.2em;
+                                margin-bottom: 10px;
+                                color: var(--primary-color);
+                                position: relative;
+                                z-index: 1;
+                            }
+                            
+                            .quantity-controls {
+                                display: flex;
+                                align-items: center;
+                                margin-bottom: 10px;
+                                width: 100%;
+                                justify-content: center;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            
+                            .quantity-btn {
+                                width: 30px;
+                                height: 30px;
+                                border: 1px solid var(--primary-color);
+                                background-color: white;
+                                color: var(--primary-color);
+                                font-weight: bold;
+                                cursor: pointer;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                transition: all 0.2s ease;
+                            }
+                            
+                            .quantity-btn:hover {
+                                background-color: var(--primary-color);
+                                color: white;
+                            }
+                            
+                            .quantity-btn.decrease {
+                                border-radius: 4px 0 0 4px;
+                            }
+                            
+                            .quantity-btn.increase {
+                                border-radius: 0 4px 4px 0;
+                            }
+                            
+                            .quantity-input {
+                                width: 40px;
+                                height: 30px;
+                                border: 1px solid var(--primary-color);
+                                border-left: none;
+                                border-right: none;
+                                text-align: center;
+                                font-size: 1em;
+                            }
+                            
+                            .price-display {
+                                font-weight: bold;
+                                color: var(--primary-color);
+                                margin-top: 5px;
+                                text-align: center;
+                                min-height: 40px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 0.9em;
+                                position: relative;
+                                z-index: 1;
+                                background-color: rgba(255, 255, 255, 0.5);
+                                padding: 3px 8px;
+                                border-radius: 4px;
+                            }
+                            .price-display .dynamic-unit-price {
+                                margin-left: 5px;
+                                font-weight: normal;
+                            }
+                            
+                            /* Enhanced cart summary styling */
+                            .cart-summary { /* This will be part of the sticky summary */
+                                background-color: var(--primary-light);
+                                padding: 20px;
+                                border-radius: var(--radius-sm);
+                                margin-top: 20px;
+                                border-left: 4px solid var(--primary-color);
+                                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+                            }
+                            
+                            .cart-total {
+                                display: flex;
+                                justify-content: space-between;
+                                font-size: 1.3em;
+                                font-weight: bold;
+                                margin-bottom: 15px;
+                                color: var(--primary-dark);
+                            }
+                            
+                            .ltm-fee-notice {
+                                background-color: #e8f4ff; /* Light blue for informational */
+                                color: #004085; /* Darker blue text */
+                                padding: 10px 15px;
+                                border-radius: var(--radius-sm);
+                                margin-bottom: 15px;
+                                display: flex;
+                                flex-direction: column; /* Allow detail text to stack nicely */
+                                align-items: flex-start; /* Align icon and text to start */
+                                border-left: 3px solid #b8daff; /* Medium blue border */
+                            }
+                            
+                            .ltm-icon {
+                                margin-right: 10px;
+                                font-size: 1.2em;
+                            }
+                            
+                            .add-to-cart-button {
+                                background-color: var(--primary-color);
+                                color: white;
+                                border: none;
+                                border-radius: var(--radius-sm);
+                                padding: 14px 20px;
+                                font-size: 1.1em;
+                                font-weight: bold;
+                                cursor: pointer;
+                                width: 100%;
+                                transition: all 0.3s ease;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                letter-spacing: 0.5px;
+                                text-transform: uppercase;
+                            }
+                            
+                            .add-to-cart-button:hover {
+                                background-color: var(--primary-dark);
+                                transform: translateY(-2px);
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                            }
+                            
+                            .add-to-cart-button:active {
+                                transform: translateY(0);
+                                box-shadow: none;
+                            }
+                            
+                            .add-to-cart-button::before {
+                                content: '🛒 ';
+                                margin-right: 8px;
+                            }
+                            
+                            @media (max-width: 768px) {
+                                .size-grid-container {
+                                    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                                    gap: 10px;
+                                }
+                                
+                                .size-card {
+                                    padding: 10px;
+                                }
+                                
+                                .size-label {
+                                    font-size: 1.1em;
+                                    margin-bottom: 8px;
+                                }
+                                
+                                .quantity-btn {
+                                    width: 25px;
+                                    height: 25px;
+                                }
+                                
+                                .quantity-input {
+                                    width: 35px;
+                                    height: 25px;
+                                }
+                            }
+                            
+                            @media (max-width: 480px) {
+                                .size-grid-container {
+                                    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                                    gap: 8px;
+                                }
+                                
+                                .size-card {
+                                    padding: 8px;
+                                }
+                                
+                                .size-label {
+                                    font-size: 1em;
+                                    margin-bottom: 5px;
+                                }
+                                
+                                .quantity-btn {
+                                    width: 22px;
+                                    height: 22px;
+                                    font-size: 0.9em;
+                                }
+                                
+                                .quantity-input {
+                                    width: 30px;
+                                    height: 22px;
+                                    font-size: 0.9em;
+                                }
+                                
+                                /* Further adjust color swatches for mobile */
+                                .color-swatches-left-column .color-swatches {
+                                    max-height: 180px;
+                                    gap: 5px;
+                                }
+                                
+                                .color-swatches-left-column .swatch-wrapper {
+                                    width: 50px;
+                                    min-height: 60px;
+                                    margin: 3px;
+                                }
+                                
+                                .color-swatches-left-column .color-swatch {
+                                    width: 35px;
+                                    height: 35px;
+                                }
+                                
+                                .color-swatches-left-column .color-name {
+                                    font-size: 0.7em;
+                                }
+                            }
+                        </style>
+                        
+                        <div id="cart-contents-info" class="cart-contents-info" style="display: none; margin-bottom: 15px; padding: 10px; background-color: #f0f8ff; border-radius: 5px; border: 1px solid #d0e3ff; font-size: 0.9em;">
+                            <!-- Will be dynamically populated by JavaScript -->
+                        </div>
+                        
+                        <!-- The "pricing-tier-info" div that was here has been removed as per user request -->
+                        
+                        <div class="size-quantity-grid" id="size-quantity-grid" style="display: none;">
+                        </div>
+                        
+                        <!-- This .cart-summary will be the sticky summary -->
+                        <div class="cart-summary" id="sticky-product-cart-summary">
+                            <div class="cart-total">
+                                <div>
+                                    <span class="total-label">Total Quantity:</span> <span class="total-quantity">0</span>
+                                </div>
+                                <div>
+                                    <span class="total-label">Est. Total:</span>
+                                    <span class="total-amount total-price" data-tier-key="" data-total-quantity="0" data-ltm-fee-applies="false">$0.00</span>
+                                </div>
+                            </div>
+                            <div class="ltm-fee-notice" style="display: none;">
+                                <span class="ltm-icon" style="font-style: normal; font-weight: bold; color: #0056b3;">ℹ️</span>
+                                <span class="ltm-text">Less Than Minimum fee applies</span>
+                            </div>
+                            <button id="add-to-cart-button" class="add-to-cart-button">
+                                Add to Cart
+                            </button>
+                            <button id="view-cart-summary-button" class="view-cart-button" style="display: none; margin-top: 10px; width: 100%; padding: 10px; background-color: #17a2b8; color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 1em;">
+                                View Cart (<span class="cart-count-display">0</span>)
+                            </button>
+                        </div>
+                    </div>
+                </div> <!-- End .pricing-content-interactive -->
+            </div> <!-- End .product-interactive-column -->
+        </div> <!-- End .product-page-columns-container -->
+    </div> <!-- End .container -->
     
-    <script src="/pricing-pages.js"></script>
-    <script src="/pricing-matrix-capture.js"></script>
-    <script src="/pricing-matrix-api.js"></script>
-    <script src="/cart.js"></script>
-    <script src="/cart-integration.js"></script>
-    <script src="/cart-price-recalculator.js"></script>
-    <script src="/add-to-cart.js"></script>
+    <!-- JavaScript Files -->
+    <script src="/shared_components/js/pricing-pages.js"></script>
+    <script src="/shared_components/js/utils.js"></script> <!-- Moved up and removed defer -->
+    <script src="/shared_components/js/pricing-matrix-capture.js"></script>
+    <script src="/shared_components/js/pricing-matrix-api.js"></script>
+    <script src="/shared_components/js/dp5-helper.js"></script>
+    <script src="/shared_components/js/product-quantity-ui.js"></script>
+    <script src="/shared_components/js/cart.js"></script>
+    <script src="/shared_components/js/cart-integration.js"></script>
+    <script src="/shared_components/js/cart-price-recalculator.js"></script>
+    <script src="/shared_components/js/add-to-cart.js"></script>
+    <script src="/shared_components/js/pricing-calculator.js"></script>
+    <script src="/shared_components/js/dtg-adapter.js"></script>
+    <script src="/shared_components/js/product-pricing-ui.js"></script> <!-- Added new script, removed defer -->
     
-    <!-- Script to fix loading message issue -->
-    <script>
-        (function() {
-            console.log("Loading message fix script initialized");
-            
-            // Function to hide the loading message
-            function hideLoadingMessage() {
-                const loadingMessages = document.querySelectorAll('.loading-message');
-                loadingMessages.forEach(function(msg) {
-                    console.log('Hiding loading message:', msg);
-                    msg.style.display = 'none';
-                });
-            }
-            
-            // Function to check if Caspio table is loaded
-            function checkCaspioTableLoaded() {
-                // Check for various indicators that Caspio content has loaded
-                const hasCaspioTable = !!document.querySelector('.matrix-price-table') ||
-                                      !!document.querySelector('.cbResultSetTable') ||
-                                      !!document.querySelector('#matrix-price-body') ||
-                                      !!document.querySelector('.cbResultSet') ||
-                                      !!document.querySelector('iframe[src*="caspio"]');
-                
-                if (hasCaspioTable) {
-                    console.log('Caspio table detected, hiding loading messages');
-                    hideLoadingMessage();
-                    return true;
-                }
-                return false;
-            }
-            
-            // Set up a MutationObserver to detect when Caspio content is added
-            const observer = new MutationObserver(function(mutations) {
-                if (checkCaspioTableLoaded()) {
-                    // If we found the table, disconnect the observer
-                    observer.disconnect();
-                }
-            });
-            
-            // Start observing the document with the configured parameters
-            observer.observe(document.body, { childList: true, subtree: true });
-            
-            // Also check immediately in case the table is already loaded
-            checkCaspioTableLoaded();
-            
-            // Set up periodic checks to ensure loading message is hidden
-            const checkIntervals = [1000, 2000, 3000, 5000, 8000, 10000];
-            checkIntervals.forEach(interval => {
-                setTimeout(() => {
-                    if (document.querySelector('.loading-message')) {
-                        console.log(`Checking for Caspio table after ${interval}ms`);
-                        if (checkCaspioTableLoaded()) {
-                            console.log(`Found Caspio table after ${interval}ms`);
-                        } else if (interval >= 5000) {
-                            // If we still have loading messages but no table after 5+ seconds,
-                            // hide them anyway as a fallback
-                            console.log(`No Caspio table found after ${interval}ms, hiding loading messages anyway`);
-                            hideLoadingMessage();
-                        }
-                    }
-                }, interval);
-            });
-            
-            // Add CSS to hide loading messages when Caspio content is present
-            const styleEl = document.createElement('style');
-            styleEl.textContent = `
-                /* Hide loading messages when Caspio content is present */
-                .matrix-price-table ~ .loading-message,
-                .cbResultSetTable ~ .loading-message,
-                #matrix-price-body ~ .loading-message,
-                .cbResultSet ~ .loading-message,
-                iframe[src*="caspio"] ~ .loading-message,
-                .loading-message:has(+ .matrix-price-table),
-                .loading-message:has(+ .cbResultSetTable),
-                .loading-message:has(+ #matrix-price-body),
-                .loading-message:has(+ .cbResultSet),
-                .loading-message:has(+ iframe[src*="caspio"]) {
-                    display: none !important;
-                }
-                
-                /* Hide loading message when pricing calculator has other content */
-                #pricing-calculator:has(table) .loading-message,
-                #pricing-calculator:has(iframe) .loading-message,
-                #pricing-calculator:has(.matrix-price-table) .loading-message,
-                #pricing-calculator:has(.cbResultSetTable) .loading-message,
-                #pricing-calculator:has(#matrix-price-body) .loading-message,
-                #pricing-calculator:has(.cbResultSet) .loading-message {
-                    display: none !important;
-                }
-            `;
-            document.head.appendChild(styleEl);
-            
-            // Simple final cleanup that only targets loading messages
-            setTimeout(function() {
-                console.log('Final targeted cleanup - only hiding .loading-message elements');
-                // Only hide elements with the specific loading-message class
-                const loadingMessages = document.querySelectorAll('.loading-message');
-                loadingMessages.forEach(function(msg) {
-                    console.log('Final cleanup hiding loading message:', msg);
-                    msg.style.display = 'none';
-                });
-            }, 8000);
-        })();
-    </script>
 </body>
+<script src="/shared_components/js/order-form-pdf.js"></script>
 </html>

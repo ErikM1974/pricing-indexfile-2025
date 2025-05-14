@@ -1,0 +1,1079 @@
+/* Enhanced Pricing Pages CSS for Embroidery Pricing Redesign */
+/* Variables from main.css */
+:root {
+    --primary-color: #2f661e;     /* Main green */
+    --primary-dark: #1e4d0f;      /* Darker green for hover */
+    --primary-light: #eaf2e9;     /* Lighter green for backgrounds/borders */
+    --secondary-color: #5cb85c;   /* Accent green */
+    --secondary-light: #eaffea;   /* Lighter green */
+    --text-color: #333;           /* Main text color */
+    --border-color: #ddd;         /* Standard border color */
+    --background-light: #f8f8f8;  /* Light background */
+    --white: #ffffff;             /* White */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --spacing-sm: 10px;
+    --spacing-md: 20px;
+    --spacing-lg: 30px;
+    --font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-light);
+    color: var(--text-color);
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 1.8em;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--primary-light);
+}
+
+/* Product Context Area */
+.product-context {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-md);
+    border-left: 4px solid var(--primary-color);
+}
+
+.product-image-container {
+    flex-shrink: 0;
+    width: 250px;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--spacing-md);
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+    max-height: 250px;
+    object-fit: contain;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background-color: var(--white);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease;
+}
+
+.product-image:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.product-details {
+    flex: 1;
+}
+
+.product-details h2, .product-details h3 {
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--primary-color);
+    font-size: 1.4em;
+}
+
+.product-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+.meta-item {
+    color: var(--text-color);
+    font-size: 0.9em;
+}
+
+.back-to-product {
+    display: inline-flex;
+    align-items: center;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9em;
+    padding: 6px 12px;
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+}
+
+.back-to-product:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.back-icon {
+    margin-right: 5px;
+}
+
+/* Tab Navigation */
+.pricing-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: var(--spacing-md);
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.pricing-tab {
+    padding: 12px 20px;
+    white-space: nowrap;
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.pricing-tab:hover {
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+}
+
+.pricing-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 1.2em;
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--primary-light);
+}
+
+/* Color Selection */
+.color-selection-section {
+    background-color: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.color-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.color-swatch {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.color-swatch:hover {
+    transform: scale(1.1);
+    border-color: var(--primary-color);
+}
+
+.color-swatch.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.color-name {
+    /* position: absolute; */ /* Removed */
+    /* bottom: -25px; */ /* Removed */
+    /* left: 50%; */ /* Removed */
+    /* transform: translateX(-50%); */ /* Removed */
+    font-size: 0.75em;
+    /* white-space: nowrap; */ /* Allow wrapping - handled in HTML style */
+    color: var(--text-color);
+    text-align: center;
+    width: 100%; /* Let it take the width of the wrapper */
+    display: block; /* Ensure it behaves as a block */
+    margin-top: 4px; /* Add some space below the swatch */
+    line-height: 1.2; /* Allow for wrapping */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Pricing Section */
+.pricing-section {
+    background-color: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.pricing-grid-container {
+    overflow-x: auto;
+}
+
+.pricing-grid {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    table-layout: fixed; /* Force fixed table layout for better control */
+}
+
+.pricing-grid th {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 12px;
+    text-align: center;
+}
+
+.pricing-grid th:first-child {
+    background-color: var(--primary-dark);
+    text-align: left;
+}
+
+.pricing-grid td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid var(--primary-light);
+    width: auto; /* Let each column have appropriate width */
+}
+
+.pricing-grid td:first-child {
+    text-align: left;
+    font-weight: bold;
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.pricing-grid tr:hover td {
+    background-color: var(--secondary-light);
+}
+
+.pricing-grid tr:last-child td {
+    border-bottom: none;
+}
+
+.price-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Inventory Indicator */
+.inventory-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.inventory-good {
+    background-color: #28a745;
+}
+
+.inventory-low {
+    background-color: #ffc107;
+}
+
+.inventory-none {
+    background-color: #dc3545;
+}
+
+/* LTM Fee Container */
+.pricing-notes {
+    margin-top: var(--spacing-md);
+}
+
+.ltm-fee-container {
+    background-color: var(--primary-light);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+}
+
+.ltm-fee-container h4 {
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-color);
+    font-size: 1em;
+}
+
+.ltm-fee-container ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.ltm-fee-container li {
+    margin-bottom: 5px;
+}
+
+/* Additional Information */
+.additional-info {
+    background-color: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.additional-info h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.2em;
+}
+
+.faq-item {
+    margin-bottom: var(--spacing-md);
+}
+
+.faq-item h4 {
+    color: var(--primary-dark);
+    margin-bottom: var(--spacing-sm);
+    font-size: 1em;
+}
+
+/* Hide the original Caspio pricing matrix */
+#pricing-calculator {
+    position: absolute;
+    left: -9999px;
+    visibility: hidden;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Force proper display of pricing data in custom grid */
+#custom-pricing-grid tr td {
+    display: table-cell !important;
+}
+
+/* Hide all cells except the first one in each row in the Caspio table */
+.cbResultSetTable tr td:not(:first-child),
+.matrix-price-table tr td:not(:first-child) {
+    display: none !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .product-context {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .product-image-container {
+        margin: 0 auto var(--spacing-sm);
+    }
+
+    .product-image {
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .product-meta {
+        justify-content: center;
+    }
+
+    .pricing-grid {
+        font-size: 0.9em;
+    }
+
+    .pricing-grid th,
+    .pricing-grid td {
+        padding: 8px 5px;
+    }
+
+    .color-swatches {
+        justify-content: center;
+    }
+
+    .back-to-product {
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        max-width: 200px;
+    }
+
+    .pricing-tabs {
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .color-swatch {
+        width: 50px;
+        height: 50px;
+    }
+
+    .color-name {
+        font-size: 0.7em;
+        bottom: -22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pricing-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .pricing-tab {
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+
+    .pricing-grid {
+        font-size: 0.8em;
+    }
+
+    .pricing-grid th,
+    .pricing-grid td {
+        padding: 6px 4px;
+    }
+
+    .section-title {
+        font-size: 1.1em;
+    }
+
+    .color-swatch {
+        width: 45px;
+        height: 45px;
+    }
+
+    .color-name {
+        width: 70px;
+        font-size: 0.65em;
+    }
+
+    .container {
+        padding: var(--spacing-sm);
+    }
+
+    .product-context {
+        padding: var(--spacing-sm);
+    }
+
+    .product-details h2, .product-details h3 {
+        font-size: 1.2em;
+    }
+
+    .meta-item {
+        font-size: 0.8em;
+    }
+
+    .back-to-product {
+        font-size: 0.8em;
+        padding: 5px 10px;
+    }
+}
+
+/* Cart Button Styling */
+#cart-button-container {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--primary-light);
+}
+
+#cart-button-container h4 {
+    text-align: center;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+#add-to-cart-button {
+    display: block;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 25px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 20px auto 0;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+}
+
+#add-to-cart-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.size-input-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.size-input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius-sm);
+    background-color: var(--white);
+    transition: all 0.2s ease;
+}
+
+.size-input-group:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+}
+
+.size-input-group label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.size-quantity-input {
+    width: 65px;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+}
+
+/* Add to Cart Section */
+.add-to-cart-section {
+    background-color: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Quantity Matrix that mirrors pricing matrix */
+.quantity-matrix-container {
+    margin-bottom: var(--spacing-md);
+    overflow-x: auto;
+}
+
+.quantity-matrix {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    table-layout: fixed;
+}
+
+/* Style for active tier row */
+.quantity-matrix tr.active-tier {
+    background-color: var(--primary-light);
+}
+
+.quantity-matrix tr.active-tier td {
+    border-left: 2px solid var(--primary-color);
+    border-right: 2px solid var(--primary-color);
+}
+
+.quantity-matrix tr.active-tier td:first-child {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.quantity-matrix th {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.quantity-matrix th:first-child {
+    background-color: var(--primary-dark);
+    text-align: left;
+}
+
+.quantity-matrix tr:nth-child(odd) {
+    background-color: rgba(234, 242, 233, 0.3);
+}
+
+.quantity-matrix tr:hover {
+    background-color: var(--primary-light);
+}
+
+.quantity-matrix td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--primary-light);
+}
+
+.quantity-matrix td:first-child {
+    text-align: left;
+    font-weight: bold;
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.quantity-matrix tr:last-child td {
+    border-bottom: none;
+}
+
+/* Individual quantity input cell */
+.quantity-cell {
+    padding: 5px;
+}
+
+.size-quantity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: var(--spacing-md);
+}
+
+.size-quantity-row {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--primary-light);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+}
+
+.size-quantity-row:hover {
+    background-color: var(--secondary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.size-label {
+    font-weight: bold;
+    width: 40px;
+    text-align: center;
+    color: var(--primary-dark);
+}
+
+.quantity-input-container {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.quantity-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--primary-color);
+    background-color: var(--white);
+    color: var(--primary-color);
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.quantity-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.quantity-btn.decrease {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.quantity-btn.increase {
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.quantity-input {
+    width: 40px;
+    height: 24px;
+    border: 1px solid var(--primary-color);
+    border-left: none;
+    border-right: none;
+    text-align: center;
+    font-size: 0.9em;
+    padding: 0 2px;
+}
+
+.quantity-input:focus {
+    outline: none;
+    background-color: var(--primary-light);
+}
+
+.size-price {
+    flex: 1;
+    text-align: right;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* Size price in matrix */
+.size-price-cell {
+    font-weight: bold;
+    color: var(--primary-color);
+    padding-left: 8px;
+}
+
+.cart-summary {
+    background-color: var(--primary-light);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    margin-top: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: var(--spacing-sm);
+}
+
+.total-label {
+    color: var(--primary-dark);
+}
+
+.total-amount {
+    color: var(--primary-color);
+}
+
+.ltm-fee-notice {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    border-left: 3px solid #ffc107;
+}
+
+.ltm-icon {
+    margin-right: 8px;
+}
+
+.add-to-cart-button {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 12px 24px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.add-to-cart-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.add-to-cart-button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 768px) {
+    .size-quantity-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .add-to-cart-section {
+        padding: var(--spacing-sm);
+    }
+
+    .cart-summary {
+        padding: var(--spacing-sm);
+    }
+
+    .add-to-cart-button {
+        padding: 10px 20px;
+    }
+
+    .quantity-matrix th,
+    .quantity-matrix td {
+        padding: 8px 5px;
+    }
+
+    .quantity-btn {
+        width: 22px;
+        height: 22px;
+    }
+
+    .quantity-input {
+        width: 35px;
+        height: 22px;
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .size-quantity-row {
+        padding: 8px;
+    }
+
+    .quantity-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 0.8em;
+    }
+
+    .quantity-input {
+        width: 30px;
+        height: 20px;
+        font-size: 0.8em;
+    }
+
+    .size-label {
+        width: 30px;
+        font-size: 0.9em;
+    }
+
+    .size-price {
+        font-size: 0.9em;
+    }
+
+    .cart-total {
+        font-size: 1.1em;
+    }
+
+    .add-to-cart-button {
+        font-size: 1em;
+        padding: 8px 16px;
+    }
+
+    .quantity-matrix {
+        font-size: 0.8em;
+    }
+
+    .quantity-matrix th,
+    .quantity-matrix td {
+        padding: 6px 3px;
+    }
+}
+/* View Cart Button in Summary */
+.view-cart-button {
+    background-color: #17a2b8; /* Teal/Info color */
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.view-cart-button:hover {
+    background-color: #117a8b; /* Darker teal */
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.view-cart-button:disabled {
+    background-color: #adb5bd;
+    cursor: not-allowed;
+}
+/* Styles for Two-Column Product Page Layout */
+.product-page-columns-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px; /* Adjust gap as needed */
+    margin-top: var(--spacing-lg); /* Add some top margin */
+}
+
+.product-context-column {
+    flex: 0 0 350px; /* Adjust width as needed, e.g., 300px, 400px */
+    /* For sticky behavior, uncomment and adjust: */
+    /* position: sticky; 
+    top: 20px;  */
+    /* Consider max-height if content can be very long and you want internal scroll for this column */
+    /* height: calc(100vh - 40px); /* Example: full viewport height minus some padding */
+    /* overflow-y: auto; */
+    background-color: var(--white);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.product-interactive-column {
+    flex: 1;
+    min-width: 0; /* Prevents flexbox overflow issues with nested flex/grid items */
+    background-color: var(--white);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.product-image-container-context img { /* Styles for the image in the new context column */
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-md);
+}
+.product-image-container-context .image-zoom-overlay { /* Ensure zoom overlay is positioned correctly */
+    position: absolute; /* If not already, or adjust as needed */
+}
+
+
+/* Highlight for active pricing tier in the pricing grid */
+.pricing-grid th.active-tier-highlight,
+.pricing-grid td.active-tier-highlight {
+    background-color: var(--primary-extralight, #e6f3ff) !important; /* A lighter shade of primary */
+    font-weight: bold;
+    color: var(--primary-dark, #003366) !important; /* Darker primary color for text */
+    border: 1px solid var(--primary-color, #007bff); /* Optional: border to emphasize */
+}
+.pricing-grid th.active-tier-highlight {
+    border-bottom: 2px solid var(--primary-color, #007bff) !important;
+}
+
+
+/* Styling for the sticky cart summary at the bottom of the interactive column */
+#sticky-product-cart-summary {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--white);
+    padding: var(--spacing-md);
+    border-top: 2px solid var(--primary-color);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    z-index: 100; /* Ensure it's above other content in the column */
+}
+
+#sticky-product-cart-summary .cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+#sticky-product-cart-summary .cart-total > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+#sticky-product-cart-summary .total-label {
+    font-size: 0.9em;
+    color: var(--text-muted);
+}
+#sticky-product-cart-summary .total-quantity,
+#sticky-product-cart-summary .total-price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--primary-dark);
+}
+#sticky-product-cart-summary .add-to-cart-button,
+#sticky-product-cart-summary .view-cart-button {
+    width: 100%;
+    margin-top: var(--spacing-sm);
+}
+
+
+/* Responsive adjustments for the two-column layout */
+@media (max-width: 1024px) { /* Adjust this breakpoint as needed */
+    .product-page-columns-container {
+        flex-direction: column;
+    }
+    .product-context-column {
+        flex: 0 0 auto; /* Reset flex basis for stacked layout */
+        position: static; /* Remove sticky behavior when stacked */
+        height: auto; /* Reset height */
+        overflow-y: visible; /* Reset overflow */
+        margin-bottom: var(--spacing-lg);
+    }
+    #sticky-product-cart-summary {
+        position: static; /* Non-sticky on smaller screens, part of normal flow */
+        border-top: 1px solid var(--border-color);
+        box-shadow: none;
+    }
+}
+
+/* Ensure .price-display and .dynamic-unit-price are styled if not already globally */
+.price-display {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-top: 5px;
+    text-align: center;
+    min-height: 20px; /* Adjust if needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9em; 
+}
+.price-display .dynamic-unit-price { 
+    margin-left: 5px;
+    font-weight: normal; /* Or bold if preferred */
+    color: var(--text-color); /* Or var(--primary-color) */
+}
+
+/* Ensure .product-header in the context column is styled appropriately */
+.product-context-column .product-header {
+    padding: var(--spacing-sm) 0; /* Adjust padding if needed */
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: var(--spacing-md);
+}
+.product-context-column .product-title-area h2 {
+    font-size: 1.3em; /* Adjust as needed */
+}
+.product-context-column .product-meta {
+    font-size: 0.9em;
+}
+.product-context-column .product-meta .mini-color-swatch {
+    width: 20px;
+    height: 20px;
+    margin-left: 0;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Collapsible sections for mobile (example) */
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+.collapsible-content.is-expanded {
+    max-height: 1000px; /* Adjust to a sufficiently large value */
+    transition: max-height 0.5s ease-in;
+}
+.collapsible-toggle { /* Style for the button/link that toggles */
+    cursor: pointer;
+    /* Add other styling as needed */
+}
