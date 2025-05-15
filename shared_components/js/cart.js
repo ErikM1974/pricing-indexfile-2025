@@ -716,32 +716,97 @@ if (typeof window.NWCACart === 'undefined') {
       }
       debugCart("ADD", "Product data validated");
 
-      // Check if we already have items with a different embellishment type
-      const existingEmbellishmentTypes = new Set(
-        cartState.items
-          .filter(item => item.CartStatus === 'Active')
-          .map(item => item.ImprintType)
-      );
+      // --- START Custom Validation Rules ---
 
-      if (existingEmbellishmentTypes.size > 0 &&
-          !existingEmbellishmentTypes.has(productData.embellishmentType)) {
-        debugCart("ADD", "Different embellishment type detected", {existing: Array.from(existingEmbellishmentTypes), new: productData.embellishmentType});
-        // Show warning about different embellishment types
-        const proceed = confirm(
-          `You already have items with ${Array.from(existingEmbellishmentTypes).join(', ')} ` +
-          `in your cart. Adding items with ${productData.embellishmentType} may result in ` +
-          `separate production runs. For optimal pricing and production, we recommend ` +
-          `placing separate orders for different embellishment types. Do you want to proceed?`
-        );
+      const activeCartItems = cartState.items.filter(item => item.CartStatus === 'Active');
+      const newItemEmbType = productData.embellishmentType;
+      const newItemIsCapEmbroidery = newItemEmbType === "Cap Embroidery";
 
-        if (!proceed) {
-          debugCart("ADD", "User canceled adding item due to different embellishment type");
-          cartState.loading = false;
-          triggerEvent('cartUpdated');
-          return { success: false, error: null }; // User canceled, not an error
+      if (activeCartItems.length > 0) {
+        const firstCartItemEmbType = activeCartItems[0].ImprintType;
+
+        // 1. Embellishment Type Validation
+        if (newItemEmbType !== firstCartItemEmbType) {
+          // Check if one is "Cap Embroidery" and the other is not
+          const oneIsCapOtherIsNot = (newItemIsCapEmbroidery && firstCartItemEmbType !== "Cap Embroidery") ||
+                                   (!newItemIsCapEmbroidery && firstCartItemEmbType === "Cap Embroidery");
+          const generalMix = productData.embellishmentType !== "Cap Embroidery" && firstCartItemEmbType !== "Cap Embroidery";
+
+
+          if (oneIsCapOtherIsNot) {
+             alert("Only one embellishment type per cart is allowed when 'Cap Embroidery' is selected. Please create a new order for different embellishment types.");
+             debugCart("ADD-VALIDATION-FAIL", "Mixed embellishment types with Cap Embroidery denied.", { newItem: newItemEmbType, cartHas: firstCartItemEmbType });
+             cartState.loading = false;
+             triggerEvent('cartUpdated');
+             return { success: false, error: "Mixed embellishment types with Cap Embroidery." };
+          } else if (generalMix) {
+            // This is the original logic for general mixed embellishment types, kept for now.
+            // If the new logic is to strictly prevent *any* mix if Cap Embroidery is involved, this part might be redundant
+            // or needs to be adjusted based on the exact requirement for non-cap mixes.
+            // For now, the original confirm dialog for general mixes will still appear if this condition is met.
+            debugCart("ADD", "Different embellishment type detected (general mix, not involving Cap Embroidery specifically in this conflict)", {existing: firstCartItemEmbType, new: newItemEmbType});
+             const proceedGeneralMix = confirm(
+              `You already have items with ${firstCartItemEmbType} ` +
+              `in your cart. Adding items with ${newItemEmbType} may result in ` +
+              `separate production runs. For optimal pricing and production, we recommend ` +
+              `placing separate orders for different embellishment types. Do you want to proceed?`
+            );
+            if (!proceedGeneralMix) {
+              debugCart("ADD", "User canceled adding item due to different embellishment type (general mix)");
+              cartState.loading = false;
+              triggerEvent('cartUpdated');
+              return { success: false, error: null }; // User canceled
+            }
+            debugCart("ADD", "User chose to proceed with different embellishment type (general mix)");
+          }
         }
-        debugCart("ADD", "User chose to proceed with different embellishment type");
       }
+
+      // 2. Stitch Count Validation (for "Cap Embroidery")
+      if (newItemIsCapEmbroidery) {
+        const newItemStitchCount = productData.stitchCount; // Added in add-to-cart.js
+        if (!newItemStitchCount) {
+            alert("Error: Stitch count is missing for the cap embroidery item. Cannot add to cart.");
+            debugCart("ADD-VALIDATION-FAIL", "Cap embroidery item missing stitchCount.", productData);
+            cartState.loading = false;
+            triggerEvent('cartUpdated');
+            return { success: false, error: "Missing stitch count for cap embroidery item." };
+        }
+
+        const capEmbroideryItemsInCart = activeCartItems.filter(item => item.ImprintType === "Cap Embroidery");
+        if (capEmbroideryItemsInCart.length > 0) {
+          const existingStitchCount = capEmbroideryItemsInCart[0].EmbellishmentOptions ? JSON.parse(capEmbroideryItemsInCart[0].EmbellishmentOptions).stitchCount : undefined;
+          // Fallback if EmbellishmentOptions is not structured as expected or stitchCount is directly on item
+          const directStitchCount = capEmbroideryItemsInCart[0].stitchCount;
+
+          let currentCartStitchCount = existingStitchCount || directStitchCount;
+
+
+          if (!currentCartStitchCount && capEmbroideryItemsInCart[0].EmbellishmentOptions) {
+             try {
+                const opts = JSON.parse(capEmbroideryItemsInCart[0].EmbellishmentOptions);
+                currentCartStitchCount = opts.stitchCount;
+             } catch (e) {
+                console.warn("Could not parse EmbellishmentOptions for stitch count from existing cart item", capEmbroideryItemsInCart[0]);
+             }
+          }
+           // If still no stitch count, check if it was added directly to the item (older items might have this)
+          if (!currentCartStitchCount && capEmbroideryItemsInCart[0].stitchCount) {
+              currentCartStitchCount = capEmbroideryItemsInCart[0].stitchCount;
+          }
+
+
+          if (currentCartStitchCount && newItemStitchCount.toString() !== currentCartStitchCount.toString()) {
+            alert(`All cap embroidery items in the cart must have the same stitch count. The cart has items with ${currentCartStitchCount} stitches, and you are trying to add an item with ${newItemStitchCount} stitches. Please adjust the stitch count or create a new order.`);
+            debugCart("ADD-VALIDATION-FAIL", "Different stitch counts for Cap Embroidery denied.", { newItem: newItemStitchCount, cartHas: currentCartStitchCount });
+            cartState.loading = false;
+            triggerEvent('cartUpdated');
+            return { success: false, error: "Different stitch counts for Cap Embroidery." };
+          }
+        }
+      }
+      // --- END Custom Validation Rules ---
+
 
       // Check inventory before adding
       debugCart("ADD", "Checking inventory for", {style: productData.styleNumber, color: productData.color});

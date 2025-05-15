@@ -214,10 +214,217 @@ console.log("[QUANTITY-UI:LOAD] Product quantity UI creation module loaded.");
         return true; // Indicate success
     }
 
+    // --- START Cap Embroidery Specific Price Update Logic ---
+
+    /**
+     * Finds the relevant price tier from masterData.headers or masterData.tierDefs
+     * based on the total quantity.
+     * @param {number} totalQuantity - The total quantity of items.
+     * @param {Array<string|Object>} headers - The tier headers (e.g., ["1-11", "12-23", "24+"] or [{label: "1-11", min:1, max:11}, ...]).
+     * @returns {string|null} The key/label of the correct price tier, or null if not found.
+     */
+    function getPriceTierForQuantity(totalQuantity, headers) {
+        if (!headers || headers.length === 0) return null;
+
+        for (const header of headers) {
+            let tierLabel;
+            let minQty, maxQty;
+
+            if (typeof header === 'string') {
+                tierLabel = header;
+                const parts = header.split('-');
+                minQty = parseInt(parts[0], 10);
+                if (parts.length > 1) {
+                    maxQty = parseInt(parts[1], 10);
+                } else if (header.endsWith('+')) {
+                    maxQty = Infinity;
+                } else { // Single number tier
+                    maxQty = minQty;
+                }
+            } else if (typeof header === 'object' && header.label) { // For tierDefs like {label: "1-11", priceField: "Tier1", min: 1, max: 11}
+                tierLabel = header.priceField || header.label; // Prefer priceField if available, fallback to label
+                minQty = header.min !== undefined ? parseInt(header.min, 10) : parseInt(header.label.split('-')[0], 10);
+                maxQty = header.max !== undefined ? parseInt(header.max, 10) : (header.label.includes('-') ? parseInt(header.label.split('-')[1], 10) : (header.label.endsWith('+') ? Infinity : minQty));
+            } else {
+                continue; // Skip malformed header
+            }
+
+            if (isNaN(minQty)) continue;
+            if (isNaN(maxQty)) maxQty = Infinity; // If maxQty is not parsed, assume it's an open-ended tier like "24+"
+
+            if (totalQuantity >= minQty && totalQuantity <= maxQty) {
+                return tierLabel;
+            }
+        }
+        // If no tier matched exactly, try to find the closest one (e.g. if qty is 0, it might not match "1-11")
+        // For simplicity, if totalQuantity is less than the first tier's min, use the first tier.
+        // Or, if it's greater than the last tier's max, use the last tier.
+        // This part might need refinement based on exact business rules for quantities outside defined tiers.
+        if (totalQuantity > 0 && headers.length > 0) {
+            let firstTierLabel, firstTierMin;
+            const firstHeader = headers[0];
+            if (typeof firstHeader === 'string') {
+                firstTierLabel = firstHeader;
+                firstTierMin = parseInt(firstHeader.split('-')[0], 10);
+            } else if (typeof firstHeader === 'object' && firstHeader.label) {
+                firstTierLabel = firstHeader.priceField || firstHeader.label;
+                firstTierMin = firstHeader.min !== undefined ? parseInt(firstHeader.min, 10) : parseInt(firstHeader.label.split('-')[0], 10);
+            }
+            if (totalQuantity < firstTierMin) return firstTierLabel;
+
+
+            let lastTierLabel, lastTierMax;
+            const lastHeader = headers[headers.length - 1];
+             if (typeof lastHeader === 'string') {
+                lastTierLabel = lastHeader;
+                const parts = lastHeader.split('-');
+                if (parts.length > 1) lastTierMax = parseInt(parts[1], 10);
+                else if (lastHeader.endsWith('+')) lastTierMax = Infinity;
+                else lastTierMax = parseInt(parts[0], 10);
+            } else if (typeof lastHeader === 'object' && lastHeader.label) {
+                lastTierLabel = lastHeader.priceField || lastHeader.label;
+                const parts = lastHeader.label.split('-');
+                if (lastHeader.max !== undefined) lastTierMax = parseInt(lastHeader.max, 10);
+                else if (parts.length > 1) lastTierMax = parseInt(parts[1], 10);
+                else if (lastHeader.label.endsWith('+')) lastTierMax = Infinity;
+                else lastTierMax = parseInt(parts[0], 10);
+            }
+            if (totalQuantity > lastTierMax && lastTierMax !== Infinity) return lastTierLabel;
+        }
+
+
+        return null; // No matching tier found
+    }
+
+    /**
+     * Formats a numeric price into a string like $X.XX.
+     * @param {string|number} price - The price to format.
+     * @returns {string} Formatted price string or 'N/A'.
+     */
+    function formatPrice(price) {
+        const num = parseFloat(price);
+        if (isNaN(num)) {
+            return 'N/A';
+        }
+        return '$' + num.toFixed(2);
+    }
+
+
+    /**
+     * Updates the unit price display for cap embroidery items in the quantity UI.
+     * This is typically called when stitch count or quantity changes.
+     */
+    function updateCapEmbroideryItemUnitPrices() {
+        const stitchCountSelect = document.getElementById('client-stitch-count-select');
+        // Only run if stitch count select exists (i.e., on cap embroidery page)
+        // and master data is loaded.
+        if (!stitchCountSelect || !window.capEmbroideryMasterData || !window.capEmbroideryMasterData.profile || !window.capEmbroideryMasterData.profile.pricing) {
+            // console.log("[QUANTITY-UI:CAP-EMB] Stitch count select or master data not ready. Skipping unit price update.");
+            return;
+        }
+
+        const selectedStitchCount = stitchCountSelect.value;
+        const masterData = window.capEmbroideryMasterData;
+
+        // Find the pricing data for the selected stitch count
+        const stitchCountFieldNames = ['Stitch_Count', 'Stitches', 'stitch_count', 'Embroidery_Stitch_Count'];
+        let pricingDataForStitchCount = null;
+        for (const record of masterData.profile.pricing) {
+            for (const fieldName of stitchCountFieldNames) {
+                if (record[fieldName] && record[fieldName].toString() === selectedStitchCount) {
+                    pricingDataForStitchCount = record;
+                    break;
+                }
+            }
+            if (pricingDataForStitchCount) break;
+        }
+
+        if (!pricingDataForStitchCount) {
+            console.warn(`[QUANTITY-UI:CAP-EMB] No pricing data found for stitch count: ${selectedStitchCount}. Unit prices will not be updated.`);
+            // Clear or set prices to N/A
+            document.querySelectorAll('.price-display, .size-price, .dynamic-unit-price').forEach(el => el.textContent = 'N/A');
+            return;
+        }
+
+        // Calculate total quantity
+        let totalQuantity = 0;
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            const qty = parseInt(input.value, 10);
+            if (!isNaN(qty) && qty > 0) {
+                totalQuantity += qty;
+            }
+        });
+
+        // Determine the correct price tier based on total quantity
+        const headers = masterData.headers || (masterData.tierDefs ? masterData.tierDefs : []); // Use tierDefs directly if headers is not primary
+        const priceTierKey = getPriceTierForQuantity(totalQuantity, headers);
+
+        let unitPrice = 'N/A';
+        if (priceTierKey && pricingDataForStitchCount[priceTierKey]) {
+            unitPrice = formatPrice(pricingDataForStitchCount[priceTierKey]);
+        } else if (totalQuantity === 0) {
+            unitPrice = formatPrice(0); // Or keep as N/A, or show first tier price
+        } else {
+            console.warn(`[QUANTITY-UI:CAP-EMB] Could not determine price tier for total quantity: ${totalQuantity} with key: ${priceTierKey}. Using N/A.`);
+        }
+
+        // Update all unit price displays
+        // These selectors target price displays in both matrix and grid layouts, and the add-to-cart section
+        document.querySelectorAll('.price-display, .size-price, .dynamic-unit-price').forEach(priceEl => {
+            // For cap embroidery, all sizes get the same unit price based on total quantity and selected stitch count.
+            // The `size` dataset on priceEl is not used here to differentiate price, as it's uniform.
+            priceEl.textContent = unitPrice;
+        });
+        // console.log(`[QUANTITY-UI:CAP-EMB] Unit prices updated to ${unitPrice} for stitch count ${selectedStitchCount} and total qty ${totalQuantity}. Tier key: ${priceTierKey}`);
+    }
+
+
+    function setupCapEmbroideryEventListeners() {
+        const stitchCountSelect = document.getElementById('client-stitch-count-select');
+        if (stitchCountSelect) {
+            stitchCountSelect.addEventListener('change', updateCapEmbroideryItemUnitPrices);
+            // console.log("[QUANTITY-UI:CAP-EMB] Event listener for stitch count dropdown attached for unit price updates.");
+
+            // Also listen to quantity changes
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                input.addEventListener('input', updateCapEmbroideryItemUnitPrices);
+                input.addEventListener('change', updateCapEmbroideryItemUnitPrices); // For spinners or direct entry
+            });
+            // console.log("[QUANTITY-UI:CAP-EMB] Event listeners for quantity inputs attached for unit price updates.");
+
+            // Initial call in case data is already loaded and quantities pre-filled
+            // Ensure master data is available before calling
+            if (window.capEmbroideryMasterData) {
+                 updateCapEmbroideryItemUnitPrices();
+            }
+        }
+    }
+
+    // Listen for the event that signals cap embroidery master data is ready
+    document.addEventListener('caspioCapPricingCalculated', function(event) {
+        if (event.detail && event.detail.success && window.capEmbroideryMasterData) {
+            // console.log("[QUANTITY-UI:CAP-EMB] Received 'caspioCapPricingCalculated', attempting to update unit prices.");
+            updateCapEmbroideryItemUnitPrices(); // Update prices now that data is confirmed
+        }
+    });
+
+
+    // Call setup when the DOM is ready, specifically for cap embroidery enhancements
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupCapEmbroideryEventListeners);
+    } else {
+        // DOMContentLoaded has already fired
+        setupCapEmbroideryEventListeners();
+    }
+
+    // --- END Cap Embroidery Specific Price Update Logic ---
+
+
     // Expose public API
     window.ProductQuantityUI = {
         createQuantityMatrix: createQuantityMatrix,
-        createSizeQuantityGrid: createSizeQuantityGrid
+        createSizeQuantityGrid: createSizeQuantityGrid,
+        updateCapEmbroideryItemUnitPrices: updateCapEmbroideryItemUnitPrices // Expose if needed externally
     };
 
 })();

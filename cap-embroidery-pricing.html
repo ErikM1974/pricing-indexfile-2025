@@ -603,7 +603,7 @@
                 <!-- Pricing Content (Grid, Tabs, Add to Cart Section) -->
                 <div class="pricing-content-interactive"> <!-- New wrapper for clarity -->
                     <!-- Hidden Caspio Matrix - Keep this for data source -->
-                    <div id="pricing-calculator" class="pricing-calculator">
+                    <div id="pricing-calculator" class="pricing-calculator" style="display:none !important; width:0; height:0; border:0; visibility: hidden;">
                         <div class="loading-message">Loading pricing data...</div>
                     </div>
                     
@@ -612,7 +612,16 @@
                         <div class="pricing-header" style="margin-bottom: 20px;">
                             <!-- Enhanced header with more prominence -->
                              <h3 class="section-title" style="font-size: 1.3em; margin: 0;">Detailed Pricing per Quantity Tier</h3>
-                             <div class="selected-color-indicator">
+                             <div style="display: flex; align-items: center; gap: 15px;"> <!-- Wrapper for dropdown and color indicator -->
+                                 <div class="stitch-count-selector" style="display: flex; align-items: center; gap: 5px;">
+                                     <label for="client-stitch-count-select" style="font-size: 0.9em; font-weight: bold;">Stitch Count:</label>
+                                     <select id="client-stitch-count-select" name="client-stitch-count-select" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+                                         <option value="5000">5,000</option>
+                                         <option value="8000" selected>8,000</option>
+                                         <option value="10000">10,000</option>
+                                     </select>
+                                 </div>
+                                 <div class="selected-color-indicator">
                                 <span>Selected Color:</span>
                                 <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches"></div>
                                 <strong id="pricing-color-name">Color Name</strong>

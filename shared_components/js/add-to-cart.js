@@ -570,8 +570,8 @@
         }
         console.log("[ADD-TO-CART] Setting PRODUCT_TITLE before adding to cart:", productTitle);
         
-        const productData = {
-            styleNumber: styleNumber, color: colorCode, embellishmentType: embType,
+        let productData = {
+            styleNumber: styleNumber, color: colorCode, embellishmentType: embType, // embType is from detectEmbellishmentType()
             pricingTier: tierKey, ltmFeeApplied: ltmFeeApplies, totalQuantity: totalQuantity,
             sizes: sizesForCart,
             imageUrl: specificImageUrl,
@@ -584,6 +584,16 @@
                 combinedQuantity, existingCartQuantity: cartQuantity, baseUnitPrices
             }
         };
+
+        // --- START Cap Embroidery Specific Data ---
+        const stitchCountSelect = document.getElementById('client-stitch-count-select');
+        if (stitchCountSelect && stitchCountSelect.value) {
+            const selectedStitchCount = stitchCountSelect.value;
+            productData.stitchCount = selectedStitchCount;
+            productData.embellishmentType = "Cap Embroidery"; // Ensure specific string as per requirement
+            console.log(`[ADD-TO-CART:CAP-EMB] Added stitchCount: ${selectedStitchCount} and ensured embellishmentType: "Cap Embroidery"`);
+        }
+        // --- END Cap Embroidery Specific Data ---
         
         // Explicitly ensure the image URL and product title are captured in the logs just before cart addition
         console.log("[ADD-TO-CART:FINAL] Product data for cart:", {
