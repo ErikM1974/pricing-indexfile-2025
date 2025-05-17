@@ -723,9 +723,15 @@
 
     function initializeUIAndListeners() {
          if (uiInitialized) { console.log("[ADD-TO-CART] UI and Listeners already initialized."); return; }
-         if (!window.nwcaPricingData || !window.availableSizesFromTable) {
-             console.error("[ADD-TO-CART:INIT-UI] Pricing data or available sizes missing. Aborting UI initialization.");
-             handlePricingDataError({ detail: { message: 'Pricing data missing during UI initialization.' } });
+         // Rely on nwcaPricingData which is set by dtg-adapter before dispatching the event that triggers this.
+         if (!window.nwcaPricingData ||
+             !window.nwcaPricingData.prices ||
+             !window.nwcaPricingData.uniqueSizes ||
+             window.nwcaPricingData.uniqueSizes.length === 0) {
+             console.error("[ADD-TO-CART:INIT-UI] Essential pricing data (nwcaPricingData.prices or non-empty nwcaPricingData.uniqueSizes) missing. Aborting UI initialization. Data:", {
+                nwcaPricingData: JSON.stringify(window.nwcaPricingData || {})
+             });
+             handlePricingDataError({ detail: { message: 'Pricing data missing or incomplete during UI initialization.' } });
              return;
          }
          uiInitialized = true;
@@ -868,41 +874,79 @@
 
     function syncSizesWithPricingMatrix() {
         console.log("[ADD-TO-CART] Syncing sizes with pricing matrix...");
-        const availableSizes = window.availableSizesFromTable;
-        if (!availableSizes || availableSizes.length === 0) {
-            console.error("[ADD-TO-CART] Cannot sync sizes: No sizes available from parsed table data (window.availableSizesFromTable).");
+        let sizesToUse = [];
+        let sourceOfSizes = "";
+
+        // Prioritize sizes from nwcaPricingData if available (set by dtg-adapter)
+        if (window.nwcaPricingData && window.nwcaPricingData.uniqueSizes && window.nwcaPricingData.uniqueSizes.length > 0) {
+            sizesToUse = window.nwcaPricingData.uniqueSizes;
+            sourceOfSizes = "nwcaPricingData.uniqueSizes";
+        }
+        // Fallback to availableSizesFromTable (set by pricing-matrix-capture)
+        else if (window.availableSizesFromTable && window.availableSizesFromTable.length > 0) {
+            sizesToUse = window.availableSizesFromTable;
+            sourceOfSizes = "availableSizesFromTable";
+        }
+
+        if (sizesToUse.length === 0) {
+            console.error("[ADD-TO-CART] Cannot sync sizes: No sizes available from nwcaPricingData.uniqueSizes or availableSizesFromTable.");
             const quantitySection = document.getElementById('quantity-section') || document.getElementById('size-quantity-grid-container') || document.getElementById('quantity-matrix');
             if (quantitySection) {
-                quantitySection.innerHTML = '<p style="color: red; font-weight: bold; padding: 10px; border: 1px solid red; background-color: #ffeeee;">Error: Could not load size information from the pricing table.</p>';
+                // Avoid overwriting if dp5-helper might still be working or has placed a more specific error.
+                if (!quantitySection.querySelector('.error-message')) { // Check if an error is already there
+                    quantitySection.innerHTML = '<p class="error-message" style="color: red; font-weight: bold; padding: 10px; border: 1px solid red; background-color: #ffeeee;">Error: Could not load size information.</p>';
+                }
             }
             return;
         }
-        console.log("[ADD-TO-CART] Sizes to use for UI:", availableSizes);
-        const useGrid = window.PricingPageUI?.determineLayoutPreference ? window.PricingPageUI.determineLayoutPreference() : false; 
-        let uiCreated = false;
-        if (useGrid) {
-            console.log("[ADD-TO-CART] Using grid layout for quantity inputs.");
-            if (window.ProductQuantityUI && typeof window.ProductQuantityUI.createSizeQuantityGrid === 'function') {
-                uiCreated = window.ProductQuantityUI.createSizeQuantityGrid(availableSizes);
-                 const matrixContainer = document.getElementById('quantity-matrix');
-                 if(matrixContainer) matrixContainer.style.display = 'none';
-            } else {
-                console.error("[ADD-TO-CART] ProductQuantityUI.createSizeQuantityGrid function not found!");
+        console.log(`[ADD-TO-CART] Sizes to use for UI (from ${sourceOfSizes}):`, sizesToUse);
+
+        // Check if quantity input elements already exist (e.g., created by dp5-helper.js)
+        const sizeQuantityGrid = document.getElementById('size-quantity-grid');
+        const existingRows = sizeQuantityGrid ? sizeQuantityGrid.querySelectorAll('.size-quantity-row .quantity-input') : null;
+
+        let uiAlreadyExists = existingRows && existingRows.length > 0 && existingRows.length === sizesToUse.length;
+
+        if (uiAlreadyExists) {
+            console.log("[ADD-TO-CART] Quantity input UI elements seem to already exist (likely created by dp5-helper). Attaching listeners.");
+            // Ensure the main container for the grid is visible
+            const gridContainerParent = document.getElementById('size-quantity-grid-container');
+            if (gridContainerParent) {
+                gridContainerParent.style.display = 'block'; // Or 'flex' etc.
+                 console.log("[ADD-TO-CART] Ensured #size-quantity-grid-container is visible (UI already existed).");
+                const matrixContainer = document.getElementById('quantity-matrix'); // Hide the other one
+                if(matrixContainer) matrixContainer.style.display = 'none';
             }
+            attachQuantityChangeListeners(); // Ensure listeners are attached to these existing elements
         } else {
-            console.log("[ADD-TO-CART] Using matrix layout for quantity inputs.");
-             if (window.ProductQuantityUI && typeof window.ProductQuantityUI.createQuantityMatrix === 'function') {
-                uiCreated = window.ProductQuantityUI.createQuantityMatrix(availableSizes);
-                 const gridContainer = document.getElementById('size-quantity-grid-container');
-                 if(gridContainer) gridContainer.style.display = 'none';
+            console.log("[ADD-TO-CART] Quantity input UI elements do not exist or mismatch. Attempting to create them via ProductQuantityUI.");
+            const useGrid = window.PricingPageUI?.determineLayoutPreference ? window.PricingPageUI.determineLayoutPreference() : false;
+            let uiCreatedByThisFunction = false;
+            if (useGrid) {
+                console.log("[ADD-TO-CART] Using grid layout for quantity inputs.");
+                if (window.ProductQuantityUI && typeof window.ProductQuantityUI.createSizeQuantityGrid === 'function') {
+                    uiCreatedByThisFunction = window.ProductQuantityUI.createSizeQuantityGrid(sizesToUse);
+                    const matrixContainer = document.getElementById('quantity-matrix');
+                    if (matrixContainer) matrixContainer.style.display = 'none';
+                } else {
+                    console.error("[ADD-TO-CART] ProductQuantityUI.createSizeQuantityGrid function not found!");
+                }
             } else {
-                 console.error("[ADD-TO-CART] ProductQuantityUI.createQuantityMatrix function not found!");
+                console.log("[ADD-TO-CART] Using matrix layout for quantity inputs.");
+                if (window.ProductQuantityUI && typeof window.ProductQuantityUI.createQuantityMatrix === 'function') {
+                    uiCreatedByThisFunction = window.ProductQuantityUI.createQuantityMatrix(sizesToUse);
+                    const gridContainer = document.getElementById('size-quantity-grid-container');
+                    if (gridContainer) gridContainer.style.display = 'none';
+                } else {
+                    console.error("[ADD-TO-CART] ProductQuantityUI.createQuantityMatrix function not found!");
+                }
             }
-        }
-        if (uiCreated) {
-             attachQuantityChangeListeners();
-        } else {
-             console.error("[ADD-TO-CART] Failed to create quantity UI.");
+
+            if (uiCreatedByThisFunction) {
+                attachQuantityChangeListeners();
+            } else {
+                console.error("[ADD-TO-CART] Failed to create quantity UI in syncSizesWithPricingMatrix.");
+            }
         }
     }
 

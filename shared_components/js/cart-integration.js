@@ -218,6 +218,7 @@
 
   // Track initialization to prevent multiple instances
   window.cartIntegrationInitialized = window.cartIntegrationInitialized || false;
+  window.currentCaspioPricing = null; // Store data from Caspio event
 
   // Expose the initialization function to the global scope
   // This is critical for the Caspio page to be able to call it
@@ -228,7 +229,7 @@
       return;
     }
 
-    debugCart("INIT", "Cart integration initialization started");
+    debugCart("INIT", "Cart integration (legacy) initialization started");
     window.cartIntegrationInitialized = true;
 
     try {
@@ -257,7 +258,7 @@
 
       function attemptToAddButton() {
         try {
-          checkAndAddCartButton();
+          checkAndAddCartButton(); // This will add the traditional cart button if elements are found
         } catch (e) {
           debugCart("INIT-ERROR", "Error adding cart button:", e);
           retryCount++;
@@ -278,6 +279,87 @@
       debugCart("INIT-ERROR", "Fatal error in cart integration initialization:", error);
     }
   };
+
+
+  /**
+   * NEW: Initializes or updates cart integration components using data from Caspio.
+   * This function is intended to be called by dtg-adapter.js when 'caspioDtgDataReady' event occurs.
+   * @param {object} caspioEventData - The event.detail object from caspioDtgDataReady.
+   */
+  window.initCartIntegrationWithData = async function(caspioEventData) {
+    debugCart("INIT_WITH_DATA", "Initializing cart integration with Caspio data:", caspioEventData);
+    window.currentCaspioPricing = caspioEventData; // Store globally for getProductData and getPrice
+
+    try {
+        // 1. Ensure main cart UI elements (like Add to Cart button, View Cart link) are present.
+        //    We can call checkAndAddCartButton which is idempotent.
+        //    This function also handles adding the "View Cart" link.
+        checkAndAddCartButton();
+
+        // 2. Re-initialize/update size inputs based on caspioEventData.uniqueSizes
+        const sizeInputContainer = document.querySelector('#cart-button-container .size-input-grid') ||
+                                   document.querySelector('#cart-button-container div[style*="display: flex"][style*="flex-wrap: wrap"]'); // More robust selector
+
+        if (sizeInputContainer) {
+            debugCart("INIT_WITH_DATA", "Found size input container, proceeding to update/add size inputs.");
+            
+            // Clear existing loading/error messages within the size input area
+            const loadingMsg = sizeInputContainer.querySelector('div[style*="font-style: italic"]');
+            if (loadingMsg) loadingMsg.remove();
+            
+            const noSizesMsg = sizeInputContainer.querySelector('div[style*="No size information available"]');
+            if (noSizesMsg) noSizesMsg.remove();
+
+            let inventoryDetails = [];
+            if (caspioEventData.styleNumber && caspioEventData.color) {
+                 // Fetch live inventory for the given style and color
+                const inventoryResult = await fetchInventoryData(caspioEventData.styleNumber, caspioEventData.color);
+                if (inventoryResult && inventoryResult.inventory) {
+                    inventoryDetails = inventoryResult.inventory;
+                }
+            }
+            // The addSizeInputs function is idempotent (clears old inputs)
+            addSizeInputs(sizeInputContainer, caspioEventData.uniqueSizes || getFallbackSizes(), inventoryDetails);
+        } else {
+            debugCart("INIT_WITH_DATA_WARN", "Size input container not found. Sizes cannot be updated from Caspio data.");
+            // If the container isn't there, it implies addCartButton hasn't fully run or found its markers.
+            // This might be okay if the page structure is different and addCartButton handles it.
+        }
+
+        // 3. Update embellishment options if they differ (though DTG options are usually static)
+        const embType = caspioEventData.embellishmentType || detectEmbellishmentType(); // Prefer Caspio's type
+        const optionsContainer = document.getElementById('embellishment-options');
+        if (optionsContainer) {
+            const newOptionsSection = createEmbellishmentOptionsUI(embType);
+            optionsContainer.innerHTML = newOptionsSection.innerHTML; // Replace content
+            debugCart("INIT_WITH_DATA", "Embellishment options UI updated for type:", embType);
+        }
+
+
+        // 4. Ensure NWCACart is loaded (if not already)
+        if (!window.NWCACart && typeof window.loadCartScript === 'function') {
+            debugCart("INIT_WITH_DATA", "NWCACart not available, attempting to load it.");
+            const cartScriptLoaded = Array.from(document.scripts).some(script =>
+                script.src && (script.src.includes('/cart.js') || script.src.endsWith('cart.js')));
+            if (!cartScriptLoaded) {
+                window.loadCartScript();
+            }
+        }
+        
+        // 5. Synchronize carts if DirectCartAPI has items
+        await synchronizeCartSystems();
+
+
+        window.cartIntegrationInitialized = true; // Mark as initialized
+        debugCart("INIT_WITH_DATA", "Cart integration with Caspio data complete.");
+
+    } catch (error) {
+        debugCart("INIT_WITH_DATA_ERROR", "Error in initCartIntegrationWithData:", error);
+        // Display a fallback UI message via dtg-adapter's mechanism if needed
+        throw error; // Re-throw so dtg-adapter can catch and display fallback
+    }
+  };
+
 
   function checkAndAddCartButton() {
     debugCart("CHECK", "Running checkAndAddCartButton");
@@ -1437,104 +1519,102 @@ async function handleAddToCart() {
 
   function getProductData() {
     try {
-      debugCart("PRODUCT", "Getting product data from form");
+        debugCart("PRODUCT", "Getting product data...");
 
-      // Get URL parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      const styleNumber = urlParams.get('StyleNumber');
-      const colorCode = urlParams.get('COLOR'); // This is usually the Color Name from product page
+        let styleNumber, colorName, catalogColor, embellishmentType, imageUrl;
 
-      // Validate required parameters
-      if (!styleNumber) {
-        console.error("Missing style number in URL parameters");
-        throw new Error('Missing style number. Please ensure you are on a valid product page.');
-      }
+        if (window.currentCaspioPricing) {
+            debugCart("PRODUCT", "Using data from currentCaspioPricing");
+            const caspioData = window.currentCaspioPricing;
+            styleNumber = caspioData.styleNumber;
+            colorName = caspioData.color; // This is the display color name
+            catalogColor = caspioData.color; // Assuming Caspio 'color' is suitable for catalog/inventory lookup. Adjust if a specific 'colorCode' is provided by Caspio.
+            embellishmentType = caspioData.embellishmentType || detectEmbellishmentType(); // Prefer Caspio's, fallback to detection
+            // Image URL might not be in caspioEventData, so we might still need to extract it or get it from SanMar API if product page context is available
+            imageUrl = extractProductImageUrl(); // Keep trying to extract from page, or it could be added to caspioEventData
+            
+            debugCart("PRODUCT", `Data from Caspio: Style: ${styleNumber}, Color: ${colorName}, EmbType: ${embellishmentType}`);
+        } else {
+            debugCart("PRODUCT", "Falling back to URL parameters and page detection (legacy mode)");
+            const urlParams = new URLSearchParams(window.location.search);
+            styleNumber = urlParams.get('StyleNumber');
+            const colorFromUrl = urlParams.get('COLOR');
 
-      if (!colorCode) { // colorCode here is actually the color name from the URL
-        console.error("Missing color name in URL parameters");
-        throw new Error('Missing color information. Please ensure you are on a valid product page.');
-      }
-
-       // Treat the COLOR param directly as the colorName
-       const colorName = colorCode;
-       debugCart("PRODUCT", `Using Color Name from URL: "${colorName}"`);
-
-       // We might still need the Catalog Color code if the API needs it for inventory
-       // Let's assume it might be stored globally by product.html script (needs confirmation)
-       const catalogColor = window.selectedCatalogColor || colorName; // Fallback to name if global var not set
-       debugCart("PRODUCT", `Using Catalog Color Code: "${catalogColor}" (may fallback to name)`);
-
-
-      debugCart("PRODUCT", `Processing product: Style ${styleNumber}, Color ${colorName}`);
-
-      // Auto-detect embellishment type based on DataPage ID or title
-      const embellishmentType = detectEmbellishmentType();
-      debugCart("PRODUCT", `Detected embellishment type: ${embellishmentType}`);
-
-      // Get embellishment options from UI inputs
-      const embOptions = getEmbellishmentOptionsFromUI(embellishmentType);
-      debugCart("PRODUCT", "Embellishment options:", embOptions);
-
-      // Try to extract product image URL
-      const productImage = extractProductImageUrl();
-      debugCart("PRODUCT", "Product image URL:", productImage || "Not found");
-
-      // Get sizes and quantities
-      const sizes = [];
-      const inputs = document.querySelectorAll('.size-quantity-input');
-
-      if (!inputs || inputs.length === 0) {
-        console.warn("No size inputs found on page. This might happen if inventory fetch failed.");
-        // Allow adding even without inputs if fallback pricing is acceptable
-        // throw new Error('Size selection inputs not found. Please refresh the page and try again.');
-      } else {
-         debugCart("PRODUCT", `Found ${inputs.length} size inputs`);
-         inputs.forEach(input => {
-            const size = input.dataset.size;
-            const quantity = parseInt(input.value) || 0;
-
-            if (quantity > 0) {
-                console.log(`Processing size ${size} with quantity ${quantity}`);
-                const price = getPrice(size, quantity); // Get price *per unit* for this size/qty tier
-                debugCart("PRODUCT", `Calculated price for size ${size}: $${price}`);
-
-                sizes.push({
-                size: size,
-                quantity: quantity,
-                unitPrice: price,
-                warehouseSource: 'Pricing Matrix' // Indicate price came from matrix
-                });
+            if (!styleNumber) {
+                console.error("Missing style number in URL parameters");
+                throw new Error('Missing style number. Please ensure you are on a valid product page.');
             }
-         });
-      }
+            if (!colorFromUrl) {
+                console.error("Missing color name in URL parameters");
+                throw new Error('Missing color information. Please ensure you are on a valid product page.');
+            }
+            colorName = colorFromUrl;
+            catalogColor = window.selectedCatalogColor || colorName;
+            embellishmentType = detectEmbellishmentType();
+            imageUrl = extractProductImageUrl();
+        }
 
+        if (!styleNumber || !colorName) {
+            throw new Error('Critical product information (style or color) is missing.');
+        }
 
-      if (sizes.length === 0) {
-        console.error("No sizes selected with quantity > 0");
-        throw new Error('Please select at least one size and quantity.');
-      }
+        debugCart("PRODUCT", `Processing product: Style ${styleNumber}, Color ${colorName}`);
+        debugCart("PRODUCT", `Using embellishment type: ${embellishmentType}`);
 
-      debugCart("PRODUCT", `Added ${sizes.length} sizes to cart`);
+        const embOptions = getEmbellishmentOptionsFromUI(embellishmentType);
+        debugCart("PRODUCT", "Embellishment options:", embOptions);
 
-      // Construct and return the product data object
-      const productData = {
-        styleNumber: styleNumber,
-        color: colorName, // Use the name from URL
-        colorCode: catalogColor, // Use the catalog code (or name fallback)
-        embellishmentType: embellishmentType,
-        embellishmentOptions: embOptions,
-        sizes: sizes,
-        imageUrl: productImage
-      };
+        const sizes = [];
+        const inputs = document.querySelectorAll('.size-quantity-input');
 
-      debugCart("PRODUCT", "Final product data:", productData);
-      return productData;
+        if (!inputs || inputs.length === 0) {
+            console.warn("No size inputs found on page. This might happen if inventory fetch failed or Caspio data didn't populate them.");
+        } else {
+            debugCart("PRODUCT", `Found ${inputs.length} size inputs`);
+            inputs.forEach(input => {
+                const size = input.dataset.size;
+                const quantity = parseInt(input.value) || 0;
+
+                if (quantity > 0) {
+                    // Pass the total quantity of this specific item being added for accurate tier lookup
+                    const price = getPrice(size, quantity, styleNumber, colorName, embellishmentType);
+                    debugCart("PRODUCT", `Calculated price for size ${size}, qty ${quantity}: $${price}`);
+                    sizes.push({
+                        size: size,
+                        quantity: quantity,
+                        unitPrice: price,
+                        // warehouseSource can be updated if Caspio provides it, or defaults to 'Pricing Matrix'
+                        warehouseSource: window.currentCaspioPricing ? 'Caspio DTG Matrix' : 'Pricing Matrix'
+                    });
+                }
+            });
+        }
+
+        if (sizes.length === 0) {
+            console.error("No sizes selected with quantity > 0");
+            throw new Error('Please select at least one size and quantity.');
+        }
+
+        debugCart("PRODUCT", `Added ${sizes.length} sizes to cart`);
+
+        const productData = {
+            styleNumber: styleNumber,
+            color: colorName,
+            colorCode: catalogColor, // This should be the code SanMar API/Inventory uses
+            embellishmentType: embellishmentType,
+            embellishmentOptions: embOptions,
+            sizes: sizes,
+            imageUrl: imageUrl
+        };
+
+        debugCart("PRODUCT", "Final product data:", productData);
+        return productData;
 
     } catch (error) {
-      debugCart("PRODUCT-ERROR", "Error in getProductData:", error);
-      throw error; // Re-throw to be handled by the caller
+        debugCart("PRODUCT-ERROR", "Error in getProductData:", error);
+        throw error;
     }
-  }
+}
 
 
   // Extract product image URL from the page
@@ -1834,212 +1914,172 @@ async function handleAddToCart() {
   }
 
 
- function getPrice(size, quantity) {
+ function getPrice(size, quantity, styleNumber, colorName, embellishmentType) { // Added more context params
     try {
-      let embType = detectEmbellishmentType();
-      // Map detected type to the expected variable prefix (handle case variations)
-       let prefix = embType.toLowerCase().replace(/[^a-z0-9]/g, ''); // Sanitize prefix: lowercase, remove non-alphanumeric
-       debugCart("PRICE-DEBUG", `Raw detected type: ${embType}, Sanitized prefix: ${prefix}`);
+        // Attempt to use Caspio-provided pricing first
+        if (window.currentCaspioPricing &&
+            window.currentCaspioPricing.styleNumber === styleNumber &&
+            window.currentCaspioPricing.color === colorName && // Ensure it's for the correct color
+            window.currentCaspioPricing.embellishmentType === embellishmentType) {
 
-       // Explicit mapping based on known DataPage wrapper IDs if available
-       if (document.getElementById('dp5-wrapper')) { prefix = 'dp5'; }
-       else if (document.getElementById('dp7-wrapper')) { prefix = 'dp7'; } // cap-emb
-       else if (document.getElementById('dp6-wrapper')) { prefix = 'dp6'; } // dtg
-       else if (document.getElementById('dp8-wrapper')) { prefix = 'dp8'; } // screenprint
-       // Add mapping for dtf if needed: else if (document.getElementById('dtf-wrapper')) { prefix = 'dtX'; }
+            const caspioData = window.currentCaspioPricing;
+            debugCart("PRICE", `Attempting to use Caspio pricing for Size: ${size}, Quantity: ${quantity}`);
 
-      let headers, prices, tiers;
-
-      debugCart("PRICE", `Getting price for Size: ${size}, Quantity: ${quantity}, Embellishment: ${embType} (using prefix: ${prefix})`);
-
-      // Try specific prefix first, then generic 'dp5' only if prefix wasn't already 'dp5'
-      const possiblePrefixes = [prefix];
-      if (prefix !== 'dp5') {
-          possiblePrefixes.push('dp5'); // Add dp5 as a fallback if primary prefix fails
-      }
-
-      for (const pfx of possiblePrefixes) {
-           debugCart("PRICE-DEBUG", `Trying prefix: ${pfx}`);
-           let foundHeaders = false, foundPrices = false, foundTiers = false;
-
-           if (!headers && window[`${pfx}GroupedHeaders`]) {
-                headers = window[`${pfx}GroupedHeaders`];
-                foundHeaders = true;
-                debugCart("PRICE", `Found headers source: ${pfx}GroupedHeaders`);
-           } else if (!headers && window[`${pfx}Headers`]) { // Fallback to non-grouped
-                headers = window[`${pfx}Headers`];
-                 foundHeaders = true;
-                debugCart("PRICE", `Found headers source: ${pfx}Headers`);
-           }
-
-           if (!prices && window[`${pfx}GroupedPrices`]) {
-                prices = window[`${pfx}GroupedPrices`];
-                 foundPrices = true;
-                debugCart("PRICE", `Found prices source: ${pfx}GroupedPrices`);
-           } else if (!prices && window[`${pfx}Prices`]) { // Fallback to non-grouped
-                prices = window[`${pfx}Prices`];
-                 foundPrices = true;
-                debugCart("PRICE", `Found prices source: ${pfx}Prices`);
-            }
-
-            if (!tiers && window[`${pfx}ApiTierData`]) {
-                 tiers = window[`${pfx}ApiTierData`];
-                  foundTiers = true;
-                 debugCart("PRICE", `Found tiers source: ${pfx}ApiTierData`);
-            } else if (!tiers && window[`${pfx}TierData`]) { // Fallback to non-Api
-                 tiers = window[`${pfx}TierData`];
-                  foundTiers = true;
-                 debugCart("PRICE", `Found tiers source: ${pfx}TierData`);
-            }
-            // If we found all components with this prefix, stop searching
-            if (foundHeaders && foundPrices && foundTiers) {
-                 debugCart("PRICE-DEBUG", `Found all components with prefix: ${pfx}`);
-                 break;
+            if (!caspioData.prices || typeof caspioData.prices !== 'object' ||
+                !caspioData.headers || !Array.isArray(caspioData.headers) ||
+                !caspioData.tierData || typeof caspioData.tierData !== 'object') {
+                debugCart("PRICE-WARN", "Caspio pricing data is incomplete or malformed. Falling back.", caspioData);
             } else {
-                 debugCart("PRICE-DEBUG", `Did not find all components with prefix: ${pfx} (H:${foundHeaders}, P:${foundPrices}, T:${foundTiers})`);
-                 // Reset components if we didn't find all three with this prefix, to try the next prefix cleanly
-                 if (!foundHeaders) headers = null;
-                 if (!foundPrices) prices = null;
-                 if (!foundTiers) tiers = null;
-            }
-      }
+                // Find the correct size column (header) from Caspio's headers
+                // Caspio headers are the size names like "S", "M", "L", "XL", "2XL", etc.
+                // Caspio prices object has keys like "S", "M", "L", etc., and values are objects with tier keys.
+                // e.g., caspioData.prices.S = { "T1": "10.00", "T2": "9.00" }
+                // caspioData.tierData = { "T1": {MinQuantity: 1, MaxQuantity: 11}, "T2": {MinQuantity:12, MaxQuantity:23} }
 
+                const upperSize = size.toUpperCase();
+                let caspioSizeKey = null;
 
-      // --- Robustness Checks ---
-      if (!headers || !prices || !tiers) {
-        debugCart("PRICE-ERROR", `Missing pricing data components for ${embType} (tried prefixes: ${possiblePrefixes.join(', ')}):`, {
-          headers: !!headers,
-          prices: !!prices,
-          tiers: !!tiers
-        });
-        const missingComponents = [];
-        if (!headers) missingComponents.push('headers');
-        if (!prices) missingComponents.push('prices');
-        if (!tiers) missingComponents.push('tiers');
-        debugCart("PRICE-ERROR", `Missing pricing components: ${missingComponents.join(', ')}`);
-        const dataPageId = document.querySelector('[id^="cb_div_dp"]')?.id || 'unknown_datapage_id';
-        debugCart("PRICE-ERROR", `DataPage ID (approx): ${dataPageId}`);
-        debugCart("PRICE-ERROR", "Global pricing variables checked:", possiblePrefixes.map(pfx => `${pfx}GroupedHeaders`).join(', '), 'etc.');
-
-        return getFallbackPrice(size, quantity, embType);
-      }
-
-      // Find size group (case-insensitive comparison)
-        let sizeGroup = null;
-        const upperSize = size.toUpperCase(); // Convert input size to uppercase once
-
-         // Ensure headers is an array
-         if (!Array.isArray(headers)) {
-             debugCart("PRICE-ERROR", "Headers data is not an array:", headers);
-             return getFallbackPrice(size, quantity, embType);
-         }
-
-
-        for (const header of headers) {
-             if (typeof header !== 'string') {
-                  debugCart("PRICE-WARN", "Non-string header found, skipping:", header);
-                  continue; // Skip non-string headers
-             }
-            const upperHeader = header.toUpperCase(); // Convert header to uppercase
-
-            // Direct match (case-insensitive)
-            if (upperHeader === upperSize) {
-                sizeGroup = header; // Use original header case for lookup
-                 debugCart("PRICE", `Found direct size match for ${size}: ${sizeGroup}`);
-                 break;
-            }
-
-            // Range match (e.g., "S-XL")
-            if (upperHeader.includes('-')) {
-                const parts = header.split('-'); // Use original case header for splitting
-                if (parts.length === 2) { // Ensure it's a simple range like "S-XL"
-                    const rangeStart = parts[0].trim().toUpperCase();
-                    const rangeEnd = parts[1].trim().toUpperCase();
-                    // Basic alphabetical check - might need refinement for non-standard sizes
-                    if (upperSize >= rangeStart && upperSize <= rangeEnd) {
-                        sizeGroup = header;
-                        debugCart("PRICE", `Found size range match for ${size}: ${sizeGroup}`);
+                for (const header of caspioData.headers) {
+                    if (typeof header === 'string' && header.toUpperCase() === upperSize) {
+                        caspioSizeKey = header; // Use original case from Caspio headers
                         break;
-                     }
-                 }
+                    }
+                }
+                
+                if (!caspioSizeKey || !caspioData.prices[caspioSizeKey]) {
+                    debugCart("PRICE-WARN", `Size key "${caspioSizeKey || size}" not found in Caspio prices object or headers. Falling back.`);
+                } else {
+                    const sizePriceProfile = caspioData.prices[caspioSizeKey]; // e.g., { "T1": "10.00", "T2": "9.00" }
+                    let applicableTierKey = null;
+                    let highestMinQty = -1;
+
+                    for (const tierKey in caspioData.tierData) {
+                        const tierInfo = caspioData.tierData[tierKey];
+                        if (tierInfo && typeof tierInfo.MinQuantity !== 'undefined') {
+                            const minQty = parseInt(tierInfo.MinQuantity);
+                             // Check if this tier exists in the price profile for this size
+                            if (sizePriceProfile.hasOwnProperty(tierKey) && quantity >= minQty && minQty > highestMinQty) {
+                                applicableTierKey = tierKey;
+                                highestMinQty = minQty;
+                            }
+                        }
+                    }
+
+                    if (applicableTierKey && sizePriceProfile[applicableTierKey]) {
+                        const priceStr = sizePriceProfile[applicableTierKey];
+                        const price = parseFloat(priceStr);
+                        if (!isNaN(price) && price > 0) {
+                            debugCart("PRICE", `Using Caspio price for ${size}, tier ${applicableTierKey}: $${price}`);
+                            return price;
+                        } else {
+                            debugCart("PRICE-WARN", `Invalid Caspio price string "${priceStr}" for size ${size}, tier ${applicableTierKey}. Falling back.`);
+                        }
+                    } else {
+                        debugCart("PRICE-WARN", `No applicable Caspio tier found for quantity ${quantity} for size ${size}. Falling back.`);
+                    }
+                }
             }
-         }
+        } else {
+            debugCart("PRICE", "currentCaspioPricing not available or not matching current item. Using legacy pricing logic.");
+        }
+
+        // Fallback to legacy pricing logic (dp5, dp6, etc. global variables)
+        let embType = embellishmentType || detectEmbellishmentType(); // Use provided or detect
+        let prefix = embType.toLowerCase().replace(/[^a-z0-9]/g, '');
+        debugCart("PRICE-DEBUG", `Legacy: Raw detected type: ${embType}, Sanitized prefix: ${prefix}`);
+
+        if (document.getElementById('dp5-wrapper')) { prefix = 'dp5'; }
+        else if (document.getElementById('dp7-wrapper')) { prefix = 'dp7'; }
+        else if (document.getElementById('dp6-wrapper')) { prefix = 'dp6'; }
+        else if (document.getElementById('dp8-wrapper')) { prefix = 'dp8'; }
+
+        let headers, prices, tiers;
+        debugCart("PRICE", `Legacy: Getting price for Size: ${size}, Quantity: ${quantity}, Embellishment: ${embType} (using prefix: ${prefix})`);
+
+        const possiblePrefixes = [prefix];
+        if (prefix !== 'dp5' && !(window.currentCaspioPricing && window.currentCaspioPricing.embellishmentType === 'dtg')) { // Avoid dp5 fallback if it's DTG and Caspio data was present
+            possiblePrefixes.push('dp5');
+        }
 
 
-      if (!sizeGroup) {
-        debugCart("PRICE-ERROR", `No size group found for size "${size}" in headers:`, headers);
-        return getFallbackPrice(size, quantity, embType);
-      }
+        for (const pfx of possiblePrefixes) {
+            debugCart("PRICE-DEBUG", `Legacy: Trying prefix: ${pfx}`);
+            let foundHeaders = false, foundPrices = false, foundTiers = false;
 
-      // Get price profile using the found sizeGroup key (case matters for object keys)
-      // Ensure prices is an object
-      if (typeof prices !== 'object' || prices === null) {
-            debugCart("PRICE-ERROR", "Prices data is not a valid object:", prices);
-            return getFallbackPrice(size, quantity, embType);
-      }
-      const profile = prices[sizeGroup];
-      if (!profile) {
-        debugCart("PRICE-ERROR", `No price profile found for size group "${sizeGroup}"`);
-        return getFallbackPrice(size, quantity, embType);
-      }
+            if (!headers && window[`${pfx}GroupedHeaders`]) { headers = window[`${pfx}GroupedHeaders`]; foundHeaders = true; }
+            else if (!headers && window[`${pfx}Headers`]) { headers = window[`${pfx}Headers`]; foundHeaders = true; }
 
-      // Find tier
-      let tier = null;
-      let highestMin = -1;
+            if (!prices && window[`${pfx}GroupedPrices`]) { prices = window[`${pfx}GroupedPrices`]; foundPrices = true; }
+            else if (!prices && window[`${pfx}Prices`]) { prices = window[`${pfx}Prices`]; foundPrices = true; }
 
-      // Ensure tiers is an object before iterating
-       if (typeof tiers !== 'object' || tiers === null) {
-           debugCart("PRICE-ERROR", "Tiers data is not a valid object:", tiers);
-           return getFallbackPrice(size, quantity, embType);
-       }
-       // Ensure profile is an object before iterating tier labels
-        if (typeof profile !== 'object' || profile === null) {
-            debugCart("PRICE-ERROR", `Price profile for size group "${sizeGroup}" is not a valid object:`, profile);
+            if (!tiers && window[`${pfx}ApiTierData`]) { tiers = window[`${pfx}ApiTierData`]; foundTiers = true; }
+            else if (!tiers && window[`${pfx}TierData`]) { tiers = window[`${pfx}TierData`]; foundTiers = true; }
+            
+            if (foundHeaders && foundPrices && foundTiers) { debugCart("PRICE-DEBUG", `Legacy: Found all components with prefix: ${pfx}`); break; }
+            else {
+                if (!foundHeaders) headers = null;
+                if (!foundPrices) prices = null;
+                if (!foundTiers) tiers = null;
+            }
+        }
+
+        if (!headers || !prices || !tiers) {
+            debugCart("PRICE-ERROR", `Legacy: Missing pricing data components for ${embType}.`);
             return getFallbackPrice(size, quantity, embType);
         }
 
-      for (const tierLabel in tiers) {
-         // Check if the tier exists in the price profile for this sizeGroup
-         if (!profile.hasOwnProperty(tierLabel)) {
-              debugCart("PRICE-WARN", `Tier label "${tierLabel}" not found in price profile for size group "${sizeGroup}". Skipping.`);
-              continue; // Skip if this tier doesn't apply to this size group
-         }
+        let sizeGroup = null;
+        const upperSize = size.toUpperCase();
+        if (!Array.isArray(headers)) { return getFallbackPrice(size, quantity, embType); }
 
-        const tierInfo = tiers[tierLabel];
-         // Check if tierInfo is valid and has MinQuantity
-         if (typeof tierInfo === 'object' && tierInfo !== null && typeof tierInfo.MinQuantity !== 'undefined') {
-             const minQty = parseInt(tierInfo.MinQuantity);
-             if (!isNaN(minQty) && quantity >= minQty && minQty > highestMin) {
-                 tier = tierLabel;
-                 highestMin = minQty;
-             }
-         } else {
-              debugCart("PRICE-WARN", `Invalid tier info for label "${tierLabel}":`, tierInfo);
-         }
-      }
+        for (const header of headers) {
+            if (typeof header !== 'string') continue;
+            const upperHeader = header.toUpperCase();
+            if (upperHeader === upperSize) { sizeGroup = header; break; }
+            if (upperHeader.includes('-')) {
+                const parts = header.split('-');
+                if (parts.length === 2) {
+                    const rangeStart = parts[0].trim().toUpperCase();
+                    const rangeEnd = parts[1].trim().toUpperCase();
+                    if (upperSize >= rangeStart && upperSize <= rangeEnd) { sizeGroup = header; break; }
+                }
+            }
+        }
 
+        if (!sizeGroup) { return getFallbackPrice(size, quantity, embType); }
+        if (typeof prices !== 'object' || prices === null) { return getFallbackPrice(size, quantity, embType); }
+        const profile = prices[sizeGroup];
+        if (!profile || typeof profile !== 'object') { return getFallbackPrice(size, quantity, embType); }
 
-      if (!tier) {
-        debugCart("PRICE-ERROR", `No pricing tier found for quantity ${quantity}. Tiers checked:`, tiers);
-        return getFallbackPrice(size, quantity, embType);
-      }
+        let tierKey = null;
+        let highestMin = -1;
+        if (typeof tiers !== 'object' || tiers === null) { return getFallbackPrice(size, quantity, embType); }
 
-      debugCart("PRICE", `Using tier ${tier} for quantity ${quantity}`);
+        for (const currentTierKey in tiers) {
+            if (!profile.hasOwnProperty(currentTierKey)) continue;
+            const tierInfo = tiers[currentTierKey];
+            if (tierInfo && typeof tierInfo.MinQuantity !== 'undefined') {
+                const minQty = parseInt(tierInfo.MinQuantity);
+                if (!isNaN(minQty) && quantity >= minQty && minQty > highestMin) {
+                    tierKey = currentTierKey;
+                    highestMin = minQty;
+                }
+            }
+        }
 
-      // Get price
-      const price = parseFloat(profile[tier]) || 0; // Ensure price is a number
-      if (price <= 0) {
-        debugCart("PRICE-WARN", `Invalid or zero price (${price}) found for size ${size}, tier ${tier}. Using fallback.`);
-         return getFallbackPrice(size, quantity, embType); // Use fallback for zero/invalid price
-      }
+        if (!tierKey) { return getFallbackPrice(size, quantity, embType); }
+        
+        const priceVal = parseFloat(profile[tierKey]);
+        if (isNaN(priceVal) || priceVal <= 0) { return getFallbackPrice(size, quantity, embType); }
 
-      debugCart("PRICE", `Final price for ${size}, quantity ${quantity}: $${price}`);
-      return price;
+        debugCart("PRICE", `Legacy: Final price for ${size}, quantity ${quantity}, tier ${tierKey}: $${priceVal}`);
+        return priceVal;
+
     } catch (error) {
-      debugCart("PRICE-ERROR", "Error finding price:", error);
-      return getFallbackPrice(size, quantity, 'unknown'); // Pass generic type on error
+        debugCart("PRICE-ERROR", "Error finding price:", error);
+        return getFallbackPrice(size, quantity, embellishmentType || 'unknown');
     }
-  }
+}
 
 
   // Fallback pricing function when pricing data is not available
@@ -2453,6 +2493,6 @@ async function handleAddToCart() {
 
   // Signal that the cart integration is available
   window.nwcaCartIntegrationLoaded = true;
-  debugCart("LOAD", "Cart integration script fully loaded and ready");
+  debugCart("LOAD", "Cart integration script fully loaded and ready. Version with Caspio Data Init.");
 
 })(); // End of IIFE

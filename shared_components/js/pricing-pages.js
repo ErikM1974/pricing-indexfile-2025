@@ -456,6 +456,21 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         container.innerHTML = '<div class="loading-message">Loading pricing data...</div>';
         container.classList.add('loading'); container.classList.remove('pricing-unavailable'); delete container.dataset.loadFailed;
         const params = new URLSearchParams(); params.append('StyleNumber', styleNumber); if (colorForCaspio) { params.append('COLOR', colorForCaspio); }
+
+        // ADD PRINT_LOCATION from parent dropdown or global state (set by dtg-adapter.js)
+        const embType = getEmbellishmentTypeFromUrl(); // Ensure this function is accessible or pass embType
+        if (embType === 'dtg') { // Only add for DTG pages, or make more generic if needed
+            const parentLocationDropdown = document.getElementById('parent-dtg-location-select');
+            if (parentLocationDropdown && parentLocationDropdown.value) {
+                params.append('PRINT_LOCATION', parentLocationDropdown.value);
+                console.log(`PricingPages: Adding PRINT_LOCATION from parent dropdown for initial load: ${parentLocationDropdown.value}`);
+            } else if (window.currentSelectedPrintLocation) {
+                // Fallback to global state if dropdown not found/empty, set by dtg-adapter.js
+                params.append('PRINT_LOCATION', window.currentSelectedPrintLocation);
+                console.log(`PricingPages: Adding PRINT_LOCATION from global state for initial load: ${window.currentSelectedPrintLocation}`);
+            }
+        }
+        
         const fullUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}/emb?${params.toString()}`;
         console.log(`PricingPages: Loading Caspio embed from URL: ${fullUrl}`);
         const script = document.createElement('script'); script.type = 'text/javascript'; script.src = fullUrl; script.async = true;

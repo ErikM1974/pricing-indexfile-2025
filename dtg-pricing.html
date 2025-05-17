@@ -604,10 +604,28 @@
                 <div class="pricing-content-interactive"> <!-- New wrapper for clarity -->
                     <!-- Hidden Caspio Matrix - Keep this for data source -->
                     <div id="pricing-calculator" class="pricing-calculator">
+<!-- CASPIO DATAPAGE DEPLOYMENT CODE GOES HERE -->
                         <div class="loading-message">Loading pricing data...</div>
                     </div>
                     
                     <!-- Custom Pricing Grid - Enhanced now that it's at the top -->
+
+                    <!-- Parent Print Location Selector -->
+                    <div id="parent-location-selector-container" style="margin-bottom: 20px; padding: 15px; background-color: var(--background-light, #f8f9fa); border-radius: var(--radius-sm); text-align:center;">
+                      <label for="parent-dtg-location-select" style="margin-right: 8px; font-weight: bold; font-size: 1em;">Select Print Location(s):</label>
+                      <select id="parent-dtg-location-select" style="padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 0.9em; min-width: 200px;">
+                        <option value="">-- Select Location --</option>
+                        <option value="LC">Left Chest Only</option>
+                        <option value="FF">Full Front Only</option>
+                        <option value="FB">Full Back Only</option>
+                        <option value="JF">Jumbo Front Only</option>
+                        <option value="JB">Jumbo Back Only</option>
+                        <option value="LC_FB">Left Chest + Full Back</option>
+                        <option value="FF_FB">Full Front + Full Back</option>
+                        <option value="JF_JB">Jumbo Front + Jumbo Back</option>
+                      </select>
+                    </div>
+                    
                     <div class="pricing-section">
                         <div class="pricing-header" style="margin-bottom: 20px;">
                             <!-- Enhanced header with more prominence -->
@@ -894,7 +912,10 @@
                     </div>
                     
                     <!-- Add to Cart Section - Enhanced UI -->
-                    <div class="add-to-cart-section">
+                    <div id="caspio-dtg-error-message" class="error-message" style="color: red; background-color: #fdd; border: 1px solid red; padding: 10px; margin-bottom: 15px; border-radius: var(--radius-sm); display: none;"></div>
+                    <div id="cart-fallback-ui" class="fallback-message" style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 10px; margin-bottom: 15px; border-radius: var(--radius-sm); display: none;"></div>
+
+                    <div class="add-to-cart-section" id="add-to-cart-section"> <!-- Added ID for easier selection -->
                         <h3 class="section-title" style="font-size: 1.3em; margin-top: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light);">Add to Cart</h3>
                         
                         <div class="size-grid-container" id="size-grid-container">

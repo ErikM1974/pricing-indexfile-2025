@@ -21,30 +21,39 @@
         
         // Listen for pricing data loaded event - This is the primary trigger for the pricing grid.
         window.addEventListener('pricingDataLoaded', function(event) {
-            console.log("[DP5-HELPER] 'pricingDataLoaded' event received.", event.detail);
+            console.log("********************************************************************************");
+            console.log("[DP5-HELPER] RAW 'pricingDataLoaded' EVENT DETECTED. Timestamp:", new Date().toISOString());
+            console.log("[DP5-HELPER] Event object:", event);
+            console.log("[DP5-HELPER] Event detail stringified:", JSON.stringify(event.detail));
+            console.log("********************************************************************************");
             
-            if (event.detail && event.detail.headers && event.detail.prices && event.detail.tierData) {
+            if (event.detail && event.detail.headers && event.detail.prices && (event.detail.tierData || event.detail.tiers)) {
+                console.log("[DP5-HELPER] Event passed primary validation (headers, prices, tierData/tiers exist). Event source might be:", event.detail.selectedLocationValue ? "dtg-adapter" : "pricing-matrix-capture/other");
                 const pricingDataFromEvent = {
                     headers: event.detail.headers,
                     prices: event.detail.prices,
-                    tiers: event.detail.tierData,
+                    tiers: event.detail.tierData || event.detail.tiers, // Normalize here
                     uniqueSizes: event.detail.uniqueSizes || [...new Set(event.detail.headers.filter(h => !h.includes('-') && !h.includes('/')))],
                     styleNumber: event.detail.styleNumber,
                     color: event.detail.color,
                     embellishmentType: event.detail.embellishmentType,
                     isFallback: event.detail.isFallback || false
                 };
-
-                if (!window.directFixApplied) {
-                    console.log("[DP5-HELPER] Pricing data is available from event. Updating custom pricing grid.");
+        
+                // **** ADD DEBUG LOG ****
+                console.log("[DP5-HELPER] Constructed pricingDataFromEvent:", JSON.stringify(pricingDataFromEvent));
+                // **** END DEBUG LOG ****
+        
+                // if (!window.directFixApplied) { // Temporarily remove this check to ensure adapter-driven updates are processed
+                    console.log("[DP5-HELPER] Pricing data is available from event. Updating custom pricing grid (directFixApplied check bypassed for testing).");
                     updateCustomPricingGrid(pricingDataFromEvent);
-                } else {
-                    console.log("[DP5-HELPER] Skipping custom pricing grid update (via 'pricingDataLoaded' event) as DIRECT-FIX already applied it.");
-                }
+                // } else {
+                //     console.log("[DP5-HELPER] Skipping custom pricing grid update (via 'pricingDataLoaded' event) as DIRECT-FIX already applied it.");
+                // }
             } else {
-                console.warn("[DP5-HELPER] 'pricingDataLoaded' event received, but event.detail is missing required pricing data. Grid will not be updated by this event.");
+                console.warn("[DP5-HELPER] 'pricingDataLoaded' event FAILED primary validation (missing headers, prices, or tierData/tiers). Event Detail:", JSON.stringify(event.detail));
             }
-            
+                    
             // Inventory data loading is still relevant here if style/color are present
             if (event.detail && event.detail.styleNumber && event.detail.color) {
                 loadInventoryData(event.detail.styleNumber, event.detail.color);
@@ -119,25 +128,43 @@
         console.log("[DP5-HELPER] updateCustomPricingGrid called with data:", pricingDataInput);
         let dataToUse = pricingDataInput;
 
+        // **** ADD DEBUG LOG ****
+        console.log("[DP5-HELPER] updateCustomPricingGrid - Initial pricingDataInput:", JSON.stringify(pricingDataInput));
+        console.log("[DP5-HELPER] updateCustomPricingGrid - Initial window.nwcaPricingData:", JSON.stringify(window.nwcaPricingData));
+        // **** END DEBUG LOG ****
+
         // Primary validation: Check if the passed data is usable
+        // Normalize tierData to tiers if present
+        if (dataToUse && dataToUse.tierData && !dataToUse.tiers) {
+            dataToUse.tiers = dataToUse.tierData;
+            // delete dataToUse.tierData; // Optionally remove the old key
+        }
+
         if (!dataToUse || !dataToUse.headers || !dataToUse.prices || !dataToUse.tiers) {
-            console.warn("[DP5-HELPER] updateCustomPricingGrid: Input pricingData is incomplete. Attempting to use global nwcaPricingData as fallback.");
+            console.warn("[DP5-HELPER] updateCustomPricingGrid: Input pricingData is incomplete (checked for .headers, .prices, .tiers). Attempting to use global nwcaPricingData as fallback.");
             dataToUse = window.nwcaPricingData; // Try global data
+            if (dataToUse && dataToUse.tierData && !dataToUse.tiers) { // Normalize global data too
+                dataToUse.tiers = dataToUse.tierData;
+                // delete dataToUse.tierData;
+            }
         }
 
         // Second validation: After potentially switching to global data, check again
         if (!dataToUse || !dataToUse.headers || !dataToUse.prices || !dataToUse.tiers) {
-            console.warn("[DP5-HELPER] updateCustomPricingGrid: Pricing data (passed or global) still not fully available or incomplete. Grid update deferred. This may resolve via 'pricingDataLoaded' event.");
-            // DO NOT recursively call updateCustomPricingGrid here to prevent infinite loops.
-            // The final setTimeout in initialize() is the last resort.
+            console.warn("[DP5-HELPER] updateCustomPricingGrid: Pricing data (passed or global) still not fully available or incomplete (checked for .headers, .prices, .tiers). Grid update deferred.");
             return;
         }
         
-        console.log("[DP5-HELPER] Using data for pricing grid. Headers:", dataToUse.headers);
+        console.log("[DP5-HELPER] Using data for pricing grid. Headers:", dataToUse.headers, "Tiers:", dataToUse.tiers); // Added Tiers to log
         
         if (!dataToUse.uniqueSizes || dataToUse.uniqueSizes.length === 0) {
-            dataToUse.uniqueSizes = [...new Set(dataToUse.headers.filter(h => !h.includes('-') && !h.includes('/')))];
-            console.log("[DP5-HELPER] Derived uniqueSizes for grid update:", dataToUse.uniqueSizes);
+            if (dataToUse.headers && Array.isArray(dataToUse.headers)) {
+                 dataToUse.uniqueSizes = [...new Set(dataToUse.headers.filter(h => h && typeof h === 'string' && !h.includes('-') && !h.includes('/')))];
+                 console.log("[DP5-HELPER] Derived uniqueSizes for grid update:", dataToUse.uniqueSizes);
+            } else {
+                console.warn("[DP5-HELPER] Cannot derive uniqueSizes, headers are missing or not an array.");
+                dataToUse.uniqueSizes = [];
+            }
         }
 
         const pricingGrid = document.getElementById('custom-pricing-grid');
@@ -275,24 +302,53 @@
     }
     
     function updateAddToCartSection(sizes) {
-        if (window.directFixApplied || window.addToCartInitialized) {
-            console.log("[DP5-HELPER] Skipping Add to Cart section update as it's already handled.");
+        // Only skip if the add to cart UI itself has ALREADY been initialized by this function or add-to-cart.js
+        // The directFixApplied flag is more about whether the pricing grid was from direct scrape vs. event.
+        if (window.addToCartInitialized) {
+            console.log("[DP5-HELPER] Skipping Add to Cart section update as it's already initialized (window.addToCartInitialized is true).");
             return;
         }
+        
+        const sizeQuantityGrid = document.getElementById('size-quantity-grid'); // Get it once
+
+        // We should also check if the elements it tries to create already exist, to prevent duplication if add-to-cart.js runs first.
+        if (sizeQuantityGrid && sizeQuantityGrid.querySelector('.size-quantity-row')) {
+            console.log("[DP5-HELPER] Skipping Add to Cart section update as UI elements seem to already exist.");
+            window.addToCartInitialized = true; // Mark as initialized if elements are found
+            return;
+        }
+
         if (!sizes || sizes.length === 0) {
             console.warn("[DP5-HELPER] No sizes provided to updateAddToCartSection. Add to Cart UI may not populate correctly.");
-            // Potentially clear or hide the add to cart section if sizes are truly unavailable.
-            // const sizeQuantityGrid = document.getElementById('size-quantity-grid');
-            // if (sizeQuantityGrid) sizeQuantityGrid.innerHTML = '<p>Size selection unavailable.</p>';
+            if (sizeQuantityGrid) sizeQuantityGrid.innerHTML = '<p>Size selection unavailable.</p>'; // Use the existing variable
             return;
         }
         console.log("[DP5-HELPER] Updating Add to Cart section with sizes:", sizes);
-        const sizeQuantityGrid = document.getElementById('size-quantity-grid');
-        if (!sizeQuantityGrid) {
-            console.warn("[DP5-HELPER] Size quantity grid not found for Add to Cart.");
+        
+        let sizeQuantityGridContainer = document.getElementById('size-quantity-grid-container');
+        if (!sizeQuantityGridContainer) {
+            console.warn("[DP5-HELPER] #size-quantity-grid-container not found. This is unexpected if add-to-cart.js or ProductQuantityUI is supposed to create it. Bailing from AddToCart UI update by dp5-helper.");
+            // If the main container isn't there, dp5-helper cannot reliably place its grid.
             return;
         }
-        sizeQuantityGrid.innerHTML = '';
+        sizeQuantityGridContainer.style.display = 'block'; // Or 'flex', ensure it's visible
+        console.log("[DP5-HELPER] Ensured #size-quantity-grid-container is visible.");
+
+        // Now ensure #size-quantity-grid exists within the container, or create it.
+        let currentSizeQuantityGrid = document.getElementById('size-quantity-grid'); // Renamed to avoid conflict with the parameter 'sizeQuantityGrid' from outer scope
+        if (!currentSizeQuantityGrid) {
+            console.warn("[DP5-HELPER] #size-quantity-grid not found within #size-quantity-grid-container. Creating it now.");
+            currentSizeQuantityGrid = document.createElement('div');
+            currentSizeQuantityGrid.id = 'size-quantity-grid';
+            sizeQuantityGridContainer.appendChild(currentSizeQuantityGrid);
+        }
+        
+        if (!currentSizeQuantityGrid) { // Should not happen if creation above worked
+            console.error("[DP5-HELPER] Critical error: #size-quantity-grid still not found after attempting creation. Cannot populate.");
+            return;
+        }
+
+        currentSizeQuantityGrid.innerHTML = ''; // Clear previous content
         sizes.forEach(size => {
             const row = document.createElement('div');
             row.className = 'size-quantity-row';
@@ -347,7 +403,8 @@
             row.appendChild(priceDisplay);
             sizeQuantityGrid.appendChild(row);
         });
-        console.log("[DP5-HELPER] Add to Cart section updated.");
+        console.log("[DP5-HELPER] Add to Cart section updated by dp5-helper.");
+        window.addToCartInitialized = true; // Mark that dp5-helper has done its job for add-to-cart UI
     }
     
     function addInventoryIndicator(priceCell, sizeGroup, inventoryData) {
@@ -652,6 +709,9 @@
         // Expose the new initColorSwatches that takes data
         initializeWithColorData: initColorSwatches,
         // Keep legacy for any direct calls if necessary, or for the fallback path
-        refreshColorSwatchesLegacy: initColorSwatchesLegacy
+        refreshColorSwatchesLegacy: initColorSwatchesLegacy,
+        testListenerReach: function(source, data) {
+            console.log(`[DP5-HELPER] testListenerReach CALLED BY: ${source}`, data);
+        }
     };
 })();
