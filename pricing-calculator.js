@@ -29,12 +29,32 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded.");
      */
     function calculatePricing(sizeQuantities, existingCartQuantity, pricingData) {
         console.log("[PRICING-CALC:CALC] Calculating pricing...");
-        console.log("[PRICING-CALC:INPUT] Size Quantities:", sizeQuantities);
+        console.log("[PRICING-CALC:INPUT] Size Quantities:", JSON.parse(JSON.stringify(sizeQuantities || {})));
         console.log("[PRICING-CALC:INPUT] Existing Cart Qty:", existingCartQuantity);
-        // console.log("[PRICING-CALC:INPUT] Pricing Data:", pricingData); // Can be very large
+        
+        // Detailed debugging for pricingData
+        console.log("[PRICING-CALC:DEBUG] Raw pricingData object received:", pricingData);
+        if (typeof pricingData === 'object' && pricingData !== null) {
+            console.log("[PRICING-CALC:DEBUG] pricingData is an object.");
+            console.log("[PRICING-CALC:DEBUG] Keys in pricingData:", Object.keys(pricingData));
+            console.log("[PRICING-CALC:DEBUG] pricingData.prices exists:", pricingData.hasOwnProperty('prices'));
+            console.log("[PRICING-CALC:DEBUG] pricingData.tierData exists:", pricingData.hasOwnProperty('tierData'));
+            if (pricingData.hasOwnProperty('prices')) {
+                console.log("[PRICING-CALC:DEBUG] typeof pricingData.prices:", typeof pricingData.prices);
+                console.log("[PRICING-CALC:DEBUG] pricingData.prices content (first few keys):", pricingData.prices ? JSON.stringify(Object.keys(pricingData.prices).slice(0,5)) : 'null/undefined');
+            }
+            if (pricingData.hasOwnProperty('tierData')) {
+                console.log("[PRICING-CALC:DEBUG] typeof pricingData.tierData:", typeof pricingData.tierData);
+                console.log("[PRICING-CALC:DEBUG] pricingData.tierData content (first few keys):", pricingData.tierData ? JSON.stringify(Object.keys(pricingData.tierData).slice(0,5)) : 'null/undefined');
+            }
+        } else {
+            console.log("[PRICING-CALC:DEBUG] pricingData is NOT a valid object or is null/undefined. Type:", typeof pricingData);
+        }
 
         if (!pricingData || !pricingData.prices || !pricingData.tierData) {
-            console.error("[PRICING-CALC:ERROR] Invalid or missing pricingData object.");
+            // Added embellishmentType to the error for more context
+            const embType = pricingData && pricingData.embellishmentType ? pricingData.embellishmentType : 'unknown';
+            console.error(`[PRICING-CALC:ERROR] Invalid or missing pricingData object, or missing 'prices'/'tierData' properties for embellishment type: ${embType}.`);
             return null;
         }
 

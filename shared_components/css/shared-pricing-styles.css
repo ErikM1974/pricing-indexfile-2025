@@ -1000,6 +1000,101 @@ h1 {
     color: var(--primary-dark);
 }
 #sticky-product-cart-summary .add-to-cart-button,
+
+/* ============================================= */
+/* == Screen Print Specific Pricing Options == */
+/* ============================================= */
+
+/* General container for a form group within screen print options */
+.screen-print-options .form-group {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--primary-light);
+}
+
+.screen-print-options .form-group:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0; /* Remove bottom margin for the last group */
+}
+
+.screen-print-options .form-group label.group-label { /* For a main label of a group like "Number of Colors" */
+    display: block;
+    font-weight: 600; /* Slightly bolder */
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-dark);
+    font-size: 1.05em;
+}
+
+/* Number of Colors Select Dropdown */
+#color-select-container { /* Assuming this ID for the container div */
+    /* Inherits .form-group styling if class is applied */
+}
+
+#color-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background-color: var(--white);
+    font-size: 1em;
+    color: var(--text-color);
+    box-sizing: border-box;
+    appearance: none; /* Basic reset for custom arrow later if needed */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23333'%3E%3Cpath d='M8 11.207l-4.646-4.647a.5.5 0 0 1 .708-.708L8 9.793l4.03-4.03a.5.5 0 0 1 .708.708L8 11.207z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    cursor: pointer;
+}
+
+#color-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(47, 102, 30, 0.2); /* primary-light with alpha */
+}
+
+/* Additional Logo Checkbox */
+#additional-logo-container { /* Assuming this ID for the container div for flex layout */
+    display: flex; /* For aligning checkbox and label */
+    align-items: center;
+    padding-top: var(--spacing-sm); /* Add some space if it's not the first element in a group */
+}
+
+#additional-logo-checkbox {
+    margin: 0 var(--spacing-sm) 0 0;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+    flex-shrink: 0; /* Prevent shrinking if label is long */
+}
+
+#additional-logo-container label[for="additional-logo-checkbox"] { /* More specific selector */
+    font-weight: normal;
+    color: var(--text-color);
+    cursor: pointer;
+    margin-bottom: 0; /* Override general label margins */
+    font-size: 0.95em;
+}
+
+/* Container for all screen print specific options within the interactive column */
+.product-interactive-column .screen-print-options {
+    background-color: var(--primary-light); /* Light green background for the options block */
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg); /* Space before the quantity matrix or cart summary */
+    border: 1px solid var(--primary-color); /* Subtle border */
+    box-shadow: var(--shadow-sm);
+}
+
+.product-interactive-column .screen-print-options h3.options-title { /* For a title like "Screen Print Options" */
+    margin-top: 0;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--primary-color);
+    color: var(--primary-dark);
+    font-size: 1.2em;
+}
 #sticky-product-cart-summary .view-cart-button {
     width: 100%;
     margin-top: var(--spacing-sm);

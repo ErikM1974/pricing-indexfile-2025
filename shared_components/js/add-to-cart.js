@@ -10,34 +10,34 @@
             const cartSystem = window.detectAvailableCartSystem ? window.detectAvailableCartSystem() : null;
             if (!cartSystem) {
                 console.warn("[ADD-TO-CART] No cart system available for cart content fetch");
-                return { embroideryItems: 0, totalItems: 0, items: [] };
+                return { itemsOfCurrentType: 0, totalItems: 0, items: [] };
             }
             const cartResult = await cartSystem.api.getCartItems();
             if (!cartResult || !cartResult.success || !Array.isArray(cartResult.items)) {
                 console.warn("[ADD-TO-CART] Failed to get cart items or no items returned");
-                return { embroideryItems: 0, totalItems: 0, items: [] };
+                return { itemsOfCurrentType: 0, totalItems: 0, items: [] };
             }
             const currentEmbType = detectEmbellishmentType();
-            let embroideryItemCount = 0;
+            let itemsOfCurrentTypeCount = 0;
             let totalItemCount = 0;
             cartResult.items.forEach(item => {
                 if (Array.isArray(item.sizes)) {
                     const itemQuantity = item.sizes.reduce((sum, size) => sum + (parseInt(size.quantity) || 0), 0);
                     totalItemCount += itemQuantity;
                     if (item.embellishmentType === currentEmbType) {
-                        embroideryItemCount += itemQuantity;
+                        itemsOfCurrentTypeCount += itemQuantity;
                     }
                 }
             });
-            console.log(`[ADD-TO-CART] Cart contains ${embroideryItemCount} items of type '${currentEmbType}' out of ${totalItemCount} total items`);
+            console.log(`[ADD-TO-CART] Cart contains ${itemsOfCurrentTypeCount} items of type '${currentEmbType}' out of ${totalItemCount} total items`);
             return {
-                embroideryItems: embroideryItemCount,
+                itemsOfCurrentType: itemsOfCurrentTypeCount,
                 totalItems: totalItemCount,
                 items: cartResult.items
             };
         } catch (error) {
             console.error("[ADD-TO-CART] Error fetching cart contents:", error);
-            return { embroideryItems: 0, totalItems: 0, items: [] };
+            return { itemsOfCurrentType: 0, totalItems: 0, items: [] };
         }
     }
 
@@ -49,10 +49,10 @@
         }
         updatingCartTotal = true;
         try {
-            console.log("[ADD-TO-CART] Updating cart total (Refactored v4 - Dynamic Pricing)");
-            window.updateCartTotal = updateCartTotal; 
+            console.log("[ADD-TO-CART] Updating cart total (Refactored v5 - Screen Print Integration)");
+            window.updateCartTotal = updateCartTotal;
             let quantityInputs = [];
-            const sizeQuantities = {}; 
+            const sizeQuantities = {};
             let newQuantityTotal = 0;
             try {
                 const useGrid = window.PricingPageUI?.determineLayoutPreference ? window.PricingPageUI.determineLayoutPreference() : false;
@@ -78,78 +78,89 @@
 
             if (!window.cartContents) {
                 console.log("[ADD-TO-CART] Cart contents not available, fetching...");
-                updatingCartTotal = false; 
+                updatingCartTotal = false;
                 fetchCartContents().then(contents => {
                     window.cartContents = contents;
-                    updateCartTotal(); 
+                    updateCartTotal();
                 }).catch(error => {
                     console.error("[ADD-TO-CART] Error fetching cart contents:", error);
-                    window.cartContents = { embroideryItems: 0, totalItems: 0, items: [] }; 
-                    updateCartTotal(); 
+                    window.cartContents = { itemsOfCurrentType: 0, totalItems: 0, items: [] };
+                    updateCartTotal();
                 });
-                return; 
+                return;
             }
 
             const currentEmbType = detectEmbellishmentType();
-            let existingEmbroideryItems = 0;
+            let existingItemsOfCurrentType = 0;
             if (window.NWCACart && typeof window.NWCACart.getCartItems === 'function') {
-                const activeCartItems = window.NWCACart.getCartItems('Active'); 
+                const activeCartItems = window.NWCACart.getCartItems('Active');
                 if (activeCartItems && Array.isArray(activeCartItems)) {
                     activeCartItems.forEach(item => {
                         if (item.ImprintType === currentEmbType && item.CartStatus === 'Active' && Array.isArray(item.sizes)) {
-                            existingEmbroideryItems += item.sizes.reduce((sum, size) => sum + (parseInt(size.Quantity) || 0), 0);
+                            existingItemsOfCurrentType += item.sizes.reduce((sum, size) => sum + (parseInt(size.Quantity) || 0), 0);
                         }
                     });
                 }
-                 console.log(`[ADD-TO-CART:DEBUG] Calculated existing ${currentEmbType} items directly from NWCACart: ${existingEmbroideryItems}. Active cart items found:`, activeCartItems);
+                 console.log(`[ADD-TO-CART:DEBUG] Calculated existing ${currentEmbType} items directly from NWCACart: ${existingItemsOfCurrentType}. Active cart items found:`, activeCartItems);
             } else {
                  console.warn("[ADD-TO-CART] NWCACart.getCartItems not available to calculate existing quantity.");
             }
             
-            const pricingData = window.nwcaPricingData;
-            if (!pricingData) {
-                console.error("[ADD-TO-CART] Pricing data (window.nwcaPricingData) not available. Cannot calculate prices.");
-                 const totalAmountDisplay = document.querySelector('.total-amount');
-                 if(totalAmountDisplay) totalAmountDisplay.textContent = 'Error: Pricing Unavailable';
+            let calculatedPricing;
+            const pricingDataForCalc = window.nwcaPricingData; // General pricing data
+
+            // For all embellishment types, including screen-print, use NWCAPricingCalculator
+            // with window.nwcaPricingData, which should be populated by the respective adapter/capture script.
+            if (!pricingDataForCalc) {
+                console.error(`[ADD-TO-CART] Pricing data (window.nwcaPricingData) not available for ${currentEmbType}. Cannot calculate prices.`);
+                const totalAmountDisplay = document.querySelector('.total-amount');
+                if(totalAmountDisplay) totalAmountDisplay.textContent = 'Error: Pricing Unavailable';
                 updatingCartTotal = false;
                 return;
             }
-
             if (!window.NWCAPricingCalculator || typeof window.NWCAPricingCalculator.calculatePricing !== 'function') {
-                 console.error("[ADD-TO-CART] NWCAPricingCalculator is not available!");
-                 updatingCartTotal = false;
-                 return;
+                console.error("[ADD-TO-CART] NWCAPricingCalculator is not available!");
+                updatingCartTotal = false;
+                return;
             }
-            console.log("[ADD-TO-CART] Data for Pricing Calculator:", {
-                sizeQuantities: JSON.parse(JSON.stringify(sizeQuantities)), 
-                existingCartQuantity: existingEmbroideryItems, 
-                pricingDataAvailable: !!pricingData
+            
+            console.log(`[ADD-TO-CART] Using NWCAPricingCalculator for ${currentEmbType}. Data:`, {
+                sizeQuantities: JSON.parse(JSON.stringify(sizeQuantities)),
+                existingCartQuantity: existingItemsOfCurrentType,
+                pricingData: JSON.parse(JSON.stringify(pricingDataForCalc)) // Log the actual pricing data being used
             });
             
-            const calculatedPricing = window.NWCAPricingCalculator.calculatePricing(
+            calculatedPricing = window.NWCAPricingCalculator.calculatePricing(
                 sizeQuantities,
-                existingEmbroideryItems, 
-                pricingData
+                existingItemsOfCurrentType,
+                pricingDataForCalc // This is window.nwcaPricingData
             );
-            console.log("[ADD-TO-CART] Full calculatedPricing result:", JSON.parse(JSON.stringify(calculatedPricing || {})));
+
+            // More direct logging of the calculatedPricing object itself
+            console.log(`[ADD-TO-CART] Direct calculatedPricing object for ${currentEmbType}:`, calculatedPricing);
             
-            if (!calculatedPricing) {
-                console.error("[ADD-TO-CART] Pricing calculation failed.");
-                 const totalAmountDisplay = document.querySelector('.total-amount');
-                 if(totalAmountDisplay) totalAmountDisplay.textContent = 'Error: Calculation Failed';
+            if (!calculatedPricing || typeof calculatedPricing !== 'object' || Object.keys(calculatedPricing).length === 0) {
+                console.error("[ADD-TO-CART] Pricing calculation failed or returned non-object/empty object. Value:", calculatedPricing);
+                const totalAmountDisplay = document.querySelector('.total-amount');
+                if (totalAmountDisplay) {
+                    totalAmountDisplay.textContent = 'Error: Calc Failed'; // Shorter error for UI
+                    totalAmountDisplay.style.color = 'red'; // Make error more visible
+                }
                 updatingCartTotal = false;
                 return;
             }
+            // If we reach here, calculatedPricing is a valid, non-empty object.
+            console.log(`[ADD-TO-CART] Pricing calculation successful for ${currentEmbType}. Proceeding to update UI.`);
 
             window.cartItemData = {
-                ...calculatedPricing,
-                cartQuantity: existingEmbroideryItems,
-                totalQuantity: newQuantityTotal, 
-                prospectiveTotal: calculatedPricing.combinedQuantity 
+                ...calculatedPricing, 
+                cartQuantity: existingItemsOfCurrentType, 
+                totalQuantity: newQuantityTotal,
+                prospectiveTotal: calculatedPricing.combinedQuantity
             };
             console.log("[ADD-TO-CART] Prospective total calculation:", {
                 new: newQuantityTotal,
-                existing: existingEmbroideryItems,
+                existing: existingItemsOfCurrentType,
                 combined: calculatedPricing.combinedQuantity,
                 tier: calculatedPricing.tierKey,
                 ltmApplies: calculatedPricing.ltmFeeApplies
@@ -161,21 +172,21 @@
                 if (calculatedPricing.ltmFeeApplies) {
                     const ltmText = ltmFeeNotice.querySelector('.ltm-text');
                     if (ltmText) {
-                         const ltmQuantityNeeded = Math.max(0, 24 - calculatedPricing.combinedQuantity);
+                         const ltmQuantityNeeded = Math.max(0, (window.LTM_MINIMUM_QUANTITY || 24) - calculatedPricing.combinedQuantity); 
                          ltmText.innerHTML = `
                             <div style="display:flex;align-items:center;margin-bottom:5px;">
                                 <span style="font-size:1.3em;margin-right:8px;">⚠️</span>
                                 <span style="font-size:1.1em;font-weight:bold;">Less Than Minimum Fee</span>
                             </div>
                             <div style="margin-bottom:5px;">
-                                <div>Total LTM Fee: <span style="color:#663c00;font-weight:bold;font-size:1.1em;">$${calculatedPricing.ltmFeeTotal.toFixed(2)}</span></div>
-                                <div>Per Item: <span style="color:#663c00;font-weight:bold;">$${calculatedPricing.ltmFeePerItem.toFixed(2)}</span> × ${calculatedPricing.combinedQuantity} items</div>
+                                <div>Total LTM Fee: <span style="color:#663c00;font-weight:bold;font-size:1.1em;">$${(calculatedPricing.ltmFeeTotal || 0).toFixed(2)}</span></div>
+                                <div>Per Item: <span style="color:#663c00;font-weight:bold;">$${(calculatedPricing.ltmFeePerItem || 0).toFixed(2)}</span> × ${calculatedPricing.combinedQuantity} items</div>
                             </div>
                             ${ltmQuantityNeeded > 0 ? `<div style="font-size:0.9em;font-style:italic;margin-top:5px;padding-top:5px;border-top:1px dashed #ffc107;">
-                                Add ${ltmQuantityNeeded} more items to reach 24 pieces and eliminate this fee
+                                Add ${ltmQuantityNeeded} more items to reach ${(window.LTM_MINIMUM_QUANTITY || 24)} pieces and eliminate this fee
                             </div>` : ''}
-                            ${existingEmbroideryItems > 0 ? `<div style="font-size:0.9em;background-color:#e8f4ff;padding:5px;margin-top:5px;border-radius:4px;border-left:3px solid #0d6efd;">
-                                <span style="font-weight:bold;">Prospective Pricing:</span> Includes ${existingEmbroideryItems} items already in cart.
+                            ${existingItemsOfCurrentType > 0 ? `<div style="font-size:0.9em;background-color:#e8f4ff;padding:5px;margin-top:5px;border-radius:4px;border-left:3px solid #0d6efd;">
+                                <span style="font-weight:bold;">Prospective Pricing:</span> Includes ${existingItemsOfCurrentType} items already in cart.
                             </div>` : ''}
                         `;
                     }
@@ -191,7 +202,7 @@
             const callUpdateAllPricingDisplays = () => {
                 if (window.NWCAProductPricingUI && typeof window.NWCAProductPricingUI.updateAllPricingDisplays === 'function') {
                     try {
-                        window.NWCAProductPricingUI.updateAllPricingDisplays(newQuantityTotal, existingEmbroideryItems, calculatedPricing);
+                        window.NWCAProductPricingUI.updateAllPricingDisplays(newQuantityTotal, existingItemsOfCurrentType, calculatedPricing);
                         console.log("[ADD-TO-CART] Successfully called NWCAProductPricingUI.updateAllPricingDisplays with calculatedPricing.");
                     } catch (uiError) {
                         console.error("[ADD-TO-CART] Error calling NWCAProductPricingUI.updateAllPricingDisplays:", uiError, calculatedPricing);
@@ -211,7 +222,7 @@
                 console.warn("[ADD-TO-CART] NWCAProductPricingUI not yet ready. Listening for 'nwcaProductPricingUIReady' event.");
                 document.addEventListener('nwcaProductPricingUIReady', function onUIReady() {
                     console.log("[ADD-TO-CART] 'nwcaProductPricingUIReady' event received. Attempting to call updateAllPricingDisplays.");
-                    document.removeEventListener('nwcaProductPricingUIReady', onUIReady); // Listen only once
+                    document.removeEventListener('nwcaProductPricingUIReady', onUIReady); 
                     callUpdateAllPricingDisplays();
                 }, { once: true });
             }
@@ -243,25 +254,36 @@
             }
 
             if (totalAmountDisplay) {
-                totalAmountDisplay.textContent = `$${calculatedPricing.totalPrice.toFixed(2)}`;
-                // Store data attributes for other scripts if needed, but keep display simple
-                totalAmountDisplay.dataset.calculatedTotal = calculatedPricing.totalPrice.toFixed(2);
-                totalAmountDisplay.dataset.totalQuantity = newQuantityTotal; // items being added
-                totalAmountDisplay.dataset.tierKey = calculatedPricing.tierKey;
-                totalAmountDisplay.dataset.ltmFeeApplies = calculatedPricing.ltmFeeApplies;
-                totalAmountDisplay.dataset.ltmFeeTotal = calculatedPricing.ltmFeeTotal.toFixed(2);
-                totalAmountDisplay.dataset.combinedQuantity = calculatedPricing.combinedQuantity;
-                totalAmountDisplay.dataset.existingCartQty = existingEmbroideryItems;
+                console.log(`[ADD-TO-CART:UI_UPDATE] Attempting to update totalAmountDisplay. Current textContent: '${totalAmountDisplay.textContent}'`);
+                if (calculatedPricing && typeof calculatedPricing.totalPrice === 'number' && !isNaN(calculatedPricing.totalPrice)) {
+                    const newTotalText = `$${calculatedPricing.totalPrice.toFixed(2)}`;
+                    totalAmountDisplay.textContent = newTotalText;
+                    totalAmountDisplay.style.color = ''; // Reset color if it was red
+                    console.log(`[ADD-TO-CART:UI_UPDATE] Successfully updated totalAmountDisplay to: '${newTotalText}'`);
+                } else {
+                    console.error(`[ADD-TO-CART:UI_UPDATE_ERROR] calculatedPricing.totalPrice is invalid. Value:`, calculatedPricing ? calculatedPricing.totalPrice : 'calculatedPricing is null/undefined');
+                    totalAmountDisplay.textContent = 'Error: Price Invalid';
+                    totalAmountDisplay.style.color = 'red';
+                }
+                totalAmountDisplay.dataset.calculatedTotal = (calculatedPricing && typeof calculatedPricing.totalPrice === 'number') ? calculatedPricing.totalPrice.toFixed(2) : '0.00';
+                totalAmountDisplay.dataset.totalQuantity = newQuantityTotal;
+                totalAmountDisplay.dataset.tierKey = calculatedPricing ? calculatedPricing.tierKey : '';
+                totalAmountDisplay.dataset.ltmFeeApplies = calculatedPricing ? calculatedPricing.ltmFeeApplies : 'false';
+                totalAmountDisplay.dataset.ltmFeeTotal = (calculatedPricing && typeof calculatedPricing.ltmFeeTotal === 'number') ? calculatedPricing.ltmFeeTotal.toFixed(2) : '0.00';
+                totalAmountDisplay.dataset.combinedQuantity = calculatedPricing ? calculatedPricing.combinedQuantity : '0';
+                totalAmountDisplay.dataset.existingCartQty = existingItemsOfCurrentType;
+            } else {
+                console.warn("[ADD-TO-CART:UI_UPDATE] totalAmountDisplay element not found in sticky summary.");
             }
 
             if (ltmFeeNoticeInStickySummary) {
                 if (calculatedPricing.ltmFeeApplies && newQuantityTotal > 0) {
-                    ltmFeeNoticeInStickySummary.style.display = 'flex'; // Or 'block' depending on its CSS
+                    ltmFeeNoticeInStickySummary.style.display = 'flex'; 
                     const ltmTextElement = ltmFeeNoticeInStickySummary.querySelector('.ltm-text');
                     let ltmDetailElement = ltmFeeNoticeInStickySummary.querySelector('.ltm-detail-text');
 
                     if (ltmTextElement) {
-                        ltmTextElement.textContent = `LTM Fee Applied ($${calculatedPricing.ltmFeeTotal.toFixed(2)})`;
+                        ltmTextElement.textContent = `LTM Fee Applied ($${(calculatedPricing.ltmFeeTotal || 0).toFixed(2)})`;
                     }
 
                     if (!ltmDetailElement) {
@@ -269,23 +291,22 @@
                         ltmDetailElement.className = 'ltm-detail-text';
                         ltmDetailElement.style.fontSize = '0.85em';
                         ltmDetailElement.style.marginTop = '5px';
-                        ltmDetailElement.style.color = '#6c757d'; // A slightly softer color for the detail
-                        // Insert after the main ltm-text, or at the end of the notice
+                        ltmDetailElement.style.color = '#6c757d'; 
                         if(ltmTextElement && ltmTextElement.parentNode === ltmFeeNoticeInStickySummary) {
                             ltmTextElement.insertAdjacentElement('afterend', ltmDetailElement);
                         } else {
                             ltmFeeNoticeInStickySummary.appendChild(ltmDetailElement);
                         }
                     }
-                    
-                    ltmDetailElement.innerHTML = `<small>Orders under 24 pcs incur a $50 LTM fee, added to the 24-pc price and distributed per item. (e.g., 10 items: 24-pc price + $5.00/item).</small>`;
+                    const ltmMinQty = window.LTM_MINIMUM_QUANTITY || 24;
+                    const ltmFeeValue = window.LTM_FEE_VALUE || 50;
+                    ltmDetailElement.innerHTML = `<small>Orders under ${ltmMinQty} pcs incur a $${ltmFeeValue.toFixed(2)} LTM fee, added to the ${ltmMinQty}-pc price and distributed per item. (e.g., 10 items: ${ltmMinQty}-pc price + $${(ltmFeeValue / (calculatedPricing.combinedQuantity || 1)).toFixed(2)}/item).</small>`;
                 } else {
                     ltmFeeNoticeInStickySummary.style.display = 'none';
                 }
             }
             document.dispatchEvent(new Event('cartTotalUpdated'));
             
-            // Enable/disable the Add to Cart button based on quantity
             const addToCartButton = document.getElementById('add-to-cart-button');
             if (addToCartButton) {
                 if (newQuantityTotal > 0) {
@@ -297,13 +318,19 @@
                 }
             }
         } catch (error) {
-            console.error("[ADD-TO-CART] Error in updateCartTotal (Refactored v3):", error);
+            console.error("[ADD-TO-CART] Error in updateCartTotal (Refactored v5):", error);
         } finally {
             updatingCartTotal = false;
         }
     }
 
     function validatePricesBeforeAddingToCart() {
+        const currentEmbType = detectEmbellishmentType();
+        if (currentEmbType === 'screen-print') {
+            console.log("[ADD-TO-CART:VALIDATION] Skipping price validation for screen-print as pricing data source is different.");
+            return true;
+        }
+
         console.log("[ADD-TO-CART] Validating prices before adding to cart (Refactored)");
         if (!window.cartItemData || !window.cartItemData.items || !window.cartItemData.tierKey) {
             console.error("[ADD-TO-CART:VALIDATION] No calculated cartItemData available for validation. Triggering recalculation.");
@@ -314,7 +341,7 @@
                  return false;
             }
         }
-        const sourcePricingData = window.nwcaPricingData;
+        const sourcePricingData = window.nwcaPricingData; 
         if (!sourcePricingData || !sourcePricingData.prices || !sourcePricingData.tierData) {
              console.error("[ADD-TO-CART:VALIDATION] Cannot validate prices: Missing source pricing data (window.nwcaPricingData).");
              alert("Pricing data is missing or invalid. Please refresh the page.");
@@ -326,10 +353,11 @@
         let allPricesValid = true;
         let invalidSizes = [];
         let ltmReferenceTier = null;
+        const ltmMinQty = window.LTM_MINIMUM_QUANTITY || 24;
         if (ltmFeeApplies) {
              ltmReferenceTier = Object.keys(sourceTierData).find(t => {
                  const td = sourceTierData[t];
-                 return (td.MinQuantity || 0) <= 24 && (td.MaxQuantity === undefined || td.MaxQuantity >= 24);
+                 return (td.MinQuantity || 0) <= ltmMinQty && (td.MaxQuantity === undefined || td.MaxQuantity >= ltmMinQty);
              }) || tierKey; 
         }
         for (const size in calculatedItems) {
@@ -347,7 +375,7 @@
                 expectedBasePrice = itemData.baseUnitPrice; 
             }
             expectedBasePrice = isNaN(expectedBasePrice) ? 0 : expectedBasePrice;
-            let expectedDisplayPrice = expectedBasePrice + (ltmFeeApplies ? ltmFeePerItem : 0);
+            let expectedDisplayPrice = expectedBasePrice + (ltmFeeApplies ? (ltmFeePerItem || 0) : 0);
             const actualDisplayPrice = itemData.displayUnitPrice;
             const tolerance = 0.011; 
             const priceDifference = Math.abs(expectedDisplayPrice - actualDisplayPrice);
@@ -370,62 +398,107 @@
         return true;
     }
 
-    function handleAddToCart() {
-        console.log("[ADD-TO-CART] Add to Cart button clicked"); 
+    async function handleAddToCart() { 
+        console.log("[ADD-TO-CART] Add to Cart button clicked");
         const addToCartButton = document.getElementById('add-to-cart-button');
         if (addToCartButton) {
              if (addToCartButton.disabled) {
                  console.log("[ADD-TO-CART] Button already processing, ignoring click");
-                 return; 
+                 return;
              }
              addToCartButton.disabled = true;
              addToCartButton._originalText = addToCartButton.textContent;
              addToCartButton.textContent = 'Processing...';
         }
-        if (!window.cartContents) {
+
+        const pageEmbType = detectEmbellishmentType(); 
+
+        if (window.NWCACart && typeof window.NWCACart.getEmbellishmentType === 'function' && typeof window.NWCACart.getCartItems === 'function') {
+            const cartEmbType = window.NWCACart.getEmbellishmentType();
+            const activeCartItems = window.NWCACart.getCartItems('Active');
+            const isCartEmpty = !activeCartItems || activeCartItems.length === 0;
+
+            console.log(`[ADD-TO-CART] Page Embellishment Type: ${pageEmbType}, Cart Embellishment Type: ${cartEmbType}, Cart Empty: ${isCartEmpty}`);
+
+            if (cartEmbType && cartEmbType !== pageEmbType && !isCartEmpty) {
+                if (confirm(`Your cart contains items with a different embellishment type ('${cartEmbType.replace(/-/g, ' ')}'). Adding this '${pageEmbType.replace(/-/g, ' ')}' item will clear your current cart. Proceed?`)) {
+                    console.log("[ADD-TO-CART] User confirmed to clear cart.");
+                    if (typeof window.NWCACart.clearCart === 'function') {
+                        await window.NWCACart.clearCart(); 
+                        console.log("[ADD-TO-CART] Cart cleared.");
+                        if (typeof window.NWCACart.setEmbellishmentType === 'function') {
+                            window.NWCACart.setEmbellishmentType(pageEmbType);
+                            console.log(`[ADD-TO-CART] Cart embellishment type set to ${pageEmbType}.`);
+                        } else {
+                            console.warn("[ADD-TO-CART] NWCACart.setEmbellishmentType not available after clear.");
+                        }
+                        window.cartContents = await fetchCartContents(); 
+                        updateCartTotal(); 
+                    } else {
+                        console.error("[ADD-TO-CART] NWCACart.clearCart function not available. Cannot proceed.");
+                        alert("Error: Could not clear cart. Please manage your cart manually or contact support.");
+                        if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
+                        return;
+                    }
+                } else {
+                    console.log("[ADD-TO-CART] User cancelled cart clearing. Aborting add to cart.");
+                    if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
+                    return;
+                }
+            } else if (isCartEmpty && typeof window.NWCACart.setEmbellishmentType === 'function') {
+                window.NWCACart.setEmbellishmentType(pageEmbType);
+                console.log(`[ADD-TO-CART] Cart was empty. Cart embellishment type set to ${pageEmbType}.`);
+            }
+        } else {
+            console.warn("[ADD-TO-CART] NWCACart.getEmbellishmentType or NWCACart.getCartItems not available for embellishment type check.");
+        }
+
+
+        if (!window.cartContents) { 
             console.log("[ADD-TO-CART] Cart contents not available, fetching before adding...");
-            fetchCartContents().then(contents => {
-                window.cartContents = contents;
-                handleAddToCart(); 
-            }).catch(error => {
+            try {
+                window.cartContents = await fetchCartContents();
+            } catch (error) {
                 console.error("[ADD-TO-CART] Error fetching cart contents before add:", error);
                 alert("Could not verify cart contents. Please try adding again.");
                 if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
-            });
-            return; 
+                return;
+            }
         }
-        console.log("[ADD-TO-CART] Step 2: Forcing price recalculation..."); 
+
+        console.log("[ADD-TO-CART] Step 2: Forcing price recalculation...");
         updateCartTotal(); 
-        console.log("[ADD-TO-CART] Step 2: Price recalculation complete. Checking window.cartItemData:", JSON.parse(JSON.stringify(window.cartItemData || {}))); 
+        console.log("[ADD-TO-CART] Step 2: Price recalculation complete. Checking window.cartItemData:", JSON.parse(JSON.stringify(window.cartItemData || {})));
         if (!window.cartItemData || !window.cartItemData.items) {
-             console.error("[ADD-TO-CART] Price calculation failed or window.cartItemData is invalid before add. Aborting."); 
+             console.error("[ADD-TO-CART] Price calculation failed or window.cartItemData is invalid before add. Aborting.");
              alert("Could not calculate final prices. Please refresh and try again.");
               if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
-             return; 
+             return;
         }
-        console.log("[ADD-TO-CART] Step 2: window.cartItemData seems valid."); 
-        console.log("[ADD-TO-CART] Step 3: Starting price validation..."); 
+        console.log("[ADD-TO-CART] Step 2: window.cartItemData seems valid.");
+        console.log("[ADD-TO-CART] Step 3: Starting price validation...");
         let pricesAreValid = false;
         try {
-            pricesAreValid = validatePricesBeforeAddingToCart();
+            pricesAreValid = validatePricesBeforeAddingToCart(); 
         } catch (validationError) {
             console.error("[ADD-TO-CART] CRITICAL ERROR during price validation:", validationError);
             alert("A critical error occurred during price validation. Please refresh.");
             if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
             return;
         }
-        console.log(`[ADD-TO-CART] Step 3: Price validation result: ${pricesAreValid}`); 
+        console.log(`[ADD-TO-CART] Step 3: Price validation result: ${pricesAreValid}`);
         if (!pricesAreValid) {
-            console.log("[ADD-TO-CART] Step 3: Price validation failed. Aborting add to cart."); 
+            console.log("[ADD-TO-CART] Step 3: Price validation failed. Aborting add to cart.");
             if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
-            return; 
+            return;
         }
-        console.log("[ADD-TO-CART] Step 3: Price validation passed."); 
-        console.log("[ADD-TO-CART] Step 4: Collecting final product data..."); 
+        console.log("[ADD-TO-CART] Step 3: Price validation passed.");
+        console.log("[ADD-TO-CART] Step 4: Collecting final product data...");
         const {
             tierKey, ltmFeeApplies, totalQuantity, items: calculatedItems,
-            ltmFeeTotal, ltmFeePerItem, combinedQuantity, cartQuantity, baseUnitPrices
+            ltmFeeTotal, ltmFeePerItem, combinedQuantity, cartQuantity, baseUnitPrices,
         } = window.cartItemData;
+
         console.log(`[ADD-TO-CART] Handle Add: Using Tier: ${tierKey}, LTM Applies: ${ltmFeeApplies} from validated cartItemData`);
         if (totalQuantity === 0) {
             alert('Please select at least one size and quantity.');
@@ -440,7 +513,7 @@
                     sizesForCart.push({
                         size: size,
                         quantity: item.quantity,
-                        unitPrice: item.displayUnitPrice,
+                        unitPrice: item.displayUnitPrice, 
                         totalPrice: item.itemTotal
                     });
                 }
@@ -453,14 +526,10 @@
          }
          const styleNumber = NWCAUtils.getUrlParameter('StyleNumber') || document.getElementById('product-style-number')?.value || 'UNKNOWN_STYLE';
          const colorCode = NWCAUtils.getUrlParameter('COLOR') || document.getElementById('product-color-code')?.value || 'UNKNOWN_COLOR';
-         const embType = detectEmbellishmentType();
-         // Get the product image URL with improved fallback handling
         let specificImageUrl = '';
         
-        // Try to get product title
         let productTitle = '';
         
-        // Get product title from the specific element with ID 'product-title-context'
         const productTitleElement = document.getElementById('product-title-context');
         if (productTitleElement && productTitleElement.textContent) {
             productTitle = productTitleElement.textContent.trim();
@@ -468,12 +537,10 @@
         } else {
             console.log('[ADD-TO-CART] Could not find #product-title-context element, using fallbacks');
             
-            // First check if it's in window.productContext
             if (window.productContext && window.productContext.PRODUCT_TITLE) {
                 productTitle = window.productContext.PRODUCT_TITLE;
                 console.log("[ADD-TO-CART] Captured product title from window.productContext:", productTitle);
             } else {
-                // Try to get from page elements
                 const titleSelectors = [
                     'h1.product-title', 'h2.product-title', '.product-name h1',
                     '#product-title', '.product-title', 'h1', 'title'
@@ -488,7 +555,6 @@
                     }
                 }
                 
-                // If still no title, use style number and color
                 if (!productTitle) {
                     const style = NWCAUtils.getUrlParameter('StyleNumber') || document.getElementById('product-style-number')?.value;
                     const color = NWCAUtils.getUrlParameter('COLOR') || document.getElementById('product-color-code')?.value;
@@ -500,10 +566,8 @@
             }
         }
         
-        // Log product title capture result
         console.log(`[ADD-TO-CART:TITLE] Final product title: '${productTitle}'`);
         
-        // Try main product image first
         const productImageElement = document.getElementById('product-image');
         if (productImageElement && productImageElement.getAttribute('src')) {
             specificImageUrl = productImageElement.getAttribute('src');
@@ -511,7 +575,6 @@
         } else {
             console.warn("[ADD-TO-CART:IMAGE] No product image URL found in #product-image element or src is empty");
             
-            // Try window.productContext first (common source of product data)
             if (window.productContext) {
                 const contextImageProps = ['IMAGE_URL_FRONT', 'FRONT_MODEL', 'imageUrl', 'ImageURL'];
                 for (const prop of contextImageProps) {
@@ -523,7 +586,6 @@
                 }
             }
             
-            // If still no image, try alternative image sources
             if (!specificImageUrl) {
                 const altSelectors = [
                     '.product-image', 'img.product', '.main-product-image',
@@ -531,7 +593,6 @@
                     '#ProductImg', '.product-single__photo', '.featured-image'
                 ];
                 
-                // Join selectors for a single query
                 const altImages = document.querySelectorAll(altSelectors.join(', '));
                 
                 if (altImages.length > 0) {
@@ -540,18 +601,16 @@
                         if (altUrl) {
                             specificImageUrl = altUrl;
                             console.log(`[ADD-TO-CART:IMAGE] Found alternative image from selector at index ${i}:`, altUrl);
-                            break; // Use the first valid image URL found
+                            break; 
                         }
                     }
                 }
                 
-                // Try SanMar URL construction if still no image
                 if (!specificImageUrl) {
                     const style = NWCAUtils.getUrlParameter('StyleNumber') || document.getElementById('product-style-number')?.value;
                     const color = NWCAUtils.getUrlParameter('COLOR') || document.getElementById('product-color-code')?.value;
 
                     if (style && color) {
-                        // Try to construct a SanMar URL based on known patterns
                         specificImageUrl = `https://cdnm.sanmar.com/imglib/mresjpg/2014/f19/${style}_${color.toLowerCase()}_model_front_082010.jpg`;
                         console.log(`[ADD-TO-CART:IMAGE] Constructed SanMar URL as fallback:`, specificImageUrl);
                     }
@@ -559,50 +618,106 @@
             }
         }
         
-        // Enhanced image URL logging for debugging
         console.log(`[ADD-TO-CART:IMAGE] Final image URL details - Type: ${typeof specificImageUrl}, Length: ${specificImageUrl.length}, Value: '${specificImageUrl}'`);
         const currentPageUrl = window.location.href;
         const currentPagePath = window.location.pathname;
-        // Ensure product title is explicitly set
         if (!productTitle) {
             console.warn("[ADD-TO-CART] No product title found, creating one from style and color");
             productTitle = `${styleNumber} - ${colorCode}`;
         }
         console.log("[ADD-TO-CART] Setting PRODUCT_TITLE before adding to cart:", productTitle);
+
+        let embellishmentOptionsForCart = {};
+        if (pageEmbType === 'screen-print' && window.cartItemData) {
+            const screenPrintConfig = window.screenPrintAdapter && typeof window.screenPrintAdapter.getSelectedConfiguration === 'function' ?
+                                      window.screenPrintAdapter.getSelectedConfiguration() : null;
+
+            if (screenPrintConfig && screenPrintConfig.selectedColorCount) {
+                embellishmentOptionsForCart.numberOfColors = parseInt(screenPrintConfig.selectedColorCount);
+            } else if (window.cartItemData.numberOfColors) { // Fallback if adapter doesn't provide it but calculator did (older versions)
+                embellishmentOptionsForCart.numberOfColors = window.cartItemData.numberOfColors;
+            } else {
+                 // Attempt to get from the color select dropdown directly as a last resort
+                const colorSelectDropdown = document.getElementById('color-select');
+                if (colorSelectDropdown && colorSelectDropdown.value) {
+                    embellishmentOptionsForCart.numberOfColors = parseInt(colorSelectDropdown.value);
+                }
+            }
+            
+            // Fees from the calculator result (window.cartItemData)
+            embellishmentOptionsForCart.setupFee = typeof window.cartItemData.setupFee === 'number' ? window.cartItemData.setupFee : 0;
+            embellishmentOptionsForCart.flashCharge = typeof window.cartItemData.flashCharge === 'number' ? window.cartItemData.flashCharge : 0;
+            
+            // LTM details
+            embellishmentOptionsForCart.ltmFeeApplies = window.cartItemData.ltmFeeApplies || false;
+            embellishmentOptionsForCart.ltmFeeTotal = window.cartItemData.ltmFeeTotal || 0;
+
+            // If primary/additional location details are still part of cartItemData (they might not be with calc v2.0)
+            // These might need to be sourced differently if they represent complex objects.
+            // For now, let's assume they are simple or not strictly needed by NWCACart for screen-print in this exact structure.
+            // If NWCACart needs detailed breakdown of primary vs additional costs, that's a deeper integration.
+            // embellishmentOptionsForCart.primaryLocationDetails = window.cartItemData.primaryLocation;
+            // embellishmentOptionsForCart.additionalLocationDetails = window.cartItemData.additionalLocation;
+
+            console.log("[ADD-TO-CART] Populated screen print details into embellishmentOptionsForCart:", JSON.parse(JSON.stringify(embellishmentOptionsForCart)));
+        }
+
+        const stitchCountSelect = document.getElementById('client-stitch-count-select');
+        if (stitchCountSelect && stitchCountSelect.value && pageEmbType === 'cap-embroidery') {
+            const selectedStitchCount = stitchCountSelect.value;
+            embellishmentOptionsForCart.stitchCount = selectedStitchCount;
+            console.log(`[ADD-TO-CART:CAP-EMB] Added stitchCount to embellishmentOptionsForCart: ${selectedStitchCount}`);
+        }
+        // TODO: Add UI-driven options for other embellishment types (embroidery, DTG, DTF) here if add-to-cart.js manages their UI elements.
+        // Example:
+        // if (pageEmbType === 'embroidery') {
+        //     const embroideryLocation = document.getElementById('embroidery-location-select')?.value;
+        //     if (embroideryLocation) embellishmentOptionsForCart.location = embroideryLocation;
+        // }
         
         let productData = {
-            styleNumber: styleNumber, color: colorCode, embellishmentType: embType, // embType is from detectEmbellishmentType()
-            pricingTier: tierKey, ltmFeeApplied: ltmFeeApplies, totalQuantity: totalQuantity,
+            styleNumber: styleNumber, color: colorCode, embellishmentType: pageEmbType,
+            // pricingTier, ltmFeeApplied, totalQuantity are part of pricingInfo or derivable, not directly on productData for NWCACart
             sizes: sizesForCart,
             imageUrl: specificImageUrl,
-            PRODUCT_TITLE: productTitle, // Explicitly set PRODUCT_TITLE with exact casing
-            productTitle: productTitle, // Also include as productTitle for backward compatibility
+            PRODUCT_TITLE: productTitle,
+            productTitle: productTitle, // Keep for potential local use, NWCACart uses PRODUCT_TITLE
             sourceUrl: currentPageUrl,
             sourcePage: currentPagePath,
+            embellishmentOptions: embellishmentOptionsForCart, // Key change: storing detailed options here
             pricingInfo: {
-                tierKey, ltmFeeApplies, ltmFeeTotal, ltmFeePerItem,
-                combinedQuantity, existingCartQuantity: cartQuantity, baseUnitPrices
+                tierKey: tierKey,
+                ltmFeeApplies: ltmFeeApplies,
+                ltmFeeTotal: ltmFeeTotal,
+                ltmFeePerItem: ltmFeePerItem,
+                combinedQuantity: combinedQuantity,
+                existingCartQuantity: cartQuantity, // This is existing items of same type in cart
+                baseUnitPrices: baseUnitPrices, // Base unit prices for each size at the determined tier
+                
+                // Specific fees from calculator, ensuring they are numbers
+                setupFee: (typeof window.cartItemData.setupFee === 'number') ? window.cartItemData.setupFee : 0,
+                flashCharge: (typeof window.cartItemData.flashCharge === 'number') ? window.cartItemData.flashCharge : 0,
+                
+                // Number of colors from embellishmentOptions if available
+                numberOfColors: embellishmentOptionsForCart.numberOfColors || null
+                // primaryLocation and additionalLocation details might be too complex for simple pricingInfo
+                // and are better suited for embellishmentOptions if needed by the cart in detail.
             }
         };
-
-        // --- START Cap Embroidery Specific Data ---
-        const stitchCountSelect = document.getElementById('client-stitch-count-select');
-        if (stitchCountSelect && stitchCountSelect.value) {
-            const selectedStitchCount = stitchCountSelect.value;
-            productData.stitchCount = selectedStitchCount;
-            productData.embellishmentType = "Cap Embroidery"; // Ensure specific string as per requirement
-            console.log(`[ADD-TO-CART:CAP-EMB] Added stitchCount: ${selectedStitchCount} and ensured embellishmentType: "Cap Embroidery"`);
+        for (const key in productData.pricingInfo) {
+            if (productData.pricingInfo[key] === undefined) {
+                delete productData.pricingInfo[key];
+            }
         }
-        // --- END Cap Embroidery Specific Data ---
         
-        // Explicitly ensure the image URL and product title are captured in the logs just before cart addition
         console.log("[ADD-TO-CART:FINAL] Product data for cart:", {
+            embellishmentOptions: JSON.parse(JSON.stringify(productData.embellishmentOptions)), // Log the crucial part
             imageUrl: specificImageUrl ? `'${specificImageUrl}'` : "MISSING",
             productTitle: productTitle ? `'${productTitle}'` : "MISSING",
-            PRODUCT_TITLE: productData.PRODUCT_TITLE ? `'${productData.PRODUCT_TITLE}'` : "MISSING"
+            PRODUCT_TITLE: productData.PRODUCT_TITLE ? `'${productData.PRODUCT_TITLE}'` : "MISSING",
+            pricingInfo: JSON.parse(JSON.stringify(productData.pricingInfo))
         });
         
-        // Double-check that PRODUCT_TITLE is set properly
         if (!productData.PRODUCT_TITLE) {
             console.warn("[ADD-TO-CART:FINAL] PRODUCT_TITLE is missing, explicitly setting it");
             productData.PRODUCT_TITLE = productTitle || `${styleNumber} - ${colorCode}`;
@@ -619,34 +734,28 @@
             if (addToCartButton) addToCartButton.textContent = 'Adding...';
             console.log("[ADD-TO-CART] Step 5: Preparing to call NWCACart.addToCart with data:", JSON.parse(JSON.stringify(productData)));
             
-            // Add a test function to verify and fix the API payload
             const verifyPayload = (data) => {
                 console.log("[ADD-TO-CART:TEST] Verifying payload structure before sending to API:");
                 console.log("[ADD-TO-CART:TEST] PRODUCT_TITLE present:", !!data.PRODUCT_TITLE);
                 console.log("[ADD-TO-CART:TEST] PRODUCT_TITLE value:", data.PRODUCT_TITLE);
                 
-                // Ensure PRODUCT_TITLE is set
                 if (!data.PRODUCT_TITLE) {
                     console.warn("[ADD-TO-CART:TEST] PRODUCT_TITLE missing from payload, adding it");
                     data.PRODUCT_TITLE = data.productTitle || `${data.styleNumber} - ${data.color}`;
                     console.log("[ADD-TO-CART:TEST] Added PRODUCT_TITLE:", data.PRODUCT_TITLE);
                 }
                 
-                // Log the image URL for debugging
                 console.log("[ADD-TO-CART:TEST] Image URL being sent:", data.imageUrl || "MISSING");
                 console.log("[ADD-TO-CART:TEST] PRODUCT_TITLE being sent:", data.PRODUCT_TITLE || "MISSING");
                 
                 return data;
             };
             
-            // Call the verification function before sending to API
             window.NWCACart.addToCart(verifyPayload(productData))
                 .then(result => {
                     console.log("[ADD-TO-CART] Step 5: NWCACart.addToCart call completed. Result:", result); 
                     if (result && result.success) {
                         console.log("[ADD-TO-CART] Step 5: Add to cart reported SUCCESS."); 
-                        // Use our direct implementation that shows product image rather than check for two systems
-                        // This ensures we only ever show one notification modal with the product image
                         showSuccessWithImageAndTitle(productData);
                         return fetchCartContents(); 
                     } else {
@@ -662,9 +771,9 @@
                      updateCartTotal(); 
                      if (window.NWCACart?.recalculatePrices) {
                          console.log("[ADD-TO-CART] Triggering price recalculation after successful add");
-                         window.NWCACart.recalculatePrices(embType).catch(err => console.error("Error during post-add recalculation:", err));
+                         window.NWCACart.recalculatePrices(pageEmbType).catch(err => console.error("Error during post-add recalculation:", err));
                      }
-                     window.dispatchEvent(new CustomEvent('cartItemAdded', { detail: { embellishmentType: embType, success: true } }));
+                     window.dispatchEvent(new CustomEvent('cartItemAdded', { detail: { embellishmentType: pageEmbType, success: true } }));
                      if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
                  })
                 .catch(error => {
@@ -707,7 +816,6 @@
          if (uiInitialized) return;
          console.log("[ADD-TO-CART] 'pricingDataLoaded' event received or data found. Checking NWCACart status...", event?.detail);
          
-         // Check for NWCACart initialization status
          if (window.NWCACart && window.NWCACart.isInitialized) {
              console.log("[ADD-TO-CART] NWCACart is already initialized. Proceeding with UI initialization.");
              initializeUIAndListeners();
@@ -723,17 +831,34 @@
 
     function initializeUIAndListeners() {
          if (uiInitialized) { console.log("[ADD-TO-CART] UI and Listeners already initialized."); return; }
-         // Rely on nwcaPricingData which is set by dtg-adapter before dispatching the event that triggers this.
-         if (!window.nwcaPricingData ||
+         
+         const currentEmbType = detectEmbellishmentType();
+         // For screen-print, nwcaPricingData might not be the primary source if screenPrintAdapter handles its own data.
+         // However, uniqueSizes might still come from a shared source or be set by the adapter.
+         if (currentEmbType !== 'screen-print' && 
+             (!window.nwcaPricingData ||
              !window.nwcaPricingData.prices ||
              !window.nwcaPricingData.uniqueSizes ||
-             window.nwcaPricingData.uniqueSizes.length === 0) {
-             console.error("[ADD-TO-CART:INIT-UI] Essential pricing data (nwcaPricingData.prices or non-empty nwcaPricingData.uniqueSizes) missing. Aborting UI initialization. Data:", {
+             window.nwcaPricingData.uniqueSizes.length === 0)) {
+             console.error("[ADD-TO-CART:INIT-UI] Essential pricing data (nwcaPricingData) missing for non-screen-print. Aborting UI initialization. Data:", {
                 nwcaPricingData: JSON.stringify(window.nwcaPricingData || {})
              });
              handlePricingDataError({ detail: { message: 'Pricing data missing or incomplete during UI initialization.' } });
              return;
+         } else if (currentEmbType === 'screen-print' && (!window.screenPrintAdapter || !window.screenPrintAdapter.isInitialized())) {
+            // For screen-print, we might depend on the adapter being ready.
+            // Or, if uniqueSizes are still expected on window.nwcaPricingData even for screen-print:
+            if (!window.nwcaPricingData || !window.nwcaPricingData.uniqueSizes || window.nwcaPricingData.uniqueSizes.length === 0) {
+                 console.error("[ADD-TO-CART:INIT-UI] Essential uniqueSizes data missing for screen-print. Aborting UI initialization. Data:", {
+                    nwcaPricingData: JSON.stringify(window.nwcaPricingData || {})
+                 });
+                 handlePricingDataError({ detail: { message: 'Size data missing or incomplete for screen print UI initialization.' } });
+                 return;
+            }
+             console.log("[ADD-TO-CART:INIT-UI] Screen print page, proceeding with UI initialization, assuming adapter will provide full pricing later or uniqueSizes are available.");
          }
+
+
          uiInitialized = true;
          console.log("[ADD-TO-CART:INIT-UI] Proceeding with UI initialization. NWCACart is initialized and ready.");
          syncSizesWithPricingMatrix();
@@ -789,28 +914,51 @@
         isInitializing = true;
         console.log("[ADD-TO-CART] DOM ready, starting initialization...");
         
-        // Setup function to handle when both cart contents and pricing data are ready
         function setupWhenDataReady(cartContents) {
             window.cartContents = cartContents;
             console.log("[ADD-TO-CART] Initial cart contents fetched.");
-            console.log("[ADD-TO-CART] Checking for pricing data...");
-            if (window.nwcaPricingData && window.availableSizesFromTable) {
-                 console.log("[ADD-TO-CART] Pricing data already available. Proceeding with NWCACart check.");
-                 setTimeout(handlePricingDataReady, 0);
+            console.log("[ADD-TO-CART] Checking for pricing data / adapter readiness...");
+
+            const currentEmbType = detectEmbellishmentType();
+            let dataReadyForInit = false;
+
+            if (currentEmbType === 'screen-print') {
+                // For screen print, we might primarily wait for the adapter to be ready,
+                // and ensure uniqueSizes are available (either from adapter or nwcaPricingData)
+                if (window.screenPrintAdapter && typeof window.screenPrintAdapter.isInitialized === 'function' && window.screenPrintAdapter.isInitialized()) {
+                     if (window.nwcaPricingData && window.nwcaPricingData.uniqueSizes && window.nwcaPricingData.uniqueSizes.length > 0) {
+                        dataReadyForInit = true;
+                        console.log("[ADD-TO-CART] Screen print adapter initialized and uniqueSizes available. Proceeding.");
+                     } else if (window.screenPrintAdapter.getUniqueSizes && window.screenPrintAdapter.getUniqueSizes().length > 0) {
+                        dataReadyForInit = true;
+                         console.log("[ADD-TO-CART] Screen print adapter initialized and provides uniqueSizes. Proceeding.");
+                     } else {
+                         console.log("[ADD-TO-CART] Screen print adapter initialized, but uniqueSizes not found. Waiting for 'pricingDataLoaded' or 'screenPrintAdapterReady'.");
+                     }
+                } else {
+                    console.log("[ADD-TO-CART] Screen print adapter not yet initialized. Waiting for 'screenPrintAdapterReady' or 'pricingDataLoaded'.");
+                }
             } else {
-                 console.log("[ADD-TO-CART] Pricing data not yet available. Waiting for 'pricingDataLoaded' or 'pricingDataError' event.");
+                // For other types, rely on nwcaPricingData and availableSizesFromTable
+                if (window.nwcaPricingData && window.availableSizesFromTable) { // Or just window.nwcaPricingData.uniqueSizes
+                    dataReadyForInit = true;
+                    console.log("[ADD-TO-CART] Pricing data (nwcaPricingData/availableSizesFromTable) already available for non-screen-print. Proceeding.");
+                } else {
+                    console.log("[ADD-TO-CART] Pricing data not yet available for non-screen-print. Waiting for 'pricingDataLoaded'.");
+                }
+            }
+
+            if (dataReadyForInit) {
+                 setTimeout(handlePricingDataReady, 0); // Call with a timeout to ensure event loop clears
+            } else {
+                 console.log("[ADD-TO-CART] Data not fully ready. Attaching listeners: 'pricingDataLoaded', 'screenPrintAdapterReady'.");
                  window.addEventListener('pricingDataLoaded', handlePricingDataReady, { once: true });
+                 window.addEventListener('screenPrintAdapterReady', handlePricingDataReady, { once: true }); // If adapter dispatches this
                  window.addEventListener('pricingDataError', handlePricingDataError, { once: true });
             }
         }
         
-        // Start by fetching cart contents
         fetchCartContents().then(setupWhenDataReady).catch(error => {
-            console.error("[ADD-TO-CART] Initialization failed during cart fetch:", error);
-            const errorDisplay = document.getElementById('cart-error-display');
-            if(errorDisplay) errorDisplay.textContent = "Error loading cart data. Pricing may be inaccurate.";
-            isInitializing = false;
-        }).catch(error => {
             console.error("[ADD-TO-CART] Initialization failed during cart fetch:", error);
             const errorDisplay = document.getElementById('cart-error-display');
             if(errorDisplay) errorDisplay.textContent = "Error loading cart data. Pricing may be inaccurate.";
@@ -876,24 +1024,32 @@
         console.log("[ADD-TO-CART] Syncing sizes with pricing matrix...");
         let sizesToUse = [];
         let sourceOfSizes = "";
+        const currentEmbType = detectEmbellishmentType();
 
-        // Prioritize sizes from nwcaPricingData if available (set by dtg-adapter)
-        if (window.nwcaPricingData && window.nwcaPricingData.uniqueSizes && window.nwcaPricingData.uniqueSizes.length > 0) {
+        if (currentEmbType === 'screen-print' && window.screenPrintAdapter && typeof window.screenPrintAdapter.getUniqueSizes === 'function') {
+            sizesToUse = window.screenPrintAdapter.getUniqueSizes();
+            sourceOfSizes = "screenPrintAdapter.getUniqueSizes()";
+            // If adapter doesn't provide sizes, try nwcaPricingData as a fallback even for screen-print
+            if (!sizesToUse || sizesToUse.length === 0) {
+                if (window.nwcaPricingData && window.nwcaPricingData.uniqueSizes && window.nwcaPricingData.uniqueSizes.length > 0) {
+                    sizesToUse = window.nwcaPricingData.uniqueSizes;
+                    sourceOfSizes = "nwcaPricingData.uniqueSizes (fallback for screen-print)";
+                }
+            }
+        } else if (window.nwcaPricingData && window.nwcaPricingData.uniqueSizes && window.nwcaPricingData.uniqueSizes.length > 0) {
             sizesToUse = window.nwcaPricingData.uniqueSizes;
             sourceOfSizes = "nwcaPricingData.uniqueSizes";
-        }
-        // Fallback to availableSizesFromTable (set by pricing-matrix-capture)
-        else if (window.availableSizesFromTable && window.availableSizesFromTable.length > 0) {
+        } else if (window.availableSizesFromTable && window.availableSizesFromTable.length > 0) { // Older fallback
             sizesToUse = window.availableSizesFromTable;
             sourceOfSizes = "availableSizesFromTable";
         }
 
+
         if (sizesToUse.length === 0) {
-            console.error("[ADD-TO-CART] Cannot sync sizes: No sizes available from nwcaPricingData.uniqueSizes or availableSizesFromTable.");
+            console.error("[ADD-TO-CART] Cannot sync sizes: No sizes available from any source.");
             const quantitySection = document.getElementById('quantity-section') || document.getElementById('size-quantity-grid-container') || document.getElementById('quantity-matrix');
             if (quantitySection) {
-                // Avoid overwriting if dp5-helper might still be working or has placed a more specific error.
-                if (!quantitySection.querySelector('.error-message')) { // Check if an error is already there
+                if (!quantitySection.querySelector('.error-message')) { 
                     quantitySection.innerHTML = '<p class="error-message" style="color: red; font-weight: bold; padding: 10px; border: 1px solid red; background-color: #ffeeee;">Error: Could not load size information.</p>';
                 }
             }
@@ -901,23 +1057,21 @@
         }
         console.log(`[ADD-TO-CART] Sizes to use for UI (from ${sourceOfSizes}):`, sizesToUse);
 
-        // Check if quantity input elements already exist (e.g., created by dp5-helper.js)
         const sizeQuantityGrid = document.getElementById('size-quantity-grid');
         const existingRows = sizeQuantityGrid ? sizeQuantityGrid.querySelectorAll('.size-quantity-row .quantity-input') : null;
 
         let uiAlreadyExists = existingRows && existingRows.length > 0 && existingRows.length === sizesToUse.length;
 
         if (uiAlreadyExists) {
-            console.log("[ADD-TO-CART] Quantity input UI elements seem to already exist (likely created by dp5-helper). Attaching listeners.");
-            // Ensure the main container for the grid is visible
+            console.log("[ADD-TO-CART] Quantity input UI elements seem to already exist. Attaching listeners.");
             const gridContainerParent = document.getElementById('size-quantity-grid-container');
             if (gridContainerParent) {
-                gridContainerParent.style.display = 'block'; // Or 'flex' etc.
+                gridContainerParent.style.display = 'block'; 
                  console.log("[ADD-TO-CART] Ensured #size-quantity-grid-container is visible (UI already existed).");
-                const matrixContainer = document.getElementById('quantity-matrix'); // Hide the other one
+                const matrixContainer = document.getElementById('quantity-matrix'); 
                 if(matrixContainer) matrixContainer.style.display = 'none';
             }
-            attachQuantityChangeListeners(); // Ensure listeners are attached to these existing elements
+            attachQuantityChangeListeners(); 
         } else {
             console.log("[ADD-TO-CART] Quantity input UI elements do not exist or mismatch. Attempting to create them via ProductQuantityUI.");
             const useGrid = window.PricingPageUI?.determineLayoutPreference ? window.PricingPageUI.determineLayoutPreference() : false;
@@ -967,13 +1121,11 @@
             productTitle: productData.PRODUCT_TITLE || "none"
         });
         
-        // Remove any existing notification
         const existingNotification = document.querySelector('.success-notification-modal');
         if (existingNotification) {
             existingNotification.remove();
         }
         
-        // Create notification container
         const notification = document.createElement('div');
         notification.className = 'success-notification-modal';
         notification.style.position = 'fixed';
@@ -991,15 +1143,12 @@
         notification.style.flexDirection = 'column';
         notification.style.alignItems = 'center';
         
-        // Add success header
         const header = document.createElement('h4');
         header.textContent = 'Item Added to Cart';
         header.style.color = '#28a745';
         header.style.marginBottom = '15px';
         notification.appendChild(header);
         
-        // Add product image
-        // Create image container regardless of imageUrl presence - we'll show fallback if needed
         const imageContainer = document.createElement('div');
         imageContainer.style.marginBottom = '15px';
         imageContainer.style.width = '100%';
@@ -1019,10 +1168,9 @@
             image.style.borderRadius = '4px';
             image.style.padding = '5px';
             
-            // Add onerror handler to show fallback when image fails to load
             image.onerror = function() {
                 console.warn(`[ADD-TO-CART:SUCCESS] Image failed to load: '${productData.imageUrl}'`);
-                this.src = ''; // Clear the src
+                this.src = ''; 
                 this.style.display = 'none';
                 createFallbackImage(imageContainer, productData);
             };
@@ -1035,7 +1183,6 @@
         
         notification.appendChild(imageContainer);
         
-        // Helper function to create fallback image display
         function createFallbackImage(container, data) {
             const fallback = document.createElement('div');
             fallback.className = 'image-fallback';
@@ -1060,20 +1207,17 @@
             container.appendChild(fallback);
         }
         
-        // Add product details
         const details = document.createElement('div');
         details.style.marginBottom = '15px';
         details.style.width = '100%';
         details.style.textAlign = 'center';
         
-        // Use PRODUCT_TITLE if available, otherwise fall back to style-color
         const productName = document.createElement('p');
         productName.textContent = productData.PRODUCT_TITLE || `${productData.styleNumber} - ${productData.color}`;
         productName.style.fontWeight = 'bold';
         productName.style.marginBottom = '5px';
         details.appendChild(productName);
         
-        // Add style-color as a secondary line if we have a product title
         if (productData.PRODUCT_TITLE && productData.PRODUCT_TITLE !== `${productData.styleNumber} - ${productData.color}`) {
             const styleColor = document.createElement('p');
             styleColor.textContent = `${productData.styleNumber} - ${productData.color}`;
@@ -1096,7 +1240,6 @@
         
         notification.appendChild(details);
         
-        // Add buttons
         const buttonContainer = document.createElement('div');
         buttonContainer.style.display = 'flex';
         buttonContainer.style.justifyContent = 'space-between';
@@ -1133,7 +1276,6 @@
         buttonContainer.appendChild(closeBtn);
         notification.appendChild(buttonContainer);
         
-        // Add overlay
         const overlay = document.createElement('div');
         overlay.style.position = 'fixed';
         overlay.style.top = '0';
@@ -1147,11 +1289,9 @@
             overlay.remove();
         });
         
-        // Add to DOM
         document.body.appendChild(overlay);
         document.body.appendChild(notification);
         
-        // Auto-close after 5 seconds
         setTimeout(() => {
             if (document.body.contains(notification)) {
                 notification.remove();

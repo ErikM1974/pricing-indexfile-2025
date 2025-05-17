@@ -31,7 +31,10 @@ const NWCAProductPricingUI = (function() {
         ltmPerItemDisplay: null,
         // Collapsible section toggles/containers
         collapsibleSectionToggles: [],
-        collapsibleSections: []
+        collapsibleSections: [],
+        // Additional Logo Pricing Table
+        additionalLogoPricingGrid: null,
+        additionalPricingLoading: null
     };
 
     // Configuration (example)
@@ -105,6 +108,10 @@ const NWCAProductPricingUI = (function() {
             }
         }
 
+        // Cache elements for additional logo pricing table
+        elements.additionalLogoPricingGrid = document.getElementById('additional-logo-pricing-grid');
+        elements.additionalPricingLoading = document.getElementById('additional-pricing-loading');
+
         debugProductUI("INFO", "DOM elements cached:", elements);
     }
 
@@ -117,6 +124,11 @@ const NWCAProductPricingUI = (function() {
             input.addEventListener('change', handleQuantityChangeOnProductPage);
             input.addEventListener('input', handleQuantityChangeOnProductPage);
         });
+
+        // Listen for pricing data to build the table for screen print
+        debugProductUI("INFO", "Attempting to add pricingDataLoaded listener to document.");
+        document.addEventListener('pricingDataLoaded', _handlePricingDataForTable);
+        debugProductUI("INFO", "pricingDataLoaded listener ADDED to document.");
     }
 
     /**
@@ -549,11 +561,274 @@ const NWCAProductPricingUI = (function() {
         }
     }
 
+    function _handlePricingDataForTable(event) {
+        debugProductUI("EVENT", "_handlePricingDataForTable CALLED.", { type: event.type, detailKeys: event.detail ? Object.keys(event.detail) : 'no-detail' });
+
+        // Check if this event is from screenprint-adapter.js (has 'tiers' array and 'fees' object)
+        // and not from pricing-matrix-capture.js (which has 'prices' object and 'tierData' object)
+        if (event.detail &&
+            event.detail.embellishmentType === 'screen-print' &&
+            Array.isArray(event.detail.tiers) && // screenprint-adapter dispatches 'tiers' as an array
+            typeof event.detail.fees === 'object' && // screenprint-adapter dispatches 'fees' as an object
+            !event.detail.hasOwnProperty('prices') && // pricing-matrix-capture dispatches 'prices'
+            !event.detail.hasOwnProperty('tierData'))   // pricing-matrix-capture dispatches 'tierData'
+        {
+            debugProductUI("INFO", "Processing 'pricingDataLoaded' event (likely from screenprint-adapter) for screen-print table.", event.detail);
+            const { uniqueSizes, tiers, fees } = event.detail;
+
+            if (elements.pricingGrid && Array.isArray(uniqueSizes) && uniqueSizes.length > 0 && Array.isArray(tiers) && tiers.length > 0) {
+                _buildScreenPrintPricingTable(uniqueSizes, tiers, fees);
+                const loadingElement = document.getElementById('pricing-loading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+                elements.pricingGrid.style.display = 'table';
+                debugProductUI("INFO", "Screen print pricing table built and display set to 'table'.");
+
+                // Now, try to build the additional logo pricing table
+                if (event.detail.fullAdditionalLocationPricing) {
+                    if (elements.additionalLogoPricingGrid) {
+                        _buildAdditionalLogoPricingTable(event.detail.fullAdditionalLocationPricing);
+                        if (elements.additionalPricingLoading) {
+                            elements.additionalPricingLoading.style.display = 'none';
+                        }
+                        elements.additionalLogoPricingGrid.style.display = 'table';
+                        debugProductUI("INFO", "Additional logo pricing table built and display set to 'table'.");
+                    } else {
+                        debugProductUI("WARN", "Additional logo pricing grid element not found.");
+                    }
+                } else {
+                    debugProductUI("INFO", "No fullAdditionalLocationPricing data found in event.detail. Skipping additional logo table.");
+                    if (elements.additionalPricingLoading) elements.additionalPricingLoading.textContent = 'Additional location pricing not available.';
+                }
+
+            } else {
+                debugProductUI("WARN", "Cannot build screen print table: Missing pricingGrid, or uniqueSizes/tiers are invalid/empty.", {
+                    hasGrid: !!elements.pricingGrid,
+                    uniqueSizesValid: Array.isArray(uniqueSizes) && uniqueSizes.length > 0,
+                    tiersValid: Array.isArray(tiers) && tiers.length > 0,
+                    receivedUniqueSizes: uniqueSizes,
+                    receivedTiers: tiers
+                });
+                 if (elements.additionalPricingLoading) elements.additionalPricingLoading.textContent = 'Primary pricing data missing, cannot load additional pricing.';
+            }
+        } else if (event.detail && event.detail.embellishmentType === 'screen-print') {
+            debugProductUI("EVENT", `_handlePricingDataForTable: Received 'screen-print' event, but structure not from screenprint-adapter (e.g., has 'prices' or 'tierData' instead of 'tiers' array). Skipping table build for this event.`, event.detail);
+        } else if (event.detail) {
+            debugProductUI("EVENT", `_handlePricingDataForTable: Skipped. EmbellishmentType is '${event.detail.embellishmentType}', expected 'screen-print' with specific structure.`, event.detail);
+        } else {
+            debugProductUI("EVENT", "_handlePricingDataForTable: Skipped. event.detail is missing.", event);
+        }
+    }
+
+    function _buildScreenPrintPricingTable(uniqueSizes, tiersData, feesData) {
+        if (!elements.pricingGrid) return;
+
+        const table = elements.pricingGrid;
+        let thead = table.querySelector('thead');
+        if (!thead) {
+            thead = document.createElement('thead');
+            table.appendChild(thead);
+        }
+        thead.innerHTML = ''; // Clear existing header
+
+        let tbody = table.querySelector('tbody');
+        if (!tbody) {
+            tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+        }
+        tbody.innerHTML = ''; // Clear existing body
+
+        // Build Header Row: "Qty Range" | Size1 | Size2 | ...
+        const headerRow = document.createElement('tr');
+        headerRow.id = 'pricing-header-row';
+        const thQty = document.createElement('th');
+        thQty.textContent = 'Qty Range';
+        headerRow.appendChild(thQty);
+
+        uniqueSizes.forEach(size => {
+            const thSizeHeader = document.createElement('th');
+            thSizeHeader.textContent = size;
+            headerRow.appendChild(thSizeHeader);
+        });
+        thead.appendChild(headerRow);
+
+        // Build Body Rows: TierLabel | PriceForSize1 | PriceForSize2 | ...
+        tiersData.forEach(tier => {
+            const tr = document.createElement('tr');
+            const tdTierLabel = document.createElement('td');
+            tdTierLabel.style.fontWeight = 'bold';
+            let tierLabelText = `${tier.minQty}${tier.maxQty ? '-' + tier.maxQty : '+'}`;
+            if (tier.label && tier.label !== tierLabelText && !tierLabelText.includes(tier.label)) { // If Caspio tier.label is different and more descriptive
+                tierLabelText = tier.label; // Use Caspio's label
+            }
+
+            // Append LTM fee information directly to the tier label cell if applicable
+            // This LTM_Fee comes from the screenprint-adapter's processed tier data,
+            // which should originate from Caspio's tierData.LTM_Fee
+            if (tier.ltmFee && parseFloat(tier.ltmFee) > 0) {
+                tierLabelText += `<br><small style="font-weight:normal; font-style:italic;">(LTM Fee: $${parseFloat(tier.ltmFee).toFixed(2)})</small>`;
+            }
+            tdTierLabel.innerHTML = tierLabelText;
+            tr.appendChild(tdTierLabel);
+
+            uniqueSizes.forEach(size => {
+                const tdPrice = document.createElement('td');
+                let priceForSizeInTier = 'N/A';
+                // tier.prices is expected to be an object like { "S": 10.00, "M": 10.00, "2XL": 12.00 }
+                // This structure comes from screenprint-adapter.js, which processes the Caspio masterBundle.
+                // The Caspio masterBundle's primaryLocationPricing[colorCount].tiers[tierIndex].prices object
+                // is already structured per individual size by the calcPriLocProf function in Caspio HTML Block 2.
+                if (tier.prices && tier.prices[size] !== undefined) {
+                    priceForSizeInTier = tier.prices[size];
+                }
+                tdPrice.textContent = typeof priceForSizeInTier === 'number' ? `$${priceForSizeInTier.toFixed(2)}` : priceForSizeInTier;
+                tr.appendChild(tdPrice);
+            });
+            tbody.appendChild(tr);
+        });
+        
+        // Add fees information if available
+        if (feesData && (feesData.setup || feesData.flash)) {
+            let tfoot = table.querySelector('tfoot');
+            if (!tfoot) {
+                tfoot = document.createElement('tfoot');
+                table.appendChild(tfoot);
+            }
+            tfoot.innerHTML = '';
+            const feesRow = document.createElement('tr');
+            const feesCell = document.createElement('td');
+            feesCell.colSpan = tiersData.length + 1; // Span all columns
+            feesCell.style.textAlign = 'left';
+            feesCell.style.paddingTop = '10px';
+            feesCell.style.fontSize = '0.9em';
+            
+            let feesHtml = '<strong>Additional Notes:</strong><ul>';
+            if (feesData.setup) {
+                feesHtml += `<li>Setup Fee: $${parseFloat(feesData.setup).toFixed(2)} per color.</li>`;
+            }
+            if (feesData.flash) {
+                feesHtml += `<li>Flash Charge: $${parseFloat(feesData.flash).toFixed(2)} (if applicable, for dark garments).</li>`;
+            }
+            feesHtml += '<li>Dark garments may require a white base (counts as an extra color).</li>';
+            feesHtml += '</ul>';
+            feesCell.innerHTML = feesHtml;
+            feesRow.appendChild(feesCell);
+            tfoot.appendChild(feesRow);
+        }
+        debugProductUI("INFO", "Screen print pricing table built.");
+    }
+
+    function _buildAdditionalLogoPricingTable(fullAdditionalPricingData) {
+        if (!elements.additionalLogoPricingGrid) {
+            debugProductUI("ERROR", "_buildAdditionalLogoPricingTable: additionalLogoPricingGrid element not found.");
+            return;
+        }
+
+        const table = elements.additionalLogoPricingGrid;
+        let thead = table.querySelector('thead');
+        if (!thead) { thead = document.createElement('thead'); table.appendChild(thead); }
+        thead.innerHTML = '';
+
+        let tbody = table.querySelector('tbody');
+        if (!tbody) { tbody = document.createElement('tbody'); table.appendChild(tbody); }
+        tbody.innerHTML = '';
+        
+        let tfoot = table.querySelector('tfoot');
+        if (!tfoot) { tfoot = document.createElement('tfoot'); table.appendChild(tfoot); }
+        tfoot.innerHTML = '';
+
+
+        // Header: Qty Range | 1 Color | 2 Colors | ... | 6 Colors
+        const headerRow = document.createElement('tr');
+        const thQty = document.createElement('th');
+        thQty.textContent = 'Qty Range';
+        thQty.style.textAlign = 'left';
+        headerRow.appendChild(thQty);
+
+        const colorCounts = ["1", "2", "3", "4", "5", "6"]; // Standard color counts for additional location
+        colorCounts.forEach(count => {
+            const thColor = document.createElement('th');
+            thColor.textContent = `${count} Color${parseInt(count) > 1 ? 's' : ''}`;
+            thColor.style.textAlign = 'center';
+            headerRow.appendChild(thColor);
+        });
+        thead.appendChild(headerRow);
+
+        // Determine common tier labels from the "1 Color" data (or first available)
+        const firstColorCountData = fullAdditionalPricingData["1"] || fullAdditionalPricingData[Object.keys(fullAdditionalPricingData)[0]];
+        if (!firstColorCountData || !firstColorCountData.tiers || firstColorCountData.tiers.length === 0) {
+            debugProductUI("WARN", "No tier data available for additional logo pricing table.", firstColorCountData);
+            tbody.innerHTML = '<tr><td colspan="7">Additional location pricing data not available.</td></tr>';
+            return;
+        }
+        const commonTiers = firstColorCountData.tiers.map(t => ({
+            label: t.label || `${t.minQty}${t.maxQty ? '-' + t.maxQty : '+'}`,
+            minQty: t.minQty,
+            maxQty: t.maxQty,
+            ltmFee: t.ltmFee
+        }));
+        
+        let overallSetupNote = "";
+
+        commonTiers.forEach(tierInfo => {
+            const tr = document.createElement('tr');
+            const tdTierLabel = document.createElement('td');
+            tdTierLabel.style.fontWeight = 'bold';
+            tdTierLabel.style.textAlign = 'left';
+            let tierLabelText = tierInfo.label;
+            if (tierInfo.ltmFee && parseFloat(tierInfo.ltmFee) > 0) {
+                 tierLabelText += `<br><small style="font-weight:normal; font-style:italic;">(LTM Fee: $${parseFloat(tierInfo.ltmFee).toFixed(2)})</small>`;
+            }
+            tdTierLabel.innerHTML = tierLabelText;
+            tr.appendChild(tdTierLabel);
+
+            colorCounts.forEach(colorCountKey => {
+                const tdPrice = document.createElement('td');
+                tdPrice.style.textAlign = 'center';
+                let pricePerPiece = 'N/A';
+                const colorCountPricing = fullAdditionalPricingData[colorCountKey];
+                if (colorCountPricing && colorCountPricing.tiers) {
+                    const matchingTier = colorCountPricing.tiers.find(t => (t.label || `${t.minQty}${t.maxQty ? '-' + t.maxQty : '+'}`) === tierInfo.label);
+                    if (matchingTier && matchingTier.pricePerPiece !== undefined && matchingTier.pricePerPiece !== null) {
+                        pricePerPiece = parseFloat(matchingTier.pricePerPiece);
+                    }
+                }
+                tdPrice.textContent = typeof pricePerPiece === 'number' ? `$${pricePerPiece.toFixed(2)}` : pricePerPiece;
+                tr.appendChild(tdPrice);
+                
+                // Collect setup fee info for the footer note (once per color count)
+                if (tierInfo.minQty === commonTiers[0].minQty && colorCountPricing && colorCountPricing.setupFee > 0) {
+                    if (overallSetupNote) overallSetupNote += ", ";
+                    overallSetupNote += `${colorCountKey} clr: $${parseFloat(colorCountPricing.setupFee).toFixed(2)}`;
+                }
+            });
+            tbody.appendChild(tr);
+        });
+        
+        if (overallSetupNote) {
+            const feesRow = document.createElement('tr');
+            const feesCell = document.createElement('td');
+            feesCell.colSpan = colorCounts.length + 1;
+            feesCell.style.textAlign = 'left';
+            feesCell.style.paddingTop = '10px';
+            feesCell.style.fontSize = '0.85em';
+            feesCell.innerHTML = `<strong>Note:</strong> Additional location setup fees (per location): ${overallSetupNote}.`;
+            feesRow.appendChild(feesCell);
+            tfoot.appendChild(feesRow);
+        }
+        debugProductUI("INFO", "Additional logo pricing table built.");
+    }
+
+
     // Public API
     return {
         initialize,
         // Expose for potential external updates if cart changes elsewhere
-        updateAllPricingDisplays
+        updateAllPricingDisplays,
+        // Expose for screenprint adapter to directly call if needed, or for testing
+        _buildScreenPrintPricingTable,
+        _buildAdditionalLogoPricingTable
     };
 
 })();

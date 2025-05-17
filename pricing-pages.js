@@ -376,6 +376,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     }
 
     function updateTabNavigation() {
+        console.log("PricingPages DEBUG: Entering updateTabNavigation()");
         const styleNumber = getUrlParameter('StyleNumber');
         const colorCode = getUrlParameter('COLOR');
         const currentPage = window.location.pathname.toLowerCase();
@@ -388,6 +389,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             tab.href = url;
             tab.classList.toggle('active', currentPage.includes(`/pricing/${targetPage}`));
         });
+        console.log("PricingPages DEBUG: Exiting updateTabNavigation()");
     }
 
     // --- Caspio Loading and Handling ---
@@ -402,25 +404,88 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         embroidery: 'pricing-calculator',
         'cap-embroidery': 'pricing-calculator',
         dtg: 'pricing-calculator',
-        screenprint: 'pricing-calculator',
+        screenprint: 'caspio-iframe-container', // Changed for screenprint direct iframe
         dtf: 'pricing-calculator'
     };
-
-    function loadCaspioEmbed(containerId, caspioAppKey, styleNumber) {
+    
+    // Modified to handle screenprint with direct iframe, others with /emb script
+    function loadCaspioEmbed(containerId, caspioAppKey, styleNumber, embType) { // Added embType
         const container = document.getElementById(containerId);
         if (!container) { console.error(`PricingPages: Container #${containerId} not found.`); return; }
         if (!styleNumber) { console.error(`PricingPages: Style number missing for Caspio load.`); container.innerHTML = '<div class="error-message">Error: Style number missing.</div>'; container.dataset.loadFailed = 'true'; container.classList.add('pricing-unavailable'); return; }
+        
         const colorForCaspio = window.selectedCatalogColor || window.selectedColorName || '';
-        console.log(`PricingPages: Using color for Caspio embed: '${colorForCaspio}'`);
-        container.innerHTML = '<div class="loading-message">Loading pricing data...</div>';
-        container.classList.add('loading'); container.classList.remove('pricing-unavailable'); delete container.dataset.loadFailed;
-        const params = new URLSearchParams(); params.append('StyleNumber', styleNumber); if (colorForCaspio) { params.append('COLOR', colorForCaspio); }
-        const fullUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}/emb?${params.toString()}`;
-        console.log(`PricingPages: Loading Caspio embed from URL: ${fullUrl}`);
-        const script = document.createElement('script'); script.type = 'text/javascript'; script.src = fullUrl; script.async = true;
-        script.onload = function() { console.log(`PricingPages: Caspio script ${caspioAppKey} loaded from ${fullUrl}`); container.classList.remove('loading'); setTimeout(() => checkCaspioRender(container, caspioAppKey), 5000); };
-        script.onerror = function() { console.error(`PricingPages: Error loading Caspio script ${caspioAppKey} from ${fullUrl}`); container.classList.remove('loading'); container.classList.add('pricing-unavailable'); container.dataset.loadFailed = 'true'; };
-        container.appendChild(script);
+        console.log(`PricingPages: Using color for Caspio: '${colorForCaspio}' for type: ${embType}, container: #${containerId}`);
+        
+        // Clear container and set loading message (unless it's the hidden screenprint iframe)
+        if (embType !== 'screenprint') {
+            container.innerHTML = '<div class="loading-message">Loading pricing data...</div>';
+        } else {
+            container.innerHTML = ''; // Clear previous iframe if any for screenprint
+        }
+        container.classList.add('loading');
+        container.classList.remove('pricing-unavailable');
+        delete container.dataset.loadFailed;
+    
+        const params = new URLSearchParams();
+        params.append('StyleNumber', styleNumber);
+        if (colorForCaspio) { params.append('COLOR', colorForCaspio); }
+    
+        if (embType === 'screenprint') {
+            // For screenprint, load directly into an iframe with cbEmbed=1
+            params.append('cbEmbed', '1'); // Crucial for postMessage
+            // Ensure this is the correct direct Caspio DataPage URL, not the /emb script URL
+            const directUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}?${params.toString()}`;
+            console.log(`PricingPages: Loading Screenprint Caspio iframe directly from URL: ${directUrl}`);
+            
+            const iframe = document.createElement('iframe');
+            iframe.src = directUrl;
+            iframe.style.display = 'none'; // Keep it hidden as it's a data source
+            iframe.style.width = '1px';
+            iframe.style.height = '1px';
+            iframe.title = 'Caspio Data Source for Screen Print Pricing'; // Accessibility
+            
+            iframe.onload = function() {
+                console.log(`PricingPages: Screenprint Caspio iframe ${caspioAppKey} loaded from ${directUrl}`);
+                container.classList.remove('loading');
+                // For direct iframe, postMessage should happen; timeout in adapter will handle if it doesn't.
+                // No need for checkCaspioRender for this specific hidden iframe.
+                container.dataset.loadFailed = 'false'; // Assume success if it loads, adapter handles data.
+            };
+            iframe.onerror = function() {
+                console.error(`PricingPages: Error loading Screenprint Caspio iframe ${caspioAppKey} from ${directUrl}`);
+                container.classList.remove('loading');
+                container.classList.add('pricing-unavailable');
+                container.dataset.loadFailed = 'true';
+                // Trigger fallback UI via adapter's timeout or a specific event if needed
+                // The adapter's timeout will handle showing the #pricing-fallback div.
+                // We could also dispatch a specific error event here if needed.
+                // document.dispatchEvent(new CustomEvent('pricingDataError', { detail: { message: `Failed to load screen print data source (iframe error).` }}));
+            };
+            container.appendChild(iframe);
+    
+        } else {
+            // Original embed script method for other embellishment types
+            const fullUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}/emb?${params.toString()}`;
+            console.log(`PricingPages: Loading Caspio embed script from URL: ${fullUrl} for type ${embType}`);
+            const scriptTag = document.createElement('script');
+            scriptTag.type = 'text/javascript';
+            scriptTag.src = fullUrl;
+            scriptTag.async = true;
+            scriptTag.onload = function() {
+                console.log(`PricingPages: Caspio script ${caspioAppKey} loaded from ${fullUrl}`);
+                container.classList.remove('loading');
+                // Only call checkCaspioRender for non-screenprint types that use the visible embed
+                setTimeout(() => checkCaspioRender(container, caspioAppKey), 5000);
+            };
+            scriptTag.onerror = function() {
+                console.error(`PricingPages: Error loading Caspio script ${caspioAppKey} from ${fullUrl}`);
+                container.classList.remove('loading');
+                container.classList.add('pricing-unavailable');
+                container.dataset.loadFailed = 'true';
+            };
+            container.appendChild(scriptTag);
+        }
     }
 
     function checkCaspioRender(container, caspioAppKey) {
@@ -442,8 +507,16 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         for (let i = 0; i < appKeys.length; i++) {
             const currentKey = appKeys[i];
             console.log(`PricingPages: Attempting load for ${embType} with key #${i + 1}: ${currentKey}`);
-            loadCaspioEmbed(container.id, currentKey, styleNumber);
-            await new Promise(resolve => setTimeout(resolve, 6000));
+            loadCaspioEmbed(container.id, currentKey, styleNumber, embType); // Pass embType
+            
+            // For screenprint with direct iframe, we don't rely on checkCaspioRender in the same way.
+            // The adapter's timeout is the main check for postMessage.
+            // For others, keep the delay and check.
+            if (embType !== 'screenprint') {
+                await new Promise(resolve => setTimeout(resolve, 6000));
+            } else {
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Shorter wait for iframe, adapter handles timeout
+            }
             const loadFailed = container.dataset.loadFailed === 'true';
             if (!loadFailed) { console.log(`PricingPages: Successfully loaded ${embType} pricing with key: ${currentKey}`); loadedSuccessfully = true; break; }
             else { console.warn(`PricingPages: Failed to load ${embType} pricing with key: ${currentKey}.`); if (i < appKeys.length - 1) console.log("PricingPages: Trying next key..."); }
@@ -554,7 +627,9 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // --- UI Initialization Functions (Moved from inline scripts) ---
 
     function setupTabs() {
-        const tabHeaders = document.querySelectorAll('.tab-header'); const tabPanes = document.querySelectorAll('.tab-pane'); if (!tabHeaders.length || !tabPanes.length) return; tabHeaders.forEach(header => { header.addEventListener('click', function() { tabHeaders.forEach(h => h.classList.remove('active')); tabPanes.forEach(p => p.classList.remove('active')); this.classList.add('active'); const tabId = this.getAttribute('data-tab'); const targetPane = document.getElementById(tabId); if (targetPane) targetPane.classList.add('active'); }); }); console.log("PricingPages: Tab functionality initialized.");
+        console.log("PricingPages DEBUG: Entering setupTabs()");
+        const tabHeaders = document.querySelectorAll('.tab-header'); const tabPanes = document.querySelectorAll('.tab-pane'); if (!tabHeaders.length || !tabPanes.length) { console.log("PricingPages DEBUG: setupTabs - no tabs/panes found, returning."); return; } tabHeaders.forEach(header => { header.addEventListener('click', function() { tabHeaders.forEach(h => h.classList.remove('active')); tabPanes.forEach(p => p.classList.remove('active')); this.classList.add('active'); const tabId = this.getAttribute('data-tab'); const targetPane = document.getElementById(tabId); if (targetPane) targetPane.classList.add('active'); }); }); console.log("PricingPages: Tab functionality initialized.");
+        console.log("PricingPages DEBUG: Exiting setupTabs()");
     }
 
     function setupInventoryLegend() {
@@ -562,7 +637,27 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     }
 
     function setupImageZoom() {
-        const imageContainer = document.querySelector('.product-image-container'); const image = document.getElementById('product-image'); const zoomOverlay = document.querySelector('.image-zoom-overlay'); if (!imageContainer || !image || !zoomOverlay) return; if (document.querySelector('.image-zoom-modal')) return; const modal = document.createElement('div'); modal.className = 'image-zoom-modal'; modal.style.cssText = 'display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); overflow:auto;'; const modalContent = document.createElement('img'); modalContent.className = 'image-zoom-modal-content'; modalContent.style.cssText = 'margin:auto; display:block; max-width:90%; max-height:90%; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);'; const closeButton = document.createElement('span'); closeButton.className = 'image-zoom-close'; closeButton.innerHTML = '&times;'; closeButton.style.cssText = 'position:absolute; top:15px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer;'; modal.appendChild(modalContent); modal.appendChild(closeButton); document.body.appendChild(modal); zoomOverlay.addEventListener('click', () => { modal.style.display = 'block'; modalContent.src = image.src; }); closeButton.addEventListener('click', () => { modal.style.display = 'none'; }); modal.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; }); console.log("PricingPages: Image zoom functionality initialized.");
+        console.log("PricingPages DEBUG: Entering setupImageZoom()");
+        const imageContainer = document.querySelector('.product-image-container-context');
+        const image = document.getElementById('product-image-context');
+        const zoomOverlay = imageContainer ? imageContainer.querySelector('.image-zoom-overlay') : null;
+
+        if (!imageContainer || !image || !zoomOverlay) {
+            console.warn("PricingPages DEBUG: setupImageZoom - image zoom elements not found, returning.", {imageContainerExists: !!imageContainer, imageExists: !!image, zoomOverlayExists: !!zoomOverlay});
+            console.log("PricingPages DEBUG: Exiting setupImageZoom() early due to missing elements.");
+            return;
+        }
+        if (document.querySelector('.image-zoom-modal')) {
+            console.log("PricingPages DEBUG: setupImageZoom - modal already exists, returning.");
+            console.log("PricingPages DEBUG: Exiting setupImageZoom() early - modal exists.");
+            return;
+        }
+        const modal = document.createElement('div'); modal.className = 'image-zoom-modal'; modal.style.cssText = 'display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); overflow:auto;'; const modalContent = document.createElement('img'); modalContent.className = 'image-zoom-modal-content'; modalContent.style.cssText = 'margin:auto; display:block; max-width:90%; max-height:90%; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);'; const closeButton = document.createElement('span'); closeButton.className = 'image-zoom-close'; closeButton.innerHTML = '&times;'; closeButton.style.cssText = 'position:absolute; top:15px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer;'; modal.appendChild(modalContent); modal.appendChild(closeButton); document.body.appendChild(modal);
+        zoomOverlay.addEventListener('click', () => { modal.style.display = 'block'; modalContent.src = image.src; });
+        closeButton.addEventListener('click', () => { modal.style.display = 'none'; });
+        modal.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; });
+        console.log("PricingPages: Image zoom functionality initialized.");
+        console.log("PricingPages DEBUG: Exiting setupImageZoom() after successful setup.");
     }
 
     function setupShowMoreColorsButton() {
@@ -621,17 +716,67 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         // Determine Caspio DP to load
         const styleNumber = window.selectedStyleNumber;
         const embType = getEmbellishmentTypeFromUrl();
-        const pricingContainerId = CONTAINER_IDS[embType] || 'pricing-calculator';
-        const appKeys = CASPIO_APP_KEYS[embType] || [];
-        const pricingContainer = document.getElementById(pricingContainerId);
+        
+        console.log(`PricingPages DOM CHECK --- STEP 1: embType determined as '${embType}'`);
 
-        if (!pricingContainer) { console.error(`PricingPages: Pricing container #${pricingContainerId} not found.`); return; }
-        if (embType === 'unknown' || (embType !== 'dtf' && appKeys.length === 0)) { console.error(`PricingPages: Unknown page type or no AppKeys for ${embType}.`); displayContactMessage(pricingContainer, embType); return; }
-        if (embType === 'dtf') { console.log("PricingPages: Handling DTF page (coming soon)."); displayContactMessage(pricingContainer, embType); initializeFallbackPricingData(embType); return; }
+        if (embType === 'screenprint') {
+            console.log(`PricingPages DOM CHECK --- STEP 2: embType is 'screenprint'. Attempting to find #caspio-iframe-container.`);
+            const containerForScreenprint = document.getElementById('caspio-iframe-container');
+            if (containerForScreenprint) {
+                console.log(`PricingPages DOM CHECK --- STEP 3: #caspio-iframe-container FOUND!`);
+                // Now proceed with screenprint specific loading using this container
+                const appKeys = CASPIO_APP_KEYS['screenprint'] || [];
+                if (appKeys.length > 0) {
+                    console.log(`PricingPages DOM CHECK --- STEP 4: AppKeys for screenprint found. Proceeding to load.`);
+                    await tryLoadCaspioSequentially(containerForScreenprint, appKeys, styleNumber, 'screenprint');
+                } else {
+                    console.error(`PricingPages DOM CHECK --- STEP 4: No AppKeys for screenprint!`);
+                    displayContactMessage(document.getElementById('pricing-fallback') || document.body, 'screenprint');
+                    initializeFallbackPricingData('screenprint');
+                }
+            } else {
+                console.error(`PricingPages DOM CHECK --- STEP 3: #caspio-iframe-container NOT FOUND via getElementById! This is the critical issue.`);
+                if (document.documentElement) {
+                    const fullHTML = document.documentElement.outerHTML;
+                    if (fullHTML.includes('id="caspio-iframe-container"')) {
+                        console.warn("PricingPages DOM CHECK (fail detail): The string 'id=\"caspio-iframe-container\"' IS PRESENT in document.documentElement.outerHTML. This suggests getElementById is failing for an unexpected reason.");
+                    } else {
+                        console.error("PricingPages DOM CHECK (fail detail): The string 'id=\"caspio-iframe-container\"' IS NOT PRESENT in document.documentElement.outerHTML. The div is missing from the DOM string.");
+                    }
+                } else {
+                    console.error(`PricingPages DOM CHECK (fail detail): document.documentElement is NULL or undefined!`);
+                }
+                displayContactMessage(document.getElementById('pricing-fallback') || document.body, 'screenprint');
+                initializeFallbackPricingData('screenprint');
+                return; // Stop further processing for screenprint if container not found
+            }
+        } else {
+            // Original logic for other embellishment types
+            console.log(`PricingPages DOM CHECK --- STEP 2: embType is '${embType}' (not screenprint). Using original logic.`);
+            const pricingContainerId = CONTAINER_IDS[embType] || 'pricing-calculator';
+            const appKeys = CASPIO_APP_KEYS[embType] || [];
+            const pricingContainer = document.getElementById(pricingContainerId);
 
-        // Try loading Caspio
-        await tryLoadCaspioSequentially(pricingContainer, appKeys, styleNumber, embType);
-
+            if (!pricingContainer) {
+                console.error(`PricingPages: Pricing container #${pricingContainerId} not found for ${embType}.`);
+                displayContactMessage(document.getElementById('pricing-fallback') || document.body, embType);
+                initializeFallbackPricingData(embType);
+                return;
+            }
+            if (embType === 'unknown' || (embType !== 'dtf' && appKeys.length === 0)) {
+                console.error(`PricingPages: Unknown page type or no AppKeys for ${embType}.`);
+                displayContactMessage(pricingContainer, embType);
+                initializeFallbackPricingData(embType);
+                return;
+            }
+            if (embType === 'dtf') {
+                console.log("PricingPages: Handling DTF page (coming soon).");
+                displayContactMessage(pricingContainer, embType);
+                initializeFallbackPricingData(embType);
+                return;
+            }
+            await tryLoadCaspioSequentially(pricingContainer, appKeys, styleNumber, embType);
+        }
         // Final UI setup
         setupInventoryLegend();
         updateMiniColorSwatch();

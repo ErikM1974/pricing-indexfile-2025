@@ -182,6 +182,64 @@ const NWCAUtils = (function() {
         const results = regex.exec(location.search);
         return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
     }
+
+    /**
+     * Defines a standard order for apparel sizes.
+     * OSFA (One Size Fits All) is treated as a unique case.
+     */
+    const STANDARD_SIZE_ORDER = [
+        'XS', 'S', 'M', 'L', 'XL',
+        '2XL', 'XXL',
+        '3XL', 'XXXL',
+        '4XL', 'XXXXL',
+        '5XL', 'XXXXXL',
+        '6XL', 'XXXXXXL',
+        'OSFA' // One Size Fits All
+    ];
+
+    /**
+     * Gets the numerical index of a size based on the standard order.
+     * @param {string} size - The size string (e.g., "M", "2XL").
+     * @returns {number} The index of the size, or -1 if not found.
+     */
+    function getSizeOrderIndex(size) {
+        if (!size || typeof size !== 'string') return -1;
+        const upperSize = size.toUpperCase().trim();
+        const index = STANDARD_SIZE_ORDER.indexOf(upperSize);
+        // Handle common variations like XXL for 2XL
+        if (index === -1) {
+            if (upperSize === 'XXL') return STANDARD_SIZE_ORDER.indexOf('2XL');
+            if (upperSize === 'XXXL') return STANDARD_SIZE_ORDER.indexOf('3XL');
+            // Add more variations if needed
+        }
+        return index;
+    }
+
+    /**
+     * Checks if a given size falls within a specified size range (e.g., "S-XL").
+     * @param {string} sizeToCheck - The size to check (e.g., "M").
+     * @param {string} rangeStartSize - The start of the range (e.g., "S").
+     * @param {string} rangeEndSize - The end of the range (e.g., "XL").
+     * @returns {boolean} True if the size is within the range (inclusive), false otherwise.
+     */
+    function isSizeInRange(sizeToCheck, rangeStartSize, rangeEndSize) {
+        const checkIndex = getSizeOrderIndex(sizeToCheck);
+        const startIndex = getSizeOrderIndex(rangeStartSize);
+        const endIndex = getSizeOrderIndex(rangeEndSize);
+
+        if (checkIndex === -1 || startIndex === -1 || endIndex === -1) {
+            // If any size is not recognized, cannot reliably determine range.
+            // Fallback to simple string comparison if it's an exact match for start or end.
+            // This is a basic fallback, more complex non-standard sizes might not work.
+            const upperCheck = String(sizeToCheck).toUpperCase().trim();
+            if (upperCheck === String(rangeStartSize).toUpperCase().trim()) return true;
+            if (upperCheck === String(rangeEndSize).toUpperCase().trim()) return true;
+            debugUtil("WARN", `isSizeInRange: Unrecognized size(s) for range check. Check: ${sizeToCheck}, Start: ${rangeStartSize}, End: ${rangeEndSize}`);
+            return false;
+        }
+        return checkIndex >= startIndex && checkIndex <= endIndex;
+    }
+
     // Public API
     return {
         formatCurrency,
@@ -193,6 +251,8 @@ const NWCAUtils = (function() {
         sortSizesByGroupOrder,
         normalizeColorName, // Expose normalizeColorName
         getUrlParameter,
+        isSizeInRange, // Expose the new function
+        getSizeOrderIndex, // Expose helper if needed elsewhere
         debugUtil
     };
 })();
