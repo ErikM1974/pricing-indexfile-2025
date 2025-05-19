@@ -14,6 +14,7 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
     const FALLBACK_UI_DIV_ID = 'cart-fallback-ui';
     const EXPECTED_CASPIO_ORIGIN_1 = 'https://c3eku948.caspio.com'; // Primary Caspio domain
     const EXPECTED_CASPIO_ORIGIN_2 = 'https://nwcustom.caspio.com'; // Custom Caspio domain
+    const EXPECTED_CASPIO_ORIGIN_3 = 'https://www.teamnwca.com'; // Production website domain
 
     function displayError(message) {
         const errorDiv = document.getElementById(ERROR_MESSAGE_DIV_ID);
@@ -183,13 +184,17 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
     function handleCaspioMessage(event) {
         if (event.data && event.data.type === 'caspioDtgMasterBundleReady') {
             console.log('[ADAPTER:DTG] Received caspioDtgMasterBundleReady. Origin:', event.origin);
-            const isExpectedOrigin = event.origin === EXPECTED_CASPIO_ORIGIN_1 || event.origin === EXPECTED_CASPIO_ORIGIN_2;
+            const isExpectedOrigin = event.origin === EXPECTED_CASPIO_ORIGIN_1 ||
+                                    event.origin === EXPECTED_CASPIO_ORIGIN_2 ||
+                                    event.origin === EXPECTED_CASPIO_ORIGIN_3 ||
+                                    event.origin === window.location.origin; // Allow same origin as the page
             const isDevelopmentEnv = window.location.hostname === 'localhost';
 
             if (isExpectedOrigin || isDevelopmentEnv) {
                 if (!isExpectedOrigin && isDevelopmentEnv) {
                     console.warn(`[ADAPTER:DTG] MasterBundle from unexpected origin (${event.origin}) but allowing in dev.`);
                 }
+                console.log(`[ADAPTER:DTG] Processing MasterBundle from origin: ${event.origin}`);
                 processMasterBundle(event.data.detail);
             } else {
                 console.error('[ADAPTER:DTG] MasterBundle from UNEXPECTED origin. Ignoring. Origin:', event.origin);
