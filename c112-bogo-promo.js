@@ -47,6 +47,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailInstructionsEl = document.getElementById('bogoEmailInstructions');
     const priceTiersDisplayEl = document.getElementById('priceTiersDisplay');
 
+    // Customer Form Elements
+    const customerFormEl = document.getElementById('bogoCustomerForm');
+    const customerNameEl = document.getElementById('customerName');
+    const customerEmailEl = document.getElementById('customerEmail');
+    const customerPhoneEl = document.getElementById('customerPhone');
+    const customerCompanyEl = document.getElementById('customerCompany');
+    const customerAddress1El = document.getElementById('customerAddress1');
+    const customerAddress2El = document.getElementById('customerAddress2');
+    const customerCityEl = document.getElementById('customerCity');
+    const customerStateEl = document.getElementById('customerState');
+    const customerZipCodeEl = document.getElementById('customerZipCode');
+    const customerCountryEl = document.getElementById('customerCountry');
+    const customerApiFeedbackEl = document.getElementById('customerApiFeedback');
+
     function init() {
         // Set product details
         if (productTitleEl) productTitleEl.innerHTML = DEFAULT_PRODUCT_TITLE; // Use innerHTML if title has <sup> etc.
@@ -382,44 +396,285 @@ document.addEventListener('DOMContentLoaded', () => {
         if (emailInstructionsEl) emailInstructionsEl.style.display = 'none';
     }
 
-    function handleGeneratePdf() {
-        if (typeof jsPDF === 'undefined') {
-            alert('Error: PDF library not loaded. Please ensure you are connected to the internet.');
+    function displayApiFeedback(message, type) {
+        if (!customerApiFeedbackEl) return;
+        customerApiFeedbackEl.textContent = message;
+        customerApiFeedbackEl.className = `api-feedback ${type}`; // type can be 'success' or 'error'
+        customerApiFeedbackEl.style.display = 'block';
+    }
+
+    // Helper function to fetch an image and convert to Data URI
+    async function getImageDataUri(url) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Network response was not ok for image ${url}: ${response.statusText}`);
+            }
+            const blob = await response.blob();
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        } catch (error) {
+            console.error(`Error fetching or converting image ${url}:`, error);
+            return null; // Return null if fetching/conversion fails
+        }
+    }
+
+    async function handleGeneratePdf() { // Made async to handle await for API call
+        console.log('handleGeneratePdf called. Checking window.jspdf:', window.jspdf);
+        if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+            alert('Error: PDF library (jsPDF) not loaded. Please ensure you are connected to the internet and try refreshing the page.');
+            console.error("jsPDF library not found on window.jspdf or window.jspdf.jsPDF was not initialized.");
             return;
         }
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+
+        let customerDataForPdf = null;
+        let proceedWithPdf = true;
+
+        // Check if customer form has been filled (at least required fields)
+        const name = customerNameEl.value.trim();
+        const email = customerEmailEl.value.trim();
+        const phone = customerPhoneEl.value.trim();
+
+        if (name || email || phone) { // User has attempted to fill the form
+            // Validate required fields
+            if (!name || !email || !phone) {
+                displayApiFeedback('Please fill in all required fields: Name, Email, and Phone.', 'error');
+                proceedWithPdf = false; // Don't generate PDF if required fields are missing after attempting to fill
+                return; // Stop here
+            }
+            // Basic email validation
+            if (!/^\S+@\S+\.\S+$/.test(email)) {
+                displayApiFeedback('Please enter a valid email address.', 'error');
+                proceedWithPdf = false;
+                return; // Stop here
+            }
+
+            const customerDataPayload = {
+                Name: name,
+                Email: email,
+                Phone: phone,
+                Company: customerCompanyEl.value.trim(),
+                Address1: customerAddress1El.value.trim(),
+                Address2: customerAddress2El.value.trim(),
+                City: customerCityEl.value.trim(),
+                State: customerStateEl.value.trim(),
+                ZipCode: customerZipCodeEl.value.trim(),
+                Country: customerCountryEl.value.trim()
+            };
+            customerDataForPdf = { ...customerDataPayload }; // Store for PDF regardless of API outcome
+
+            try {
+                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/customers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(customerDataPayload)
+                });
+                
+                // Try to parse JSON only if response is likely to have a body
+                let resultMessage = `Response status: ${response.status}`;
+                if (response.headers.get("content-type")?.includes("application/json")) {
+                    const result = await response.json();
+                    resultMessage = result.message || `Customer API: ${response.statusText}`;
+                }
+
+                if (response.ok) { // Typically 200-299
+                    displayApiFeedback(`Customer details saved successfully. ${resultMessage}`, 'success');
+                } else {
+                    displayApiFeedback(`Error saving customer details: ${resultMessage}. Details will still be on PDF.`, 'error');
+                }
+            } catch (error) {
+                console.error('API submission error:', error);
+                displayApiFeedback(`Network error saving customer details: ${error.message}. Details will still be on PDF.`, 'error');
+            }
+        } else {
+            // Form not filled, clear any previous feedback
+            if (customerApiFeedbackEl) customerApiFeedbackEl.style.display = 'none';
+        }
         
+        // PDF Generation Logic (proceeds if form was skipped or after API attempt)
+        console.log('Proceeding to PDF generation. window.jspdf.jsPDF is:', window.jspdf.jsPDF);
+        const jsPDFConstructor = window.jspdf.jsPDF; // Assign directly
+
+        if (typeof jsPDFConstructor !== 'function') {
+            alert('Error: jsPDF constructor is not a function. Library might be corrupted or loaded incorrectly.');
+            console.error('window.jspdf.jsPDF is not a function:', jsPDFConstructor);
+            return;
+        }
+        const doc = new jsPDFConstructor();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 14; // Page margin
+        let yPos = margin;
+
+        // --- 1. Header: Company Name (Text), Quote Title, Date ---
+        doc.setFont(undefined, 'bold');
+        doc.setFontSize(16);
+        doc.text('Northwest Custom Apparel', margin, yPos + 5); // Adjusted yPos for text
+        
+        doc.setFontSize(18); // PRICE QUOTE title
+        doc.text('PRICE QUOTE', pageWidth - margin, yPos + 7, { align: 'right' });
+        yPos += 15; // Initial yPos increment after company name / quote title line
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - margin, yPos, { align: 'right' });
+        yPos += 7; // Space after date line
+        // Removed priming call and swatch pre-loading logic
+        yPos += 5; // Space before customer info
+
+        // --- 2. Customer Information (if available) ---
+        if (customerDataForPdf) {
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('Customer Information:', margin, yPos);
+            yPos += 6;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            if (customerDataForPdf.Name) { doc.text(`Name: ${customerDataForPdf.Name}`, margin, yPos); yPos += 5; }
+            if (customerDataForPdf.Company) { doc.text(`Company: ${customerDataForPdf.Company}`, margin, yPos); yPos += 5; }
+            if (customerDataForPdf.Email) { doc.text(`Email: ${customerDataForPdf.Email}`, margin, yPos); yPos += 5; }
+            if (customerDataForPdf.Phone) { doc.text(`Phone: ${customerDataForPdf.Phone}`, margin, yPos); yPos += 5; }
+            
+            let addressString = '';
+            if (customerDataForPdf.Address1) addressString += customerDataForPdf.Address1;
+            if (customerDataForPdf.Address2) addressString += (addressString ? `, ${customerDataForPdf.Address2}` : customerDataForPdf.Address2);
+            
+            let cityStateZip = [];
+            if (customerDataForPdf.City) cityStateZip.push(customerDataForPdf.City);
+            if (customerDataForPdf.State) cityStateZip.push(customerDataForPdf.State);
+            if (customerDataForPdf.ZipCode) cityStateZip.push(customerDataForPdf.ZipCode);
+            if (cityStateZip.length > 0) addressString += (addressString ? `, ${cityStateZip.join(', ')}` : cityStateZip.join(', '));
+            if (customerDataForPdf.Country) addressString += (addressString ? `, ${customerDataForPdf.Country}` : customerDataForPdf.Country);
+
+            if (addressString) {
+                doc.text(`Address: ${addressString}`, margin, yPos); yPos += 5;
+            }
+            yPos += 7; // Extra space after customer info
+        }
+
+        // --- 3. Product & Order Details ---
+        // Section "Quote For:" and "Unit Price Applied (before BOGO)" is removed.
+        const pageProductTitle = productTitleEl ? productTitleEl.innerText : DEFAULT_PRODUCT_TITLE;
+        yPos += 5; // Add some space if customer info was present, or if not, start after header.
+
         let totalQuantityForPdf = 0;
         selectedOrderItems.forEach(item => { totalQuantityForPdf += item.quantity; });
         const currentTierPriceForPdf = getCurrentTierPrice(totalQuantityForPdf);
-        const pageProductTitle = productTitleEl ? productTitleEl.innerText : DEFAULT_PRODUCT_TITLE;
+        const discountedItemPriceForPdf = currentTierPriceForPdf ? currentTierPriceForPdf * 0.75 : 0;
 
-        doc.setFontSize(18);
-        doc.text('C112 Cap - BOGO Deal Quote', 14, 22);
-        doc.setFontSize(11);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
-        doc.text(`Product: ${pageProductTitle} (Style: ${PRODUCT_STYLE})`, 14, 37);
-        
-        let yPos = 44;
-        if (currentTierPriceForPdf) {
-            doc.text(`Price Tier Applied (per item before BOGO): $${currentTierPriceForPdf.toFixed(2)}`, 14, yPos);
-            yPos += 7;
+        // Calculate overall BOGO distribution for the entire order
+        let orderTotalFullPriceItems = 0;
+        let orderTotalDiscountedItems = 0;
+        if (currentTierPriceForPdf && totalQuantityForPdf >= MIN_ORDER_QUANTITY) {
+            const numberOfPairs = Math.floor(totalQuantityForPdf / 2);
+            const singleItems = totalQuantityForPdf % 2;
+            orderTotalFullPriceItems = numberOfPairs + singleItems;
+            orderTotalDiscountedItems = numberOfPairs;
+        } else {
+            orderTotalFullPriceItems = totalQuantityForPdf; // All items are full price if no BOGO
         }
         
-        doc.setFontSize(12);
-        doc.text('Order Details:', 14, yPos + 7);
-        yPos += 14;
-        
-        selectedOrderItems.forEach((item) => {
-            doc.text(`${item.quantity} x ${item.color.name}`, 14, yPos);
-            if (currentTierPriceForPdf) {
-                 doc.text(`(Base Tier Price: $${currentTierPriceForPdf.toFixed(2)})`, 100, yPos);
-            }
-            yPos += 7;
-        });
+        let remainingOrderFullPriceSlots = orderTotalFullPriceItems;
+        let remainingOrderDiscountedSlots = orderTotalDiscountedItems;
 
-        // Recalculate for PDF to ensure accuracy
+        // Columnar Order Items
+        doc.setFontSize(11); // Heading for the table
+        doc.setFont(undefined, 'bold');
+        doc.text('Order Items:', margin, yPos); yPos += 7; // Increased space after heading
+        
+        doc.setFontSize(9); // Smaller font for table content & headers
+        const colStyleX = margin;
+        const colDescX = colStyleX + 20;
+        const colColorX = colDescX + 75; // Adjusted width
+        const colQtyX = colColorX + 40;   // Adjusted width
+        const colDetailsX = colQtyX + 18; // X for the start of "Price Details" column text
+        const colLineTotalX = pageWidth - margin; // Define X for the Line Total column (right edge)
+
+        doc.text('Style', colStyleX, yPos);
+        doc.text('Description', colDescX, yPos);
+        doc.text('Color', colColorX, yPos);
+        doc.text('Qty', colQtyX, yPos, { align: 'right' });
+        doc.text('Price Details', colDetailsX, yPos);
+        doc.text('Line Total', colLineTotalX, yPos, { align: 'right' }); // Add Line Total header
+        yPos += 3;
+        doc.setLineWidth(0.2);
+        doc.line(margin, yPos, pageWidth - margin, yPos); // Underline headers
+        yPos += 5;
+        doc.setFont(undefined, 'normal');
+
+        selectedOrderItems.forEach((item) => {
+            const itemStartY = yPos;
+            doc.text(PRODUCT_STYLE, colStyleX, itemStartY);
+            doc.text(pageProductTitle, colDescX, itemStartY, { maxWidth: colColorX - colDescX - 2 });
+            doc.text(item.color.name, colColorX, itemStartY, { maxWidth: colQtyX - colColorX - 2 });
+            doc.text(item.quantity.toString(), colQtyX, itemStartY, { align: 'right' });
+
+            let detailY = itemStartY;
+            let linesInDetail = 0;
+            // Ensuring these are declared and initialized for each item iteration.
+            let itemSpecificQtyAtFull = 0;
+            let itemSpecificQtyAtBOGO = 0;
+
+            if (currentTierPriceForPdf && totalQuantityForPdf >= MIN_ORDER_QUANTITY) {
+                let itemQtyToDistribute = item.quantity;
+
+                if (remainingOrderFullPriceSlots > 0) {
+                    const takeForFull = Math.min(itemQtyToDistribute, remainingOrderFullPriceSlots);
+                    itemSpecificQtyAtFull = takeForFull;
+                    remainingOrderFullPriceSlots -= takeForFull;
+                    itemQtyToDistribute -= takeForFull;
+                }
+                if (itemQtyToDistribute > 0 && remainingOrderDiscountedSlots > 0) {
+                    const takeForBOGO = Math.min(itemQtyToDistribute, remainingOrderDiscountedSlots);
+                    itemSpecificQtyAtBOGO = takeForBOGO;
+                    remainingOrderDiscountedSlots -= takeForBOGO;
+                }
+                
+                if (itemSpecificQtyAtFull > 0) {
+                    doc.text(`${itemSpecificQtyAtFull} units @ $${currentTierPriceForPdf.toFixed(2)}`, colDetailsX, detailY, {align: 'left'});
+                    detailY += 5;
+                    linesInDetail++;
+                }
+                if (itemSpecificQtyAtBOGO > 0) {
+                    doc.text(`${itemSpecificQtyAtBOGO} units @ $${discountedItemPriceForPdf.toFixed(2)} (25% off)`, colDetailsX, detailY, {align: 'left'});
+                    detailY += 5;
+                    linesInDetail++;
+                }
+            } else if (currentTierPriceForPdf) {
+                 itemSpecificQtyAtFull = item.quantity;
+                 doc.text(`${item.quantity} units @ $${currentTierPriceForPdf.toFixed(2)}`, colDetailsX, detailY, {align: 'left'});
+                 linesInDetail++;
+                 detailY += 5;
+            } else {
+                itemSpecificQtyAtFull = item.quantity;
+                const fallbackPrice = C112_8000_STITCH_PRICING_TIERS[0]?.price || 0;
+                doc.text(`${item.quantity} units @ $${fallbackPrice.toFixed(2)} (Std. Price)`, colDetailsX, detailY, {align: 'left'});
+                linesInDetail++;
+                detailY += 5;
+            }
+            
+            // Calculate and display Line Total for this item
+            let lineItemTotal = 0;
+            const effectiveTierPrice = currentTierPriceForPdf || (C112_8000_STITCH_PRICING_TIERS[0]?.price || 0);
+            const effectiveBogoPrice = discountedItemPriceForPdf || (effectiveTierPrice * 0.75);
+
+            // This calculation now uses itemSpecificQtyAtFull and itemSpecificQtyAtBOGO which are guaranteed to be in scope
+            lineItemTotal = (itemSpecificQtyAtFull * effectiveTierPrice) + (itemSpecificQtyAtBOGO * effectiveBogoPrice);
+            
+            doc.text(`$${lineItemTotal.toFixed(2)}`, colLineTotalX, itemStartY, { align: 'right' });
+
+            // Ensure yPos advances by at least one main line height, or more if sub-lines took space.
+            yPos = Math.max(itemStartY + 6, detailY - (linesInDetail > 0 ? 0 : 5) );
+            yPos += 2; // Small padding after each item block
+        });
+        yPos += 8; // Extra space after items list
+
+        // --- 4. Financial Summary ---
+        // Recalculate for PDF to ensure accuracy (already done in previous version, good)
         let pdfGrossSubtotal = 0;
         let pdfBogoDiscount = 0;
         let pdfNetSubtotal = 0;
@@ -458,35 +713,69 @@ document.addEventListener('DOMContentLoaded', () => {
             doc.text('BOGO Breakdown:', 14, yPos);
             pdfBreakdownLines.forEach(line => {
                 yPos += 5;
-                doc.text(line, 18, yPos);
+                doc.text(line, margin + 5, yPos); // Indent breakdown lines
             });
-            yPos += 7; // Extra space after breakdown
+            yPos += 7;
         }
         
-        doc.setFontSize(11);
-        doc.text(`Subtotal (Pre-Discount):`, 120, yPos);
-        doc.text(`$${pdfGrossSubtotal.toFixed(2)}`, 180, yPos, { align: 'right' });
-        yPos += 7;
-        doc.text(`BOGO Discount:`, 120, yPos);
-        doc.text(`-$${pdfBogoDiscount.toFixed(2)}`, 180, yPos, { align: 'right' });
-        yPos += 7;
-        doc.text(`Subtotal (Post-Discount):`, 120, yPos);
-        doc.text(`$${pdfNetSubtotal.toFixed(2)}`, 180, yPos, { align: 'right' });
-        yPos += 7;
-        doc.text(`Milton Sales Tax (10.1%):`, 120, yPos);
-        doc.text(`$${pdfTaxAmount.toFixed(2)}`, 180, yPos, { align: 'right' });
-        yPos += 7;
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'bold');
-        doc.text(`Grand Total:`, 120, yPos);
-        doc.text(`$${pdfGrandTotal.toFixed(2)}`, 180, yPos, { align: 'right' });
-        doc.setFont(undefined, 'normal');
-        
-        yPos += 15;
+        const totalsX = pageWidth / 2 + 20; // X position for totals labels
+        const amountsX = pageWidth - margin;  // X position for amounts (right aligned)
+
         doc.setFontSize(10);
-        doc.text('Minimum order 24 caps. Price includes 8000-stitch embroidery.', 14, yPos);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Subtotal (Pre-Discount):`, totalsX, yPos);
+        doc.text(`$${pdfGrossSubtotal.toFixed(2)}`, amountsX, yPos, { align: 'right' });
+        yPos += 6;
+        doc.text(`BOGO Discount:`, totalsX, yPos);
+        doc.text(`-$${pdfBogoDiscount.toFixed(2)}`, amountsX, yPos, { align: 'right' });
+        yPos += 6;
+        doc.setFont(undefined, 'bold');
+        doc.text(`Subtotal (Post-Discount):`, totalsX, yPos);
+        doc.text(`$${pdfNetSubtotal.toFixed(2)}`, amountsX, yPos, { align: 'right' });
+        yPos += 6;
+        doc.setFont(undefined, 'normal');
+        doc.text(`Milton Sales Tax (10.1%):`, totalsX, yPos);
+        doc.text(`$${pdfTaxAmount.toFixed(2)}`, amountsX, yPos, { align: 'right' });
+        yPos += 7;
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.setDrawColor(0); // Black line
+        doc.line(totalsX - 5, yPos, amountsX, yPos); // Line above grand total
         yPos += 5;
-        doc.text('Please email this quote to sales@nwcustomapparel.com to finalize your order.', 14, yPos);
+        doc.text(`GRAND TOTAL:`, totalsX, yPos);
+        doc.text(`$${pdfGrandTotal.toFixed(2)}`, amountsX, yPos, { align: 'right' });
+        doc.setFont(undefined, 'normal');
+        yPos += 12; // More space after Grand Total
+
+        // --- Prominent Email Instructions ---
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'bold');
+        doc.text('To Finalize Your Order or For Questions:', margin, yPos);
+        yPos += 6;
+        doc.setFont(undefined, 'normal');
+        doc.text('Please email this PDF quote to: sales@nwcustomapparel.com', margin, yPos);
+        yPos += 5;
+        doc.text('Or contact your sales representative:', margin, yPos);
+        yPos += 5;
+        doc.text('  Nika: nika@nwcustomapparel.com', margin, yPos);
+        yPos += 5;
+        doc.text('  Taylar: taylar@nwcustomapparel.com', margin, yPos);
+        
+        // --- 5. Footer ---
+        const footerStartY = pageHeight - margin - 15; // Adjust 15 based on content height
+        doc.setLineWidth(0.2);
+        doc.line(margin, footerStartY, pageWidth - margin, footerStartY); // Horizontal line above footer
+        yPos = footerStartY + 7;
+
+        doc.setFontSize(9);
+        doc.text('Northwest Custom Apparel', margin, yPos);
+        doc.text('253-922-5793', pageWidth - margin, yPos, {align: 'right'});
+        yPos += 5;
+        doc.text('2025 Freeman Road East, Milton, WA 98354', margin, yPos);
+        // Removed duplicated email info from here, now it's prominent above.
+        yPos += 7;
+        doc.setFontSize(8);
+        doc.text('Minimum order 24 caps. Price includes 8000-stitch embroidery. Quote valid for 30 days.', margin, yPos);
 
         doc.save('NWCA_C112_BOGO_Quote.pdf');
         if (emailInstructionsEl) emailInstructionsEl.style.display = 'block';
