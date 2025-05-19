@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C112 BOGO Deal! | NWCA</title>
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <!-- jsPDF Libraries for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Page-specific adjustments if needed, complementing shared-pricing-styles.css */
+        body {
+            background-color: var(--background-global, #f0f2f5); /* Consistent global background */
+        }
+        .container { /* Override default container from shared if it's too narrow or has wrong padding */
+            max-width: 1200px; /* Wider for two-column layout */
+            margin: 20px auto;
+            padding: 20px; /* Standard padding */
+        }
+
+        /* BOGO Deal Header - Enhanced */
+        .bogo-deal-header {
+            /* Using a subtle gradient - adjust colors/angle as needed. Assumes --primary-color is your green. */
+            background: linear-gradient(135deg, var(--primary-color) 0%, color-mix(in srgb, var(--primary-color) 85%, black) 100%);
+            color: white;
+            padding: 25px 20px; /* Slightly more padding */
+            text-align: center;
+            border-radius: var(--radius-md, 8px) var(--radius-md, 8px) 0 0; /* Ensure fallback for radius */
+            margin-bottom: 0;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Softer, more modern shadow */
+        }
+        .bogo-deal-header .nwca-logo {
+            max-height: 55px; /* Slightly adjusted */
+            margin-bottom: 15px;
+        }
+        .bogo-deal-header h1 {
+            margin: 0 0 8px 0; /* More space below h1 */
+            font-size: 2.2em; /* Slightly larger */
+            font-weight: 700; /* Bolder */
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* Subtle text shadow */
+        }
+        .bogo-deal-header h2 {
+            margin: 0 0 10px 0; /* Space below h2 */
+            font-size: 1.5em; /* Slightly larger */
+            font-weight: 500; /* Adjusted weight */
+            color: var(--accent-color, #ffc107);
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+        }
+        .bogo-deal-header .deal-terms {
+            font-size: 0.9em;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        /* Ensure columns have some background and padding */
+        .product-context-column, .product-interactive-column {
+            background-color: var(--white, #fff);
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        .product-interactive-column { /* Specific for this page's right side */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Styling for the selected items list in the right column */
+        #bogoSelectedItemsContainer .item-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dotted var(--border-light, #eee);
+        }
+        #bogoSelectedItemsContainer .item-entry:last-child {
+            border-bottom: none;
+        }
+        #bogoSelectedItemsContainer .item-info img {
+            width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px; vertical-align: middle;
+        }
+        #bogoSelectedItemsContainer input[type="number"] {
+            width: 60px; padding: 8px; text-align: center; border: 1px solid var(--border-color); border-radius: var(--radius-xs);
+        }
+        #bogoSelectedItemsContainer .remove-item-btn {
+            background: var(--danger-color, #dc3545); color: white; border: none; padding: 8px 12px; cursor: pointer; font-size: 0.9em; border-radius: var(--radius-xs); margin-left: 10px;
+        }
+        #bogoSelectedItemsContainer .remove-item-btn:hover {
+            background: var(--danger-dark, #c82333);
+        }
+
+        /* Totals section for BOGO */
+        .bogo-totals {
+            margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: right; font-size: 1.1em;
+        }
+        .bogo-totals p { margin: 8px 0; }
+        .bogo-totals strong { color: var(--primary-color); }
+        .bogo-min-order-notice { color: var(--danger-color, #dc3545); font-weight: bold; }
+        .bogo-min-order-notice.met { color: var(--success-color, #28a745); }
+
+        /* Actions for BOGO */
+        .bogo-actions button {
+            background-color: var(--success-color, #28a745); color: white; padding: 12px 25px; border: none; border-radius: var(--radius-sm); font-size: 1.1em; cursor: pointer; transition: background-color 0.3s ease; width: 100%; margin-top: 10px;
+        }
+        .bogo-actions button:hover:not(:disabled) { background-color: var(--success-dark, #218838); }
+        .bogo-actions button:disabled { background-color: #ccc; cursor: not-allowed; }
+        #bogoEmailInstructions { margin-top: 15px; padding: 10px; background-color: var(--info-light, #e9f5ff); border: 1px solid var(--info-border, #b3d7ff); border-radius: var(--radius-xs); }
+
+        /* Make sure product image in left column is responsive */
+        .product-image-container-context img { width: 100%; height: auto; }
+
+        /* Adjustments for .color-swatches-container.compact if needed */
+        .color-swatches-container.compact .color-swatches {
+             max-height: 400px; /* More space for swatches if desired */
+             overflow-y: auto;  /* Enable vertical scrolling */
+             display: flex;       /* Ensure flex layout for swatches */
+             flex-wrap: wrap;     /* Allow swatches to wrap to next line */
+             justify-content: flex-start; /* Align swatches to the start */
+             padding: 10px 5px; /* Add some padding inside the scrollable area */
+             border: 1px solid var(--border-light, #eee); /* Optional: border for the scroll area */
+             border-radius: var(--radius-xs);
+        }
+        .section-title { /* General section title from shared styles, ensure it's applied */
+            font-size: 1.3em;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .product-interactive-column .section-title {
+            margin-top: 0; /* First title in right column might not need top margin */
+        }
+         /* Override for product title in left column to match cap-embroidery page */
+        .product-context-column .product-header .product-title-area h2 {
+            color: var(--primary-color); /* Ensure it uses primary color */
+            font-size: 1.5em; /* Match size */
+        }
+        .product-context-column .product-header {
+            background-color: var(--background-light, #f8f9fa);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 15px;
+            padding: 15px 20px;
+        }
+        .product-meta {
+            font-size: 0.9em;
+            color: var(--text-muted);
+        }
+        .static-product-info {
+             padding:15px; background-color: var(--background-ultralight); border-radius: var(--radius-sm); margin-top:15px; font-size: 0.9em;
+        }
+
+        /* Swatch Styles from cap-embroidery-pricing.html */
+        /* Simplified Swatch Styles */
+        .swatch-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70px; /* Adjust as needed */
+            min-height: 75px; /* Ensure enough space for swatch + name */
+            margin: 5px;
+            cursor: pointer;
+            justify-content: flex-start; /* Align items to the top */
+        }
+
+        .color-swatch { /* This class will be on the div that gets the background image */
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            margin-bottom: 4px;
+            background-size: cover;
+            background-position: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .color-swatch:hover {
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active { /* JS will add 'active' to the .color-swatch div */
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .color-name {
+            font-size: 0.75em;
+            text-align: center;
+            color: var(--text-color);
+            width: 100%; /* Take full width of wrapper */
+            line-height: normal; /* Use default line height */
+            padding: 0 2px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            display: block; /* Ensure it's a block element */
+        }
+
+        /* Pulse animation for highlighting a swatch (optional, can be triggered by JS) */
+        @keyframes pulse-highlight {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 128, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0); }
+        }
+
+        .color-swatch.pulse-highlight {
+            animation: pulse-highlight 1s ease; /* Run once */
+            border-color: var(--primary-color);
+        }
+        /* End Swatch Styles */
+
+        /* Force header text to be white & re-apply subtle shadows */
+        .bogo-deal-header h1 {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25) !important; /* Subtle dark shadow for H1 */
+        }
+        .bogo-deal-header h2 {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2) !important; /* Subtle dark shadow for H2 */
+        }
+        .bogo-deal-header p.deal-terms {
+            color: #ffffff !important;
+            text-shadow: none !important; /* No shadow for smaller text usually better */
+        }
+
+        /* Thumbnail Gallery Styles */
+        .thumbnail-gallery-container {
+            margin-top: 15px; /* Space above the gallery */
+            padding-top: 10px; /* Optional padding if a border is added */
+            border-top: 1px solid var(--border-light, #eee); /* Optional separator */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px; /* Space between thumbnails */
+            justify-content: flex-start; /* Align thumbnails to the start */
+        }
+        .gallery-thumbnail {
+            width: 65px;
+            height: 65px;
+            object-fit: cover;
+            border: 2px solid var(--border-color, #ddd);
+            border-radius: var(--radius-xs, 4px);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            background-color: #f9f9f9; /* Fallback bg for broken images */
+        }
+        .gallery-thumbnail:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.08);
+        }
+        .gallery-thumbnail.active-thumbnail {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 6px rgba(var(--primary-color-rgb, 0,76,151), 0.7); /* Use RGB version of primary if available */
+            transform: scale(1.08);
+        }
+        /* End Thumbnail Gallery Styles */
+
+        /* Price Tiers Display Styles */
+        .price-tiers-section {
+            margin-top: 20px;
+            margin-bottom: 15px; /* Space before the dynamic price guidance */
+            padding: 15px;
+            background-color: var(--background-light, #f8f9fa);
+            border: 1px solid var(--border-color, #dee2e6);
+            border-radius: var(--radius-sm, 0.25rem);
+            font-size: 0.9em;
+        }
+        .price-tiers-section h4 { /* Optional heading for the section */
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: var(--text-color-strong, #333);
+        }
+        .price-tier-item {
+            padding: 5px 0;
+            border-bottom: 1px dashed var(--border-light, #eee);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .price-tier-item:last-child {
+            border-bottom: none;
+        }
+        .price-tier-item.active-tier {
+            background-color: var(--primary-ultralight, #e6f2ff); /* A very light version of primary color */
+            color: var(--primary-color, #007bff);
+            font-weight: bold;
+            padding-left: 10px; /* Indent active tier slightly */
+            margin-left: -10px; /* Counteract padding for full background effect if parent has padding */
+            border-radius: var(--radius-xs);
+        }
+        .bogo-breakdown-details { /* Style for the new BOGO breakdown section */
+            font-size: 0.9em;
+            color: var(--text-muted, #6c757d);
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--border-light, #eee);
+            text-align: left; /* Align breakdown text to the left */
+        }
+        .bogo-breakdown-details p {
+            margin: 3px 0;
+        }
+        /* End Price Tiers Display Styles */
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="bogo-deal-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel Logo" class="nwca-logo">
+            <h1>Embroidered Mesh Back Trucker Cap BOGO DEAL!</h1>
+            <h2>Buy One, Get One 25% OFF!</h2>
+            <p class="deal-terms">Minimum order: 24 caps. Price includes 8000-stitch embroidery.</p>
+        </div>
+
+        <div class="product-page-columns-container">
+            <!-- Left Column: Product Context (Inspired by cap-embroidery-pricing.html) -->
+            <div class="product-context-column">
+                <div class="product-header">
+                    <div class="product-title-area">
+                        <h2 id="product-title-context">Port Authority<sup>&reg;</sup> Pro Camouflage Series Cap</h2>
+                        <div class="product-meta">
+                            <span class="meta-item">Style: <strong id="product-style-context">C112</strong></span>
+                        </div>
+                    </div>
+                    <!-- No navigation area needed for this simple page -->
+                </div>
+                <div class="product-image-container-context">
+                    <img id="product-image-context" src="https://www.sanmar.com/cs/images/C112_mossyoakduckblind_model_front_040820.jpg" alt="C112 Cap">
+                    <!-- Zoom overlay can be kept if desired, or removed for simplicity -->
+                    <!-- <div class="image-zoom-overlay"><span class="zoom-icon">🔍</span></div> -->
+                </div>
+                <div class="thumbnail-gallery-container" id="thumbnailGalleryContainer">
+                    <!-- Thumbnails will be populated by JS -->
+                </div>
+                <div class="static-product-info">
+                    <!-- Price guidance paragraph removed from here -->
+                    <p>This two-toned cap features breathable mesh and contrast stitching on the bill. Fabric: 100% cotton twill front panels and bill (Solids) 65/35 polyester/cotton twill front panels and bill (Heathers) 100% polyester mesh mid and back panels Structure: Structured Profile: Mid Closure: 7-position adjustable snapback</p>
+                </div>
+                
+                <!-- Swatch section removed from left column -->
+            </div>
+
+            <!-- Right Column: Interactive BOGO Order Elements -->
+            <div class="product-interactive-column">
+                <!-- Swatch section MOVED to top of right column -->
+                <div class="color-swatches-right-column">
+                    <div class="color-swatches-container compact">
+                        <h3 class="section-title">1. Select Your Colors</h3>
+                        <div class="color-swatches" id="bogoColorSwatchesContainer">
+                            <!-- C112 Color swatches will be dynamically added here by c112-bogo-promo.js -->
+                        </div>
+                        <!-- "Show More Colors" button can be added by JS if many colors -->
+                    </div>
+                </div>
+
+                <h3 class="section-title" style="margin-top: 20px;">2. Build Your BOGO Order</h3>
+                <div id="bogoSelectedItemsContainer">
+                    <p>Click on a color swatch above to add it here. Then, enter quantities.</p>
+                    <!-- Selected items will be listed here by JS -->
+                </div>
+
+                <!-- Price Tiers Display Area -->
+                <div id="priceTiersDisplay" class="price-tiers-section">
+                    <!-- Price tiers will be populated by JS -->
+                </div>
+
+                <!-- Moved Price Guidance Text Here -->
+                <div class="bogo-price-guidance" style="margin-top: 20px; padding: 10px; background-color: var(--info-ultralight, #f8f9fa); border-radius: var(--radius-xs); text-align: center; font-size: 0.9em; border: 1px solid var(--border-light, #eee);">
+                    <p style="margin:0;">
+                        <span id="basePriceDisplay">Select items to see pricing. Min 24 for BOGO deal.</span>
+                    </p>
+                </div>
+
+                <div class="bogo-totals">
+                    <div id="bogoBreakdownDisplay" class="bogo-breakdown-details">
+                        <!-- Detailed BOGO breakdown will be populated by JS here -->
+                        <p>Calculating BOGO details...</p>
+                    </div>
+                    <p>Subtotal (Pre-Discount): <span id="bogoGrossSubtotal">$0.00</span></p>
+                    <p>BOGO Discount: <span id="bogoBogoDiscount">$0.00</span></p>
+                    <p>Subtotal (Post-Discount): <span id="bogoNetSubtotal">$0.00</span></p>
+                    <p>Milton Sales Tax (10.1%): <span id="bogoTaxAmount">$0.00</span></p>
+                    <p><strong>Grand Total: <span id="bogoGrandTotal">$0.00</span></strong></p>
+                    <p class="bogo-min-order-notice" id="bogoMinOrderNotice">Minimum 24 caps required.</p>
+                </div>
+
+                <div class="bogo-actions">
+                    <h3 class="section-title" style="margin-top: 20px;">3. Finalize & Get Quote</h3>
+                    <button id="bogoGeneratePdfButton" disabled>Generate PDF Quote</button>
+                    <div id="bogoEmailInstructions" style="display:none;">
+                        <p>Please download your PDF quote and email it to <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a> to finalize your order, or if you have any questions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="c112-bogo-promo.js"></script>
+</body>
+</html>
