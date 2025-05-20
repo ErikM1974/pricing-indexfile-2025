@@ -859,6 +859,332 @@
             }
         }
     </style>
+    
+    <!-- Modern Button Styles -->
+    <style>
+        /* Button Base Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: var(--radius-sm, 4px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+        
+        /* Button Types */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, color-mix(in srgb, var(--primary-color) 85%, black) 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: var(--primary-dark);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color, #dc3545) 0%, color-mix(in srgb, var(--danger-color, #dc3545) 85%, black) 100%);
+            color: white;
+        }
+        
+        /* Button Sizes */
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+        }
+        
+        /* Button States */
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:focus {
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 47, 102, 30), 0.25);
+        }
+        
+        .btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Button Type States */
+        .btn-primary:hover {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 90%, black) 0%, color-mix(in srgb, var(--primary-color) 75%, black) 100%);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            color: var(--primary-color);
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--danger-color, #dc3545) 90%, black) 0%, color-mix(in srgb, var(--danger-color, #dc3545) 75%, black) 100%);
+        }
+        
+        /* Button with Icon */
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-icon i,
+        .btn-icon span {
+            margin-right: 0.5rem;
+        }
+        
+        /* Apply to specific buttons */
+        #bogoGeneratePdfButton {
+            width: 100%;
+            margin-top: 10px;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, var(--success-color, #28a745) 0%, color-mix(in srgb, var(--success-color, #28a745) 85%, black) 100%);
+            color: white;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        #bogoGeneratePdfButton:hover:not(:disabled) {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--success-color, #28a745) 90%, black) 0%, color-mix(in srgb, var(--success-color, #28a745) 75%, black) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        #bogoGeneratePdfButton:active:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        #bogoGeneratePdfButton:disabled {
+            background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Remove Item Button */
+        .remove-item-btn {
+            background: linear-gradient(135deg, var(--danger-color, #dc3545) 0%, color-mix(in srgb, var(--danger-color, #dc3545) 85%, black) 100%);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.9em;
+            border-radius: var(--radius-sm);
+            margin-left: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .remove-item-btn:hover {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--danger-color, #dc3545) 90%, black) 0%, color-mix(in srgb, var(--danger-color, #dc3545) 75%, black) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .remove-item-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Collapsible Toggle Styling */
+        .collapsible-header {
+            position: relative;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--white) 0%, var(--background-light, #f8f9fa) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collapsible-header:hover {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--white) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .collapsible-header:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .collapsible-header .toggle-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            font-size: 0.8em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .collapsible-header:hover .toggle-icon {
+            background-color: var(--primary-dark);
+            transform: scale(1.1);
+        }
+        
+        .collapsible-header.active .toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color, #2f661e) 0%, color-mix(in srgb, var(--primary-color, #2f661e) 85%, black) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color, #2f661e) 90%, black) 0%, color-mix(in srgb, var(--primary-color, #2f661e) 75%, black) 100%);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .back-to-top:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.95rem;
+            }
+            
+            .btn-sm {
+                padding: 0.35rem 0.7rem;
+                font-size: 0.8rem;
+            }
+            
+            .btn-lg {
+                padding: 0.8rem 1.6rem;
+                font-size: 1.05rem;
+            }
+            
+            #bogoGeneratePdfButton {
+                font-size: 1rem;
+            }
+            
+            .remove-item-btn {
+                padding: 6px 10px;
+                font-size: 0.85em;
+                margin-left: 5px;
+            }
+            
+            .collapsible-header {
+                padding: 12px;
+            }
+            
+            .collapsible-header .toggle-icon {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .back-to-top {
+                width: 45px;
+                height: 45px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .btn-sm {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
+            }
+            
+            .btn-lg {
+                padding: 0.7rem 1.4rem;
+                font-size: 1rem;
+            }
+            
+            .remove-item-btn {
+                padding: 5px 8px;
+                font-size: 0.8em;
+            }
+            
+            .collapsible-header {
+                padding: 10px;
+                font-size: 0.95em;
+            }
+            
+            .collapsible-header .toggle-icon {
+                width: 18px;
+                height: 18px;
+                font-size: 0.75em;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -945,21 +1271,6 @@
                 <li><strong>Give Us a Call:</strong> We still love talking to our customers! Reach us at <strong>253-922-5793</strong>.</li>
                 <li><strong>Visit Our Showroom:</strong> Come on down to our showroom! You can see and feel a sample of the C112 trucker cap (and even grab one to show your coworkers) before placing your order. We'd love to see you!</li>
             </ul>
-        </div>
-    </div>
-</section>
-
-<!-- Visit Our Showroom Section -->
-<section id="visit-showroom" class="showroom-section">
-    <div class="showroom-container">
-        <div class="showroom-image">
-            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Visit%20NW%20Custom%20Apparel%20Showroom.png?ver=1" alt="Northwest Custom Apparel Showroom" class="showroom-img">
-        </div>
-        <div class="showroom-content">
-            <h2>Visit Our Newly Remodeled Showroom!</h2>
-            <p>Experience our products in person at our newly remodeled showroom! Browse our expanded selection of embroidered baseball caps including premium brands like Richardson, Carhartt, and Nike. Our knowledgeable staff is ready to help you find the perfect products for your needs and answer any questions about customization options.</p>
-            <p class="showroom-hours"><strong>Showroom Hours:</strong> Monday-Friday, 9 AM - 5 PM</p>
-            <p class="showroom-cta">Stop by to see and feel sample products before placing your order!</p>
         </div>
     </div>
 </section>
@@ -1142,13 +1453,28 @@
 
                 <div class="bogo-actions">
                     <h3 class="section-title" style="margin-top: 20px;">3. Finalize & Get Quote</h3>
-                    <button id="bogoGeneratePdfButton" disabled>Generate PDF Quote</button>
+                    <button id="bogoGeneratePdfButton" class="btn-lg" disabled>Generate PDF Quote</button>
                     <div id="bogoEmailInstructions" style="display:none;">
                         <p>Please download your PDF quote and email it to <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a> to finalize your order, or if you have any questions.</p>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <!-- Visit Our Showroom Section -->
+        <section id="visit-showroom" class="showroom-section" style="margin-top: 40px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+            <div class="showroom-container">
+                <div class="showroom-image">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Visit%20NW%20Custom%20Apparel%20Showroom.png?ver=1" alt="Northwest Custom Apparel Showroom" class="showroom-img">
+                </div>
+                <div class="showroom-content">
+                    <h2>Visit Our Newly Remodeled Showroom!</h2>
+                    <p>Experience our products in person at our newly remodeled showroom! Browse our expanded selection of embroidered baseball caps including premium brands like Richardson, Carhartt, and Nike. Our knowledgeable staff is ready to help you find the perfect products for your needs and answer any questions about customization options.</p>
+                    <p class="showroom-hours"><strong>Showroom Hours:</strong> Monday-Friday, 9 AM - 5 PM</p>
+                    <p class="showroom-cta">Stop by to see and feel sample products before placing your order!</p>
+                </div>
+            </div>
+        </section>
     </div>
 
     <!-- Modal/Lightbox HTML Structure -->
@@ -1162,7 +1488,6 @@
     </div>
 
     <script src="c112-bogo-promo.js"></script>
-    
     <!-- Modal/Lightbox JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {

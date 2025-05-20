@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div>
                     Qty: <input type="number" value="${item.quantity}" min="1" data-color-code="${item.color.code}">
-                    <button class="remove-item-btn" data-color-code="${item.color.code}">&times; Remove</button>
+                    <button class="remove-item-btn" data-color-code="${item.color.code}"><span>&times;</span> Remove</button>
                 </div>
             `;
             selectedItemsContainerEl.appendChild(itemDiv);
