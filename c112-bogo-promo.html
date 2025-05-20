@@ -808,6 +808,57 @@
             }
         }
     </style>
+    <!-- Back to Top Button Styles -->
+    <style>
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color, #0056b3);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            background-color: color-mix(in srgb, var(--primary-color, #0056b3) 85%, black);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .back-to-top:active {
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 768px) {
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -1241,6 +1292,42 @@
                     showNextImage();
                 }
             });
+        });
+    </script>
+    <!-- Back to Top Button -->
+    <div id="backToTop" class="back-to-top" aria-label="Back to top">
+        &#8593;
+    </div>
+    
+    <!-- Back to Top Button JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const backToTopButton = document.getElementById('backToTop');
+            
+            // Show/hide button based on scroll position
+            function toggleBackToTopButton() {
+                if (window.scrollY > 300) {
+                    backToTopButton.classList.add('visible');
+                } else {
+                    backToTopButton.classList.remove('visible');
+                }
+            }
+            
+            // Smooth scroll to top when button is clicked
+            function scrollToTop(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+            
+            // Add event listeners
+            window.addEventListener('scroll', toggleBackToTopButton);
+            backToTopButton.addEventListener('click', scrollToTop);
+            
+            // Initial check in case page is loaded scrolled down
+            toggleBackToTopButton();
         });
     </script>
 </body>
