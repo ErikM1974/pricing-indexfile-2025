@@ -8,6 +8,51 @@
     <!-- jsPDF Libraries for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
+        /* Navigation menu styles */
+        .top-nav {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            border-radius: var(--radius-md, 8px);
+        }
+        .top-nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .top-nav-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .top-nav-contact {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .top-nav a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .top-nav a:hover {
+            color: var(--accent-color, #ffc107);
+            text-decoration: underline;
+        }
+        .top-nav .contact-item {
+            display: flex;
+            align-items: center;
+        }
+        .top-nav .contact-item i {
+            margin-right: 5px;
+        }
+        
         /* Page-specific adjustments if needed, complementing shared-pricing-styles.css */
         body {
             background-color: var(--background-global, #f0f2f5); /* Consistent global background */
@@ -299,16 +344,147 @@
         }
         /* End Price Tiers Display Styles */
 
+        /* Customer Info Form Styles */
+        #customerInfoFormContainer {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: var(--background-ultralight, #fcfdff);
+            border: 1px solid var(--border-color, #dee2e6);
+            border-radius: var(--radius-md, 8px);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.9em;
+            color: var(--text-color-strong);
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xs);
+            box-sizing: border-box; /* Ensures padding doesn't add to width */
+            font-size: 0.95em;
+        }
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 0, 123, 255), 0.25); /* Use RGB for primary color if available */
+        }
+        .form-group .required-indicator {
+            color: var(--danger-color, #dc3545);
+            margin-left: 3px;
+        }
+        .api-feedback { /* For success/error messages from API calls */
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: var(--radius-xs);
+            font-size: 0.9em;
+        }
+        .api-feedback.success {
+            background-color: var(--success-ultralight, #e6ffed);
+            border: 1px solid var(--success-border, #b3e6c3);
+            color: var(--success-dark, #155724);
+        }
+        .api-feedback.error {
+            background-color: var(--danger-ultralight, #ffe6e6);
+            border: 1px solid var(--danger-border, #e6b3b3);
+            color: var(--danger-dark, #721c24);
+        }
+        /* End Customer Info Form Styles */
+
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Navigation Menu -->
+        <div class="top-nav">
+            <div class="top-nav-container">
+                <div class="top-nav-links">
+                    <a href="https://www.nwcustomapparel.com" target="_blank">Northwest Custom Apparel</a>
+                </div>
+                <div class="top-nav-contact">
+                    <span class="contact-item"><i>📞</i> <a href="tel:2539225793">253-922-5793</a></span>
+                    <span class="contact-item"><i>✉️</i> <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></span>
+                    <span class="contact-item"><i>👤</i> <a href="mailto:taylar@nwcustomapparel.com">Taylar Hanson</a></span>
+                    <span class="contact-item"><i>👤</i> <a href="mailto:nika@nwcustomapparel.com">Nika Lao</a></span>
+                </div>
+            </div>
+        </div>
+        
         <div class="bogo-deal-header">
             <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel Logo" class="nwca-logo">
             <h1>Embroidered Mesh Back Trucker Cap BOGO DEAL!</h1>
             <h2>Buy One, Get One 25% OFF!</h2>
             <p class="deal-terms">Minimum order: 24 caps. Price includes 8000-stitch embroidery.</p>
         </div>
+<section id="ordering-instructions" class="ordering-info-section">
+    <h2>Ready to Get Your Embroidered Mesh Back Trucker Caps?</h2>
+    <p class="offer-highlight">Take advantage of our special offer: <strong>Buy One, Get One 25% OFF!</strong> Each cap includes your logo embroidered on the front (up to 8,000 stitches).</p>
+    <p>We've set up this simple order form to make getting your custom trucker caps (Style C112) quick and easy. Here’s how it works:</p>
+
+    <div class="collapsible-item">
+        <h3 class="collapsible-header">Ordering Online is as Easy as 1-2-3! <span class="toggle-icon">▶</span></h3>
+        <div class="collapsible-content">
+            <ol class="steps-list">
+                <li>
+                    <h4>Select Your Cap Colors & Quantities:</h4>
+                    <ul>
+                        <li>Use the "Select Your Colors" section to browse available cap colors.</li>
+                        <li>For each color you'd like, enter the desired quantity in the "Qty" box next to your chosen style (like "Grey Steel/ Neon Yellow").</li>
+                    </ul>
+                </li>
+                <li>
+                    <h4>Fill Out Your Contact Information:</h4>
+                    <ul>
+                        <li>Scroll down to "Your Information (Optional)" and provide your name, email, phone number, and shipping details. This helps us get your order processed smoothly.</li>
+                    </ul>
+                </li>
+                <li>
+                    <h4>Download & Email Your Order Summary:</h4>
+                    <ul>
+                        <li>Once you've made your selections and filled in your details, please print the page as a PDF (or save as PDF).</li>
+                        <li>Email your saved PDF order summary to us. You can send it to our main sales inbox or directly to your preferred account executive:
+                            <ul>
+                                <li>General Sales: <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></li>
+                                <li>Nika: <a href="mailto:nika@nwcustomapparel.com">nika@nwcustomapparel.com</a></li>
+                                <li>Taylar: <a href="mailto:taylar@nwcustomapparel.com">taylar@nwcustomapparel.com</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="collapsible-item">
+        <h3 class="collapsible-header">What Happens Next? <span class="toggle-icon">▶</span></h3>
+        <div class="collapsible-content">
+            <p>Once we receive your emailed order form, our team will personally contact you to:</p>
+            <ul>
+                <li>Confirm all the details of your order.</li>
+                <li>Discuss your logo and embroidery requirements.</li>
+                <li>Finalize payment arrangements. We'll make sure everything is 100% correct before we proceed!</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="collapsible-item">
+        <h3 class="collapsible-header">Prefer Other Ways to Order? We've Got You Covered! <span class="toggle-icon">▶</span></h3>
+        <div class="collapsible-content">
+            <p>We're happy to take your order in the way that works best for you:</p>
+            <ul>
+                <li><strong>Give Us a Call:</strong> We still love talking to our customers! Reach us at <strong>253-922-5793</strong>.</li>
+                <li><strong>Visit Our Showroom:</strong> Come on down to our showroom! You can see and feel a sample of the C112 trucker cap (and even grab one to show your coworkers) before placing your order. We'd love to see you!</li>
+            </ul>
+        </div>
+    </div>
+</section>
 
         <div class="product-page-columns-container">
             <!-- Left Column: Product Context (Inspired by cap-embroidery-pricing.html) -->
@@ -380,6 +556,54 @@
                     <p>Milton Sales Tax (10.1%): <span id="bogoTaxAmount">$0.00</span></p>
                     <p><strong>Grand Total: <span id="bogoGrandTotal">$0.00</span></strong></p>
                     <p class="bogo-min-order-notice" id="bogoMinOrderNotice">Minimum 24 caps required.</p>
+                </div>
+
+                <!-- Customer Information Form -->
+                <div id="customerInfoFormContainer">
+                    <h3 class="section-title" style="margin-bottom: 20px;">Your Information (Optional)</h3>
+                    <div id="customerApiFeedback" class="api-feedback" style="display: none;"></div> <!-- For API messages -->
+                    <form id="bogoCustomerForm">
+                        <div class="form-group">
+                            <label for="customerName">Name <span class="required-indicator">*</span></label>
+                            <input type="text" id="customerName" name="Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerEmail">Email <span class="required-indicator">*</span></label>
+                            <input type="email" id="customerEmail" name="Email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Phone <span class="required-indicator">*</span></label>
+                            <input type="tel" id="customerPhone" name="Phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerCompany">Company Name</label>
+                            <input type="text" id="customerCompany" name="Company">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerAddress1">Address Line 1</label>
+                            <input type="text" id="customerAddress1" name="Address1">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerAddress2">Address Line 2</label>
+                            <input type="text" id="customerAddress2" name="Address2">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerCity">City</label>
+                            <input type="text" id="customerCity" name="City">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerState">State</label>
+                            <input type="text" id="customerState" name="State">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerZipCode">Zip Code</label>
+                            <input type="text" id="customerZipCode" name="ZipCode">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerCountry">Country</label>
+                            <input type="text" id="customerCountry" name="Country">
+                        </div>
+                    </form>
                 </div>
 
                 <div class="bogo-actions">
