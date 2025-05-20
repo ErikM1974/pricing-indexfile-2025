@@ -397,7 +397,119 @@
             color: var(--danger-dark, #721c24);
         }
         /* End Customer Info Form Styles */
+        
+        /* Responsive Video Container Styles */
+        .embroidery-video-container {
+            margin-top: 25px;
+            margin-bottom: 20px;
+        }
+        .responsive-video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background-color: #f0f0f0; /* Light background while video loads */
+            border-radius: var(--radius-sm, 4px);
+            box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.1));
+        }
+        .responsive-video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-sm, 4px);
+        }
+        /* End Responsive Video Container Styles */
 
+    </style>
+    
+    <style>
+        /* Quantity Pricing Section Styles */
+        .pricing-section {
+            background-color: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .quantity-pricing-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .price-tier-card {
+            flex: 1;
+            min-width: 80px;
+            background-color: var(--background-light, #f8f9fa);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .price-tier-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-color);
+        }
+        
+        .price-tier-header {
+            font-weight: bold;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed var(--border-light, #eee);
+        }
+        
+        .price-tier-price {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 5px 0;
+        }
+        
+        .price-tier-label {
+            font-size: 0.8em;
+            color: var(--text-muted, #6c757d);
+        }
+        
+        .pricing-note {
+            background-color: var(--primary-light);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .pricing-note p {
+            margin: 5px 0;
+        }
+        
+        .pricing-note strong {
+            color: var(--primary-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .quantity-pricing-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .price-tier-card {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -413,6 +525,9 @@
                     <span class="contact-item"><i>✉️</i> <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></span>
                     <span class="contact-item"><i>👤</i> <a href="mailto:taylar@nwcustomapparel.com">Taylar Hanson</a></span>
                     <span class="contact-item"><i>👤</i> <a href="mailto:nika@nwcustomapparel.com">Nika Lao</a></span>
+                    <span class="contact-item"><i>𝕏</i> <a href="https://x.com/nwcustomapparel" target="_blank">Twitter</a></span>
+                    <span class="contact-item"><i>📘</i> <a href="https://www.facebook.com/nwcustomapparel" target="_blank">Facebook</a></span>
+                    <span class="contact-item"><i>📸</i> <a href="https://www.instagram.com/nwcustomapparel/" target="_blank">Instagram</a></span>
                 </div>
             </div>
         </div>
@@ -509,6 +624,64 @@
                 <div class="static-product-info">
                     <!-- Price guidance paragraph removed from here -->
                     <p>This two-toned cap features breathable mesh and contrast stitching on the bill. Fabric: 100% cotton twill front panels and bill (Solids) 65/35 polyester/cotton twill front panels and bill (Heathers) 100% polyester mesh mid and back panels Structure: Structured Profile: Mid Closure: 7-position adjustable snapback</p>
+                </div>
+                
+                <!-- Quantity Pricing Section -->
+                <div class="pricing-section">
+                    <h3 class="section-title">Quantity Pricing</h3>
+                    <div class="quantity-pricing-container">
+                        <div class="price-tier-card">
+                            <div class="price-tier-header">24-47 units</div>
+                            <div class="price-tier-price">$17.00</div>
+                            <div class="price-tier-label">per item</div>
+                        </div>
+                        <div class="price-tier-card">
+                            <div class="price-tier-header">48-71 units</div>
+                            <div class="price-tier-price">$16.00</div>
+                            <div class="price-tier-label">per item</div>
+                        </div>
+                        <div class="price-tier-card">
+                            <div class="price-tier-header">72+ units</div>
+                            <div class="price-tier-price">$15.50</div>
+                            <div class="price-tier-label">per item</div>
+                        </div>
+                    </div>
+                    <div class="pricing-note">
+                        <p>Price includes 8000-stitch embroidery. Minimum order: 24 caps.</p>
+                        <p><strong>BOGO Deal:</strong> Buy one, get one 25% OFF!</p>
+                    </div>
+                </div>
+                
+                <!-- Tips to Purchasing Custom Embroidered Baseball Caps Video -->
+                <div class="embroidery-video-container">
+                    <h3 class="section-title">Tips to Purchasing Custom Embroidered Baseball Caps</h3>
+                    <div class="responsive-video-wrapper">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/m07rWvPx1fg?si=r7hyVfL3HEeAUmj4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+                
+                <!-- History of NW Custom Apparel Video -->
+                <div class="embroidery-video-container">
+                    <h3 class="section-title">History of NW Custom Apparel Since 1977, narrated by owner Jim Mickelson</h3>
+                    <div class="responsive-video-wrapper">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/V2UyrU92igE?si=wiPga18bf4Kivpy3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+                
+                <!-- Embroidery Process Video -->
+                <div class="embroidery-video-container">
+                    <h3 class="section-title">See Our Embroidery Process</h3>
+                    <div class="responsive-video-wrapper">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/tzuD6ePulM4?si=zBg8_c8o5N-XHsXG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+                
+                <!-- Second Video - Erik Mickelson talks baseball caps -->
+                <div class="embroidery-video-container">
+                    <h3 class="section-title">Operations Manager Erik Mickelson talks baseball caps</h3>
+                    <div class="responsive-video-wrapper">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/beR8V1KSWT0?si=-caNSzPzk1z3CKDe" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
                 </div>
                 
                 <!-- Swatch section removed from left column -->
