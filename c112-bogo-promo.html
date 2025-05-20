@@ -425,6 +425,303 @@
 
     </style>
     
+    <!-- CTA Headline Styles -->
+    <style>
+        /* Call-to-Action Headline Styles */
+        .cta-headline-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, color-mix(in srgb, var(--primary-color) 85%, black) 100%);
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+            margin: 30px 0;
+            border-radius: var(--radius-md, 8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .cta-headline-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+        }
+        
+        .cta-headline {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cta-arrow {
+            display: inline-block;
+            margin-left: 10px;
+            font-size: 1.2em;
+            animation: bounce 1.5s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+        
+        /* Decorative elements */
+        .cta-headline-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='rgba(255,255,255,.05)' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.3;
+            z-index: 1;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .cta-headline {
+                font-size: 1.8em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .cta-headline {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+    
+    <!-- Showroom Section Styles -->
+    <style>
+        /* Visit Our Showroom Section */
+        .showroom-section {
+            margin: 30px 0;
+            background: linear-gradient(135deg, var(--white) 0%, var(--background-light, #f8f9fa) 100%);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-color);
+            border-radius: var(--radius-md, 8px);
+            box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.1));
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .showroom-section:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md, 0 4px 8px rgba(0,0,0,0.15));
+        }
+        
+        .showroom-container {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+        }
+        
+        .showroom-image {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            overflow: hidden;
+        }
+        
+        .showroom-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .showroom-img:hover {
+            transform: scale(1.03);
+        }
+        
+        .showroom-content {
+            flex: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .showroom-content h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        
+        .showroom-content p {
+            margin-bottom: 15px;
+            font-size: 1.05em;
+            line-height: 1.5;
+        }
+        
+        .showroom-hours {
+            background-color: var(--primary-ultralight, #e6f2ff);
+            padding: 10px 15px;
+            border-radius: var(--radius-sm, 4px);
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .showroom-cta {
+            font-weight: 600;
+            font-size: 1.1em !important;
+            color: var(--primary-dark);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .showroom-container {
+                flex-direction: column;
+            }
+            
+            .showroom-image {
+                max-width: 100%;
+                min-width: 100%;
+            }
+            
+            .showroom-img {
+                max-height: 300px;
+            }
+            
+            .showroom-content {
+                padding: 20px;
+            }
+            
+            .showroom-content h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+    
+    <!-- Modal/Lightbox CSS -->
+    <style>
+        /* Modal/Lightbox Styles */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.85);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .image-modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 90%;
+            height: 90%;
+            max-width: 1200px;
+        }
+        
+        .modal-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-sm, 4px);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background-color: rgba(255, 0, 0, 0.7);
+        }
+        
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s ease;
+            user-select: none;
+        }
+        
+        .modal-nav:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        
+        .modal-prev {
+            left: 10px;
+        }
+        
+        .modal-next {
+            right: 10px;
+        }
+        
+        /* Add a pointer cursor to images that can be clicked to open the modal */
+        .product-image-container-context img,
+        .gallery-thumbnail {
+            cursor: pointer;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                height: 95%;
+            }
+            
+            .modal-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 24px;
+            }
+            
+            .modal-close {
+                top: -30px;
+                width: 30px;
+                height: 30px;
+                font-size: 20px;
+            }
+        }
+    </style>
+    
     <style>
         /* Quantity Pricing Section Styles */
         .pricing-section {
@@ -601,6 +898,26 @@
     </div>
 </section>
 
+<!-- Visit Our Showroom Section -->
+<section id="visit-showroom" class="showroom-section">
+    <div class="showroom-container">
+        <div class="showroom-image">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Visit%20NW%20Custom%20Apparel%20Showroom.png?ver=1" alt="Northwest Custom Apparel Showroom" class="showroom-img">
+        </div>
+        <div class="showroom-content">
+            <h2>Visit Our Newly Remodeled Showroom!</h2>
+            <p>Experience our products in person at our newly remodeled showroom! Browse our expanded selection of embroidered baseball caps including premium brands like Richardson, Carhartt, and Nike. Our knowledgeable staff is ready to help you find the perfect products for your needs and answer any questions about customization options.</p>
+            <p class="showroom-hours"><strong>Showroom Hours:</strong> Monday-Friday, 9 AM - 5 PM</p>
+            <p class="showroom-cta">Stop by to see and feel sample products before placing your order!</p>
+        </div>
+    </div>
+</section>
+
+<!-- Begin Your Custom Cap Order CTA -->
+<section class="cta-headline-section">
+    <h2 class="cta-headline">Begin Your Custom Cap Order Here <span class="cta-arrow">↓</span></h2>
+</section>
+
         <div class="product-page-columns-container">
             <!-- Left Column: Product Context (Inspired by cap-embroidery-pricing.html) -->
             <div class="product-context-column">
@@ -676,13 +993,6 @@
                     </div>
                 </div>
                 
-                <!-- Second Video - Erik Mickelson talks baseball caps -->
-                <div class="embroidery-video-container">
-                    <h3 class="section-title">Operations Manager Erik Mickelson talks baseball caps</h3>
-                    <div class="responsive-video-wrapper">
-                        <iframe width="560" height="315" src="https://www.youtube.com/embed/beR8V1KSWT0?si=-caNSzPzk1z3CKDe" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    </div>
-                </div>
                 
                 <!-- Swatch section removed from left column -->
             </div>
@@ -733,7 +1043,7 @@
 
                 <!-- Customer Information Form -->
                 <div id="customerInfoFormContainer">
-                    <h3 class="section-title" style="margin-bottom: 20px;">Your Information (Optional)</h3>
+                    <h3 class="section-title" style="margin-bottom: 20px;">Your Information</h3>
                     <div id="customerApiFeedback" class="api-feedback" style="display: none;"></div> <!-- For API messages -->
                     <form id="bogoCustomerForm">
                         <div class="form-group">
@@ -790,6 +1100,148 @@
         </div>
     </div>
 
+    <!-- Modal/Lightbox HTML Structure -->
+    <div id="imageModal" class="image-modal">
+        <div class="modal-content">
+            <img id="modalImage" class="modal-image" src="" alt="Product Image">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <div class="modal-nav modal-prev" id="modalPrev">&#10094;</div>
+            <div class="modal-nav modal-next" id="modalNext">&#10095;</div>
+        </div>
+    </div>
+
     <script src="c112-bogo-promo.js"></script>
+    
+    <!-- Modal/Lightbox JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalClose = document.getElementById('modalClose');
+            const modalPrev = document.getElementById('modalPrev');
+            const modalNext = document.getElementById('modalNext');
+            const mainProductImage = document.getElementById('product-image-context');
+            const thumbnailGallery = document.getElementById('thumbnailGalleryContainer');
+            
+            let currentImageIndex = 0;
+            let galleryImages = [];
+            
+            // Function to collect all available images
+            function collectGalleryImages() {
+                galleryImages = [];
+                // Add main product image
+                if (mainProductImage) {
+                    galleryImages.push({
+                        src: mainProductImage.src,
+                        alt: mainProductImage.alt || 'Product Image'
+                    });
+                }
+                
+                // Add all thumbnails
+                if (thumbnailGallery) {
+                    const thumbnails = thumbnailGallery.querySelectorAll('.gallery-thumbnail');
+                    thumbnails.forEach(thumb => {
+                        // Avoid duplicates
+                        if (!galleryImages.some(img => img.src === thumb.src)) {
+                            galleryImages.push({
+                                src: thumb.src,
+                                alt: thumb.alt || 'Product Image'
+                            });
+                        }
+                    });
+                }
+                
+                return galleryImages;
+            }
+            
+            // Function to open modal with specific image
+            function openModal(imageSrc, imageAlt) {
+                collectGalleryImages();
+                
+                // Find the index of the clicked image
+                currentImageIndex = galleryImages.findIndex(img => img.src === imageSrc);
+                if (currentImageIndex === -1) currentImageIndex = 0;
+                
+                modalImage.src = imageSrc;
+                modalImage.alt = imageAlt || 'Product Image';
+                
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+                
+                // Show/hide navigation based on gallery size
+                if (galleryImages.length <= 1) {
+                    modalPrev.style.display = 'none';
+                    modalNext.style.display = 'none';
+                } else {
+                    modalPrev.style.display = 'flex';
+                    modalNext.style.display = 'flex';
+                }
+            }
+            
+            // Function to close modal
+            function closeModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+            
+            // Function to navigate to previous image
+            function showPrevImage() {
+                if (galleryImages.length <= 1) return;
+                
+                currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+                modalImage.src = galleryImages[currentImageIndex].src;
+                modalImage.alt = galleryImages[currentImageIndex].alt;
+            }
+            
+            // Function to navigate to next image
+            function showNextImage() {
+                if (galleryImages.length <= 1) return;
+                
+                currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+                modalImage.src = galleryImages[currentImageIndex].src;
+                modalImage.alt = galleryImages[currentImageIndex].alt;
+            }
+            
+            // Event listeners
+            if (mainProductImage) {
+                mainProductImage.addEventListener('click', function() {
+                    openModal(this.src, this.alt);
+                });
+            }
+            
+            if (thumbnailGallery) {
+                thumbnailGallery.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('gallery-thumbnail')) {
+                        openModal(e.target.src, e.target.alt);
+                    }
+                });
+            }
+            
+            modalClose.addEventListener('click', closeModal);
+            
+            modalPrev.addEventListener('click', showPrevImage);
+            modalNext.addEventListener('click', showNextImage);
+            
+            // Close modal when clicking outside the image
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (!modal.classList.contains('active')) return;
+                
+                if (e.key === 'Escape') {
+                    closeModal();
+                } else if (e.key === 'ArrowLeft') {
+                    showPrevImage();
+                } else if (e.key === 'ArrowRight') {
+                    showNextImage();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
