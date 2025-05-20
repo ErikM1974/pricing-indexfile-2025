@@ -72,6 +72,99 @@ document.addEventListener('DOMContentLoaded', () => {
         if (generatePdfButtonEl) {
             generatePdfButtonEl.addEventListener('click', handleGeneratePdf);
         }
+        setupAccordion(); // Call to set up the new accordion
+    }
+
+    function setupAccordion() {
+        const accordionItems = document.querySelectorAll('.ordering-info-section .collapsible-item');
+        
+        accordionItems.forEach((item, index) => {
+            const header = item.querySelector('.collapsible-header');
+            const content = item.querySelector('.collapsible-content');
+
+            if (!header) {
+                console.error('Collapsible header not found in item:', item);
+                return;
+            }
+            if (!content) {
+                console.error('Collapsible content not found in item:', item);
+                return;
+            }
+
+            // Initialize: Open the first item by default using inline style
+            if (index === 0) {
+                header.classList.add('active'); // For icon
+                content.style.display = 'block'; // Show with inline style
+            } else {
+                // Ensure other headers are not active and content is hidden with inline style
+                header.classList.remove('active'); // For icon
+                content.style.display = 'none';  // Hide with inline style
+            }
+
+            header.addEventListener('click', () => {
+                console.log('Accordion header clicked:', header);
+                console.log('Associated content div:', content);
+                
+                // Toggle 'active' class on the header (for icon rotation via CSS)
+                header.classList.toggle('active');
+                
+                // Toggle display of content using inline styles
+                let newDisplayState;
+                if (content.style.display === 'block') {
+                    content.style.display = 'none';
+                    content.classList.remove('active'); // CRITICAL: Remove the active class
+                    content.classList.remove('is-expanded'); // CRITICAL: Also remove the is-expanded class from shared CSS
+                    newDisplayState = 'none';
+                    // Optionally reset any aggressive styles when hiding
+                    content.style.height = '';
+                    content.style.maxHeight = ''; // Reset max-height explicitly
+                    content.style.opacity = '';
+                    content.style.visibility = '';
+                    content.style.overflow = ''; // Reset overflow explicitly
+                } else {
+                    content.style.display = 'block';
+                    content.classList.add('active'); // CRITICAL: Add the active class
+                    content.classList.add('is-expanded'); // CRITICAL: Also add the is-expanded class from shared CSS
+                    newDisplayState = 'block';
+                    // Aggressively try to make the content div and its children visible
+                    content.style.height = 'auto'; // Override fixed height
+                    content.style.maxHeight = '2000px !important'; // Override max-height with a large value
+                    content.style.opacity = '1';
+                    content.style.visibility = 'visible';
+                    content.style.overflow = 'visible'; // Ensure overflow is visible
+                    content.style.color = 'red'; // Make text red to be VERY obvious
+                    content.style.fontSize = '16px'; // Force a visible font size
+                    
+                    Array.from(content.children).forEach(child => {
+                        if (child instanceof HTMLElement) {
+                            child.style.display = 'block'; // Ensure children are block
+                            child.style.height = 'auto';
+                            child.style.opacity = '1';
+                            child.style.visibility = 'visible';
+                            child.style.color = 'blue'; // Make direct children blue
+                            child.style.fontSize = '16px';
+                        }
+                    });
+                    // Log the innerHTML when we try to show it
+                    console.log(`innerHTML of content div (should be red/blue if styled):`, content.innerHTML);
+                }
+                
+                console.log('Header active state:', header.classList.contains('active'));
+                console.log('Content display style IMMEDIATELY SET TO:', newDisplayState);
+
+                // Check the style again after a short delay to detect interference
+                setTimeout(() => {
+                    const headerTextForLog = header.textContent.trim().substring(0, 30); // Get first 30 chars of header text
+                    console.log(`AFTER 100ms DELAY: For header "${headerTextForLog}...", content display is: ${content.style.display}`);
+                    if (newDisplayState === 'block' && content.style.display !== 'block') {
+                        console.warn(`WARNING: For header "${headerTextForLog}...", content display was 'block' but is now '${content.style.display}' after 100ms! Interference suspected.`);
+                    }
+                    if (newDisplayState === 'block') {
+                        console.log(`innerHTML of content div AFTER 100ms DELAY:`, content.innerHTML);
+                    }
+                }, 100);
+            });
+        });
     }
 
     async function fetchAndRenderColors() {
@@ -587,19 +680,20 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text('Order Items:', margin, yPos); yPos += 7; // Increased space after heading
         
         doc.setFontSize(9); // Smaller font for table content & headers
-        const colStyleX = margin;
-        const colDescX = colStyleX + 20;
-        const colColorX = colDescX + 75; // Adjusted width
-        const colQtyX = colColorX + 40;   // Adjusted width
-        const colDetailsX = colQtyX + 18; // X for the start of "Price Details" column text
-        const colLineTotalX = pageWidth - margin; // Define X for the Line Total column (right edge)
+        // New Column Layout: Description | Color | Qty / Price | Line Total
+        const colDescX = margin; // Description starts at margin
+        const descMaxWidth = 70;
+        const colColorX = colDescX + descMaxWidth + 5; // Allow 5 for padding after desc
+        const colorMaxWidth = 45;
+        const colDetailsX = colColorX + colorMaxWidth + 5; // Renamed to "Qty / Price", allow 5 for padding after color
+        const colLineTotalX = pageWidth - margin;
+        // Max width for "Qty / Price" content: colLineTotalX - colDetailsX - (padding for line total text itself e.g. 2)
+        const qtyPriceMaxWidth = colLineTotalX - colDetailsX - 2;
 
-        doc.text('Style', colStyleX, yPos);
         doc.text('Description', colDescX, yPos);
         doc.text('Color', colColorX, yPos);
-        doc.text('Qty', colQtyX, yPos, { align: 'right' });
-        doc.text('Price Details', colDetailsX, yPos);
-        doc.text('Line Total', colLineTotalX, yPos, { align: 'right' }); // Add Line Total header
+        doc.text('Qty / Price', colDetailsX, yPos, {align: 'left'});
+        doc.text('Line Total', colLineTotalX, yPos, { align: 'right' });
         yPos += 3;
         doc.setLineWidth(0.2);
         doc.line(margin, yPos, pageWidth - margin, yPos); // Underline headers
@@ -608,10 +702,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         selectedOrderItems.forEach((item) => {
             const itemStartY = yPos;
-            doc.text(PRODUCT_STYLE, colStyleX, itemStartY);
-            doc.text(pageProductTitle, colDescX, itemStartY, { maxWidth: colColorX - colDescX - 2 });
-            doc.text(item.color.name, colColorX, itemStartY, { maxWidth: colQtyX - colColorX - 2 });
-            doc.text(item.quantity.toString(), colQtyX, itemStartY, { align: 'right' });
+            // Removed PRODUCT_STYLE (Style column)
+            doc.text(pageProductTitle, colDescX, itemStartY, { maxWidth: descMaxWidth });
+            doc.text(item.color.name, colColorX, itemStartY, { maxWidth: colorMaxWidth });
+            // Removed item.quantity.toString() (Qty column)
 
             let detailY = itemStartY;
             let linesInDetail = 0;
@@ -634,27 +728,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     remainingOrderDiscountedSlots -= takeForBOGO;
                 }
                 
+                // const priceDetailMaxWidth = colLineTotalX - colDetailsX - 2; // This is now qtyPriceMaxWidth, defined above with other col vars
+
                 if (itemSpecificQtyAtFull > 0) {
-                    doc.text(`${itemSpecificQtyAtFull} units @ $${currentTierPriceForPdf.toFixed(2)}`, colDetailsX, detailY, {align: 'left'});
-                    detailY += 5;
-                    linesInDetail++;
+                    const textLines = doc.splitTextToSize(`${itemSpecificQtyAtFull} units @ $${currentTierPriceForPdf.toFixed(2)}`, qtyPriceMaxWidth);
+                    doc.text(textLines, colDetailsX, detailY, { align: 'left' });
+                    detailY += (textLines.length * 5); // Increment Y by number of lines
+                    linesInDetail += textLines.length;
                 }
                 if (itemSpecificQtyAtBOGO > 0) {
-                    doc.text(`${itemSpecificQtyAtBOGO} units @ $${discountedItemPriceForPdf.toFixed(2)} (25% off)`, colDetailsX, detailY, {align: 'left'});
-                    detailY += 5;
-                    linesInDetail++;
+                    const textLines = doc.splitTextToSize(`${itemSpecificQtyAtBOGO} units @ $${discountedItemPriceForPdf.toFixed(2)} (25% off)`, qtyPriceMaxWidth);
+                    doc.text(textLines, colDetailsX, detailY, { align: 'left' });
+                    detailY += (textLines.length * 5);
+                    linesInDetail += textLines.length;
                 }
             } else if (currentTierPriceForPdf) {
                  itemSpecificQtyAtFull = item.quantity;
-                 doc.text(`${item.quantity} units @ $${currentTierPriceForPdf.toFixed(2)}`, colDetailsX, detailY, {align: 'left'});
-                 linesInDetail++;
-                 detailY += 5;
+                 const textLines = doc.splitTextToSize(`${item.quantity} units @ $${currentTierPriceForPdf.toFixed(2)}`, qtyPriceMaxWidth);
+                 doc.text(textLines, colDetailsX, detailY, { align: 'left' });
+                 detailY += (textLines.length * 5);
+                 linesInDetail += textLines.length;
             } else {
                 itemSpecificQtyAtFull = item.quantity;
                 const fallbackPrice = C112_8000_STITCH_PRICING_TIERS[0]?.price || 0;
-                doc.text(`${item.quantity} units @ $${fallbackPrice.toFixed(2)} (Std. Price)`, colDetailsX, detailY, {align: 'left'});
-                linesInDetail++;
-                detailY += 5;
+                const textLines = doc.splitTextToSize(`${item.quantity} units @ $${fallbackPrice.toFixed(2)} (Std. Price)`, qtyPriceMaxWidth);
+                doc.text(textLines, colDetailsX, detailY, { align: 'left' });
+                detailY += (textLines.length * 5);
+                linesInDetail += textLines.length;
             }
             
             // Calculate and display Line Total for this item
@@ -751,15 +851,23 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFontSize(10);
         doc.setFont(undefined, 'bold');
         doc.text('To Finalize Your Order or For Questions:', margin, yPos);
-        yPos += 6;
+        yPos += 7; // Increased spacing
         doc.setFont(undefined, 'normal');
+        
+        doc.setFont(undefined, 'bold');
         doc.text('Please email this PDF quote to: sales@nwcustomapparel.com', margin, yPos);
-        yPos += 5;
+        yPos += 7; // Increased spacing
+        doc.setFont(undefined, 'normal');
+
+        doc.setFont(undefined, 'bold');
         doc.text('Or contact your sales representative:', margin, yPos);
-        yPos += 5;
-        doc.text('  Nika: nika@nwcustomapparel.com', margin, yPos);
-        yPos += 5;
-        doc.text('  Taylar: taylar@nwcustomapparel.com', margin, yPos);
+        yPos += 7; // Increased spacing
+        doc.setFont(undefined, 'normal');
+        
+        const representativeIndent = margin + 4;
+        doc.text('Nika: nika@nwcustomapparel.com', representativeIndent, yPos);
+        yPos += 6; // Slightly less for sub-items
+        doc.text('Taylar: taylar@nwcustomapparel.com', representativeIndent, yPos);
         
         // --- 5. Footer ---
         const footerStartY = pageHeight - margin - 15; // Adjust 15 based on content height
