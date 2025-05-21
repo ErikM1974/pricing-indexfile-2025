@@ -100,15 +100,42 @@
         }
 
         /* Ensure columns have some background and padding */
-        .product-context-column, .product-interactive-column {
+        /* Custom styles for two-column layout in c112-bogo-promo.html */
+        .product-page-columns-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        .product-context-column {
+            flex: 1; /* Allow left column to grow */
             background-color: var(--white, #fff);
             padding: 20px;
             border-radius: var(--radius-sm);
             box-shadow: var(--shadow-sm);
         }
         .product-interactive-column { /* Specific for this page's right side */
+            flex: 1; /* Allow right column to grow */
+            max-width: 500px; /* Constrain the width of the right column */
+            min-width: 320px; /* Ensure a minimum width for smaller screens */
+            background-color: var(--white, #fff);
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
+        }
+
+        /* Responsive adjustments for the two-column layout */
+        @media (max-width: 1024px) { /* Adjust this breakpoint as needed */
+            .product-page-columns-container {
+                flex-direction: column;
+            }
+            .product-context-column,
+            .product-interactive-column {
+                flex: 0 0 auto; /* Reset flex basis for stacked layout */
+                max-width: 100%; /* Allow full width when stacked */
+            }
         }
 
         /* Styling for the selected items list in the right column */
