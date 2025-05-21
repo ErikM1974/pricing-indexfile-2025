@@ -327,6 +327,29 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedItemsContainerEl.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('change', handleQuantityChange);
             input.addEventListener('input', handleQuantityChange); // For immediate feedback
+
+            // Mobile usability enhancement: clear '1' on focus for touch devices
+            const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+            if (isTouchDevice) {
+                input.addEventListener('focus', function(e) {
+                    if (e.target.value === '1') {
+                        e.target.value = '';
+                    } else {
+                        // For other values, select the text for easier overwrite.
+                        // Note: select() behavior can vary on mobile number inputs.
+                        e.target.select();
+                    }
+                });
+
+                input.addEventListener('blur', function(e) {
+                    if (e.target.value === '') {
+                        // If the field is empty on blur, dispatch a change event.
+                        // The handleQuantityChange function will then reset it to '1'.
+                        const changeEvent = new Event('change', { bubbles: true, cancelable: true });
+                        e.target.dispatchEvent(changeEvent);
+                    }
+                });
+            }
         });
         selectedItemsContainerEl.querySelectorAll('.remove-item-btn').forEach(button => {
             button.addEventListener('click', handleRemoveItem);
@@ -886,9 +909,38 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text('Minimum order 24 caps. Price includes 8000-stitch embroidery. Quote valid for 30 days.', margin, yPos);
 
         doc.save('NWCA_C112_BOGO_Quote.pdf');
-        if (emailInstructionsEl) emailInstructionsEl.style.display = 'block';
-    }
+        
+        // Enhanced email instructions and mailto link
+        if (emailInstructionsEl) {
+            emailInstructionsEl.style.display = 'block';
+            const mailtoLink = document.getElementById('bogoMailtoLink');
+            if (mailtoLink) {
+                const customerName = customerNameEl.value.trim() || "Valued Customer";
+                const customerEmail = customerEmailEl.value.trim();
+                const customerPhone = customerPhoneEl.value.trim();
+                const customerCompany = customerCompanyEl.value.trim();
 
+                const subject = `C112 BOGO Cap Order Inquiry - ${customerName}`;
+                let body = `Hello Northwest Custom Apparel,\n\nPlease find my C112 BOGO cap order quote attached.\n\n`;
+                body += `Order Details Summary:\n`;
+                selectedOrderItems.forEach(item => {
+                    body += `- ${item.color.name}: ${item.quantity} unit(s)\n`;
+                });
+                body += `\nTotal Quoted: ${bogoGrandTotalEl.textContent}\n\n`;
+                
+                body += `My Contact Information:\n`;
+                body += `Name: ${customerName}\n`;
+                if (customerEmail) body += `Email: ${customerEmail}\n`;
+                if (customerPhone) body += `Phone: ${customerPhone}\n`;
+                if (customerCompany) body += `Company: ${customerCompany}\n`;
+                
+                body += `\nPlease contact me to finalize the details or if you have any questions.\n\nThank you!`;
+
+                mailtoLink.href = `mailto:sales@nwcustomapparel.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            }
+        }
+    }
+ 
     function renderPriceTiers() {
         if (!priceTiersDisplayEl) return;
         priceTiersDisplayEl.innerHTML = ''; // Clear previous (if any)
