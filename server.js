@@ -10,6 +10,19 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Force HTTPS in production (Heroku)
+app.use((req, res, next) => {
+  // Skip for localhost development
+  if (process.env.NODE_ENV === 'production') {
+    // The 'x-forwarded-proto' header is set by Heroku
+    if (req.headers['x-forwarded-proto'] !== 'https') {
+      // Redirect to HTTPS
+      return res.redirect('https://' + req.hostname + req.url);
+    }
+  }
+  return next();
+});
+
 // Middleware
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
