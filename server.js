@@ -3,6 +3,7 @@ const path = require('path');
 const fetch = require('node-fetch');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
+const compression = require('compression');
 
 // Load environment variables
 dotenv.config();
@@ -24,7 +25,20 @@ app.use((req, res, next) => {
 });
 
 // Middleware
-app.use(express.static(__dirname));
+// Compress all responses
+app.use(compression());
+
+// Set proper cache headers for static assets
+app.use(express.static(__dirname, {
+  maxAge: '1d', // Cache static assets for 1 day
+  setHeaders: (res, path) => {
+    // Don't cache HTML files
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  }
+}));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
