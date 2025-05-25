@@ -7,6 +7,72 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
     "use strict";
 
     const CAP_EMBROIDERY_APP_KEY = 'a0e150004ecd0739f853449c8d7f'; // Keep for reference
+    
+    // Function to fix the "72-9999" label
+    function fixTierLabels() {
+        // Use a more aggressive approach to find and fix the label
+        const elements = document.querySelectorAll('td, th');
+        let found = false;
+        
+        elements.forEach(function(element) {
+            // Check for exact match or contains
+            if (element.textContent.trim() === '72-9999' ||
+                element.textContent.trim() === '72-99999' ||
+                element.textContent.includes('72-9999')) {
+                console.log("[ADAPTER:CAP-EMB] Found '72-9999' label, changing to '72+'");
+                element.textContent = '72+';
+                found = true;
+            }
+        });
+        
+        return found;
+    }
+    
+    // Set up a polling mechanism to check for the label every 100ms
+    let checkInterval;
+    let checkCount = 0;
+    const MAX_CHECKS = 50; // 5 seconds max
+    
+    function startLabelChecker() {
+        console.log("[ADAPTER:CAP-EMB] Starting label checker");
+        
+        // Clear any existing interval
+        if (checkInterval) {
+            clearInterval(checkInterval);
+        }
+        
+        checkCount = 0;
+        
+        // Check immediately
+        fixTierLabels();
+        
+        // Then set up interval
+        checkInterval = setInterval(function() {
+            checkCount++;
+            
+            // Try to fix labels
+            const found = fixTierLabels();
+            
+            // If we've checked enough times or found and fixed the label, stop checking
+            if (checkCount >= MAX_CHECKS) {
+                console.log("[ADAPTER:CAP-EMB] Max checks reached, stopping label checker");
+                clearInterval(checkInterval);
+            }
+        }, 100);
+    }
+    
+    // Start the label checker when the page loads
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startLabelChecker);
+    } else {
+        startLabelChecker();
+    }
+    
+    // Also start the checker when the Caspio data is loaded
+    document.addEventListener('caspioCapPricingCalculated', function() {
+        console.log("[ADAPTER:CAP-EMB] Caspio data loaded, starting label checker");
+        startLabelChecker();
+    });
 
     /**
      * Formats a numeric price into a string like $X.XX.
@@ -140,7 +206,14 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
                 // First Cell (Tier Label)
                 const tdTierLabel = tr.insertCell();
                 const tierDefinition = tierDefinitions[currentTierKey];
-                tdTierLabel.textContent = (tierDefinition && tierDefinition.TierLabel) ? tierDefinition.TierLabel : currentTierKey;
+                
+                // Fix for 72+ tier label
+                if (tierDefinition && tierDefinition.MinQuantity === 72 &&
+                    (tierDefinition.MaxQuantity === 99999 || tierDefinition.MaxQuantity === undefined)) {
+                    tdTierLabel.textContent = "72+";
+                } else {
+                    tdTierLabel.textContent = (tierDefinition && tierDefinition.TierLabel) ? tierDefinition.TierLabel : currentTierKey;
+                }
 
                 // Inner Loop: Iterate through sizeHeadersToDisplay to create price cells
                 sizeHeadersToDisplay.forEach(currentSizeKey => {
@@ -189,8 +262,30 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
             console.log("[ADAPTER:CAP-EMB] Received 'caspioCapPricingCalculated' event with data:", event.detail);
             window.capEmbroideryMasterData = event.detail;
             console.log('[ADAPTER:CAP-EMB] Master data ASSIGNED in event listener:', window.capEmbroideryMasterData ? JSON.parse(JSON.stringify(window.capEmbroideryMasterData)) : window.capEmbroideryMasterData);
+            
             // Initial population of the table with default stitch count (or currently selected)
             updateCapPricingDisplay();
+            
+            // Force pricing-matrix-capture.js to use our complete data
+            if (typeof capturePricingMatrix === 'function') {
+                console.log("[ADAPTER:CAP-EMB] Triggering pricing-matrix-capture to use our complete data");
+                // This will use our modified capturePricingMatrix function that prioritizes capEmbroideryMasterData
+                const pricingTable = document.querySelector('.matrix-price-table') || document.querySelector('.cbResultSetTable');
+                if (pricingTable) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const styleNumber = urlParams.get('StyleNumber');
+                    const colorCode = urlParams.get('COLOR');
+                    const embType = 'cap-embroidery';
+                    if (styleNumber && colorCode) {
+                        setTimeout(function() {
+                            console.log("[ADAPTER:CAP-EMB] Forcing pricing-matrix-capture to use our complete data");
+                            if (typeof capturePricingMatrix === 'function') {
+                                capturePricingMatrix(pricingTable, styleNumber, colorCode, embType);
+                            }
+                        }, 100);
+                    }
+                }
+            }
         } else {
             const errorMessage = event.detail ? event.detail.message : "Unknown error";
             console.error("[ADAPTER:CAP-EMB] Received 'caspioCapPricingCalculated' event with failure:", errorMessage);
@@ -208,6 +303,15 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
         if (stitchCountSelect) {
             stitchCountSelect.addEventListener('change', updateCapPricingDisplay);
             console.log("[ADAPTER:CAP-EMB] Event listener for stitch count dropdown (#client-stitch-count-select) attached.");
+            
+            // Trigger an initial update with the default selected stitch count
+            // This ensures we display complete pricing data on page load
+            if (window.capEmbroideryMasterData) {
+                console.log("[ADAPTER:CAP-EMB] Master data already available on DOMContentLoaded, triggering initial display update");
+                updateCapPricingDisplay();
+            } else {
+                console.log("[ADAPTER:CAP-EMB] Master data not yet available on DOMContentLoaded, will wait for caspioCapPricingCalculated event");
+            }
         } else {
             console.error("[ADAPTER:CAP-EMB] Stitch count select dropdown (#client-stitch-count-select) not found on DOMContentLoaded.");
         }
@@ -228,9 +332,15 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
         // 'caspioCapPricingCalculated', this init might not need to do much beyond setup
         // that must happen before data arrives, if any.
         const styleNumber = new URLSearchParams(window.location.search).get('StyleNumber');
-         if (!styleNumber) {
-             console.warn("[ADAPTER:CAP-EMB] StyleNumber not found in URL during init. Pricing might depend on it being available for Caspio calls.");
-         }
+        if (!styleNumber) {
+            console.warn("[ADAPTER:CAP-EMB] StyleNumber not found in URL during init. Pricing might depend on it being available for Caspio calls.");
+        }
+        
+        // If master data is already available, trigger an initial display update
+        if (window.capEmbroideryMasterData) {
+            console.log("[ADAPTER:CAP-EMB] Master data already available in init, triggering display update");
+            updateCapPricingDisplay();
+        }
     }
 
     // Expose necessary parts to the global window object
