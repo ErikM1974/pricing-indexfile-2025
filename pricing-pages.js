@@ -104,106 +104,288 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // Fetches details for the initially selected color to display title, image etc.
     // Relies on dp5-helper.js to fetch and populate the actual color swatches.
     async function fetchProductDetails(styleNumber) {
-        console.log(`[fetchProductDetails] Fetching initial details for Style: ${styleNumber}`);
-
-        // Get initial color from URL - DO NOT set globals here yet, wait for API confirmation
-        const initialUrlColorName = getUrlParameter('COLOR') ? decodeURIComponent(getUrlParameter('COLOR').replace(/\+/g, ' ')) : null;
-        console.log(`[fetchProductDetails] Initial color from URL: ${initialUrlColorName}`);
-
-        // Use the URL color if present, otherwise fetch without color to get defaults/first color info
-        const colorIdentifierForApi = initialUrlColorName; // Can be null
-
+        console.log(`[fetchProductDetails] Fetching product colors for Style: ${styleNumber} using /api/product-colors`);
+        
         try {
-            // --- Step 1: Fetch details for the specific initial color (or default if none specified) ---
-            let detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`;
-            if (colorIdentifierForApi) {
-                detailApiUrl += `&color=${encodeURIComponent(colorIdentifierForApi)}`;
-            }
-            console.log(`[fetchProductDetails] Fetching initial details from: ${detailApiUrl}`);
-            const response = await fetch(detailApiUrl);
-            if (!response.ok) throw new Error(`API Error (Initial Details): ${response.status}`);
-            const details = await response.json();
-            console.log("[fetchProductDetails] Received initial details:", JSON.stringify(details, null, 2));
-
-            // --- Step 2: Update Global State with confirmed initial color ---
-            window.selectedColorName = details.COLOR_NAME || initialUrlColorName || null;
-            window.selectedCatalogColor = details.CATALOG_COLOR || null;
-            console.log(`[fetchProductDetails] Initial Globals Set: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
-
-            // --- Step 3: Update Initial UI Elements (New Context and Old Fallback) ---
-            const titleElContext = document.getElementById('product-title-context');
-            const imageElContext = document.getElementById('product-image-context');
-            const colorElContext = document.getElementById('product-color-context');
-            const selectedColorSwatchContext = document.getElementById('selected-color-swatch-context');
-
-            const titleElOld = document.getElementById('product-title'); // Fallback
-            const imageElOld = document.getElementById('product-image'); // Fallback
-            const colorElOld = document.getElementById('product-color'); // Fallback
-
-            const productTitleText = details.PRODUCT_TITLE || styleNumber;
-            if (titleElContext) titleElContext.textContent = productTitleText;
-            if (titleElOld) titleElOld.textContent = productTitleText;
-
-
-            const initialImageUrl = details.MAIN_IMAGE_URL || details.FRONT_MODEL || details.FRONT_FLAT || '';
-            if (initialImageUrl) {
-                if (imageElContext) {
-                    imageElContext.src = initialImageUrl;
-                    imageElContext.alt = `${productTitleText} - ${window.selectedColorName || ''}`;
-                    console.log(`[fetchProductDetails] Set initial context image src to: ${initialImageUrl}`);
-                }
-                if (imageElOld) { // Fallback
-                    imageElOld.src = initialImageUrl;
-                    imageElOld.alt = `${productTitleText} - ${window.selectedColorName || ''}`;
-                }
-            } else {
-                if (imageElContext) { imageElContext.src = ''; imageElContext.alt = productTitleText; }
-                if (imageElOld) { imageElOld.src = ''; imageElOld.alt = productTitleText; }
-                console.warn("[fetchProductDetails] No initial image URL found in API response.");
-            }
-
-            const colorNameText = window.selectedColorName || 'Not Selected';
-            if (colorElContext) colorElContext.textContent = colorNameText;
-            if (colorElOld) colorElOld.textContent = colorNameText;
+            const apiUrl = `${window.API_BASE_URL || API_PROXY_BASE_URL}/api/product-colors?styleNumber=${encodeURIComponent(styleNumber)}`;
+            console.log(`[fetchProductDetails] Fetching from: ${apiUrl}`);
             
-            if (selectedColorSwatchContext) { // Update the context mini swatch
-                const swatchImageUrl = details.COLOR_SWATCH_IMAGE_URL;
-                if (swatchImageUrl) {
-                    selectedColorSwatchContext.style.backgroundImage = `url('${swatchImageUrl}')`;
-                    selectedColorSwatchContext.style.backgroundColor = ''; // Clear background color if image is used
-                } else {
-                    selectedColorSwatchContext.style.backgroundImage = '';
-                    selectedColorSwatchContext.style.backgroundColor = NWCAUtils.normalizeColorName(window.selectedColorName || 'grey'); // Use NWCAUtils
-                }
+            const response = await fetch(apiUrl);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-
-            // --- Step 4: Update Mini Swatch in pricing section & Active Swatch ---
-            setTimeout(() => {
-                 updateMiniColorSwatch(); // This updates the #pricing-color-swatch in the right column
-                 const allSwatches = document.querySelectorAll('.color-swatch');
-                 allSwatches.forEach(s => {
-                      const isActive = (window.selectedCatalogColor && NWCAUtils.normalizeColorName(s.dataset.catalogColor) === NWCAUtils.normalizeColorName(window.selectedCatalogColor)) ||
-                                       (!window.selectedCatalogColor && window.selectedColorName && NWCAUtils.normalizeColorName(s.dataset.colorName) === NWCAUtils.normalizeColorName(window.selectedColorName)); // Use NWCAUtils
-                      s.classList.toggle('active', isActive);
-                 });
-                 console.log("[fetchProductDetails] Applied initial active class to swatches.");
-            }, 500);
-
-            // --- Step 5: Swatch Population is handled by dp5-helper.js ---
-            console.log("[fetchProductDetails] Swatch population will be handled by dp5-helper.js");
-
+            console.log(`[fetchProductDetails] Received product colors data:`, await response.clone().json());
+            
+            const data = await response.json();
+            
+            if (!data || !data.colors || data.colors.length === 0) {
+                console.error('[fetchProductDetails] No colors data received');
+                return;
+            }
+            
+            // Store all colors globally
+            window.productColors = data.colors;
+            
+            // Get initial color from URL
+            const urlColor = getUrlParameter('COLOR') ? decodeURIComponent(getUrlParameter('COLOR').replace(/\+/g, ' ')) : null;
+            
+            // Find the matching color
+            let matchedColor = null;
+            
+            // Try exact match first
+            matchedColor = data.colors.find(c =>
+                c.CATALOG_COLOR && c.CATALOG_COLOR.toLowerCase() === urlColor?.toLowerCase()
+            );
+            
+            // If no exact match, try partial match
+            if (!matchedColor && urlColor) {
+                matchedColor = data.colors.find(c =>
+                    c.CATALOG_COLOR && c.CATALOG_COLOR.toLowerCase().includes(urlColor.toLowerCase())
+                );
+            }
+            
+            // If still no match, try COLOR_NAME
+            if (!matchedColor && urlColor) {
+                matchedColor = data.colors.find(c =>
+                    c.COLOR_NAME && c.COLOR_NAME.toLowerCase().includes(urlColor.toLowerCase())
+                );
+            }
+            
+            // If still no match, use first color
+            if (!matchedColor && data.colors.length > 0) {
+                matchedColor = data.colors[0];
+            }
+            
+            console.log(`[fetchProductDetails] Matched URL color "${urlColor}" to:`, matchedColor);
+            
+            if (matchedColor) {
+                // Store the selected color globally
+                window.selectedColorData = matchedColor;
+                
+                // Update global variables
+                window.selectedColorName = matchedColor.COLOR_NAME || urlColor;
+                window.selectedCatalogColor = matchedColor.CATALOG_COLOR || urlColor;
+                
+                // Store both for compatibility
+                window.selectedColor = window.selectedColorName;
+                window.catalogColor = window.selectedCatalogColor;
+                
+                console.log(`[fetchProductDetails] Globals Set: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
+                
+                // Update the product title
+                const titleElContext = document.getElementById('product-title-context');
+                const titleElOld = document.getElementById('product-title');
+                const productTitle = data.productTitle || `Style ${styleNumber}`;
+                
+                if (titleElContext) titleElContext.textContent = productTitle;
+                if (titleElOld) titleElOld.textContent = productTitle;
+                
+                // Update the style number
+                const styleElContext = document.getElementById('product-style-context');
+                const styleElOld = document.getElementById('product-style');
+                if (styleElContext) styleElContext.textContent = styleNumber;
+                if (styleElOld) styleElOld.textContent = styleNumber;
+                
+                // Update color display
+                const colorElContext = document.getElementById('product-color-context');
+                const colorElOld = document.getElementById('product-color');
+                if (colorElContext) colorElContext.textContent = window.selectedColorName;
+                if (colorElOld) colorElOld.textContent = window.selectedColorName;
+                
+                // Update the product images with gallery
+                updateProductImageGallery(matchedColor);
+                
+                // Update mini color swatch
+                updateMiniColorSwatch();
+                
+                // Populate color swatches
+                populateColorSwatches(data.colors);
+            }
+            
+            // Dispatch event
+            window.dispatchEvent(new CustomEvent('productColorsReady', {
+                detail: { colors: data.colors, selectedColor: matchedColor }
+            }));
+            
         } catch (error) {
-            console.error('[fetchProductDetails] Error fetching initial product details:', error);
+            console.error('[fetchProductDetails] Error fetching product details:', error);
             const titleElContext = document.getElementById('product-title-context');
             const imageElContext = document.getElementById('product-image-context');
             if (titleElContext) titleElContext.textContent = 'Error Loading Product Info';
             if (imageElContext) imageElContext.src = '';
-            const titleElOld = document.getElementById('product-title'); // Fallback
-            const imageElOld = document.getElementById('product-image'); // Fallback
-            if (titleElOld) titleElOld.textContent = 'Error Loading Product Info';
-            if (imageElOld) imageElOld.src = '';
         }
+    }
+
+    // New function to update product image gallery with all available images
+    function updateProductImageGallery(colorData) {
+        console.log('[updateProductImageGallery] Updating image gallery with color data:', colorData);
+        
+        // Check if we have the new gallery structure
+        const mainImageEl = document.getElementById('product-image-main');
+        const mainImageContainer = document.getElementById('main-image-container');
+        const thumbnailsContainer = document.getElementById('image-thumbnails');
+        
+        // Get the existing image element
+        const existingImageEl = document.getElementById('product-image-context');
+        
+        // Add diagnostic logging
+        console.log('[updateProductImageGallery] Element check:');
+        console.log('  - mainImageEl (product-image-main):', mainImageEl);
+        console.log('  - mainImageContainer:', mainImageContainer);
+        console.log('  - thumbnailsContainer:', thumbnailsContainer);
+        console.log('  - existingImageEl (product-image-context):', existingImageEl);
+        
+        if (!existingImageEl && !mainImageEl) {
+            console.warn('[updateProductImageGallery] No image elements found - neither product-image-context nor product-image-main exist');
+            return;
+        }
+        
+        // Collect all available images
+        const images = [];
+        
+        // Define image types with labels
+        const imageTypes = [
+            { key: 'FRONT_MODEL', label: 'Front' },
+            { key: 'BACK_MODEL', label: 'Back' },
+            { key: 'SIDE_MODEL', label: 'Side' },
+            { key: 'THREE_Q_MODEL', label: '3/4 View' },
+            { key: 'FRONT_FLAT', label: 'Front Flat' },
+            { key: 'BACK_FLAT', label: 'Back Flat' }
+        ];
+        
+        // Add main image first if available
+        if (colorData.MAIN_IMAGE_URL || colorData.FRONT_MODEL_IMAGE_URL) {
+            images.push({
+                url: colorData.MAIN_IMAGE_URL || colorData.FRONT_MODEL_IMAGE_URL,
+                label: 'Main',
+                isMain: true
+            });
+        }
+        
+        // Add other images
+        imageTypes.forEach(type => {
+            if (colorData[type.key] && colorData[type.key] !== colorData.MAIN_IMAGE_URL) {
+                images.push({
+                    url: colorData[type.key],
+                    label: type.label,
+                    isMain: false
+                });
+            }
+        });
+        
+        // If we have the new gallery elements
+        if (mainImageEl && thumbnailsContainer) {
+            console.log('[updateProductImageGallery] Using new gallery structure');
+            
+            // Set the main image
+            if (images.length > 0) {
+                mainImageEl.src = images[0].url;
+                mainImageEl.alt = `${window.selectedStyleNumber || 'C112'} - ${window.selectedColorName || ''}`;
+                console.log(`[updateProductImageGallery] Set main image src to: ${images[0].url}`);
+                
+                // Clear and populate thumbnails
+                thumbnailsContainer.innerHTML = '';
+                
+                images.forEach((img, index) => {
+                    const thumbnailItem = document.createElement('div');
+                    thumbnailItem.className = 'thumbnail-item';
+                    if (index === 0) thumbnailItem.classList.add('active');
+                    
+                    const thumbnailImg = document.createElement('img');
+                    thumbnailImg.src = img.url;
+                    thumbnailImg.alt = img.label;
+                    
+                    const thumbnailLabel = document.createElement('div');
+                    thumbnailLabel.className = 'thumbnail-label';
+                    thumbnailLabel.textContent = img.label;
+                    
+                    thumbnailItem.appendChild(thumbnailImg);
+                    thumbnailItem.appendChild(thumbnailLabel);
+                    
+                    // Add click handler
+                    thumbnailItem.addEventListener('click', () => {
+                        // Update main image
+                        mainImageEl.src = img.url;
+                        
+                        // Update active state
+                        thumbnailsContainer.querySelectorAll('.thumbnail-item').forEach(t => t.classList.remove('active'));
+                        thumbnailItem.classList.add('active');
+                    });
+                    
+                    thumbnailsContainer.appendChild(thumbnailItem);
+                });
+                
+                // Setup zoom functionality
+                setupImageZoomForGallery();
+            } else {
+                console.warn('[updateProductImageGallery] No images available for this color');
+                mainImageEl.src = '';
+                mainImageEl.alt = 'No image available';
+                
+                // Show no images message
+                const noImagesMsg = document.createElement('div');
+                noImagesMsg.className = 'no-images-message';
+                noImagesMsg.textContent = 'No images available for this color';
+                thumbnailsContainer.innerHTML = '';
+                thumbnailsContainer.appendChild(noImagesMsg);
+            }
+        } else if (existingImageEl) {
+            console.log('[updateProductImageGallery] Fallback: Using existing image element (product-image-context)');
+            // Use the existing image element
+            if (images.length > 0) {
+                existingImageEl.src = images[0].url;
+                existingImageEl.alt = `${window.selectedStyleNumber || 'C112'} - ${window.selectedColorName || ''}`;
+                console.log(`[updateProductImageGallery] Set existing image src to: ${images[0].url}`);
+            } else {
+                console.warn('[updateProductImageGallery] No images available for this color');
+                existingImageEl.src = '';
+                existingImageEl.alt = 'No image available';
+            }
+        }
+    }
+    
+    // Enhanced image zoom for gallery
+    function setupImageZoomForGallery() {
+        const mainImageContainer = document.getElementById('main-image-container');
+        const mainImage = document.getElementById('product-image-main');
+        const zoomOverlay = mainImageContainer?.querySelector('.image-zoom-overlay');
+        
+        if (!mainImageContainer || !mainImage || !zoomOverlay) return;
+        
+        // Remove existing modal if any
+        const existingModal = document.querySelector('.image-zoom-modal');
+        if (existingModal) existingModal.remove();
+        
+        const modal = document.createElement('div');
+        modal.className = 'image-zoom-modal';
+        modal.style.cssText = 'display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); overflow:auto;';
+        
+        const modalContent = document.createElement('img');
+        modalContent.className = 'image-zoom-modal-content';
+        modalContent.style.cssText = 'margin:auto; display:block; max-width:90%; max-height:90%; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);';
+        
+        const closeButton = document.createElement('span');
+        closeButton.className = 'image-zoom-close';
+        closeButton.innerHTML = '&times;';
+        closeButton.style.cssText = 'position:absolute; top:15px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer;';
+        
+        modal.appendChild(modalContent);
+        modal.appendChild(closeButton);
+        document.body.appendChild(modal);
+        
+        zoomOverlay.addEventListener('click', () => {
+            modal.style.display = 'block';
+            modalContent.src = mainImage.src;
+        });
+        
+        closeButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) modal.style.display = 'none';
+        });
     }
 
     function populateColorSwatches(colors) {
@@ -219,8 +401,8 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             swatch.dataset.colorName = color.COLOR_NAME;
             swatch.dataset.catalogColor = color.CATALOG_COLOR;
             swatch.title = color.COLOR_NAME;
-            if (color.COLOR_SWATCH_IMAGE_URL) {
-                swatch.style.backgroundImage = `url('${color.COLOR_SWATCH_IMAGE_URL}')`;
+            if (color.COLOR_SQUARE_IMAGE) {
+                swatch.style.backgroundImage = `url('${color.COLOR_SQUARE_IMAGE}')`;
             } else {
                 swatch.style.backgroundColor = color.COLOR_NAME.toLowerCase().replace(/\s+/g, '');
             }
@@ -244,32 +426,6 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         setupShowMoreColorsButton();
     }
 
-    // Fetches details for a specific color and updates the UI accordingly
-    async function fetchAndApplyColorSpecificDetails(styleNumber, colorIdentifier) {
-         console.log(`[DEBUG] fetchAndApplyColorSpecificDetails called for Style: ${styleNumber}, Color: ${colorIdentifier}`);
-         if (!styleNumber || !colorIdentifier) {
-              console.error("[DEBUG] Missing styleNumber or colorIdentifier for fetchAndApplyColorSpecificDetails");
-              return;
-         }
-         try {
-              const detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(colorIdentifier)}`;
-              console.log(`[DEBUG] Fetching specific color details from: ${detailApiUrl}`);
-              const response = await fetch(detailApiUrl);
-              if (!response.ok) throw new Error(`API Error (Specific Color): ${response.status}`);
-              const details = await response.json();
-              console.log("[DEBUG] Received specific color details:", JSON.stringify(details, null, 2));
-
-              // Update main image using the URL from this specific response
-              updateMainProductImage(details.MAIN_IMAGE_URL || details.FRONT_MODEL || details.FRONT_FLAT || '');
-
-              // Update mini swatch (which relies on global state already set by handleColorSwatchClick)
-              updateMiniColorSwatch();
-
-         } catch (error) {
-              console.error(`[DEBUG] Error fetching specific details for color ${colorIdentifier}:`, error);
-              // Optionally handle error, e.g., show a placeholder image or message
-         }
-    }
 
     function handleColorSwatchClick(colorData) {
         console.log("[DEBUG] handleColorSwatchClick called with:", JSON.stringify(colorData, null, 2));
@@ -284,6 +440,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         // --- Step 1: Update Global State ---
         window.selectedColorName = newColorName;
         window.selectedCatalogColor = newCatalogColor;
+        window.selectedColorData = colorData; // Store full color data
         console.log(`[DEBUG] Globals updated: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
 
         // --- Step 2: Update UI Elements Immediately Available (Context and Fallback) ---
@@ -296,7 +453,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
              console.warn("[DEBUG] #product-color-context element not found.");
         }
         if (selectedColorSwatchContext) { // Update the context mini swatch
-            const swatchImageUrl = colorData.COLOR_SWATCH_IMAGE_URL;
+            const swatchImageUrl = colorData.COLOR_SQUARE_IMAGE;
             if (swatchImageUrl) {
                 selectedColorSwatchContext.style.backgroundImage = `url('${swatchImageUrl}')`;
                 selectedColorSwatchContext.style.backgroundColor = '';
@@ -311,7 +468,6 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
              colorElOld.textContent = newColorName;
         }
 
-
         const allSwatches = document.querySelectorAll('.color-swatch');
         console.log(`[DEBUG] Updating active class for ${allSwatches.length} swatches.`);
         allSwatches.forEach(s => {
@@ -323,13 +479,14 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             s.classList.toggle('active', isActive);
         });
 
-        // --- Step 3: Fetch Specific Details for Image & Update Mini Swatch ---
-        const styleNumber = window.selectedStyleNumber;
-        // Use CATALOG_COLOR if available for the API call, otherwise use COLOR_NAME
-        const colorIdentifierForApi = newCatalogColor || newColorName;
-        fetchAndApplyColorSpecificDetails(styleNumber, colorIdentifierForApi); // Will call updateMainProductImage and updateMiniColorSwatch internally
+        // --- Step 3: Update Product Image Gallery ---
+        updateProductImageGallery(colorData);
+        
+        // --- Step 4: Update Mini Swatch ---
+        updateMiniColorSwatch();
 
-        // --- Step 4: Reload Caspio ---
+        // --- Step 5: Reload Caspio ---
+        const styleNumber = window.selectedStyleNumber;
         const embType = getEmbellishmentTypeFromUrl();
         const pricingContainerId = CONTAINER_IDS[embType] || 'pricing-calculator';
         const appKeys = CASPIO_APP_KEYS[embType] || [];
@@ -347,33 +504,10 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
              console.warn("PricingPages: Cannot reload Caspio - missing style number or app keys.");
         }
 
-        // --- Step 5: Dispatch Event ---
+        // --- Step 6: Dispatch Event ---
         window.dispatchEvent(new CustomEvent('colorChanged', { detail: colorData }));
     }
 
-    function updateMainProductImage(imageUrl) {
-        console.log(`[DEBUG] updateMainProductImage called with URL: ${imageUrl}`);
-        const imageElContext = document.getElementById('product-image-context');
-        const imageElOld = document.getElementById('product-image'); // Fallback
-
-        if (imageUrl) {
-            if (imageElContext) {
-                imageElContext.src = imageUrl;
-                console.log(`[DEBUG] Set #product-image-context src to: ${imageUrl}`);
-            }
-            if (imageElOld) { // Fallback
-                imageElOld.src = imageUrl;
-                console.log(`[DEBUG] Set #product-image (fallback) src to: ${imageUrl}`);
-            }
-        } else {
-            if (imageElContext) imageElContext.src = '';
-            if (imageElOld) imageElOld.src = '';
-            console.warn("PricingPages: No image URL provided for selected color swatch. Image not updated.");
-        }
-         if (!imageElContext && !imageElOld) {
-             console.warn("[DEBUG] Neither #product-image-context nor #product-image element found.");
-         }
-    }
 
     function updateTabNavigation() {
         console.log("PricingPages DEBUG: Entering updateTabNavigation()");
@@ -638,26 +772,10 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
 
     function setupImageZoom() {
         console.log("PricingPages DEBUG: Entering setupImageZoom()");
-        const imageContainer = document.querySelector('.product-image-container-context');
-        const image = document.getElementById('product-image-context');
-        const zoomOverlay = imageContainer ? imageContainer.querySelector('.image-zoom-overlay') : null;
-
-        if (!imageContainer || !image || !zoomOverlay) {
-            console.warn("PricingPages DEBUG: setupImageZoom - image zoom elements not found, returning.", {imageContainerExists: !!imageContainer, imageExists: !!image, zoomOverlayExists: !!zoomOverlay});
-            console.log("PricingPages DEBUG: Exiting setupImageZoom() early due to missing elements.");
-            return;
-        }
-        if (document.querySelector('.image-zoom-modal')) {
-            console.log("PricingPages DEBUG: setupImageZoom - modal already exists, returning.");
-            console.log("PricingPages DEBUG: Exiting setupImageZoom() early - modal exists.");
-            return;
-        }
-        const modal = document.createElement('div'); modal.className = 'image-zoom-modal'; modal.style.cssText = 'display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); overflow:auto;'; const modalContent = document.createElement('img'); modalContent.className = 'image-zoom-modal-content'; modalContent.style.cssText = 'margin:auto; display:block; max-width:90%; max-height:90%; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);'; const closeButton = document.createElement('span'); closeButton.className = 'image-zoom-close'; closeButton.innerHTML = '&times;'; closeButton.style.cssText = 'position:absolute; top:15px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer;'; modal.appendChild(modalContent); modal.appendChild(closeButton); document.body.appendChild(modal);
-        zoomOverlay.addEventListener('click', () => { modal.style.display = 'block'; modalContent.src = image.src; });
-        closeButton.addEventListener('click', () => { modal.style.display = 'none'; });
-        modal.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; });
-        console.log("PricingPages: Image zoom functionality initialized.");
-        console.log("PricingPages DEBUG: Exiting setupImageZoom() after successful setup.");
+        // The new gallery has its own zoom functionality, so we just need to ensure it's set up
+        // This function is called during initialization, but the actual zoom is handled by setupImageZoomForGallery
+        console.log("PricingPages: Image zoom will be handled by the gallery.");
+        console.log("PricingPages DEBUG: Exiting setupImageZoom()");
     }
 
     function setupShowMoreColorsButton() {

@@ -161,9 +161,18 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             console.log(`[fetchProductDetails] Globals Set: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
 
             // --- Update Main Product Image ---
-            const mainImageUrl = selectedColorObject.MAIN_IMAGE_URL || selectedColorObject.FRONT_MODEL || '';
+            // Check for new gallery structure first
+            const mainImageEl = document.getElementById('product-image-main');
             const imageElContext = document.getElementById('product-image-context');
-            if (imageElContext) {
+            
+            const mainImageUrl = selectedColorObject.MAIN_IMAGE_URL || selectedColorObject.FRONT_MODEL || '';
+            
+            if (mainImageEl) {
+                // Use new gallery structure
+                console.log(`[fetchProductDetails] Using new gallery structure with product-image-main`);
+                updateProductImageGallery(selectedColorObject);
+            } else if (imageElContext) {
+                // Fallback to old structure
                 if (mainImageUrl) {
                     imageElContext.src = mainImageUrl;
                     imageElContext.alt = `${productData.productTitle || styleNumber} - ${selectedColorObject.COLOR_NAME}`;
@@ -323,8 +332,14 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         console.log(`[handleColorSwatchClick] Globals updated: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
 
         // --- Step 2: Update Main Product Image ---
-        const mainImageUrl = colorData.MAIN_IMAGE_URL || colorData.FRONT_MODEL || '';
-        updateMainProductImage(mainImageUrl); // updateMainProductImage already exists and handles #product-image-context
+        // Check if we have the new gallery structure
+        const mainImageEl = document.getElementById('product-image-main');
+        if (mainImageEl) {
+            updateProductImageGallery(colorData);
+        } else {
+            const mainImageUrl = colorData.MAIN_IMAGE_URL || colorData.FRONT_MODEL || '';
+            updateMainProductImage(mainImageUrl); // updateMainProductImage already exists and handles #product-image-context
+        }
 
         // --- Step 3: Update Selected Color Display (Left Column) ---
         const colorElContext = document.getElementById('product-color-context');
@@ -414,6 +429,154 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
          if (!imageElContext && !imageElOld) {
              console.warn("[DEBUG] Neither #product-image-context nor #product-image element found.");
          }
+    }
+    
+    // New function to update product image gallery with all available images
+    function updateProductImageGallery(colorData) {
+        console.log('[updateProductImageGallery] Updating image gallery with color data:', colorData);
+        
+        // Check if we have the new gallery structure
+        const mainImageEl = document.getElementById('product-image-main');
+        const mainImageContainer = document.getElementById('main-image-container');
+        const thumbnailsContainer = document.getElementById('image-thumbnails');
+        
+        if (!mainImageEl || !thumbnailsContainer) {
+            console.warn('[updateProductImageGallery] Gallery elements not found, falling back to updateMainProductImage');
+            const mainImageUrl = colorData.MAIN_IMAGE_URL || colorData.FRONT_MODEL || '';
+            updateMainProductImage(mainImageUrl);
+            return;
+        }
+        
+        // Collect all available images
+        const images = [];
+        
+        // Define image types with labels
+        const imageTypes = [
+            { key: 'FRONT_MODEL', label: 'Front' },
+            { key: 'BACK_MODEL', label: 'Back' },
+            { key: 'SIDE_MODEL', label: 'Side' },
+            { key: 'THREE_Q_MODEL', label: '3/4 View' },
+            { key: 'FRONT_FLAT', label: 'Front Flat' },
+            { key: 'BACK_FLAT', label: 'Back Flat' }
+        ];
+        
+        // Add main image first if available
+        if (colorData.MAIN_IMAGE_URL || colorData.FRONT_MODEL_IMAGE_URL || colorData.FRONT_MODEL) {
+            images.push({
+                url: colorData.MAIN_IMAGE_URL || colorData.FRONT_MODEL_IMAGE_URL || colorData.FRONT_MODEL,
+                label: 'Main',
+                isMain: true
+            });
+        }
+        
+        // Add other images
+        imageTypes.forEach(type => {
+            if (colorData[type.key] && colorData[type.key] !== colorData.MAIN_IMAGE_URL) {
+                images.push({
+                    url: colorData[type.key],
+                    label: type.label,
+                    isMain: false
+                });
+            }
+        });
+        
+        console.log('[updateProductImageGallery] Found images:', images);
+        
+        // Set the main image
+        if (images.length > 0) {
+            mainImageEl.src = images[0].url;
+            mainImageEl.alt = `${window.selectedStyleNumber || 'Product'} - ${window.selectedColorName || ''}`;
+            console.log(`[updateProductImageGallery] Set main image src to: ${images[0].url}`);
+            
+            // Clear and populate thumbnails
+            thumbnailsContainer.innerHTML = '';
+            
+            images.forEach((img, index) => {
+                const thumbnailItem = document.createElement('div');
+                thumbnailItem.className = 'thumbnail-item';
+                if (index === 0) thumbnailItem.classList.add('active');
+                
+                const thumbnailImg = document.createElement('img');
+                thumbnailImg.src = img.url;
+                thumbnailImg.alt = img.label;
+                
+                const thumbnailLabel = document.createElement('div');
+                thumbnailLabel.className = 'thumbnail-label';
+                thumbnailLabel.textContent = img.label;
+                
+                thumbnailItem.appendChild(thumbnailImg);
+                thumbnailItem.appendChild(thumbnailLabel);
+                
+                // Add click handler
+                thumbnailItem.addEventListener('click', () => {
+                    // Update main image
+                    mainImageEl.src = img.url;
+                    
+                    // Update active state
+                    thumbnailsContainer.querySelectorAll('.thumbnail-item').forEach(t => t.classList.remove('active'));
+                    thumbnailItem.classList.add('active');
+                });
+                
+                thumbnailsContainer.appendChild(thumbnailItem);
+            });
+            
+            // Setup zoom functionality if needed
+            setupImageZoomForGallery();
+        } else {
+            console.warn('[updateProductImageGallery] No images available for this color');
+            mainImageEl.src = '';
+            mainImageEl.alt = 'No image available';
+            
+            // Show no images message
+            const noImagesMsg = document.createElement('div');
+            noImagesMsg.className = 'no-images-message';
+            noImagesMsg.textContent = 'No images available for this color';
+            thumbnailsContainer.innerHTML = '';
+            thumbnailsContainer.appendChild(noImagesMsg);
+        }
+    }
+    
+    // Enhanced image zoom for gallery
+    function setupImageZoomForGallery() {
+        const mainImageContainer = document.getElementById('main-image-container');
+        const mainImage = document.getElementById('product-image-main');
+        const zoomOverlay = mainImageContainer?.querySelector('.image-zoom-overlay');
+        
+        if (!mainImageContainer || !mainImage || !zoomOverlay) return;
+        
+        // Remove existing modal if any
+        const existingModal = document.querySelector('.image-zoom-modal');
+        if (existingModal) existingModal.remove();
+        
+        const modal = document.createElement('div');
+        modal.className = 'image-zoom-modal';
+        modal.style.cssText = 'display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); overflow:auto;';
+        
+        const modalContent = document.createElement('img');
+        modalContent.className = 'image-zoom-modal-content';
+        modalContent.style.cssText = 'margin:auto; display:block; max-width:90%; max-height:90%; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);';
+        
+        const closeButton = document.createElement('span');
+        closeButton.className = 'image-zoom-close';
+        closeButton.innerHTML = '&times;';
+        closeButton.style.cssText = 'position:absolute; top:15px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer;';
+        
+        modal.appendChild(modalContent);
+        modal.appendChild(closeButton);
+        document.body.appendChild(modal);
+        
+        zoomOverlay.addEventListener('click', () => {
+            modal.style.display = 'block';
+            modalContent.src = mainImage.src;
+        });
+        
+        closeButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) modal.style.display = 'none';
+        });
     }
 
     function updateTabNavigation() {
