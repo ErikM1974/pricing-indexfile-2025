@@ -1,0 +1,671 @@
+/* ============================================
+   PHASE 1: VISUAL FOUNDATION
+   Modern enhancements for cap-embroidery-pricing
+   ============================================ */
+
+/* 1. MODERN COLOR SYSTEM
+   ============================================ */
+:root {
+    /* Primary colors with gradients */
+    --primary-color: #2f661e;
+    --primary-dark: #1e4d0f;
+    --primary-light: #eaf2e9;
+    --primary-gradient: linear-gradient(135deg, #2f661e 0%, #3d7a2a 100%);
+    --primary-gradient-hover: linear-gradient(135deg, #3d7a2a 0%, #4a8837 100%);
+    
+    /* Secondary colors */
+    --secondary-color: #5cb85c;
+    --secondary-light: #eaffea;
+    --secondary-gradient: linear-gradient(135deg, #5cb85c 0%, #6fd86f 100%);
+    
+    /* Neutral palette */
+    --neutral-50: #fafafa;
+    --neutral-100: #f8f9fa;
+    --neutral-200: #e9ecef;
+    --neutral-300: #dee2e6;
+    --neutral-400: #ced4da;
+    --neutral-500: #adb5bd;
+    --neutral-600: #6c757d;
+    --neutral-700: #495057;
+    --neutral-800: #343a40;
+    --neutral-900: #212529;
+    
+    /* Semantic colors */
+    --success-color: #28a745;
+    --success-light: #d4edda;
+    --info-color: #17a2b8;
+    --info-light: #d1ecf1;
+    --warning-color: #ffc107;
+    --warning-light: #fff3cd;
+    --danger-color: #dc3545;
+    --danger-light: #f8d7da;
+    
+    /* Shadows - more subtle and modern */
+    --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.15);
+    
+    /* Colored shadows for depth */
+    --shadow-primary: 0 4px 14px rgba(47, 102, 30, 0.15);
+    --shadow-success: 0 4px 14px rgba(40, 167, 69, 0.15);
+    
+    /* Border radius system */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 350ms ease;
+    --transition-slower: 500ms ease;
+}
+
+/* 2. MODERN SPACING SYSTEM
+   ============================================ */
+:root {
+    --space-xs: 0.25rem;   /* 4px */
+    --space-sm: 0.5rem;    /* 8px */
+    --space-md: 1rem;      /* 16px */
+    --space-lg: 1.5rem;    /* 24px */
+    --space-xl: 2rem;      /* 32px */
+    --space-2xl: 3rem;     /* 48px */
+    --space-3xl: 4rem;     /* 64px */
+    --space-4xl: 6rem;     /* 96px */
+}
+
+/* 3. TYPOGRAPHY SYSTEM
+   ============================================ */
+:root {
+    /* Font families */
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    
+    /* Font sizes - modular scale 1.25 */
+    --text-xs: 0.64rem;     /* 10.24px */
+    --text-sm: 0.8rem;      /* 12.8px */
+    --text-base: 1rem;      /* 16px */
+    --text-lg: 1.25rem;     /* 20px */
+    --text-xl: 1.563rem;    /* 25px */
+    --text-2xl: 1.953rem;   /* 31.25px */
+    --text-3xl: 2.441rem;   /* 39px */
+    --text-4xl: 3.052rem;   /* 48.8px */
+    
+    /* Font weights */
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    
+    /* Line heights */
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
+}
+
+/* 4. APPLY MODERN TYPOGRAPHY
+   ============================================ */
+body {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--neutral-800);
+    font-weight: var(--font-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--font-semibold);
+    line-height: var(--leading-tight);
+    color: var(--neutral-900);
+    margin-top: 0;
+    margin-bottom: var(--space-md);
+}
+
+h1 {
+    font-size: var(--text-3xl);
+    letter-spacing: -0.025em;
+}
+
+h2 {
+    font-size: var(--text-2xl);
+    letter-spacing: -0.02em;
+}
+
+h3 {
+    font-size: var(--text-xl);
+    letter-spacing: -0.015em;
+}
+
+h4 {
+    font-size: var(--text-lg);
+    letter-spacing: -0.01em;
+}
+
+/* 5. ENHANCED COMPONENT STYLES
+   ============================================ */
+
+/* Container improvements */
+.container {
+    max-width: 1280px;
+    padding: var(--space-lg);
+    margin: 0 auto;
+}
+
+/* Enhanced page title */
+.container > h1 {
+    color: var(--primary-dark);
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
+    border-bottom: 3px solid var(--primary-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.container > h1::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100px;
+    height: 3px;
+    background: var(--primary-gradient);
+    animation: slideIn var(--transition-slower) ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Enhanced product header */
+.product-header {
+    background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+    border: 1px solid var(--neutral-200);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-base);
+}
+
+.product-header:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.product-title-area h2 {
+    color: var(--primary-dark);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    margin: 0;
+}
+
+/* Enhanced back button */
+.back-to-product {
+    background: var(--neutral-100);
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-medium);
+    transition: all var(--transition-base);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.back-to-product:hover {
+    background: var(--primary-gradient);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-primary);
+}
+
+.back-icon {
+    transition: transform var(--transition-base);
+}
+
+.back-to-product:hover .back-icon {
+    transform: translateX(-3px);
+}
+
+/* Enhanced image gallery */
+.main-image-container {
+    background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+}
+
+.main-image-container:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.main-image-container img {
+    border-radius: var(--radius-lg);
+}
+
+/* Enhanced thumbnails */
+.thumbnail-item {
+    background: white;
+    border: 2px solid var(--neutral-200);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+}
+
+.thumbnail-item:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.thumbnail-item.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.1);
+}
+
+/* Enhanced color swatches */
+.color-swatch {
+    border: 3px solid var(--neutral-200);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.color-swatch::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all var(--transition-slow);
+}
+
+.color-swatch:hover {
+    border-color: var(--primary-color);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.color-swatch:hover::before {
+    width: 100%;
+    height: 100%;
+}
+
+.color-swatch.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(47, 102, 30, 0.2);
+    transform: scale(1.05);
+}
+
+/* Enhanced pricing grid */
+.pricing-grid {
+    border: none;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.pricing-grid th {
+    background: var(--primary-gradient);
+    color: white;
+    font-weight: var(--font-semibold);
+    padding: var(--space-md);
+    text-transform: uppercase;
+    font-size: var(--text-sm);
+    letter-spacing: 0.05em;
+}
+
+.pricing-grid td {
+    background: white;
+    padding: var(--space-md);
+    transition: all var(--transition-base);
+}
+
+.pricing-grid tbody tr {
+    border-bottom: 1px solid var(--neutral-100);
+}
+
+.pricing-grid tbody tr:hover td {
+    background: var(--primary-light);
+    transform: scale(1.02);
+}
+
+.pricing-grid tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Enhanced section titles */
+.section-title {
+    color: var(--primary-dark);
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--primary-light);
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: var(--primary-gradient);
+}
+
+/* Enhanced buttons */
+.add-to-cart-button {
+    background: var(--primary-gradient);
+    border: none;
+    color: white;
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.add-to-cart-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all var(--transition-slow);
+}
+
+.add-to-cart-button:hover {
+    background: var(--primary-gradient-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-primary);
+}
+
+.add-to-cart-button:hover::before {
+    width: 300%;
+    height: 300%;
+}
+
+.add-to-cart-button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Enhanced quantity controls */
+.quantity-btn {
+    background: white;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    font-weight: var(--font-bold);
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.quantity-btn:hover {
+    background: var(--primary-gradient);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: var(--shadow-sm);
+}
+
+.quantity-input {
+    border: 2px solid var(--neutral-300);
+    font-weight: var(--font-medium);
+    transition: all var(--transition-base);
+}
+
+.quantity-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.1);
+}
+
+/* Enhanced size cards */
+.size-card {
+    background: linear-gradient(135deg, var(--primary-light) 0%, rgba(234, 242, 233, 0.5) 100%);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    transition: all var(--transition-base);
+}
+
+.size-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-primary);
+}
+
+.size-label {
+    color: var(--primary-dark);
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+}
+
+/* Enhanced cart summary */
+.cart-summary {
+    background: linear-gradient(135deg, var(--primary-light) 0%, rgba(234, 242, 233, 0.7) 100%);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--primary-color);
+}
+
+.cart-total {
+    font-size: var(--text-xl);
+    color: var(--primary-dark);
+}
+
+/* Enhanced dropdowns */
+select {
+    background: white;
+    border: 2px solid var(--neutral-300);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+select:hover {
+    border-color: var(--primary-light);
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.1);
+}
+
+/* Enhanced loading states */
+.loading-message {
+    color: var(--primary-color);
+    font-size: var(--text-lg);
+    font-weight: var(--font-medium);
+    text-align: center;
+    padding: var(--space-2xl);
+}
+
+.loading-message::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--primary-light);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: var(--space-sm);
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Enhanced price displays */
+.price-display {
+    font-weight: var(--font-bold);
+    color: var(--primary-dark);
+    font-size: var(--text-lg);
+}
+
+.dynamic-unit-price {
+    color: var(--primary-color);
+    font-size: var(--text-xl);
+}
+
+/* Enhanced info boxes */
+.pricing-tier-info,
+.ltm-fee-notice {
+    background: linear-gradient(135deg, var(--info-light) 0%, rgba(209, 236, 241, 0.5) 100%);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    border-left: 4px solid var(--info-color);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+a,
+input,
+select,
+.color-swatch,
+.thumbnail-item,
+.size-card,
+.pricing-grid tr {
+    transition: all var(--transition-base);
+}
+
+/* 6. ANIMATIONS
+   ============================================ */
+
+/* Fade in animation for page load */
+.container > * {
+    animation: fadeInUp 0.6s ease-out;
+    animation-fill-mode: both;
+}
+
+.container > *:nth-child(1) { animation-delay: 0.1s; }
+.container > *:nth-child(2) { animation-delay: 0.2s; }
+.container > *:nth-child(3) { animation-delay: 0.3s; }
+.container > *:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pulse animation for active elements */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(47, 102, 30, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(47, 102, 30, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(47, 102, 30, 0);
+    }
+}
+
+.pulse-highlight {
+    animation: pulse 2s ease-in-out;
+}
+
+/* 7. RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    :root {
+        --text-base: 0.875rem;  /* 14px on mobile */
+    }
+    
+    .container {
+        padding: var(--space-md);
+    }
+    
+    .container > h1 {
+        font-size: var(--text-2xl);
+    }
+    
+    .section-title {
+        font-size: var(--text-lg);
+    }
+    
+    .add-to-cart-button {
+        padding: var(--space-sm) var(--space-lg);
+        font-size: var(--text-base);
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --text-base: 0.8125rem;  /* 13px on small mobile */
+    }
+    
+    .container {
+        padding: var(--space-sm);
+    }
+    
+    .cart-summary {
+        padding: var(--space-md);
+    }
+}
+
+/* 8. PRINT STYLES
+   ============================================ */
+
+@media print {
+    body {
+        color: black;
+        background: white;
+    }
+    
+    .no-print {
+        display: none !important;
+    }
+    
+    .pricing-grid {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+}
