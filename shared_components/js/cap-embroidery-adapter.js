@@ -88,15 +88,150 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
     }
 
     /**
+     * Shows a loading indicator while the pricing table is updating
+     */
+    function showPricingUpdateIndicator() {
+        const pricingGrid = document.getElementById('custom-pricing-grid');
+        if (!pricingGrid) return;
+        
+        // Add loading overlay to the pricing grid
+        let loadingOverlay = document.getElementById('pricing-loading-overlay');
+        if (!loadingOverlay) {
+            loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'pricing-loading-overlay';
+            loadingOverlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(255, 255, 255, 0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                border-radius: var(--radius-sm);
+                font-weight: bold;
+                color: var(--primary-color);
+                font-size: 1.1em;
+            `;
+            loadingOverlay.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="margin-bottom: 8px;">🔄</div>
+                    <div>Updating pricing...</div>
+                </div>
+            `;
+            
+            // Make sure the pricing grid container is positioned relatively
+            const gridContainer = pricingGrid.closest('.pricing-grid-container') || pricingGrid.parentElement;
+            if (gridContainer) {
+                gridContainer.style.position = 'relative';
+                gridContainer.appendChild(loadingOverlay);
+            }
+        }
+        loadingOverlay.style.display = 'flex';
+    }
+
+    /**
+     * Hides the loading indicator
+     */
+    function hidePricingUpdateIndicator() {
+        const loadingOverlay = document.getElementById('pricing-loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+        }
+    }
+
+    /**
+     * Shows a brief success message when pricing is updated
+     */
+    function showPricingUpdateSuccess(stitchCount) {
+        const formattedStitchCount = parseInt(stitchCount, 10).toLocaleString();
+        
+        // Create or update success indicator
+        let successIndicator = document.getElementById('pricing-update-success');
+        if (!successIndicator) {
+            successIndicator = document.createElement('div');
+            successIndicator.id = 'pricing-update-success';
+            successIndicator.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 12px 20px;
+                border-radius: var(--radius-sm);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-weight: bold;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            document.body.appendChild(successIndicator);
+        }
+        
+        successIndicator.innerHTML = `✅ Pricing updated for ${formattedStitchCount} stitches`;
+        successIndicator.style.transform = 'translateX(0)';
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            successIndicator.style.transform = 'translateX(100%)';
+        }, 3000);
+    }
+
+    /**
+     * Updates the table header to clearly show the current stitch count
+     */
+    function updateTableHeaderWithStitchCount(stitchCount) {
+        const formattedStitchCount = parseInt(stitchCount, 10).toLocaleString();
+        
+        // Update the section title to include stitch count
+        const sectionTitle = document.querySelector('.pricing-header .section-title');
+        if (sectionTitle) {
+            sectionTitle.innerHTML = `Detailed Pricing per Quantity Tier <span style="color: var(--primary-color); font-weight: normal; font-size: 0.9em;">(${formattedStitchCount} stitches)</span>`;
+        }
+        
+        // Add or update a stitch count indicator in the table
+        const pricingGrid = document.getElementById('custom-pricing-grid');
+        if (pricingGrid) {
+            // Add a data attribute to the table for styling purposes
+            pricingGrid.setAttribute('data-current-stitch-count', stitchCount);
+            
+            // Add a subtle indicator to the table caption or create one
+            let tableCaption = pricingGrid.querySelector('caption');
+            if (!tableCaption) {
+                tableCaption = document.createElement('caption');
+                tableCaption.style.cssText = `
+                    caption-side: top;
+                    text-align: center;
+                    padding: 8px;
+                    background: var(--primary-light);
+                    color: var(--primary-color);
+                    font-weight: bold;
+                    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+                    margin-bottom: 0;
+                `;
+                pricingGrid.insertBefore(tableCaption, pricingGrid.firstChild);
+            }
+            tableCaption.textContent = `Current Pricing: ${formattedStitchCount} Stitch Count`;
+        }
+    }
+
+    /**
      * Updates the custom pricing grid display based on the selected stitch count
      * and the data stored in window.capEmbroideryMasterData.
      */
     function updateCapPricingDisplay() {
         console.log('[ADAPTER:CAP-EMB] updateCapPricingDisplay CALLED. Current window.capEmbroideryMasterData:', window.capEmbroideryMasterData ? JSON.parse(JSON.stringify(window.capEmbroideryMasterData)) : window.capEmbroideryMasterData);
         console.log("[ADAPTER:CAP-EMB] Updating cap pricing display...");
+        
+        // Show loading indicator
+        showPricingUpdateIndicator();
+        
         const stitchCountSelect = document.getElementById('client-stitch-count-select');
         if (!stitchCountSelect) {
             console.error("[ADAPTER:CAP-EMB] Stitch count select dropdown (#client-stitch-count-select) not found.");
+            hidePricingUpdateIndicator();
             return;
         }
         const selectedStitchCount = stitchCountSelect.value;
@@ -247,12 +382,20 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
             pricingGridBody.innerHTML = `<tr><td colspan="${colSpan}">${message} Please select another option or check data source.</td></tr>`;
         }
 
-        // Update pricing explanation text
+        // Update pricing explanation text with current stitch count
         const pricingExplanationP = document.querySelector('.pricing-explanation p');
         if (pricingExplanationP) {
             const formattedStitchCount = parseInt(selectedStitchCount, 10).toLocaleString();
             pricingExplanationP.innerHTML = `<strong>Note:</strong> Prices shown are per item and include a ${formattedStitchCount} stitch embroidered logo.`;
         }
+        
+        // Update table header to show current stitch count
+        updateTableHeaderWithStitchCount(selectedStitchCount);
+        
+        // Hide loading indicator and show success feedback
+        hidePricingUpdateIndicator();
+        showPricingUpdateSuccess(selectedStitchCount);
+        
         console.log("[ADAPTER:CAP-EMB] Cap pricing display updated for stitch count:", selectedStitchCount);
     }
 
@@ -301,7 +444,28 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
     document.addEventListener('DOMContentLoaded', function() {
         const stitchCountSelect = document.getElementById('client-stitch-count-select');
         if (stitchCountSelect) {
-            stitchCountSelect.addEventListener('change', updateCapPricingDisplay);
+            stitchCountSelect.addEventListener('change', function() {
+                // Show immediate feedback on the dropdown
+                const indicator = document.getElementById('stitch-count-indicator');
+                if (indicator) {
+                    indicator.style.opacity = '1';
+                    setTimeout(() => {
+                        indicator.style.opacity = '0';
+                    }, 2000);
+                }
+                
+                // Add visual feedback to the dropdown itself
+                stitchCountSelect.style.borderColor = 'var(--primary-color)';
+                stitchCountSelect.style.boxShadow = '0 0 0 3px var(--primary-light)';
+                
+                setTimeout(() => {
+                    stitchCountSelect.style.borderColor = '#ddd';
+                    stitchCountSelect.style.boxShadow = 'none';
+                }, 1000);
+                
+                // Update the pricing display
+                updateCapPricingDisplay();
+            });
             console.log("[ADAPTER:CAP-EMB] Event listener for stitch count dropdown (#client-stitch-count-select) attached.");
             
             // Trigger an initial update with the default selected stitch count
