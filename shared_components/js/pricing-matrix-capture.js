@@ -145,6 +145,66 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
 
 
     function capturePricingMatrix(pricingTable, styleNumber, colorCode, embType) {
+        // Check if we already have complete data from the caspioCapPricingCalculated event
+        if (window.capEmbroideryMasterData && embType === 'cap-embroidery') {
+            console.log("[PRICING-MATRIX:CAPTURE] Complete cap embroidery data already available from caspioCapPricingCalculated event. Using that instead of capturing from table.");
+            
+            // Create a compatible data structure from the master data
+            const masterData = window.capEmbroideryMasterData;
+            const selectedStitchCount = document.getElementById('client-stitch-count-select')?.value || '8000';
+            const pricingDataForStitchCount = masterData.allPriceProfiles[selectedStitchCount];
+            
+            if (pricingDataForStitchCount) {
+                const headers = masterData.groupedHeaders || [];
+                const prices = {};
+                const tierData = {};
+                
+                // Convert the data format
+                headers.forEach(sizeHeader => {
+                    prices[sizeHeader] = {};
+                    Object.keys(masterData.tierDefinitions).forEach(tierKey => {
+                        if (pricingDataForStitchCount[sizeHeader] && pricingDataForStitchCount[sizeHeader][tierKey] !== undefined) {
+                            prices[sizeHeader][tierKey] = pricingDataForStitchCount[sizeHeader][tierKey];
+                        }
+                        
+                        // Copy the tier definition
+                        tierData[tierKey] = {...masterData.tierDefinitions[tierKey]};
+                        
+                        // Ensure the tier label is preserved correctly
+                        if (tierKey === "72+" || (tierData[tierKey].MinQuantity === 72 &&
+                            (tierData[tierKey].MaxQuantity === 99999 || tierData[tierKey].MaxQuantity === undefined))) {
+                            // Make sure the label property is set to "72+"
+                            tierData[tierKey].label = "72+";
+                        }
+                    });
+                });
+                
+                window.nwcaPricingData = {
+                    styleNumber,
+                    color: colorCode,
+                    embellishmentType: embType,
+                    headers,
+                    prices,
+                    tierData,
+                    uniqueSizes: [...new Set(headers.filter(h => !h.includes('-') && !h.includes('/')))],
+                    capturedAt: new Date().toISOString(),
+                    fromMasterData: true
+                };
+                
+                console.log("[PRICING-MATRIX:CAPTURE] Created complete pricing data from master data:", JSON.stringify(window.nwcaPricingData, null, 2));
+                captureCompleted = true;
+                
+                const event = new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData });
+                window.dispatchEvent(event);
+                console.log("[PRICING-MATRIX:CAPTURE] 'pricingDataLoaded' event dispatched with complete data.");
+                
+                // Call the save function asynchronously
+                savePricingMatrixToServer(window.nwcaPricingData);
+                
+                return window.nwcaPricingData;
+            }
+        }
+        
         if (captureCompleted) {
              console.log("[PRICING-MATRIX:CAPTURE] Capture already completed, skipping redundant capture.");
              return window.nwcaPricingData;
@@ -172,7 +232,19 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
                     const tierText = cells[0].textContent.trim();
                     if (!tierText) return;
                     const parsedTier = parseTierText(tierText);
-                    if (parsedTier) tierData[tierText] = parsedTier;
+                    if (parsedTier) {
+                        // Ensure the tier label is preserved correctly
+                        if (tierText.includes('+') || (parsedTier.MinQuantity === 72 &&
+                            (parsedTier.MaxQuantity === 99999 || parsedTier.MaxQuantity === undefined))) {
+                            // For tiers like "72+" that have no upper limit or a very high one
+                            const tierKey = tierText.includes('+') ? tierText : parsedTier.MinQuantity + "+";
+                            tierData[tierKey] = parsedTier;
+                            // Also set the label property to ensure it displays correctly
+                            tierData[tierKey].label = tierKey;
+                        } else {
+                            tierData[tierText] = parsedTier;
+                        }
+                    }
                     for (let i = 1; i < cells.length; i++) {
                         if (i - 1 < headers.length) {
                             const size = headers[i - 1];
