@@ -669,3 +669,134 @@ select,
         border: 1px solid #000;
     }
 }
+
+/* 9. BACK LOGO OPTION STYLES
+   ============================================ */
+
+/* Back Logo Option Checkbox Container */
+.back-logo-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    background: linear-gradient(135deg, var(--info-light) 0%, rgba(209, 236, 241, 0.3) 100%);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--info-color);
+    margin-bottom: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+}
+
+.back-logo-option:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.back-logo-option input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.back-logo-option label {
+    font-weight: var(--font-medium);
+    color: var(--neutral-800);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Back Logo Pricing Info Display */
+.back-logo-pricing-info {
+    margin-top: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    background: linear-gradient(135deg, var(--info-light) 0%, rgba(209, 236, 241, 0.3) 100%);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--info-color);
+    font-size: var(--text-sm);
+    animation: fadeInSlide var(--transition-base) ease-out;
+}
+
+.back-logo-pricing-info > div {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xs);
+}
+
+.back-logo-pricing-info > div:last-child {
+    margin-bottom: 0;
+}
+
+.back-logo-pricing-info strong {
+    color: var(--info-color);
+    font-weight: var(--font-semibold);
+}
+
+/* Animation for back logo pricing info */
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Back Logo Stitch Count Selector */
+.back-logo-stitch-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-sm);
+}
+
+.back-logo-stitch-selector label {
+    font-weight: var(--font-medium);
+    color: var(--neutral-700);
+}
+
+.back-logo-stitch-selector select {
+    min-width: 150px;
+}
+
+/* Enhanced pricing display with back logo */
+.price-with-back-logo {
+    position: relative;
+}
+
+.price-with-back-logo::after {
+    content: '+BL';
+    position: absolute;
+    top: -8px;
+    right: -25px;
+    background: var(--info-color);
+    color: white;
+    font-size: var(--text-xs);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-bold);
+}
+
+/* Responsive adjustments for back logo */
+@media (max-width: 768px) {
+    .back-logo-option {
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .back-logo-pricing-info {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-xs);
+    }
+    
+    .back-logo-stitch-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+    
+    .back-logo-stitch-selector select {
+        width: 100%;
+    }
+}

@@ -98,9 +98,10 @@ console.log("[QUANTITY-UI:LOAD] Product quantity UI creation module loaded.");
              tdPrice.style.padding = '5px';
              tdPrice.style.textAlign = 'center';
              tdPrice.style.verticalAlign = 'top'; // Align price info top
+             tdPrice.className = 'price-display has-breakdown'; // Add class for styling
 
              const priceDisplay = document.createElement('div');
-             priceDisplay.className = 'price-display'; // Use this class for updates
+             priceDisplay.className = 'price-display size-price-display'; // Use this class for updates
              priceDisplay.dataset.size = size;
              priceDisplay.textContent = '$0.00'; // Initial placeholder
              priceDisplay.style.fontSize = '0.9em';

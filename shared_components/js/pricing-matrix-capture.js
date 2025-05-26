@@ -154,6 +154,8 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
             const selectedStitchCount = document.getElementById('client-stitch-count-select')?.value || '8000';
             const pricingDataForStitchCount = masterData.allPriceProfiles[selectedStitchCount];
             
+            console.log(`[PRICING-MATRIX:CAPTURE] Using stitch count ${selectedStitchCount} for initial capture`);
+            
             if (pricingDataForStitchCount) {
                 const headers = masterData.groupedHeaders || [];
                 const prices = {};
@@ -169,6 +171,13 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
                         
                         // Copy the tier definition
                         tierData[tierKey] = {...masterData.tierDefinitions[tierKey]};
+                        
+                        // Add LTM_Fee for tiers under 24 items
+                        const minQty = tierData[tierKey].MinQuantity || 0;
+                        const maxQty = tierData[tierKey].MaxQuantity;
+                        if (minQty > 0 && (maxQty === undefined || maxQty < 24)) {
+                            tierData[tierKey].LTM_Fee = 50.00;
+                        }
                         
                         // Ensure the tier label is preserved correctly
                         if (tierKey === "72+" || (tierData[tierKey].MinQuantity === 72 &&
@@ -188,7 +197,8 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
                     tierData,
                     uniqueSizes: [...new Set(headers.filter(h => !h.includes('-') && !h.includes('/')))],
                     capturedAt: new Date().toISOString(),
-                    fromMasterData: true
+                    fromMasterData: true,
+                    currentStitchCount: selectedStitchCount
                 };
                 
                 console.log("[PRICING-MATRIX:CAPTURE] Created complete pricing data from master data:", JSON.stringify(window.nwcaPricingData, null, 2));

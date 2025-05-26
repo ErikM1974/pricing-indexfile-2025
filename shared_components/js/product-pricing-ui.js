@@ -260,14 +260,33 @@ const NWCAProductPricingUI = (function() {
     function updateDynamicPriceDisplaysPerSize(calculatedPricingData) {
         if (!calculatedPricingData || !calculatedPricingData.items) {
             debugProductUI("WARN", "updateDynamicPriceDisplaysPerSize: Missing calculatedPricingData or items.", calculatedPricingData);
-            elements.sizeQuantityInputs.forEach(input => {
-                const priceDisplayElement = input.closest('.size-card')?.querySelector('.dynamic-unit-price');
-                if (priceDisplayElement) priceDisplayElement.textContent = "N/A";
+            
+            // Update all price displays to N/A
+            const allPriceDisplays = document.querySelectorAll('.size-price-display, .dynamic-unit-price');
+            allPriceDisplays.forEach(display => {
+                display.textContent = "N/A";
             });
             return;
         }
         debugProductUI("UI-UPDATE", "Updating dynamic price displays per size using calculatedPricingData.items", calculatedPricingData.items);
         
+        // Handle matrix layout (uses .size-price-display)
+        const matrixPriceDisplays = document.querySelectorAll('.size-price-display');
+        matrixPriceDisplays.forEach(display => {
+            const size = display.dataset.size;
+            if (size && calculatedPricingData.items[size] && calculatedPricingData.items[size].displayUnitPrice !== undefined) {
+                const unitPrice = parseFloat(calculatedPricingData.items[size].displayUnitPrice);
+                if (!isNaN(unitPrice)) {
+                    display.innerHTML = `Unit Price: <span style="font-weight: bold;">$${unitPrice.toFixed(2)}</span>`;
+                } else {
+                    display.textContent = "Unit Price: N/A";
+                }
+            } else {
+                display.textContent = "Unit Price: N/A";
+            }
+        });
+        
+        // Handle grid layout (uses .dynamic-unit-price inside .size-card)
         elements.sizeQuantityInputs.forEach((input) => {
             const size = input.dataset.size;
             const priceDisplayElement = input.closest('.size-card')?.querySelector('.dynamic-unit-price');

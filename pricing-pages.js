@@ -709,6 +709,12 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // --- UI Update Functions (Consolidated) ---
 
     function updatePriceDisplayForSize(size, quantity, unitPrice, displayPrice, itemTotal, ltmFeeApplies, ltmFeePerItem, combinedQuantity, ltmFee) {
+        // Check if back logo is enabled for cap embroidery
+        const hasBackLogo = window.CapEmbroideryBackLogo?.isEnabled() || false;
+        const backLogoPerItem = window.CapEmbroideryBackLogo?.getPricePerItem() || 0;
+        
+        console.log(`[updatePriceDisplayForSize] Size: ${size}, hasBackLogo: ${hasBackLogo}, backLogoPerItem: ${backLogoPerItem}`);
+        
         const matrixPriceDisplay = document.querySelector(`#quantity-matrix .price-display[data-size="${size}"]`);
         if (matrixPriceDisplay) {
             matrixPriceDisplay.dataset.unitPrice = unitPrice.toFixed(2);
@@ -724,7 +730,14 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
                     cardHtml = `
                         <div class="price-breakdown-card ltm-active">
                             <div class="price-breakdown-header">LTM Fee Applied</div>
-                            <div class="price-breakdown-row"><span>Base:</span> <span>$${unitPrice.toFixed(2)}</span></div>
+                            <div class="price-breakdown-row"><span>Base:</span> <span>$${unitPrice.toFixed(2)}</span></div>`;
+                    
+                    // Add back logo row if enabled
+                    if (hasBackLogo && backLogoPerItem > 0) {
+                        cardHtml += `<div class="price-breakdown-row"><span>Back Logo:</span> <span>+$${backLogoPerItem.toFixed(2)}</span></div>`;
+                    }
+                    
+                    cardHtml += `
                             <div class="price-breakdown-row"><span>LTM:</span> <span>+$${ltmFeePerItem.toFixed(2)}</span></div>
                             <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${displayPrice.toFixed(2)}</span></div>
                             <div class="price-breakdown-row total-price"><span>Total (${quantity}):</span> <span>$${itemTotal.toFixed(2)}</span></div>
@@ -733,7 +746,14 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
                     cardHtml = `
                         <div class="price-breakdown-card standard">
                             <div class="price-breakdown-header">Standard Price</div>
-                            <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${unitPrice.toFixed(2)}</span></div>
+                            <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${unitPrice.toFixed(2)}</span></div>`;
+                    
+                    // Add back logo row if enabled
+                    if (hasBackLogo && backLogoPerItem > 0) {
+                        cardHtml += `<div class="price-breakdown-row"><span>Back Logo:</span> <span>+$${backLogoPerItem.toFixed(2)}</span></div>`;
+                    }
+                    
+                    cardHtml += `
                             <div class="price-breakdown-row total-price"><span>Total (${quantity}):</span> <span>$${itemTotal.toFixed(2)}</span></div>
                         </div>`;
                 }
@@ -747,7 +767,72 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             matrixPriceDisplay.dataset.displayPrice = displayPrice;
             matrixPriceDisplay.dataset.tier = window.cartItemData?.tierKey || '';
         }
-        const gridPriceDisplay = document.querySelector(`#size-quantity-grid-container .size-price[data-size="${size}"]`); if (gridPriceDisplay) { if (quantity <= 0) { gridPriceDisplay.textContent = `$${unitPrice.toFixed(2)}`; gridPriceDisplay.style.backgroundColor = ''; gridPriceDisplay.style.padding = ''; gridPriceDisplay.style.borderRadius = ''; gridPriceDisplay.style.border = ''; gridPriceDisplay.style.boxShadow = ''; } else { if (ltmFeeApplies) { gridPriceDisplay.innerHTML = `<div style="font-weight:bold;color:#212529;background-color:#ffc107;margin-bottom:5px;padding:3px;border-radius:4px;text-align:center;">⚠️ LTM FEE ⚠️</div><div>$${unitPrice.toFixed(2)} + <strong style="color:#663c00">$${ltmFeePerItem.toFixed(2)}</strong> LTM</div><div><strong style="font-size:1.1em;">$${itemTotal.toFixed(2)}</strong></div><div style="background-color:#fff3cd;padding:3px;margin-top:3px;border-radius:3px;"><small>($${ltmFee.toFixed(2)} fee ÷ ${combinedQuantity} items)</small></div>`; gridPriceDisplay.style.backgroundColor = '#fff3cd'; gridPriceDisplay.style.padding = '8px'; gridPriceDisplay.style.borderRadius = '4px'; gridPriceDisplay.style.border = '2px solid #dc3545'; gridPriceDisplay.style.boxShadow = '0 0 5px rgba(220, 53, 69, 0.3)'; } else { gridPriceDisplay.textContent = `$${displayPrice.toFixed(2)}`; gridPriceDisplay.style.backgroundColor = ''; gridPriceDisplay.style.padding = ''; gridPriceDisplay.style.borderRadius = ''; gridPriceDisplay.style.border = ''; gridPriceDisplay.style.boxShadow = ''; } } gridPriceDisplay.dataset.quantity = quantity; gridPriceDisplay.dataset.unitPrice = unitPrice; gridPriceDisplay.dataset.displayPrice = displayPrice; gridPriceDisplay.dataset.tier = window.cartItemData?.tierKey || ''; }
+        const gridPriceDisplay = document.querySelector(`#size-quantity-grid-container .size-price[data-size="${size}"]`);
+        if (gridPriceDisplay) {
+            if (quantity <= 0) {
+                gridPriceDisplay.textContent = `$${unitPrice.toFixed(2)}`;
+                gridPriceDisplay.style.backgroundColor = '';
+                gridPriceDisplay.style.padding = '';
+                gridPriceDisplay.style.borderRadius = '';
+                gridPriceDisplay.style.border = '';
+                gridPriceDisplay.style.boxShadow = '';
+                gridPriceDisplay.style.fontWeight = '';
+                gridPriceDisplay.style.color = '';
+            } else {
+                // Build the price display HTML
+                let priceHTML = '';
+                
+                if (ltmFeeApplies) {
+                    priceHTML = `<div style="font-weight:bold;color:#212529;background-color:#ffc107;margin-bottom:5px;padding:3px;border-radius:4px;text-align:center;">⚠️ LTM FEE ⚠️</div>`;
+                    priceHTML += `<div>$${unitPrice.toFixed(2)}`;
+                    
+                    // Add back logo if enabled
+                    if (hasBackLogo && backLogoPerItem > 0) {
+                        priceHTML += ` + <strong style="color:#0056b3">$${backLogoPerItem.toFixed(2)}</strong> BL`;
+                    }
+                    
+                    priceHTML += ` + <strong style="color:#663c00">$${ltmFeePerItem.toFixed(2)}</strong> LTM</div>`;
+                    priceHTML += `<div><strong style="font-size:1.1em;">$${itemTotal.toFixed(2)}</strong></div>`;
+                    priceHTML += `<div style="background-color:#fff3cd;padding:3px;margin-top:3px;border-radius:3px;"><small>($${ltmFee.toFixed(2)} fee ÷ ${combinedQuantity} items)</small></div>`;
+                    
+                    gridPriceDisplay.innerHTML = priceHTML;
+                    gridPriceDisplay.style.backgroundColor = '#fff3cd';
+                    gridPriceDisplay.style.padding = '8px';
+                    gridPriceDisplay.style.borderRadius = '4px';
+                    gridPriceDisplay.style.border = '2px solid #dc3545';
+                    gridPriceDisplay.style.boxShadow = '0 0 5px rgba(220, 53, 69, 0.3)';
+                } else {
+                    // For non-LTM items, show back logo if enabled
+                    if (hasBackLogo && backLogoPerItem > 0) {
+                        priceHTML = `<div style="font-size:0.85em;color:#666;">Base: $${unitPrice.toFixed(2)}</div>`;
+                        priceHTML += `<div style="font-size:0.85em;color:#0056b3;">+BL: $${backLogoPerItem.toFixed(2)}</div>`;
+                        priceHTML += `<div style="font-weight:bold;font-size:1.1em;margin-top:2px;">$${displayPrice.toFixed(2)}</div>`;
+                        
+                        gridPriceDisplay.innerHTML = priceHTML;
+                        gridPriceDisplay.style.backgroundColor = '#e8f5e9';
+                        gridPriceDisplay.style.padding = '4px 8px';
+                        gridPriceDisplay.style.borderRadius = '4px';
+                        gridPriceDisplay.style.border = '1px solid #4caf50';
+                        gridPriceDisplay.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                        gridPriceDisplay.style.fontWeight = 'normal';
+                        gridPriceDisplay.style.color = '#2e7d32';
+                    } else {
+                        gridPriceDisplay.textContent = `$${displayPrice.toFixed(2)}`;
+                        gridPriceDisplay.style.backgroundColor = '#e8f5e9';
+                        gridPriceDisplay.style.padding = '4px 8px';
+                        gridPriceDisplay.style.borderRadius = '4px';
+                        gridPriceDisplay.style.border = '1px solid #4caf50';
+                        gridPriceDisplay.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                        gridPriceDisplay.style.fontWeight = 'bold';
+                        gridPriceDisplay.style.color = '#2e7d32';
+                    }
+                }
+            }
+            gridPriceDisplay.dataset.quantity = quantity;
+            gridPriceDisplay.dataset.unitPrice = unitPrice;
+            gridPriceDisplay.dataset.displayPrice = displayPrice;
+            gridPriceDisplay.dataset.tier = window.cartItemData?.tierKey || '';
+        }
     }
 
     function showSuccessWithViewCartButton(productData) {

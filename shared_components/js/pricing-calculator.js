@@ -145,9 +145,16 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
             const itemFlashChargeTotal = quantity * flashChargePerItem;
             totalFlashChargeForOrder += itemFlashChargeTotal;
             
-            // Display unit price includes per-item LTM and per-item flash charge
-            const displayUnitPrice = baseUnitPrice + ltmFeePerItem + flashChargePerItem;
-            const itemTotal = quantity * displayUnitPrice; // This total already includes distributed LTM and flash for these items
+            // Check for back logo pricing (cap embroidery specific)
+            let backLogoPerItem = 0;
+            if (pricingData.embellishmentType === 'cap-embroidery' && window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.isEnabled()) {
+                backLogoPerItem = window.CapEmbroideryBackLogo.getPrice();
+                console.log(`[PRICING-CALC:BACK-LOGO] Back logo enabled, adding $${backLogoPerItem} per item`);
+            }
+            
+            // Display unit price includes per-item LTM, per-item flash charge, and back logo
+            const displayUnitPrice = baseUnitPrice + ltmFeePerItem + flashChargePerItem + backLogoPerItem;
+            const itemTotal = quantity * displayUnitPrice; // This total already includes distributed LTM, flash, and back logo for these items
 
             calculatedItems[size] = {
                 quantity: quantity,

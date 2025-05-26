@@ -382,11 +382,21 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
             pricingGridBody.innerHTML = `<tr><td colspan="${colSpan}">${message} Please select another option or check data source.</td></tr>`;
         }
 
-        // Update pricing explanation text with current stitch count
+        // Update pricing explanation text with current stitch count and back logo info
         const pricingExplanationP = document.querySelector('.pricing-explanation p');
         if (pricingExplanationP) {
             const formattedStitchCount = parseInt(selectedStitchCount, 10).toLocaleString();
-            pricingExplanationP.innerHTML = `<strong>Note:</strong> Prices shown are per item and include a ${formattedStitchCount} stitch embroidered logo.`;
+            let explanationText = `<strong>Note:</strong> Prices shown are per item and include a ${formattedStitchCount} stitch embroidered logo.`;
+            
+            // Add back logo information if enabled
+            if (window.capEmbroideryBackLogo && window.capEmbroideryBackLogo.isEnabled()) {
+                const backLogoStitchCount = window.capEmbroideryBackLogo.getStitchCount();
+                const backLogoPrice = window.capEmbroideryBackLogo.getPricePerItem();
+                const formattedBackStitchCount = backLogoStitchCount.toLocaleString();
+                explanationText = `<strong>Note:</strong> Prices shown are per item and include a ${formattedStitchCount} stitch embroidered logo. <span style="color: var(--primary-color); font-weight: bold;">Back logo (${formattedBackStitchCount} stitches) adds $${backLogoPrice.toFixed(2)} per item.</span>`;
+            }
+            
+            pricingExplanationP.innerHTML = explanationText;
         }
         
         // Update table header to show current stitch count
@@ -465,6 +475,52 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
                 
                 // Update the pricing display
                 updateCapPricingDisplay();
+                
+                // Update the window.nwcaPricingData with the new stitch count's pricing
+                if (window.capEmbroideryMasterData) {
+                    const selectedStitchCount = stitchCountSelect.value;
+                    const masterData = window.capEmbroideryMasterData;
+                    const pricingDataForStitchCount = masterData.allPriceProfiles[selectedStitchCount];
+                    
+                    if (pricingDataForStitchCount && window.nwcaPricingData) {
+                        console.log(`[ADAPTER:CAP-EMB] Updating window.nwcaPricingData for stitch count ${selectedStitchCount}`);
+                        
+                        // Update the prices in window.nwcaPricingData
+                        const headers = masterData.groupedHeaders || [];
+                        const prices = {};
+                        
+                        headers.forEach(sizeHeader => {
+                            prices[sizeHeader] = {};
+                            Object.keys(masterData.tierDefinitions).forEach(tierKey => {
+                                if (pricingDataForStitchCount[sizeHeader] && pricingDataForStitchCount[sizeHeader][tierKey] !== undefined) {
+                                    prices[sizeHeader][tierKey] = pricingDataForStitchCount[sizeHeader][tierKey];
+                                }
+                            });
+                        });
+                        
+                        // Update the global pricing data
+                        window.nwcaPricingData.prices = prices;
+                        window.nwcaPricingData.currentStitchCount = selectedStitchCount;
+                        
+                        console.log("[ADAPTER:CAP-EMB] Updated pricing data:", JSON.stringify(window.nwcaPricingData.prices, null, 2));
+                        
+                        // Dispatch event to notify other components
+                        window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
+                            detail: {
+                                stitchCount: selectedStitchCount,
+                                prices: prices
+                            }
+                        }));
+                    }
+                }
+                
+                // Trigger cart total recalculation to update add to cart prices
+                if (window.updateCartTotal && typeof window.updateCartTotal === 'function') {
+                    console.log("[ADAPTER:CAP-EMB] Triggering cart total update after stitch count change");
+                    window.updateCartTotal();
+                } else {
+                    console.warn("[ADAPTER:CAP-EMB] updateCartTotal function not available");
+                }
             });
             console.log("[ADAPTER:CAP-EMB] Event listener for stitch count dropdown (#client-stitch-count-select) attached.");
             
