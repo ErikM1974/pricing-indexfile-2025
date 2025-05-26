@@ -172,7 +172,17 @@
                 if (calculatedPricing.ltmFeeApplies) {
                     const ltmText = ltmFeeNotice.querySelector('.ltm-text');
                     if (ltmText) {
-                         const ltmQuantityNeeded = Math.max(0, (window.LTM_MINIMUM_QUANTITY || 24) - calculatedPricing.combinedQuantity); 
+                         const ltmQuantityNeeded = Math.max(0, (window.LTM_MINIMUM_QUANTITY || 24) - calculatedPricing.combinedQuantity);
+                         
+                         // Check if back logo is enabled for cap embroidery
+                         let backLogoInfo = '';
+                         if (currentEmbType === 'cap-embroidery' && window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.isEnabled()) {
+                             const backLogoPrice = window.CapEmbroideryBackLogo.getPrice();
+                             backLogoInfo = `<div style="margin-top:5px;padding-top:5px;border-top:1px dashed #ffc107;">
+                                 <div><strong>Back Logo:</strong> <span style="color:#663c00;font-weight:bold;">+$${backLogoPrice.toFixed(2)}</span> per item</div>
+                             </div>`;
+                         }
+                         
                          ltmText.innerHTML = `
                             <div style="display:flex;align-items:center;margin-bottom:5px;">
                                 <span style="font-size:1.3em;margin-right:8px;">⚠️</span>
@@ -182,6 +192,7 @@
                                 <div>Total LTM Fee: <span style="color:#663c00;font-weight:bold;font-size:1.1em;">$${(calculatedPricing.ltmFeeTotal || 0).toFixed(2)}</span></div>
                                 <div>Per Item: <span style="color:#663c00;font-weight:bold;">$${(calculatedPricing.ltmFeePerItem || 0).toFixed(2)}</span> × ${calculatedPricing.combinedQuantity} items</div>
                             </div>
+                            ${backLogoInfo}
                             ${ltmQuantityNeeded > 0 ? `<div style="font-size:0.9em;font-style:italic;margin-top:5px;padding-top:5px;border-top:1px dashed #ffc107;">
                                 Add ${ltmQuantityNeeded} more items to reach ${(window.LTM_MINIMUM_QUANTITY || 24)} pieces and eliminate this fee
                             </div>` : ''}
@@ -228,6 +239,16 @@
             }
 
             const allAvailableSizes = Object.keys(calculatedPricing.baseUnitPrices || {});
+            
+            // Check if back logo is enabled for cap embroidery
+            let backLogoPerItem = 0;
+            let hasBackLogo = false;
+            if (currentEmbType === 'cap-embroidery' && window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.isEnabled()) {
+                backLogoPerItem = window.CapEmbroideryBackLogo.getPrice();
+                hasBackLogo = true;
+                console.log(`[ADD-TO-CART] Back logo enabled for price display update: $${backLogoPerItem} per item`);
+            }
+            
             allAvailableSizes.forEach(size => {
                 const quantity = sizeQuantities[size] || 0;
                 const itemData = calculatedPricing.items[size];
@@ -238,7 +259,9 @@
                         itemData ? itemData.displayUnitPrice : baseUnitPrice,
                         itemData ? itemData.itemTotal : 0,
                         calculatedPricing.ltmFeeApplies, calculatedPricing.ltmFeePerItem,
-                        calculatedPricing.combinedQuantity, calculatedPricing.ltmFeeTotal
+                        calculatedPricing.combinedQuantity, calculatedPricing.ltmFeeTotal,
+                        hasBackLogo, backLogoPerItem,  // Pass back logo info
+                        pricingDataForCalc.currentStitchCount // Pass front stitch count
                     );
                 } else {
                      console.error(`[ADD-TO-CART] PricingPageUI.updatePriceDisplayForSize not available for size ${size}.`);
@@ -278,29 +301,37 @@
 
             if (ltmFeeNoticeInStickySummary) {
                 if (calculatedPricing.ltmFeeApplies && newQuantityTotal > 0) {
-                    ltmFeeNoticeInStickySummary.style.display = 'flex'; 
-                    const ltmTextElement = ltmFeeNoticeInStickySummary.querySelector('.ltm-text');
-                    let ltmDetailElement = ltmFeeNoticeInStickySummary.querySelector('.ltm-detail-text');
-
-                    if (ltmTextElement) {
-                        ltmTextElement.textContent = `LTM Fee Applied ($${(calculatedPricing.ltmFeeTotal || 0).toFixed(2)})`;
-                    }
-
-                    if (!ltmDetailElement) {
-                        ltmDetailElement = document.createElement('div');
-                        ltmDetailElement.className = 'ltm-detail-text';
-                        ltmDetailElement.style.fontSize = '0.85em';
-                        ltmDetailElement.style.marginTop = '5px';
-                        ltmDetailElement.style.color = '#6c757d'; 
-                        if(ltmTextElement && ltmTextElement.parentNode === ltmFeeNoticeInStickySummary) {
-                            ltmTextElement.insertAdjacentElement('afterend', ltmDetailElement);
-                        } else {
-                            ltmFeeNoticeInStickySummary.appendChild(ltmDetailElement);
-                        }
-                    }
+                    ltmFeeNoticeInStickySummary.style.display = 'flex';
+                    
+                    // Fix: Ensure ltmFeeTotal is properly calculated and displayed
+                    const ltmFeeAmount = calculatedPricing.ltmFeeTotal || (window.LTM_FEE_VALUE || 50.00);
                     const ltmMinQty = window.LTM_MINIMUM_QUANTITY || 24;
                     const ltmFeeValue = window.LTM_FEE_VALUE || 50;
-                    ltmDetailElement.innerHTML = `<small>Orders under ${ltmMinQty} pcs incur a $${ltmFeeValue.toFixed(2)} LTM fee, added to the ${ltmMinQty}-pc price and distributed per item. (e.g., 10 items: ${ltmMinQty}-pc price + $${(ltmFeeValue / (calculatedPricing.combinedQuantity || 1)).toFixed(2)}/item).</small>`;
+                    
+                    // Check if back logo is enabled for cap embroidery
+                    let backLogoInfo = '';
+                    if (currentEmbType === 'cap-embroidery' && window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.isEnabled()) {
+                        const backLogoPrice = window.CapEmbroideryBackLogo.getPrice();
+                        backLogoInfo = `<div style="margin-top:5px;padding-top:5px;border-top:1px dashed #b8daff;">
+                            <strong>Back Logo:</strong> +$${backLogoPrice.toFixed(2)}/item
+                        </div>`;
+                    }
+                    
+                    // Update the entire content of the LTM fee notice
+                    ltmFeeNoticeInStickySummary.innerHTML = `
+                        <span class="ltm-icon" style="font-style: normal; font-weight: bold; color: #0056b3;">ℹ️</span>
+                        <div style="flex: 1;">
+                            <div class="ltm-text" style="font-weight: bold; margin-bottom: 5px;">
+                                Less Than Minimum fee applies
+                                <span style="color: #004085; margin-left: 10px;">$${ltmFeeAmount.toFixed(2)}</span>
+                            </div>
+                            <div class="ltm-detail-text" style="font-size: 0.85em; color: #6c757d;">
+                                <small>Orders under ${ltmMinQty} pcs incur a $${ltmFeeValue.toFixed(2)} LTM fee
+                                ($${(ltmFeeValue / (calculatedPricing.combinedQuantity || 1)).toFixed(2)}/item)</small>
+                                ${backLogoInfo}
+                            </div>
+                        </div>
+                    `;
                 } else {
                     ltmFeeNoticeInStickySummary.style.display = 'none';
                 }
@@ -667,6 +698,16 @@
             const selectedStitchCount = stitchCountSelect.value;
             embellishmentOptionsForCart.stitchCount = selectedStitchCount;
             console.log(`[ADD-TO-CART:CAP-EMB] Added stitchCount to embellishmentOptionsForCart: ${selectedStitchCount}`);
+            
+            // Check for back logo option
+            if (window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.isEnabled()) {
+                embellishmentOptionsForCart.backLogo = {
+                    enabled: true,
+                    stitchCount: selectedStitchCount,
+                    price: window.CapEmbroideryBackLogo.getPrice()
+                };
+                console.log(`[ADD-TO-CART:CAP-EMB] Added back logo to embellishmentOptionsForCart:`, embellishmentOptionsForCart.backLogo);
+            }
         }
         // TODO: Add UI-driven options for other embellishment types (embroidery, DTG, DTF) here if add-to-cart.js manages their UI elements.
         // Example:
@@ -1228,7 +1269,23 @@
         }
         
         const embType = document.createElement('p');
-        embType.textContent = `Embellishment: ${productData.embellishmentType.replace(/-/g, ' ')}`;
+        let embellishmentText = `Embellishment: ${productData.embellishmentType.replace(/-/g, ' ')}`;
+        
+        // Add stitch count for cap embroidery
+        if (productData.embellishmentType === 'cap-embroidery' && productData.embellishmentOptions && productData.embellishmentOptions.stitchCount) {
+            const stitchCount = parseInt(productData.embellishmentOptions.stitchCount).toLocaleString();
+            embellishmentText += ` (${stitchCount} stitches`;
+            
+            // Add back logo info if present
+            if (productData.embellishmentOptions.backLogo && productData.embellishmentOptions.backLogo.enabled) {
+                const backLogoStitches = parseInt(productData.embellishmentOptions.backLogo.stitchCount).toLocaleString();
+                embellishmentText += ` + back logo ${backLogoStitches} stitches`;
+            }
+            
+            embellishmentText += ')';
+        }
+        
+        embType.textContent = embellishmentText;
         embType.style.fontSize = '0.9em';
         embType.style.marginBottom = '5px';
         details.appendChild(embType);

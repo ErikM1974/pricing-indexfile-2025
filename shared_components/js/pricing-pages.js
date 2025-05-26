@@ -720,46 +720,162 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
 
     // --- UI Update Functions (Consolidated) ---
 
-    function updatePriceDisplayForSize(size, quantity, unitPrice, displayPrice, itemTotal, ltmFeeApplies, ltmFeePerItem, combinedQuantity, ltmFee) {
+    function updatePriceDisplayForSize(size, quantity, unitPrice, displayPrice, itemTotal, ltmFeeApplies, ltmFeePerItem, combinedQuantity, ltmFee, hasBackLogo, backLogoPerItem, frontStitchCount) {
         const matrixPriceDisplay = document.querySelector(`#quantity-matrix .price-display[data-size="${size}"]`);
+        const formattedFrontStitchCount = frontStitchCount ? ` (${parseInt(frontStitchCount).toLocaleString()} st)` : '';
+
         if (matrixPriceDisplay) {
+            // Use the passed parameters for back logo info, with fallback to checking global if not provided
+            if (hasBackLogo === undefined || backLogoPerItem === undefined) {
+                // Fallback to checking global for backward compatibility
+                backLogoPerItem = 0;
+                hasBackLogo = false;
+                if (window.CapEmbroideryBackLogo && typeof window.CapEmbroideryBackLogo.isEnabled === 'function' && window.CapEmbroideryBackLogo.isEnabled()) {
+                    backLogoPerItem = window.CapEmbroideryBackLogo.getPrice();
+                    hasBackLogo = true;
+                }
+            }
+            
+            console.log(`[updatePriceDisplayForSize] Size: ${size}, hasBackLogo: ${hasBackLogo}, backLogoPerItem: ${backLogoPerItem}, frontStitches: ${frontStitchCount}`);
+            
+            const actualDisplayPrice = displayPrice; // displayPrice from calculator already includes backLogoPerItem
             matrixPriceDisplay.dataset.unitPrice = unitPrice.toFixed(2);
+            matrixPriceDisplay.dataset.displayPrice = actualDisplayPrice.toFixed(2);
+            
             if (quantity <= 0) {
-                matrixPriceDisplay.innerHTML = `$${unitPrice.toFixed(2)}`;
+                // For zero quantity, show the base price plus back logo if applicable
+                const zeroQtyPrice = hasBackLogo ? (unitPrice + backLogoPerItem) : unitPrice;
+                matrixPriceDisplay.innerHTML = `$${zeroQtyPrice.toFixed(2)}`;
                 matrixPriceDisplay.className = 'price-display'; // Reset classes
                 matrixPriceDisplay.style.backgroundColor = '';
                 matrixPriceDisplay.style.padding = '';
                 matrixPriceDisplay.style.border = '';
             } else {
                 let cardHtml = '';
+                
                 if (ltmFeeApplies) {
+                    const actualItemTotal = actualDisplayPrice * quantity;
+                    
                     cardHtml = `
                         <div class="price-breakdown-card ltm-active">
                             <div class="price-breakdown-header">LTM Fee Applied</div>
-                            <div class="price-breakdown-row"><span>Base:</span> <span>$${unitPrice.toFixed(2)}</span></div>
-                            <div class="price-breakdown-row"><span>LTM:</span> <span>+$${ltmFeePerItem.toFixed(2)}</span></div>
-                            <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${displayPrice.toFixed(2)}</span></div>
-                            <div class="price-breakdown-row total-price"><span>Total (${quantity}):</span> <span>$${itemTotal.toFixed(2)}</span></div>
+                            <div class="price-breakdown-row"><span>Base${formattedFrontStitchCount}:</span> <span>$${unitPrice.toFixed(2)}</span></div>`;
+                    
+                    if (ltmFeePerItem > 0) {
+                        cardHtml += `<div class="price-breakdown-row"><span>LTM:</span> <span>+$${ltmFeePerItem.toFixed(2)}</span></div>`;
+                    }
+                    
+                    if (hasBackLogo) {
+                        const backLogoStitchCount = window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.getStitchCount ? window.CapEmbroideryBackLogo.getStitchCount() : '';
+                        const formattedBackStitchCount = backLogoStitchCount ? ` (${parseInt(backLogoStitchCount).toLocaleString()} st)` : '';
+                        cardHtml += `<div class="price-breakdown-row"><span>Back Logo${formattedBackStitchCount}:</span> <span>+$${backLogoPerItem.toFixed(2)}</span></div>`;
+                    }
+                    
+                    cardHtml += `
+                            <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${actualDisplayPrice.toFixed(2)}</span></div>
+                            <div class="price-breakdown-row total-price"><span>Total (${quantity}):</span> <span>$${actualItemTotal.toFixed(2)}</span></div>
                         </div>`;
                 } else {
+                    const actualItemTotal = actualDisplayPrice * quantity;
+                    
                     cardHtml = `
                         <div class="price-breakdown-card standard">
                             <div class="price-breakdown-header">Standard Price</div>
-                            <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${unitPrice.toFixed(2)}</span></div>
-                            <div class="price-breakdown-row total-price"><span>Total (${quantity}):</span> <span>$${itemTotal.toFixed(2)}</span></div>
+                            <div class="price-breakdown-row"><span>Base${formattedFrontStitchCount}:</span> <span>$${unitPrice.toFixed(2)}</span></div>`;
+                    
+                    if (hasBackLogo) {
+                        const backLogoStitchCount = window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.getStitchCount ? window.CapEmbroideryBackLogo.getStitchCount() : '';
+                        const formattedBackStitchCount = backLogoStitchCount ? ` (${parseInt(backLogoStitchCount).toLocaleString()} st)` : '';
+                        cardHtml += `<div class="price-breakdown-row"><span>Back Logo${formattedBackStitchCount}:</span> <span>+$${backLogoPerItem.toFixed(2)}</span></div>`;
+                    }
+                    
+                    cardHtml += `
+                            <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${actualDisplayPrice.toFixed(2)}</span></div>
+                            <div class="price-breakdown-row total-price"><span>Total (${quantity}):</span> <span>$${actualItemTotal.toFixed(2)}</span></div>
                         </div>`;
                 }
                 matrixPriceDisplay.innerHTML = cardHtml;
-                matrixPriceDisplay.className = 'price-display has-breakdown'; // Add class to indicate it has the card
+                matrixPriceDisplay.className = 'price-display has-breakdown';
                 matrixPriceDisplay.style.backgroundColor = '';
                 matrixPriceDisplay.style.padding = '0';
                 matrixPriceDisplay.style.border = 'none';
             }
             matrixPriceDisplay.dataset.quantity = quantity;
-            matrixPriceDisplay.dataset.displayPrice = displayPrice;
             matrixPriceDisplay.dataset.tier = window.cartItemData?.tierKey || '';
         }
-        const gridPriceDisplay = document.querySelector(`#size-quantity-grid-container .size-price[data-size="${size}"]`); if (gridPriceDisplay) { if (quantity <= 0) { gridPriceDisplay.textContent = `$${unitPrice.toFixed(2)}`; gridPriceDisplay.style.backgroundColor = ''; gridPriceDisplay.style.padding = ''; gridPriceDisplay.style.borderRadius = ''; gridPriceDisplay.style.border = ''; gridPriceDisplay.style.boxShadow = ''; } else { if (ltmFeeApplies) { gridPriceDisplay.innerHTML = `<div style="font-weight:bold;color:#212529;background-color:#ffc107;margin-bottom:5px;padding:3px;border-radius:4px;text-align:center;">⚠️ LTM FEE ⚠️</div><div>$${unitPrice.toFixed(2)} + <strong style="color:#663c00">$${ltmFeePerItem.toFixed(2)}</strong> LTM</div><div><strong style="font-size:1.1em;">$${itemTotal.toFixed(2)}</strong></div><div style="background-color:#fff3cd;padding:3px;margin-top:3px;border-radius:3px;"><small>($${ltmFee.toFixed(2)} fee ÷ ${combinedQuantity} items)</small></div>`; gridPriceDisplay.style.backgroundColor = '#fff3cd'; gridPriceDisplay.style.padding = '8px'; gridPriceDisplay.style.borderRadius = '4px'; gridPriceDisplay.style.border = '2px solid #dc3545'; gridPriceDisplay.style.boxShadow = '0 0 5px rgba(220, 53, 69, 0.3)'; } else { gridPriceDisplay.textContent = `$${displayPrice.toFixed(2)}`; gridPriceDisplay.style.backgroundColor = ''; gridPriceDisplay.style.padding = ''; gridPriceDisplay.style.borderRadius = ''; gridPriceDisplay.style.border = ''; gridPriceDisplay.style.boxShadow = ''; } } gridPriceDisplay.dataset.quantity = quantity; gridPriceDisplay.dataset.unitPrice = unitPrice; gridPriceDisplay.dataset.displayPrice = displayPrice; gridPriceDisplay.dataset.tier = window.cartItemData?.tierKey || ''; }
+        const gridPriceDisplay = document.querySelector(`#size-quantity-grid-container .size-price[data-size="${size}"]`);
+        if (gridPriceDisplay) {
+            if (quantity <= 0) {
+                const zeroQtyPrice = hasBackLogo ? (unitPrice + backLogoPerItem) : unitPrice;
+                gridPriceDisplay.textContent = `$${zeroQtyPrice.toFixed(2)}`;
+                gridPriceDisplay.style.backgroundColor = '';
+                gridPriceDisplay.style.padding = '';
+                gridPriceDisplay.style.borderRadius = '';
+                gridPriceDisplay.style.border = '';
+                gridPriceDisplay.style.boxShadow = '';
+                gridPriceDisplay.style.fontWeight = '';
+                gridPriceDisplay.style.color = '';
+            } else {
+                let priceHTML = '';
+                
+                if (ltmFeeApplies) {
+                    const actualDisplayPrice = displayPrice; // Already includes back logo from calculator
+                    const actualItemTotal = actualDisplayPrice * quantity;
+                    
+                    priceHTML = `<div style="font-weight:bold;color:#212529;background-color:#ffc107;margin-bottom:5px;padding:3px;border-radius:4px;text-align:center;">⚠️ LTM FEE ⚠️</div>`;
+                    priceHTML += `<div>Base${formattedFrontStitchCount}: $${unitPrice.toFixed(2)}`;
+                    
+                    if (hasBackLogo && backLogoPerItem > 0) {
+                         const backLogoStitchCount = window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.getStitchCount ? window.CapEmbroideryBackLogo.getStitchCount() : '';
+                         const formattedBackStitchCount = backLogoStitchCount ? ` (${parseInt(backLogoStitchCount).toLocaleString()} st)` : '';
+                        priceHTML += ` + <strong style="color:#0056b3">$${backLogoPerItem.toFixed(2)}</strong> BL${formattedBackStitchCount}`;
+                    }
+                    
+                    priceHTML += ` + <strong style="color:#663c00">$${ltmFeePerItem.toFixed(2)}</strong> LTM</div>`;
+                    priceHTML += `<div><strong style="font-size:1.1em;">$${actualItemTotal.toFixed(2)}</strong></div>`;
+                    priceHTML += `<div style="background-color:#fff3cd;padding:3px;margin-top:3px;border-radius:3px;"><small>($${ltmFee.toFixed(2)} fee ÷ ${combinedQuantity} items)</small></div>`;
+                    
+                    gridPriceDisplay.innerHTML = priceHTML;
+                    gridPriceDisplay.style.backgroundColor = '#fff3cd';
+                    gridPriceDisplay.style.padding = '8px';
+                    gridPriceDisplay.style.borderRadius = '4px';
+                    gridPriceDisplay.style.border = '2px solid #dc3545';
+                    gridPriceDisplay.style.boxShadow = '0 0 5px rgba(220, 53, 69, 0.3)';
+                } else {
+                    const actualDisplayPrice = displayPrice; // Already includes back logo from calculator
+                    
+                    if (hasBackLogo && backLogoPerItem > 0) {
+                        const backLogoStitchCount = window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.getStitchCount ? window.CapEmbroideryBackLogo.getStitchCount() : '';
+                        const formattedBackStitchCount = backLogoStitchCount ? ` (${parseInt(backLogoStitchCount).toLocaleString()} st)` : '';
+                        priceHTML = `<div style="font-size:0.85em;color:#666;">Base${formattedFrontStitchCount}: $${unitPrice.toFixed(2)}</div>`;
+                        priceHTML += `<div style="font-size:0.85em;color:#0056b3;">+BL${formattedBackStitchCount}: $${backLogoPerItem.toFixed(2)}</div>`;
+                        priceHTML += `<div style="font-weight:bold;font-size:1.1em;margin-top:2px;">$${actualDisplayPrice.toFixed(2)}</div>`;
+                        
+                        gridPriceDisplay.innerHTML = priceHTML;
+                        gridPriceDisplay.style.backgroundColor = '#e8f5e9';
+                        gridPriceDisplay.style.padding = '4px 8px';
+                        gridPriceDisplay.style.borderRadius = '4px';
+                        gridPriceDisplay.style.border = '1px solid #4caf50';
+                        gridPriceDisplay.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                        gridPriceDisplay.style.fontWeight = 'normal';
+                        gridPriceDisplay.style.color = '#2e7d32';
+                    } else {
+                        gridPriceDisplay.textContent = `$${actualDisplayPrice.toFixed(2)}`;
+                        gridPriceDisplay.style.backgroundColor = '#e8f5e9';
+                        gridPriceDisplay.style.padding = '4px 8px';
+                        gridPriceDisplay.style.borderRadius = '4px';
+                        gridPriceDisplay.style.border = '1px solid #4caf50';
+                        gridPriceDisplay.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                        gridPriceDisplay.style.fontWeight = 'bold';
+                        gridPriceDisplay.style.color = '#2e7d32';
+                    }
+                }
+            }
+            gridPriceDisplay.dataset.quantity = quantity;
+            gridPriceDisplay.dataset.unitPrice = unitPrice;
+            gridPriceDisplay.dataset.displayPrice = displayPrice; // Store the original displayPrice from calculator
+            gridPriceDisplay.dataset.tier = window.cartItemData?.tierKey || '';
+        }
     }
 
     function showSuccessWithViewCartButton(productData) {
