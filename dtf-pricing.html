@@ -483,10 +483,46 @@
         /* Pricing breakdown styles */
         .pricing-breakdown {
             background-color: var(--white);
-            padding: 20px;
             border-radius: var(--radius-md);
             box-shadow: var(--shadow-md);
             margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .breakdown-accordion-header {
+            background-color: var(--background-light);
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+        
+        .breakdown-accordion-header:hover {
+            background-color: #e8f5e9;
+        }
+        
+        .breakdown-accordion-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.2em;
+        }
+        
+        .breakdown-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background-color: var(--white);
+        }
+        
+        .pricing-breakdown.active .breakdown-accordion-content {
+            max-height: 1500px;
+        }
+        
+        .breakdown-inner {
+            padding: 20px;
         }
         
         .breakdown-title {
@@ -501,8 +537,18 @@
         .breakdown-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 10px 0;
             border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .breakdown-item.indented {
+            padding-left: 30px;
+        }
+        
+        .breakdown-item.sub-item {
+            padding-left: 50px;
+            font-size: 0.95em;
         }
         
         .breakdown-item:last-child {
@@ -608,6 +654,58 @@
                 font-size: 1.4em;
             }
         }
+        
+        /* Accordion styles */
+        .accordion {
+            margin-top: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        
+        .accordion-header {
+            background-color: var(--background-light);
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .accordion-header:hover {
+            background-color: #e8f5e9;
+        }
+        
+        .accordion-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.1em;
+        }
+        
+        .accordion-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+        
+        .accordion.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background-color: #f0f7ed;
+        }
+        
+        .accordion.active .accordion-content {
+            max-height: 500px;
+        }
+        
+        .accordion-inner {
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -666,31 +764,6 @@
             <!-- Right Column: Interactive Elements -->
             <div class="product-interactive-column">
                 
-                <!-- Pricing Formula Box -->
-                <div class="pricing-formula-box">
-                    <h3>📊 Our DTF Pricing Formula</h3>
-                    <p>We calculate your price by applying our margin to the product costs, then adding operational expenses:</p>
-                    <div class="formula-steps">
-                        1. Garment Price = Blank Garment ÷ 0.60 (40% margin)<br>
-                        2. Transfer Price = Already includes margin<br>
-                        3. Final Price = Garment Price + Transfer(s) + Freight + Labor<br>
-                        <br>
-                        <strong>Pricing Tiers:</strong> 24-47 | 48-71 | 72-100 | 101-250 | 251+<br>
-                        <strong>Minimum:</strong> Orders under 24 = $50 setup charge<br>
-                        <strong>Multi-Location:</strong> Labor doubles for each additional transfer<br>
-                        <br>
-                        <strong>Size Upcharges:</strong> Larger sizes (2XL+) add $2-7 to final price
-                    </div>
-                </div>
-                
-                <!-- Garment Cost Section -->
-                <div class="garment-cost-section">
-                    <div class="garment-cost-display">
-                        <span class="garment-cost-label">Blank Garment Cost:</span>
-                        <span class="garment-cost-value" id="garment-cost-display">Loading...</span>
-                    </div>
-                    <div class="cost-source" id="cost-source">Fetching from product data...</div>
-                </div>
                 
                 <!-- DTF Transfer Configuration -->
                 <div class="dtf-transfer-section">
@@ -738,10 +811,17 @@
                 
                 <!-- Pricing Results -->
                 <div id="pricing-results" style="display: none;">
-                    <div class="pricing-breakdown">
-                        <h3 class="breakdown-title">Your Pricing Breakdown</h3>
-                        <div id="breakdown-details">
-                            <!-- Breakdown will be populated by JavaScript -->
+                    <div class="pricing-breakdown" id="pricing-breakdown-accordion" data-require-password="false">
+                        <div class="breakdown-accordion-header" onclick="togglePricingBreakdown()">
+                            <h3>💰 Cost Analysis (Internal Use)</h3>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="breakdown-accordion-content">
+                            <div class="breakdown-inner">
+                                <div id="breakdown-details">
+                                    <!-- Breakdown will be populated by JavaScript -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -750,9 +830,48 @@
                     </div>
                 </div>
                 
-                <!-- Hidden Caspio Matrix (for compatibility) -->
+                <!-- Pricing Formula Accordion (moved to bottom) -->
+                <div class="accordion" id="pricing-formula-accordion">
+                    <div class="accordion-header" onclick="toggleAccordion()">
+                        <h3>📊 Pricing Formula</h3>
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>We calculate your price by applying our margin to the product costs, then adding operational expenses:</p>
+                            <div class="formula-steps">
+                                1. Garment Price = Blank Garment ÷ 0.60 (40% margin)<br>
+                                2. Transfer Price = Already includes margin<br>
+                                3. Final Price = Garment Price + Transfer(s) + Freight + Labor<br>
+                                <br>
+                                <strong>Pricing Tiers:</strong> 24-47 | 48-71 | 72-100 | 101-250 | 251+<br>
+                                <strong>Minimum:</strong> Orders under 24 = $50 setup charge<br>
+                                <strong>Multi-Location:</strong> Labor doubles for each additional transfer<br>
+                                <br>
+                                <strong>Size Upcharges:</strong> Larger sizes (2XL+) add $2-7 to final price
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hidden elements for compatibility with shared scripts -->
                 <div id="pricing-calculator" class="pricing-calculator" style="display:none !important; width:0; height:0; border:0; visibility: hidden;">
                     <div class="loading-message">Loading pricing data...</div>
+                </div>
+                
+                <!-- Hidden quantity matrix for script compatibility -->
+                <div id="quantity-matrix" style="display:none !important;"></div>
+                
+                <!-- Hidden add to cart button for script compatibility -->
+                <button id="add-to-cart-button" style="display:none !important;">Add to Cart</button>
+                
+                <!-- Hidden matrix elements for script compatibility -->
+                <div class="matrix-price-table" style="display:none !important;"></div>
+                <div id="matrix-note" style="display:none !important;"></div>
+                
+                <!-- Hidden sticky summary for script compatibility -->
+                <div class="sticky-summary" style="display:none !important;">
+                    <div id="totalAmountDisplay"></div>
                 </div>
             </div>
         </div>
@@ -777,7 +896,7 @@
     <script>
         // Constants
         const FREIGHT_COST = 15.00;
-        const LABOR_COST_PER_TRANSFER = 3.33;
+        const LABOR_COST_PER_TRANSFER = 2.00;
         const MINIMUM_CHARGE = 50.00;
         const MINIMUM_CHARGE_QTY = 24;
         const TARGET_MARGIN = 0.40; // 40% gross margin
@@ -1165,24 +1284,34 @@
             document.getElementById('pricing-results').style.display = 'block';
         }
 
+        // Store style number globally
+        let currentStyleNumber = '';
+        
         // Update pricing display
         function updatePricingDisplay(data) {
             const breakdownDiv = document.getElementById('breakdown-details');
             let breakdownHTML = '';
             
             if (data.isLTM) {
+                const ltmPerPiece = MINIMUM_CHARGE / data.primaryQuantity;
                 breakdownHTML += `
-                    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
                         <strong style="color: #856404;">Less Than Minimum Order</strong><br>
-                        <span style="color: #856404;">Orders under ${MINIMUM_CHARGE_QTY} pieces include a $${MINIMUM_CHARGE.toFixed(2)} setup charge</span>
+                        <span style="color: #856404;">Orders under ${MINIMUM_CHARGE_QTY} pieces include a $${MINIMUM_CHARGE.toFixed(2)} setup charge</span><br>
+                        <span style="color: #856404; font-size: 0.9em;">($${ltmPerPiece.toFixed(2)} per item for ${data.primaryQuantity} items ordered)</span>
                     </div>
                 `;
             }
             
+            // Use style number if available
+            const styleLabel = currentStyleNumber ?
+                `${currentStyleNumber} (Blank Cost) $${data.garmentCost.toFixed(2)}` :
+                `Blank Garment $${data.garmentCost.toFixed(2)}`;
+            
             breakdownHTML += `
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Blank Garment</span>
-                    <span class="breakdown-value">$${data.garmentCost.toFixed(2)}</span>
+                <div class="breakdown-item" style="font-style: italic; color: #666;">
+                    <span class="breakdown-label">${styleLabel}</span>
+                    <span class="breakdown-value"></span>
                 </div>
                 <div class="breakdown-item">
                     <span class="breakdown-label">Garment with 40% margin</span>
@@ -1194,22 +1323,22 @@
             if (data.transferDetails.length > 1) {
                 data.transferDetails.forEach(detail => {
                     breakdownHTML += `
-                        <div class="breakdown-item">
-                            <span class="breakdown-label">Location ${detail.location}: ${detail.size}</span>
+                        <div class="breakdown-item indented">
+                            <span class="breakdown-label" style="padding-left: 20px;">Location ${detail.location}: ${detail.size}</span>
                             <span class="breakdown-value">$${detail.price.toFixed(2)}</span>
                         </div>
                     `;
                 });
                 breakdownHTML += `
-                    <div class="breakdown-item" style="font-weight: 600; background-color: #f8f9fa; margin: 0 -20px; padding: 10px 20px;">
+                    <div class="breakdown-item" style="font-weight: 600;">
                         <span>Total Transfer Cost</span>
                         <span>$${data.totalTransferCost.toFixed(2)}</span>
                     </div>
                 `;
             } else {
                 breakdownHTML += `
-                    <div class="breakdown-item">
-                        <span class="breakdown-label">${data.transferDetails[0].size} Transfer</span>
+                    <div class="breakdown-item indented">
+                        <span class="breakdown-label" style="padding-left: 20px;">${data.transferDetails[0].size} Transfer</span>
                         <span class="breakdown-value">$${data.transferDetails[0].price.toFixed(2)}</span>
                     </div>
                 `;
@@ -1220,12 +1349,44 @@
                     <span class="breakdown-label">Freight ($${FREIGHT_COST}÷${data.currentTier.baseQty || data.primaryQuantity})</span>
                     <span class="breakdown-value">$${data.freightPerPiece.toFixed(2)}</span>
                 </div>
-                
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Labor (${data.transferDetails.length} transfer${data.transferDetails.length > 1 ? 's' : ''} × $${LABOR_COST_PER_TRANSFER.toFixed(2)})</span>
+            `;
+            
+            // Enhanced labor breakdown
+            breakdownHTML += `
+                <div class="breakdown-item" style="margin-top: 10px;">
+                    <span class="breakdown-label" style="font-weight: 600;">Labor Breakdown:</span>
+                    <span></span>
+                </div>
+            `;
+            
+            data.transferDetails.forEach(detail => {
+                const locationName = detail.location === 1 ? 'Front' : 'Back';
+                breakdownHTML += `
+                    <div class="breakdown-item sub-item">
+                        <span class="breakdown-label" style="padding-left: 40px;">Labor - ${locationName} (${detail.size})</span>
+                        <span class="breakdown-value">$${LABOR_COST_PER_TRANSFER.toFixed(2)}</span>
+                    </div>
+                `;
+            });
+            
+            breakdownHTML += `
+                <div class="breakdown-item indented" style="font-weight: 600;">
+                    <span class="breakdown-label" style="padding-left: 20px;">Total Labor</span>
                     <span class="breakdown-value">$${data.laborCostTotal.toFixed(2)}</span>
                 </div>
-                
+            `;
+            
+            if (data.isLTM) {
+                const ltmPerPiece = MINIMUM_CHARGE / data.primaryQuantity;
+                breakdownHTML += `
+                    <div class="breakdown-item" style="margin-top: 10px;">
+                        <span class="breakdown-label">LTM Charge ($${MINIMUM_CHARGE.toFixed(2)}÷${data.primaryQuantity})</span>
+                        <span class="breakdown-value">$${ltmPerPiece.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+            
+            breakdownHTML += `
                 <div class="breakdown-total">
                     <span>Price per Piece</span>
                     <span>$${data.displayPricePerPiece.toFixed(2)}</span>
@@ -1276,10 +1437,11 @@
                     const basePrice = calculateTierPrice(tierTransferCost, tier24.baseQty, numTransfers);
                     
                     tierHTML += `
-                        <div class="tier-card ${currentTier === tier ? 'current' : ''}">
+                        <div class="tier-card ${currentTier === tier ? 'current' : ''}" style="position: relative;">
                             <div class="tier-qty">${tier.label}</div>
                             <div class="tier-price">$${basePrice.toFixed(2)}</div>
-                            <div class="tier-note">+ LTM charge</div>
+                            <div class="tier-note" style="color: #dc3545; font-weight: 600;">+ $50 LTM</div>
+                            <div style="font-size: 0.75em; color: #666; margin-top: 3px;">Total varies by qty</div>
                         </div>
                     `;
                 } else {
@@ -1343,33 +1505,58 @@
             const styleNumber = urlParams.get('StyleNumber') || (event.detail && event.detail.styleNumber);
             
             if (styleNumber) {
+                // Store the style number globally
+                currentStyleNumber = styleNumber;
+                
                 // Fetch garment prices from API
                 const priceData = await fetchGarmentPrices(styleNumber);
                 
                 if (priceData) {
                     // Get base garment cost (lowest price, typically S-XL)
                     garmentCost = getBaseGarmentCost(priceData);
-                    document.getElementById('garment-cost-display').textContent = `$${garmentCost.toFixed(2)}`;
-                    document.getElementById('cost-source').textContent = `Base price (S-XL sizes)`;
                     
                     // Log the price breakdown for transparency
+                    console.log('[DTF] Style Number:', currentStyleNumber);
                     console.log('[DTF] Garment prices by size:', priceData.sizes);
                     console.log('[DTF] Size upcharges:', sizeUpcharges);
                     console.log('[DTF] Base garment cost:', garmentCost);
                 } else {
                     // Fallback to default if API fails
                     garmentCost = 5.50;
-                    document.getElementById('garment-cost-display').textContent = `$${garmentCost.toFixed(2)}`;
-                    document.getElementById('cost-source').textContent = 'Using default price (API unavailable)';
+                    console.log('[DTF] Using default garment cost (API unavailable)');
                 }
             } else {
                 // No style number available
                 garmentCost = 5.50;
-                document.getElementById('garment-cost-display').textContent = `$${garmentCost.toFixed(2)}`;
-                document.getElementById('cost-source').textContent = 'Using default price (no style specified)';
+                console.log('[DTF] Using default garment cost (no style specified)');
             }
         });
 
+        // Toggle accordion function
+        function toggleAccordion() {
+            const accordion = document.getElementById('pricing-formula-accordion');
+            accordion.classList.toggle('active');
+        }
+        
+        // Toggle pricing breakdown accordion
+        function togglePricingBreakdown() {
+            const accordion = document.getElementById('pricing-breakdown-accordion');
+            
+            // Check if password protection is enabled (can be set via data attribute)
+            const requirePassword = accordion.dataset.requirePassword === 'true';
+            
+            if (requirePassword && !accordion.classList.contains('active')) {
+                // Simple password check - you can customize this
+                const password = prompt('Enter password to view cost analysis:');
+                if (password !== 'nwca2025') { // Change this password as needed
+                    alert('Incorrect password');
+                    return;
+                }
+            }
+            
+            accordion.classList.toggle('active');
+        }
+        
         // Initialize on load
         window.addEventListener('DOMContentLoaded', function() {
             updateTransferSizes(1);
@@ -1383,6 +1570,28 @@
                     }
                 }
             });
+            
+            // Initialize DTF-specific globals to prevent errors
+            window.dtfPricingInitialized = true;
+            
+            // Dispatch event to signal DTF page is ready
+            window.dispatchEvent(new CustomEvent('dtfPageReady', {
+                detail: {
+                    styleNumber: currentStyleNumber || 'PC61',
+                    embellishmentType: 'dtf'
+                }
+            }));
+        });
+        
+        // Override the product pricing UI ready check for DTF
+        window.addEventListener('nwcaProductPricingUIReady', function() {
+            console.log('[DTF] Product pricing UI ready event received');
+        });
+        
+        // Prevent errors from missing pricing matrix elements
+        window.addEventListener('pricingDataLoaded', function(event) {
+            console.log('[DTF] Pricing data loaded event received:', event.detail);
+            // DTF page handles its own pricing, so we just acknowledge the event
         });
     </script>
 </body>
