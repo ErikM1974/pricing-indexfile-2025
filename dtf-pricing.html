@@ -1120,7 +1120,9 @@
                 // Copy quantity from location 1 if it exists
                 const qty1 = document.getElementById('quantity1').value;
                 if (qty1) {
-                    document.getElementById('quantity2').placeholder = `Same as Location 1 (${qty1})`;
+                    const qty2Field = document.getElementById('quantity2');
+                    qty2Field.value = qty1; // Set the actual value to match location 1
+                    qty2Field.placeholder = `Same as Location 1 (${qty1})`;
                 }
             } else {
                 // Remove second location
@@ -1565,9 +1567,9 @@
             document.getElementById('quantity1').addEventListener('input', function() {
                 if (hasSecondLocation) {
                     const qty2Field = document.getElementById('quantity2');
-                    if (!qty2Field.value) {
-                        qty2Field.placeholder = `Same as Location 1 (${this.value})`;
-                    }
+                    // Always update the value to match location 1, unless user has manually entered a different value
+                    qty2Field.value = this.value;
+                    qty2Field.placeholder = `Same as Location 1 (${this.value})`;
                 }
             });
             
