@@ -151,6 +151,165 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
         }
         console.log(`[PRICING-MATRIX:CAPTURE] Capturing data for ${styleNumber}, ${colorCode}, ${embType}`);
         try {
+            // --- CAP EMBROIDERY: Use Master Data if available ---
+            if (embType === 'cap-embroidery' && window.capEmbroideryMasterData) {
+                console.log("[PRICING-MATRIX:CAPTURE-DEBUG] Entered cap master data path. Raw masterData:", JSON.stringify(window.capEmbroideryMasterData));
+                const masterData = window.capEmbroideryMasterData;
+
+                if (!masterData.success) { // Check for success property
+                    console.warn("[PRICING-MATRIX:CAPTURE-WARN] masterData.success is not true or is missing. masterData.success value:", masterData.success);
+                    // If not successful, or critical data is missing, fall through to table scraping.
+                    if (!masterData.allPriceProfiles || !masterData.groupedHeaders) {
+                         console.error("[PRICING-MATRIX:CAPTURE-ERROR] masterData is not successful or missing critical properties (allPriceProfiles, groupedHeaders). Will attempt table scrape.");
+                         // By not returning null here, it will fall through to the table scraping logic below.
+                    } else {
+                        // It's not "success:true" but has profiles and headers, maybe proceed with caution?
+                        // For now, let's be strict: if not success:true, we'd ideally fall through.
+                        // However, the original log "Complete cap embroidery data already available" implies we should use it.
+                        // This path is tricky. Let's assume if we are here, we try to use it.
+                        console.warn("[PRICING-MATRIX:CAPTURE-WARN] masterData.success is not true, but attempting to proceed as allPriceProfiles and groupedHeaders might exist.");
+                    }
+                }
+                
+                // Ensure allPriceProfiles exists before trying to access it
+                if (!masterData.allPriceProfiles) {
+                    console.error("[PRICING-MATRIX:CAPTURE-ERROR] masterData.allPriceProfiles is missing. Cannot use master data path. Will attempt table scrape.");
+                    // Fall through by not returning null. The table scraping logic will be attempted.
+                } else {
+                    // This is the main execution block for master data if allPriceProfiles exists
+                    const stitchCountElement = document.getElementById('client-stitch-count-select');
+                    const currentStitchCount = stitchCountElement ? stitchCountElement.value : (masterData.currentStitchCount || '8000');
+                    const pricesForStitchCount = masterData.allPriceProfiles[currentStitchCount];
+
+                    if (!pricesForStitchCount) {
+                        console.error(`[PRICING-MATRIX:CAPTURE-ERROR] No price profile found for stitch count ${currentStitchCount} in master data.`);
+                        window.dispatchEvent(new CustomEvent('pricingDataError', { detail: { message: `No price profile for stitch count ${currentStitchCount}.` } }));
+                        return null; // Critical error, cannot proceed
+                    }
+
+                    // Original detailed logging for uniqueSizes derivation starts here
+                    // Directly derive masterHeaders and masterUniqueSizes from masterData
+                    // Prioritize groupedHeaders, then headers. If both are problematic, it will be an empty array.
+                    let masterHeaders = (Array.isArray(masterData.groupedHeaders) && masterData.groupedHeaders.length > 0)
+                                        ? masterData.groupedHeaders
+                                        : (Array.isArray(masterData.headers) ? masterData.headers : []);
+                    console.log("[PRICING-MATRIX:DEBUG-MASTER] Initial masterHeaders from masterData:", JSON.stringify(masterHeaders));
+                    let masterUniqueSizes = Array.isArray(masterData.uniqueSizes) ? masterData.uniqueSizes : [];
+                    console.log("[PRICING-MATRIX:DEBUG-MASTER] Initial masterUniqueSizes from masterData:", JSON.stringify(masterUniqueSizes));
+
+                    if (masterUniqueSizes.length === 0 && masterHeaders.length > 0) {
+                        masterUniqueSizes = [...new Set(masterHeaders)];
+                        console.log("[PRICING-MATRIX:DEBUG-MASTER] Derived masterUniqueSizes directly from masterHeaders:", JSON.stringify(masterUniqueSizes));
+                    } else {
+                        // Fallback: if masterHeaders is empty, try to get sizes from price keys if masterData.uniqueSizes is also empty
+                        const initialMasterUniqueSizes = Array.isArray(masterData.uniqueSizes) ? masterData.uniqueSizes : [];
+                        if (initialMasterUniqueSizes.length === 0 && pricesForStitchCount && typeof pricesForStitchCount === 'object') {
+                            masterHeaders = Object.keys(pricesForStitchCount); // These are the size keys like "S/M"
+                            masterUniqueSizes = [...new Set(masterHeaders)];
+                            console.warn("[PRICING-MATRIX:CAPTURE-MASTER-FALLBACK] masterHeaders was empty, derived masterUniqueSizes from price keys:", JSON.stringify(masterUniqueSizes));
+                        } else {
+                            masterUniqueSizes = initialMasterUniqueSizes; // Use whatever was in masterData.uniqueSizes (likely empty)
+                            console.warn("[PRICING-MATRIX:CAPTURE-MASTER-FALLBACK] masterHeaders empty, and could not derive from price keys or masterData.uniqueSizes was already set. masterUniqueSizes:", JSON.stringify(masterUniqueSizes));
+                        }
+                    }
+
+                    if (masterUniqueSizes.length === 0) {
+                        console.error("[PRICING-MATRIX:CAPTURE-ERROR] CRITICAL: Could not determine unique sizes for cap embroidery from master data. masterHeaders:", JSON.stringify(masterHeaders), "masterData.uniqueSizes:", JSON.stringify(masterData.uniqueSizes));
+                        window.dispatchEvent(new CustomEvent('pricingDataError', { detail: { message: 'Could not determine unique sizes for cap pricing from master data.' } }));
+                        return null; // Critical error, cannot proceed
+                    }
+                    
+                    window.availableSizesFromTable = masterHeaders; // Make headers available
+                    
+                    console.log("[PRICING-MATRIX:DEBUG] Before assigning to nwcaPricingData (master data path) - masterUniqueSizes:", JSON.stringify(masterUniqueSizes), "masterHeaders:", JSON.stringify(masterHeaders));
+
+                    window.nwcaPricingData = {
+                        styleNumber: styleNumber,
+                        color: colorCode,
+                        embellishmentType: embType,
+                        headers: masterHeaders,
+                        prices: pricesForStitchCount,
+                        tierData: masterData.tierDefinitions || {},
+                        uniqueSizes: masterUniqueSizes,
+                        capturedAt: new Date().toISOString(),
+                        fromMasterData: true,
+                        currentStitchCount: currentStitchCount,
+                        tiers: masterData.tierDefinitions || {}
+                    };
+                    console.log("[PRICING-MATRIX:CAPTURE] Created pricing data from MASTER DATA:", JSON.stringify(window.nwcaPricingData, null, 2));
+                    captureCompleted = true;
+                    window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData }));
+                    console.log("[PRICING-MATRIX:CAPTURE] 'pricingDataLoaded' event dispatched (from master data).");
+                    savePricingMatrixToServer(window.nwcaPricingData);
+                    return window.nwcaPricingData;
+                } // End of if (masterData.allPriceProfiles)
+                const stitchCountElement = document.getElementById('client-stitch-count-select');
+                const currentStitchCount = stitchCountElement ? stitchCountElement.value : (masterData.currentStitchCount || '8000');
+                
+                const pricesForStitchCount = masterData.allPriceProfiles?.[currentStitchCount];
+                if (!pricesForStitchCount) {
+                    console.error(`[PRICING-MATRIX:CAPTURE-ERROR] No price profile found for stitch count ${currentStitchCount} in master data.`);
+                    window.dispatchEvent(new CustomEvent('pricingDataError', { detail: { message: `No price profile for stitch count ${currentStitchCount}.` } }));
+                    return null;
+                }
+
+                // Directly derive masterHeaders and masterUniqueSizes from masterData
+                // Prioritize groupedHeaders, then headers. If both are problematic, it will be an empty array.
+                let masterHeaders = (Array.isArray(masterData.groupedHeaders) && masterData.groupedHeaders.length > 0)
+                                    ? masterData.groupedHeaders
+                                    : (Array.isArray(masterData.headers) ? masterData.headers : []);
+                
+                let masterUniqueSizes = [];
+                if (masterHeaders.length > 0) {
+                    masterUniqueSizes = [...new Set(masterHeaders)];
+                    console.log("[PRICING-MATRIX:DEBUG-MASTER] Derived masterUniqueSizes directly from masterHeaders:", JSON.stringify(masterUniqueSizes));
+                } else {
+                    // Fallback: if masterHeaders is empty, try to get sizes from price keys if masterData.uniqueSizes is also empty
+                    const initialMasterUniqueSizes = Array.isArray(masterData.uniqueSizes) ? masterData.uniqueSizes : [];
+                    if (initialMasterUniqueSizes.length === 0 && pricesForStitchCount && typeof pricesForStitchCount === 'object') {
+                        masterHeaders = Object.keys(pricesForStitchCount); // These are the size keys like "S/M"
+                        masterUniqueSizes = [...new Set(masterHeaders)];
+                        console.warn("[PRICING-MATRIX:CAPTURE-MASTER-FALLBACK] masterHeaders was empty, derived masterUniqueSizes from price keys:", JSON.stringify(masterUniqueSizes));
+                    } else {
+                        masterUniqueSizes = initialMasterUniqueSizes; // Use whatever was in masterData.uniqueSizes (likely empty)
+                        console.warn("[PRICING-MATRIX:CAPTURE-MASTER-FALLBACK] masterHeaders empty, and could not derive from price keys or masterData.uniqueSizes was already set. masterUniqueSizes:", JSON.stringify(masterUniqueSizes));
+                    }
+                }
+
+                if (masterUniqueSizes.length === 0) {
+                    console.error("[PRICING-MATRIX:CAPTURE-ERROR] CRITICAL: Could not determine unique sizes for cap embroidery from master data. masterHeaders:", JSON.stringify(masterHeaders), "masterData.uniqueSizes:", JSON.stringify(masterData.uniqueSizes));
+                    window.dispatchEvent(new CustomEvent('pricingDataError', { detail: { message: 'Could not determine unique sizes for cap pricing from master data.' } }));
+                    return null;
+                }
+                
+                window.availableSizesFromTable = masterHeaders; // Make headers available
+                
+                console.log("[PRICING-MATRIX:DEBUG] Before assigning to nwcaPricingData (master data path) - masterUniqueSizes:", JSON.stringify(masterUniqueSizes), "masterHeaders:", JSON.stringify(masterHeaders));
+
+                window.nwcaPricingData = {
+                    styleNumber: styleNumber,
+                    color: colorCode,
+                    embellishmentType: embType,
+                    headers: masterHeaders,
+                    prices: pricesForStitchCount,
+                    tierData: masterData.tierDefinitions || {},
+                    uniqueSizes: masterUniqueSizes,
+                    capturedAt: new Date().toISOString(),
+                    fromMasterData: true,
+                    currentStitchCount: currentStitchCount,
+                    tiers: masterData.tierDefinitions || {}
+                };
+                console.log("[PRICING-MATRIX:CAPTURE] Created pricing data from MASTER DATA:", JSON.stringify(window.nwcaPricingData, null, 2));
+                captureCompleted = true;
+                window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData }));
+                console.log("[PRICING-MATRIX:CAPTURE] 'pricingDataLoaded' event dispatched (from master data).");
+                savePricingMatrixToServer(window.nwcaPricingData);
+                return window.nwcaPricingData;
+            }
+
+            // --- REGULAR TABLE SCRAPING LOGIC ---
+            // This will run if the cap master data path above was not taken or failed early (e.g. masterData.allPriceProfiles was missing)
+            console.log("[PRICING-MATRIX:CAPTURE] Proceeding with table scraping logic (either not a cap, or cap master data was not ready/valid).");
             const headers = [];
             const headerRow = pricingTable.querySelector('tr');
             if (!headerRow) { console.error("[PRICING-MATRIX:CAPTURE-ERROR] Header row not found."); return null; }
@@ -195,14 +354,72 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
              }
 
             console.log("[PRICING-MATRIX:DEBUG] Preparing to set window.nwcaPricingData"); // DEBUG LOG
+            // For uniqueSizes, we will directly use the headers obtained from the table.
+            // The previous filtering was too aggressive for caps with sizes like "S/M".
+            // If specific filtering is needed for garment pages (e.g. to exclude "S-XL" if S, M, L, XL are present),
+            // that should be handled by a more sophisticated logic, possibly in the display modules.
+            // const extractedUniqueSizes = [...new Set(headers)]; // Previous attempt
+            // console.log("[PRICING-MATRIX:DEBUG] Using all headers as uniqueSizes:", extractedUniqueSizes);
+
+            // Directly use headers for uniqueSizes, ensuring it's a new array from a Set to guarantee uniqueness.
+            const uniqueSizesFromHeaders = [...new Set(headers)];
+            console.log("[PRICING-MATRIX:DEBUG] Derived uniqueSizesFromHeaders:", JSON.stringify(uniqueSizesFromHeaders));
+
+            // Determine uniqueSizes. For caps, always derive from headers if possible,
+            // as masterData might have an empty uniqueSizes array.
+            let finalUniqueSizes;
+            if (embType === 'cap-embroidery' && headers && headers.length > 0) {
+                finalUniqueSizes = [...new Set(headers)];
+                console.log("[PRICING-MATRIX:DEBUG] Cap embroidery: Forcing uniqueSizes from headers:", JSON.stringify(finalUniqueSizes));
+            } else {
+                finalUniqueSizes = uniqueSizesFromHeaders; // From line 206: const uniqueSizesFromHeaders = [...new Set(headers)];
+            }
+
             window.nwcaPricingData = {
                 styleNumber, color: colorCode, embellishmentType: embType,
                 headers, prices: priceMatrix, tierData,
-                uniqueSizes: [...new Set(headers.filter(h => !h.includes('-') && !h.includes('/')))],
+                uniqueSizes: finalUniqueSizes,
                 capturedAt: new Date().toISOString()
             };
+            console.log("[PRICING-MATRIX:DEBUG] window.nwcaPricingData immediately after assignment, uniqueSizes:", JSON.stringify(window.nwcaPricingData.uniqueSizes));
+            
+            // The post-construction check below might now be redundant for caps if the above works,
+            // but keeping it for safety / other scenarios.
+            // Post-construction check specifically for caps if uniqueSizes ended up empty
+            // This check is crucial if the data source (e.g., masterData for caps) doesn't provide uniqueSizes correctly.
+            if (window.nwcaPricingData && typeof window.nwcaPricingData === 'object') {
+                if (window.nwcaPricingData.embellishmentType === 'cap-embroidery') {
+                    console.log("[PRICING-MATRIX:CAPTURE-FIX-CHECK] Checking cap data. Current uniqueSizes:", JSON.stringify(window.nwcaPricingData.uniqueSizes), "Headers:", JSON.stringify(window.nwcaPricingData.headers));
+                    if ((!window.nwcaPricingData.uniqueSizes || window.nwcaPricingData.uniqueSizes.length === 0) &&
+                        window.nwcaPricingData.headers && window.nwcaPricingData.headers.length > 0) {
+                        console.warn("[PRICING-MATRIX:CAPTURE-FIX-APPLY] Cap embroidery data had empty/invalid uniqueSizes. Repopulating from headers.");
+                        window.nwcaPricingData.uniqueSizes = [...new Set(window.nwcaPricingData.headers)];
+                        console.warn("[PRICING-MATRIX:CAPTURE-FIX-APPLIED] After fix, uniqueSizes:", JSON.stringify(window.nwcaPricingData.uniqueSizes));
+                    } else if (window.nwcaPricingData.uniqueSizes && window.nwcaPricingData.uniqueSizes.length > 0) {
+                        console.log("[PRICING-MATRIX:CAPTURE-FIX-CHECK] Cap data uniqueSizes already populated:", JSON.stringify(window.nwcaPricingData.uniqueSizes));
+                    } else {
+                        console.warn("[PRICING-MATRIX:CAPTURE-FIX-CHECK] Cap data uniqueSizes empty, but headers also empty or invalid. Cannot fix uniqueSizes from headers.");
+                    }
+                }
+            } else {
+                console.error("[PRICING-MATRIX:CAPTURE-FIX-CHECK] window.nwcaPricingData is not an object or undefined before fix check.");
+            }
 
-            console.log("[PRICING-MATRIX:CAPTURE] Data captured successfully. Value:", JSON.stringify(window.nwcaPricingData, null, 2)); // DEBUG LOG (Stringified)
+            console.log("[PRICING-MATRIX:CAPTURE] Data captured successfully (pre-final-cap-fix). Value:", JSON.stringify(window.nwcaPricingData, null, 2));
+
+            // FINAL ATTEMPT TO FIX CAP UNIQUE SIZES before dispatching
+            if (window.nwcaPricingData && window.nwcaPricingData.embellishmentType === 'cap-embroidery') {
+                if ((!window.nwcaPricingData.uniqueSizes || window.nwcaPricingData.uniqueSizes.length === 0) &&
+                    window.nwcaPricingData.headers && window.nwcaPricingData.headers.length > 0) {
+                    console.warn("[PRICING-MATRIX:FINAL-CAP-FIX] uniqueSizes empty for cap before dispatch. Forcing from headers.");
+                    window.nwcaPricingData.uniqueSizes = [...new Set(window.nwcaPricingData.headers)];
+                    console.warn("[PRICING-MATRIX:FINAL-CAP-FIX] uniqueSizes after forcing:", JSON.stringify(window.nwcaPricingData.uniqueSizes));
+                } else {
+                    console.log("[PRICING-MATRIX:FINAL-CAP-FIX] uniqueSizes for cap seems okay or headers unavailable:", JSON.stringify(window.nwcaPricingData.uniqueSizes));
+                }
+            }
+            
+            console.log("[PRICING-MATRIX:CAPTURE] Final nwcaPricingData before dispatch. Value:", JSON.stringify(window.nwcaPricingData, null, 2));
             captureCompleted = true; // Set flag *after* successful capture and data assignment
 
             const event = new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData });
