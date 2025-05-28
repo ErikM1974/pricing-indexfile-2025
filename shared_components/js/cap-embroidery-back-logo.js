@@ -82,6 +82,22 @@
                 checkbox.addEventListener('change', function() {
                     window.capEmbroideryBackLogo.setEnabled(this.checked);
                     console.log('[CAP-EMB-BACK-LOGO] Back logo toggled:', this.checked);
+
+                    // Also handle visibility of details here, as this listener is the one firing
+                    const detailsDiv = document.getElementById('back-logo-details');
+                    const pricingDisplaySectionDiv = document.getElementById('back-logo-pricing-display');
+
+                    if (detailsDiv) {
+                        detailsDiv.style.setProperty('display', this.checked ? 'block' : 'none', 'important');
+                        console.log('[CAP-EMB-BACK-LOGO] Set detailsDiv.style.display to:', detailsDiv.style.display);
+                    } else {
+                        console.warn('[CAP-EMB-BACK-LOGO] #back-logo-details not found in its own listener.');
+                    }
+                    if (pricingDisplaySectionDiv) {
+                        pricingDisplaySectionDiv.style.setProperty('display', this.checked ? 'block' : 'none', 'important');
+                        console.log('[CAP-EMB-BACK-LOGO] Set pricingDisplaySectionDiv.style.display to:', pricingDisplaySectionDiv.style.display);
+                    }
+
                 });
                 
                 // Set initial state
@@ -97,10 +113,49 @@
                 const newSelect = backLogoStitchSelect.cloneNode(true);
                 backLogoStitchSelect.parentNode.replaceChild(newSelect, backLogoStitchSelect);
                 
-                newSelect.addEventListener('change', function() {
+                newSelect.addEventListener('input', function() { // Changed to 'input' for better responsiveness
                     const stitchCount = parseInt(this.value);
-                    console.log('[CAP-EMB-BACK-LOGO] Back logo stitch count changed to:', stitchCount);
-                    window.capEmbroideryBackLogo.setStitchCount(stitchCount);
+                    console.log('[CAP-EMB-BACK-LOGO] Back logo stitch count INPUT event. Value: ' + this.value + ', Parsed: ' + stitchCount);
+                    
+                    if (!isNaN(stitchCount) && stitchCount > 0) {
+                        window.capEmbroideryBackLogo.setStitchCount(stitchCount); // This updates BACK_LOGO_CONFIG and calls updateCartTotal
+
+                        // Now, directly update the UI elements for back logo price display
+                        const priceForDisplay = BACK_LOGO_CONFIG.price; // Get the price calculated by setStitchCount
+
+                        const priceDisplayElement = document.getElementById('back-logo-price'); // Next to input
+                        if (priceDisplayElement) {
+                            priceDisplayElement.textContent = `Price: $${priceForDisplay.toFixed(2)} per item`;
+                            console.log(`[CAP-EMB-BACK-LOGO] UI Updated #back-logo-price to: ${priceDisplayElement.textContent}`);
+                        }
+
+                        const displayStitchCountElement = document.getElementById('back-logo-display-stitch-count'); // In separate blue box
+                        if (displayStitchCountElement) {
+                            displayStitchCountElement.textContent = `${stitchCount.toLocaleString()} stitches`;
+                            console.log(`[CAP-EMB-BACK-LOGO] UI Updated #back-logo-display-stitch-count to: ${displayStitchCountElement.textContent}`);
+                        }
+
+                        const displayPriceElementInSection = document.getElementById('back-logo-display-price'); // In separate blue box
+                        if (displayPriceElementInSection) {
+                            displayPriceElementInSection.textContent = `$${priceForDisplay.toFixed(2)} per item`;
+                            console.log(`[CAP-EMB-BACK-LOGO] UI Updated #back-logo-display-price to: ${displayPriceElementInSection.textContent}`);
+                        }
+                        
+                        // Also, ensure the main pricing explanation note updates
+                        if (typeof updatePricingExplanation === 'function') { // This function is in cap-embroidery-enhanced.js
+                            updatePricingExplanation();
+                        } else if (window.CapEmbroideryEnhanced && typeof window.CapEmbroideryEnhanced.updatePricingExplanation === 'function'){
+                            // This is not how it's exposed. updatePricingExplanation is not part of the CapEmbroideryEnhanced object.
+                            // It's a private function within the IIFE of cap-embroidery-enhanced.js.
+                            // For now, we rely on updateCartTotal to trigger other necessary updates.
+                            // A better solution would be a custom event or a shared update manager.
+                        }
+                         if (window.updatePricingExplanation) window.updatePricingExplanation();
+
+
+                    } else {
+                        console.log('[CAP-EMB-BACK-LOGO] Invalid stitch count input:', this.value);
+                    }
                 });
                 
                 // Set initial stitch count

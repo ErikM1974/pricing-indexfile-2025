@@ -184,6 +184,7 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded.");
             ltmFeePerItem: ltmFeePerItem,
             combinedQuantity: combinedQuantity,
             items: calculatedItems,
+            // totalPrice is the sum of item totals, where each itemTotal includes distributed LTM if applicable.
             totalPrice: overallTotalPrice,
             nextTier: nextTier,
             quantityForNextTier: quantityForNextTier > 0 ? quantityForNextTier : 0,
@@ -205,6 +206,7 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded.");
          });
 
 
+        console.log(`[PRICING-CALC:FINAL_SUM_RULE_B] overallTotalPrice (sum of item totals with distributed LTM): ${overallTotalPrice}, ltmFeeApplies: ${ltmFeeApplies}, ltmFeeTotal (flat fee, not added to this totalPrice): ${ltmFeeTotal}, Final result.totalPrice: ${result.totalPrice}`);
         console.log("[PRICING-CALC:RESULT]", result);
         return result;
     }

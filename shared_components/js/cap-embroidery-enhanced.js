@@ -11,45 +11,40 @@
 
     // Initialize when DOM is ready
     function initialize() {
-        console.log('[CAP-EMB-ENHANCED] DOM ready, initializing...');
+        console.log('[CAP-EMB-ENHANCED] DOM ready, attempting to initialize UI enhancements immediately...');
+            
+        try {
+            // Add back logo UI
+            addBackLogoOption();
+        } catch (error) {
+            console.error('[CAP-EMB-ENHANCED] Error adding back logo option:', error);
+        }
         
-        // Wait for other scripts to finish DOM manipulation
-        setTimeout(() => {
-            console.log('[CAP-EMB-ENHANCED] Starting UI enhancements after delay...');
-            
-            try {
-                // Add back logo UI
-                addBackLogoOption();
-            } catch (error) {
-                console.error('[CAP-EMB-ENHANCED] Error adding back logo option:', error);
-            }
-            
-            try {
-                // Enhance stitch count selector
-                enhanceStitchCountSelector();
-            } catch (error) {
-                console.error('[CAP-EMB-ENHANCED] Error enhancing stitch count selector:', error);
-            }
-            
-            try {
-                // Add validation hooks
-                addValidationHooks();
-            } catch (error) {
-                console.error('[CAP-EMB-ENHANCED] Error adding validation hooks:', error);
-            }
-            
-            try {
-                // Listen for stitch count changes
-                setupStitchCountListener();
-            } catch (error) {
-                console.error('[CAP-EMB-ENHANCED] Error setting up stitch count listener:', error);
-            }
-        }, 1500); // Wait 1.5 seconds for DOM to stabilize
+        try {
+            // Enhance stitch count selector
+            enhanceStitchCountSelector();
+        } catch (error) {
+            console.error('[CAP-EMB-ENHANCED] Error enhancing stitch count selector:', error);
+        }
+        
+        try {
+            // Add validation hooks
+            addValidationHooks();
+        } catch (error) {
+            console.error('[CAP-EMB-ENHANCED] Error adding validation hooks:', error);
+        }
+        
+        try {
+            // Listen for stitch count changes
+            setupStitchCountListener();
+        } catch (error) {
+            console.error('[CAP-EMB-ENHANCED] Error setting up stitch count listener:', error);
+        }
     }
 
     // Add back logo option UI
     function addBackLogoOption() {
-        console.log('[CAP-EMB-ENHANCED] Adding back logo option UI');
+        console.log('[CAP-EMB-ENHANCED] Attempting to add back logo option UI elements.');
         
         // Create back logo option container
         const backLogoContainer = document.createElement('div');
@@ -110,67 +105,70 @@
         
         // Find the best insertion point - look for the add to cart section
         const addToCartSection = document.querySelector('.add-to-cart-section');
+        console.log('[CAP-EMB-ENHANCED] addToCartSection found:', !!addToCartSection);
         
         if (addToCartSection) {
-            // Find the section title
             const sectionTitle = addToCartSection.querySelector('.section-title');
+            console.log('[CAP-EMB-ENHANCED] sectionTitle within addToCartSection found:', !!sectionTitle);
             if (sectionTitle) {
-                // Insert after the section title
                 sectionTitle.insertAdjacentElement('afterend', backLogoContainer);
-                console.log('[CAP-EMB-ENHANCED] Back logo option inserted after Add to Cart section title');
+                console.log('[CAP-EMB-ENHANCED] Back logo option inserted after Add to Cart section title.');
             } else {
-                // Insert at the beginning of add to cart section
                 addToCartSection.insertBefore(backLogoContainer, addToCartSection.firstChild);
-                console.log('[CAP-EMB-ENHANCED] Back logo option inserted at beginning of add to cart section');
+                console.log('[CAP-EMB-ENHANCED] Back logo option inserted at beginning of add to cart section (no title found).');
             }
         } else {
-            // Fallback: Try to find the size grid or quantity matrix
+            console.warn('[CAP-EMB-ENHANCED] .add-to-cart-section not found. Trying fallbacks for backLogoContainer.');
             const sizeGridContainer = document.getElementById('size-grid-container');
+            console.log('[CAP-EMB-ENHANCED] sizeGridContainer found:', !!sizeGridContainer);
             const quantityMatrix = document.getElementById('quantity-matrix');
+            console.log('[CAP-EMB-ENHANCED] quantityMatrix found:', !!quantityMatrix);
             
             if (sizeGridContainer) {
                 sizeGridContainer.insertAdjacentElement('beforebegin', backLogoContainer);
-                console.log('[CAP-EMB-ENHANCED] Back logo option inserted before size grid container');
+                console.log('[CAP-EMB-ENHANCED] Back logo option inserted before size grid container.');
             } else if (quantityMatrix) {
                 quantityMatrix.insertAdjacentElement('beforebegin', backLogoContainer);
-                console.log('[CAP-EMB-ENHANCED] Back logo option inserted before quantity matrix');
+                console.log('[CAP-EMB-ENHANCED] Back logo option inserted before quantity matrix.');
             } else {
-                // Last resort: find the pricing section
-                const pricingSection = document.querySelector('.pricing-section');
-                if (pricingSection) {
-                    pricingSection.appendChild(backLogoContainer);
-                    console.log('[CAP-EMB-ENHANCED] Back logo option appended to pricing section');
+                const pricingSectionFallback = document.querySelector('.pricing-section');
+                console.log('[CAP-EMB-ENHANCED] pricingSectionFallback for backLogoContainer found:', !!pricingSectionFallback);
+                if (pricingSectionFallback) {
+                    pricingSectionFallback.appendChild(backLogoContainer);
+                    console.log('[CAP-EMB-ENHANCED] Back logo option appended to pricing section (fallback).');
                 } else {
-                    // Ultimate fallback
                     document.body.appendChild(backLogoContainer);
-                    console.log('[CAP-EMB-ENHANCED] Back logo option appended to body as fallback');
+                    console.error('[CAP-EMB-ENHANCED] CRITICAL FALLBACK: Back logo option appended to document.body.');
                 }
             }
         }
         
         // Insert the back logo pricing display in the pricing section
-        const pricingSection = document.querySelector('.pricing-section');
-        if (pricingSection) {
-            // Find the pricing grid or size grid container
+        const pricingSectionForDisplay = document.querySelector('.pricing-section');
+        console.log('[CAP-EMB-ENHANCED] pricingSectionForDisplay found:', !!pricingSectionForDisplay);
+        if (pricingSectionForDisplay) {
             const pricingGrid = document.getElementById('custom-pricing-grid');
-            const sizeGridContainer = document.getElementById('size-grid-container');
-            const quantityMatrix = document.getElementById('quantity-matrix');
-            
-            // Insert after the pricing grid or size grid
-            if (pricingGrid && pricingGrid.parentNode === pricingSection) {
+            console.log('[CAP-EMB-ENHANCED] pricingGrid for display insertion found:', !!pricingGrid);
+            const sizeGridContainerForDisplay = document.getElementById('size-grid-container'); // Re-check, might be created by other scripts
+            console.log('[CAP-EMB-ENHANCED] sizeGridContainerForDisplay found:', !!sizeGridContainerForDisplay);
+             const quantityMatrixForDisplay = document.getElementById('quantity-matrix');
+            console.log('[CAP-EMB-ENHANCED] quantityMatrixForDisplay found:', !!quantityMatrixForDisplay);
+
+            if (pricingGrid && pricingGrid.parentNode === pricingSectionForDisplay) {
                 pricingGrid.insertAdjacentElement('afterend', backLogoPricingDisplay);
-                console.log('[CAP-EMB-ENHANCED] Back logo pricing display inserted after pricing grid');
-            } else if (sizeGridContainer) {
-                sizeGridContainer.insertAdjacentElement('afterend', backLogoPricingDisplay);
-                console.log('[CAP-EMB-ENHANCED] Back logo pricing display inserted after size grid container');
-            } else if (quantityMatrix) {
-                quantityMatrix.insertAdjacentElement('afterend', backLogoPricingDisplay);
-                console.log('[CAP-EMB-ENHANCED] Back logo pricing display inserted after quantity matrix');
+                console.log('[CAP-EMB-ENHANCED] Back logo pricing display inserted after pricing grid.');
+            } else if (sizeGridContainerForDisplay) { // Check if it exists before trying to insert after it
+                sizeGridContainerForDisplay.insertAdjacentElement('afterend', backLogoPricingDisplay);
+                console.log('[CAP-EMB-ENHANCED] Back logo pricing display inserted after size grid container.');
+            } else if (quantityMatrixForDisplay) {
+                 quantityMatrixForDisplay.insertAdjacentElement('afterend', backLogoPricingDisplay);
+                console.log('[CAP-EMB-ENHANCED] Back logo pricing display inserted after quantity matrix.');
             } else {
-                // Insert at the end of pricing section
-                pricingSection.appendChild(backLogoPricingDisplay);
-                console.log('[CAP-EMB-ENHANCED] Back logo pricing display appended to pricing section');
+                pricingSectionForDisplay.appendChild(backLogoPricingDisplay);
+                console.log('[CAP-EMB-ENHANCED] Back logo pricing display appended to pricing section (fallback).');
             }
+        } else {
+            console.warn('[CAP-EMB-ENHANCED] .pricing-section not found for backLogoPricingDisplay.');
         }
         
         // Add event listeners
@@ -181,6 +179,21 @@
         const pricingDisplaySection = document.getElementById('back-logo-pricing-display');
         
         checkbox.addEventListener('change', function() {
+console.log('[CAP-EMB-ENHANCED] Back logo checkbox changed. Checked:', this.checked);
+            if (!details) {
+                console.error('[CAP-EMB-ENHANCED] Back logo details element (#back-logo-details) not found in checkbox listener!');
+            }
+            if (!pricingDisplaySection) {
+                console.error('[CAP-EMB-ENHANCED] Back logo pricingDisplaySection element (#back-logo-pricing-display) not found in checkbox listener!');
+            }
+            // Original line will be: details.style.display = this.checked ? 'block' : 'none';
+if (details) { // Check if details exists before logging its style
+                console.log('[CAP-EMB-ENHANCED] Set details.style.display to:', details.style.display);
+            }
+            if (pricingDisplaySection) { // Check if pricingDisplaySection exists
+                console.log('[CAP-EMB-ENHANCED] Set pricingDisplaySection.style.display to:', pricingDisplaySection.style.display);
+            }
+            // We'll add more logging after the style changes too.
             details.style.display = this.checked ? 'block' : 'none';
             pricingDisplaySection.style.display = this.checked ? 'block' : 'none';
             if (this.checked) {
@@ -197,6 +210,7 @@
         });
         
         stitchInput.addEventListener('input', function() {
+            console.log('[CAP-EMB-ENHANCED] Back logo stitchInput "input" EVENT LISTENER FIRED. Value:', this.value); // Made log more specific
             updateBackLogoPrice();
             // Update pricing explanation
             updatePricingExplanation();
@@ -209,21 +223,33 @@
         });
         
         function updateBackLogoPrice() {
-            const stitches = parseInt(stitchInput.value) || BACK_LOGO_MINIMUM_STITCHES;
+            console.log('[CAP-EMB-ENHANCED] updateBackLogoPrice called.');
+            if (!stitchInput) console.error('[CAP-EMB-ENHANCED] stitchInput is not defined in updateBackLogoPrice');
+            if (!priceDisplay) console.error('[CAP-EMB-ENHANCED] priceDisplay is not defined in updateBackLogoPrice');
+
+            const stitches = parseInt(stitchInput?.value) || BACK_LOGO_MINIMUM_STITCHES;
+            console.log('[CAP-EMB-ENHANCED] updateBackLogoPrice - Stitches:', stitches, 'Raw input value:', stitchInput?.value);
             const price = Math.max(
                 BACK_LOGO_MINIMUM_CHARGE,
                 (stitches / 1000) * BACK_LOGO_PRICE_PER_1000_STITCHES
             );
             priceDisplay.textContent = `Price: $${price.toFixed(2)} per item`;
+            console.log('[CAP-EMB-ENHANCED] updateBackLogoPrice - Updated #back-logo-price text to:', priceDisplay.textContent);
             
             // Update the pricing display section
             const displayStitchCount = document.getElementById('back-logo-display-stitch-count');
             const displayPrice = document.getElementById('back-logo-display-price');
             if (displayStitchCount) {
                 displayStitchCount.textContent = `${stitches.toLocaleString()} stitches`;
+                console.log('[CAP-EMB-ENHANCED] updateBackLogoPrice - Updated #back-logo-display-stitch-count text to:', displayStitchCount.textContent);
+            } else {
+                console.warn('[CAP-EMB-ENHANCED] updateBackLogoPrice - #back-logo-display-stitch-count not found.');
             }
             if (displayPrice) {
                 displayPrice.textContent = `$${price.toFixed(2)} per item`;
+                console.log('[CAP-EMB-ENHANCED] updateBackLogoPrice - Updated #back-logo-display-price text to:', displayPrice.textContent);
+            } else {
+                console.warn('[CAP-EMB-ENHANCED] updateBackLogoPrice - #back-logo-display-price not found.');
             }
         }
         
@@ -237,10 +263,21 @@
             });
         }
         
-        function updatePricingExplanation() {
-            const note = document.querySelector('.pricing-explanation p');
-            if (!note) return;
-            
+        // This function needs to be accessible by setupStitchCountListener, so move it to the IIFE's scope
+        // function updatePricingExplanation() { ... } // Moved below
+        
+        // Trigger price display update for all sizes
+        // This function also needs to be accessible by the event listeners, move to IIFE scope
+        // function triggerPriceDisplayUpdate() { ... } // Moved below
+    } // End of addBackLogoOption
+
+    function updatePricingExplanation() { // Moved here
+        const note = document.querySelector('.pricing-explanation p');
+        if (!note) {
+            console.warn('[CAP-EMB-ENHANCED] updatePricingExplanation: .pricing-explanation p not found.');
+            return;
+        }
+        
             const stitchCountSelect = document.getElementById('client-stitch-count-select');
             const stitchCount = parseInt(stitchCountSelect?.value || '8000').toLocaleString();
             let explanationText = `<strong>Note:</strong> Prices shown are per item and include a ${stitchCount} stitch embroidered logo.`;
@@ -261,8 +298,19 @@
             
             note.innerHTML = explanationText;
         }
-    }
+    // REMOVED EXTRA CLOSING BRACE HERE
 
+    function triggerPriceDisplayUpdate() { // Moved here
+        // Force update of all price displays by simulating a quantity change
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            // Trigger the input event to update price displays
+            const event = new Event('input', { bubbles: true });
+            input.dispatchEvent(event);
+        });
+        console.log('[CAP-EMB-ENHANCED] triggerPriceDisplayUpdate executed.');
+    }
+ 
     // Enhance stitch count selector styling
     function enhanceStitchCountSelector() {
         console.log('[CAP-EMB-ENHANCED] Enhancing stitch count selector');
@@ -434,7 +482,17 @@
             console.log('[CAP-EMB-ENHANCED] Stitch count changed to:', this.value);
             
             // Update the pricing explanation
-            updatePricingExplanation();
+            if (typeof updatePricingExplanation === 'function') {
+                updatePricingExplanation();
+            } else {
+                console.error('[CAP-EMB-ENHANCED] updatePricingExplanation is not defined in stitch count listener scope.');
+            }
+            // Also trigger price display update for all sizes, as stitch count affects base prices
+            if (typeof triggerPriceDisplayUpdate === 'function') {
+                triggerPriceDisplayUpdate();
+            } else {
+                console.error('[CAP-EMB-ENHANCED] triggerPriceDisplayUpdate is not defined in stitch count listener scope.');
+            }
         });
     }
 

@@ -243,6 +243,8 @@
             }
 
             if (totalAmountDisplay) {
+                console.log('[ADD-TO-CART:UI_UPDATE] About to update totalAmountDisplay. calculatedPricing object:', JSON.parse(JSON.stringify(calculatedPricing)));
+                console.log('[ADD-TO-CART:UI_UPDATE] Attempting to update totalAmountDisplay. Current textContent:', totalAmountDisplay.textContent, 'New value based on calculatedPricing.totalPrice:', calculatedPricing.totalPrice.toFixed(2));
                 totalAmountDisplay.textContent = `$${calculatedPricing.totalPrice.toFixed(2)}`;
                 // Store data attributes for other scripts if needed, but keep display simple
                 totalAmountDisplay.dataset.calculatedTotal = calculatedPricing.totalPrice.toFixed(2);
