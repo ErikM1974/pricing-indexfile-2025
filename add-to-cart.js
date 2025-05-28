@@ -161,10 +161,10 @@
                 if (calculatedPricing.ltmFeeApplies) {
                     const ltmText = ltmFeeNotice.querySelector('.ltm-text');
                     if (ltmText) {
-                         const ltmQuantityNeeded = Math.max(0, 24 - calculatedPricing.combinedQuantity);
+                         const ltmQuantityNeeded = Math.max(0, (NWCA_APP_CONFIG.FEES.LTM_GENERAL_THRESHOLD || 24) - calculatedPricing.combinedQuantity);
                          ltmText.innerHTML = `
-                            <div style="display:flex;align-items:center;margin-bottom:5px;">
-                                <span style="font-size:1.3em;margin-right:8px;">⚠️</span>
+                             <div style="display:flex;align-items:center;margin-bottom:5px;">
+                                 <span style="font-size:1.3em;margin-right:8px;">⚠️</span>
                                 <span style="font-size:1.1em;font-weight:bold;">Less Than Minimum Fee</span>
                             </div>
                             <div style="margin-bottom:5px;">
@@ -172,7 +172,7 @@
                                 <div>Per Item: <span style="color:#663c00;font-weight:bold;">$${calculatedPricing.ltmFeePerItem.toFixed(2)}</span> × ${calculatedPricing.combinedQuantity} items</div>
                             </div>
                             ${ltmQuantityNeeded > 0 ? `<div style="font-size:0.9em;font-style:italic;margin-top:5px;padding-top:5px;border-top:1px dashed #ffc107;">
-                                Add ${ltmQuantityNeeded} more items to reach 24 pieces and eliminate this fee
+                                Add ${ltmQuantityNeeded} more items to reach ${(NWCA_APP_CONFIG.FEES.LTM_GENERAL_THRESHOLD || 24)} pieces and eliminate this fee
                             </div>` : ''}
                             ${existingEmbroideryItems > 0 ? `<div style="font-size:0.9em;background-color:#e8f4ff;padding:5px;margin-top:5px;border-radius:4px;border-left:3px solid #0d6efd;">
                                 <span style="font-weight:bold;">Prospective Pricing:</span> Includes ${existingEmbroideryItems} items already in cart.
@@ -244,10 +244,12 @@
 
             if (totalAmountDisplay) {
                 console.log('[ADD-TO-CART:UI_UPDATE] About to update totalAmountDisplay. calculatedPricing object:', JSON.parse(JSON.stringify(calculatedPricing)));
-                console.log('[ADD-TO-CART:UI_UPDATE] Attempting to update totalAmountDisplay. Current textContent:', totalAmountDisplay.textContent, 'New value based on calculatedPricing.totalPrice:', calculatedPricing.totalPrice.toFixed(2));
-                totalAmountDisplay.textContent = `$${calculatedPricing.totalPrice.toFixed(2)}`;
+                const finalTotalPriceForDisplay = calculatedPricing.totalPrice; // This should already have LTM distributed
+                console.log(`[ADD-TO-CART:UI_UPDATE] Embellishment: ${calculatedPricing.embellishmentType || 'N/A'}, Final Total Price for Sticky Summary: $${finalTotalPriceForDisplay.toFixed(2)}`);
+                console.log('[ADD-TO-CART:UI_UPDATE] Attempting to update totalAmountDisplay. Current textContent:', totalAmountDisplay.textContent, 'New value based on finalTotalPriceForDisplay:', finalTotalPriceForDisplay.toFixed(2));
+                totalAmountDisplay.textContent = `$${finalTotalPriceForDisplay.toFixed(2)}`;
                 // Store data attributes for other scripts if needed, but keep display simple
-                totalAmountDisplay.dataset.calculatedTotal = calculatedPricing.totalPrice.toFixed(2);
+                totalAmountDisplay.dataset.calculatedTotal = finalTotalPriceForDisplay.toFixed(2);
                 totalAmountDisplay.dataset.totalQuantity = newQuantityTotal; // items being added
                 totalAmountDisplay.dataset.tierKey = calculatedPricing.tierKey;
                 totalAmountDisplay.dataset.ltmFeeApplies = calculatedPricing.ltmFeeApplies;
@@ -280,7 +282,7 @@
                         }
                     }
                     
-                    ltmDetailElement.innerHTML = `<small>Orders under 24 pcs incur a $50 LTM fee, added to the 24-pc price and distributed per item. (e.g., 10 items: 24-pc price + $5.00/item).</small>`;
+                    ltmDetailElement.innerHTML = `<small>Orders under ${(NWCA_APP_CONFIG.FEES.LTM_GENERAL_THRESHOLD || 24)} pcs incur a $${(NWCA_APP_CONFIG.FEES.LTM_GENERAL_FEE_AMOUNT || 50).toFixed(2)} LTM fee, added to the ${(NWCA_APP_CONFIG.FEES.LTM_GENERAL_THRESHOLD || 24)}-pc price and distributed per item. (e.g., 10 items: ${(NWCA_APP_CONFIG.FEES.LTM_GENERAL_THRESHOLD || 24)}-pc price + $${((NWCA_APP_CONFIG.FEES.LTM_GENERAL_FEE_AMOUNT || 50) / 10).toFixed(2)}/item).</small>`;
                 } else {
                     ltmFeeNoticeInStickySummary.style.display = 'none';
                 }
@@ -331,8 +333,8 @@
         if (ltmFeeApplies) {
              ltmReferenceTier = Object.keys(sourceTierData).find(t => {
                  const td = sourceTierData[t];
-                 return (td.MinQuantity || 0) <= 24 && (td.MaxQuantity === undefined || td.MaxQuantity >= 24);
-             }) || tierKey; 
+                 return (td.MinQuantity || 0) <= (NWCA_APP_CONFIG.FEES.LTM_GENERAL_THRESHOLD || 24) && (td.MaxQuantity === undefined || td.MaxQuantity >= (NWCA_APP_CONFIG.FEES.LTM_GENERAL_THRESHOLD || 24));
+             }) || tierKey;
         }
         for (const size in calculatedItems) {
             const itemData = calculatedItems[size];
@@ -430,7 +432,7 @@
         } = window.cartItemData;
         console.log(`[ADD-TO-CART] Handle Add: Using Tier: ${tierKey}, LTM Applies: ${ltmFeeApplies} from validated cartItemData`);
         if (totalQuantity === 0) {
-            alert('Please select at least one size and quantity.');
+            alert(NWCA_APP_CONFIG.MESSAGES.SELECT_QUANTITY_ALERT || 'Please select at least one size and quantity.');
             if (addToCartButton) { addToCartButton.textContent = addToCartButton._originalText || 'Add to Cart'; addToCartButton.disabled = false; }
             return;
         }

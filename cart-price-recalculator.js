@@ -6,8 +6,22 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
     
     // Constants
     const API_BASE_URL = '/api'; // Use relative URL to hit the local Express server instead of direct Caspio URL
-    const LTM_FEE = 50.00; // Less Than Minimum fee
-    const LTM_THRESHOLD = 24; // Threshold for LTM fee (applies when quantity < this value)
+    // const LTM_FEE = 50.00; // Less Than Minimum fee - Now from app-config.js
+    // const LTM_THRESHOLD = 24; // Threshold for LTM fee - Now from app-config.js
+
+    function getLtmConfig(embellishmentType) {
+        const feesConfig = window.NWCA_APP_CONFIG?.FEES || {};
+        if (embellishmentType === 'cap-embroidery') {
+            return {
+                threshold: feesConfig.LTM_CAP_MINIMUM_QUANTITY || 24,
+                feeAmount: feesConfig.LTM_CAP_FEE_AMOUNT || 50.00
+            };
+        }
+        return {
+            threshold: feesConfig.LTM_GENERAL_THRESHOLD || 24,
+            feeAmount: feesConfig.LTM_GENERAL_FEE_AMOUNT || 50.00
+        };
+    }
     
     /**
      * Get pricing tier description based on quantity
@@ -33,25 +47,30 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
     /**
      * Calculate the Less Than Minimum (LTM) fee per item
      * @param {number} totalQuantity - Total quantity of items
+     * @param {string} embellishmentType - The type of embellishment to determine specific LTM rules.
      * @returns {number} - LTM fee per item, or 0 if not applicable
      */
-    function calculateLTMFeePerItem(totalQuantity) {
-        if (totalQuantity < LTM_THRESHOLD && totalQuantity > 0) {
+    function calculateLTMFeePerItem(totalQuantity, embellishmentType) {
+        const ltmConfig = getLtmConfig(embellishmentType);
+
+        if (totalQuantity < ltmConfig.threshold && totalQuantity > 0) {
             // Calculate the per-item LTM fee
-            const ltmFeePerItem = LTM_FEE / totalQuantity;
-            console.log(`[PRICE-RECALC:LTM] Applying LTM fee: $${LTM_FEE.toFixed(2)} ÷ ${totalQuantity} = $${ltmFeePerItem.toFixed(2)} per item`);
+            const ltmFeePerItem = ltmConfig.feeAmount / totalQuantity;
+            console.log(`[PRICE-RECALC:LTM] Applying LTM fee for ${embellishmentType}: $${ltmConfig.feeAmount.toFixed(2)} ÷ ${totalQuantity} = $${ltmFeePerItem.toFixed(2)} per item`);
             return ltmFeePerItem;
         }
-        return 0; // No LTM fee for quantities >= LTM_THRESHOLD
+        return 0; // No LTM fee for quantities >= ltmConfig.threshold
     }
     
     /**
      * Check if LTM fee applies
      * @param {number} totalQuantity - Total quantity of items
+     * @param {string} embellishmentType - The type of embellishment.
      * @returns {boolean} - True if LTM fee applies
      */
-    function hasLTMFee(totalQuantity) {
-        return totalQuantity > 0 && totalQuantity < LTM_THRESHOLD;
+    function hasLTMFee(totalQuantity, embellishmentType) {
+        const ltmConfig = getLtmConfig(embellishmentType);
+        return totalQuantity > 0 && totalQuantity < ltmConfig.threshold;
     }
     
     // Initialize when DOM is ready
@@ -141,13 +160,14 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
             console.log(`[PRICE-RECALC:TOTAL] Total quantity for ${embellishmentType}: ${totalQuantity}`);
             
             // Check if LTM fee applies
-            const ltmFeeApplies = hasLTMFee(totalQuantity);
-            const ltmFeePerItem = calculateLTMFeePerItem(totalQuantity);
+            const ltmConfig = getLtmConfig(embellishmentType);
+            const ltmFeeApplies = hasLTMFee(totalQuantity, embellishmentType);
+            const ltmFeePerItem = calculateLTMFeePerItem(totalQuantity, embellishmentType);
             
             if (ltmFeeApplies) {
-                console.log(`[PRICE-RECALC:LTM] Less Than Minimum fee applies: $${LTM_FEE.toFixed(2)} total, $${ltmFeePerItem.toFixed(2)} per item`);
+                console.log(`[PRICE-RECALC:LTM] Less Than Minimum fee applies for ${embellishmentType}: $${ltmConfig.feeAmount.toFixed(2)} total, $${ltmFeePerItem.toFixed(2)} per item`);
             } else {
-                console.log(`[PRICE-RECALC:LTM] No Less Than Minimum fee applies (quantity >= ${LTM_THRESHOLD})`);
+                console.log(`[PRICE-RECALC:LTM] No Less Than Minimum fee applies for ${embellishmentType} (quantity >= ${ltmConfig.threshold})`);
             }
             
             // For each item, update prices based on the total quantity across all items

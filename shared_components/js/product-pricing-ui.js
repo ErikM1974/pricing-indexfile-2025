@@ -519,8 +519,8 @@ const NWCAProductPricingUI = (function() {
         });
 
 
-        if (!currentTier || !currentTier.label) {
-            debugProductUI("WARN", "highlightActivePricingTierInGrid: currentTier or currentTier.label is undefined.", currentTier);
+        if (!currentTier || !currentTier.TierLabel) { // Check for TierLabel
+            debugProductUI("WARN", "highlightActivePricingTierInGrid: currentTier or currentTier.TierLabel is undefined.", currentTier);
             return;
         }
 
@@ -530,7 +530,7 @@ const NWCAProductPricingUI = (function() {
             const firstCell = row.querySelector('td:first-child');
             if (firstCell) {
                 const cellText = firstCell.textContent.trim();
-                const tierLabelToMatch = currentTier.label;
+                const tierLabelToMatch = currentTier.TierLabel; // Use TierLabel
                 // Ensure tierLabelToMatch is also a string and trimmed, though it should be from tierKey
                 const safeTierLabelToMatch = String(tierLabelToMatch || '').trim();
 
@@ -538,7 +538,7 @@ const NWCAProductPricingUI = (function() {
                 
                 if (cellText === safeTierLabelToMatch) {
                     row.classList.add('current-pricing-level-highlight');
-                    debugProductUI("UI-UPDATE", `Applied .current-pricing-level-highlight to row for tier: ${currentTier.label}`);
+                    debugProductUI("UI-UPDATE", `Applied .current-pricing-level-highlight to row for tier: ${currentTier.TierLabel}`);
                 }
             } else {
                 debugProductUI("WARN", "A row in pricing grid tbody is missing its first td.", row);
@@ -555,15 +555,22 @@ const NWCAProductPricingUI = (function() {
     function getCurrentPricingTier(totalQuantity, tiersToUse) {
         tiersToUse = tiersToUse || config.pricingTiers; // Fallback to default config if not provided
         for (const tier of tiersToUse) {
-            if (totalQuantity >= tier.minQty && totalQuantity <= tier.maxQty) {
+            if (totalQuantity >= tier.minQty && (tier.maxQty === undefined || totalQuantity <= tier.maxQty)) { // Handle undefined maxQty for "72+"
                 return tier;
             }
         }
         // If quantity is 0 or doesn't fit, default to the first tier or handle as LTM case explicitly
-        if (totalQuantity === 0 && tiersToUse.length > 0) return tiersToUse[0];
-        // If LTM is handled by the first tier (e.g. 1-23), this is fine.
-        // Otherwise, might need specific logic for quantities below the first defined tier's minQty.
-        return tiersToUse.length > 0 ? tiersToUse[0] : null;
+        if (totalQuantity === 0 && tiersToUse.length > 0) return tiersToUse[0]; // Default to first tier if quantity is 0
+        
+        // If quantity is > 0 but still no match (e.g. below lowest minQty if not 1), return lowest tier
+        if (tiersToUse.length > 0) {
+            // Sort by minQty to be sure
+            const sortedTiers = [...tiersToUse].sort((a,b) => (a.minQty || 0) - (b.minQty || 0));
+            if (totalQuantity < sortedTiers[0].minQty) {
+                return sortedTiers[0];
+            }
+        }
+        return tiersToUse.length > 0 ? tiersToUse[0] : null; // Final fallback
     }
 
     /**

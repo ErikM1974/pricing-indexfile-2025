@@ -5,8 +5,23 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded.");
 (function() {
     "use strict";
 
-    const LTM_FEE_AMOUNT = 50.00; // Standard LTM fee
-    const LTM_THRESHOLD = 24; // Minimum quantity to avoid LTM fee
+    // LTM constants are now sourced from NWCA_APP_CONFIG
+    // const LTM_FEE_AMOUNT = 50.00; // Standard LTM fee
+    // const LTM_THRESHOLD = 24; // Minimum quantity to avoid LTM fee
+
+    function getLtmConfig(embellishmentType) {
+        const feesConfig = window.NWCA_APP_CONFIG?.FEES || {};
+        if (embellishmentType === 'cap-embroidery') {
+            return {
+                threshold: feesConfig.LTM_CAP_MINIMUM_QUANTITY || 24,
+                feeAmount: feesConfig.LTM_CAP_FEE_AMOUNT || 50.00
+            };
+        }
+        return {
+            threshold: feesConfig.LTM_GENERAL_THRESHOLD || 24,
+            feeAmount: feesConfig.LTM_GENERAL_FEE_AMOUNT || 50.00
+        };
+    }
 
     /**
      * Calculates pricing details for a set of items based on quantity and pricing data.
@@ -53,8 +68,8 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded.");
 
         if (!pricingData || !pricingData.prices || !pricingData.tierData) {
             // Added embellishmentType to the error for more context
-            const embType = pricingData && pricingData.embellishmentType ? pricingData.embellishmentType : 'unknown';
-            console.error(`[PRICING-CALC:ERROR] Invalid or missing pricingData object, or missing 'prices'/'tierData' properties for embellishment type: ${embType}.`);
+            const embTypeFromData = pricingData && pricingData.embellishmentType ? pricingData.embellishmentType : 'unknown';
+            console.error(`[PRICING-CALC:ERROR] Invalid or missing pricingData object, or missing 'prices'/'tierData' properties for embellishment type: ${embTypeFromData}.`);
             return null;
         }
 
@@ -123,20 +138,23 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded.");
         console.log(`[PRICING-CALC:TIER] Determined Tier: ${tierKey}`);
 
         // Determine LTM fee application
-        if (combinedQuantity > 0 && combinedQuantity < LTM_THRESHOLD) {
+        const embType = pricingData?.embellishmentType || 'unknown';
+        const ltmConfig = getLtmConfig(embType);
+
+        if (combinedQuantity > 0 && combinedQuantity < ltmConfig.threshold) {
             ltmFeeApplies = true;
-            // Find the LTM fee amount from the *matched* tier, or use default
+            // Find the LTM fee amount from the *matched* tier, or use default from specific config
             const matchedTierInfo = tierData[tierKey];
-            ltmFeeTotal = (matchedTierInfo && matchedTierInfo.LTM_Fee !== undefined) ? matchedTierInfo.LTM_Fee : LTM_FEE_AMOUNT;
+            ltmFeeTotal = (matchedTierInfo && matchedTierInfo.LTM_Fee !== undefined) ? matchedTierInfo.LTM_Fee : ltmConfig.feeAmount;
             ltmFeePerItem = combinedQuantity > 0 ? (ltmFeeTotal / combinedQuantity) : 0;
 
             // Determine the reference tier for base pricing (usually the tier containing LTM_THRESHOLD)
             ltmReferenceTier = Object.keys(tierData).find(t => {
                  const td = tierData[t];
-                 return (td.MinQuantity || 0) <= LTM_THRESHOLD && (td.MaxQuantity === undefined || td.MaxQuantity >= LTM_THRESHOLD);
+                 return (td.MinQuantity || 0) <= ltmConfig.threshold && (td.MaxQuantity === undefined || td.MaxQuantity >= ltmConfig.threshold);
             }) || tierKey; // Fallback to current tier if threshold tier not found
 
-            console.log(`[PRICING-CALC:LTM] LTM Applies. Fee: $${ltmFeeTotal.toFixed(2)}, Per Item: $${ltmFeePerItem.toFixed(2)}, Base Tier: ${ltmReferenceTier}`);
+            console.log(`[PRICING-CALC:LTM] LTM Applies for ${embType}. Fee: $${ltmFeeTotal.toFixed(2)}, Per Item: $${ltmFeePerItem.toFixed(2)}, Base Tier: ${ltmReferenceTier}, Threshold: ${ltmConfig.threshold}`);
         }
 
         // Calculate prices for each item being added

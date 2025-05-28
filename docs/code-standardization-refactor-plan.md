@@ -26,8 +26,14 @@ We will tackle the standardization in the following phases, ordered to generally
         2.  Identify hardcoded values (magic numbers, strings for UI messages, fee amounts, thresholds) in key JavaScript files.
         3.  Move these values into `app-config.js`, organizing them into logical objects (e.g., `APP_CONFIG.FEES.LTM_AMOUNT`, `APP_CONFIG.MESSAGES.STITCH_MISMATCH`).
         4.  Update the original JavaScript files to reference these values from `app-config.js`. (Initially, `app-config.js` can expose a global `APP_CONFIG` object if ES6 modules are not yet in place).
-    *   **Initial Target Files**:
-        *   [`shared_components/js/cap-embroidery-validation.js`](../shared_components/js/cap-embroidery-validation.js) (LTM fee details, warning messages)
+ *   **Notes on Script Dependencies and Initialization:**
+     *   When centralizing configurations (e.g., into `app-config.js`) or utilities (e.g., into `utils.js`), ensure these core/shared scripts are loaded and fully initialized *before* any dependent scripts attempt to access their global objects (e.g., `window.NWCA_APP_CONFIG`, `window.NWCAUtils`).
+     *   Verify script load order in HTML files. For critical early dependencies, direct script inclusion in the HTML `<head>` or at the beginning of the `<body>` (before other scripts) is more reliable than relying on dynamic loading by other scripts if timing is critical (e.g., functions needed during `DOMContentLoaded` by multiple scripts).
+     *   If `DOMContentLoaded` event listeners in one script rely on global objects set up by another script that also runs on `DOMContentLoaded` or is an IIFE, race conditions can occur. Consider using custom events to signal readiness of core utilities if complex dependencies arise (e.g., `NWCAUtilsReady`, `AppConfigReady` events that other modules can listen for before initializing fully).
+     *   When refactoring functions into a shared utility object (e.g., `NWCAUtils`), ensure the utility object is assigned to the global scope (e.g., `window.NWCAUtils = ...`) if it's intended to be accessed globally by other scripts not using ES6 module imports.
+     *   Browser caching can sometimes mask the effects of JavaScript changes. Always perform a hard refresh (Ctrl+Shift+R or Cmd+Shift+R) and, if issues persist, clear site data or test in an incognito window to ensure the latest script versions are being executed.
+ *   **Initial Target Files**:
+     *   [`shared_components/js/cap-embroidery-validation.js`](../shared_components/js/cap-embroidery-validation.js) (LTM fee details, warning messages)
         *   [`shared_components/js/cap-embroidery-back-logo.js`](../shared_components/js/cap-embroidery-back-logo.js) (back logo price, stitch count)
         *   [`shared_components/js/add-to-cart.js`](../shared_components/js/add-to-cart.js) (any default messages or parameters)
         *   Adapters (e.g., default stitch counts, specific fee names if hardcoded).
@@ -59,6 +65,7 @@ We will tackle the standardization in the following phases, ordered to generally
         1.  Identify small, stateless, purely functional pieces of logic duplicated across multiple files (e.g., formatting currency, normalizing strings, simple DOM element selections, URL parameter parsing, specific data transformations).
         2.  Move these identified functions into [`shared_components/js/utils.js`](../shared_components/js/utils.js), ensuring they are generic and well-named.
         3.  Update all calling locations to use the centralized utility function (e.g., `NWCAUtils.formatCurrency()`).
+        4.  When moving a function to a shared utility like `utils.js`, if that function is called very early in the page lifecycle by multiple scripts (e.g., during `DOMContentLoaded`), ensure the `utils.js` script itself is loaded and `NWCAUtils` is globally available before these calls. If timing issues persist, temporarily keeping a local copy of a critical, early-needed function within the dependent script might be a pragmatic short-term solution while a more robust event-based or module-loading dependency management strategy is implemented.
     *   **Initial Areas of Focus**:
         *   Currency formatting (already in `utils.js`, ensure it's used everywhere).
         *   URL parameter getting (already in `utils.js`, ensure consistent use).

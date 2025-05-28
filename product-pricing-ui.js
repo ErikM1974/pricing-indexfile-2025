@@ -36,8 +36,11 @@ const NWCAProductPricingUI = (function() {
 
     // Configuration (example)
     const config = {
-        ltmFee: 50.00, // Standard LTM fee amount
-        ltmThreshold: 24, // Default LTM quantity threshold (e.g., less than 24 pieces)
+        // LTM values will now be sourced from NWCA_APP_CONFIG where available
+        // ltmFee: 50.00,
+        // ltmThreshold: 24,
+        get ltmFee() { return (window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.FEES && NWCA_APP_CONFIG.FEES.LTM_GENERAL_FEE_AMOUNT) || 50.00; },
+        get ltmThreshold() { return (window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.FEES && NWCA_APP_CONFIG.FEES.LTM_GENERAL_THRESHOLD) || 24; },
         pricingTiers: [ // Example structure, actual tiers come from pricing data
             { minQty: 1, maxQty: 23, label: "1-23" },
             { minQty: 24, maxQty: 47, label: "24-47" },

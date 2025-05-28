@@ -3,7 +3,7 @@
 /**
  * @namespace NWCAUtils
  */
-const NWCAUtils = (function() {
+window.NWCAUtils = (function() {
     'use strict';
 
     function debugUtil(level, message, data = null) {

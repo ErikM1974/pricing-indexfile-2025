@@ -49,6 +49,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // --- Page Initialization Functions ---
 
     function updateProductContext() {
+        console.log("[DEBUG] updateProductContext START");
         const styleNumber = getUrlParameter('StyleNumber');
         const colorFromUrl = getUrlParameter('COLOR');
 
@@ -56,7 +57,8 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         if (styleNumber === '{styleNumber}' || colorFromUrl === '{colorCode}' || !styleNumber) { // Also check if styleNumber is missing
             console.error("PricingPages: ERROR - URL contains placeholder values or is missing style. Aborting initialization.", { styleNumber, colorFromUrl });
             // Display an error message to the user
-            document.body.innerHTML = '<div class="error-message" style="padding: 20px; text-align: center; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px; margin: 20px;"><strong>Error:</strong> Invalid product link parameters. Please go back to the product page, ensure a style and color are selected, wait a moment for links to update, and then try the pricing link again.</div>';
+            const errorMsg = (window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.MESSAGES && NWCA_APP_CONFIG.MESSAGES.INVALID_PRODUCT_LINK_ERROR) || '<strong>Error:</strong> Invalid product link parameters. Please go back to the product page, ensure a style and color are selected, wait a moment for links to update, and then try the pricing link again.';
+            document.body.innerHTML = `<div class="error-message" style="padding: 20px; text-align: center; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px; margin: 20px;">${errorMsg}</div>`;
             return; // Stop further processing
         }
         // --- End Diagnosis Check ---
@@ -99,11 +101,13 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             if (titleElOld) titleElOld.textContent = 'Product Not Found';
             if (imageElOld) imageElOld.src = '';
         }
+        console.log("[DEBUG] updateProductContext END");
     }
 
     // Fetches details for the initially selected color to display title, image etc.
     // Relies on dp5-helper.js to fetch and populate the actual color swatches.
     async function fetchProductDetails(styleNumber) {
+        console.log("[DEBUG] fetchProductDetails START for style:", styleNumber);
         console.log(`[fetchProductDetails] Fetching product colors for Style: ${styleNumber} using /api/product-colors`);
         
         try {
@@ -215,6 +219,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             if (titleElContext) titleElContext.textContent = 'Error Loading Product Info';
             if (imageElContext) imageElContext.src = '';
         }
+        console.log("[DEBUG] fetchProductDetails END for style:", styleNumber);
     }
 
     // New function to update product image gallery with all available images
@@ -885,6 +890,20 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         return false; // Final fallback
     }
 
+    function updateEmbroideryDefaultStitchInfo() {
+        const stitchInfoElement = document.getElementById('embroidery-default-stitch-info');
+        if (stitchInfoElement && window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.PRODUCT_DEFAULTS && typeof NWCA_APP_CONFIG.PRODUCT_DEFAULTS.DEFAULT_EMBROIDERY_STITCH_COUNT !== 'undefined') {
+            const defaultStitches = NWCA_APP_CONFIG.PRODUCT_DEFAULTS.DEFAULT_EMBROIDERY_STITCH_COUNT;
+            stitchInfoElement.textContent = `Pricing Includes a ${defaultStitches.toLocaleString()} stitch embroidered logo.`;
+            console.log(`PricingPages: Updated embroidery default stitch info to ${defaultStitches} stitches.`);
+        } else {
+            if (!stitchInfoElement) console.log("PricingPages: Embroidery stitch info element not found.");
+            if (!window.NWCA_APP_CONFIG || !NWCA_APP_CONFIG.PRODUCT_DEFAULTS || typeof NWCA_APP_CONFIG.PRODUCT_DEFAULTS.DEFAULT_EMBROIDERY_STITCH_COUNT === 'undefined') {
+                console.log("PricingPages: Default embroidery stitch count config not found.");
+            }
+        }
+    }
+
 
     // --- Main Initialization ---
 
@@ -983,6 +1002,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         // Final UI setup
         setupInventoryLegend();
         updateMiniColorSwatch();
+        updateEmbroideryDefaultStitchInfo(); // Update embroidery specific info
 
         console.log("PricingPages: Initialization sequence complete.");
     }
@@ -995,7 +1015,13 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     }
 
     function displayContactMessage(container, embType) {
-        if (!container) return; console.log(`PricingPages: Displaying contact message for ${embType} in #${container.id}`); container.innerHTML = ''; container.classList.remove('loading'); container.classList.add('pricing-unavailable'); ensureHiddenCartElements(container); const messageElement = document.createElement('div'); messageElement.style.textAlign = 'center'; messageElement.style.padding = '30px 20px'; messageElement.style.backgroundColor = '#f8f9fa'; messageElement.style.borderRadius = '8px'; messageElement.style.border = '1px solid #dee2e6'; messageElement.style.margin = '20px 0'; messageElement.innerHTML = `<h3 style="color: #0056b3; margin-bottom: 15px;">Pricing Currently Unavailable</h3><p style="font-size: 16px; color: #495057; margin-bottom: 20px;">We apologize, but the pricing details for this item are currently unavailable.</p><p style="font-size: 16px; color: #495057; margin-bottom: 20px;">Please call <strong style="color: #0056b3; font-size: 18px;">253-922-5793</strong> for an accurate quote.</p><p style="font-size: 14px; color: #6c757d;">Our team is ready to assist you.</p>`; container.appendChild(messageElement);
+        if (!container) return; console.log(`PricingPages: Displaying contact message for ${embType} in #${container.id}`); container.innerHTML = ''; container.classList.remove('loading'); container.classList.add('pricing-unavailable'); ensureHiddenCartElements(container); const messageElement = document.createElement('div'); messageElement.style.textAlign = 'center'; messageElement.style.padding = '30px 20px'; messageElement.style.backgroundColor = '#f8f9fa'; messageElement.style.borderRadius = '8px'; messageElement.style.border = '1px solid #dee2e6'; messageElement.style.margin = '20px 0';
+        const phoneNumber = (window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.MESSAGES && NWCA_APP_CONFIG.MESSAGES.CONTACT_PHONE_NUMBER) || "253-922-5793";
+        const headerMsg = (window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.MESSAGES && NWCA_APP_CONFIG.MESSAGES.PRICING_UNAVAILABLE_HEADER) || "Pricing Currently Unavailable";
+        const body1Msg = (window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.MESSAGES && NWCA_APP_CONFIG.MESSAGES.PRICING_UNAVAILABLE_BODY_1) || "We apologize, but the pricing details for this item are currently unavailable.";
+        const callInstructionMsg = ((window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.MESSAGES && NWCA_APP_CONFIG.MESSAGES.PRICING_UNAVAILABLE_CALL_INSTRUCTION) || "Please call <strong style=\"color: #0056b3; font-size: 18px;\">%PHONE_NUMBER%</strong> for an accurate quote.").replace("%PHONE_NUMBER%", phoneNumber);
+        const assistanceMsg = (window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.MESSAGES && NWCA_APP_CONFIG.MESSAGES.PRICING_UNAVAILABLE_ASSISTANCE) || "Our team is ready to assist you.";
+        messageElement.innerHTML = `<h3 style="color: #0056b3; margin-bottom: 15px;">${headerMsg}</h3><p style="font-size: 16px; color: #495057; margin-bottom: 20px;">${body1Msg}</p><p style="font-size: 16px; color: #495057; margin-bottom: 20px;">${callInstructionMsg}</p><p style="font-size: 14px; color: #6c757d;">${assistanceMsg}</p>`; container.appendChild(messageElement);
     }
 
     // --- Global UI Object ---

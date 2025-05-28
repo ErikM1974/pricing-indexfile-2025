@@ -9,7 +9,9 @@ window.NWCA_APP_CONFIG = window.NWCA_APP_CONFIG || {};
 
     CONFIG.FEES = {
         LTM_CAP_MINIMUM_QUANTITY: 24,
-        LTM_CAP_FEE_AMOUNT: 50.00
+        LTM_CAP_FEE_AMOUNT: 50.00,
+        LTM_GENERAL_THRESHOLD: 24,       // General LTM threshold for most products
+        LTM_GENERAL_FEE_AMOUNT: 50.00    // General LTM fee amount
     };
 
     CONFIG.MESSAGES = {
@@ -38,10 +40,18 @@ window.NWCA_APP_CONFIG = window.NWCA_APP_CONFIG || {};
             PER_CAP_LABEL: "Per Cap:",
             ELIMINATE_FEE_PREFIX: "Add",
             ELIMINATE_FEE_SUFFIX: "more caps to eliminate this fee"
-        }
+        },
+        SELECT_QUANTITY_ALERT: "Please select at least one size and quantity.",
+        CONTACT_PHONE_NUMBER: "253-922-5793",
+        PRICING_UNAVAILABLE_HEADER: "Pricing Currently Unavailable",
+        PRICING_UNAVAILABLE_BODY_1: "We apologize, but the pricing details for this item are currently unavailable.",
+        PRICING_UNAVAILABLE_CALL_INSTRUCTION: "Please call <strong style=\"color: #0056b3; font-size: 18px;\">%PHONE_NUMBER%</strong> for an accurate quote.",
+        PRICING_UNAVAILABLE_ASSISTANCE: "Our team is ready to assist you.",
+        INVALID_PRODUCT_LINK_ERROR: "<strong>Error:</strong> Invalid product link parameters. Please go back to the product page, ensure a style and color are selected, wait a moment for links to update, and then try the pricing link again."
     };
 
     CONFIG.PRODUCT_DEFAULTS = {
+        DEFAULT_EMBROIDERY_STITCH_COUNT: 8000
         // Example: DEFAULT_STITCH_COUNT: 5000
     };
 

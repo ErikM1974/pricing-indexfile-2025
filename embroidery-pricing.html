@@ -578,7 +578,7 @@
                     </div>
                 </div>
                 <div class="static-product-info" style="padding:15px; background-color: var(--background-light); border-radius: var(--radius-sm); margin-top:15px;">
-                    <p>Pricing Includes an 8,000 stitch embroidered logo.</p>
+                    <p id="embroidery-default-stitch-info">Pricing Includes an 8,000 stitch embroidered logo.</p>
                     <!-- Other static info can go here -->
                 </div>
                 
@@ -1298,8 +1298,9 @@
     </div> <!-- End .container -->
     
     <!-- JavaScript Files -->
+    <script src="/shared_components/js/app-config.js"></script> <!-- Load App Config First -->
+    <script src="/utils.js"></script> <!-- Moved up to ensure NWCAUtils is defined first -->
     <script src="/pricing-pages.js"></script>
-    <script src="/utils.js"></script> <!-- Moved up and removed defer -->
     <script src="/pricing-matrix-capture.js"></script>
     <script src="/pricing-matrix-api.js"></script>
     <script src="/dp5-helper.js"></script>
