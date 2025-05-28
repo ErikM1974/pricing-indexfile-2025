@@ -721,6 +721,9 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // --- UI Update Functions (Consolidated) ---
 
     function updatePriceDisplayForSize(size, quantity, unitPrice, displayPrice, itemTotal, ltmFeeApplies, ltmFeePerItem, combinedQuantity, ltmFee, hasBackLogo, backLogoPerItem, frontStitchCount) {
+        // console.log(`[DEBUG_LTM] updatePriceDisplayForSize PARAMS for ${size}:`, {
+        //     size, quantity, unitPrice, displayPrice, itemTotal, ltmFeeApplies, ltmFeePerItem, combinedQuantity, ltmFee, hasBackLogo, backLogoPerItem, frontStitchCount
+        // });
         // Try multiple selectors to find the correct price display cell for this size
         // First try the new pricing box row structure
         let matrixPriceDisplay = document.querySelector(`#price-box-row .price-display[data-size="${size}"]`);
@@ -772,17 +775,18 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
                     const actualItemTotal = actualDisplayPrice * quantity;
                     
                     // Modified to make the card more compact and fit within column
-                    cardHtml = `
+                    cardHtml += `
                         <div class="price-breakdown-card ltm-active" style="width:100%; max-width:140px; display:flex; flex-direction:column; margin:0 auto;">
                             <div class="price-breakdown-header" style="text-align:center; font-size:0.8em; padding:2px 4px;">LTM Fee Applied</div>
                             <div style="padding:3px 6px;">
                                 <div class="price-breakdown-row" style="padding:1px 0; font-size:0.75em;"><span>Base${formattedFrontStitchCount}:</span> <span>$${unitPrice.toFixed(2)}</span></div>`;
-                    
-                    if (ltmFeePerItem > 0) {
-                        cardHtml += `<div class="price-breakdown-row" style="padding:1px 0; font-size:0.75em;"><span>LTM:</span> <span>+$${ltmFeePerItem.toFixed(2)}</span></div>`;
-                    }
-                    
-                    if (hasBackLogo) {
+               
+               // Ensure LTM fee per item is displayed if it's greater than zero
+               if (ltmFeeApplies && ltmFeePerItem > 0) {
+                   cardHtml += `<div class="price-breakdown-row" style="padding:1px 0; font-size:0.75em;"><span>LTM:</span> <span style="color: #dc3545; font-weight: bold;">+$${ltmFeePerItem.toFixed(2)}</span></div>`;
+               }
+               
+               if (hasBackLogo) {
                         const backLogoStitchCount = window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.getStitchCount ? window.CapEmbroideryBackLogo.getStitchCount() : '';
                         const formattedBackStitchCount = backLogoStitchCount ? ` (${parseInt(backLogoStitchCount).toLocaleString()} st)` : '';
                         cardHtml += `<div class="price-breakdown-row" style="padding:1px 0; font-size:0.75em;"><span>Back Logo${formattedBackStitchCount}:</span> <span>+$${backLogoPerItem.toFixed(2)}</span></div>`;
@@ -815,6 +819,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
                             </div>
                         </div>`;
                 }
+                // console.log(`[DEBUG_LTM] updatePriceDisplayForSize - Generated cardHtml for ${size} (Qty: ${quantity}):\n`, cardHtml);
                 matrixPriceDisplay.innerHTML = cardHtml;
                 matrixPriceDisplay.className = 'price-display has-breakdown';
                 matrixPriceDisplay.style.backgroundColor = '';

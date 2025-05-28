@@ -104,18 +104,20 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
 
         const ltmThresholdForProduct = currentTierObject.LTM_Threshold || LTM_THRESHOLD; // Tier specific or default
         const ltmFeeApplies = combinedQuantity > 0 && combinedQuantity < ltmThresholdForProduct;
-        const ltmFeeFromTier = currentTierObject.LTM_Fee !== undefined ? currentTierObject.LTM_Fee : (pricingData.fees && pricingData.fees.ltm !== undefined ? pricingData.fees.ltm : LTM_FEE_AMOUNT);
-        const ltmFeeTotal = ltmFeeApplies ? parseFloat(ltmFeeFromTier) : 0;
+        // If LTM applies, use the standard LTM_FEE_AMOUNT unless the tier specifies a different non-zero LTM fee.
+        const ltmFeeTotal = ltmFeeApplies
+            ? (currentTierObject.LTM_Fee !== undefined && parseFloat(currentTierObject.LTM_Fee) > 0 ? parseFloat(currentTierObject.LTM_Fee) : LTM_FEE_AMOUNT)
+            : 0;
         const ltmFeePerItem = ltmFeeApplies && combinedQuantity > 0 ? (ltmFeeTotal / combinedQuantity) : 0;
-
+ 
         // Determine the reference tier for LTM base pricing (usually the tier containing LTM_THRESHOLD)
         ltmReferenceTierKey = allTierKeys.find(tKey => {
             const td = tierData[tKey];
             return (td.MinQuantity || 0) <= ltmThresholdForProduct && (td.MaxQuantity === undefined || td.MaxQuantity >= ltmThresholdForProduct);
         }) || tierKey; // Fallback to current tier if threshold tier not found
-
+ 
         console.log(`[PRICING-CALC:LTM] LTM Applies: ${ltmFeeApplies}, Fee: $${ltmFeeTotal.toFixed(2)}, Per Item: $${ltmFeePerItem.toFixed(2)}, Base Tier for LTM Price: ${ltmReferenceTierKey}`);
-
+ 
         const calculatedItems = {};
         let overallTotalPrice = 0;
         
@@ -155,7 +157,7 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
             // Display unit price includes per-item LTM, per-item flash charge, and back logo
             const displayUnitPrice = baseUnitPrice + ltmFeePerItem + flashChargePerItem + backLogoPerItem;
             const itemTotal = quantity * displayUnitPrice; // This total already includes distributed LTM, flash, and back logo for these items
-
+ 
             calculatedItems[size] = {
                 quantity: quantity,
                 baseUnitPrice: baseUnitPrice,
@@ -166,9 +168,9 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
             };
             overallTotalPrice += itemTotal;
         }
-
+ 
         overallTotalPrice += setupFee; // Add one-time setup fee
-
+ 
         const result = {
             tierKey: tierKey,
             tierObject: currentTierObject,
@@ -198,11 +200,11 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
             }
             result.baseUnitPrices[size] = isNaN(basePrice) ? 0 : basePrice;
         });
-
+ 
         console.log("[PRICING-CALC:RESULT] (v2.0)", result);
         return result;
     }
-
+ 
     window.NWCAPricingCalculator = {
         calculatePricing: calculatePricing
     };

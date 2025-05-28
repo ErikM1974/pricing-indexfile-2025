@@ -147,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const sortedQuantityTiers = Object.keys(tierInfo).sort((a, b) => tierInfo[a].MinQuantity - tierInfo[b].MinQuantity);
         let matchedPrice = null;
+        let matchedTier = null;
 
         for (const tierLabel of sortedQuantityTiers) {
             const currentTierDef = tierInfo[tierLabel];
@@ -156,10 +157,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (quantity >= minQty && quantity <= maxQty) {
                 if (priceProfileForSize[tierLabel] !== undefined && priceProfileForSize[tierLabel] !== null) {
                     matchedPrice = parseFloat(priceProfileForSize[tierLabel]);
+                    matchedTier = currentTierDef;
                 }
                 break;
             }
         }
+
+        // Apply LTM fee if applicable
+        if (matchedPrice !== null && matchedTier && quantity < 24) {
+            const ltmFee = matchedTier.LTM_Fee || 50.00; // Default to $50 if not specified
+            const ltmFeePerItem = ltmFee / quantity;
+            matchedPrice += ltmFeePerItem; // Add LTM fee per item to the price
+        }
+
         return matchedPrice;
     }
 

@@ -64,9 +64,17 @@
                 newTotalPrice += item.itemTotal || 0;
             });
             
-            // Add any fees that were in the original calculation
+            // Add any fees that were in the original calculation (like setup fee)
+            // The LTM fee is already distributed into the itemTotals via ltmFeePerItem in displayUnitPrice,
+            // so newTotalPrice (sum of itemTotals) already includes it.
+            // We only need to add fees that are truly order-level and not per-item distributed.
             newTotalPrice += enhancedPricing.setupFee || 0;
-            newTotalPrice += enhancedPricing.ltmFeeTotal || 0;
+            
+            // DO NOT re-add enhancedPricing.ltmFeeTotal here, as it's already accounted for
+            // in the itemTotal sum that forms newTotalPrice.
+            // if (enhancedPricing.ltmFeeApplies && enhancedPricing.ltmFeeTotal) {
+            //     console.log('[CAP-EMB-ADAPTER-ENHANCED] LTM fee already included in item totals. Not adding flat fee again.');
+            // }
             
             enhancedPricing.totalPrice = newTotalPrice;
             enhancedPricing.totalQuantity = totalQuantity;

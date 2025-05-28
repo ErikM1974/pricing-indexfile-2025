@@ -151,8 +151,10 @@
                     let ltmFeeTotal = 0;
                     if (capItemCount > 0 && capItemCount < window.CapEmbroideryValidation.MINIMUM_CAP_QUANTITY) {
                         ltmFeeTotal = window.CapEmbroideryValidation.LTM_FEE;
+                        console.log("[CAP-EMB-CART] LTM fee applies: $" + ltmFeeTotal.toFixed(2) + " for " + capItemCount + " items");
                     }
                     
+                    // Update the LTM display with the calculated fee
                     window.CapEmbroideryValidation.updateCapLTMDisplay(capItemCount, ltmFeeTotal);
                 }
             });

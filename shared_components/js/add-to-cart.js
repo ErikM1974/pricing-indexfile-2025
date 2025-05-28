@@ -129,15 +129,17 @@
                 existingCartQuantity: existingItemsOfCurrentType,
                 pricingData: JSON.parse(JSON.stringify(pricingDataForCalc)) // Log the actual pricing data being used
             });
+            // console.log(`[DEBUG_LTM] add-to-cart PRE-CALC:`, { sizeQuantities: JSON.parse(JSON.stringify(sizeQuantities)), existingItemsOfCurrentType, pricingDataForCalc: JSON.parse(JSON.stringify(pricingDataForCalc)) });
             
             calculatedPricing = window.NWCAPricingCalculator.calculatePricing(
                 sizeQuantities,
                 existingItemsOfCurrentType,
                 pricingDataForCalc // This is window.nwcaPricingData
             );
-
+ 
             // More direct logging of the calculatedPricing object itself
             console.log(`[ADD-TO-CART] Direct calculatedPricing object for ${currentEmbType}:`, calculatedPricing);
+            // console.log(`[DEBUG_LTM] add-to-cart POST-CALC: calculatedPricing:`, JSON.parse(JSON.stringify(calculatedPricing)));
             
             if (!calculatedPricing || typeof calculatedPricing !== 'object' || Object.keys(calculatedPricing).length === 0) {
                 console.error("[ADD-TO-CART] Pricing calculation failed or returned non-object/empty object. Value:", calculatedPricing);
@@ -184,14 +186,15 @@
                          }
                          
                          ltmText.innerHTML = `
-                            <div style="display:flex;align-items:center;margin-bottom:5px;">
-                                <span style="font-size:1.3em;margin-right:8px;">⚠️</span>
-                                <span style="font-size:1.1em;font-weight:bold;">Less Than Minimum Fee</span>
-                            </div>
-                            <div style="margin-bottom:5px;">
-                                <div>Total LTM Fee: <span style="color:#663c00;font-weight:bold;font-size:1.1em;">$${(calculatedPricing.ltmFeeTotal || 0).toFixed(2)}</span></div>
-                                <div>Per Item: <span style="color:#663c00;font-weight:bold;">$${(calculatedPricing.ltmFeePerItem || 0).toFixed(2)}</span> × ${calculatedPricing.combinedQuantity} items</div>
-                            </div>
+                             <div style="display:flex;align-items:center;margin-bottom:5px;">
+                                 <span style="font-size:1.3em;margin-right:8px;">⚠️</span>
+                                 <span style="font-size:1.1em;font-weight:bold;">Less Than Minimum Fee</span>
+                             </div>
+                             <div style="margin-bottom:5px;">
+                                 <div>Total LTM Fee: <span style="color:#663c00;font-weight:bold;font-size:1.1em;">$${(calculatedPricing.ltmFeeTotal || 0).toFixed(2)}</span></div>
+                                 <div>Per Item: <span style="color:#663c00;font-weight:bold;">$${(calculatedPricing.ltmFeePerItem || 0).toFixed(2)}</span> × ${calculatedPricing.combinedQuantity} items</div>
+                                 <div>Minimum Order: <span style="color:#663c00;font-weight:bold;">24 pieces</span></div>
+                             </div>
                             ${backLogoInfo}
                             ${ltmQuantityNeeded > 0 ? `<div style="font-size:0.9em;font-style:italic;margin-top:5px;padding-top:5px;border-top:1px dashed #ffc107;">
                                 Add ${ltmQuantityNeeded} more items to reach ${(window.LTM_MINIMUM_QUANTITY || 24)} pieces and eliminate this fee
@@ -254,10 +257,18 @@
                 const itemData = calculatedPricing.items[size];
                 const baseUnitPrice = calculatedPricing.baseUnitPrices[size] || 0;
                 if (window.PricingPageUI && typeof window.PricingPageUI.updatePriceDisplayForSize === 'function') {
+                    const displayUnitPriceForUI = itemData ? itemData.displayUnitPrice : baseUnitPrice;
+                    const itemTotalForUI = itemData ? itemData.itemTotal : 0;
+                    // console.log(`[DEBUG_LTM] add-to-cart PRE-UI_UPDATE for Size ${size}:`, {
+                    //     size, quantity, baseUnitPrice, displayUnitPriceForUI, itemTotalForUI,
+                    //     ltmFeeApplies: calculatedPricing.ltmFeeApplies, ltmFeePerItem: calculatedPricing.ltmFeePerItem,
+                    //     combinedQuantity: calculatedPricing.combinedQuantity, ltmFeeTotal: calculatedPricing.ltmFeeTotal,
+                    //     hasBackLogo, backLogoPerItem, currentStitchCount: pricingDataForCalc.currentStitchCount
+                    // });
                     window.PricingPageUI.updatePriceDisplayForSize(
                         size, quantity, baseUnitPrice,
-                        itemData ? itemData.displayUnitPrice : baseUnitPrice,
-                        itemData ? itemData.itemTotal : 0,
+                        displayUnitPriceForUI,
+                        itemTotalForUI,
                         calculatedPricing.ltmFeeApplies, calculatedPricing.ltmFeePerItem,
                         calculatedPricing.combinedQuantity, calculatedPricing.ltmFeeTotal,
                         hasBackLogo, backLogoPerItem,  // Pass back logo info
@@ -328,6 +339,7 @@
                             <div class="ltm-detail-text" style="font-size: 0.85em; color: #6c757d;">
                                 <small>Orders under ${ltmMinQty} pcs incur a $${ltmFeeValue.toFixed(2)} LTM fee
                                 ($${(ltmFeeValue / (calculatedPricing.combinedQuantity || 1)).toFixed(2)}/item)</small>
+                                <div style="margin-top: 5px; font-weight: bold;">Add ${ltmMinQty - calculatedPricing.combinedQuantity} more to avoid this fee</div>
                                 ${backLogoInfo}
                             </div>
                         </div>

@@ -237,6 +237,9 @@
                     <div style="font-size:0.9em;font-style:italic;margin-top:5px;padding-top:5px;border-top:1px dashed #ffc107;">
                         ${ltmMessages.ELIMINATE_FEE_PREFIX} <strong>${capsNeeded} ${ltmMessages.ELIMINATE_FEE_SUFFIX}</strong>
                     </div>
+                    <div style="font-size:0.9em;margin-top:5px;padding-top:5px;border-top:1px dashed #ffc107;color:#dc3545;font-weight:bold;">
+                        LTM fee is divided by quantity ($${ltmConfig.LTM_CAP_FEE_AMOUNT.toFixed(2)} ÷ ${totalQuantity} = $${perCapFee.toFixed(2)}/cap)
+                    </div>
                 `;
             }
             
