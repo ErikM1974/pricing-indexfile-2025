@@ -33,7 +33,11 @@
                     headers: event.detail.headers,
                     prices: event.detail.prices,
                     tiers: event.detail.tierData || event.detail.tiers, // Normalize here
-                    uniqueSizes: event.detail.uniqueSizes || [...new Set(event.detail.headers.filter(h => !h.includes('-') && !h.includes('/')))],
+                    uniqueSizes: event.detail.uniqueSizes || (
+                        event.detail.embellishmentType === 'cap-embroidery'
+                            ? [...new Set(event.detail.headers)]
+                            : [...new Set(event.detail.headers.filter(h => !h.includes('-') && !h.includes('/')))]
+                    ),
                     styleNumber: event.detail.styleNumber,
                     color: event.detail.color,
                     embellishmentType: event.detail.embellishmentType,
@@ -159,8 +163,15 @@
         
         if (!dataToUse.uniqueSizes || dataToUse.uniqueSizes.length === 0) {
             if (dataToUse.headers && Array.isArray(dataToUse.headers)) {
-                 dataToUse.uniqueSizes = [...new Set(dataToUse.headers.filter(h => h && typeof h === 'string' && !h.includes('-') && !h.includes('/')))];
-                 console.log("[DP5-HELPER] Derived uniqueSizes for grid update:", dataToUse.uniqueSizes);
+                if (dataToUse.embellishmentType === 'cap-embroidery') {
+                    // For cap embroidery, use the headers directly without filtering slashes
+                    dataToUse.uniqueSizes = [...new Set(dataToUse.headers)];
+                    console.log("[DP5-HELPER] Cap embroidery detected: Using headers directly for uniqueSizes:", dataToUse.uniqueSizes);
+                } else {
+                    // Original logic for other embellishment types
+                    dataToUse.uniqueSizes = [...new Set(dataToUse.headers.filter(h => h && typeof h === 'string' && !h.includes('-') && !h.includes('/')))];
+                    console.log("[DP5-HELPER] Derived uniqueSizes for grid update:", dataToUse.uniqueSizes);
+                }
             } else {
                 console.warn("[DP5-HELPER] Cannot derive uniqueSizes, headers are missing or not an array.");
                 dataToUse.uniqueSizes = [];
@@ -288,7 +299,9 @@
                 headers,
                 prices: priceMatrix,
                 tiers: tierData,
-                uniqueSizes: [...new Set(headers.filter(h => !h.includes('-') && !h.includes('/')))],
+                uniqueSizes: (typeof getEmbellishmentTypeFromUrl === 'function' && getEmbellishmentTypeFromUrl() === 'cap-embroidery')
+                    ? [...new Set(headers)] // For cap embroidery, use headers directly without filtering slashes
+                    : [...new Set(headers.filter(h => !h.includes('-') && !h.includes('/')))],
                 styleNumber: window.selectedStyleNumber || 'FALLBACK_STYLE',
                 color: window.selectedColorName || 'FALLBACK_COLOR',
                 embellishmentType: (typeof getEmbellishmentTypeFromUrl === 'function' ? getEmbellishmentTypeFromUrl() : 'unknown'),

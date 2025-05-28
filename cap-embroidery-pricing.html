@@ -486,26 +486,57 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
+            max-width: 100%;
+        }
+        
+        /* Quantity input table styling */
+        .quantity-input-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            max-width: 100%;
         }
         
         .quantity-matrix th,
-        .quantity-matrix td {
+        .quantity-matrix td,
+        .quantity-input-table th,
+        .quantity-input-table td {
             padding: 8px;
             text-align: center;
             border: 1px solid #ddd;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
-        .quantity-matrix th {
+        /* First column (labels) should be narrower */
+        .quantity-input-table th:first-child,
+        .quantity-input-table td:first-child {
+            width: 80px;
+            max-width: 80px;
+        }
+        
+        /* Size columns should have fixed width */
+        .quantity-input-table th:not(:first-child),
+        .quantity-input-table td:not(:first-child) {
+            width: 120px;
+            max-width: 120px;
+        }
+        
+        .quantity-matrix th,
+        .quantity-input-table th {
             background-color: var(--primary-light);
             color: var(--primary-color);
             font-weight: bold;
         }
         
         .quantity-matrix th:first-child,
-        .quantity-matrix td:first-child {
+        .quantity-matrix td:first-child,
+        .quantity-input-table th:first-child,
+        .quantity-input-table td:first-child {
             text-align: left;
             font-weight: bold;
-            width: 100px;
+            width: 80px;
+            max-width: 80px;
         }
         
         /* Price display row styling */
@@ -1158,77 +1189,140 @@
                         </div>
                         
                         <style>
-                            /* Price Breakdown Card Styles */
+                            /* Enhanced Price Breakdown Card Styles for Mockup Layout */
                             .price-breakdown-card {
-                                font-size: 0.85em;
-                                border-radius: var(--radius-sm);
+                                font-size: 0.75em;
+                                border-radius: 4px;
                                 overflow: hidden;
-                                box-shadow: var(--shadow-sm);
-                                border: 1px solid var(--border-light);
-                                margin: 5px auto; /* Center card if cell is wider */
-                                width: 100%; /* Make card fill cell width */
-                                box-sizing: border-box; /* Include padding and border in width */
-                                min-width: 110px; /* Prevent it from becoming too narrow */
-                                max-width: 150px; /* Still constrain max width if cell is very wide */
+                                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                                border: 1px solid #ddd;
+                                margin: 0 auto;
+                                width: 100%;
+                                max-width: 110px;
+                                box-sizing: border-box;
                                 text-align: left;
+                                background-color: #fff;
                             }
+                            
                             .price-breakdown-card .price-breakdown-header {
                                 color: white;
                                 font-weight: bold;
-                                padding: 4px 8px;
+                                padding: 4px;
                                 text-align: center;
-                                font-size: 0.9em;
+                                font-size: 0.8em;
+                                background-color: #17a2b8; /* Blue background as shown in mockup */
                             }
+                            
                             .price-breakdown-card.ltm-active .price-breakdown-header {
-                                background-color: var(--info-color, #17a2b8); /* Softer blue/teal for LTM header */
+                                background-color: #17a2b8; /* Blue for LTM Fee Applied */
                             }
+                            
                             .price-breakdown-card.standard .price-breakdown-header {
-                                background-color: var(--secondary-color, #6c757d); /* Consistent neutral header */
+                                background-color: #6c757d; /* Gray for standard pricing */
                             }
+                            
                             .price-breakdown-card .price-breakdown-row {
                                 display: flex;
                                 justify-content: space-between;
-                                padding: 4px 8px; /* Increased padding slightly */
-                                border-bottom: 1px solid var(--border-extralight, #f0f0f0);
-                                line-height: 1.3; /* Improve line height */
+                                padding: 2px 4px;
+                                border-bottom: 1px solid #f0f0f0;
+                                line-height: 1.2;
+                                font-size: 0.75em;
+                                background-color: #e8f4ff; /* Light blue background as in mockup */
                             }
+                            
                             .price-breakdown-card .price-breakdown-row:last-child {
                                 border-bottom: none;
-                            }
-                            .price-breakdown-card .price-breakdown-row span:first-child { /* Label */
-                                color: var(--text-muted, #6c757d);
-                                margin-right: auto; /* Pushes value to the right */
-                                padding-right: 5px; /* Space between label and value */
-                            }
-                            .price-breakdown-card .price-breakdown-row span:last-child { /* Value */
+                                background-color: rgba(0,0,0,0.03); /* Slightly darker for total row */
                                 font-weight: bold;
-                                white-space: nowrap; /* Prevent price from wrapping if possible */
+                                font-size: 1.05em;
                             }
-                             .price-breakdown-row.total-price span { /* For the 'Total $X (Y)' line */
-                                font-size: 0.95em; /* Slightly smaller if needed */
+                            
+                            .price-breakdown-card .price-breakdown-row span:first-child {
+                                color: #333;
+                                font-weight: normal;
                             }
+                            
+                            .price-breakdown-card .price-breakdown-row span:last-child {
+                                font-weight: bold;
+                                color: #333;
+                                white-space: nowrap;
+                            }
+                            
                             .price-breakdown-card.ltm-active {
-                                background-color: var(--info-light, #e8f4ff); /* Light blue background for LTM card */
+                                background-color: #fff;
                             }
-                             .price-breakdown-card.ltm-active .price-breakdown-row.unit-price span:last-child,
-                             .price-breakdown-card.ltm-active .price-breakdown-row.total-price span:last-child {
-                                color: var(--info-dark, #004085);
+                            
+                            .price-breakdown-card.ltm-active .price-breakdown-row.unit-price span:last-child,
+                            .price-breakdown-card.ltm-active .price-breakdown-row.total-price span:last-child {
+                                color: #004085;
                             }
+                            
                             .price-breakdown-card.standard {
-                                background-color: var(--background-light, #f8f9fa);
+                                background-color: #f8f9fa;
                             }
+                            
                             .price-breakdown-card.standard .price-breakdown-row.unit-price span:last-child,
                             .price-breakdown-card.standard .price-breakdown-row.total-price span:last-child {
                                 color: var(--primary-color);
                             }
-                            .price-breakdown-row.total-price {
-                                background-color: rgba(0,0,0,0.03);
-                                font-size: 1.05em;
-                            }
-                            /* Ensure .price-display cell in matrix can hold the card without extra padding */
-                            #quantity-matrix td.price-display.has-breakdown {
-                                padding: 5px !important; /* Override default table cell padding */
+                            
+                            /* Ensure pricing boxes fit properly in table cells */
+                            .quantity-input-table td.price-display.has-breakdown {
+                                padding: 4px !important;
                                 vertical-align: top;
+                                width: 120px;
+                                max-width: 120px;
+                                text-align: center;
+                            }
+                            
+                            /* Table styling to match mockup */
+                            .quantity-input-table {
+                                border-collapse: collapse;
+                                width: 100%;
+                                table-layout: fixed;
+                            }
+                            
+                            .quantity-input-table th,
+                            .quantity-input-table td {
+                                border: 1px solid #ddd;
+                                text-align: center;
+                                vertical-align: middle;
+                            }
+                            
+                            .quantity-input-table .size-header-row td,
+                            .quantity-input-table .size-header-row th {
+                                background-color: #f2f2f2;
+                                font-weight: bold;
+                                padding: 8px;
+                            }
+                            
+                            .quantity-input-table .quantity-input-row td:first-child,
+                            .quantity-input-table .price-display-row td:first-child {
+                                background-color: #f8f9fa;
+                                font-weight: bold;
+                                text-align: right;
+                                padding-right: 10px;
+                                width: 80px;
+                                max-width: 80px;
+                            }
+                            
+                            .quantity-input-table .quantity-input-row td:not(:first-child) {
+                                background-color: #fff;
+                                padding: 5px;
+                            }
+                            
+                            .quantity-input-table .price-display-row td:not(:first-child) {
+                                background-color: #fff;
+                                padding: 4px;
+                                vertical-align: top;
+                            }
+                            
+                            /* Size column width consistency */
+                            .quantity-input-table td:not(:first-child),
+                            .quantity-input-table th:not(:first-child) {
+                                width: 120px;
+                                max-width: 120px;
                             }
 
 

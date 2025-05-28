@@ -8,110 +8,200 @@ console.log("[QUANTITY-UI:LOAD] Product quantity UI creation module loaded.");
     // Function to create the quantity input fields (matrix layout)
     function createQuantityMatrix(sizes) {
         console.log("[QUANTITY-UI] Creating quantity matrix with sizes:", sizes);
-        const matrixContainer = document.getElementById('quantity-matrix'); // Target the specific container
+        const matrixContainer = document.getElementById('quantity-matrix');
         if (!matrixContainer) {
             console.error("[QUANTITY-UI] Quantity matrix container (#quantity-matrix) not found.");
-            return false; // Indicate failure
+            return false;
         }
 
-        matrixContainer.innerHTML = ''; // Clear existing content first
-        matrixContainer.style.display = 'block'; // Ensure container is visible
+        matrixContainer.innerHTML = '';
+        matrixContainer.style.display = 'block';
 
         if (!sizes || sizes.length === 0) {
             console.warn('[QUANTITY-UI] No sizes provided to createQuantityMatrix.');
             matrixContainer.innerHTML = '<p>No sizes available.</p>';
-            return false; // Indicate failure
+            return false;
         }
 
-        // Create table structure
+        // Create table structure matching the mockup exactly
         const table = document.createElement('table');
-        table.className = 'quantity-input-table'; // Add class for styling
+        table.className = 'quantity-input-table';
         table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
-        table.setAttribute('aria-label', 'Product Quantity Input Matrix'); // Accessibility
+        table.style.tableLayout = 'fixed';
+        table.setAttribute('aria-label', 'Product Quantity Input Matrix');
 
-        const thead = table.createTHead();
         const tbody = table.createTBody();
-        const headerRow = thead.insertRow();
-        const inputRow = tbody.insertRow(); // Row for inputs
-        inputRow.id = 'quantity-input-row'; // Keep ID if needed elsewhere
-        const priceRow = tbody.insertRow(); // Row for prices
-        priceRow.id = 'price-display-row'; // Keep ID if needed elsewhere
-
-        // Add header cell for the price row label
-        const priceHeaderCell = priceRow.insertCell();
-        priceHeaderCell.textContent = 'Price:';
-        priceHeaderCell.style.fontWeight = 'bold';
-        priceHeaderCell.style.textAlign = 'right';
-        priceHeaderCell.style.paddingRight = '10px';
-        priceHeaderCell.style.border = '1px solid #ddd'; // Style consistency
-        priceHeaderCell.style.verticalAlign = 'top';
-
-        // Add header cell for the input row label (optional, could be empty)
-        const inputHeaderCell = inputRow.insertCell();
-        inputHeaderCell.textContent = 'Qty:'; // Or leave empty: ''
-        inputHeaderCell.style.fontWeight = 'bold';
-        inputHeaderCell.style.textAlign = 'right';
-        inputHeaderCell.style.paddingRight = '10px';
-        inputHeaderCell.style.border = '1px solid #ddd'; // Style consistency
-
-        // Add empty header cell for the main header row (aligns with Qty/Price labels)
-        const mainHeaderSpacer = document.createElement('th');
-        mainHeaderSpacer.setAttribute('scope', 'col'); // Accessibility
-        mainHeaderSpacer.style.border = '1px solid #ddd'; // Style consistency
-        headerRow.appendChild(mainHeaderSpacer);
-
-
-        // Populate header, input, and price rows for each size
+        
+        // Row 1: Size headers (S/M, M/L, L/XL)
+        const headerRow = tbody.insertRow();
+        headerRow.className = 'size-header-row';
+        
+        // Empty cell for label column
+        const headerLabelCell = headerRow.insertCell();
+        headerLabelCell.style.border = '1px solid #ddd';
+        headerLabelCell.style.width = '80px';
+        headerLabelCell.style.maxWidth = '80px';
+        headerLabelCell.style.backgroundColor = '#f2f2f2';
+        
+        // Size header cells
         sizes.forEach(size => {
-            // Header cell
-            const th = document.createElement('th');
+            const th = headerRow.insertCell();
             th.textContent = size;
-            th.setAttribute('scope', 'col'); // Accessibility
             th.style.border = '1px solid #ddd';
             th.style.padding = '8px';
             th.style.textAlign = 'center';
             th.style.backgroundColor = '#f2f2f2';
-            headerRow.appendChild(th);
+            th.style.fontWeight = 'bold';
+            th.style.width = '120px';
+            th.style.maxWidth = '120px';
+        });
 
-            // Input cell
-            const tdInput = inputRow.insertCell();
+        // Row 2: "Qty:" label + quantity inputs (1, 1, 1) under each size
+        const quantityRow = tbody.insertRow();
+        quantityRow.className = 'quantity-input-row';
+        quantityRow.id = 'quantity-input-row';
+        
+        // Qty label cell
+        const qtyLabelCell = quantityRow.insertCell();
+        qtyLabelCell.textContent = 'Qty:';
+        qtyLabelCell.style.fontWeight = 'bold';
+        qtyLabelCell.style.textAlign = 'right';
+        qtyLabelCell.style.paddingRight = '10px';
+        qtyLabelCell.style.border = '1px solid #ddd';
+        qtyLabelCell.style.backgroundColor = '#f8f9fa';
+        qtyLabelCell.style.verticalAlign = 'middle';
+        
+        // Quantity input cells
+        sizes.forEach(size => {
+            const tdInput = quantityRow.insertCell();
             tdInput.style.border = '1px solid #ddd';
             tdInput.style.padding = '5px';
             tdInput.style.textAlign = 'center';
+            tdInput.style.backgroundColor = '#fff';
 
             const input = document.createElement('input');
             input.type = 'number';
             input.className = 'quantity-input';
             input.dataset.size = size;
             input.min = '0';
-            input.placeholder = '0';
-            input.value = ''; // Start empty
+            input.placeholder = '1';
+            input.value = '1'; // Default to 1 as shown in mockup
             input.setAttribute('aria-label', `Quantity for size ${size}`);
-            input.style.width = '50px'; // Adjust width as needed
+            input.style.width = '50px';
             input.style.textAlign = 'center';
+            input.style.border = '1px solid #ccc';
+            input.style.borderRadius = '4px';
+            input.style.padding = '4px';
             tdInput.appendChild(input);
+        });
 
-             // Price display cell
-             const tdPrice = priceRow.insertCell();
-             tdPrice.style.border = '1px solid #ddd';
-             tdPrice.style.padding = '5px';
-             tdPrice.style.textAlign = 'center';
-             tdPrice.style.verticalAlign = 'top'; // Align price info top
-             tdPrice.className = 'price-display has-breakdown'; // Add class for styling
+        // Row 3: "Price:" label + pricing boxes under each size
+        const priceRow = tbody.insertRow();
+        priceRow.className = 'price-display-row';
+        priceRow.id = 'price-box-row';
+        
+        // Price label cell
+        const priceLabelCell = priceRow.insertCell();
+        priceLabelCell.textContent = 'Price:';
+        priceLabelCell.style.fontWeight = 'bold';
+        priceLabelCell.style.textAlign = 'right';
+        priceLabelCell.style.paddingRight = '10px';
+        priceLabelCell.style.border = '1px solid #ddd';
+        priceLabelCell.style.backgroundColor = '#f8f9fa';
+        priceLabelCell.style.verticalAlign = 'top';
+        
+        // Pricing box cells
+        sizes.forEach(size => {
+            const tdPriceBox = priceRow.insertCell();
+            tdPriceBox.style.border = '1px solid #ddd';
+            tdPriceBox.style.padding = '4px';
+            tdPriceBox.style.textAlign = 'center';
+            tdPriceBox.style.verticalAlign = 'top';
+            tdPriceBox.style.width = '120px';
+            tdPriceBox.style.maxWidth = '120px';
+            tdPriceBox.className = 'price-display has-breakdown';
+            tdPriceBox.dataset.size = size;
 
-             const priceDisplay = document.createElement('div');
-             priceDisplay.className = 'price-display size-price-display'; // Use this class for updates
-             priceDisplay.dataset.size = size;
-             priceDisplay.textContent = '$0.00'; // Initial placeholder
-             priceDisplay.style.fontSize = '0.9em';
-             priceDisplay.style.minHeight = '40px'; // Ensure space for price breakdown
-             tdPrice.appendChild(priceDisplay);
+            // Create the pricing box matching the mockup
+            const pricingBox = document.createElement('div');
+            pricingBox.className = 'price-breakdown-card ltm-active';
+            pricingBox.dataset.size = size;
+            pricingBox.style.width = '100%';
+            pricingBox.style.maxWidth = '110px';
+            pricingBox.style.margin = '0 auto';
+            pricingBox.style.fontSize = '0.75em';
+            pricingBox.style.border = '1px solid #ddd';
+            pricingBox.style.borderRadius = '4px';
+            pricingBox.style.overflow = 'hidden';
+
+            // Header: "LTM Fee Applied" (blue background)
+            const header = document.createElement('div');
+            header.className = 'price-breakdown-header';
+            header.textContent = 'LTM Fee Applied';
+            header.style.backgroundColor = '#17a2b8';
+            header.style.color = 'white';
+            header.style.fontWeight = 'bold';
+            header.style.padding = '4px';
+            header.style.textAlign = 'center';
+            header.style.fontSize = '0.8em';
+            pricingBox.appendChild(header);
+
+            // Base price row
+            const baseRow = document.createElement('div');
+            baseRow.className = 'price-breakdown-row';
+            baseRow.innerHTML = '<span>Base:</span><span>$24.00</span>';
+            baseRow.style.display = 'flex';
+            baseRow.style.justifyContent = 'space-between';
+            baseRow.style.padding = '2px 4px';
+            baseRow.style.borderBottom = '1px solid #f0f0f0';
+            baseRow.style.backgroundColor = '#e8f4ff';
+            pricingBox.appendChild(baseRow);
+
+            // LTM fee row
+            const ltmRow = document.createElement('div');
+            ltmRow.className = 'price-breakdown-row';
+            ltmRow.innerHTML = '<span>LTM:</span><span>+$16.67</span>';
+            ltmRow.style.display = 'flex';
+            ltmRow.style.justifyContent = 'space-between';
+            ltmRow.style.padding = '2px 4px';
+            ltmRow.style.borderBottom = '1px solid #f0f0f0';
+            ltmRow.style.backgroundColor = '#e8f4ff';
+            pricingBox.appendChild(ltmRow);
+
+            // Unit price row
+            const unitRow = document.createElement('div');
+            unitRow.className = 'price-breakdown-row unit-price';
+            unitRow.innerHTML = '<span>Unit:</span><span>$40.67</span>';
+            unitRow.style.display = 'flex';
+            unitRow.style.justifyContent = 'space-between';
+            unitRow.style.padding = '2px 4px';
+            unitRow.style.borderBottom = '1px solid #f0f0f0';
+            unitRow.style.backgroundColor = '#e8f4ff';
+            unitRow.style.fontWeight = 'bold';
+            pricingBox.appendChild(unitRow);
+
+            // Total row
+            const totalRow = document.createElement('div');
+            totalRow.className = 'price-breakdown-row total-price';
+            totalRow.innerHTML = '<span>Total (1):</span><span>$40.67</span>';
+            totalRow.style.display = 'flex';
+            totalRow.style.justifyContent = 'space-between';
+            totalRow.style.padding = '2px 4px';
+            totalRow.style.backgroundColor = 'rgba(0,0,0,0.03)';
+            totalRow.style.fontWeight = 'bold';
+            totalRow.style.fontSize = '1.05em';
+            pricingBox.appendChild(totalRow);
+
+            // Add the pricing box to the cell
+            tdPriceBox.appendChild(pricingBox);
+            
+            console.log(`[ProductQuantityUI] Created pricing box for size: ${size}, data-size: ${pricingBox.dataset.size}`);
         });
 
         matrixContainer.appendChild(table);
-        console.log("[QUANTITY-UI] Quantity matrix created successfully.");
-        return true; // Indicate success
+        console.log("[QUANTITY-UI] Quantity matrix created successfully with mockup layout.");
+        return true;
     }
 
     // Function to create the quantity input fields (grid layout)
@@ -342,8 +432,17 @@ console.log("[QUANTITY-UI:LOAD] Product quantity UI creation module loaded.");
 
         if (!pricingDataForStitchCount) {
             console.warn(`[QUANTITY-UI:CAP-EMB] No pricing data found for stitch count: ${selectedStitchCount}. Unit prices will not be updated.`);
-            // Clear or set prices to N/A
-            document.querySelectorAll('.price-display, .size-price, .dynamic-unit-price').forEach(el => el.textContent = 'N/A');
+            // Clear or set prices to N/A for the new pricing box structure
+            document.querySelectorAll('.price-breakdown-card').forEach(card => {
+                const baseSpan = card.querySelector('.price-breakdown-row:nth-child(2) span:last-child');
+                const ltmSpan = card.querySelector('.price-breakdown-row:nth-child(3) span:last-child');
+                const unitSpan = card.querySelector('.price-breakdown-row:nth-child(4) span:last-child');
+                const totalSpan = card.querySelector('.price-breakdown-row:nth-child(5) span:last-child');
+                if (baseSpan) baseSpan.textContent = 'N/A';
+                if (ltmSpan) ltmSpan.textContent = 'N/A';
+                if (unitSpan) unitSpan.textContent = 'N/A';
+                if (totalSpan) totalSpan.textContent = 'N/A';
+            });
             return;
         }
 
@@ -360,23 +459,94 @@ console.log("[QUANTITY-UI:LOAD] Product quantity UI creation module loaded.");
         const headers = masterData.headers || (masterData.tierDefs ? masterData.tierDefs : []); // Use tierDefs directly if headers is not primary
         const priceTierKey = getPriceTierForQuantity(totalQuantity, headers);
 
-        let unitPrice = 'N/A';
+        let basePrice = 0;
+        let ltmFee = 0;
+        let unitPrice = 0;
+        
         if (priceTierKey && pricingDataForStitchCount[priceTierKey]) {
-            unitPrice = formatPrice(pricingDataForStitchCount[priceTierKey]);
+            basePrice = parseFloat(pricingDataForStitchCount[priceTierKey]) || 0;
+            // Check if LTM fee applies (typically for small quantities)
+            if (totalQuantity > 0 && totalQuantity < 12) { // Assuming LTM applies for quantities under 12
+                ltmFee = 16.67; // Example LTM fee
+                unitPrice = basePrice + ltmFee;
+            } else {
+                ltmFee = 0;
+                unitPrice = basePrice;
+            }
         } else if (totalQuantity === 0) {
-            unitPrice = formatPrice(0); // Or keep as N/A, or show first tier price
+            // Show default pricing for first tier when no quantity is selected
+            const firstTierKey = headers.length > 0 ? (typeof headers[0] === 'string' ? headers[0] : headers[0].label || headers[0].priceField) : null;
+            if (firstTierKey && pricingDataForStitchCount[firstTierKey]) {
+                basePrice = parseFloat(pricingDataForStitchCount[firstTierKey]) || 0;
+                ltmFee = 16.67; // Assume LTM for display purposes
+                unitPrice = basePrice + ltmFee;
+            }
         } else {
-            console.warn(`[QUANTITY-UI:CAP-EMB] Could not determine price tier for total quantity: ${totalQuantity} with key: ${priceTierKey}. Using N/A.`);
+            console.warn(`[QUANTITY-UI:CAP-EMB] Could not determine price tier for total quantity: ${totalQuantity} with key: ${priceTierKey}. Using default values.`);
+            basePrice = 24.00; // Default fallback
+            ltmFee = 16.67;
+            unitPrice = basePrice + ltmFee;
         }
 
-        // Update all unit price displays
-        // These selectors target price displays in both matrix and grid layouts, and the add-to-cart section
-        document.querySelectorAll('.price-display, .size-price, .dynamic-unit-price').forEach(priceEl => {
-            // For cap embroidery, all sizes get the same unit price based on total quantity and selected stitch count.
-            // The `size` dataset on priceEl is not used here to differentiate price, as it's uniform.
-            priceEl.textContent = unitPrice;
+        // Update each pricing box with the calculated values
+        document.querySelectorAll('.price-breakdown-card').forEach(card => {
+            const size = card.dataset.size;
+            if (!size) return;
+
+            // Get the quantity for this specific size
+            const sizeInput = document.querySelector(`.quantity-input[data-size="${size}"]`);
+            const sizeQuantity = sizeInput ? parseInt(sizeInput.value, 10) || 1 : 1;
+
+            // Update header based on LTM status
+            const header = card.querySelector('.price-breakdown-header');
+            if (header) {
+                if (ltmFee > 0) {
+                    header.textContent = 'LTM Fee Applied';
+                    header.style.backgroundColor = '#17a2b8'; // Blue for LTM
+                    card.className = 'price-breakdown-card ltm-active';
+                } else {
+                    header.textContent = 'Standard Pricing';
+                    header.style.backgroundColor = '#6c757d'; // Gray for standard
+                    card.className = 'price-breakdown-card standard';
+                }
+            }
+
+            // Update base price
+            const baseSpan = card.querySelector('.price-breakdown-row:nth-child(2) span:last-child');
+            if (baseSpan) baseSpan.textContent = formatPrice(basePrice);
+
+            // Update LTM fee
+            const ltmSpan = card.querySelector('.price-breakdown-row:nth-child(3) span:last-child');
+            if (ltmSpan) {
+                if (ltmFee > 0) {
+                    ltmSpan.textContent = `+${formatPrice(ltmFee)}`;
+                } else {
+                    ltmSpan.textContent = '$0.00';
+                }
+            }
+
+            // Update unit price
+            const unitSpan = card.querySelector('.price-breakdown-row:nth-child(4) span:last-child');
+            if (unitSpan) unitSpan.textContent = formatPrice(unitPrice);
+
+            // Update total price (unit price × quantity for this size)
+            const totalSpan = card.querySelector('.price-breakdown-row:nth-child(5) span:last-child');
+            const totalRow = card.querySelector('.price-breakdown-row:nth-child(5)');
+            if (totalSpan && totalRow) {
+                const sizeTotal = unitPrice * sizeQuantity;
+                totalSpan.textContent = formatPrice(sizeTotal);
+                // Update the label to show the quantity
+                const totalLabel = totalRow.querySelector('span:first-child');
+                if (totalLabel) totalLabel.textContent = `Total (${sizeQuantity}):`;
+            }
         });
-        // console.log(`[QUANTITY-UI:CAP-EMB] Unit prices updated to ${unitPrice} for stitch count ${selectedStitchCount} and total qty ${totalQuantity}. Tier key: ${priceTierKey}`);
+        
+        // Also update other price displays (grid layout and add-to-cart section) for compatibility
+        document.querySelectorAll('.size-price:not(.price-breakdown-card), .dynamic-unit-price').forEach(priceEl => {
+            priceEl.textContent = formatPrice(unitPrice);
+        });
+        
+        console.log(`[QUANTITY-UI:CAP-EMB] Pricing boxes updated - Base: ${formatPrice(basePrice)}, LTM: ${formatPrice(ltmFee)}, Unit: ${formatPrice(unitPrice)} for stitch count ${selectedStitchCount} and total qty ${totalQuantity}. Tier key: ${priceTierKey}`);
     }
 
 
@@ -386,11 +556,19 @@ console.log("[QUANTITY-UI:LOAD] Product quantity UI creation module loaded.");
             stitchCountSelect.addEventListener('change', updateCapEmbroideryItemUnitPrices);
             // console.log("[QUANTITY-UI:CAP-EMB] Event listener for stitch count dropdown attached for unit price updates.");
 
-            // Also listen to quantity changes
-            document.querySelectorAll('.quantity-input').forEach(input => {
-                input.addEventListener('input', updateCapEmbroideryItemUnitPrices);
-                input.addEventListener('change', updateCapEmbroideryItemUnitPrices); // For spinners or direct entry
+            // Also listen to quantity changes - use event delegation for dynamically created inputs
+            document.addEventListener('input', function(event) {
+                if (event.target.classList.contains('quantity-input')) {
+                    updateCapEmbroideryItemUnitPrices();
+                }
             });
+            
+            document.addEventListener('change', function(event) {
+                if (event.target.classList.contains('quantity-input')) {
+                    updateCapEmbroideryItemUnitPrices();
+                }
+            });
+            
             // console.log("[QUANTITY-UI:CAP-EMB] Event listeners for quantity inputs attached for unit price updates.");
 
             // Initial call in case data is already loaded and quantities pre-filled

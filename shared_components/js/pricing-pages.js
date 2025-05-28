@@ -721,7 +721,22 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // --- UI Update Functions (Consolidated) ---
 
     function updatePriceDisplayForSize(size, quantity, unitPrice, displayPrice, itemTotal, ltmFeeApplies, ltmFeePerItem, combinedQuantity, ltmFee, hasBackLogo, backLogoPerItem, frontStitchCount) {
-        const matrixPriceDisplay = document.querySelector(`#quantity-matrix .price-display[data-size="${size}"]`);
+        // Try multiple selectors to find the correct price display cell for this size
+        // First try the new pricing box row structure
+        let matrixPriceDisplay = document.querySelector(`#price-box-row .price-display[data-size="${size}"]`);
+        
+        // If not found, try alternative selectors for backward compatibility
+        if (!matrixPriceDisplay) {
+            matrixPriceDisplay = document.querySelector(`#quantity-matrix .price-display[data-size="${size}"]`);
+        }
+        if (!matrixPriceDisplay) {
+            matrixPriceDisplay = document.querySelector(`.quantity-input-table .price-display[data-size="${size}"]`);
+        }
+        if (!matrixPriceDisplay) {
+            matrixPriceDisplay = document.querySelector(`[data-size="${size}"].price-display`);
+        }
+        
+        console.log(`[updatePriceDisplayForSize] Looking for price display for size: ${size}, found:`, matrixPriceDisplay);
         const formattedFrontStitchCount = frontStitchCount ? ` (${parseInt(frontStitchCount).toLocaleString()} st)` : '';
 
         if (matrixPriceDisplay) {
@@ -756,42 +771,48 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
                 if (ltmFeeApplies) {
                     const actualItemTotal = actualDisplayPrice * quantity;
                     
+                    // Modified to make the card more compact and fit within column
                     cardHtml = `
-                        <div class="price-breakdown-card ltm-active">
-                            <div class="price-breakdown-header">LTM Fee Applied</div>
-                            <div class="price-breakdown-row"><span>Base${formattedFrontStitchCount}:</span> <span>$${unitPrice.toFixed(2)}</span></div>`;
+                        <div class="price-breakdown-card ltm-active" style="width:100%; max-width:140px; display:flex; flex-direction:column; margin:0 auto;">
+                            <div class="price-breakdown-header" style="text-align:center; font-size:0.8em; padding:2px 4px;">LTM Fee Applied</div>
+                            <div style="padding:3px 6px;">
+                                <div class="price-breakdown-row" style="padding:1px 0; font-size:0.75em;"><span>Base${formattedFrontStitchCount}:</span> <span>$${unitPrice.toFixed(2)}</span></div>`;
                     
                     if (ltmFeePerItem > 0) {
-                        cardHtml += `<div class="price-breakdown-row"><span>LTM:</span> <span>+$${ltmFeePerItem.toFixed(2)}</span></div>`;
+                        cardHtml += `<div class="price-breakdown-row" style="padding:1px 0; font-size:0.75em;"><span>LTM:</span> <span>+$${ltmFeePerItem.toFixed(2)}</span></div>`;
                     }
                     
                     if (hasBackLogo) {
                         const backLogoStitchCount = window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.getStitchCount ? window.CapEmbroideryBackLogo.getStitchCount() : '';
                         const formattedBackStitchCount = backLogoStitchCount ? ` (${parseInt(backLogoStitchCount).toLocaleString()} st)` : '';
-                        cardHtml += `<div class="price-breakdown-row"><span>Back Logo${formattedBackStitchCount}:</span> <span>+$${backLogoPerItem.toFixed(2)}</span></div>`;
+                        cardHtml += `<div class="price-breakdown-row" style="padding:1px 0; font-size:0.75em;"><span>Back Logo${formattedBackStitchCount}:</span> <span>+$${backLogoPerItem.toFixed(2)}</span></div>`;
                     }
                     
                     cardHtml += `
-                            <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${actualDisplayPrice.toFixed(2)}</span></div>
-                            <div class="price-breakdown-row total-price"><span>Total (${quantity}):</span> <span>$${actualItemTotal.toFixed(2)}</span></div>
+                                <div class="price-breakdown-row unit-price" style="padding:1px 0; font-size:0.8em; font-weight:bold;"><span>Unit:</span> <span>$${actualDisplayPrice.toFixed(2)}</span></div>
+                                <div class="price-breakdown-row total-price" style="padding:1px 0; font-size:0.8em; font-weight:bold; border-top:1px solid #ddd; margin-top:2px; padding-top:2px;"><span>Total (${quantity}):</span> <span>$${actualItemTotal.toFixed(2)}</span></div>
+                            </div>
                         </div>`;
                 } else {
                     const actualItemTotal = actualDisplayPrice * quantity;
                     
+                    // Modified to make the card more compact and fit within column
                     cardHtml = `
-                        <div class="price-breakdown-card standard">
-                            <div class="price-breakdown-header">Standard Price</div>
-                            <div class="price-breakdown-row"><span>Base${formattedFrontStitchCount}:</span> <span>$${unitPrice.toFixed(2)}</span></div>`;
+                        <div class="price-breakdown-card standard" style="width:100%; max-width:140px; display:flex; flex-direction:column; margin:0 auto;">
+                            <div class="price-breakdown-header" style="text-align:center; font-size:0.8em; padding:2px 4px;">Standard Price</div>
+                            <div style="padding:3px 6px;">
+                                <div class="price-breakdown-row" style="padding:1px 0; font-size:0.75em;"><span>Base${formattedFrontStitchCount}:</span> <span>$${unitPrice.toFixed(2)}</span></div>`;
                     
                     if (hasBackLogo) {
                         const backLogoStitchCount = window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.getStitchCount ? window.CapEmbroideryBackLogo.getStitchCount() : '';
                         const formattedBackStitchCount = backLogoStitchCount ? ` (${parseInt(backLogoStitchCount).toLocaleString()} st)` : '';
-                        cardHtml += `<div class="price-breakdown-row"><span>Back Logo${formattedBackStitchCount}:</span> <span>+$${backLogoPerItem.toFixed(2)}</span></div>`;
+                        cardHtml += `<div class="price-breakdown-row" style="padding:1px 0; font-size:0.75em;"><span>Back Logo${formattedBackStitchCount}:</span> <span>+$${backLogoPerItem.toFixed(2)}</span></div>`;
                     }
                     
                     cardHtml += `
-                            <div class="price-breakdown-row unit-price"><span>Unit:</span> <span>$${actualDisplayPrice.toFixed(2)}</span></div>
-                            <div class="price-breakdown-row total-price"><span>Total (${quantity}):</span> <span>$${actualItemTotal.toFixed(2)}</span></div>
+                                <div class="price-breakdown-row unit-price" style="padding:1px 0; font-size:0.8em; font-weight:bold;"><span>Unit:</span> <span>$${actualDisplayPrice.toFixed(2)}</span></div>
+                                <div class="price-breakdown-row total-price" style="padding:1px 0; font-size:0.8em; font-weight:bold; border-top:1px solid #ddd; margin-top:2px; padding-top:2px;"><span>Total (${quantity}):</span> <span>$${actualItemTotal.toFixed(2)}</span></div>
+                            </div>
                         </div>`;
                 }
                 matrixPriceDisplay.innerHTML = cardHtml;

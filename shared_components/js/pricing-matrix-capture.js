@@ -195,7 +195,9 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
                     headers,
                     prices,
                     tierData,
-                    uniqueSizes: [...new Set(headers.filter(h => !h.includes('-') && !h.includes('/')))],
+                    uniqueSizes: embType === 'cap-embroidery'
+                        ? [...new Set(headers)] // For cap embroidery, use headers directly without filtering slashes
+                        : [...new Set(headers.filter(h => !h.includes('-') && !h.includes('/')))],
                     capturedAt: new Date().toISOString(),
                     fromMasterData: true,
                     currentStitchCount: selectedStitchCount
@@ -280,7 +282,9 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
             window.nwcaPricingData = {
                 styleNumber, color: colorCode, embellishmentType: embType,
                 headers, prices: priceMatrix, tierData,
-                uniqueSizes: [...new Set(headers.filter(h => !h.includes('-') && !h.includes('/')))],
+                uniqueSizes: embType === 'cap-embroidery'
+                    ? [...new Set(headers)] // For cap embroidery, use headers directly without filtering slashes
+                    : [...new Set(headers.filter(h => !h.includes('-') && !h.includes('/')))],
                 capturedAt: new Date().toISOString()
             };
 
