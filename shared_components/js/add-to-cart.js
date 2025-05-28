@@ -337,6 +337,20 @@
                 }
             }
             document.dispatchEvent(new Event('cartTotalUpdated'));
+
+            // Conditional styling for pricing boxes
+            const pricingBoxDivs = document.querySelectorAll('.price-display > div');
+            if (calculatedPricing && typeof calculatedPricing.ltmFeeApplies === 'boolean') {
+                const totalQuantityForStyling = newQuantityTotal + existingItemsOfCurrentType; // Use combined quantity for styling condition
+                if (totalQuantityForStyling >= 24 && calculatedPricing.ltmFeeApplies === false) {
+                    pricingBoxDivs.forEach(box => box.classList.add('pricing-box-no-ltm'));
+                } else {
+                    pricingBoxDivs.forEach(box => box.classList.remove('pricing-box-no-ltm'));
+                }
+            } else {
+                // Fallback or if calculatedPricing is not fully ready, ensure default style
+                pricingBoxDivs.forEach(box => box.classList.remove('pricing-box-no-ltm'));
+            }
             
             const addToCartButton = document.getElementById('add-to-cart-button');
             if (addToCartButton) {

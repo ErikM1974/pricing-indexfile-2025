@@ -1127,15 +1127,79 @@ h1 {
     margin-top: 5px;
     text-align: center;
     min-height: 20px; /* Adjust if needed */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9em; 
+    display: table-cell !important; /* Ensure it behaves as a table cell */
+    /* vertical-align: top; is handled by the general td rule or JS */
+    /* width and max-width are handled by JS inline styles */
+    font-size: 0.9em;
+    /* Removed align-items and justify-content as they are not applicable to table-cell */
 }
-.price-display .dynamic-unit-price { 
+.price-display .dynamic-unit-price {
     margin-left: 5px;
     font-weight: normal; /* Or bold if preferred */
     color: var(--text-color); /* Or var(--primary-color) */
+}
+/* Default Pricing Box Styles (Universal) */
+td.price-display > div { /* This is the main container for one price box */
+    border: 1px solid #ced4da;      /* Softer border */
+    border-radius: 0.375rem;        /* Bootstrap-like rounded corners (6px) */
+    overflow: hidden;
+    margin: 5px auto;               /* Some spacing around, centered if td allows */
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow */
+    background-color: #f8f9fa;      /* Light background for the box frame, rows will be white */
+    max-width: 230px;               /* Control width */
+    min-height: 100px;              /* Ensure some minimum height */
+    padding: 0;                     /* Reset padding, children will define */
+    display: flex;                  /* Use flex for internal layout */
+    flex-direction: column;
+    text-align: left;               /* Default text align for content */
+}
+
+/* Default Header within the pricing box */
+td.price-display > div > div:first-child {
+    background-color: #6c757d;      /* Muted Grey/Blue (Bootstrap secondary) */
+    color: white;
+    font-weight: bold;
+    padding: 0.5rem 0.75rem;        /* 8px 12px */
+    text-align: center;
+    border-bottom: 1px solid #5a6268; /* Darker shade for separation */
+}
+
+/* Default Rows within the pricing box */
+td.price-display > div > div:not(:first-child) {
+    background-color: white;        /* Rows are white */
+    color: #212529;                 /* Dark text for rows */
+    padding: 0.375rem 0.75rem;      /* 6px 12px */
+    border-bottom: 1px solid #e9ecef; /* Light separator for rows */
+    /* display: flex; /* REMOVED - let content flow naturally or be styled by more specific rules */
+    /* justify-content: space-between; /* REMOVED */
+    /* align-items: center; /* REMOVED */
+    font-size: 0.875em;             /* Slightly smaller font for row content */
+    line-height: 1.4;               /* Added for better readability of multi-line content */
+}
+
+/* IF a row *specifically* uses the span > span structure for label/value, style it */
+td.price-display > div > div:not(:first-child) > span:first-child + span:last-child {
+    /* This selector targets rows that have exactly two spans, implying label/value */
+    /* Re-apply flex for these specific cases if needed, or assume they are inline-block and will space out */
+    /* For now, let's assume the spans themselves will handle their layout or are simple enough. */
+    /* If they still need to be on one line and spaced, add: */
+    /* display: flex; justify-content: space-between; align-items: center; width: 100%; */
+}
+
+
+/* Remove border from the very last data row */
+td.price-display > div > div:last-of-type {
+    border-bottom: none;
+}
+
+/* Styling for label and value spans within rows (if structure is span:span) */
+td.price-display > div > div:not(:first-child) > span:first-child {
+    color: #495057;                 /* Grey for label text */
+    margin-right: 0.5rem;
+}
+
+td.price-display > div > div:not(:first-child) > span:last-child {
+    font-weight: 600;               /* Bolder for value */
 }
 
 /* Ensure .product-header in the context column is styled appropriately */
@@ -1172,3 +1236,35 @@ h1 {
     cursor: pointer;
     /* Add other styling as needed */
 }
+
+/* Container for the quantity-price table grid */
+#size-quantity-grid-container {
+    display: block !important; /* Override any inherited flex/grid that might be causing issues */
+    width: 100% !important;   /* Ensure it takes full available width of its parent */
+    box-sizing: border-box;
+}
+
+/* Styles for quantity-price-table to ensure proper column layout */
+table.quantity-price-table {
+    display: table !important; /* Explicitly set to table to override other display types */
+    width: 100%; /* Encourage table to use available width of its container */
+    border-collapse: collapse; /* Standard good practice for tables */
+    table-layout: auto; /* Allow browser to distribute column widths based on content */
+}
+
+table.quantity-price-table > tbody > tr > td {
+    padding: 5px; /* Adjust for "nicely spaced" */
+    vertical-align: top;
+    /* text-align: left; */ /* Or 'center' if preferred for all cells by default */
+}
+/* Conditional Green Styling - Applied when LTM is NOT applicable and qty >= 24 */
+/* This class is added to the main div inside td.price-display */
+td.price-display > div.pricing-box-no-ltm > div:first-child { /* Target only the header of the green box */
+    background-color: var(--secondary-color) !important; /* #5cb85c - Standard Green */
+    color: white !important;
+    border-bottom: 1px solid #4a9d4a !important; /* Slightly darker green for separation */
+}
+
+/* Rows within the green box will inherit default styling from: */
+/* td.price-display > div > div:not(:first-child) */
+/* No need to repeat row styling unless specific overrides for green box rows are needed. */
