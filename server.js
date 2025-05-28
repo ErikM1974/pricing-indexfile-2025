@@ -30,12 +30,12 @@ app.use(compression());
 
 // Set proper cache headers for static assets
 app.use(express.static(__dirname, {
-  maxAge: '1d', // Cache static assets for 1 day
+  maxAge: '0', // Don't cache static assets
   setHeaders: (res, path) => {
-    // Don't cache HTML files
-    if (path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache');
-    }
+    // Set no-cache for all files to ensure changes are immediately visible
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
   }
 }));
 
