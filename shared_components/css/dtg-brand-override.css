@@ -1,0 +1,276 @@
+/* DTG Brand Color Override - Replace all blue with Northwest Custom Apparel green */
+/* This file is specific to DTG page to avoid affecting other pages */
+
+/* Force brand colors everywhere - using !important to override any existing styles */
+:root {
+    --primary-color: #2e5827 !important;    /* Forest Green */
+    --primary-dark: #1e3d1a !important;     /* Dark Forest */
+    --primary-light: #4a7c40 !important;    /* Light Forest */
+    --primary-extralight: #e8f5e6 !important; /* Very light green for backgrounds */
+    
+    /* Override any blue variables */
+    --bs-blue: #2e5827 !important;
+    --blue: #2e5827 !important;
+    --info: #2e5827 !important;
+    --bs-primary: #2e5827 !important;
+}
+
+/* Pricing tabs */
+.pricing-tab.active {
+    color: var(--primary-color) !important;
+    border-bottom-color: var(--primary-color) !important;
+}
+
+.pricing-tab:hover {
+    color: var(--primary-dark) !important;
+}
+
+/* Buttons */
+.btn-primary,
+.add-to-cart-button {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+.btn-primary:hover,
+.add-to-cart-button:hover {
+    background-color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+}
+
+.btn-primary:focus,
+.add-to-cart-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(46, 88, 39, 0.25) !important;
+}
+
+/* Color swatches */
+.color-swatch.active {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.25) !important;
+}
+
+.color-swatch:hover {
+    border-color: var(--primary-color) !important;
+}
+
+/* Links */
+a {
+    color: var(--primary-color) !important;
+}
+
+a:hover {
+    color: var(--primary-dark) !important;
+}
+
+/* Selected color indicator */
+.selected-color-indicator {
+    background-color: var(--primary-extralight) !important;
+    border-left-color: var(--primary-color) !important;
+}
+
+/* Mini color swatch */
+.mini-color-swatch.active-swatch {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px var(--primary-light) !important;
+}
+
+/* Pricing grid active tier */
+.active-tier-highlight {
+    background-color: var(--primary-light) !important;
+    color: var(--primary-color) !important;
+}
+
+/* Current pricing level highlight */
+#custom-pricing-grid tbody tr.current-pricing-level-highlight td {
+    background-color: var(--primary-extralight) !important;
+}
+
+#custom-pricing-grid tbody tr.current-pricing-level-highlight td:first-child {
+    color: var(--primary-dark) !important;
+}
+
+/* Loading states */
+.loading-spinner {
+    border-top-color: var(--primary-color) !important;
+}
+
+/* Form controls */
+.form-control:focus,
+.quantity-input:focus,
+select:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(46, 88, 39, 0.25) !important;
+}
+
+/* Quantity buttons */
+.quantity-btn:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+/* Price displays */
+.price-display,
+.total-price,
+.dynamic-unit-price {
+    color: var(--primary-color) !important;
+}
+
+/* Cart summary */
+.cart-summary {
+    background-color: var(--primary-extralight) !important;
+    border-left-color: var(--primary-color) !important;
+}
+
+/* LTM fee notice - use green theme */
+.ltm-fee-notice {
+    background-color: #e8f5e6 !important; /* Light green background */
+    border-left-color: #2e5827 !important; /* Green border */
+}
+
+/* Fix blue colors in LTM notice */
+.ltm-fee-notice .ltm-icon {
+    color: #1e3d1a !important; /* Dark green for icon */
+}
+
+.ltm-fee-notice .ltm-text,
+.ltm-fee-notice span {
+    color: #1e3d1a !important; /* Dark green for text */
+}
+
+/* Override specific blue hex colors that might appear */
+[style*="#17a2b8"] {
+    background-color: #2e5827 !important;
+}
+
+[style*="#004085"] {
+    color: #1e3d1a !important;
+}
+
+[style*="#b8daff"] {
+    border-color: #4a7c40 !important;
+}
+
+[style*="#e8f4ff"] {
+    background-color: #e8f5e6 !important;
+}
+
+/* Tier progress */
+.tier-dot.active {
+    background-color: var(--primary-color) !important;
+}
+
+.tier-progress-fill {
+    background-color: var(--primary-color) !important;
+}
+
+/* Section titles */
+.section-title {
+    color: var(--primary-color) !important;
+}
+
+/* Back to product link */
+.back-to-product {
+    color: var(--primary-color) !important;
+}
+
+.back-to-product:hover {
+    color: var(--primary-dark) !important;
+}
+
+/* Pricing header */
+.pricing-header {
+    border-bottom-color: var(--primary-light) !important;
+}
+
+/* Table headers */
+#custom-pricing-grid th {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+/* Override Bootstrap blue classes if they exist */
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.border-primary {
+    border-color: var(--primary-color) !important;
+}
+
+/* Alert styles */
+.alert-primary {
+    background-color: var(--primary-extralight) !important;
+    border-color: var(--primary-light) !important;
+    color: var(--primary-dark) !important;
+}
+
+/* Badge styles */
+.badge-primary {
+    background-color: var(--primary-color) !important;
+}
+
+/* Progress bars */
+.progress-bar {
+    background-color: var(--primary-color) !important;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color) !important;
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--primary-extralight) !important;
+}
+
+/* Tooltip styles */
+.tooltip-icon {
+    background-color: var(--primary-color) !important;
+}
+
+/* Dropdown menus */
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: var(--primary-extralight) !important;
+    color: var(--primary-dark) !important;
+}
+
+/* Print location selector */
+#parent-dtg-location-select {
+    border-color: #ccc !important;
+}
+
+#parent-dtg-location-select:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(46, 88, 39, 0.25) !important;
+}
+
+/* Override any inline styles that might have blue */
+[style*="color: blue"],
+[style*="color:#0000ff"],
+[style*="color: #0000ff"],
+[style*="color:rgb(0,0,255)"],
+[style*="color: rgb(0, 0, 255)"] {
+    color: var(--primary-color) !important;
+}
+
+[style*="background-color: blue"],
+[style*="background-color:#0000ff"],
+[style*="background-color: #0000ff"],
+[style*="background-color:rgb(0,0,255)"],
+[style*="background-color: rgb(0, 0, 255)"] {
+    background-color: var(--primary-color) !important;
+}
+
+[style*="border-color: blue"],
+[style*="border-color:#0000ff"],
+[style*="border-color: #0000ff"],
+[style*="border-color:rgb(0,0,255)"],
+[style*="border-color: rgb(0, 0, 255)"] {
+    border-color: var(--primary-color) !important;
+}

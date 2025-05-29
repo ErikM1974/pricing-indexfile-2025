@@ -252,6 +252,13 @@ h1 {
 .pricing-grid th:first-child {
     background-color: var(--primary-dark);
     text-align: left;
+    min-width: 100px;
+}
+
+/* Hide the first header if it's empty (no Quantity label) */
+.pricing-grid thead tr th:first-child:empty {
+    background-color: transparent;
+    border: none;
 }
 
 .pricing-grid td {
@@ -264,8 +271,37 @@ h1 {
 .pricing-grid td:first-child {
     text-align: left;
     font-weight: bold;
-    background-color: var(--primary-light);
+    background-color: #f8f9fa;
     color: var(--primary-dark);
+    border-right: 2px solid var(--primary-light);
+    position: relative;
+    padding-left: 20px;
+}
+
+/* Add a subtle gradient to quantity rows */
+.pricing-grid tbody tr {
+    transition: all 0.2s ease;
+}
+
+.pricing-grid tbody tr:hover {
+    background-color: rgba(46, 88, 39, 0.05);
+    transform: translateX(2px);
+}
+
+/* Style the price cells */
+.pricing-grid td:not(:first-child) {
+    font-weight: 600;
+    color: #2e5827;
+    font-size: 1.05em;
+}
+
+/* Fix for DTG pricing initial message visibility */
+#custom-pricing-grid td.initial-message {
+    background-color: #f8f9fa !important; /* Light gray background */
+    color: #333 !important; /* Dark text for contrast */
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
 }
 
 .pricing-grid tr:hover td {
@@ -1054,6 +1090,86 @@ h1 {
 }
 
 /* Additional Logo Checkbox */
+
+/* DTG Location Selector Enhancements */
+#parent-dtg-location-select {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+#parent-dtg-location-select:hover {
+    box-shadow: 0 0 8px rgba(46, 88, 39, 0.4) !important;
+    transform: translateY(-1px);
+}
+
+#parent-dtg-location-select:focus {
+    outline: 2px solid #2e5827;
+    outline-offset: 2px;
+}
+
+/* Location indicator in pricing header */
+.pricing-header .section-title span {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 2px 8px;
+    background-color: rgba(46, 88, 39, 0.1);
+    border-radius: 4px;
+    font-weight: normal;
+}
+
+/* Smooth transitions for loading states */
+#pricing-table-loading {
+    transition: opacity 0.3s ease;
+}
+
+#custom-pricing-grid {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    table-layout: fixed !important;
+    width: 100% !important;
+}
+
+/* Ensure consistent table layout */
+#custom-pricing-grid th,
+#custom-pricing-grid td {
+    text-align: center !important;
+    vertical-align: middle !important;
+    padding: 10px 8px !important;
+    white-space: nowrap !important;
+}
+
+/* First column (QTY) styling */
+#custom-pricing-grid th:first-child,
+#custom-pricing-grid td:first-child {
+    text-align: left !important;
+    font-weight: bold !important;
+    background-color: #f8f9fa !important;
+    min-width: 80px !important;
+}
+
+/* Size columns equal width */
+#custom-pricing-grid th:not(:first-child),
+#custom-pricing-grid td:not(:first-child) {
+    width: calc((100% - 80px) / 7) !important; /* 7 size columns */
+}
+
+/* Prevent layout shifts during updates */
+.pricing-grid-container {
+    min-height: 300px;
+    position: relative;
+}
+
+/* Ensure price cells maintain consistent height */
+#custom-pricing-grid td {
+    height: 45px !important;
+    line-height: 1.4 !important;
+}
+
+/* Fix for tier labels */
+#custom-pricing-grid tbody td:first-child {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
 #additional-logo-container { /* Assuming this ID for the container div for flex layout */
     display: flex; /* For aligning checkbox and label */
     align-items: center;

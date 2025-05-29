@@ -6,6 +6,7 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
 
     let dtgCaspioMessageTimeoutId = null;
     let dtgCaspioDataProcessed = false;  // Indicates if any valid message from Caspio was processed
+    let dtgProcessingMasterBundle = false; // Prevent duplicate processing
     window.dtgMasterPriceBundle = null; // To store the master bundle from Caspio
     window.currentSelectedPrintLocation = ""; // Useful for knowing the dropdown's state
 
@@ -106,9 +107,19 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
 
     async function displayPricingForSelectedLocation(locationCode) {
         console.log(`[ADAPTER:DTG] Displaying pricing for location: ${locationCode}`);
+        
+        // Show loading state immediately with smooth transition
+        showLoadingState();
+        
+        // Small delay to ensure loading state is visible
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         if (!window.dtgMasterPriceBundle || !window.dtgMasterPriceBundle.allLocationPrices) {
             console.error('[ADAPTER:DTG] Master bundle not available to display pricing.');
             displayError('Pricing data is not loaded. Please refresh.');
+            if (initialState) initialState.style.display = 'none';
+            if (loadingSpinner) loadingSpinner.style.display = 'none';
+            if (pricingGrid) pricingGrid.style.display = 'table';
             return;
         }
 
@@ -161,6 +172,34 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         } else {
             console.warn('[ADAPTER:DTG] DP5Helper.testListenerReach not found or not a function!');
         }
+        
+        // Hide loading spinner and initial state, show table with animation
+        const initState = document.getElementById('pricing-initial-state');
+        const spinner = document.getElementById('pricing-table-loading');
+        const grid = document.getElementById('custom-pricing-grid');
+        
+        if (initState) initState.style.display = 'none';
+        if (spinner) spinner.style.display = 'none';
+        if (grid) {
+            grid.style.display = 'table';
+            // Trigger animation
+            setTimeout(() => {
+                grid.style.opacity = '1';
+                grid.style.transform = 'translateY(0)';
+            }, 50);
+        }
+        
+        // Trigger price grouping after displaying pricing (only once per location change)
+        if (!window.dtgPriceGroupingScheduled) {
+            window.dtgPriceGroupingScheduled = true;
+            setTimeout(() => {
+                if (window.DTGPriceGroupingV4 && typeof window.DTGPriceGroupingV4.applyPriceGrouping === 'function') {
+                    console.log('[ADAPTER:DTG] Triggering price grouping after location data display');
+                    window.DTGPriceGroupingV4.applyPriceGrouping();
+                }
+                window.dtgPriceGroupingScheduled = false;
+            }, 2000); // Wait 2 seconds for table to fully render
+        }
 
         if (window.PricingMatrixCapture && typeof window.PricingMatrixCapture.stop === 'function') {
             window.PricingMatrixCapture.stop();
@@ -183,6 +222,12 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
 
     function handleCaspioMessage(event) {
         if (event.data && event.data.type === 'caspioDtgMasterBundleReady') {
+            // Prevent duplicate processing
+            if (dtgProcessingMasterBundle) {
+                console.log('[ADAPTER:DTG] Already processing master bundle, ignoring duplicate message');
+                return;
+            }
+            
             console.log('[ADAPTER:DTG] Received caspioDtgMasterBundleReady. Origin:', event.origin);
             const isExpectedOrigin = event.origin === EXPECTED_CASPIO_ORIGIN_1 ||
                                     event.origin === EXPECTED_CASPIO_ORIGIN_2 ||
@@ -195,11 +240,16 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
                     console.warn(`[ADAPTER:DTG] MasterBundle from unexpected origin (${event.origin}) but allowing in dev.`);
                 }
                 console.log(`[ADAPTER:DTG] Processing MasterBundle from origin: ${event.origin}`);
+                dtgProcessingMasterBundle = true;
                 processMasterBundle(event.data.detail);
+                // Reset flag after a delay to allow for legitimate new bundles
+                setTimeout(() => {
+                    dtgProcessingMasterBundle = false;
+                }, 1000);
             } else {
                 console.error('[ADAPTER:DTG] MasterBundle from UNEXPECTED origin. Ignoring. Origin:', event.origin);
             }
-            return; 
+            return;
         }
         // console.debug('[ADAPTER:DTG] Ignoring message of type:', event.data?.type);
     }
@@ -211,10 +261,10 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         window.addEventListener('message', handleCaspioMessage, false);
         console.log('[ADAPTER:DTG] Added window message listener for Caspio master bundle.');
         
-        setupParentLocationSelector(); 
+        setupParentLocationSelector();
 
-        dtgCaspioDataProcessed = false; 
-        resetDtgCaspioMessageTimeout(); 
+        dtgCaspioDataProcessed = false;
+        resetDtgCaspioMessageTimeout();
 
         const styleNumber = typeof NWCAUtils !== 'undefined' ? NWCAUtils.getUrlParameter('StyleNumber') : null;
         const colorName = (typeof NWCAUtils !== 'undefined' && NWCAUtils.getUrlParameter('COLOR')) ? decodeURIComponent(NWCAUtils.getUrlParameter('COLOR').replace(/\+/g, ' ')) : null;
@@ -227,6 +277,16 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         console.log(`[ADAPTER:DTG] DTG pricing context: Style: ${styleNumber || 'N/A'}, Color: ${colorName || 'N/A'}`);
         console.log(`[ADAPTER:DTG] Associated AppKey: ${DTG_APP_KEY}`);
         console.log("[ADAPTER:DTG] Waiting for 'caspioDtgMasterBundleReady' event from Caspio page...");
+        
+        // Show beautiful initial state
+        const initialState = document.getElementById('pricing-initial-state');
+        const dtgPricingGrid = document.getElementById('custom-pricing-grid');
+        const loadingSpinner = document.getElementById('pricing-table-loading');
+        
+        // Show initial state, hide others
+        if (initialState) initialState.style.display = 'block';
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
+        if (dtgPricingGrid) dtgPricingGrid.style.display = 'none';
     }
 
     window.DTGAdapter = {
@@ -236,7 +296,7 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         displayPricingForSelectedLocation: displayPricingForSelectedLocation
     };
     
-    const CASPIO_IFRAME_TIMEOUT_DURATION = 25000; 
+    const CASPIO_IFRAME_TIMEOUT_DURATION = 15000; // 15 seconds to allow for initial load
 
     function resetDtgCaspioMessageTimeout() {
         if (dtgCaspioMessageTimeoutId) {
@@ -260,15 +320,34 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
     function setupParentLocationSelector() {
         const parentLocationDropdown = document.getElementById('parent-dtg-location-select');
         if (parentLocationDropdown) {
-            window.currentSelectedPrintLocation = parentLocationDropdown.value; 
+            // Style the dropdown to make it more prominent
+            parentLocationDropdown.style.border = '2px solid #2e5827';
+            parentLocationDropdown.style.fontWeight = 'bold';
+            parentLocationDropdown.style.backgroundColor = '#f8f9fa';
+            parentLocationDropdown.style.padding = '10px';
+            parentLocationDropdown.style.fontSize = '1.1em';
+            
+            window.currentSelectedPrintLocation = parentLocationDropdown.value;
+            
+            // Add visual indicator for current selection
+            updateLocationIndicator(parentLocationDropdown.value);
 
             parentLocationDropdown.addEventListener('change', function() {
                 const selectedValue = this.value;
                 console.log('[ADAPTER:DTG] Parent location dropdown changed to:', selectedValue);
-                window.currentSelectedPrintLocation = selectedValue; 
+                window.currentSelectedPrintLocation = selectedValue;
+                
+                // Update visual indicator
+                updateLocationIndicator(selectedValue);
+                
+                // Show loading state immediately
+                showLoadingState();
 
-                if (window.dtgMasterPriceBundle) { 
-                    displayPricingForSelectedLocation(selectedValue);
+                if (window.dtgMasterPriceBundle) {
+                    // Add a small delay to show loading state
+                    setTimeout(() => {
+                        displayPricingForSelectedLocation(selectedValue);
+                    }, 300);
                 } else {
                     console.warn('[ADAPTER:DTG] Location changed, but master bundle not yet loaded.');
                     const dtgPricingGrid = document.getElementById('custom-pricing-grid');
@@ -283,6 +362,43 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
             console.log('[ADAPTER:DTG] Event listener added to parent-dtg-location-select.');
         } else {
             console.warn('[ADAPTER:DTG] parent-dtg-location-select dropdown not found.');
+        }
+    }
+    
+    function updateLocationIndicator(locationValue) {
+        // Update the pricing header to show selected location
+        const pricingHeader = document.querySelector('.pricing-header .section-title');
+        if (pricingHeader && locationValue) {
+            const locationText = document.querySelector(`#parent-dtg-location-select option[value="${locationValue}"]`)?.textContent || locationValue;
+            pricingHeader.innerHTML = `Detailed Pricing per Quantity Tier <span style="color: #2e5827; font-size: 0.9em;">(${locationText})</span>`;
+        }
+        
+        // Update dropdown visual state
+        const dropdown = document.getElementById('parent-dtg-location-select');
+        if (dropdown) {
+            dropdown.style.borderColor = '#2e5827';
+            dropdown.style.boxShadow = '0 0 5px rgba(46, 88, 39, 0.3)';
+        }
+    }
+    
+    function showLoadingState() {
+        const initialState = document.getElementById('pricing-initial-state');
+        const loadingSpinner = document.getElementById('pricing-table-loading');
+        const pricingGrid = document.getElementById('custom-pricing-grid');
+        
+        if (initialState) initialState.style.display = 'none';
+        if (loadingSpinner) {
+            loadingSpinner.style.display = 'block';
+            // Ensure spinner is visible with smooth transition
+            setTimeout(() => {
+                if (loadingSpinner) {
+                    loadingSpinner.style.opacity = '1';
+                }
+            }, 50);
+        }
+        if (pricingGrid) {
+            pricingGrid.style.opacity = '0';
+            pricingGrid.style.transform = 'translateY(10px)';
         }
     }
 

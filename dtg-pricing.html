@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DTG Pricing | NWCA</title>
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/dtg-brand-override.css">
 <!-- jsPDF Libraries for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -932,15 +933,51 @@
                             .mini-color-swatch.clickable:hover::after {
                                 opacity: 1;
                             }
-                        </style>
+                            
+                            /* Loading spinner animation */
+                            @keyframes spin {
+                                0% { transform: rotate(0deg); }
+                                100% { transform: rotate(360deg); }
+                            }
+                            
+                            /* Initial message styling */
+                            #custom-pricing-grid tbody tr.initial-message-row td {
+                                background-color: #f8f9fa !important;
+                                color: #333 !important;
+                                font-style: italic;
+                                padding: 30px;
+                                text-align: center;
+                                font-size: 1.1em;
+                            }
+                       </style>
                         
                         <div class="pricing-grid-container">
-                            <table class="pricing-grid" id="custom-pricing-grid">
+                            <!-- Beautiful initial state -->
+                            <div id="pricing-initial-state" style="text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                                <div style="background: white; display: inline-block; padding: 40px 60px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#2e5827" stroke-width="2" style="margin-bottom: 20px;">
+                                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                                        <path d="M12 8v4m0 4h.01"/>
+                                    </svg>
+                                    <h3 style="color: #2e5827; font-size: 1.5em; margin: 0 0 10px 0; font-weight: 600;">Select a Print Location</h3>
+                                    <p style="color: #666; margin: 0; font-size: 1.1em;">Choose your print location above to view custom pricing</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Loading spinner for pricing table -->
+                            <div id="pricing-table-loading" style="display: none; text-align: center; padding: 60px 20px;">
+                                <div style="position: relative; display: inline-block;">
+                                    <div style="width: 60px; height: 60px; border: 4px solid #e8f5e9; border-top: 4px solid #2e5827; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border: 3px solid #c8e6c9; border-top: 3px solid #4caf50; border-radius: 50%; animation: spin 1.5s linear infinite reverse;"></div>
+                                </div>
+                                <p style="margin-top: 25px; color: #2e5827; font-size: 1.2em; font-weight: 500;">Loading your custom pricing...</p>
+                            </div>
+                            
+                            <table class="pricing-grid" id="custom-pricing-grid" style="display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease;">
                                 <thead>
                                     <tr id="pricing-header-row">
-                                        <th>Quantity</th>
-                                        <!-- Size headers will be dynamically populated. JS needs to add data-tier-label to these THs. -->
-                                        <!-- Example: <th data-tier-label="1-23">1-23</th> -->
+                                        <!-- No more ugly "Quantity" header! -->
+                                        <!-- Size headers will be dynamically populated -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -950,7 +987,7 @@
                             
                             <!-- Added helpful pricing explanation -->
                             <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                                <p><strong>Note:</strong> Prices shown are per item and include an 8,000 stitch embroidered logo.</p>
+                                <p><strong>Note:</strong> Prices shown are per item and include a full-color DTG print on the selected location.</p>
                             </div>
                             
                             <!-- Pricing info tabs removed as per user request -->
@@ -1429,6 +1466,17 @@
                                 View Cart (<span class="cart-count-display">0</span>)
                             </button>
                         </div>
+                        
+                        <!-- Quote Actions -->
+                        <div class="quote-actions" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+                            <h4 style="margin-bottom: 10px; color: #2e5827;">Quote Options:</h4>
+                            <button class="btn btn-secondary" onclick="printQuote()" style="margin-right: 10px; background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                                📄 Print Quote
+                            </button>
+                            <button class="btn btn-secondary" onclick="emailQuote()" style="background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                                ✉️ Email Quote
+                            </button>
+                        </div>
                     </div>
                 </div> <!-- End .pricing-content-interactive -->
             </div> <!-- End .product-interactive-column -->
@@ -1448,6 +1496,9 @@
     <script src="/shared_components/js/add-to-cart.js"></script>
     <script src="/shared_components/js/pricing-calculator.js"></script>
     <script src="/shared_components/js/dtg-adapter.js"></script>
+    <!-- DISABLED: Price grouping was causing layout issues when switching locations -->
+    <!-- <script src="/shared_components/js/dtg-price-grouping-v4.js"></script> -->
+    <script src="/shared_components/js/dtg-quote.js"></script> <!-- Quote functionality -->
     <script src="/shared_components/js/product-pricing-ui.js"></script> <!-- Added new script, removed defer -->
     
 </body>

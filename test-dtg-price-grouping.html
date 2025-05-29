@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test DTG Price Grouping</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .pricing-grid {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        .pricing-grid th, .pricing-grid td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .pricing-grid th {
+            background-color: #2e5827;
+            color: white;
+        }
+        .pricing-grid tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>DTG Price Grouping Test</h1>
+    
+    <div class="controls">
+        <button onclick="loadTestData()">Load Test Data</button>
+        <button onclick="applyGrouping()">Apply Price Grouping</button>
+        <button onclick="resetTable()">Reset Table</button>
+    </div>
+    
+    <div id="status" class="status" style="display: none;"></div>
+    
+    <table class="pricing-grid" id="custom-pricing-grid">
+        <thead>
+            <tr id="pricing-header-row">
+                <th>Quantity</th>
+                <th>S</th>
+                <th>M</th>
+                <th>L</th>
+                <th>XL</th>
+                <th>2XL</th>
+                <th>3XL</th>
+                <th>4XL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>24-47</td>
+                <td>$17</td>
+                <td>$17</td>
+                <td>$17</td>
+                <td>$17</td>
+                <td>$19</td>
+                <td>$20</td>
+                <td>$21</td>
+            </tr>
+            <tr>
+                <td>48-71</td>
+                <td>$15</td>
+                <td>$15</td>
+                <td>$15</td>
+                <td>$15</td>
+                <td>$17</td>
+                <td>$18</td>
+                <td>$19</td>
+            </tr>
+            <tr>
+                <td>72+</td>
+                <td>$14.50</td>
+                <td>$14.50</td>
+                <td>$14.50</td>
+                <td>$14.50</td>
+                <td>$16.50</td>
+                <td>$17.50</td>
+                <td>$18.50</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h2>Debug Output</h2>
+    <pre id="debug-output"></pre>
+    
+    <script src="/shared_components/js/dtg-price-grouping-v3.js"></script>
+    <script>
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + (isError ? 'error' : 'success');
+            status.style.display = 'block';
+        }
+        
+        function updateDebug(message) {
+            const debug = document.getElementById('debug-output');
+            debug.textContent += message + '\n';
+        }
+        
+        function loadTestData() {
+            updateDebug('Test data already loaded in HTML');
+            showStatus('Test data loaded');
+        }
+        
+        function applyGrouping() {
+            updateDebug('\n=== Applying Price Grouping ===');
+            
+            if (window.DTGPriceGroupingV3) {
+                try {
+                    // First analyze the groups
+                    const groups = window.DTGPriceGroupingV3.analyzePriceGroups();
+                    updateDebug('Groups found: ' + JSON.stringify(groups, null, 2));
+                    
+                    // Then apply the grouping
+                    window.DTGPriceGroupingV3.applyPriceGrouping();
+                    showStatus('Price grouping applied successfully');
+                } catch (error) {
+                    updateDebug('Error: ' + error.message);
+                    showStatus('Error applying price grouping: ' + error.message, true);
+                }
+            } else {
+                updateDebug('DTGPriceGroupingV3 not found on window');
+                showStatus('Price grouping script not loaded', true);
+            }
+        }
+        
+        function resetTable() {
+            location.reload();
+        }
+        
+        // Monitor console logs
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            updateDebug('[LOG] ' + args.join(' '));
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            updateDebug('[WARN] ' + args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            updateDebug('[ERROR] ' + args.join(' '));
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test DTG Timeout Fix</title>
+</head>
+<body>
+    <h1>DTG Timeout Fix Test</h1>
+    <p>Test URL for PC61 in Ash color:</p>
+    <a href="http://localhost:3000/dtg-pricing.html?StyleNumber=PC61&COLOR=Ash" target="_blank">
+        Test DTG Pricing - PC61 Ash (Local Server)
+    </a>
+    
+    <h2>What to Test:</h2>
+    <ol>
+        <li>Click the link above</li>
+        <li>Time how long it takes for pricing to load</li>
+        <li>Should load in under 10 seconds (not 25)</li>
+        <li>Check console for "[ADAPTER:DTG] Setting Caspio message timeout for 10 seconds"</li>
+    </ol>
+    
+    <h2>Expected Console Output:</h2>
+    <pre>
+[ADAPTER:DTG] Setting Caspio message timeout for 10 seconds.
+[ADAPTER:DTG] Received caspioDtgMasterBundleReady
+[ADAPTER:DTG] Processing Master Bundle
+    </pre>
+    
+    <h2>If it works:</h2>
+    <p>✅ Pricing loads in ~10 seconds or less</p>
+    <p>✅ No timeout error after 10 seconds</p>
+    <p>✅ Console shows "10 seconds" not "25 seconds"</p>
+    
+    <h2>If it doesn't work:</h2>
+    <p>❌ You'll see timeout error after 10 seconds</p>
+    <p>❌ We can try 15 seconds instead</p>
+</body>
+</html>

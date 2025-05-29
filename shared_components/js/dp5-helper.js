@@ -186,9 +186,16 @@
         
         const headerRow = document.getElementById('pricing-header-row') || pricingGrid.querySelector('thead tr');
         if (headerRow) {
-            while (headerRow.children.length > 1) {
-                headerRow.removeChild(headerRow.lastChild);
-            }
+            // Clear all headers first
+            headerRow.innerHTML = '';
+            
+            // Add "QTY" header for the first column
+            const qtyHeader = document.createElement('th');
+            qtyHeader.textContent = 'QTY';
+            qtyHeader.style.fontWeight = 'bold';
+            headerRow.appendChild(qtyHeader);
+            
+            // Add size headers
             dataToUse.headers.forEach(sizeHeader => {
                 const th = document.createElement('th');
                 th.textContent = sizeHeader;
@@ -217,7 +224,10 @@
             const row = document.createElement('tr');
             const tierCell = document.createElement('td');
             let tierLabel = '';
-            if (tier.MaxQuantity && tier.MinQuantity) {
+            // Special handling for 72+ tier
+            if (tier.MinQuantity === 72 && (tier.MaxQuantity === 99999 || tier.MaxQuantity === undefined)) {
+                tierLabel = '72+';
+            } else if (tier.MaxQuantity && tier.MinQuantity) {
                 tierLabel = `${tier.MinQuantity}-${tier.MaxQuantity}`;
             } else if (tier.MinQuantity) {
                 tierLabel = `${tier.MinQuantity}+`;
