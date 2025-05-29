@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Tier Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .debug-section {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .tier-info {
+            background: #e8f5e9;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+        .missing-tier {
+            background: #ffebee;
+            color: #c62828;
+        }
+        pre {
+            background: #263238;
+            color: #aed581;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        button {
+            background: #2e5827;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1e3a1a;
+        }
+    </style>
+</head>
+<body>
+    <h1>DTG Tier Debug Test</h1>
+    
+    <div class="debug-section">
+        <h2>Test Controls</h2>
+        <button onclick="testAPIEndpoint()">Test API Endpoint</button>
+        <button onclick="checkMasterBundle()">Check Master Bundle</button>
+        <button onclick="simulateTierDisplay()">Simulate Tier Display</button>
+    </div>
+    
+    <div id="api-results" class="debug-section" style="display:none;">
+        <h2>API Results</h2>
+        <pre id="api-output"></pre>
+    </div>
+    
+    <div id="bundle-results" class="debug-section" style="display:none;">
+        <h2>Master Bundle Analysis</h2>
+        <div id="bundle-output"></div>
+    </div>
+    
+    <div id="tier-simulation" class="debug-section" style="display:none;">
+        <h2>Tier Display Simulation</h2>
+        <div id="simulation-output"></div>
+    </div>
+
+    <script>
+        async function testAPIEndpoint() {
+            const resultsDiv = document.getElementById('api-results');
+            const outputDiv = document.getElementById('api-output');
+            resultsDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-tiers?method=DTG');
+                const data = await response.json();
+                
+                outputDiv.textContent = JSON.stringify(data, null, 2);
+                
+                // Analyze the tiers
+                console.log('DTG Tiers from API:', data);
+                const tierLabels = data.map(t => t.TierLabel);
+                console.log('Tier Labels:', tierLabels);
+                
+                // Check for missing tiers
+                const expectedTiers = ['24-47', '48-71', '72+'];
+                const missingTiers = expectedTiers.filter(t => !tierLabels.includes(t));
+                if (missingTiers.length > 0) {
+                    console.warn('Missing tiers:', missingTiers);
+                }
+            } catch (error) {
+                outputDiv.textContent = 'Error fetching API: ' + error.message;
+            }
+        }
+        
+        function checkMasterBundle() {
+            const resultsDiv = document.getElementById('bundle-results');
+            const outputDiv = document.getElementById('bundle-output');
+            resultsDiv.style.display = 'block';
+            
+            if (window.parent && window.parent.dtgMasterPriceBundle) {
+                const bundle = window.parent.dtgMasterPriceBundle;
+                let html = '<h3>Bundle Structure:</h3>';
+                
+                // Check tier data
+                html += '<div class="tier-info"><strong>Tier Data:</strong><br>';
+                if (bundle.tierData) {
+                    Object.keys(bundle.tierData).forEach(tier => {
+                        html += `${tier}: ${JSON.stringify(bundle.tierData[tier])}<br>`;
+                    });
+                } else {
+                    html += 'No tier data found';
+                }
+                html += '</div>';
+                
+                // Check location prices
+                html += '<div class="tier-info"><strong>Location Prices:</strong><br>';
+                if (bundle.allLocationPrices) {
+                    Object.keys(bundle.allLocationPrices).forEach(loc => {
+                        html += `<strong>${loc}:</strong><br>`;
+                        const prices = bundle.allLocationPrices[loc];
+                        if (prices && bundle.uniqueSizes && bundle.uniqueSizes.length > 0) {
+                            const firstSize = bundle.uniqueSizes[0];
+                            html += `Sample prices for size ${firstSize}: ${JSON.stringify(prices[firstSize])}<br>`;
+                        }
+                    });
+                } else {
+                    html += 'No location prices found';
+                }
+                html += '</div>';
+                
+                outputDiv.innerHTML = html;
+            } else {
+                outputDiv.innerHTML = '<p>No master bundle found. Make sure this is running in the context of a DTG pricing page.</p>';
+            }
+        }
+        
+        function simulateTierDisplay() {
+            const resultsDiv = document.getElementById('tier-simulation');
+            const outputDiv = document.getElementById('simulation-output');
+            resultsDiv.style.display = 'block';
+            
+            // Simulate the expected tier structure
+            const expectedTiers = {
+                '24-47': { MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6 },
+                '48-71': { MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6 },
+                '72+': { MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6 }
+            };
+            
+            let html = '<h3>Expected Tier Display:</h3>';
+            html += '<table style="width:100%; border-collapse:collapse;">';
+            html += '<tr><th style="border:1px solid #ddd; padding:8px;">Tier</th><th style="border:1px solid #ddd; padding:8px;">Quantity Range</th><th style="border:1px solid #ddd; padding:8px;">Display Label</th></tr>';
+            
+            Object.keys(expectedTiers).forEach(tierKey => {
+                const tier = expectedTiers[tierKey];
+                const displayLabel = tier.MaxQuantity === 99999 ? `${tier.MinQuantity}+` : tierKey;
+                const rowClass = !window.parent?.dtgMasterPriceBundle?.tierData?.[tierKey] ? 'missing-tier' : '';
+                
+                html += `<tr class="${rowClass}">`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${tierKey}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${tier.MinQuantity} - ${tier.MaxQuantity}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${displayLabel}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</table>';
+            
+            // Add diagnostic info
+            html += '<h3>Diagnostic Info:</h3>';
+            html += '<div class="tier-info">';
+            html += '<p>To fix missing tiers:</p>';
+            html += '<ol>';
+            html += '<li>Ensure the API endpoint returns all 3 tiers (24-47, 48-71, 72+)</li>';
+            html += '<li>Check that the Caspio datapage processes all tiers correctly</li>';
+            html += '<li>Verify the DTG adapter includes all tiers in the pricing display</li>';
+            html += '<li>Ensure dp5-helper.js processes all tier headers correctly</li>';
+            html += '</ol>';
+            html += '</div>';
+            
+            outputDiv.innerHTML = html;
+        }
+        
+        // Auto-run tests if on DTG pricing page
+        if (window.location.search.includes('StyleNumber')) {
+            console.log('DTG Tier Debug: Running on pricing page context');
+            setTimeout(() => {
+                testAPIEndpoint();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

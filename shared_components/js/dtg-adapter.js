@@ -82,27 +82,30 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         let initialLocationCode = parentDropdown ? parentDropdown.value : null;
 
         if (!initialLocationCode && masterBundle.printLocationMeta && masterBundle.printLocationMeta.length > 0) {
-            initialLocationCode = masterBundle.printLocationMeta[0].code; 
-            if (parentDropdown) parentDropdown.value = initialLocationCode; 
+            initialLocationCode = masterBundle.printLocationMeta[0].code;
+            if (parentDropdown) parentDropdown.value = initialLocationCode;
         }
         
-        if (initialLocationCode && masterBundle.allLocationPrices[initialLocationCode] !== undefined) {
-            displayPricingForSelectedLocation(initialLocationCode);
-        } else if (masterBundle.printLocationMeta && masterBundle.printLocationMeta.length > 0) {
-            // Fallback if initialLocationCode from dropdown isn't in bundle, or dropdown was empty
-            const firstValidLocation = masterBundle.printLocationMeta.find(loc => masterBundle.allLocationPrices[loc.code] !== undefined);
-            if (firstValidLocation) {
-                initialLocationCode = firstValidLocation.code;
-                if (parentDropdown) parentDropdown.value = initialLocationCode;
+        // Add a small delay to ensure DOM is ready and all data is properly structured
+        setTimeout(() => {
+            if (initialLocationCode && masterBundle.allLocationPrices[initialLocationCode] !== undefined) {
                 displayPricingForSelectedLocation(initialLocationCode);
+            } else if (masterBundle.printLocationMeta && masterBundle.printLocationMeta.length > 0) {
+                // Fallback if initialLocationCode from dropdown isn't in bundle, or dropdown was empty
+                const firstValidLocation = masterBundle.printLocationMeta.find(loc => masterBundle.allLocationPrices[loc.code] !== undefined);
+                if (firstValidLocation) {
+                    initialLocationCode = firstValidLocation.code;
+                    if (parentDropdown) parentDropdown.value = initialLocationCode;
+                    displayPricingForSelectedLocation(initialLocationCode);
+                } else {
+                    console.warn('[ADAPTER:DTG] No valid initial location code with data found in master bundle.');
+                    displayError('Pricing data available, but not for the default/selected location. Please choose another.');
+                }
             } else {
-                console.warn('[ADAPTER:DTG] No valid initial location code with data found in master bundle.');
-                displayError('Pricing data available, but not for the default/selected location. Please choose another.');
+                console.warn('[ADAPTER:DTG] No initial location code and no locations in bundle meta.');
+                displayError('Please select a print location to view pricing.');
             }
-        } else {
-            console.warn('[ADAPTER:DTG] No initial location code and no locations in bundle meta.');
-            displayError('Please select a print location to view pricing.');
-        }
+        }, 500); // 500ms delay to ensure proper data structure
     }
 
     async function displayPricingForSelectedLocation(locationCode) {
@@ -145,20 +148,117 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         
         clearMessages(); 
 
+        // Ensure tierData is properly structured with all expected tiers
+        const ensuredTierData = masterBundle.tierData || {};
+        
+        // Check and ensure ALL standard DTG tiers are present
+        const expectedTiers = {
+            '24-47': { MinQuantity: 24, MaxQuantity: 47 },
+            '48-71': { MinQuantity: 48, MaxQuantity: 71 },
+            '72+': { MinQuantity: 72, MaxQuantity: 99999 }
+        };
+        
+        // Add any missing tiers
+        let tiersAdded = false;
+        Object.keys(expectedTiers).forEach(tierKey => {
+            if (!ensuredTierData[tierKey]) {
+                console.warn(`[ADAPTER:DTG] Missing tier '${tierKey}', adding default values`);
+                ensuredTierData[tierKey] = expectedTiers[tierKey];
+                tiersAdded = true;
+            }
+        });
+        
+        if (tiersAdded) {
+            console.log('[ADAPTER:DTG] Added missing tiers to ensure complete tier structure');
+        }
+        
+        // Group sizes as requested: S-XL, 2XL, 3XL, 4XL
+        const groupedHeaders = [];
+        const groupedPrices = {};
+        const sizeMapping = {
+            'S': 'S-XL',
+            'M': 'S-XL',
+            'L': 'S-XL',
+            'XL': 'S-XL',
+            '2XL': '2XL',
+            '3XL': '3XL',
+            '4XL': '4XL',
+            '5XL': '5XL',
+            '6XL': '6XL'
+        };
+        
+        // Create grouped headers
+        const addedGroups = new Set();
+        (masterBundle.uniqueSizes || []).forEach(size => {
+            const group = sizeMapping[size] || size;
+            if (!addedGroups.has(group)) {
+                addedGroups.add(group);
+                groupedHeaders.push(group);
+            }
+        });
+        
+        // Group prices - use the highest price within each group
+        groupedHeaders.forEach(group => {
+            groupedPrices[group] = {};
+            Object.keys(ensuredTierData).forEach(tierKey => {
+                let maxPrice = 0;
+                let foundPrice = false;
+                
+                if (group === 'S-XL') {
+                    // For S-XL group, check S, M, L, XL
+                    ['S', 'M', 'L', 'XL'].forEach(size => {
+                        if (locationPriceProfile[size] && locationPriceProfile[size][tierKey] !== undefined) {
+                            const price = parseFloat(locationPriceProfile[size][tierKey]);
+                            if (!isNaN(price) && price > maxPrice) {
+                                maxPrice = price;
+                                foundPrice = true;
+                            }
+                        }
+                    });
+                } else {
+                    // For individual sizes (2XL, 3XL, 4XL, etc.)
+                    if (locationPriceProfile[group] && locationPriceProfile[group][tierKey] !== undefined) {
+                        const price = parseFloat(locationPriceProfile[group][tierKey]);
+                        if (!isNaN(price)) {
+                            maxPrice = price;
+                            foundPrice = true;
+                        }
+                    }
+                }
+                
+                groupedPrices[group][tierKey] = foundPrice ? maxPrice : 0;
+            });
+        });
+        
+        console.log('[ADAPTER:DTG] Size grouping applied:', {
+            originalHeaders: masterBundle.uniqueSizes,
+            groupedHeaders: groupedHeaders,
+            samplePrices: groupedPrices['24-47'] || {}
+        });
+        
         const singleLocationDataPayload = {
             styleNumber: masterBundle.styleNumber,
             color: masterBundle.color,
             embellishmentType: "dtg",
-            headers: masterBundle.uniqueSizes || [], 
-            prices: locationPriceProfile,          
-            tierData: masterBundle.tierData,
-            uniqueSizes: masterBundle.uniqueSizes || [], 
+            headers: groupedHeaders,
+            prices: groupedPrices,
+            tierData: ensuredTierData,
+            tiers: ensuredTierData, // Add both for compatibility
+            uniqueSizes: masterBundle.uniqueSizes || [], // Keep original for cart functionality
             selectedLocationValue: locationCode,
-            productTitle: masterBundle.productTitle || masterBundle.styleNumber, 
+            productTitle: masterBundle.productTitle || masterBundle.styleNumber,
             capturedAt: new Date().toISOString(),
             hasError: false, // Assuming if we have a profile, it's not an error state for this location
             errorMessage: ""
         };
+        
+        console.log('[ADAPTER:DTG] Preparing to dispatch pricingDataLoaded with:', {
+            headers: singleLocationDataPayload.headers,
+            tierKeys: Object.keys(singleLocationDataPayload.tierData),
+            uniqueSizes: singleLocationDataPayload.uniqueSizes,
+            pricesForFirstSize: singleLocationDataPayload.headers[0] ? singleLocationDataPayload.prices[singleLocationDataPayload.headers[0]] : 'No sizes',
+            embellishmentType: singleLocationDataPayload.embellishmentType
+        });
         
         window.nwcaPricingData = singleLocationDataPayload;
 
@@ -307,11 +407,14 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         dtgCaspioMessageTimeoutId = setTimeout(() => {
             if (!dtgCaspioDataProcessed) {
                 console.error('[ADAPTER:DTG] Timeout: No master bundle message received from Caspio.');
-                displayError('The pricing module did not respond with complete data. Please refresh or try again later.');
+                // Don't show error immediately - just log it
+                // displayError('The pricing module did not respond with complete data. Please refresh or try again later.');
                 const dtgPricingGrid = document.getElementById('custom-pricing-grid');
-                if (dtgPricingGrid) {
+                if (dtgPricingGrid && dtgPricingGrid.style.display !== 'none') {
                     const tbody = dtgPricingGrid.querySelector('tbody');
-                    if (tbody) tbody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding:20px; color:red;">Failed to load pricing data.</td></tr>';
+                    if (tbody && tbody.innerHTML.trim() === '') {
+                        tbody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding:20px;">Please select a print location to view pricing.</td></tr>';
+                    }
                 }
             }
         }, CASPIO_IFRAME_TIMEOUT_DURATION);

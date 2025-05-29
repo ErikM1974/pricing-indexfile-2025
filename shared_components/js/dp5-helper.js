@@ -6,11 +6,26 @@
 (function() {
     "use strict";
     
-    console.log("[DP5-HELPER] Loading DP5 Helper for enhanced UI (v5 - Refined Fallbacks)");
+    console.log("[DP5-HELPER] Loading DP5 Helper for enhanced UI (v5.1 - Tier Label Formatting)");
     
     // State variables
     let initialized = false;
     let inventoryData = null;
+    
+    // Helper function to format tier labels
+    function formatTierLabel(label) {
+        if (!label || typeof label !== 'string') return label;
+        
+        // Check if this is a "N-99999" pattern and convert to "N+"
+        const match = label.match(/^(\d+)-(\d+)$/);
+        if (match) {
+            const [, start, end] = match;
+            if (end === '99999') {
+                return `${start}+`;
+            }
+        }
+        return label;
+    }
     
     // Initialize the helper
     function initialize() {
@@ -20,6 +35,7 @@
         window.API_PROXY_BASE_URL = window.API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         
         // Listen for pricing data loaded event - This is the primary trigger for the pricing grid.
+        // DTG adapter dispatches on window, so we need to listen on window
         window.addEventListener('pricingDataLoaded', function(event) {
             console.log("********************************************************************************");
             console.log("[DP5-HELPER] RAW 'pricingDataLoaded' EVENT DETECTED. Timestamp:", new Date().toISOString());
@@ -195,8 +211,14 @@
             qtyHeader.style.fontWeight = 'bold';
             headerRow.appendChild(qtyHeader);
             
+            // Group sizes if this is DTG pricing
+            let displayHeaders = dataToUse.headers;
+            if (window.location.pathname.includes('dtg-pricing')) {
+                displayHeaders = groupSizesForDisplay(dataToUse.headers, dataToUse.prices, dataToUse.tiers);
+            }
+            
             // Add size headers
-            dataToUse.headers.forEach(sizeHeader => {
+            displayHeaders.forEach(sizeHeader => {
                 const th = document.createElement('th');
                 th.textContent = sizeHeader;
                 headerRow.appendChild(th);
@@ -232,32 +254,50 @@
             } else if (tier.MinQuantity) {
                 tierLabel = `${tier.MinQuantity}+`;
             }
+            // Apply formatting to clean up tier labels (e.g., "72-99999" -> "72+")
+            tierLabel = formatTierLabel(tierLabel);
             tierCell.textContent = tierLabel;
             row.appendChild(tierCell);
             
-            dataToUse.headers.forEach(sizeGroup => {
-                const priceCell = document.createElement('td');
-                priceCell.className = 'price-cell';
-                const price = dataToUse.prices[sizeGroup] && dataToUse.prices[sizeGroup][tierKey] !== undefined ?
-                    dataToUse.prices[sizeGroup][tierKey] : null;
-                
-                if (price !== null && price !== undefined) {
-                    const priceNum = parseFloat(price);
-                    let formattedPrice;
-                    if (!isNaN(priceNum)) {
-                        formattedPrice = priceNum % 1 === 0 ? `$${priceNum}` : `$${priceNum.toFixed(2)}`;
+            // Add price cells for each size
+            if (window.location.pathname.includes('dtg-pricing')) {
+                // Group sizes for DTG using the same grouped headers
+                const groupedPrices = groupPricesForDisplay(dataToUse.headers, dataToUse.prices, tierKey, displayHeaders);
+                groupedPrices.forEach(priceInfo => {
+                    const priceCell = document.createElement('td');
+                    priceCell.className = 'price-cell';
+                    priceCell.innerHTML = priceInfo.price;
+                    if (inventoryData && inventoryData.sizes && priceInfo.sizeGroup) {
+                        addInventoryIndicator(priceCell, priceInfo.sizeGroup, inventoryData);
+                    }
+                    row.appendChild(priceCell);
+                });
+            } else {
+                // Normal display for other pages
+                dataToUse.headers.forEach(sizeGroup => {
+                    const priceCell = document.createElement('td');
+                    priceCell.className = 'price-cell';
+                    const price = dataToUse.prices[sizeGroup] && dataToUse.prices[sizeGroup][tierKey] !== undefined ?
+                        dataToUse.prices[sizeGroup][tierKey] : null;
+                    
+                    if (price !== null && price !== undefined) {
+                        const priceNum = parseFloat(price);
+                        let formattedPrice;
+                        if (!isNaN(priceNum)) {
+                            formattedPrice = priceNum % 1 === 0 ? `$${priceNum}` : `$${priceNum.toFixed(2)}`;
+                        } else {
+                             formattedPrice = 'N/A';
+                        }
+                        priceCell.innerHTML = formattedPrice;
+                        if (inventoryData && inventoryData.sizes) {
+                            addInventoryIndicator(priceCell, sizeGroup, inventoryData);
+                        }
                     } else {
-                         formattedPrice = 'N/A';
+                        priceCell.textContent = 'N/A';
                     }
-                    priceCell.innerHTML = formattedPrice;
-                    if (inventoryData && inventoryData.sizes) {
-                        addInventoryIndicator(priceCell, sizeGroup, inventoryData);
-                    }
-                } else {
-                    priceCell.textContent = 'N/A';
-                }
-                row.appendChild(priceCell);
-            });
+                    row.appendChild(priceCell);
+                });
+            }
             tbody.appendChild(row);
         });
         
@@ -433,10 +473,13 @@
     function addInventoryIndicator(priceCell, sizeGroup, inventoryData) {
         if (priceCell.querySelector('.inventory-indicator')) return;
         let sizesToCheck = [];
-        if (sizeGroup === 'S-XL') sizesToCheck = ['S', 'M', 'L', 'XL'];
-        else if (sizeGroup === '2XL') sizesToCheck = ['2XL'];
-        else if (sizeGroup === '3XL') sizesToCheck = ['3XL'];
-        else sizesToCheck = [sizeGroup];
+        
+        // Handle dynamically grouped sizes (e.g., "S-M-L-XL")
+        if (sizeGroup.includes('-')) {
+            sizesToCheck = sizeGroup.split('-');
+        } else {
+            sizesToCheck = [sizeGroup];
+        }
         
         let lowestInventory = Infinity;
         sizesToCheck.forEach(size => {
@@ -726,6 +769,107 @@
         document.addEventListener('DOMContentLoaded', handleMobileAdjustments);
     }
     
+    // Helper function to group sizes for display - Fixed grouping as requested
+    function groupSizesForDisplay(headers, prices, tiers) {
+        console.log('[DP5-HELPER] groupSizesForDisplay called with:', {
+            headers: headers,
+            pathname: window.location.pathname
+        });
+        
+        if (!window.location.pathname.includes('dtg-pricing')) {
+            console.log('[DP5-HELPER] Not DTG pricing page, returning original headers');
+            return headers; // Only group for DTG pricing
+        }
+        
+        // Fixed grouping as requested by Mr. Erik: S-XL, 2XL, 3XL, 4XL
+        const sizeMapping = {
+            'S': 'S-XL',
+            'M': 'S-XL',
+            'L': 'S-XL',
+            'XL': 'S-XL',
+            '2XL': '2XL',
+            '3XL': '3XL',
+            '4XL': '4XL',
+            '5XL': '5XL',
+            '6XL': '6XL'
+        };
+        
+        // Create grouped headers in the order we want them
+        const groupedHeaders = [];
+        const addedGroups = new Set();
+        
+        // Process in a specific order to ensure S-XL comes first
+        const preferredOrder = ['S-XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+        
+        preferredOrder.forEach(group => {
+            // Check if any header maps to this group
+            const hasGroup = headers.some(size => sizeMapping[size] === group || (!sizeMapping[size] && size === group));
+            if (hasGroup && !addedGroups.has(group)) {
+                addedGroups.add(group);
+                groupedHeaders.push(group);
+            }
+        });
+        
+        // Add any remaining sizes that don't fit the standard mapping
+        headers.forEach(size => {
+            const group = sizeMapping[size] || size;
+            if (!addedGroups.has(group)) {
+                addedGroups.add(group);
+                groupedHeaders.push(group);
+            }
+        });
+        
+        console.log('[DP5-HELPER] Fixed grouped headers:', groupedHeaders);
+        return groupedHeaders;
+    }
+    
+    // Helper function to group prices for display
+    function groupPricesForDisplay(headers, prices, tierKey, groupedHeaders) {
+        const result = [];
+        
+        // Size mapping for grouping
+        const sizeMapping = {
+            'S': 'S-XL',
+            'M': 'S-XL',
+            'L': 'S-XL',
+            'XL': 'S-XL',
+            '2XL': '2XL',
+            '3XL': '3XL',
+            '4XL': '4XL',
+            '5XL': '5XL',
+            '6XL': '6XL'
+        };
+        
+        groupedHeaders.forEach(groupHeader => {
+            if (groupHeader === 'S-XL') {
+                // For S-XL group, find the highest price among S, M, L, XL
+                let maxPrice = 0;
+                let foundAnyPrice = false;
+                ['S', 'M', 'L', 'XL'].forEach(size => {
+                    if (prices[size] && prices[size][tierKey] !== undefined) {
+                        const price = parseFloat(prices[size][tierKey]);
+                        if (!isNaN(price) && price > maxPrice) {
+                            maxPrice = price;
+                            foundAnyPrice = true;
+                        }
+                    }
+                });
+                const formattedPrice = foundAnyPrice ?
+                    (maxPrice % 1 === 0 ? `$${maxPrice}` : `$${maxPrice.toFixed(2)}`) : 'N/A';
+                result.push({ price: formattedPrice, sizeGroup: groupHeader });
+            } else {
+                // Single size (2XL, 3XL, 4XL, etc.)
+                const price = prices[groupHeader] && prices[groupHeader][tierKey];
+                const priceNum = parseFloat(price);
+                const formattedPrice = !isNaN(priceNum) ?
+                    (priceNum % 1 === 0 ? `$${priceNum}` : `$${priceNum.toFixed(2)}`) : 'N/A';
+                result.push({ price: formattedPrice, sizeGroup: groupHeader });
+            }
+        });
+        
+        return result;
+    }
+
     window.DP5Helper = {
         updatePricingGrid: updateCustomPricingGrid,
         loadInventoryData: loadInventoryData,

@@ -272,6 +272,19 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
                     }
                 }
             });
+            
+            // For DTG, check if we have all expected tiers
+            if (embType === 'dtg') {
+                const expectedDTGTiers = ['24-47', '48-71', '72+'];
+                const capturedTierKeys = Object.keys(tierData);
+                const missingTiers = expectedDTGTiers.filter(tier => !capturedTierKeys.includes(tier));
+                
+                if (missingTiers.length > 0) {
+                    console.warn(`[PRICING-MATRIX:CAPTURE] DTG pricing missing expected tiers: ${missingTiers.join(', ')}. Table may not be fully loaded yet.`);
+                    // Return null to trigger retry
+                    return null;
+                }
+            }
 
              if (Object.keys(priceMatrix).length === 0 || Object.keys(tierData).length === 0) {
                  console.error("[PRICING-MATRIX:CAPTURE-ERROR] Failed to extract valid price matrix or tier data.");
