@@ -4,7 +4,7 @@
 (function() {
     'use strict';
 
-    // Configuration
+    // Configuration - Updated to match your exact API base URL
     const config = {
         apiBaseUrl: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api',
         ltmThreshold: 24,
@@ -646,22 +646,24 @@
                 
                 const itemData = {
                     QuoteID: this.currentQuote.id,
+                    LineNumber: item.lineNumber,
                     StyleNumber: item.styleNumber,
                     ProductName: item.productName,
                     Color: item.color,
-                    Quantity: item.quantity,
-                    UnitPrice: item.finalUnitPrice,
-                    TotalPrice: item.lineTotal,
+                    ColorCode: item.color.toUpperCase().replace(/\s+/g, '_'), // Generate color code
                     EmbellishmentType: item.embellishmentType,
                     PrintLocation: item.printLocation,
                     PrintLocationName: item.printLocationName,
-                    PricingTier: item.pricingTier,
-                    HasLTM: item.hasLTM,
+                    Quantity: item.quantity,
+                    HasLTM: item.hasLTM ? "Yes" : "No", // Convert boolean to string!
                     BaseUnitPrice: item.baseUnitPrice,
                     LTMPerUnit: item.ltmPerUnit,
+                    FinalUnitPrice: item.finalUnitPrice, // Correct field name
+                    LineTotal: item.lineTotal,
                     SizeBreakdown: JSON.stringify(item.sizeBreakdown),
-                    ImageURL: item.imageUrl,
-                    LineNumber: item.lineNumber
+                    PricingTier: item.pricingTier,
+                    ImageURL: item.imageUrl || '',
+                    AddedAt: new Date().toISOString() // Add timestamp
                 };
 
                 const response = await fetch(`${config.apiBaseUrl}/quote_items`, {
@@ -737,11 +739,11 @@
                             printLocation: apiItem.PrintLocation,
                             printLocationName: apiItem.PrintLocationName,
                             quantity: apiItem.Quantity,
-                            hasLTM: apiItem.HasLTM,
+                            hasLTM: apiItem.HasLTM === "Yes", // Convert string back to boolean
                             baseUnitPrice: apiItem.BaseUnitPrice,
                             ltmPerUnit: apiItem.LTMPerUnit,
-                            finalUnitPrice: apiItem.UnitPrice,
-                            lineTotal: apiItem.TotalPrice,
+                            finalUnitPrice: apiItem.FinalUnitPrice, // Correct field name
+                            lineTotal: apiItem.LineTotal, // Correct field name
                             sizeBreakdown: sizeBreakdown,
                             pricingTier: apiItem.PricingTier,
                             imageUrl: apiItem.ImageURL

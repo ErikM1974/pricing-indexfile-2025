@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real API Connection Test - NWCA Quotes</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .test-section { border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 8px; background: #f9f9f9; }
+        .result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .test-btn { padding: 10px 20px; margin: 5px; background: #2e5827; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .test-btn:hover { background: #1a3316; }
+        .api-response { background: white; padding: 15px; border: 1px solid #ccc; border-radius: 5px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>🔌 Real API Connection Test</h1>
+    <p><strong>Testing actual connection to: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com</strong></p>
+
+    <div class="test-section">
+        <h2>📡 API Connectivity Tests</h2>
+        <button class="test-btn" onclick="testQuoteSessions()">Test Quote Sessions</button>
+        <button class="test-btn" onclick="testQuoteItems()">Test Quote Items</button>
+        <button class="test-btn" onclick="testQuoteAnalytics()">Test Quote Analytics</button>
+        <button class="test-btn" onclick="testExistingQuote()">Test Load Sample Quote</button>
+        <div id="connectivity-results">Ready to test...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>💾 Create Real Quote Test</h2>
+        <button class="test-btn" onclick="createTestQuote()">Create Test Quote</button>
+        <div id="create-results">Ready to create...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 API Response Data</h2>
+        <div id="api-response-display" class="api-response">No API calls made yet...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+        
+        function updateResults(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message;
+            element.appendChild(resultDiv);
+        }
+        
+        function displayApiResponse(data) {
+            const display = document.getElementById('api-response-display');
+            display.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        }
+
+        // Test Quote Sessions endpoint
+        async function testQuoteSessions() {
+            updateResults('connectivity-results', '🧪 Testing Quote Sessions API...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/quote_sessions`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResults('connectivity-results', `✅ Quote Sessions: ${response.status} - Found ${data.length} sessions`, 'success');
+                    displayApiResponse(data);
+                } else {
+                    updateResults('connectivity-results', `❌ Quote Sessions Failed: ${response.status}`, 'error');
+                    displayApiResponse(data);
+                }
+            } catch (error) {
+                updateResults('connectivity-results', `❌ Quote Sessions Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test Quote Items endpoint
+        async function testQuoteItems() {
+            updateResults('connectivity-results', '🧪 Testing Quote Items API...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/quote_items`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResults('connectivity-results', `✅ Quote Items: ${response.status} - Found ${data.length} items`, 'success');
+                    displayApiResponse(data);
+                } else {
+                    updateResults('connectivity-results', `❌ Quote Items Failed: ${response.status}`, 'error');
+                    displayApiResponse(data);
+                }
+            } catch (error) {
+                updateResults('connectivity-results', `❌ Quote Items Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test Quote Analytics endpoint
+        async function testQuoteAnalytics() {
+            updateResults('connectivity-results', '🧪 Testing Quote Analytics API...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/quote_analytics`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResults('connectivity-results', `✅ Quote Analytics: ${response.status} - Found ${data.length} events`, 'success');
+                    displayApiResponse(data);
+                } else {
+                    updateResults('connectivity-results', `❌ Quote Analytics Failed: ${response.status}`, 'error');
+                    displayApiResponse(data);
+                }
+            } catch (error) {
+                updateResults('connectivity-results', `❌ Quote Analytics Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test loading the sample quote you provided
+        async function testExistingQuote() {
+            updateResults('connectivity-results', '🧪 Testing Sample Quote Load...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=Q_20250529_SAMPLE`);
+                const data = await response.json();
+                
+                if (response.ok && data.length > 0) {
+                    updateResults('connectivity-results', `✅ Sample Quote Loaded: Found ${data.length} items (PC61 + PC54)`, 'success');
+                    displayApiResponse(data);
+                    
+                    // Verify the exact field structure
+                    const firstItem = data[0];
+                    const fieldCheck = {
+                        hasCorrectFields: firstItem.HasLTM !== undefined && firstItem.FinalUnitPrice !== undefined,
+                        ltmFormat: firstItem.HasLTM, // Should be "No" or "Yes"
+                        priceField: firstItem.FinalUnitPrice // Should be number
+                    };
+                    
+                    updateResults('connectivity-results', `📋 Field Structure: HasLTM="${fieldCheck.ltmFormat}", FinalUnitPrice=${fieldCheck.priceField}`, 'info');
+                } else {
+                    updateResults('connectivity-results', `❌ Sample Quote Not Found`, 'error');
+                    displayApiResponse(data);
+                }
+            } catch (error) {
+                updateResults('connectivity-results', `❌ Sample Quote Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Create a real test quote
+        async function createTestQuote() {
+            updateResults('create-results', '🧪 Creating Test Quote...', 'info');
+            
+            const testQuoteId = 'Q_TEST_' + Date.now();
+            
+            try {
+                // Step 1: Create Quote Session
+                const sessionData = {
+                    QuoteID: testQuoteId,
+                    SessionID: 'test_session_' + Date.now(),
+                    CustomerEmail: 'test@example.com',
+                    CustomerName: 'Test Customer',
+                    CompanyName: 'Test Company',
+                    Status: 'Active',
+                    Notes: 'API Integration Test Quote'
+                };
+                
+                updateResults('create-results', `📝 Creating quote session: ${testQuoteId}`, 'info');
+                const sessionResponse = await fetch(`${API_BASE}/quote_sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionData)
+                });
+                
+                if (!sessionResponse.ok) {
+                    throw new Error(`Quote session creation failed: ${sessionResponse.status}`);
+                }
+                
+                const savedSession = await sessionResponse.json();
+                updateResults('create-results', `✅ Quote Session Created: ID ${savedSession.PK_ID || 'Unknown'}`, 'success');
+                
+                // Step 2: Create Quote Item
+                const itemData = {
+                    QuoteID: testQuoteId,
+                    LineNumber: 1,
+                    StyleNumber: 'PC61',
+                    ProductName: 'Essential Tee - API Test',
+                    Color: 'Navy',
+                    ColorCode: 'NAVY',
+                    EmbellishmentType: 'dtg',
+                    PrintLocation: 'FF',
+                    PrintLocationName: 'Full Front',
+                    Quantity: 24,
+                    HasLTM: 'Yes', // String format!
+                    BaseUnitPrice: 15.99,
+                    LTMPerUnit: 2.08,
+                    FinalUnitPrice: 18.07, // Correct field name
+                    LineTotal: 433.68,
+                    SizeBreakdown: '{"S":6,"M":6,"L":6,"XL":6}',
+                    PricingTier: '24-47',
+                    ImageURL: 'https://example.com/test.jpg',
+                    AddedAt: new Date().toISOString()
+                };
+                
+                updateResults('create-results', `📦 Adding quote item...`, 'info');
+                const itemResponse = await fetch(`${API_BASE}/quote_items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(itemData)
+                });
+                
+                if (!itemResponse.ok) {
+                    throw new Error(`Quote item creation failed: ${itemResponse.status}`);
+                }
+                
+                const savedItem = await itemResponse.json();
+                updateResults('create-results', `✅ Quote Item Created: ID ${savedItem.PK_ID || 'Unknown'}`, 'success');
+                
+                // Step 3: Test Analytics
+                const analyticsData = {
+                    SessionID: sessionData.SessionID,
+                    QuoteID: testQuoteId,
+                    EventType: 'api_test',
+                    StyleNumber: 'PC61',
+                    Color: 'Navy',
+                    PrintLocation: 'FF',
+                    Quantity: 24
+                };
+                
+                updateResults('create-results', `📊 Logging analytics...`, 'info');
+                const analyticsResponse = await fetch(`${API_BASE}/quote_analytics`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(analyticsData)
+                });
+                
+                if (analyticsResponse.ok) {
+                    updateResults('create-results', `✅ Analytics Logged Successfully`, 'success');
+                } else {
+                    updateResults('create-results', `⚠️ Analytics Failed: ${analyticsResponse.status}`, 'error');
+                }
+                
+                // Step 4: Verify by loading the quote back
+                updateResults('create-results', `🔍 Verifying quote was saved...`, 'info');
+                const verifyResponse = await fetch(`${API_BASE}/quote_items?quoteID=${testQuoteId}`);
+                const verifyData = await verifyResponse.json();
+                
+                if (verifyResponse.ok && verifyData.length > 0) {
+                    updateResults('create-results', `🎉 SUCCESS! Quote saved and verified. Items: ${verifyData.length}`, 'success');
+                    displayApiResponse(verifyData);
+                } else {
+                    updateResults('create-results', `❌ Verification failed - quote not found`, 'error');
+                }
+                
+            } catch (error) {
+                updateResults('create-results', `❌ Test Quote Creation Failed: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            }
+        }
+
+        // Auto-run connectivity tests on page load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                updateResults('connectivity-results', '🚀 Starting automatic API tests...', 'info');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
