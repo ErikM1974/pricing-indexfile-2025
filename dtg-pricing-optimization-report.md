@@ -215,3 +215,217 @@ The page is now production-ready and will provide a superior experience for Nort
 ---
 
 **Note to Mr. Erik:** This optimization represents best-in-class web development practices. The page now properly represents Northwest Custom Apparel's brand while delivering exceptional performance and user experience. All critical issues have been resolved, and the page is ready for immediate deployment.
+
+---
+
+## ADDENDUM: Quote System Implementation (May 29, 2025)
+
+### Overview
+Per Mr. Erik's request, we're replacing the shopping cart functionality with a simpler Quote Builder system that better handles LTM fees and allows customers to build multi-item quotes without the complexity of a full e-commerce cart.
+
+### Quote System Architecture
+
+#### 1. **Database Design for Caspio**
+
+**Table 1: NWCA_Quote_Sessions**
+Primary table for tracking quote sessions.
+
+| Field Name | Data Type | Description | Required | Default |
+|------------|-----------|-------------|----------|---------|
+| QuoteID | Text(50) | Unique quote identifier (e.g., Q_20250529_123456) | Yes | Auto-generated |
+| SessionID | Text(50) | Browser session identifier | Yes | - |
+| CustomerEmail | Text(255) | Customer email address | No | - |
+| CustomerName | Text(255) | Customer name | No | - |
+| CompanyName | Text(255) | Company name | No | - |
+| Phone | Text(50) | Contact phone | No | - |
+| TotalQuantity | Number | Total pieces in quote | Yes | 0 |
+| SubtotalAmount | Number | Subtotal before LTM | Yes | 0.00 |
+| LTMFeeTotal | Number | Total LTM fee if applicable | Yes | 0.00 |
+| TotalAmount | Number | Final total with LTM | Yes | 0.00 |
+| Status | Text(20) | active, saved, expired, converted | Yes | active |
+| CreatedAt | Date/Time | Quote creation timestamp | Yes | Timestamp |
+| UpdatedAt | Date/Time | Last update timestamp | Yes | Timestamp |
+| ExpiresAt | Date/Time | Quote expiration (30 days) | Yes | Timestamp+30days |
+| Notes | Text(64000) | Customer notes | No | - |
+
+**Table 2: NWCA_Quote_Items**
+Individual line items within quotes.
+
+| Field Name | Data Type | Description | Required | Default |
+|------------|-----------|-------------|----------|---------|
+| ItemID | Number | Auto-increment ID | Yes | Auto |
+| QuoteID | Text(50) | Foreign key to Quote_Sessions | Yes | - |
+| LineNumber | Number | Order of items in quote | Yes | - |
+| StyleNumber | Text(50) | Product style number | Yes | - |
+| ProductName | Text(255) | Product description | Yes | - |
+| Color | Text(100) | Color name | Yes | - |
+| ColorCode | Text(50) | Color code for inventory | Yes | - |
+| EmbellishmentType | Text(50) | dtg, dtf, embroidery, etc. | Yes | - |
+| PrintLocation | Text(50) | Location code (FF, FB, LC, etc.) | Yes | - |
+| PrintLocationName | Text(100) | Human-readable location | Yes | - |
+| Quantity | Number | Total quantity for this item | Yes | - |
+| HasLTM | Yes/No | Whether LTM fee applies | Yes | No |
+| BaseUnitPrice | Number | Price per unit before LTM | Yes | 0.00 |
+| LTMPerUnit | Number | LTM fee per unit if applicable | Yes | 0.00 |
+| FinalUnitPrice | Number | Final price per unit | Yes | 0.00 |
+| LineTotal | Number | Total for this line | Yes | 0.00 |
+| SizeBreakdown | Text(64000) | JSON of size distribution | Yes | {} |
+| PricingTier | Text(50) | Which tier was used | Yes | - |
+| ImageURL | Text(500) | Product image URL | No | - |
+| AddedAt | Date/Time | When item was added | Yes | Timestamp |
+
+**Table 3: NWCA_Quote_Analytics**
+Track user behavior for optimization.
+
+| Field Name | Data Type | Description | Required | Default |
+|------------|-----------|-------------|----------|---------|
+| AnalyticsID | Number | Auto-increment ID | Yes | Auto |
+| SessionID | Text(50) | Browser session | Yes | - |
+| QuoteID | Text(50) | Associated quote if created | No | - |
+| EventType | Text(50) | page_view, quantity_entered, item_added, quote_saved | Yes | - |
+| StyleNumber | Text(50) | Product being viewed | No | - |
+| Color | Text(100) | Color selected | No | - |
+| PrintLocation | Text(50) | Location selected | No | - |
+| Quantity | Number | Quantity entered | No | - |
+| HasLTM | Yes/No | Whether LTM was shown | No | No |
+| PriceShown | Number | Price displayed to user | No | - |
+| UserAgent | Text(500) | Browser info | Yes | - |
+| IPAddress | Text(50) | User IP | No | - |
+| Timestamp | Date/Time | Event timestamp | Yes | Timestamp |
+
+#### 2. **API Endpoints Structure**
+
+Once you create these tables in Caspio and set up the REST API, you'll provide endpoints like:
+
+```
+POST   /api/quote-sessions      - Create new quote
+GET    /api/quote-sessions/{id} - Get quote details
+PUT    /api/quote-sessions/{id} - Update quote
+DELETE /api/quote-sessions/{id} - Delete quote
+
+POST   /api/quote-items         - Add item to quote
+GET    /api/quote-items?quoteId={id} - Get items for quote
+PUT    /api/quote-items/{id}    - Update item
+DELETE /api/quote-items/{id}    - Remove item
+
+POST   /api/quote-analytics     - Log analytics event
+```
+
+#### 3. **Quote Builder UI Flow**
+
+**Step 1: Quantity-First Input**
+```javascript
+// User enters total quantity first
+const totalQty = document.getElementById('total-quantity').value;
+const pricingTier = calculatePricingTier(totalQty);
+const hasLTM = totalQty < 24;
+
+if (hasLTM) {
+  showLTMExplanation(totalQty);
+}
+```
+
+**Step 2: Size Distribution**
+```javascript
+// Show size inputs that must sum to total
+function validateSizeDistribution() {
+  const sizes = document.querySelectorAll('.size-qty-input');
+  const sum = Array.from(sizes).reduce((total, input) =>
+    total + parseInt(input.value || 0), 0
+  );
+  return sum === totalQty;
+}
+```
+
+**Step 3: Add to Quote**
+```javascript
+// Add item to quote with all details
+const quoteItem = {
+  styleNumber: currentStyle,
+  color: currentColor,
+  quantity: totalQty,
+  sizeBreakdown: getSizeDistribution(),
+  baseUnitPrice: calculateBasePrice(totalQty),
+  ltmPerUnit: hasLTM ? (50 / totalQty) : 0,
+  finalUnitPrice: basePrice + ltmPerUnit
+};
+```
+
+#### 4. **LTM Fee Display**
+
+**Clear LTM Explanation Box:**
+```html
+<div class="ltm-explanation" id="ltm-box" style="display:none;">
+  <h4>Less Than Minimum (LTM) Fee Applies</h4>
+  <p>For orders under 24 pieces, a $50 setup fee is distributed across all items.</p>
+  
+  <div class="ltm-breakdown">
+    <div class="ltm-row">
+      <span>Base price per piece (24-piece pricing):</span>
+      <span id="base-price">$15.99</span>
+    </div>
+    <div class="ltm-row">
+      <span>LTM fee per piece ($50 ÷ <span id="qty-display">12</span>):</span>
+      <span id="ltm-per-piece">$4.17</span>
+    </div>
+    <div class="ltm-row total">
+      <span>Your price per piece:</span>
+      <span id="final-price">$20.16</span>
+    </div>
+  </div>
+</div>
+```
+
+#### 5. **Quote Summary Panel**
+
+```html
+<div class="quote-summary-panel">
+  <h3>Your Quote Summary</h3>
+  
+  <div class="quote-items" id="quote-items-list">
+    <!-- Dynamically populated -->
+  </div>
+  
+  <div class="quote-totals">
+    <div class="total-row">
+      <span>Subtotal:</span>
+      <span id="quote-subtotal">$0.00</span>
+    </div>
+    <div class="total-row ltm" style="display:none;">
+      <span>LTM Fees:</span>
+      <span id="quote-ltm-total">$0.00</span>
+    </div>
+    <div class="total-row grand-total">
+      <span>Total:</span>
+      <span id="quote-total">$0.00</span>
+    </div>
+  </div>
+  
+  <div class="quote-actions">
+    <button onclick="saveQuote()">Save Quote</button>
+    <button onclick="emailQuote()">Email Quote</button>
+    <button onclick="exportPDF()">Download PDF</button>
+    <button onclick="clearQuote()">Start Over</button>
+  </div>
+</div>
+```
+
+### Implementation Benefits
+
+1. **Simplicity**: No complex cart system to maintain
+2. **Transparency**: LTM fees clearly shown upfront
+3. **Flexibility**: Easy to add multiple styles/colors
+4. **Future-Ready**: Can upgrade to full cart later
+5. **Analytics**: Track user behavior for insights
+6. **Professional**: PDF quotes for B2B customers
+
+### Migration Steps
+
+1. Create Caspio tables using provided CSV files
+2. Set up REST API endpoints in Caspio
+3. Replace cart UI with quote builder
+4. Implement quote persistence
+5. Add PDF generation
+6. Test with various scenarios
+
+This quote-based approach eliminates shopping cart complexity while providing a professional quoting experience perfect for B2B customers.

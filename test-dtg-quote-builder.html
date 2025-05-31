@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Quote Builder Test | NWCA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-header {
+            background: #2e5827;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .error { background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .info { background-color: #d1ecf1; color: #0c5460; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🧪 DTG Quote Builder Test</h1>
+        <p>Testing the new quantity-first quote system for Mr. Erik</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Status</h2>
+        <div id="test-results">
+            <div class="info">Initializing tests...</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Mock DTG Pricing Data</h2>
+        <div id="pricing-data-test">
+            <div class="info">Setting up mock pricing data...</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Quote Builder Interface</h2>
+        <div id="add-to-cart-section">
+            <div style="text-align: center; padding: 20px; color: #666;">
+                <p>Loading quote builder...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load the quote system -->
+    <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/dtg-quote-system.js"></script>
+
+    <script>
+        // Test script
+        function runTests() {
+            const results = document.getElementById('test-results');
+            const pricingTest = document.getElementById('pricing-data-test');
+            
+            // Test 1: Check if DTGQuoteManager loaded
+            if (window.DTGQuoteManager) {
+                results.innerHTML += '<div class="success">✅ DTGQuoteManager loaded successfully</div>';
+            } else {
+                results.innerHTML += '<div class="error">❌ DTGQuoteManager not found</div>';
+                return;
+            }
+
+            // Test 2: Setup mock pricing data
+            window.nwcaPricingData = {
+                styleNumber: 'PC61',
+                color: 'Heather Navy',
+                embellishmentType: 'dtg',
+                printLocation: 'FF',
+                uniqueSizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+                prices: {
+                    'S': { '24-47': '15.99', '48-71': '14.99', '72+': '13.99' },
+                    'M': { '24-47': '15.99', '48-71': '14.99', '72+': '13.99' },
+                    'L': { '24-47': '15.99', '48-71': '14.99', '72+': '13.99' },
+                    'XL': { '24-47': '15.99', '48-71': '14.99', '72+': '13.99' },
+                    '2XL': { '24-47': '17.99', '48-71': '16.99', '72+': '15.99' },
+                    '3XL': { '24-47': '19.99', '48-71': '18.99', '72+': '17.99' }
+                }
+            };
+            
+            pricingTest.innerHTML = '<div class="success">✅ Mock pricing data setup complete</div>';
+            pricingTest.innerHTML += '<div class="info">Style: PC61 | Color: Heather Navy | Sizes: S-3XL</div>';
+
+            // Test 3: Initialize quote system
+            try {
+                window.DTGQuoteManager.init();
+                results.innerHTML += '<div class="success">✅ Quote system initialized</div>';
+            } catch (error) {
+                results.innerHTML += '<div class="error">❌ Quote system initialization failed: ' + error.message + '</div>';
+            }
+
+            // Test 4: Check for quote summary panel
+            setTimeout(() => {
+                const panel = document.getElementById('quote-summary-panel');
+                if (panel) {
+                    results.innerHTML += '<div class="success">✅ Quote summary panel created</div>';
+                } else {
+                    results.innerHTML += '<div class="error">❌ Quote summary panel not found</div>';
+                }
+            }, 500);
+
+            // Test 5: Simulate URL parameters
+            const urlParams = new URLSearchParams();
+            urlParams.set('StyleNumber', 'PC61');
+            urlParams.set('COLOR', 'Heather Navy');
+            window.history.replaceState({}, '', '?' + urlParams.toString());
+            
+            results.innerHTML += '<div class="info">📍 URL parameters set for testing</div>';
+            results.innerHTML += '<div class="success">🎉 All tests completed! Try the quote builder below.</div>';
+        }
+
+        // Run tests when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', runTests);
+        } else {
+            runTests();
+        }
+    </script>
+</body>
+</html>

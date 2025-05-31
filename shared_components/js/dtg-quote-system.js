@@ -1,0 +1,615 @@
+// DTG Quote System - Replaces shopping cart with simple quote builder
+// For Northwest Custom Apparel - May 2025
+
+(function() {
+    'use strict';
+
+    // Configuration
+    const config = {
+        apiBaseUrl: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api',
+        ltmThreshold: 24,
+        ltmFee: 50.00,
+        sessionKey: 'nwca_quote_session',
+        quoteKey: 'nwca_current_quote',
+        brandColor: '#2e5827' // NWCA Green
+    };
+
+    // Quote Manager
+    window.DTGQuoteManager = {
+        currentQuote: {
+            id: null,
+            sessionId: null,
+            items: [],
+            totalQuantity: 0,
+            subtotal: 0,
+            ltmTotal: 0,
+            grandTotal: 0
+        },
+
+        // Initialize quote system
+        init: function() {
+            console.log('[QUOTE] Initializing DTG Quote System');
+            this.loadSession();
+            this.setupUI();
+            this.bindEvents();
+        },
+
+        // Load or create session
+        loadSession: function() {
+            let sessionId = localStorage.getItem(config.sessionKey);
+            if (!sessionId) {
+                sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem(config.sessionKey, sessionId);
+            }
+            this.currentQuote.sessionId = sessionId;
+            
+            // Load existing quote if available
+            const savedQuote = localStorage.getItem(config.quoteKey);
+            if (savedQuote) {
+                try {
+                    const quoteData = JSON.parse(savedQuote);
+                    Object.assign(this.currentQuote, quoteData);
+                    this.updateQuoteSummary();
+                } catch (e) {
+                    console.error('[QUOTE] Error loading saved quote:', e);
+                }
+            }
+        },
+
+        // Setup UI elements
+        setupUI: function() {
+            // Replace "Add to Cart" section with quote builder
+            const cartSection = document.getElementById('add-to-cart-section');
+            if (cartSection) {
+                cartSection.innerHTML = this.getQuoteBuilderHTML();
+            }
+
+            // Add quote summary panel
+            this.addQuoteSummaryPanel();
+        },
+
+        // Get quote builder HTML
+        getQuoteBuilderHTML: function() {
+            return `
+                <h3 class="section-title" style="color: ${config.brandColor};">Build Your Quote</h3>
+                
+                <!-- Step 1: Quantity First -->
+                <div class="quote-step" id="step-quantity">
+                    <h4>Step 1: How many pieces do you need?</h4>
+                    <div class="quantity-input-group">
+                        <input type="number" id="total-quantity" min="1" placeholder="Enter total quantity" 
+                               style="font-size: 1.2em; padding: 10px; width: 200px; border: 2px solid ${config.brandColor};">
+                        <button id="calculate-pricing" class="btn-primary" 
+                                style="background-color: ${config.brandColor}; margin-left: 10px;">
+                            Calculate Pricing
+                        </button>
+                    </div>
+                    
+                    <!-- Pricing Preview -->
+                    <div id="pricing-preview" style="display: none; margin-top: 20px;">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Step 2: Size Distribution -->
+                <div class="quote-step" id="step-sizes" style="display: none;">
+                    <h4>Step 2: Distribute across sizes</h4>
+                    <div id="size-distribution-grid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                    <div class="size-validation-message" style="color: red; display: none;">
+                        Sizes must add up to total quantity
+                    </div>
+                </div>
+                
+                <!-- Step 3: Add to Quote -->
+                <div class="quote-step" id="step-add" style="display: none;">
+                    <button id="add-to-quote-btn" class="btn-primary btn-large" 
+                            style="background-color: ${config.brandColor}; width: 100%; padding: 15px; font-size: 1.1em;">
+                        Add to Quote
+                    </button>
+                </div>
+            `;
+        },
+
+        // Add quote summary panel
+        addQuoteSummaryPanel: function() {
+            const panel = document.createElement('div');
+            panel.id = 'quote-summary-panel';
+            panel.className = 'quote-summary-panel';
+            panel.style.cssText = `
+                position: fixed;
+                right: 20px;
+                top: 100px;
+                width: 300px;
+                background: white;
+                border: 2px solid ${config.brandColor};
+                border-radius: 8px;
+                padding: 20px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1000;
+            `;
+            
+            panel.innerHTML = `
+                <h3 style="color: ${config.brandColor}; margin-top: 0;">Your Quote</h3>
+                <div id="quote-items-list">
+                    <p style="color: #666;">No items yet</p>
+                </div>
+                <div class="quote-totals" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <div class="total-row" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>Subtotal:</span>
+                        <span id="quote-subtotal">$0.00</span>
+                    </div>
+                    <div class="total-row ltm-row" style="display: none; color: #dc3545;">
+                        <span>LTM Fees:</span>
+                        <span id="quote-ltm">$0.00</span>
+                    </div>
+                    <div class="total-row" style="font-weight: bold; font-size: 1.2em; margin-top: 10px;">
+                        <span>Total:</span>
+                        <span id="quote-total">$0.00</span>
+                    </div>
+                </div>
+                <div class="quote-actions" style="margin-top: 20px;">
+                    <button onclick="DTGQuoteManager.saveQuote()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">Save Quote</button>
+                    <button onclick="DTGQuoteManager.exportPDF()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">Download PDF</button>
+                    <button onclick="DTGQuoteManager.emailQuote()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">Email Quote</button>
+                    <button onclick="DTGQuoteManager.clearQuote()" class="btn-link" style="width: 100%; color: #dc3545;">Clear Quote</button>
+                </div>
+            `;
+            
+            document.body.appendChild(panel);
+        },
+
+        // Bind events
+        bindEvents: function() {
+            // Quantity calculation
+            const calcBtn = document.getElementById('calculate-pricing');
+            if (calcBtn) {
+                calcBtn.addEventListener('click', () => this.calculatePricing());
+            }
+
+            // Add to quote
+            const addBtn = document.getElementById('add-to-quote-btn');
+            if (addBtn) {
+                addBtn.addEventListener('click', () => this.addItemToQuote());
+            }
+
+            // Quantity input enter key
+            const qtyInput = document.getElementById('total-quantity');
+            if (qtyInput) {
+                qtyInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.calculatePricing();
+                });
+            }
+        },
+
+        // Calculate pricing based on quantity
+        calculatePricing: function() {
+            const quantity = parseInt(document.getElementById('total-quantity').value);
+            if (!quantity || quantity < 1) {
+                alert('Please enter a valid quantity');
+                return;
+            }
+
+            // Determine pricing tier
+            const tier = this.getPricingTier(quantity);
+            const hasLTM = quantity < config.ltmThreshold;
+            
+            // Get base price from current pricing data
+            const basePrice = this.getBasePriceForTier(tier);
+            const ltmPerUnit = hasLTM ? (config.ltmFee / quantity) : 0;
+            const finalPrice = basePrice + ltmPerUnit;
+
+            // Show pricing preview
+            const preview = document.getElementById('pricing-preview');
+            preview.style.display = 'block';
+            
+            if (hasLTM) {
+                preview.innerHTML = `
+                    <div class="ltm-explanation" style="background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 5px;">
+                        <h4 style="color: #856404; margin-top: 0;">Less Than Minimum (LTM) Fee Applies</h4>
+                        <p>For orders under ${config.ltmThreshold} pieces, a $${config.ltmFee} setup fee is distributed across all items.</p>
+                        
+                        <div class="price-breakdown" style="margin-top: 10px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>Base price per piece (${config.ltmThreshold}-piece pricing):</span>
+                                <strong>$${basePrice.toFixed(2)}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #dc3545;">
+                                <span>LTM fee per piece ($${config.ltmFee} ÷ ${quantity}):</span>
+                                <strong>$${ltmPerUnit.toFixed(2)}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 1.2em; padding-top: 10px; border-top: 1px solid #ddd;">
+                                <span>Your price per piece:</span>
+                                <strong style="color: ${config.brandColor};">$${finalPrice.toFixed(2)}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                preview.innerHTML = `
+                    <div class="pricing-info" style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px;">
+                        <h4 style="color: #155724; margin-top: 0;">Your Pricing Tier: ${tier}</h4>
+                        <div style="font-size: 1.2em;">
+                            Price per piece: <strong style="color: ${config.brandColor};">$${basePrice.toFixed(2)}</strong>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Show size distribution step
+            this.showSizeDistribution(quantity);
+        },
+
+        // Get pricing tier based on quantity
+        getPricingTier: function(quantity) {
+            if (quantity >= 72) return '72+';
+            if (quantity >= 48) return '48-71';
+            return '24-47';
+        },
+
+        // Get base price for tier (from current pricing data)
+        getBasePriceForTier: function(tier) {
+            // Try DTG adapter data first (window.nwcaPricingData)
+            if (window.nwcaPricingData && window.nwcaPricingData.prices) {
+                const prices = window.nwcaPricingData.prices;
+                const firstSize = Object.keys(prices)[0];
+                if (firstSize && prices[firstSize] && prices[firstSize][tier]) {
+                    return parseFloat(prices[firstSize][tier]);
+                }
+            }
+            
+            // Try legacy currentCaspioPricing format
+            if (window.currentCaspioPricing && window.currentCaspioPricing.prices) {
+                const prices = window.currentCaspioPricing.prices;
+                const firstSize = Object.keys(prices)[0];
+                if (firstSize && prices[firstSize] && prices[firstSize][tier]) {
+                    return parseFloat(prices[firstSize][tier]);
+                }
+            }
+            
+            // Fallback prices
+            const fallbackPrices = {
+                '24-47': 15.99,
+                '48-71': 14.99,
+                '72+': 13.99
+            };
+            return fallbackPrices[tier] || 15.99;
+        },
+
+        // Show size distribution inputs
+        showSizeDistribution: function(totalQuantity) {
+            const sizesStep = document.getElementById('step-sizes');
+            const grid = document.getElementById('size-distribution-grid');
+            
+            // Get available sizes from DTG adapter or fallback
+            const sizes = window.nwcaPricingData?.uniqueSizes || window.currentCaspioPricing?.uniqueSizes || ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+            
+            grid.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px;">
+                    ${sizes.map(size => `
+                        <div style="text-align: center; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <label style="font-weight: bold; display: block; margin-bottom: 5px;">${size}</label>
+                            <input type="number" class="size-qty-input" data-size="${size}" 
+                                   min="0" value="0" style="width: 60px; padding: 5px;">
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <span>Total: <strong id="size-total">0</strong> / ${totalQuantity}</span>
+                </div>
+            `;
+            
+            sizesStep.style.display = 'block';
+            
+            // Add validation listeners
+            const inputs = grid.querySelectorAll('.size-qty-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', () => this.validateSizeDistribution(totalQuantity));
+            });
+            
+            // Show add button
+            document.getElementById('step-add').style.display = 'block';
+        },
+
+        // Validate size distribution
+        validateSizeDistribution: function(totalQuantity) {
+            const inputs = document.querySelectorAll('.size-qty-input');
+            let sum = 0;
+            inputs.forEach(input => {
+                sum += parseInt(input.value) || 0;
+            });
+            
+            document.getElementById('size-total').textContent = sum;
+            const validationMsg = document.querySelector('.size-validation-message');
+            const addBtn = document.getElementById('add-to-quote-btn');
+            
+            if (sum === totalQuantity) {
+                validationMsg.style.display = 'none';
+                addBtn.disabled = false;
+                addBtn.style.opacity = '1';
+            } else {
+                validationMsg.style.display = 'block';
+                addBtn.disabled = true;
+                addBtn.style.opacity = '0.5';
+            }
+            
+            return sum === totalQuantity;
+        },
+
+        // Add item to quote
+        addItemToQuote: function() {
+            const totalQuantity = parseInt(document.getElementById('total-quantity').value);
+            if (!this.validateSizeDistribution(totalQuantity)) {
+                alert('Please ensure sizes add up to total quantity');
+                return;
+            }
+
+            // Gather product data
+            const urlParams = new URLSearchParams(window.location.search);
+            const styleNumber = urlParams.get('StyleNumber') || window.nwcaPricingData?.styleNumber || window.currentCaspioPricing?.styleNumber;
+            const color = urlParams.get('COLOR') || window.nwcaPricingData?.color || window.currentCaspioPricing?.color;
+            const location = document.getElementById('parent-dtg-location-select')?.value || 'FF';
+            
+            // Get size breakdown
+            const sizeBreakdown = {};
+            document.querySelectorAll('.size-qty-input').forEach(input => {
+                const qty = parseInt(input.value) || 0;
+                if (qty > 0) {
+                    sizeBreakdown[input.dataset.size] = qty;
+                }
+            });
+
+            // Calculate pricing
+            const tier = this.getPricingTier(totalQuantity);
+            const basePrice = this.getBasePriceForTier(tier);
+            const hasLTM = totalQuantity < config.ltmThreshold;
+            const ltmPerUnit = hasLTM ? (config.ltmFee / totalQuantity) : 0;
+            const finalPrice = basePrice + ltmPerUnit;
+            const lineTotal = finalPrice * totalQuantity;
+
+            // Create quote item
+            const item = {
+                id: 'item_' + Date.now(),
+                lineNumber: this.currentQuote.items.length + 1,
+                styleNumber: styleNumber,
+                productName: document.getElementById('product-title-context')?.textContent || 'Product',
+                color: color,
+                embellishmentType: 'dtg',
+                printLocation: location,
+                printLocationName: this.getLocationName(location),
+                quantity: totalQuantity,
+                hasLTM: hasLTM,
+                baseUnitPrice: basePrice,
+                ltmPerUnit: ltmPerUnit,
+                finalUnitPrice: finalPrice,
+                lineTotal: lineTotal,
+                sizeBreakdown: sizeBreakdown,
+                pricingTier: tier,
+                imageUrl: document.getElementById('product-image-main')?.src || ''
+            };
+
+            // Add to quote
+            this.currentQuote.items.push(item);
+            this.updateQuoteTotals();
+            this.saveQuoteToStorage();
+            this.updateQuoteSummary();
+            
+            // Log analytics
+            this.logAnalytics('item_added', {
+                styleNumber: styleNumber,
+                quantity: totalQuantity,
+                hasLTM: hasLTM,
+                priceShown: finalPrice
+            });
+
+            // Show success message
+            this.showSuccessMessage();
+            
+            // Reset form
+            this.resetQuoteBuilder();
+        },
+
+        // Get location name
+        getLocationName: function(code) {
+            const locations = {
+                'FF': 'Full Front',
+                'FB': 'Full Back',
+                'LC': 'Left Chest',
+                'JF': 'Jumbo Front',
+                'JB': 'Jumbo Back'
+            };
+            return locations[code] || code;
+        },
+
+        // Update quote totals
+        updateQuoteTotals: function() {
+            let subtotal = 0;
+            let ltmTotal = 0;
+            let totalQuantity = 0;
+
+            this.currentQuote.items.forEach(item => {
+                subtotal += item.baseUnitPrice * item.quantity;
+                ltmTotal += item.ltmPerUnit * item.quantity;
+                totalQuantity += item.quantity;
+            });
+
+            this.currentQuote.subtotal = subtotal;
+            this.currentQuote.ltmTotal = ltmTotal;
+            this.currentQuote.grandTotal = subtotal + ltmTotal;
+            this.currentQuote.totalQuantity = totalQuantity;
+        },
+
+        // Update quote summary display
+        updateQuoteSummary: function() {
+            const itemsList = document.getElementById('quote-items-list');
+            const subtotalEl = document.getElementById('quote-subtotal');
+            const ltmEl = document.getElementById('quote-ltm');
+            const totalEl = document.getElementById('quote-total');
+            const ltmRow = document.querySelector('.ltm-row');
+
+            if (this.currentQuote.items.length === 0) {
+                itemsList.innerHTML = '<p style="color: #666;">No items yet</p>';
+            } else {
+                itemsList.innerHTML = this.currentQuote.items.map(item => `
+                    <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong>${item.styleNumber} - ${item.color}</strong>
+                            <button onclick="DTGQuoteManager.removeItem('${item.id}')" 
+                                    style="color: #dc3545; border: none; background: none; cursor: pointer;">×</button>
+                        </div>
+                        <div style="font-size: 0.9em; color: #666;">
+                            ${item.printLocationName} | Qty: ${item.quantity} | $${item.finalUnitPrice.toFixed(2)}/ea
+                        </div>
+                        <div style="text-align: right; font-weight: bold;">
+                            $${item.lineTotal.toFixed(2)}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            subtotalEl.textContent = '$' + this.currentQuote.subtotal.toFixed(2);
+            ltmEl.textContent = '$' + this.currentQuote.ltmTotal.toFixed(2);
+            totalEl.textContent = '$' + this.currentQuote.grandTotal.toFixed(2);
+
+            if (this.currentQuote.ltmTotal > 0) {
+                ltmRow.style.display = 'flex';
+            } else {
+                ltmRow.style.display = 'none';
+            }
+        },
+
+        // Remove item from quote
+        removeItem: function(itemId) {
+            this.currentQuote.items = this.currentQuote.items.filter(item => item.id !== itemId);
+            this.updateQuoteTotals();
+            this.saveQuoteToStorage();
+            this.updateQuoteSummary();
+        },
+
+        // Save quote to storage
+        saveQuoteToStorage: function() {
+            localStorage.setItem(config.quoteKey, JSON.stringify(this.currentQuote));
+        },
+
+        // Save quote to database
+        saveQuote: async function() {
+            try {
+                // Create quote ID if not exists
+                if (!this.currentQuote.id) {
+                    this.currentQuote.id = 'Q_' + new Date().toISOString().replace(/[-:T]/g, '').substr(0, 15);
+                }
+
+                // Prepare quote data
+                const quoteData = {
+                    QuoteID: this.currentQuote.id,
+                    SessionID: this.currentQuote.sessionId,
+                    TotalQuantity: this.currentQuote.totalQuantity,
+                    SubtotalAmount: this.currentQuote.subtotal,
+                    LTMFeeTotal: this.currentQuote.ltmTotal,
+                    TotalAmount: this.currentQuote.grandTotal,
+                    Status: 'saved'
+                };
+
+                // Save to API (when available)
+                console.log('[QUOTE] Saving quote:', quoteData);
+                
+                // Show success
+                alert('Quote saved successfully! Quote ID: ' + this.currentQuote.id);
+                
+                // Log analytics
+                this.logAnalytics('quote_saved');
+                
+            } catch (error) {
+                console.error('[QUOTE] Error saving quote:', error);
+                alert('Error saving quote. Please try again.');
+            }
+        },
+
+        // Export quote as PDF
+        exportPDF: function() {
+            if (this.currentQuote.items.length === 0) {
+                alert('No items in quote to export');
+                return;
+            }
+
+            // Use existing order-form-pdf.js functionality
+            if (window.generateQuotePDF) {
+                window.generateQuotePDF(this.currentQuote);
+            } else {
+                console.error('[QUOTE] PDF generation not available');
+                alert('PDF export coming soon!');
+            }
+            
+            this.logAnalytics('quote_exported');
+        },
+
+        // Email quote
+        emailQuote: function() {
+            const email = prompt('Enter email address:');
+            if (email) {
+                console.log('[QUOTE] Emailing quote to:', email);
+                alert('Quote email functionality coming soon!');
+                this.logAnalytics('quote_emailed');
+            }
+        },
+
+        // Clear quote
+        clearQuote: function() {
+            if (confirm('Are you sure you want to clear the current quote?')) {
+                this.currentQuote.items = [];
+                this.currentQuote.id = null;
+                this.updateQuoteTotals();
+                this.saveQuoteToStorage();
+                this.updateQuoteSummary();
+                this.resetQuoteBuilder();
+            }
+        },
+
+        // Reset quote builder form
+        resetQuoteBuilder: function() {
+            document.getElementById('total-quantity').value = '';
+            document.getElementById('pricing-preview').style.display = 'none';
+            document.getElementById('step-sizes').style.display = 'none';
+            document.getElementById('step-add').style.display = 'none';
+        },
+
+        // Show success message
+        showSuccessMessage: function() {
+            const preview = document.getElementById('pricing-preview');
+            preview.innerHTML = `
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; text-align: center;">
+                    <h4 style="color: #155724; margin: 0;">✓ Item added to quote successfully!</h4>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                preview.style.display = 'none';
+            }, 3000);
+        },
+
+        // Log analytics
+        logAnalytics: function(eventType, data = {}) {
+            const analyticsData = {
+                SessionID: this.currentQuote.sessionId,
+                QuoteID: this.currentQuote.id,
+                EventType: eventType,
+                Timestamp: new Date().toISOString(),
+                ...data
+            };
+            
+            console.log('[ANALYTICS]', eventType, analyticsData);
+            
+            // Send to API when available
+            // fetch(`${config.apiBaseUrl}/quote-analytics`, { ... })
+        }
+    };
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => DTGQuoteManager.init());
+    } else {
+        DTGQuoteManager.init();
+    }
+
+})();

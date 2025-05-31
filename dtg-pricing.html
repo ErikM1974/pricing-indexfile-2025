@@ -1444,39 +1444,15 @@
                         <div class="size-quantity-grid" id="size-quantity-grid" style="display: none;">
                         </div>
                         
-                        <!-- This .cart-summary will be the sticky summary -->
-                        <div class="cart-summary" id="sticky-product-cart-summary">
-                            <div class="cart-total">
-                                <div>
-                                    <span class="total-label">Total Quantity:</span> <span class="total-quantity">0</span>
-                                </div>
-                                <div>
-                                    <span class="total-label">Est. Total:</span>
-                                    <span class="total-amount total-price" data-tier-key="" data-total-quantity="0" data-ltm-fee-applies="false">$0.00</span>
-                                </div>
+                        <!-- DTG Quote Builder Section (replaces cart) -->
+                        <div id="add-to-cart-section" class="quote-builder-container">
+                            <!-- This will be replaced by DTGQuoteManager.setupUI() -->
+                            <div style="text-align: center; padding: 20px; color: #666;">
+                                <p>Loading quote builder...</p>
                             </div>
-                            <div class="ltm-fee-notice" style="display: none;">
-                                <span class="ltm-icon" style="font-style: normal; font-weight: bold; color: #0056b3;">ℹ️</span>
-                                <span class="ltm-text">Less Than Minimum fee applies</span>
-                            </div>
-                            <button id="add-to-cart-button" class="add-to-cart-button">
-                                Add to Cart
-                            </button>
-                            <button id="view-cart-summary-button" class="view-cart-button" style="display: none; margin-top: 10px; width: 100%; padding: 10px; background-color: #17a2b8; color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 1em;">
-                                View Cart (<span class="cart-count-display">0</span>)
-                            </button>
                         </div>
                         
-                        <!-- Quote Actions -->
-                        <div class="quote-actions" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
-                            <h4 style="margin-bottom: 10px; color: #2e5827;">Quote Options:</h4>
-                            <button class="btn btn-secondary" onclick="printQuote()" style="margin-right: 10px; background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                                📄 Print Quote
-                            </button>
-                            <button class="btn btn-secondary" onclick="emailQuote()" style="background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                                ✉️ Email Quote
-                            </button>
-                        </div>
+                        <!-- Quote actions now handled by DTGQuoteManager floating panel -->
                     </div>
                 </div> <!-- End .pricing-content-interactive -->
             </div> <!-- End .product-interactive-column -->
@@ -1489,18 +1465,19 @@
     <script src="/shared_components/js/pricing-matrix-capture.js"></script>
     <script src="/shared_components/js/pricing-matrix-api.js"></script>
     <script src="/shared_components/js/dp5-helper.js"></script>
-    <script src="/shared_components/js/product-quantity-ui.js"></script>
-    <script src="/shared_components/js/cart.js"></script>
-    <script src="/shared_components/js/cart-integration.js"></script>
-    <script src="/shared_components/js/cart-price-recalculator.js"></script>
-    <script src="/shared_components/js/add-to-cart.js"></script>
-    <script src="/shared_components/js/pricing-calculator.js"></script>
+    <!-- Removed cart system - replaced with quote builder -->
+    <!-- <script src="/shared_components/js/product-quantity-ui.js"></script> -->
+    <!-- <script src="/shared_components/js/cart.js"></script> -->
+    <!-- <script src="/shared_components/js/cart-integration.js"></script> -->
+    <!-- <script src="/shared_components/js/cart-price-recalculator.js"></script> -->
+    <!-- <script src="/shared_components/js/add-to-cart.js"></script> -->
+    <!-- <script src="/shared_components/js/pricing-calculator.js"></script> -->
     <script src="/shared_components/js/dtg-adapter.js"></script>
     <!-- DISABLED: Price grouping was causing layout issues when switching locations -->
     <!-- <script src="/shared_components/js/dtg-price-grouping-v4.js"></script> -->
-    <script src="/shared_components/js/dtg-quote.js"></script> <!-- Quote functionality -->
+    <script src="/shared_components/js/dtg-quote-system.js"></script> <!-- NEW: Comprehensive quote builder -->
     <script src="/shared_components/js/product-pricing-ui.js"></script> <!-- Added new script, removed defer -->
     
 </body>
-<script src="/shared_components/js/order-form-pdf.js"></script>
+<!-- PDF generation now handled by DTGQuoteManager -->
 </html>
