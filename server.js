@@ -672,7 +672,17 @@ app.get('/api/cart-integration.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'cart-integration.js'));
 });
 
+// Quote endpoints are handled by the main Caspio API
+// The quote system uses existing API endpoints:
+// - /api/quote_sessions (for quote sessions)
+// - /api/quote_items (for quote items) 
+// - /api/quote_analytics (for analytics)
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log('Using existing Caspio API for quote functionality:');
+  console.log('  Quote Sessions: /api/quote_sessions');
+  console.log('  Quote Items: /api/quote_items');
+  console.log('  Quote Analytics: /api/quote_analytics');
 });

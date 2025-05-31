@@ -150,10 +150,11 @@
                     </div>
                 </div>
                 <div class="quote-actions" style="margin-top: 20px;">
-                    <button onclick="DTGQuoteManager.saveQuote()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">Save Quote</button>
-                    <button onclick="DTGQuoteManager.exportPDF()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">Download PDF</button>
-                    <button onclick="DTGQuoteManager.emailQuote()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">Email Quote</button>
-                    <button onclick="DTGQuoteManager.clearQuote()" class="btn-link" style="width: 100%; color: #dc3545;">Clear Quote</button>
+                    <button onclick="DTGQuoteManager.saveQuote()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">💾 Save Quote</button>
+                    <button onclick="DTGQuoteManager.loadQuotePrompt()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">📂 Load Quote</button>
+                    <button onclick="DTGQuoteManager.exportPDF()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">📄 Download PDF</button>
+                    <button onclick="DTGQuoteManager.emailQuote()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">✉️ Email Quote</button>
+                    <button onclick="DTGQuoteManager.clearQuote()" class="btn-link" style="width: 100%; color: #dc3545;">🗑️ Clear Quote</button>
                 </div>
             `;
             
@@ -500,19 +501,38 @@
                     this.currentQuote.id = 'Q_' + new Date().toISOString().replace(/[-:T]/g, '').substr(0, 15);
                 }
 
-                // Prepare quote data
-                const quoteData = {
+                // Prepare quote session data (using your API structure)
+                const quoteSessionData = {
                     QuoteID: this.currentQuote.id,
                     SessionID: this.currentQuote.sessionId,
-                    TotalQuantity: this.currentQuote.totalQuantity,
-                    SubtotalAmount: this.currentQuote.subtotal,
-                    LTMFeeTotal: this.currentQuote.ltmTotal,
-                    TotalAmount: this.currentQuote.grandTotal,
-                    Status: 'saved'
+                    CustomerEmail: '', // Can be populated later
+                    CustomerName: '',
+                    CompanyName: '',
+                    Status: 'Active',
+                    Notes: `DTG Quote - ${this.currentQuote.items.length} items, Total: $${this.currentQuote.grandTotal.toFixed(2)}`
                 };
 
-                // Save to API (when available)
-                console.log('[QUOTE] Saving quote:', quoteData);
+                // Save to your quote_sessions API
+                console.log('[QUOTE] Saving quote session to API:', quoteSessionData);
+                const response = await fetch(`${config.apiBaseUrl}/quote_sessions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(quoteSessionData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to save quote session: ${response.status}`);
+                }
+
+                const savedQuoteSession = await response.json();
+                console.log('[QUOTE] Quote session saved successfully:', savedQuoteSession);
+                
+                // Now save each quote item using your quote_items API
+                for (const item of this.currentQuote.items) {
+                    await this.saveQuoteItem(item);
+                }
                 
                 // Show success
                 alert('Quote saved successfully! Quote ID: ' + this.currentQuote.id);
@@ -522,7 +542,7 @@
                 
             } catch (error) {
                 console.error('[QUOTE] Error saving quote:', error);
-                alert('Error saving quote. Please try again.');
+                alert('Error saving quote: ' + error.message);
             }
         },
 
@@ -544,13 +564,44 @@
             this.logAnalytics('quote_exported');
         },
 
+        // Load quote prompt
+        loadQuotePrompt: function() {
+            const quoteId = prompt('Enter Quote ID (e.g., Q_20250531123456):');
+            if (quoteId) {
+                this.loadQuoteById(quoteId);
+            }
+        },
+
+        // Load quote by ID
+        loadQuoteById: async function(quoteId) {
+            try {
+                const loadingMsg = document.createElement('div');
+                loadingMsg.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 2px solid #2e5827; border-radius: 8px; z-index: 10000;';
+                loadingMsg.innerHTML = '<p>Loading quote...</p>';
+                document.body.appendChild(loadingMsg);
+
+                await this.loadQuote(quoteId);
+                
+                document.body.removeChild(loadingMsg);
+                alert(`Quote ${quoteId} loaded successfully!`);
+                this.logAnalytics('quote_loaded', { quoteId });
+                
+            } catch (error) {
+                const loadingMsg = document.querySelector('[style*="Loading quote"]');
+                if (loadingMsg) document.body.removeChild(loadingMsg);
+                
+                alert('Failed to load quote: ' + error.message);
+                console.error('[QUOTE] Load error:', error);
+            }
+        },
+
         // Email quote
         emailQuote: function() {
             const email = prompt('Enter email address:');
             if (email) {
                 console.log('[QUOTE] Emailing quote to:', email);
                 alert('Quote email functionality coming soon!');
-                this.logAnalytics('quote_emailed');
+                this.logAnalytics('quote_emailed', { email });
             }
         },
 
@@ -588,20 +639,166 @@
             }, 3000);
         },
 
-        // Log analytics
-        logAnalytics: function(eventType, data = {}) {
+        // Save individual quote item (using your quote_items API)
+        saveQuoteItem: async function(item) {
+            try {
+                console.log('[QUOTE] Saving quote item:', item.id);
+                
+                const itemData = {
+                    QuoteID: this.currentQuote.id,
+                    StyleNumber: item.styleNumber,
+                    ProductName: item.productName,
+                    Color: item.color,
+                    Quantity: item.quantity,
+                    UnitPrice: item.finalUnitPrice,
+                    TotalPrice: item.lineTotal,
+                    EmbellishmentType: item.embellishmentType,
+                    PrintLocation: item.printLocation,
+                    PrintLocationName: item.printLocationName,
+                    PricingTier: item.pricingTier,
+                    HasLTM: item.hasLTM,
+                    BaseUnitPrice: item.baseUnitPrice,
+                    LTMPerUnit: item.ltmPerUnit,
+                    SizeBreakdown: JSON.stringify(item.sizeBreakdown),
+                    ImageURL: item.imageUrl,
+                    LineNumber: item.lineNumber
+                };
+
+                const response = await fetch(`${config.apiBaseUrl}/quote_items`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(itemData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to save item: ${response.status}`);
+                }
+
+                const savedItem = await response.json();
+                console.log('[QUOTE] Item saved successfully:', savedItem);
+                return savedItem;
+                
+            } catch (error) {
+                console.error('[QUOTE] Error saving quote item:', error);
+                throw error;
+            }
+        },
+
+        // Load existing quote (using your quote_sessions and quote_items APIs)
+        loadQuote: async function(quoteId) {
+            try {
+                console.log('[QUOTE] Loading quote:', quoteId);
+                
+                // Get quote session
+                const sessionResponse = await fetch(`${config.apiBaseUrl}/quote_sessions?quoteID=${quoteId}`);
+                
+                if (!sessionResponse.ok) {
+                    throw new Error(`Failed to load quote session: ${sessionResponse.status}`);
+                }
+
+                const sessionData = await sessionResponse.json();
+                console.log('[QUOTE] Quote session loaded:', sessionData);
+                
+                if (!sessionData || sessionData.length === 0) {
+                    throw new Error('Quote not found');
+                }
+                
+                const quoteSession = sessionData[0]; // Get first matching session
+                
+                // Get quote items
+                const itemsResponse = await fetch(`${config.apiBaseUrl}/quote_items?quoteID=${quoteId}`);
+                
+                if (!itemsResponse.ok) {
+                    throw new Error(`Failed to load quote items: ${itemsResponse.status}`);
+                }
+
+                const itemsData = await itemsResponse.json();
+                console.log('[QUOTE] Quote items loaded:', itemsData);
+                
+                // Update current quote with loaded data
+                this.currentQuote.id = quoteSession.QuoteID;
+                this.currentQuote.sessionId = quoteSession.SessionID;
+                this.currentQuote.items = [];
+                
+                // Convert API items back to quote items
+                if (itemsData && itemsData.length > 0) {
+                    itemsData.forEach(apiItem => {
+                        const sizeBreakdown = apiItem.SizeBreakdown ? JSON.parse(apiItem.SizeBreakdown) : {};
+                        
+                        const quoteItem = {
+                            id: 'item_' + apiItem.PK_ID,
+                            lineNumber: apiItem.LineNumber || this.currentQuote.items.length + 1,
+                            styleNumber: apiItem.StyleNumber,
+                            productName: apiItem.ProductName,
+                            color: apiItem.Color,
+                            embellishmentType: apiItem.EmbellishmentType,
+                            printLocation: apiItem.PrintLocation,
+                            printLocationName: apiItem.PrintLocationName,
+                            quantity: apiItem.Quantity,
+                            hasLTM: apiItem.HasLTM,
+                            baseUnitPrice: apiItem.BaseUnitPrice,
+                            ltmPerUnit: apiItem.LTMPerUnit,
+                            finalUnitPrice: apiItem.UnitPrice,
+                            lineTotal: apiItem.TotalPrice,
+                            sizeBreakdown: sizeBreakdown,
+                            pricingTier: apiItem.PricingTier,
+                            imageUrl: apiItem.ImageURL
+                        };
+                        
+                        this.currentQuote.items.push(quoteItem);
+                    });
+                }
+                
+                this.updateQuoteTotals();
+                this.updateQuoteSummary();
+                
+                return {
+                    session: quoteSession,
+                    items: itemsData
+                };
+                
+            } catch (error) {
+                console.error('[QUOTE] Error loading quote:', error);
+                throw error;
+            }
+        },
+
+        // Log analytics (using your quote_analytics API)
+        logAnalytics: async function(eventType, data = {}) {
             const analyticsData = {
                 SessionID: this.currentQuote.sessionId,
                 QuoteID: this.currentQuote.id,
                 EventType: eventType,
-                Timestamp: new Date().toISOString(),
+                StyleNumber: data.styleNumber || '',
+                Color: data.color || '',
+                PrintLocation: data.printLocation || '',
+                Quantity: data.quantity || 0,
+                PriceShown: data.priceShown || 0,
                 ...data
             };
             
             console.log('[ANALYTICS]', eventType, analyticsData);
             
-            // Send to API when available
-            // fetch(`${config.apiBaseUrl}/quote-analytics`, { ... })
+            // Send to your quote_analytics API
+            try {
+                const response = await fetch(`${config.apiBaseUrl}/quote_analytics`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(analyticsData)
+                });
+                
+                if (response.ok) {
+                    console.log('[ANALYTICS] Event logged successfully');
+                } else {
+                    console.warn('[ANALYTICS] API response not OK:', response.status);
+                }
+            } catch (error) {
+                console.warn('[ANALYTICS] Failed to log event:', error);
+            }
         }
     };
 
