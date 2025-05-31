@@ -722,7 +722,7 @@
                 <div class="pricing-content-interactive"> <!-- New wrapper for clarity -->
                     <!-- Hidden Caspio Matrix - Keep this for data source -->
                     <div id="pricing-calculator" class="pricing-calculator">
-<!-- CASPIO DATAPAGE DEPLOYMENT CODE GOES HERE -->
+                        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150002eb9491a50104c1d99d7/emb"></script>
                         <div class="loading-message">Loading pricing data...</div>
                     </div>
                     
@@ -1445,15 +1445,63 @@
                         </div>
                     </div> <!-- End legacy cart section -->
                         
-                    <!-- DTG Quote Builder Section (replaces cart) -->
-                    <div id="add-to-cart-section" class="quote-builder-container" style="margin-top: 30px;">
-                            <!-- This will be replaced by DTGQuoteManager.setupUI() -->
-                            <div style="text-align: center; padding: 20px; color: #666;">
-                                <p>Loading quote builder...</p>
+                    <!-- Enhanced Cart Section with Multi-Color Support -->
+                    <div id="add-to-cart-section" class="enhanced-cart-container" style="margin-top: 30px;">
+                        <h3 class="section-title" style="color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;">
+                            🛒 Add to Cart
+                        </h3>
+                        
+                        <!-- Quantity Selection -->
+                        <div class="quantity-selection-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                            <h4 style="margin-top: 0; color: var(--primary-color);">Select Quantity</h4>
+                            <div class="quantity-input-group" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <label for="cart-quantity-input" style="font-weight: bold;">Total Pieces:</label>
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <button type="button" onclick="UnifiedCartManager.adjustQuantity(-1)" 
+                                            style="width: 35px; height: 35px; border: 1px solid var(--primary-color); background: #f8f9fa; color: var(--primary-color); border-radius: 4px; cursor: pointer; font-weight: bold;">-</button>
+                                    <input type="number" id="cart-quantity-input" min="1" value="24" 
+                                           style="width: 80px; text-align: center; padding: 8px; border: 2px solid var(--primary-color); border-radius: 4px; font-size: 1.1em;">
+                                    <button type="button" onclick="UnifiedCartManager.adjustQuantity(1)" 
+                                            style="width: 35px; height: 35px; border: 1px solid var(--primary-color); background: #f8f9fa; color: var(--primary-color); border-radius: 4px; cursor: pointer; font-weight: bold;">+</button>
+                                </div>
+                                <button onclick="UnifiedCartManager.calculateCurrentPricing()" 
+                                        style="background: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                    Calculate Pricing
+                                </button>
+                            </div>
+                            
+                            <!-- Current Pricing Display -->
+                            <div id="current-pricing-display" style="margin-top: 15px; padding: 15px; background: white; border-radius: 5px; border-left: 4px solid var(--primary-color); display: none;">
+                                <!-- Populated by JavaScript -->
                             </div>
                         </div>
-                        
-                        <!-- Quote actions now handled by DTGQuoteManager floating panel -->
+
+                        <!-- Size Distribution -->
+                        <div id="size-distribution-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: none;">
+                            <h4 style="margin-top: 0; color: var(--primary-color);">Distribute Across Sizes</h4>
+                            <div id="size-distribution-grid">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                            <div class="size-validation" style="margin-top: 10px; text-align: center;">
+                                <span>Total: <strong id="size-total-display">0</strong> / <span id="size-target-display">0</span></span>
+                                <div id="size-validation-message" style="color: #dc3545; margin-top: 5px; display: none;">
+                                    Sizes must add up to total quantity
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add to Cart Button -->
+                        <div class="add-to-cart-actions" style="text-align: center;">
+                            <button id="main-add-to-cart-btn" onclick="UnifiedCartManager.addCurrentItemToCart()" 
+                                    class="add-to-cart-button" disabled
+                                    style="background: #6c757d; color: white; border: none; padding: 15px 30px; border-radius: 5px; font-size: 1.1em; font-weight: bold; cursor: not-allowed; opacity: 0.6;">
+                                🛒 Add to Cart
+                            </button>
+                            <p style="margin-top: 10px; color: #666; font-size: 0.9em;">
+                                <strong>Note:</strong> All items in cart must use the same print location and embellishment type.
+                            </p>
+                        </div>
+                    </div>
                     </div>
                 </div> <!-- End .pricing-content-interactive -->
             </div> <!-- End .product-interactive-column -->
@@ -1474,9 +1522,10 @@
     <!-- <script src="/shared_components/js/add-to-cart.js"></script> -->
     <!-- <script src="/shared_components/js/pricing-calculator.js"></script> -->
     <script src="/shared_components/js/dtg-adapter.js"></script>
+    <script src="/shared_components/js/pricing-fallback-adapter.js"></script> <!-- NEW: Fallback pricing when Caspio fails -->
     <!-- DISABLED: Price grouping was causing layout issues when switching locations -->
     <!-- <script src="/shared_components/js/dtg-price-grouping-v4.js"></script> -->
-    <script src="/shared_components/js/dtg-quote-system.js"></script> <!-- NEW: Comprehensive quote builder -->
+    <script src="/shared_components/js/unified-cart-adapter.js"></script> <!-- NEW: Unified cart system with multi-color support -->
     <script src="/shared_components/js/product-pricing-ui.js"></script> <!-- Added new script, removed defer -->
     
 </body>

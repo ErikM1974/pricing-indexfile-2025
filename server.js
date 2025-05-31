@@ -625,6 +625,57 @@ app.get('/api/pricing-matrix/:id', async (req, res) => {
   }
 });
 
+// Size Pricing API - NEW ENDPOINT FOR DTG/EMBROIDERY
+app.get('/api/size-pricing', async (req, res) => {
+  try {
+    const { styleNumber } = req.query;
+    
+    if (!styleNumber) {
+      return res.status(400).json({
+        error: 'Missing required parameter',
+        message: 'styleNumber is required'
+      });
+    }
+    
+    // Try to get size pricing data from inventory or create fallback
+    console.log(`[SIZE-PRICING] Fetching size pricing for: ${styleNumber}`);
+    
+    // Generate fallback size pricing data for now
+    const fallbackSizePricing = {
+      styleNumber: styleNumber,
+      sizes: [
+        { size: 'S', available: true, upcharge: 0 },
+        { size: 'M', available: true, upcharge: 0 },
+        { size: 'L', available: true, upcharge: 0 },
+        { size: 'XL', available: true, upcharge: 0 },
+        { size: '2XL', available: true, upcharge: 2.00 },
+        { size: '3XL', available: true, upcharge: 4.00 },
+        { size: '4XL', available: true, upcharge: 6.00 },
+        { size: '5XL', available: true, upcharge: 8.00 }
+      ],
+      addOns: [
+        { name: 'Rush Service', price: 25.00, available: true },
+        { name: 'Design Service', price: 50.00, available: true },
+        { name: 'Color Matching', price: 15.00, available: true }
+      ],
+      commonData: {
+        ltmThreshold: 24,
+        ltmFee: 50.00,
+        tiers: ['24-47', '48-71', '72+']
+      }
+    };
+    
+    res.json(fallbackSizePricing);
+    
+  } catch (error) {
+    console.error('Error in size pricing endpoint:', error);
+    res.status(500).json({
+      error: 'Failed to fetch size pricing',
+      message: error.message
+    });
+  }
+});
+
 // NEW: Image Proxy Endpoint
 app.get('/api/image-proxy', async (req, res) => {
   const imageUrl = req.query.url;
