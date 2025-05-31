@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick DTG Quote Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .test-section { border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 DTG Quote Builder - Quick Test</h1>
+    
+    <div class="test-section">
+        <h2>System Status</h2>
+        <div id="system-status">Testing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Quote Builder UI</h2>
+        <div id="add-to-cart-section">
+            <div style="text-align: center; padding: 20px; color: #666;">
+                <p>⏳ Loading quote builder...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load required scripts -->
+    <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/dtg-quote-system.js"></script>
+
+    <script>
+        // Test the system
+        function testSystem() {
+            const status = document.getElementById('system-status');
+            let results = '';
+
+            // Test 1: Utils loaded
+            if (typeof window.NWCAUtils !== 'undefined') {
+                results += '<div class="result success">✅ NWCAUtils loaded</div>';
+            } else {
+                results += '<div class="result error">❌ NWCAUtils missing</div>';
+            }
+
+            // Test 2: Quote Manager loaded
+            if (typeof window.DTGQuoteManager !== 'undefined') {
+                results += '<div class="result success">✅ DTGQuoteManager loaded</div>';
+            } else {
+                results += '<div class="result error">❌ DTGQuoteManager missing</div>';
+                status.innerHTML = results;
+                return;
+            }
+
+            // Test 3: Initialize quote system
+            try {
+                // Set up mock data first
+                window.nwcaPricingData = {
+                    styleNumber: 'PC61',
+                    color: 'Navy',
+                    uniqueSizes: ['S', 'M', 'L', 'XL', '2XL'],
+                    prices: {
+                        'S': { '24-47': '15.99', '48-71': '14.99', '72+': '13.99' },
+                        'M': { '24-47': '15.99', '48-71': '14.99', '72+': '13.99' },
+                        'L': { '24-47': '15.99', '48-71': '14.99', '72+': '13.99' },
+                        'XL': { '24-47': '15.99', '48-71': '14.99', '72+': '13.99' },
+                        '2XL': { '24-47': '17.99', '48-71': '16.99', '72+': '15.99' }
+                    }
+                };
+
+                // Set URL parameters
+                window.history.replaceState({}, '', '?StyleNumber=PC61&COLOR=Navy');
+
+                DTGQuoteManager.init();
+                results += '<div class="result success">✅ Quote system initialized</div>';
+                
+                // Check if quote panel was created
+                setTimeout(() => {
+                    const panel = document.getElementById('quote-summary-panel');
+                    if (panel) {
+                        results += '<div class="result success">✅ Quote summary panel created</div>';
+                    } else {
+                        results += '<div class="result error">❌ Quote summary panel not found</div>';
+                    }
+                    status.innerHTML = results;
+                }, 1000);
+                
+            } catch (error) {
+                results += '<div class="result error">❌ Initialization failed: ' + error.message + '</div>';
+            }
+
+            status.innerHTML = results;
+        }
+
+        // Run test when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', testSystem);
+        } else {
+            testSystem();
+        }
+    </script>
+</body>
+</html>

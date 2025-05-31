@@ -1069,8 +1069,8 @@
                     <div id="caspio-dtg-error-message" class="error-message" style="color: red; background-color: #fdd; border: 1px solid red; padding: 10px; margin-bottom: 15px; border-radius: var(--radius-sm); display: none;"></div>
                     <div id="cart-fallback-ui" class="fallback-message" style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 10px; margin-bottom: 15px; border-radius: var(--radius-sm); display: none;"></div>
 
-                    <div class="add-to-cart-section" id="add-to-cart-section"> <!-- Added ID for easier selection -->
-                        <h3 class="section-title" style="font-size: 1.3em; margin-top: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light);">Add to Cart</h3>
+                    <div class="legacy-cart-section" style="display: none;"> <!-- Hidden legacy cart section -->
+                        <h3 class="section-title" style="font-size: 1.3em; margin-top: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light);">Add to Cart (Legacy)</h3>
                         
                         <div class="size-grid-container" id="size-grid-container">
                             <!-- Populated by product-quantity-ui.js or similar.
@@ -1443,9 +1443,10 @@
                         
                         <div class="size-quantity-grid" id="size-quantity-grid" style="display: none;">
                         </div>
+                    </div> <!-- End legacy cart section -->
                         
-                        <!-- DTG Quote Builder Section (replaces cart) -->
-                        <div id="add-to-cart-section" class="quote-builder-container">
+                    <!-- DTG Quote Builder Section (replaces cart) -->
+                    <div id="add-to-cart-section" class="quote-builder-container" style="margin-top: 30px;">
                             <!-- This will be replaced by DTGQuoteManager.setupUI() -->
                             <div style="text-align: center; padding: 20px; color: #666;">
                                 <p>Loading quote builder...</p>
