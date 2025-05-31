@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Database Population Test - NWCA</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1200px; margin: 0 auto; background: #f5f5f5; }
+        .header { background: #2e5827; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        .test-section { background: white; border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .test-btn { padding: 12px 24px; margin: 8px; background: #2e5827; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .test-btn:hover { background: #1a3316; }
+        .test-btn:disabled { background: #6c757d; cursor: not-allowed; }
+        .clear-btn { background: #dc3545; }
+        .clear-btn:hover { background: #c82333; }
+        .progress { background: #e9ecef; border-radius: 10px; height: 20px; margin: 10px 0; }
+        .progress-bar { background: #2e5827; height: 100%; border-radius: 10px; transition: width 0.3s ease; text-align: center; color: white; line-height: 20px; font-size: 12px; }
+        .quote-summary { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 15px; margin: 10px 0; }
+        .data-display { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 15px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Quote Database Population Test</h1>
+        <p>Creating multiple test quotes in your Caspio database for verification</p>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Test Configuration</h2>
+        <p><strong>API Base URL:</strong> https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api</p>
+        <p><strong>Test Scenarios:</strong> 5 different quote types with realistic data</p>
+        
+        <button class="test-btn" onclick="runAllTests()">🚀 Create All Test Quotes</button>
+        <button class="test-btn" onclick="createSingleQuote()">📝 Create Single Test Quote</button>
+        <button class="test-btn clear-btn" onclick="clearResults()">🧹 Clear Results</button>
+        
+        <div class="progress" id="progress-container" style="display: none;">
+            <div class="progress-bar" id="progress-bar" style="width: 0%;">0%</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="test-results">Ready to create test quotes...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>💾 Created Quotes Summary</h2>
+        <div id="quotes-summary">No quotes created yet...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Database Verification</h2>
+        <button class="test-btn" onclick="verifyQuotes()">🔍 Check Created Quotes</button>
+        <div id="verification-results">Click to verify quotes in database...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+        let createdQuotes = [];
+        let testProgress = 0;
+
+        // Test quote scenarios
+        const testScenarios = [
+            {
+                name: "Small DTG Order with LTM",
+                quoteId: "Q_TEST_SMALL_" + Date.now(),
+                session: {
+                    customerName: "John Smith",
+                    customerEmail: "john.smith@example.com",
+                    companyName: "Smith Construction",
+                    notes: "Small order test - LTM fee applies"
+                },
+                items: [
+                    {
+                        styleNumber: "PC61",
+                        productName: "Essential Tee",
+                        color: "Navy",
+                        quantity: 12,
+                        location: "FF",
+                        locationName: "Full Front",
+                        tier: "1-23",
+                        basePrice: 15.99,
+                        hasLTM: true,
+                        ltmPerUnit: 4.17,
+                        sizes: {"S": 2, "M": 3, "L": 4, "XL": 3}
+                    }
+                ]
+            },
+            {
+                name: "Medium DTG Order - Multi Location",
+                quoteId: "Q_TEST_MEDIUM_" + Date.now(),
+                session: {
+                    customerName: "Sarah Johnson",
+                    customerEmail: "sarah@techhub.com",
+                    companyName: "Tech Hub Solutions", 
+                    notes: "Medium order with front and back print"
+                },
+                items: [
+                    {
+                        styleNumber: "PC90H",
+                        productName: "Pullover Hoodie",
+                        color: "Black",
+                        quantity: 36,
+                        location: "FF",
+                        locationName: "Full Front",
+                        tier: "24-47",
+                        basePrice: 24.99,
+                        hasLTM: false,
+                        ltmPerUnit: 0,
+                        sizes: {"S": 4, "M": 10, "L": 12, "XL": 8, "2XL": 2}
+                    },
+                    {
+                        styleNumber: "PC90H",
+                        productName: "Pullover Hoodie",
+                        color: "Black",
+                        quantity: 36,
+                        location: "FB",
+                        locationName: "Full Back",
+                        tier: "24-47",
+                        basePrice: 24.99,
+                        hasLTM: false,
+                        ltmPerUnit: 0,
+                        sizes: {"S": 4, "M": 10, "L": 12, "XL": 8, "2XL": 2}
+                    }
+                ]
+            },
+            {
+                name: "Large DTG Order - Best Pricing",
+                quoteId: "Q_TEST_LARGE_" + Date.now(),
+                session: {
+                    customerName: "Mike Rodriguez",
+                    customerEmail: "mike@bigcorp.com",
+                    companyName: "Big Corporation Inc",
+                    notes: "Large volume order - best pricing tier"
+                },
+                items: [
+                    {
+                        styleNumber: "PC54",
+                        productName: "Core Cotton Tee",
+                        color: "White",
+                        quantity: 100,
+                        location: "LC",
+                        locationName: "Left Chest",
+                        tier: "72+",
+                        basePrice: 12.99,
+                        hasLTM: false,
+                        ltmPerUnit: 0,
+                        sizes: {"S": 15, "M": 25, "L": 30, "XL": 20, "2XL": 8, "3XL": 2}
+                    }
+                ]
+            },
+            {
+                name: "Mixed Style DTG Quote",
+                quoteId: "Q_TEST_MIXED_" + Date.now(),
+                session: {
+                    customerName: "Lisa Chen",
+                    customerEmail: "lisa@eventpro.com",
+                    companyName: "Event Pro Services",
+                    notes: "Mixed styles for corporate event"
+                },
+                items: [
+                    {
+                        styleNumber: "PC61",
+                        productName: "Essential Tee",
+                        color: "Red",
+                        quantity: 24,
+                        location: "FF",
+                        locationName: "Full Front",
+                        tier: "24-47",
+                        basePrice: 15.99,
+                        hasLTM: false,
+                        ltmPerUnit: 0,
+                        sizes: {"S": 4, "M": 6, "L": 8, "XL": 6}
+                    },
+                    {
+                        styleNumber: "PC78",
+                        productName: "Core Fleece Pullover",
+                        color: "Gray",
+                        quantity: 48,
+                        location: "LC",
+                        locationName: "Left Chest",
+                        tier: "48-71",
+                        basePrice: 22.99,
+                        hasLTM: false,
+                        ltmPerUnit: 0,
+                        sizes: {"S": 6, "M": 12, "L": 15, "XL": 12, "2XL": 3}
+                    }
+                ]
+            },
+            {
+                name: "Premium DTG with Oversizes",
+                quoteId: "Q_TEST_PREMIUM_" + Date.now(),
+                session: {
+                    customerName: "David Wilson",
+                    customerEmail: "david@premiumwear.com",
+                    companyName: "Premium Wear Co",
+                    notes: "Premium products with oversize pricing"
+                },
+                items: [
+                    {
+                        styleNumber: "PC099",
+                        productName: "Pigment Dyed Tee",
+                        color: "Forest Green",
+                        quantity: 60,
+                        location: "FF",
+                        locationName: "Full Front",
+                        tier: "48-71",
+                        basePrice: 18.99,
+                        hasLTM: false,
+                        ltmPerUnit: 0,
+                        sizes: {"S": 5, "M": 12, "L": 15, "XL": 12, "2XL": 10, "3XL": 4, "4XL": 2}
+                    }
+                ]
+            }
+        ];
+
+        function updateProgress(current, total) {
+            testProgress = (current / total) * 100;
+            const progressBar = document.getElementById('progress-bar');
+            const progressContainer = document.getElementById('progress-container');
+            
+            progressContainer.style.display = 'block';
+            progressBar.style.width = testProgress + '%';
+            progressBar.textContent = Math.round(testProgress) + '%';
+            
+            if (testProgress >= 100) {
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(resultDiv);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function updateQuotesSummary() {
+            const summary = document.getElementById('quotes-summary');
+            if (createdQuotes.length === 0) {
+                summary.innerHTML = 'No quotes created yet...';
+                return;
+            }
+
+            let html = `<h3>📋 Created ${createdQuotes.length} Test Quotes:</h3>`;
+            createdQuotes.forEach((quote, index) => {
+                html += `
+                    <div class="quote-summary">
+                        <strong>${index + 1}. ${quote.name}</strong><br>
+                        <strong>Quote ID:</strong> ${quote.quoteId}<br>
+                        <strong>Customer:</strong> ${quote.customer}<br>
+                        <strong>Items:</strong> ${quote.itemCount}<br>
+                        <strong>Total Value:</strong> $${quote.totalValue.toFixed(2)}<br>
+                        <strong>Status:</strong> <span style="color: ${quote.success ? 'green' : 'red'}">${quote.success ? 'SUCCESS' : 'FAILED'}</span>
+                    </div>
+                `;
+            });
+            summary.innerHTML = html;
+        }
+
+        async function createQuoteSession(scenario) {
+            const sessionData = {
+                QuoteID: scenario.quoteId,
+                SessionID: 'test_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                CustomerEmail: scenario.session.customerEmail,
+                CustomerName: scenario.session.customerName,
+                CompanyName: scenario.session.companyName,
+                Status: 'Active',
+                Notes: scenario.session.notes
+            };
+
+            const response = await fetch(`${API_BASE}/quote_sessions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(sessionData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Session creation failed: ${response.status} - ${await response.text()}`);
+            }
+
+            return await response.json();
+        }
+
+        async function createQuoteItem(quoteId, item, lineNumber) {
+            const finalPrice = item.basePrice + item.ltmPerUnit;
+            const lineTotal = finalPrice * item.quantity;
+
+            const itemData = {
+                QuoteID: quoteId,
+                LineNumber: lineNumber,
+                StyleNumber: item.styleNumber,
+                ProductName: item.productName,
+                Color: item.color,
+                ColorCode: item.color.toUpperCase().replace(/\s+/g, '_'),
+                EmbellishmentType: 'dtg',
+                PrintLocation: item.location,
+                PrintLocationName: item.locationName,
+                Quantity: item.quantity,
+                HasLTM: item.hasLTM ? "Yes" : "No",
+                BaseUnitPrice: item.basePrice,
+                LTMPerUnit: item.ltmPerUnit,
+                FinalUnitPrice: finalPrice,
+                LineTotal: lineTotal,
+                SizeBreakdown: JSON.stringify(item.sizes),
+                PricingTier: item.tier,
+                ImageURL: `https://example.com/${item.styleNumber.toLowerCase()}-${item.color.toLowerCase().replace(/\s+/g, '-')}.jpg`,
+                AddedAt: new Date().toISOString()
+            };
+
+            const response = await fetch(`${API_BASE}/quote_items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(itemData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Item creation failed: ${response.status} - ${await response.text()}`);
+            }
+
+            return await response.json();
+        }
+
+        async function logQuoteAnalytics(quoteId, sessionId, eventType, additionalData = {}) {
+            const analyticsData = {
+                SessionID: sessionId,
+                QuoteID: quoteId,
+                EventType: eventType,
+                ...additionalData
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/quote_analytics`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(analyticsData)
+                });
+                
+                return response.ok;
+            } catch (error) {
+                console.warn('Analytics logging failed:', error);
+                return false;
+            }
+        }
+
+        async function createFullQuote(scenario) {
+            let totalValue = 0;
+            let sessionId = '';
+
+            try {
+                addResult(`🚀 Creating quote: ${scenario.name}`, 'info');
+                
+                // Create session
+                const session = await createQuoteSession(scenario);
+                sessionId = session.SessionID || 'test_session_' + Date.now();
+                addResult(`✅ Session created for ${scenario.session.customerName}`, 'success');
+
+                // Log quote started
+                await logQuoteAnalytics(scenario.quoteId, sessionId, 'quote_started', {
+                    CustomerEmail: scenario.session.customerEmail,
+                    CompanyName: scenario.session.companyName
+                });
+
+                // Create items
+                for (let i = 0; i < scenario.items.length; i++) {
+                    const item = scenario.items[i];
+                    const lineNumber = i + 1;
+                    
+                    const savedItem = await createQuoteItem(scenario.quoteId, item, lineNumber);
+                    const itemTotal = (item.basePrice + item.ltmPerUnit) * item.quantity;
+                    totalValue += itemTotal;
+                    
+                    addResult(`✅ Added ${item.productName} (${item.color}) - ${item.quantity} pcs - $${itemTotal.toFixed(2)}`, 'success');
+                    
+                    // Log item added
+                    await logQuoteAnalytics(scenario.quoteId, sessionId, 'item_added', {
+                        StyleNumber: item.styleNumber,
+                        Color: item.color,
+                        PrintLocation: item.location,
+                        Quantity: item.quantity,
+                        PriceShown: item.basePrice + item.ltmPerUnit
+                    });
+                }
+
+                // Log quote completed
+                await logQuoteAnalytics(scenario.quoteId, sessionId, 'quote_completed', {
+                    TotalItems: scenario.items.length,
+                    TotalValue: totalValue
+                });
+
+                addResult(`🎉 Quote ${scenario.quoteId} completed! Total: $${totalValue.toFixed(2)}`, 'success');
+
+                createdQuotes.push({
+                    name: scenario.name,
+                    quoteId: scenario.quoteId,
+                    customer: `${scenario.session.customerName} (${scenario.session.companyName})`,
+                    itemCount: scenario.items.length,
+                    totalValue: totalValue,
+                    success: true
+                });
+
+                return true;
+
+            } catch (error) {
+                addResult(`❌ Failed to create quote ${scenario.name}: ${error.message}`, 'error');
+                
+                createdQuotes.push({
+                    name: scenario.name,
+                    quoteId: scenario.quoteId,
+                    customer: `${scenario.session.customerName} (${scenario.session.companyName})`,
+                    itemCount: 0,
+                    totalValue: 0,
+                    success: false
+                });
+
+                return false;
+            }
+        }
+
+        async function runAllTests() {
+            addResult('🧪 Starting comprehensive quote database population test...', 'info');
+            addResult(`📊 Creating ${testScenarios.length} test quotes with realistic data`, 'info');
+            
+            const startTime = Date.now();
+            let successCount = 0;
+
+            for (let i = 0; i < testScenarios.length; i++) {
+                updateProgress(i, testScenarios.length);
+                
+                const success = await createFullQuote(testScenarios[i]);
+                if (success) successCount++;
+                
+                updateQuotesSummary();
+                
+                // Small delay between quotes
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            updateProgress(testScenarios.length, testScenarios.length);
+            
+            const endTime = Date.now();
+            const duration = ((endTime - startTime) / 1000).toFixed(1);
+            
+            addResult(`🏁 Test completed in ${duration} seconds`, 'info');
+            addResult(`✅ Success: ${successCount}/${testScenarios.length} quotes created`, successCount === testScenarios.length ? 'success' : 'warning');
+            
+            if (successCount > 0) {
+                addResult('🔍 Now check your Caspio quote_sessions, quote_items, and quote_analytics tables!', 'info');
+            }
+        }
+
+        async function createSingleQuote() {
+            const scenario = testScenarios[0]; // Use the first scenario
+            scenario.quoteId = "Q_SINGLE_TEST_" + Date.now(); // Generate new ID
+            
+            const success = await createFullQuote(scenario);
+            updateQuotesSummary();
+            
+            if (success) {
+                addResult('🔍 Check your database for the new quote!', 'info');
+            }
+        }
+
+        async function verifyQuotes() {
+            addResult('🔍 Verifying created quotes in database...', 'info');
+            
+            try {
+                // Check quote sessions
+                const sessionsResponse = await fetch(`${API_BASE}/quote_sessions`);
+                const sessions = await sessionsResponse.json();
+                
+                // Check quote items  
+                const itemsResponse = await fetch(`${API_BASE}/quote_items`);
+                const items = await itemsResponse.json();
+                
+                // Check analytics
+                const analyticsResponse = await fetch(`${API_BASE}/quote_analytics`);
+                const analytics = await analyticsResponse.json();
+                
+                const verificationResults = document.getElementById('verification-results');
+                
+                let html = `
+                    <div class="data-display">
+                        <h4>📊 Database Verification Results:</h4>
+                        <p><strong>Quote Sessions:</strong> ${sessions.length} records</p>
+                        <p><strong>Quote Items:</strong> ${items.length} records</p>
+                        <p><strong>Quote Analytics:</strong> ${analytics.length} records</p>
+                        
+                        <h5>Recent Test Quotes:</h5>
+                `;
+                
+                // Show test quotes created today
+                const today = new Date().toISOString().split('T')[0];
+                const testQuotes = sessions.filter(s => s.QuoteID && s.QuoteID.includes('TEST'));
+                
+                testQuotes.forEach(quote => {
+                    const quoteItems = items.filter(item => item.QuoteID === quote.QuoteID);
+                    const totalValue = quoteItems.reduce((sum, item) => sum + (item.LineTotal || 0), 0);
+                    
+                    html += `
+                        <div style="margin: 10px 0; padding: 10px; background: #e9ecef; border-radius: 3px;">
+                            <strong>${quote.QuoteID}</strong><br>
+                            Customer: ${quote.CustomerName || 'N/A'}<br>
+                            Items: ${quoteItems.length}<br>
+                            Total: $${totalValue.toFixed(2)}
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                verificationResults.innerHTML = html;
+                
+                addResult(`✅ Verification complete - Found ${testQuotes.length} test quotes in database`, 'success');
+                
+            } catch (error) {
+                addResult(`❌ Verification failed: ${error.message}`, 'error');
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = 'Results cleared...';
+            document.getElementById('quotes-summary').innerHTML = 'No quotes created yet...';
+            document.getElementById('verification-results').innerHTML = 'Click to verify quotes in database...';
+            createdQuotes = [];
+            testProgress = 0;
+            document.getElementById('progress-container').style.display = 'none';
+        }
+
+        // Auto-load message
+        window.addEventListener('load', function() {
+            addResult('🚀 Quote Database Population Test Ready', 'info');
+            addResult('Click "Create All Test Quotes" to populate your database with realistic test data', 'info');
+        });
+    </script>
+</body>
+</html>
