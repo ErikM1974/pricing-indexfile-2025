@@ -120,18 +120,27 @@
             panel.style.cssText = `
                 position: fixed;
                 right: 20px;
-                top: 100px;
-                width: 300px;
+                bottom: 20px;
+                width: 320px;
+                max-height: 60vh;
                 background: white;
                 border: 2px solid ${config.brandColor};
                 border-radius: 8px;
                 padding: 20px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
                 z-index: 1000;
+                overflow-y: auto;
+                transition: all 0.3s ease;
             `;
             
             panel.innerHTML = `
-                <h3 style="color: ${config.brandColor}; margin-top: 0;">Your Quote</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="color: ${config.brandColor}; margin: 0;">Your Quote</h3>
+                    <button onclick="DTGQuoteManager.toggleQuotePanel()" 
+                            style="background: none; border: 1px solid ${config.brandColor}; color: ${config.brandColor}; border-radius: 3px; padding: 5px 8px; cursor: pointer; font-size: 0.8em;"
+                            id="quote-toggle-btn">−</button>
+                </div>
+                <div id="quote-panel-content">
                 <div id="quote-items-list">
                     <p style="color: #666;">No items yet</p>
                 </div>
@@ -155,6 +164,7 @@
                     <button onclick="DTGQuoteManager.exportPDF()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">📄 Download PDF</button>
                     <button onclick="DTGQuoteManager.emailQuote()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">✉️ Email Quote</button>
                     <button onclick="DTGQuoteManager.clearQuote()" class="btn-link" style="width: 100%; color: #dc3545;">🗑️ Clear Quote</button>
+                </div>
                 </div>
             `;
             
@@ -764,6 +774,31 @@
             } catch (error) {
                 console.error('[QUOTE] Error loading quote:', error);
                 throw error;
+            }
+        },
+
+        // Toggle quote panel visibility
+        toggleQuotePanel: function() {
+            const content = document.getElementById('quote-panel-content');
+            const button = document.getElementById('quote-toggle-btn');
+            const panel = document.getElementById('quote-summary-panel');
+            
+            if (!content || !button || !panel) return;
+            
+            const isCollapsed = content.style.display === 'none';
+            
+            if (isCollapsed) {
+                content.style.display = 'block';
+                button.textContent = '−';
+                button.title = 'Collapse quote panel';
+                panel.style.height = 'auto';
+                panel.style.maxHeight = '60vh';
+            } else {
+                content.style.display = 'none';
+                button.textContent = '+';
+                button.title = 'Expand quote panel';
+                panel.style.height = '60px';
+                panel.style.maxHeight = '60px';
             }
         },
 

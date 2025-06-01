@@ -1185,6 +1185,39 @@
                    ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
         },
 
+        // Auto-distribute sizes evenly
+        autoDistributeSizes: function() {
+            const inputs = document.querySelectorAll('.size-qty-input');
+            const targetDisplay = document.getElementById('size-target-display');
+            const target = parseInt(targetDisplay?.textContent) || 0;
+            
+            if (target <= 0 || inputs.length === 0) return;
+            
+            // Clear existing values
+            inputs.forEach(input => input.value = 0);
+            
+            // Distribute evenly, prioritizing S-XL
+            const primarySizes = ['S', 'M', 'L', 'XL'];
+            const availableInputs = Array.from(inputs);
+            const primaryInputs = availableInputs.filter(input => 
+                primarySizes.includes(input.dataset.size)
+            );
+            const otherInputs = availableInputs.filter(input => 
+                !primarySizes.includes(input.dataset.size)
+            );
+            
+            // Start with primary sizes
+            const inputsToUse = primaryInputs.length > 0 ? primaryInputs : availableInputs;
+            const baseAmount = Math.floor(target / inputsToUse.length);
+            const remainder = target % inputsToUse.length;
+            
+            inputsToUse.forEach((input, index) => {
+                input.value = baseAmount + (index < remainder ? 1 : 0);
+            });
+            
+            this.validateSizeDistribution();
+        },
+
         // Reset cart form
         resetCartForm: function() {
             const quantityInput = document.getElementById('cart-quantity-input');
@@ -1192,7 +1225,7 @@
             const sizeSection = document.getElementById('size-distribution-section');
             const addBtn = document.getElementById('main-add-to-cart-btn');
             
-            if (quantityInput) quantityInput.value = '24';
+            if (quantityInput) quantityInput.value = '1';
             if (display) display.style.display = 'none';
             if (sizeSection) sizeSection.style.display = 'none';
             

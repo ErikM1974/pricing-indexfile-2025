@@ -931,7 +931,96 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     }
 
     function updateMiniColorSwatch() {
-        const pricingColorNameEl = document.getElementById('pricing-color-name'); const miniColorSwatchEl = document.getElementById('pricing-color-swatch'); const mainColorName = window.selectedColorName || document.getElementById('product-color-context')?.textContent || 'N/A'; if (!pricingColorNameEl || !miniColorSwatchEl) { console.warn("PricingPages: Mini swatch elements not found."); return; } console.log(`PricingPages: Updating mini swatch for color: ${mainColorName}`); pricingColorNameEl.textContent = mainColorName; const allSwatches = document.querySelectorAll('.color-swatch'); let matchedSwatch = null; for (const swatch of allSwatches) { const swatchName = swatch.dataset.colorName; const catalogColor = swatch.dataset.catalogColor; if ( (window.selectedCatalogColor && NWCAUtils.normalizeColorName(catalogColor) === NWCAUtils.normalizeColorName(window.selectedCatalogColor)) || (!window.selectedCatalogColor && NWCAUtils.normalizeColorName(swatchName) === NWCAUtils.normalizeColorName(mainColorName)) ) { matchedSwatch = swatch; break; } } miniColorSwatchEl.className = 'mini-color-swatch clickable'; miniColorSwatchEl.style.backgroundImage = ''; miniColorSwatchEl.style.backgroundColor = '#ccc'; if (matchedSwatch) { const computedStyle = window.getComputedStyle(matchedSwatch); miniColorSwatchEl.style.backgroundImage = computedStyle.backgroundImage; miniColorSwatchEl.style.backgroundColor = computedStyle.backgroundColor; miniColorSwatchEl.classList.add('active-swatch'); console.log("PricingPages: Applied style from matched swatch."); } else { miniColorSwatchEl.classList.add('fallback-swatch'); console.warn("PricingPages: No matching swatch found for mini swatch, using fallback style."); } if (!miniColorSwatchEl.dataset.listenerAttached) { miniColorSwatchEl.addEventListener('click', function() { const targetSwatch = Array.from(allSwatches).find(s => s.dataset.colorName === mainColorName || s.dataset.catalogColor === window.selectedCatalogColor ); if (targetSwatch) { targetSwatch.scrollIntoView({ behavior: 'smooth', block: 'center' }); targetSwatch.classList.add('pulse-highlight'); setTimeout(() => targetSwatch.classList.remove('pulse-highlight'), 2000); } }); miniColorSwatchEl.dataset.listenerAttached = 'true'; }
+        const pricingColorNameEl = document.getElementById('pricing-color-name'); 
+        const miniColorSwatchEl = document.getElementById('pricing-color-swatch'); 
+        const mainColorName = window.selectedColorName || document.getElementById('product-color-context')?.textContent || 'N/A'; 
+        
+        if (!pricingColorNameEl || !miniColorSwatchEl) { 
+            console.warn("PricingPages: Mini swatch elements not found."); 
+            return; 
+        } 
+        
+        console.log(`PricingPages: Updating mini swatch for color: ${mainColorName}`); 
+        pricingColorNameEl.textContent = mainColorName; 
+        
+        const allSwatches = document.querySelectorAll('.color-swatch'); 
+        let matchedSwatch = null; 
+        
+        for (const swatch of allSwatches) { 
+            const swatchName = swatch.dataset.colorName; 
+            const catalogColor = swatch.dataset.catalogColor; 
+            if ( (window.selectedCatalogColor && NWCAUtils.normalizeColorName(catalogColor) === NWCAUtils.normalizeColorName(window.selectedCatalogColor)) || (!window.selectedCatalogColor && NWCAUtils.normalizeColorName(swatchName) === NWCAUtils.normalizeColorName(mainColorName)) ) { 
+                matchedSwatch = swatch; 
+                break; 
+            } 
+        } 
+        
+        miniColorSwatchEl.className = 'mini-color-swatch clickable'; 
+        miniColorSwatchEl.style.backgroundImage = ''; 
+        miniColorSwatchEl.style.backgroundColor = '#ccc'; 
+        
+        if (matchedSwatch) { 
+            const computedStyle = window.getComputedStyle(matchedSwatch); 
+            
+            // Enhanced image loading - check if background image exists
+            const bgImage = computedStyle.backgroundImage;
+            if (bgImage && bgImage !== 'none') {
+                miniColorSwatchEl.style.backgroundImage = bgImage;
+                // Test if image loads
+                const testImg = new Image();
+                testImg.onload = function() {
+                    console.log("PricingPages: Mini swatch image loaded successfully");
+                };
+                testImg.onerror = function() {
+                    console.warn("PricingPages: Mini swatch image failed to load, using fallback");
+                    miniColorSwatchEl.style.backgroundImage = '';
+                    miniColorSwatchEl.style.backgroundColor = computedStyle.backgroundColor || getColorFallback(mainColorName);
+                };
+                // Extract URL from background-image CSS property
+                const urlMatch = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+                if (urlMatch) testImg.src = urlMatch[1];
+            } else {
+                miniColorSwatchEl.style.backgroundColor = computedStyle.backgroundColor || getColorFallback(mainColorName);
+            }
+            
+            miniColorSwatchEl.classList.add('active-swatch'); 
+            console.log("PricingPages: Applied style from matched swatch."); 
+        } else { 
+            // Enhanced fallback with better color detection
+            miniColorSwatchEl.style.backgroundColor = getColorFallback(mainColorName);
+            miniColorSwatchEl.classList.add('fallback-swatch'); 
+            console.warn("PricingPages: No matching swatch found for mini swatch, using enhanced fallback style."); 
+        } 
+        
+        if (!miniColorSwatchEl.dataset.listenerAttached) { 
+            miniColorSwatchEl.addEventListener('click', function() { 
+                const targetSwatch = Array.from(allSwatches).find(s => s.dataset.colorName === mainColorName || s.dataset.catalogColor === window.selectedCatalogColor ); 
+                if (targetSwatch) { 
+                    targetSwatch.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+                    targetSwatch.classList.add('pulse-highlight'); 
+                    setTimeout(() => targetSwatch.classList.remove('pulse-highlight'), 2000); 
+                } 
+            }); 
+            miniColorSwatchEl.dataset.listenerAttached = 'true'; 
+        }
+    }
+    
+    // Enhanced color fallback function
+    function getColorFallback(colorName) {
+        const colorMap = {
+            'white': '#FFFFFF', 'black': '#000000', 'navy': '#001F3F', 'blue': '#0074D9',
+            'red': '#FF4136', 'green': '#2ECC40', 'yellow': '#FFDC00', 'gray': '#AAAAAA', 'grey': '#AAAAAA',
+            'purple': '#B10DC9', 'orange': '#FF851B', 'pink': '#FF69B4', 'brown': '#8B4513',
+            'maroon': '#800000', 'forest': '#228B22', 'royal': '#4169E1', 'cardinal': '#C41E3A',
+            'kelly': '#4CBB17', 'hunter': '#355E3B', 'burgundy': '#800020', 'charcoal': '#36454F',
+            'heather': '#B0C4DE', 'stone': '#928E85', 'sand': '#C2B280', 'khaki': '#F0E68C'
+        };
+        
+        const normalizedName = colorName.toLowerCase();
+        for (const [key, value] of Object.entries(colorMap)) {
+            if (normalizedName.includes(key)) return value;
+        }
+        return '#CCCCCC'; // Default gray
     }
 
     // Helper function to determine layout preference (grid vs matrix) based on container presence

@@ -1448,7 +1448,7 @@
                     <!-- Enhanced Cart Section with Multi-Color Support -->
                     <div id="add-to-cart-section" class="enhanced-cart-container" style="margin-top: 30px;">
                         <h3 class="section-title" style="color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;">
-                            🛒 Add to Cart
+                            💰 Add to Quote
                         </h3>
                         
                         <!-- Quantity Selection -->
@@ -1459,7 +1459,7 @@
                                 <div style="display: flex; align-items: center; gap: 5px;">
                                     <button type="button" onclick="UnifiedCartManager.adjustQuantity(-1)" 
                                             style="width: 35px; height: 35px; border: 1px solid var(--primary-color); background: #f8f9fa; color: var(--primary-color); border-radius: 4px; cursor: pointer; font-weight: bold;">-</button>
-                                    <input type="number" id="cart-quantity-input" min="1" value="24" 
+                                    <input type="number" id="cart-quantity-input" min="1" value="1" 
                                            style="width: 80px; text-align: center; padding: 8px; border: 2px solid var(--primary-color); border-radius: 4px; font-size: 1.1em;">
                                     <button type="button" onclick="UnifiedCartManager.adjustQuantity(1)" 
                                             style="width: 35px; height: 35px; border: 1px solid var(--primary-color); background: #f8f9fa; color: var(--primary-color); border-radius: 4px; cursor: pointer; font-weight: bold;">+</button>
@@ -1468,6 +1468,19 @@
                                         style="background: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
                                     Calculate Pricing
                                 </button>
+                            </div>
+                            
+                            <!-- Quick Quantity Presets -->
+                            <div style="margin-top: 15px;">
+                                <label style="font-weight: bold; color: var(--primary-color); margin-right: 10px;">Quick Select:</label>
+                                <button onclick="document.getElementById('cart-quantity-input').value='24'; UnifiedCartManager.calculateCurrentPricing();" 
+                                        style="background: #f8f9fa; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 5px 10px; border-radius: 3px; margin-right: 5px; cursor: pointer;">24</button>
+                                <button onclick="document.getElementById('cart-quantity-input').value='48'; UnifiedCartManager.calculateCurrentPricing();" 
+                                        style="background: #f8f9fa; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 5px 10px; border-radius: 3px; margin-right: 5px; cursor: pointer;">48</button>
+                                <button onclick="document.getElementById('cart-quantity-input').value='72'; UnifiedCartManager.calculateCurrentPricing();" 
+                                        style="background: #f8f9fa; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 5px 10px; border-radius: 3px; margin-right: 5px; cursor: pointer;">72</button>
+                                <button onclick="document.getElementById('cart-quantity-input').value='100'; UnifiedCartManager.calculateCurrentPricing();" 
+                                        style="background: #f8f9fa; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 5px 10px; border-radius: 3px; cursor: pointer;">100</button>
                             </div>
                             
                             <!-- Current Pricing Display -->
@@ -1483,7 +1496,13 @@
                                 <!-- Populated by JavaScript -->
                             </div>
                             <div class="size-validation" style="margin-top: 10px; text-align: center;">
-                                <span>Total: <strong id="size-total-display">0</strong> / <span id="size-target-display">0</span></span>
+                                <div style="margin-bottom: 10px;">
+                                    <span>Total: <strong id="size-total-display">0</strong> / <span id="size-target-display">0</span></span>
+                                    <button onclick="UnifiedCartManager.autoDistributeSizes()" 
+                                            style="background: var(--primary-color); color: white; border: none; padding: 5px 15px; border-radius: 3px; margin-left: 15px; cursor: pointer; font-size: 0.9em;">
+                                        Auto-Distribute
+                                    </button>
+                                </div>
                                 <div id="size-validation-message" style="color: #dc3545; margin-top: 5px; display: none;">
                                     Sizes must add up to total quantity
                                 </div>
@@ -1495,10 +1514,10 @@
                             <button id="main-add-to-cart-btn" onclick="UnifiedCartManager.addCurrentItemToCart()" 
                                     class="add-to-cart-button" disabled
                                     style="background: #6c757d; color: white; border: none; padding: 15px 30px; border-radius: 5px; font-size: 1.1em; font-weight: bold; cursor: not-allowed; opacity: 0.6;">
-                                🛒 Add to Cart
+                                💰 Add to Quote
                             </button>
                             <p style="margin-top: 10px; color: #666; font-size: 0.9em;">
-                                <strong>Note:</strong> All items in cart must use the same print location and embellishment type.
+                                <strong>Note:</strong> All items in quote must use the same print location and embellishment type.
                             </p>
                         </div>
                     </div>
