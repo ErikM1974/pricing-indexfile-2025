@@ -27,6 +27,7 @@
         console.log("DTG-PAGE-SETUP: DOM ready, initializing...");
         updateProductContext();
         setupBackButton();
+        setupImageZoom();
     }
 
     function updateProductContext() {
@@ -292,25 +293,134 @@
     function updateProductImage(colorData) {
         console.log("DTG-PAGE-SETUP: Updating product image with color data:", colorData);
         
-        // Get the main product image element
-        const mainImage = document.getElementById('main-product-image-dp2');
+        // Get the main product image elements (try both IDs for compatibility)
+        const mainImage = document.getElementById('product-image-main') || document.getElementById('main-product-image-dp2');
+        const mainImageContainer = document.getElementById('main-image-container');
         
         if (mainImage && colorData) {
             // Determine the best image URL to use
-            const imageUrl = colorData.MAIN_IMAGE_URL || 
-                           colorData.FRONT_MODEL || 
-                           colorData.FRONT_MODEL_IMAGE_URL || 
+            const imageUrl = colorData.MAIN_IMAGE_URL ||
+                           colorData.FRONT_MODEL ||
+                           colorData.FRONT_MODEL_IMAGE_URL ||
                            colorData.FRONT_FLAT || '';
             
             if (imageUrl) {
                 console.log("DTG-PAGE-SETUP: Setting image URL:", imageUrl);
+                
+                // Add loading state
+                if (mainImageContainer) {
+                    mainImageContainer.classList.add('loading');
+                }
+                
+                mainImage.onload = function() {
+                    console.log("DTG-PAGE-SETUP: Image loaded successfully");
+                    if (mainImageContainer) {
+                        mainImageContainer.classList.remove('loading');
+                    }
+                };
+                
+                mainImage.onerror = function() {
+                    console.error("DTG-PAGE-SETUP: Failed to load image:", imageUrl);
+                    if (mainImageContainer) {
+                        mainImageContainer.classList.remove('loading');
+                    }
+                };
+                
                 mainImage.src = imageUrl;
                 mainImage.alt = `${window.selectedStyleNumber || 'Product'} - ${colorData.COLOR_NAME}`;
+                mainImage.style.display = 'block';
             } else {
                 console.warn("DTG-PAGE-SETUP: No image URL found for color:", colorData.COLOR_NAME);
             }
+            
+            // Populate thumbnails
+            populateThumbnails(colorData);
         } else {
             console.warn("DTG-PAGE-SETUP: Main image element not found or no color data provided");
+        }
+    }
+
+    function populateThumbnails(colorData) {
+        const thumbnailsContainer = document.getElementById('image-thumbnails');
+        if (!thumbnailsContainer) {
+            console.warn("DTG-PAGE-SETUP: Thumbnails container not found");
+            return;
+        }
+
+        // Clear existing thumbnails
+        thumbnailsContainer.innerHTML = '';
+
+        // Define thumbnail views with their labels
+        const views = [
+            {
+                url: colorData.FRONT_MODEL || colorData.FRONT_MODEL_IMAGE_URL || colorData.MAIN_IMAGE_URL,
+                label: 'Main',
+                active: true
+            },
+            {
+                url: colorData.BACK_MODEL || colorData.BACK_MODEL_IMAGE_URL,
+                label: 'Back'
+            },
+            {
+                url: colorData.SIDE_MODEL || colorData.SIDE_MODEL_IMAGE_URL,
+                label: 'Side'
+            },
+            {
+                url: colorData.THREE_QUARTER_MODEL || colorData.THREE_QUARTER_IMAGE_URL,
+                label: '3/4 View'
+            },
+            {
+                url: colorData.FRONT_FLAT || colorData.FRONT_FLAT_IMAGE_URL,
+                label: 'Front Flat'
+            },
+            {
+                url: colorData.BACK_FLAT || colorData.BACK_FLAT_IMAGE_URL,
+                label: 'Back Flat'
+            }
+        ];
+
+        // Create thumbnails for available views
+        views.forEach((view, index) => {
+            if (view.url) {
+                const thumbnailItem = document.createElement('div');
+                thumbnailItem.className = 'thumbnail-item' + (view.active ? ' active' : '');
+                
+                const thumbnailImg = document.createElement('img');
+                thumbnailImg.src = view.url;
+                thumbnailImg.alt = `${view.label} view`;
+                
+                const thumbnailLabel = document.createElement('div');
+                thumbnailLabel.className = 'thumbnail-label';
+                thumbnailLabel.textContent = view.label;
+                
+                thumbnailItem.appendChild(thumbnailImg);
+                thumbnailItem.appendChild(thumbnailLabel);
+                
+                // Add click handler
+                thumbnailItem.addEventListener('click', function() {
+                    // Update main image
+                    const mainImage = document.getElementById('product-image-main');
+                    if (mainImage) {
+                        mainImage.src = view.url;
+                        mainImage.alt = `${window.selectedStyleNumber || 'Product'} - ${colorData.COLOR_NAME} - ${view.label}`;
+                    }
+                    
+                    // Update active state
+                    document.querySelectorAll('.thumbnail-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    thumbnailItem.classList.add('active');
+                });
+                
+                thumbnailsContainer.appendChild(thumbnailItem);
+            }
+        });
+
+        // If no thumbnails were added, hide the container
+        if (thumbnailsContainer.children.length === 0) {
+            thumbnailsContainer.style.display = 'none';
+        } else {
+            thumbnailsContainer.style.display = 'flex';
         }
     }
 
@@ -341,6 +451,55 @@
         return colorMap[normalized] || '#cccccc';
     }
 
+    function setupImageZoom() {
+        // Setup zoom functionality for main image
+        const zoomOverlay = document.querySelector('.image-zoom-overlay');
+        const mainImage = document.getElementById('product-image-main');
+        const modal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+        const modalCaption = document.getElementById('modal-caption');
+        const closeModal = document.querySelector('.close-modal');
+        
+        if (zoomOverlay && mainImage && modal) {
+            // Click on zoom icon
+            zoomOverlay.addEventListener('click', function() {
+                modal.style.display = 'block';
+                modalImage.src = mainImage.src;
+                modalCaption.textContent = mainImage.alt;
+            });
+            
+            // Also allow clicking on the main image
+            mainImage.style.cursor = 'zoom-in';
+            mainImage.addEventListener('click', function() {
+                modal.style.display = 'block';
+                modalImage.src = mainImage.src;
+                modalCaption.textContent = mainImage.alt;
+            });
+        }
+        
+        // Close modal functionality
+        if (closeModal) {
+            closeModal.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+        }
+        
+        if (modal) {
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+        
+        // ESC key to close modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && modal && modal.style.display === 'block') {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
     // Export key functions for global access
     window.DTGPageSetup = {
         updateProductContext,
@@ -348,7 +507,9 @@
         fetchProductDetails,
         handleColorSwatchClick,
         updateProductImage,
-        updateSelectedColorDisplay
+        updateSelectedColorDisplay,
+        populateThumbnails,
+        setupImageZoom
     };
 
 })();
