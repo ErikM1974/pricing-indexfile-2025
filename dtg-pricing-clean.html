@@ -623,104 +623,11 @@
                 font-size: 0.7em;
             }
         }
-        
-        /* Additional styles for product-page-logic.js compatibility */
-        #product-info-area {
-            margin-bottom: 15px;
-        }
-        
-        .product-gallery-container-dp2 {
-            margin-bottom: 15px;
-        }
-        
-        .main-image-wrapper-dp2 img {
-            width: 100%;
-            height: auto;
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .additional-images-dp2 {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .additional-images-dp2 img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color 0.3s ease;
-        }
-        
-        .additional-images-dp2 img:hover {
-            border-color: var(--primary-color);
-        }
-        
-        /* Styles for inline swatch area compatibility */
-        .swatch-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            padding: 10px;
-        }
-        
-        .color-swatch-item {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid var(--border-color);
-            background-size: cover;
-            background-position: center;
-            cursor: pointer;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .color-swatch-item:hover {
-            border-color: var(--primary-color);
-        }
-        
-        .color-swatch-item.active,
-        .color-swatch-item.active-swatch {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-        
-        /* Debug styles to ensure swatches are visible */
-        #color-swatches {
-            min-height: 60px !important;
-            overflow: visible !important;
-        }
-        
-        #color-swatches .swatch-wrapper {
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-        
-        #inline-swatch-area {
-            min-height: 60px;
-            border: 1px dashed #ccc;
-        }
-        
-        #inline-swatch-area .swatch-container {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            gap: 10px !important;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>DTG Pricing</h1>
-        
-        <!-- Hidden search input for script compatibility -->
-        <input type="text" id="style-search-input" style="display: none;" />
-        <button id="search-button" style="display: none;"></button>
 
         <!-- Two-Column Layout Container -->
         <div class="product-page-columns-container">
@@ -735,40 +642,28 @@
                         </div>
                     </div>
                     <div class="navigation-area">
-                        <a id="back-to-product" href="/product.html" class="back-to-product">
+                        <a id="back-to-product" href="#" class="back-to-product">
                             <span class="back-icon">←</span> Back to Product
                         </a>
                     </div>
                 </div>
                 
-                <!-- Product Image Gallery - populated by product-page-logic.js -->
-                <div id="product-image-display-area">
-                    <!-- Images will be dynamically created by product-page-logic.js -->
-                    <div class="product-gallery-container-dp2" style="margin-bottom: 15px;">
-                        <div class="main-image-wrapper-dp2">
-                            <img id="main-product-image-dp2" src="" alt="Product image" style="width: 100%; height: auto; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);" onerror="this.style.display='none';">
+                <!-- Enhanced Product Image Gallery -->
+                <div class="product-image-gallery" id="product-image-gallery">
+                    <div class="main-image-container" id="main-image-container">
+                        <img id="product-image-main" src="" alt="Product Image" class="product-image">
+                        <div class="image-loading-spinner"></div>
+                        <div class="image-zoom-overlay">
+                            <span class="zoom-icon">🔍</span>
                         </div>
-                        <div class="additional-images-dp2" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                            <!-- Additional thumbnails will be populated here -->
-                        </div>
+                    </div>
+                    <div class="image-thumbnails" id="image-thumbnails">
+                        <!-- Thumbnails will be dynamically added here -->
                     </div>
                 </div>
                 
                 <div class="static-product-info" style="padding:15px; background-color: var(--background-light); border-radius: var(--radius-sm); margin-top:15px;">
                     <p>Pricing includes a full-color DTG print on one location.</p>
-                </div>
-                
-                <!-- Product Info Area for scripts -->
-                <div id="product-info-area" style="margin-top: 15px;">
-                    <!-- Product data will be populated here by product-page-logic.js -->
-                    <div class="loading-message" style="padding: 20px; text-align: center; color: #666;">
-                        Loading product information...
-                    </div>
-                </div>
-                
-                <!-- Inventory Area for scripts -->
-                <div id="inventory-area" style="display: none;">
-                    <!-- Hidden area for inventory data -->
                 </div>
                 
                 <!-- Color Swatches in left column -->
@@ -777,12 +672,6 @@
                         <h3 class="section-title">Available Colors</h3>
                         <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 5px; max-height: 300px;">
                             <!-- Color swatches will be dynamically added here -->
-                        </div>
-                        <div id="swatch-area" style="display: none;">
-                            <!-- Hidden swatch container for product-page-logic.js compatibility -->
-                        </div>
-                        <div id="inline-swatch-area" class="product-swatches">
-                            <!-- Inline swatch area where product-page-logic.js will put swatches -->
                         </div>
                         <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
                     </div>
@@ -866,43 +755,9 @@
                     <!-- DTG Quote System Integration -->
                     <div id="add-to-cart-section">
                         <!-- Quote system will be initialized by dtg-quote-system.js -->
-                        <div id="size-quantity-grid-container" style="margin: 20px 0; padding: 15px; background-color: var(--background-light); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-                            <h4 style="margin-top: 0; color: var(--primary-color);">Quick Add to Quote</h4>
-                            <div id="size-quantity-grid">
-                                <!-- Size quantity grid will be populated here by DP5-Helper -->
-                            </div>
-                        </div>
-                        
-                        <!-- Quote Summary Section -->
-                        <div id="quote-container" class="quote-section" style="margin-top: 20px;">
-                            <div id="quote-summary-header" style="background-color: var(--primary-light); padding: 15px; border-radius: var(--radius-sm); margin-bottom: 15px;">
-                                <h3 style="margin: 0; color: var(--primary-color);">Quote Summary</h3>
-                            </div>
-                            <div id="quote-items-list" style="margin-bottom: 15px;">
-                                <!-- Quote items will be populated here -->
-                            </div>
-                            <div id="quote-subtotal" style="padding: 10px; border-bottom: 1px solid var(--border-color);">
-                                <!-- Subtotal will be shown here -->
-                            </div>
-                            <div id="quote-ltm" class="ltm-row" style="padding: 10px; border-bottom: 1px solid var(--border-color); display: none;">
-                                <!-- LTM fees will be shown here -->
-                            </div>
-                            <div id="quote-total" style="padding: 15px; font-weight: bold; font-size: 1.2em; background-color: var(--primary-light); border-radius: var(--radius-sm);">
-                                <!-- Total will be shown here -->
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Image Modal for Zoom Functionality -->
-    <div id="image-modal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8);">
-        <div class="modal-content" style="margin: auto; display: block; width: 80%; max-width: 700px; position: relative; top: 50%; transform: translateY(-50%);">
-            <span class="close-modal" style="position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer;">&times;</span>
-            <img id="modal-image" style="width: 100%; height: auto; border-radius: 5px;">
-            <div id="modal-caption" style="margin: auto; display: block; width: 80%; max-width: 700px; text-align: center; color: #ccc; padding: 10px 0; height: 150px;"></div>
         </div>
     </div>
     
@@ -912,87 +767,6 @@
     <script src="/shared_components/js/pricing-matrix-capture-fix.js"></script>
     <script src="/shared_components/js/pricing-matrix-api.js"></script>
     <script src="/shared_components/js/dp5-helper.js"></script>
-    <script src="/product-url-handler.js"></script>
-    <script src="/shared_components/js/dtg-page-setup.js"></script>
-    <!-- DTG Page Bridge Functions -->
-    <script>
-        // Bridge function for DTG page setup
-        window.loadProductDetails = function(styleNumber) {
-            console.log('[DTG-BRIDGE] loadProductDetails called for:', styleNumber);
-            
-            if (window.DTGPageSetup && typeof window.DTGPageSetup.fetchProductDetails === 'function') {
-                window.DTGPageSetup.fetchProductDetails(styleNumber);
-            } else {
-                console.log('[DTG-BRIDGE] DTGPageSetup not ready yet');
-            }
-        };
-        
-        // Bridge function to initialize product context from URL parameters
-        window.initializeProductFromURL = function() {
-            console.log('[DTG-BRIDGE] initializeProductFromURL called');
-            
-            if (window.DTGPageSetup && typeof window.DTGPageSetup.updateProductContext === 'function') {
-                window.DTGPageSetup.updateProductContext();
-            } else {
-                console.log('[DTG-BRIDGE] DTGPageSetup not ready yet for URL initialization');
-            }
-        };
-        
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('[DTG-BRIDGE] DOM ready, initializing from URL...');
-            
-            // Wait for DTG page setup to be ready
-            const checkReady = setInterval(() => {
-                if (window.DTGPageSetup) {
-                    clearInterval(checkReady);
-                    window.initializeProductFromURL();
-                }
-            }, 100);
-        });
-    </script>
-    <!-- Image modal setup -->
-    <script>
-        // Setup image modal functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('image-modal');
-            const modalImage = document.getElementById('modal-image');
-            const closeModal = document.querySelector('.close-modal');
-            
-            // Close modal when clicking the X
-            if (closeModal) {
-                closeModal.addEventListener('click', function() {
-                    modal.style.display = 'none';
-                });
-            }
-            
-            // Close modal when clicking outside the image
-            if (modal) {
-                modal.addEventListener('click', function(event) {
-                    if (event.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
-            }
-            
-            // Setup main image click to open modal
-            document.addEventListener('click', function(event) {
-                if (event.target.matches('#main-product-image-dp2')) {
-                    modal.style.display = 'block';
-                    modalImage.src = event.target.src;
-                }
-            });
-        });
-    </script>
-    <!-- Minimal cart integration function for DTG adapter -->
-    <script>
-        // Provide minimal initCartIntegrationWithData function for DTG adapter
-        window.initCartIntegrationWithData = async function(caspioEventData) {
-            console.log('[DTG-CART] Minimal cart integration called with data:', caspioEventData);
-            // Just acknowledge the call without creating legacy cart UI
-            return Promise.resolve();
-        };
-    </script>
     <script src="/shared_components/js/dtg-adapter.js"></script>
     <script src="/shared_components/js/pricing-fallback-adapter.js"></script>
     <script src="/shared_components/js/dtg-quote-system.js"></script>

@@ -4,7 +4,12 @@
       "Bash(rg:*)",
       "Bash(grep:*)",
       "Bash(find:*)",
-      "Bash(npm start)"
+      "Bash(npm start)",
+      "Bash(git add:*)",
+      "Bash(cp:*)",
+      "Bash(python3:*)",
+      "Bash(ls:*)",
+      "Bash(diff:*)"
     ],
     "deny": []
   }
