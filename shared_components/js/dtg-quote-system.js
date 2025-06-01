@@ -119,26 +119,26 @@
             panel.className = 'quote-summary-panel';
             panel.style.cssText = `
                 position: fixed;
-                right: 20px;
-                bottom: 20px;
-                width: 320px;
-                max-height: 60vh;
+                right: 0;
+                top: 0;
+                width: 380px;
+                height: 100vh;
                 background: white;
-                border: 2px solid ${config.brandColor};
-                border-radius: 8px;
+                border-left: 3px solid ${config.brandColor};
                 padding: 20px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                box-shadow: -4px 0 12px rgba(0,0,0,0.15);
                 z-index: 1000;
                 overflow-y: auto;
-                transition: all 0.3s ease;
+                transition: transform 0.3s ease;
+                transform: translateX(100%);
             `;
             
             panel.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3 style="color: ${config.brandColor}; margin: 0;">Your Quote</h3>
                     <button onclick="DTGQuoteManager.toggleQuotePanel()" 
-                            style="background: none; border: 1px solid ${config.brandColor}; color: ${config.brandColor}; border-radius: 3px; padding: 5px 8px; cursor: pointer; font-size: 0.8em;"
-                            id="quote-toggle-btn">−</button>
+                            style="background: #dc3545; color: white; border: none; border-radius: 3px; padding: 8px 12px; cursor: pointer; font-size: 0.9em; font-weight: bold;"
+                            id="quote-toggle-btn">✕ Close</button>
                 </div>
                 <div id="quote-panel-content">
                 <div id="quote-items-list">
@@ -169,6 +169,29 @@
             `;
             
             document.body.appendChild(panel);
+            
+            // Add floating toggle button
+            const toggleBtn = document.createElement('button');
+            toggleBtn.id = 'quote-panel-toggle';
+            toggleBtn.innerHTML = '💰 Quote (<span id="quote-item-count-btn">0</span>)';
+            toggleBtn.style.cssText = `
+                position: fixed;
+                right: 20px;
+                bottom: 20px;
+                background: ${config.brandColor};
+                color: white;
+                border: none;
+                border-radius: 25px;
+                padding: 12px 20px;
+                cursor: pointer;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                z-index: 999;
+                transition: all 0.3s ease;
+                font-size: 0.9em;
+            `;
+            toggleBtn.onclick = () => this.toggleQuotePanel();
+            document.body.appendChild(toggleBtn);
         },
 
         // Bind events
@@ -440,14 +463,17 @@
             let totalQuantity = 0;
 
             this.currentQuote.items.forEach(item => {
+                // Subtotal is base prices only
                 subtotal += item.baseUnitPrice * item.quantity;
+                // LTM is already included in finalUnitPrice, so we track it separately for display
                 ltmTotal += item.ltmPerUnit * item.quantity;
                 totalQuantity += item.quantity;
             });
 
             this.currentQuote.subtotal = subtotal;
             this.currentQuote.ltmTotal = ltmTotal;
-            this.currentQuote.grandTotal = subtotal + ltmTotal;
+            // Grand total is the actual amount (finalUnitPrice * quantity for each item)
+            this.currentQuote.grandTotal = this.currentQuote.items.reduce((sum, item) => sum + item.lineTotal, 0);
             this.currentQuote.totalQuantity = totalQuantity;
         },
 
@@ -488,6 +514,12 @@
             } else {
                 ltmRow.style.display = 'none';
             }
+            
+            // Update floating button count
+            const btnCount = document.getElementById('quote-item-count-btn');
+            if (btnCount) {
+                btnCount.textContent = this.currentQuote.items.length;
+            }
         },
 
         // Remove item from quote
@@ -524,6 +556,8 @@
 
                 // Save to your quote_sessions API
                 console.log('[QUOTE] Saving quote session to API:', quoteSessionData);
+                console.log('[QUOTE] API URL:', `${config.apiBaseUrl}/quote_sessions`);
+                
                 const response = await fetch(`${config.apiBaseUrl}/quote_sessions`, {
                     method: 'POST',
                     headers: {
@@ -532,8 +566,12 @@
                     body: JSON.stringify(quoteSessionData)
                 });
 
+                console.log('[QUOTE] API Response status:', response.status);
+                
                 if (!response.ok) {
-                    throw new Error(`Failed to save quote session: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error('[QUOTE] API Error response:', errorText);
+                    throw new Error(`Failed to save quote session: ${response.status} - ${errorText}`);
                 }
 
                 const savedQuoteSession = await response.json();
@@ -676,6 +714,8 @@
                     AddedAt: new Date().toISOString() // Add timestamp
                 };
 
+                console.log('[QUOTE] Saving quote item:', itemData);
+                
                 const response = await fetch(`${config.apiBaseUrl}/quote_items`, {
                     method: 'POST',
                     headers: {
@@ -685,7 +725,9 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Failed to save item: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error('[QUOTE] API Error saving item:', errorText);
+                    throw new Error(`Failed to save item: ${response.status} - ${errorText}`);
                 }
 
                 const savedItem = await response.json();
@@ -779,26 +821,21 @@
 
         // Toggle quote panel visibility
         toggleQuotePanel: function() {
-            const content = document.getElementById('quote-panel-content');
-            const button = document.getElementById('quote-toggle-btn');
             const panel = document.getElementById('quote-summary-panel');
+            const toggleBtn = document.getElementById('quote-panel-toggle');
             
-            if (!content || !button || !panel) return;
+            if (!panel || !toggleBtn) return;
             
-            const isCollapsed = content.style.display === 'none';
+            const isOpen = panel.style.transform === 'translateX(0px)';
             
-            if (isCollapsed) {
-                content.style.display = 'block';
-                button.textContent = '−';
-                button.title = 'Collapse quote panel';
-                panel.style.height = 'auto';
-                panel.style.maxHeight = '60vh';
+            if (isOpen) {
+                // Close panel
+                panel.style.transform = 'translateX(100%)';
+                toggleBtn.style.display = 'block';
             } else {
-                content.style.display = 'none';
-                button.textContent = '+';
-                button.title = 'Expand quote panel';
-                panel.style.height = '60px';
-                panel.style.maxHeight = '60px';
+                // Open panel
+                panel.style.transform = 'translateX(0px)';
+                toggleBtn.style.display = 'none';
             }
         },
 

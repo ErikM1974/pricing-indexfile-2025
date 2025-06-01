@@ -127,8 +127,8 @@
                 </div>
                 
                 <div style="margin-top: 20px;">
-                    <button onclick="UnifiedCartManager.viewCart()" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">📋 View Full Cart</button>
-                    <button onclick="UnifiedCartManager.requestQuote()" class="btn-primary" style="width: 100%; background: ${config.brandColor};">💰 Request Quote</button>
+                    <button onclick="UnifiedCartManager.requestQuote()" class="btn-primary" style="width: 100%; background: ${config.brandColor}; margin-bottom: 10px;">💰 Request Quote</button>
+                    <button onclick="UnifiedCartManager.clearCart()" class="btn-secondary" style="width: 100%;">🗑️ Clear Quote</button>
                 </div>
             `;
             
@@ -401,13 +401,10 @@
 
         // Calculate cart totals with LTM logic
         calculateTotals: function() {
-            let subtotal = 0;
             let totalQuantity = 0;
 
-            // Calculate base totals
+            // First pass: calculate total quantity and update tier pricing
             this.currentCart.items.forEach(item => {
-                const itemSubtotal = item.baseUnitPrice * item.quantity;
-                subtotal += itemSubtotal;
                 totalQuantity += item.quantity;
                 
                 // Update item pricing based on current cart total
@@ -415,12 +412,12 @@
                 item.currentUnitPrice = this.getBasePriceForTier(currentTier, item.styleNumber, item.embellishmentType);
             });
 
-            // Calculate LTM fee (divide $50 across all pieces if under 24 total)
+            // Calculate LTM fee distribution if under threshold
             let ltmTotal = 0;
             if (totalQuantity > 0 && totalQuantity < config.ltmThreshold) {
                 ltmTotal = config.ltmFee;
                 
-                // Distribute LTM fee proportionally across items
+                // Distribute LTM fee per unit (already included in finalUnitPrice)
                 this.currentCart.items.forEach(item => {
                     item.ltmPerUnit = (config.ltmFee / totalQuantity);
                     item.finalUnitPrice = item.currentUnitPrice + item.ltmPerUnit;
@@ -435,13 +432,13 @@
                 });
             }
 
-            // Recalculate final totals
-            subtotal = this.currentCart.items.reduce((sum, item) => sum + (item.currentUnitPrice * item.quantity), 0);
-            const grandTotal = subtotal + ltmTotal;
+            // Calculate final totals - subtotal is base prices, grandTotal includes LTM in unit prices
+            const subtotal = this.currentCart.items.reduce((sum, item) => sum + (item.currentUnitPrice * item.quantity), 0);
+            const grandTotal = this.currentCart.items.reduce((sum, item) => sum + item.lineTotal, 0);
 
             this.currentCart.totals = {
                 subtotal,
-                ltmTotal,
+                ltmTotal, // This shows the total LTM fee for transparency
                 grandTotal,
                 totalQuantity
             };
@@ -596,9 +593,21 @@
             }, 3000);
         },
 
-        // View full cart
+        // View full cart (redirect to quote page)
         viewCart: function() {
-            window.location.href = '/cart';
+            window.location.href = '/cart?mode=quote';
+        },
+        
+        // Clear entire cart
+        clearCart: function() {
+            if (confirm('Are you sure you want to clear your entire quote?')) {
+                this.currentCart.items = [];
+                this.currentCart.constraints.embellishmentType = null;
+                this.currentCart.constraints.printLocation = null;
+                this.calculateTotals();
+                this.updateCartDisplay();
+                this.saveCartToStorage();
+            }
         },
 
         // Request quote
@@ -1032,28 +1041,43 @@
             this.enableAddToCartButton();
         },
 
-        // Show size distribution for current item
+        // Show size distribution for current item - TWO-TIER HORIZONTAL LAYOUT
         showSizeDistribution: function(totalQuantity) {
             const grid = document.getElementById('size-distribution-grid');
             const targetDisplay = document.getElementById('size-target-display');
             
             if (!grid) return;
             
-            // Get available sizes
-            const sizes = this.getAvailableSizes();
+            // Get available sizes and categorize them
+            const allSizes = this.getAvailableSizes();
+            const standardSizes = ['S', 'M', 'L', 'XL'].filter(size => allSizes.includes(size));
+            const extendedSizes = allSizes.filter(size => !standardSizes.includes(size));
             
-            // Create size inputs
+            // Create two-tier horizontal layout
             grid.innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
-                    ${sizes.map(size => `
-                        <div style="text-align: center; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: white;">
-                            <label style="font-weight: bold; display: block; margin-bottom: 5px;">${size}</label>
-                            <input type="number" class="size-qty-input" data-size="${size}" 
-                                   min="0" value="0" style="width: 60px; text-align: center; padding: 5px; border: 1px solid #ccc; border-radius: 3px;"
-                                   onchange="UnifiedCartManager.validateSizeDistribution()">
-                        </div>
-                    `).join('')}
+                <!-- Standard Sizes Tier (Prominent) -->
+                <div class="standard-sizes-tier" style="margin-bottom: 20px;">
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <h4 style="color: var(--primary-color); margin: 0; font-size: 1.1em;">Standard Sizes</h4>
+                        <small style="color: #666;">Most common sizes</small>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(${Math.min(standardSizes.length, 4)}, 1fr); gap: 15px; max-width: 500px; margin: 0 auto;">
+                        ${standardSizes.map(size => this.createSizeCard(size, 'standard')).join('')}
+                    </div>
                 </div>
+                
+                ${extendedSizes.length > 0 ? `
+                <!-- Extended Sizes Tier (Secondary) -->
+                <div class="extended-sizes-tier">
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <h4 style="color: #666; margin: 0; font-size: 1em;">Extended Sizes</h4>
+                        <small style="color: #999;">Additional options</small>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; max-width: 400px; margin: 0 auto;">
+                        ${extendedSizes.map(size => this.createSizeCard(size, 'extended')).join('')}
+                    </div>
+                </div>
+                ` : ''}
             `;
             
             if (targetDisplay) {
@@ -1061,6 +1085,78 @@
             }
             
             this.validateSizeDistribution();
+        },
+        
+        // Create individual size card with enhanced styling
+        createSizeCard: function(size, tier) {
+            const isStandard = tier === 'standard';
+            const cardStyle = isStandard ? 
+                'background: linear-gradient(135deg, #e8f5e9, #f1f8e9); border: 2px solid var(--primary-color); box-shadow: 0 2px 8px rgba(46, 88, 39, 0.15);' :
+                'background: #f8f9fa; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
+            
+            const buttonStyle = isStandard ?
+                'background: var(--primary-color); color: white; border: none;' :
+                'background: #6c757d; color: white; border: none;';
+                
+            const inputStyle = isStandard ?
+                'border: 2px solid var(--primary-color); font-weight: bold; font-size: 1.1em;' :
+                'border: 1px solid #ccc; font-size: 1em;';
+            
+            return `
+                <div class="size-card-${tier}" style="
+                    text-align: center; 
+                    padding: ${isStandard ? '15px' : '12px'}; 
+                    border-radius: 8px; 
+                    ${cardStyle}
+                    transition: transform 0.2s ease;
+                " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <label style="
+                        font-weight: bold; 
+                        display: block; 
+                        margin-bottom: 8px; 
+                        font-size: ${isStandard ? '1.2em' : '1em'};
+                        color: ${isStandard ? 'var(--primary-color)' : '#666'};
+                    ">${size}</label>
+                    
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 2px; margin-bottom: 5px;">
+                        <button type="button" onclick="this.nextElementSibling.stepDown(); UnifiedCartManager.validateSizeDistribution();" 
+                                style="
+                                    width: ${isStandard ? '32px' : '28px'}; 
+                                    height: ${isStandard ? '32px' : '28px'}; 
+                                    ${buttonStyle}
+                                    border-radius: 4px; 
+                                    cursor: pointer; 
+                                    font-weight: bold;
+                                    font-size: ${isStandard ? '1.2em' : '1em'};
+                                ">−</button>
+                        
+                        <input type="number" class="size-qty-input" data-size="${size}" 
+                               min="0" value="0" 
+                               style="
+                                   width: ${isStandard ? '50px' : '45px'}; 
+                                   height: ${isStandard ? '32px' : '28px'};
+                                   text-align: center; 
+                                   padding: 4px; 
+                                   ${inputStyle}
+                                   border-radius: 4px;
+                                   margin: 0 2px;
+                               "
+                               onchange="UnifiedCartManager.validateSizeDistribution()"
+                               oninput="UnifiedCartManager.validateSizeDistribution()">
+                        
+                        <button type="button" onclick="this.previousElementSibling.stepUp(); UnifiedCartManager.validateSizeDistribution();" 
+                                style="
+                                    width: ${isStandard ? '32px' : '28px'}; 
+                                    height: ${isStandard ? '32px' : '28px'}; 
+                                    ${buttonStyle}
+                                    border-radius: 4px; 
+                                    cursor: pointer; 
+                                    font-weight: bold;
+                                    font-size: ${isStandard ? '1.2em' : '1em'};
+                                ">+</button>
+                    </div>
+                </div>
+            `;
         },
 
         // Validate size distribution
@@ -1185,7 +1281,7 @@
                    ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
         },
 
-        // Auto-distribute sizes evenly
+        // Auto-distribute sizes with SMART STANDARD-FIRST LOGIC
         autoDistributeSizes: function() {
             const inputs = document.querySelectorAll('.size-qty-input');
             const targetDisplay = document.getElementById('size-target-display');
@@ -1196,26 +1292,93 @@
             // Clear existing values
             inputs.forEach(input => input.value = 0);
             
-            // Distribute evenly, prioritizing S-XL
-            const primarySizes = ['S', 'M', 'L', 'XL'];
-            const availableInputs = Array.from(inputs);
-            const primaryInputs = availableInputs.filter(input => 
-                primarySizes.includes(input.dataset.size)
+            // Define standard and extended sizes
+            const standardSizes = ['S', 'M', 'L', 'XL'];
+            const standardInputs = Array.from(inputs).filter(input => 
+                standardSizes.includes(input.dataset.size)
             );
-            const otherInputs = availableInputs.filter(input => 
-                !primarySizes.includes(input.dataset.size)
+            const extendedInputs = Array.from(inputs).filter(input => 
+                !standardSizes.includes(input.dataset.size)
             );
             
-            // Start with primary sizes
-            const inputsToUse = primaryInputs.length > 0 ? primaryInputs : availableInputs;
-            const baseAmount = Math.floor(target / inputsToUse.length);
-            const remainder = target % inputsToUse.length;
-            
-            inputsToUse.forEach((input, index) => {
-                input.value = baseAmount + (index < remainder ? 1 : 0);
-            });
+            // SMART DISTRIBUTION LOGIC
+            if (standardInputs.length > 0) {
+                if (target <= standardInputs.length * 8) {
+                    // Small quantities: Use only standard sizes
+                    const baseAmount = Math.floor(target / standardInputs.length);
+                    const remainder = target % standardInputs.length;
+                    
+                    standardInputs.forEach((input, index) => {
+                        input.value = baseAmount + (index < remainder ? 1 : 0);
+                    });
+                } else {
+                    // Larger quantities: Fill standard sizes generously, overflow to extended
+                    const standardAllocation = Math.min(target, standardInputs.length * 12);
+                    const baseStandardAmount = Math.floor(standardAllocation / standardInputs.length);
+                    const standardRemainder = standardAllocation % standardInputs.length;
+                    
+                    // Distribute to standard sizes
+                    standardInputs.forEach((input, index) => {
+                        input.value = baseStandardAmount + (index < standardRemainder ? 1 : 0);
+                    });
+                    
+                    // Distribute remainder to extended sizes if available
+                    const extendedAllocation = target - standardAllocation;
+                    if (extendedAllocation > 0 && extendedInputs.length > 0) {
+                        const baseExtendedAmount = Math.floor(extendedAllocation / extendedInputs.length);
+                        const extendedRemainder = extendedAllocation % extendedInputs.length;
+                        
+                        extendedInputs.forEach((input, index) => {
+                            input.value = baseExtendedAmount + (index < extendedRemainder ? 1 : 0);
+                        });
+                    }
+                }
+            } else {
+                // No standard sizes available, distribute among all available
+                const baseAmount = Math.floor(target / inputs.length);
+                const remainder = target % inputs.length;
+                
+                inputs.forEach((input, index) => {
+                    input.value = baseAmount + (index < remainder ? 1 : 0);
+                });
+            }
             
             this.validateSizeDistribution();
+            
+            // Show user what happened
+            this.showAutoDistributeMessage(target, standardInputs.length, extendedInputs.length);
+        },
+        
+        // Show helpful message about auto-distribution
+        showAutoDistributeMessage: function(total, standardCount, extendedCount) {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--primary-color);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                z-index: 1001;
+                font-size: 0.9em;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            `;
+            
+            if (standardCount > 0 && extendedCount > 0) {
+                messageDiv.innerHTML = `✓ Distributed ${total} pieces: Prioritized standard sizes (S-XL), overflow to extended sizes`;
+            } else if (standardCount > 0) {
+                messageDiv.innerHTML = `✓ Distributed ${total} pieces evenly across standard sizes (S-XL)`;
+            } else {
+                messageDiv.innerHTML = `✓ Distributed ${total} pieces evenly across available sizes`;
+            }
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
         },
 
         // Reset cart form
@@ -1245,7 +1408,7 @@
         UnifiedCartManager.init();
     }
 
-    // CSS for multi-color selection
+    // CSS for multi-color selection and two-tier size layout
     const style = document.createElement('style');
     style.textContent = `
         .color-swatch.selected-for-cart {
@@ -1283,6 +1446,70 @@
         
         .cart-summary-panel .btn-secondary:hover {
             background: #545b62;
+        }
+        
+        /* TWO-TIER SIZE LAYOUT MOBILE RESPONSIVENESS */
+        @media (max-width: 768px) {
+            .standard-sizes-tier > div:last-child {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+                max-width: 300px !important;
+            }
+            
+            .extended-sizes-tier > div:last-child {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px !important;
+                max-width: 250px !important;
+            }
+            
+            .size-card-standard {
+                padding: 12px !important;
+            }
+            
+            .size-card-extended {
+                padding: 10px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .standard-sizes-tier > div:last-child {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px !important;
+                max-width: 280px !important;
+            }
+            
+            .extended-sizes-tier > div:last-child {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 6px !important;
+                max-width: 240px !important;
+            }
+            
+            .size-card-standard {
+                padding: 10px !important;
+            }
+            
+            .size-card-standard label {
+                font-size: 1.1em !important;
+            }
+            
+            .size-card-extended {
+                padding: 8px !important;
+            }
+            
+            .size-card-extended label {
+                font-size: 0.9em !important;
+            }
+        }
+        
+        /* Hover effects for better UX */
+        .size-card-standard:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 4px 12px rgba(46, 88, 39, 0.25) !important;
+        }
+        
+        .size-card-extended:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
         }
     `;
     document.head.appendChild(style);
