@@ -536,8 +536,178 @@ console.log("[PDF-GEN:LOAD] Order form PDF generation module loaded (v2 - Enhanc
         }
     }
 
+    // New function to generate PDF from quote data
+    async function generateQuotePDFFromQuote(quoteData) {
+        console.log("[PDF-GEN:START] Starting Quote PDF generation from quote data...");
+
+        if (typeof jspdf === 'undefined' || typeof jspdf.jsPDF === 'undefined') {
+            console.error("[PDF-GEN:ERROR] jsPDF library not found.");
+            alert("Error: PDF library (jsPDF) not loaded correctly.");
+            return;
+        }
+        if (typeof jspdf.jsPDF.API?.autoTable === 'undefined') {
+            console.error("[PDF-GEN:ERROR] jsPDF AutoTable plugin not found.");
+            alert("Error: PDF Table plugin (jsPDF-AutoTable) not loaded correctly.");
+            return;
+        }
+
+        const { jsPDF } = jspdf;
+
+        try {
+            if (!quoteData || !quoteData.items || quoteData.items.length === 0) {
+                alert("No items in quote to generate PDF.");
+                throw new Error("Quote is empty.");
+            }
+
+            const doc = new jsPDF();
+            console.log("[PDF-GEN:INFO] Creating quote PDF from quote data");
+            let yPos = await addHeader(doc, { title: "Quote" });
+
+            // Add quote information
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            if (quoteData.id) {
+                doc.text(`Quote ID: ${quoteData.id}`, 15, yPos);
+                yPos += 6;
+            }
+            if (quoteData.sessionId) {
+                doc.text(`Session: ${quoteData.sessionId}`, 15, yPos);
+                yPos += 10;
+            }
+
+            const tableHeaders = ["Style Number", "Color", "Embellishment", "Details", "Quantity", "Unit Price", "Line Total"];
+            const tableBody = [];
+
+            quoteData.items.forEach(item => {
+                let details = '';
+                
+                // Build details based on embellishment type
+                if (item.embellishmentType === 'screenprint') {
+                    details = `${item.colorCount || 1} Color${item.colorCount > 1 ? 's' : ''}`;
+                    if (item.hasAdditionalLocation) {
+                        details += ' + 2nd Location';
+                    }
+                } else if (item.embellishmentType === 'dtg') {
+                    details = item.printLocation || 'Standard';
+                } else if (item.embellishmentType === 'embroidery') {
+                    details = `${item.stitchCount || 0} stitches`;
+                    if (item.hasBackLogo) {
+                        details += ' + Back';
+                    }
+                }
+
+                // Add size breakdown if available
+                if (item.sizeBreakdown && Object.keys(item.sizeBreakdown).length > 0) {
+                    const sizes = Object.entries(item.sizeBreakdown)
+                        .filter(([size, qty]) => qty > 0)
+                        .map(([size, qty]) => `${size}:${qty}`)
+                        .join(', ');
+                    if (sizes) {
+                        details += ` (${sizes})`;
+                    }
+                }
+
+                tableBody.push([
+                    item.styleNumber || 'N/A',
+                    item.color || 'N/A',
+                    item.embellishmentType ? item.embellishmentType.toUpperCase() : 'N/A',
+                    details || 'Standard',
+                    item.quantity || 0,
+                    formatCurrency(item.finalUnitPrice || 0),
+                    formatCurrency(item.lineTotal || 0)
+                ]);
+            });
+
+            if (tableBody.length > 0) {
+                doc.autoTable({
+                    head: [tableHeaders],
+                    body: tableBody,
+                    startY: yPos,
+                    margin: { left: 15, right: 15 },
+                    theme: 'striped',
+                    headStyles: { fillColor: [46, 88, 39], textColor: 255, fontStyle: 'bold', fontSize: 9, halign: 'center' },
+                    styles: { fontSize: 8, font: 'helvetica', cellPadding: 3, valign: 'middle', lineWidth: 0.1, lineColor: [220, 220, 220] },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    columnStyles: {
+                        0: { cellWidth: 25, fontStyle: 'bold' },
+                        1: { cellWidth: 25 },
+                        2: { cellWidth: 25 },
+                        3: { cellWidth: 40 },
+                        4: { cellWidth: 20, halign: 'right' },
+                        5: { cellWidth: 25, halign: 'right' },
+                        6: { cellWidth: 25, halign: 'right', fontStyle: 'bold' }
+                    },
+                    didDrawPage: function (data) {
+                        addFooter(doc, data.pageNumber, doc.internal.getNumberOfPages());
+                    }
+                });
+                yPos = doc.lastAutoTable.finalY + 10;
+            }
+
+            // Add summary
+            const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+            const margin = 15;
+            const summaryBlockWidth = 70;
+            const summaryBlockX = pageWidth - margin - summaryBlockWidth;
+            const summaryLineHeight = 6;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+
+            doc.text("Sub Total:", summaryBlockX, yPos);
+            doc.text(formatCurrency(quoteData.subtotal || 0), summaryBlockX + summaryBlockWidth, yPos, { align: 'right' });
+            yPos += summaryLineHeight;
+
+            if (quoteData.ltmTotal > 0) {
+                doc.setTextColor(220, 53, 69);
+                doc.text("Less Than Minimum Fee:", summaryBlockX, yPos);
+                doc.text(formatCurrency(quoteData.ltmTotal), summaryBlockX + summaryBlockWidth, yPos, { align: 'right' });
+                doc.setTextColor(0);
+                yPos += summaryLineHeight;
+            }
+
+            doc.setDrawColor(180, 180, 180);
+            doc.setLineWidth(0.2);
+            doc.line(summaryBlockX, yPos, summaryBlockX + summaryBlockWidth, yPos);
+            yPos += 3;
+
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Total:", summaryBlockX, yPos);
+            doc.text(formatCurrency(quoteData.grandTotal || 0), summaryBlockX + summaryBlockWidth, yPos, { align: 'right' });
+
+            // Add terms
+            yPos += 15;
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Terms and Conditions", margin, yPos);
+            yPos += 5;
+
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            const terms = "This quote is valid for 30 days from the date of issue. Prices are subject to change without notice after the validity period. " +
+                          "Shipping, taxes, and additional fees are not included in this quote. Production time begins after approval of artwork and payment. " +
+                          "Please review all details carefully before placing your order. Thank you for your business!";
+            const splitTerms = doc.splitTextToSize(terms, pageWidth - (2 * margin));
+            doc.text(splitTerms, margin, yPos);
+
+            const filename = `NWCA_Quote_${quoteData.id || new Date().toISOString().slice(0, 10)}.pdf`;
+            doc.save(filename);
+            console.log(`[PDF-GEN:SUCCESS] Quote PDF "${filename}" generated.`);
+
+        } catch (error) {
+            console.error("[PDF-GEN:ERROR] Failed to generate Quote PDF:", error);
+            alert(`Error generating Quote PDF: ${error.message}`);
+        }
+    }
+
+    // Export both functions
     window.NWCAOrderFormPDF = {
-        generate: generateQuotePDF
+        generate: generateQuotePDF,
+        generateFromQuote: generateQuotePDFFromQuote
     };
+
+    // Also export the quote PDF generator globally for easy access
+    window.generateQuotePDF = generateQuotePDFFromQuote;
 
 })();

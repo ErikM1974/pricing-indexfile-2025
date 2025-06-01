@@ -2,3 +2,7 @@ node_modules/
 npm-debug.log
 .DS_Store
 .env
+shared_components/js/dtg-page-setup-diagnostic.js
+test-dtg-diagnostic.html
+dtg-pricing-old.html
+.gitignore

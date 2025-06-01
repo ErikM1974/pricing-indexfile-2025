@@ -1384,3 +1384,68 @@ td.price-display > div.pricing-box-no-ltm > div:first-child { /* Target only the
 /* Rows within the green box will inherit default styling from: */
 /* td.price-display > div > div:not(:first-child) */
 /* No need to repeat row styling unless specific overrides for green box rows are needed. */
+
+/* ============================= */
+/* Quote System Integration */
+/* ============================= */
+
+/* Import quote system styles */
+@import url('quote-system.css');
+
+/* Quote-specific overrides for pricing pages */
+.pricing-page .quote-builder-container {
+    margin-top: var(--spacing-lg, 30px);
+}
+
+/* Ensure quote panel works well with pricing page layout */
+.pricing-page .quote-summary-panel {
+    top: 60px; /* Account for any fixed headers */
+}
+
+/* Quote button integration with add-to-cart section */
+.add-to-cart-section.quote-mode {
+    border-left-color: var(--secondary-color, #5cb85c);
+}
+
+.add-to-cart-section.quote-mode .section-title {
+    color: var(--secondary-color, #5cb85c);
+}
+
+/* Quote builder within pricing context */
+.pricing-section .quote-builder-container {
+    margin-bottom: 0;
+    border-radius: 0 0 var(--radius-md, 8px) var(--radius-md, 8px);
+}
+
+/* Ensure quote elements don't interfere with pricing grid */
+.pricing-grid-container + .quote-builder-container {
+    margin-top: var(--spacing-md, 20px);
+}
+
+/* Quote success message positioning for pricing pages */
+.pricing-page .quote-success-message {
+    top: 30%;
+}
+
+/* Mobile adjustments for quote system on pricing pages */
+@media (max-width: 768px) {
+    .pricing-page .quote-summary-panel {
+        top: 0;
+    }
+    
+    .pricing-page .quote-panel-toggle {
+        bottom: 70px; /* Account for mobile navigation */
+    }
+}
+
+/* Print styles for quotes on pricing pages */
+@media print {
+    .pricing-page .pricing-tabs,
+    .pricing-page .color-selection-section {
+        display: none;
+    }
+    
+    .pricing-page .quote-summary-panel {
+        page-break-inside: avoid;
+    }
+}

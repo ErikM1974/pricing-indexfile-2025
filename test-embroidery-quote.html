@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Embroidery Quote System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .test-button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #2e5827;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background-color: #1e3a1a;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Embroidery Quote System Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Test Links</h2>
+        <p>Click these links to test the embroidery pricing page with different products:</p>
+        <ul>
+            <li><a href="/embroidery-pricing.html?StyleNumber=PC54&COLOR=Athletic%20Heather" target="_blank">Port & Company PC54 - Athletic Heather</a></li>
+            <li><a href="/embroidery-pricing.html?StyleNumber=G500&COLOR=Navy" target="_blank">Gildan G500 - Navy</a></li>
+            <li><a href="/embroidery-pricing.html?StyleNumber=PC55&COLOR=Black" target="_blank">Port & Company PC55 - Black</a></li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>Quote System Status</h2>
+        <button class="test-button" onclick="checkQuoteSystem()">Check Quote System</button>
+        <button class="test-button" onclick="checkLocalStorage()">Check Local Storage</button>
+        <button class="test-button" onclick="clearQuoteData()">Clear Quote Data</button>
+        <div id="status-output"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Quote Operations</h2>
+        <button class="test-button" onclick="createTestQuote()">Create Test Quote</button>
+        <button class="test-button" onclick="loadTestQuote()">Load Test Quote</button>
+        <button class="test-button" onclick="testAPI()">Test API Connection</button>
+        <div id="operation-output"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const output = document.getElementById('status-output');
+            output.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showOperation(message, type = 'info') {
+            const output = document.getElementById('operation-output');
+            output.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function checkQuoteSystem() {
+            try {
+                const checks = {
+                    'QuoteAdapterBase': typeof window.QuoteAdapterBase !== 'undefined',
+                    'embroideryQuoteAdapter': typeof window.embroideryQuoteAdapter !== 'undefined',
+                    'Quote Panel': document.getElementById('quote-summary-panel') !== null,
+                    'Quote Toggle Button': document.getElementById('quote-panel-toggle') !== null
+                };
+
+                let html = '<h3>Quote System Components:</h3><ul>';
+                let allGood = true;
+                
+                for (const [component, exists] of Object.entries(checks)) {
+                    const status = exists ? '✅' : '❌';
+                    html += `<li>${status} ${component}: ${exists ? 'Loaded' : 'Not Found'}</li>`;
+                    if (!exists) allGood = false;
+                }
+                
+                html += '</ul>';
+                
+                if (window.embroideryQuoteAdapter && window.embroideryQuoteAdapter.currentQuote) {
+                    html += '<h3>Current Quote:</h3>';
+                    html += '<pre>' + JSON.stringify(window.embroideryQuoteAdapter.currentQuote, null, 2) + '</pre>';
+                }
+                
+                showStatus(html, allGood ? 'success' : 'error');
+            } catch (error) {
+                showStatus('Error checking quote system: ' + error.message, 'error');
+            }
+        }
+
+        function checkLocalStorage() {
+            try {
+                const sessionKey = localStorage.getItem('nwca_quote_session');
+                const quoteKey = localStorage.getItem('nwca_current_quote');
+                
+                let html = '<h3>Local Storage Data:</h3>';
+                html += '<p><strong>Session ID:</strong> ' + (sessionKey || 'Not set') + '</p>';
+                
+                if (quoteKey) {
+                    try {
+                        const quoteData = JSON.parse(quoteKey);
+                        html += '<h3>Stored Quote:</h3>';
+                        html += '<pre>' + JSON.stringify(quoteData, null, 2) + '</pre>';
+                    } catch (e) {
+                        html += '<p><strong>Quote Data:</strong> Invalid JSON</p>';
+                    }
+                } else {
+                    html += '<p><strong>Quote Data:</strong> Not set</p>';
+                }
+                
+                showStatus(html, 'info');
+            } catch (error) {
+                showStatus('Error checking local storage: ' + error.message, 'error');
+            }
+        }
+
+        function clearQuoteData() {
+            try {
+                localStorage.removeItem('nwca_quote_session');
+                localStorage.removeItem('nwca_current_quote');
+                showStatus('Quote data cleared from local storage', 'success');
+            } catch (error) {
+                showStatus('Error clearing quote data: ' + error.message, 'error');
+            }
+        }
+
+        function createTestQuote() {
+            try {
+                const testQuote = {
+                    id: 'Q_TEST_' + Date.now(),
+                    sessionId: 'sess_test_' + Date.now(),
+                    items: [
+                        {
+                            id: 'item_1',
+                            lineNumber: 1,
+                            styleNumber: 'PC54',
+                            productName: 'Port & Company Core Cotton Tee',
+                            color: 'Athletic Heather',
+                            embellishmentType: 'embroidery',
+                            quantity: 48,
+                            baseUnitPrice: 12.50,
+                            ltmPerUnit: 0,
+                            finalUnitPrice: 12.50,
+                            lineTotal: 600.00,
+                            hasLTM: false,
+                            stitchCount: 8000,
+                            location: 'Front',
+                            sizeBreakdown: { 'S': 12, 'M': 12, 'L': 12, 'XL': 12 }
+                        }
+                    ],
+                    totalQuantity: 48,
+                    subtotal: 600.00,
+                    ltmTotal: 0,
+                    grandTotal: 600.00,
+                    embellishmentType: 'embroidery'
+                };
+                
+                localStorage.setItem('nwca_current_quote', JSON.stringify(testQuote));
+                showOperation('Test quote created and saved to local storage', 'success');
+                
+                // Show the quote data
+                showOperation('<h3>Test Quote Created:</h3><pre>' + JSON.stringify(testQuote, null, 2) + '</pre>', 'success');
+            } catch (error) {
+                showOperation('Error creating test quote: ' + error.message, 'error');
+            }
+        }
+
+        function loadTestQuote() {
+            const quoteId = prompt('Enter Quote ID (or leave empty for Q_TEST_123456):');
+            const testId = quoteId || 'Q_TEST_123456';
+            
+            showOperation(`Attempting to load quote: ${testId}<br>Note: This would normally connect to the API`, 'info');
+        }
+
+        async function testAPI() {
+            try {
+                showOperation('Testing API connection...', 'info');
+                
+                const apiUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions';
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showOperation(`API connection successful! Found ${data.length || 0} quote sessions.`, 'success');
+                } else {
+                    showOperation(`API returned status: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                showOperation('Error testing API: ' + error.message, 'error');
+            }
+        }
+
+        // Check system on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                checkQuoteSystem();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
