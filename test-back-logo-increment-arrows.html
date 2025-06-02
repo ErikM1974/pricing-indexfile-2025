@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Back Logo Increment Arrows</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .test-container { border: 2px solid #ddd; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .info { color: blue; }
+        
+        /* Copy the increment control styles from the main page */
+        .increment-control { 
+            display: flex; align-items: center; background: white; border-radius: 8px; 
+            border: 2px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .increment-btn { 
+            width: 36px; height: 36px; border: none; background: transparent; 
+            font-size: 18px; font-weight: bold; color: #0056b3; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+        .increment-btn:hover { background-color: #f0f8ff; }
+        .stitch-display { 
+            padding: 8px 16px; font-weight: bold; color: #333; 
+            background: #f8f9ff; min-width: 80px; text-align: center;
+            border-left: 1px solid #ddd; border-right: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Back Logo Increment Arrows Test</h1>
+    
+    <div class="test-container">
+        <h2>Modern Back Logo UI Test</h2>
+        
+        <!-- Back Logo Checkbox -->
+        <div style="margin-bottom: 20px;">
+            <input type="checkbox" id="back-logo-checkbox" style="width: 20px; height: 20px; margin-right: 12px;">
+            <label for="back-logo-checkbox" style="font-size: 1.1em; font-weight: bold; cursor: pointer;">
+                🎯 Add Back Logo Embroidery
+            </label>
+        </div>
+        
+        <!-- Back Logo Details (hidden by default) -->
+        <div id="back-logo-details" style="display: none; padding: 20px; background: #f8f9ff; border-radius: 8px;">
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                
+                <!-- Increment Arrows -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-weight: 600;">Stitch Count:</span>
+                    <div class="increment-control">
+                        <button id="back-logo-decrement" type="button" class="increment-btn">−</button>
+                        <span id="back-logo-stitch-display" class="stitch-display">5,000</span>
+                        <button id="back-logo-increment" type="button" class="increment-btn">+</button>
+                    </div>
+                    <span style="font-size: 0.85em; color: #666;">(5K-15K)</span>
+                </div>
+                
+                <!-- Price Display -->
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-weight: 600;">Cost:</span>
+                    <div id="back-logo-price" style="padding: 8px 16px; background: #28a745; color: white; border-radius: 8px; font-weight: bold;">$5.00 per item</div>
+                </div>
+            </div>
+            
+            <!-- Summary Display -->
+            <div id="back-logo-pricing-display" style="display: none; margin-top: 15px; padding: 12px; background: rgba(40,167,69,0.1); border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span><strong>📍 Back Logo:</strong> <span id="back-logo-display-stitch-count">5,000 stitches</span></span>
+                    <span id="back-logo-display-price" style="font-weight: bold; color: #28a745;">$5.00 per item</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>Test Results</h2>
+        <div id="test-results">Running tests...</div>
+    </div>
+    
+    <div class="test-container">
+        <h2>Manual Test Controls</h2>
+        <button onclick="testIncrement()">Test Increment (+)</button>
+        <button onclick="testDecrement()">Test Decrement (-)</button>
+        <button onclick="testCheckbox()">Toggle Checkbox</button>
+        <button onclick="testPricingFormula()">Test Pricing Formula</button>
+        <button onclick="testLimits()">Test Min/Max Limits</button>
+    </div>
+
+    <!-- Load the consolidated controller -->
+    <script src="/shared_components/js/cap-embroidery-controller.js"></script>
+    
+    <script>
+        let testResults = [];
+        
+        function addTestResult(test, passed, details = '') {
+            const status = passed ? '<span class="success">✓ PASS</span>' : '<span class="error">✗ FAIL</span>';
+            testResults.push(`${status} ${test}${details ? ': ' + details : ''}`);
+            updateTestDisplay();
+        }
+        
+        function updateTestDisplay() {
+            document.getElementById('test-results').innerHTML = testResults.join('<br>');
+        }
+        
+        function testIncrement() {
+            if (window.capEmbroideryBackLogo) {
+                const beforeCount = window.capEmbroideryBackLogo.getStitchCount();
+                const success = window.capEmbroideryBackLogo.incrementStitchCount();
+                const afterCount = window.capEmbroideryBackLogo.getStitchCount();
+                
+                addTestResult('Manual Increment', success && (afterCount === beforeCount + 1000), 
+                    `${beforeCount} → ${afterCount}`);
+            } else {
+                addTestResult('Manual Increment', false, 'Controller not available');
+            }
+        }
+        
+        function testDecrement() {
+            if (window.capEmbroideryBackLogo) {
+                const beforeCount = window.capEmbroideryBackLogo.getStitchCount();
+                const success = window.capEmbroideryBackLogo.decrementStitchCount();
+                const afterCount = window.capEmbroideryBackLogo.getStitchCount();
+                
+                addTestResult('Manual Decrement', success && (afterCount === beforeCount - 1000), 
+                    `${beforeCount} → ${afterCount}`);
+            } else {
+                addTestResult('Manual Decrement', false, 'Controller not available');
+            }
+        }
+        
+        function testCheckbox() {
+            const checkbox = document.getElementById('back-logo-checkbox');
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change'));
+            
+            const isEnabled = window.capEmbroideryBackLogo ? window.capEmbroideryBackLogo.isEnabled() : false;
+            addTestResult('Checkbox Toggle', isEnabled === checkbox.checked, 
+                `Checkbox: ${checkbox.checked}, Controller: ${isEnabled}`);
+        }
+        
+        function testPricingFormula() {
+            if (!window.capEmbroideryBackLogo) {
+                addTestResult('Pricing Formula', false, 'Controller not available');
+                return;
+            }
+            
+            const testCases = [
+                { stitches: 5000, expectedPrice: 5.00 },
+                { stitches: 6000, expectedPrice: 6.00 },
+                { stitches: 8000, expectedPrice: 8.00 },
+                { stitches: 10000, expectedPrice: 10.00 },
+                { stitches: 15000, expectedPrice: 15.00 }
+            ];
+            
+            let allPassed = true;
+            let details = [];
+            
+            testCases.forEach(test => {
+                window.capEmbroideryBackLogo.setStitchCount(test.stitches);
+                const actualPrice = window.capEmbroideryBackLogo.getPricePerItem();
+                const passed = Math.abs(actualPrice - test.expectedPrice) < 0.01;
+                
+                if (!passed) allPassed = false;
+                details.push(`${test.stitches}st=$${actualPrice.toFixed(2)}${passed ? '✓' : '✗'}`);
+            });
+            
+            addTestResult('Pricing Formula', allPassed, details.join(', '));
+        }
+        
+        function testLimits() {
+            if (!window.capEmbroideryBackLogo) {
+                addTestResult('Limit Testing', false, 'Controller not available');
+                return;
+            }
+            
+            // Test minimum limit
+            window.capEmbroideryBackLogo.setStitchCount(5000);
+            const decrementAtMin = window.capEmbroideryBackLogo.decrementStitchCount();
+            const stuckAtMin = window.capEmbroideryBackLogo.getStitchCount() === 5000;
+            
+            // Test maximum limit
+            window.capEmbroideryBackLogo.setStitchCount(15000);
+            const incrementAtMax = window.capEmbroideryBackLogo.incrementStitchCount();
+            const stuckAtMax = window.capEmbroideryBackLogo.getStitchCount() === 15000;
+            
+            const passed = !decrementAtMin && stuckAtMin && !incrementAtMax && stuckAtMax;
+            addTestResult('Min/Max Limits', passed, 
+                `Min block: ${!decrementAtMin}, Max block: ${!incrementAtMax}`);
+        }
+        
+        // Automated tests when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                console.log('Running automated tests...');
+                
+                // Test 1: Controller Loading
+                if (window.CapEmbroideryController) {
+                    addTestResult('Controller Loading', true);
+                } else {
+                    addTestResult('Controller Loading', false);
+                }
+                
+                // Test 2: Global API
+                if (window.capEmbroideryBackLogo) {
+                    addTestResult('Global API', true);
+                } else {
+                    addTestResult('Global API', false);
+                }
+                
+                // Test 3: UI Elements
+                const incrementBtn = document.getElementById('back-logo-increment');
+                const decrementBtn = document.getElementById('back-logo-decrement');
+                const display = document.getElementById('back-logo-stitch-display');
+                
+                const uiElementsFound = incrementBtn && decrementBtn && display;
+                addTestResult('UI Elements', uiElementsFound);
+                
+                // Test 4: Default Values
+                if (window.capEmbroideryBackLogo) {
+                    const defaultStitches = window.capEmbroideryBackLogo.getStitchCount();
+                    const defaultPrice = window.capEmbroideryBackLogo.getPricePerItem();
+                    
+                    addTestResult('Default Values', 
+                        defaultStitches === 5000 && Math.abs(defaultPrice - 5.00) < 0.01,
+                        `${defaultStitches} stitches, $${defaultPrice.toFixed(2)}`);
+                }
+                
+                // Initialize controller if not auto-initialized
+                if (window.CapEmbroideryController && typeof window.CapEmbroideryController.initialize === 'function') {
+                    try {
+                        window.CapEmbroideryController.initialize();
+                        addTestResult('Controller Init', true);
+                    } catch (error) {
+                        addTestResult('Controller Init', false, error.message);
+                    }
+                }
+                
+            }, 500);
+        });
+    </script>
+</body>
+</html>

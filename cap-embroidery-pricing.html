@@ -55,33 +55,6 @@
                     <!-- Other static info can go here -->
                 </div>
                 
-                <!-- Back Logo Option -->
-                <div class="back-logo-option" style="margin-top: 15px;">
-                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                        <input type="checkbox" id="back-logo-checkbox" style="margin-right: 8px;">
-                        <label for="back-logo-checkbox" style="font-weight: bold; color: var(--primary-color);">Add Back Logo (+$)</label>
-                    </div>
-                    
-                    <div id="back-logo-details" style="display: none; margin-top: 10px;">
-                        <div class="back-logo-selector" style="margin-bottom: 10px;">
-                            <label for="back-logo-stitch-count" style="font-size: 0.9em; font-weight: bold;">Stitch Count:</label>
-                            <select id="back-logo-stitch-count" style="margin-left: 8px; padding: 4px 8px; border-radius: 4px; border: 1px solid #ddd;">
-                                <option value="5000">5,000</option>
-                                <option value="8000" selected>8,000</option>
-                                <option value="10000">10,000</option>
-                            </select>
-                            <span id="back-logo-price" style="margin-left: 10px; font-size: 0.9em; color: var(--primary-color);">Price: $8.00 per item</span>
-                        </div>
-                        
-                        <div id="back-logo-pricing-display" style="display: none; background-color: #e8f4ff; padding: 10px; border-radius: var(--radius-sm); border-left: 3px solid var(--primary-color);">
-                            <div style="font-size: 0.9em; color: #004085;">
-                                <strong>Back Logo Details:</strong><br>
-                                <span id="back-logo-display-stitch-count">8,000 stitches</span><br>
-                                <span id="back-logo-display-price">$8.00 per item</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 
                 <!-- Color Swatches moved to left column below product image -->
                 <div class="color-swatches-left-column" style="margin-top:15px;">
@@ -152,6 +125,72 @@
                             
                             <!-- Pricing info tabs removed as per user request -->
                             
+                        </div>
+                    </div>
+                    
+                    <!-- Back Logo Add-On Section - Optimal Placement -->
+                    <div class="back-logo-addon-section" style="margin: 25px 0; padding: 20px; background: linear-gradient(135deg, #f8f9ff 0%, #e8f4ff 100%); border-radius: 12px; border: 2px solid #e3f2fd; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <input type="checkbox" id="back-logo-checkbox" style="width: 20px; height: 20px; margin-right: 12px; cursor: pointer; transform: scale(1.2);">
+                            <label for="back-logo-checkbox" style="font-size: 1.1em; font-weight: bold; color: var(--primary-color); cursor: pointer; user-select: none;">
+                                🎯 Add Back Logo Embroidery
+                            </label>
+                        </div>
+                        
+                        <div id="back-logo-details" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,86,179,0.2);">
+                            <div class="back-logo-controls" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                                
+                                <!-- Stitch Count with Increment Arrows -->
+                                <div class="stitch-count-control" style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-weight: 600; color: #333; margin-right: 8px;">Stitch Count:</span>
+                                    <div class="increment-control" style="display: flex; align-items: center; background: white; border-radius: 8px; border: 2px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        <button id="back-logo-decrement" type="button" style="
+                                            width: 36px; height: 36px; 
+                                            border: none; background: transparent; 
+                                            font-size: 18px; font-weight: bold; color: var(--primary-color); 
+                                            cursor: pointer; border-radius: 6px 0 0 6px;
+                                            display: flex; align-items: center; justify-content: center;
+                                            transition: background-color 0.2s ease;
+                                        " onmouseover="this.style.backgroundColor='#f0f8ff'" onmouseout="this.style.backgroundColor='transparent'">−</button>
+                                        
+                                        <span id="back-logo-stitch-display" style="
+                                            padding: 8px 16px; font-weight: bold; color: #333; 
+                                            background: #f8f9ff; min-width: 80px; text-align: center;
+                                            border-left: 1px solid #ddd; border-right: 1px solid #ddd;
+                                        ">5,000</span>
+                                        
+                                        <button id="back-logo-increment" type="button" style="
+                                            width: 36px; height: 36px; 
+                                            border: none; background: transparent; 
+                                            font-size: 18px; font-weight: bold; color: var(--primary-color); 
+                                            cursor: pointer; border-radius: 0 6px 6px 0;
+                                            display: flex; align-items: center; justify-content: center;
+                                            transition: background-color 0.2s ease;
+                                        " onmouseover="this.style.backgroundColor='#f0f8ff'" onmouseout="this.style.backgroundColor='transparent'">+</button>
+                                    </div>
+                                    <span style="font-size: 0.85em; color: #666; margin-left: 8px;">(5K-15K)</span>
+                                </div>
+                                
+                                <!-- Price Display -->
+                                <div class="price-display-section" style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="font-weight: 600; color: #333;">Additional Cost:</span>
+                                    <div id="back-logo-price" style="
+                                        padding: 8px 16px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); 
+                                        color: white; border-radius: 8px; font-weight: bold; font-size: 1.1em;
+                                        box-shadow: 0 2px 6px rgba(40,167,69,0.3);
+                                    ">$5.00 per item</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Back Logo Summary Info -->
+                            <div id="back-logo-pricing-display" style="display: none; margin-top: 15px; padding: 12px 16px; background: rgba(40,167,69,0.1); border-radius: 8px; border-left: 4px solid #28a745;">
+                                <div style="font-size: 0.95em; color: #155724;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span><strong>📍 Back Logo:</strong> <span id="back-logo-display-stitch-count">5,000 stitches</span></span>
+                                        <span id="back-logo-display-price" style="font-weight: bold; color: #28a745;">$5.00 per item</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     

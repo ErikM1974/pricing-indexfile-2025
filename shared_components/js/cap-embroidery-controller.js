@@ -15,8 +15,10 @@
         backLogo: {
             defaultStitchCount: 5000,
             minStitchCount: 5000,
+            maxStitchCount: 15000,
             priceBase: 5.00,
-            pricePerThousand: 1.00
+            pricePerThousand: 1.00,
+            incrementStep: 1000
         },
         ui: {
             loadingTimeout: 5000,
@@ -599,11 +601,37 @@
             },
 
             /**
+             * Increment back logo stitch count by step amount
+             */
+            incrementStitchCount() {
+                const currentCount = CapEmbroideryController.state.backLogo.stitchCount;
+                const newCount = currentCount + CAP_CONFIG.backLogo.incrementStep;
+                if (newCount <= CAP_CONFIG.backLogo.maxStitchCount) {
+                    CapEmbroideryController.BackLogoManager.setStitchCount(newCount);
+                    return true;
+                }
+                return false; // At maximum, don't respond
+            },
+
+            /**
+             * Decrement back logo stitch count by step amount
+             */
+            decrementStitchCount() {
+                const currentCount = CapEmbroideryController.state.backLogo.stitchCount;
+                const newCount = currentCount - CAP_CONFIG.backLogo.incrementStep;
+                if (newCount >= CAP_CONFIG.backLogo.minStitchCount) {
+                    CapEmbroideryController.BackLogoManager.setStitchCount(newCount);
+                    return true;
+                }
+                return false; // At minimum, don't respond
+            },
+
+            /**
              * Set back logo stitch count and update price
              */
             setStitchCount(count) {
                 const numCount = parseInt(count);
-                if (!isNaN(numCount) && numCount >= CAP_CONFIG.backLogo.minStitchCount) {
+                if (!isNaN(numCount) && numCount >= CAP_CONFIG.backLogo.minStitchCount && numCount <= CAP_CONFIG.backLogo.maxStitchCount) {
                     CapEmbroideryController.state.backLogo.stitchCount = numCount;
                     
                     // Calculate price: $5 base + $1 per thousand above 5000
@@ -632,7 +660,9 @@
                 const priceDisplayElement = document.getElementById('back-logo-price');
                 const displayStitchCountElement = document.getElementById('back-logo-display-stitch-count');
                 const displayPriceElement = document.getElementById('back-logo-display-price');
+                const stitchDisplayElement = document.getElementById('back-logo-stitch-display');
                 
+                // Update old elements for backward compatibility
                 if (priceDisplayElement) {
                     priceDisplayElement.textContent = `Price: $${CapEmbroideryController.state.backLogo.pricePerItem.toFixed(2)} per item`;
                 }
@@ -643,6 +673,11 @@
                 
                 if (displayPriceElement) {
                     displayPriceElement.textContent = `$${CapEmbroideryController.state.backLogo.pricePerItem.toFixed(2)} per item`;
+                }
+                
+                // Update new increment arrow display
+                if (stitchDisplayElement) {
+                    stitchDisplayElement.textContent = CapEmbroideryController.state.backLogo.stitchCount.toLocaleString();
                 }
             },
 
@@ -672,28 +707,35 @@
                     console.warn('[CAP-CONTROLLER] No back logo checkbox found');
                 }
                 
-                // Find and set up stitch count selector
-                const backLogoStitchSelect = document.getElementById('back-logo-stitch-count');
-                if (backLogoStitchSelect) {
-                    // Remove existing listeners by cloning
-                    const newSelect = backLogoStitchSelect.cloneNode(true);
-                    backLogoStitchSelect.parentNode.replaceChild(newSelect, backLogoStitchSelect);
+                // Find and set up increment arrows (new UI)
+                const incrementBtn = document.getElementById('back-logo-increment');
+                const decrementBtn = document.getElementById('back-logo-decrement');
+                const stitchDisplay = document.getElementById('back-logo-stitch-display');
+                
+                if (incrementBtn && decrementBtn) {
+                    console.log('[CAP-CONTROLLER] Found increment arrows, attaching listeners');
                     
-                    newSelect.addEventListener('input', function() {
-                        const stitchCount = parseInt(this.value);
-                        console.log('[CAP-CONTROLLER] Back logo stitch count changed to:', stitchCount);
-                        
-                        if (!isNaN(stitchCount) && stitchCount > 0) {
-                            CapEmbroideryController.BackLogoManager.setStitchCount(stitchCount);
-                        }
+                    // Remove existing listeners by cloning
+                    const newIncrementBtn = incrementBtn.cloneNode(true);
+                    const newDecrementBtn = decrementBtn.cloneNode(true);
+                    incrementBtn.parentNode.replaceChild(newIncrementBtn, incrementBtn);
+                    decrementBtn.parentNode.replaceChild(newDecrementBtn, decrementBtn);
+                    
+                    // Add increment listener
+                    newIncrementBtn.addEventListener('click', function() {
+                        CapEmbroideryController.BackLogoManager.incrementStitchCount();
                     });
                     
-                    // Set initial value
-                    const initialCount = parseInt(newSelect.value);
-                    if (!isNaN(initialCount)) {
-                        CapEmbroideryController.BackLogoManager.setStitchCount(initialCount);
-                    }
+                    // Add decrement listener
+                    newDecrementBtn.addEventListener('click', function() {
+                        CapEmbroideryController.BackLogoManager.decrementStitchCount();
+                    });
+                } else {
+                    console.warn('[CAP-CONTROLLER] Increment arrow buttons not found');
                 }
+                
+                // Set initial stitch count
+                CapEmbroideryController.BackLogoManager.setStitchCount(CAP_CONFIG.backLogo.defaultStitchCount);
 
                 console.log('[CAP-CONTROLLER] Back logo UI initialization complete');
             }
@@ -852,7 +894,9 @@
         getPricePerItem: () => CapEmbroideryController.BackLogoManager.getPricePerItem(),
         setStitchCount: (count) => CapEmbroideryController.BackLogoManager.setStitchCount(count),
         getStitchCount: () => CapEmbroideryController.state.backLogo.stitchCount,
-        initializeUI: () => CapEmbroideryController.BackLogoManager.initializeUI()
+        initializeUI: () => CapEmbroideryController.BackLogoManager.initializeUI(),
+        incrementStitchCount: () => CapEmbroideryController.BackLogoManager.incrementStitchCount(),
+        decrementStitchCount: () => CapEmbroideryController.BackLogoManager.decrementStitchCount()
     };
 
     // Expose main controller
