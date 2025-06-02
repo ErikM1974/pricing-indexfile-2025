@@ -10,13 +10,268 @@
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
     <link rel="stylesheet" href="/shared_components/css/universal-cart-ui.css">
     <link rel="stylesheet" href="/shared_components/css/cap-embroidery-specific.css">
+    
+    <!-- Universal Header Responsive Styles -->
+    <style>
+        /* Mobile responsiveness for universal header */
+        @media (max-width: 768px) {
+            .universal-header .header-main > div {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+                text-align: center;
+            }
+            
+            .header-nav-hub {
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+            
+            .header-quick-actions {
+                justify-content: center !important;
+                flex-wrap: wrap;
+            }
+            
+            .style-search-container input {
+                width: 200px !important;
+            }
+            
+            .contact-info {
+                flex-direction: column !important;
+                gap: 8px !important;
+                text-align: center;
+            }
+            
+            .header-actions {
+                flex-wrap: wrap;
+                justify-content: center !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header-top-bar {
+                display: none; /* Hide top bar on very small screens */
+            }
+            
+            .header-brand div:first-child {
+                font-size: 1em !important;
+            }
+            
+            .header-brand div:last-child {
+                font-size: 0.7em !important;
+            }
+            
+            .back-to-product span:last-child {
+                display: none; /* Hide text, keep only arrow */
+            }
+            
+            .page-context {
+                display: none; /* Hide on very small screens */
+            }
+        }
+        
+        /* Improved search results positioning */
+        #style-search-results {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        /* Smooth transitions for interactive elements */
+        .universal-header button, .universal-header a {
+            transition: all 0.2s ease;
+        }
+        
+        /* Print styles */
+        @media print {
+            .universal-header {
+                position: static !important;
+                box-shadow: none !important;
+                background: white !important;
+                color: black !important;
+                border-bottom: 2px solid #2e5827;
+            }
+            
+            .header-top-bar, .header-quick-actions {
+                display: none !important;
+            }
+        }
+    </style>
+    
 <!-- jsPDF Libraries for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
+    <!-- Universal Navigation Header -->
+    <header class="universal-header" style="
+        background: linear-gradient(135deg, #2e5827 0%, #3e6837 100%);
+        color: white;
+        padding: 0;
+        box-shadow: 0 4px 12px rgba(46,88,39,0.3);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    ">
+        <!-- Top Bar with Company Info -->
+        <div class="header-top-bar" style="
+            background: rgba(0,0,0,0.1);
+            padding: 8px 0;
+            font-size: 0.85em;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        ">
+            <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div class="contact-info" style="display: flex; gap: 20px; align-items: center;">
+                    <span>📞 (555) 123-4567</span>
+                    <span>✉️ quotes@nwcustomapparel.com</span>
+                    <span>🕒 Mon-Fri 8AM-6PM PST</span>
+                </div>
+                <div class="header-actions" style="display: flex; gap: 15px; align-items: center;">
+                    <button onclick="window.print()" style="
+                        background: none; border: none; color: white; cursor: pointer;
+                        padding: 4px 8px; border-radius: 4px; transition: background 0.2s;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">
+                        🖨️ Print Quote
+                    </button>
+                    <button onclick="shareQuote()" style="
+                        background: none; border: none; color: white; cursor: pointer;
+                        padding: 4px 8px; border-radius: 4px; transition: background 0.2s;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">
+                        📤 Share
+                    </button>
+                    <button onclick="toggleHelp()" style="
+                        background: none; border: none; color: white; cursor: pointer;
+                        padding: 4px 8px; border-radius: 4px; transition: background 0.2s;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">
+                        ❓ Help
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Header Navigation -->
+        <div class="header-main" style="padding: 15px 0;">
+            <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: auto 1fr auto; gap: 30px; align-items: center;">
+                
+                <!-- Logo & Company Brand -->
+                <div class="header-brand" style="display: flex; align-items: center; gap: 12px;">
+                    <div style="
+                        width: 40px; height: 40px; 
+                        background: white; border-radius: 8px;
+                        display: flex; align-items: center; justify-content: center;
+                        font-weight: bold; color: #2e5827; font-size: 1.2em;
+                    ">NW</div>
+                    <div>
+                        <div style="font-size: 1.2em; font-weight: bold; line-height: 1;">NW Custom Apparel</div>
+                        <div style="font-size: 0.8em; opacity: 0.9; line-height: 1;">Professional Embroidery & Printing</div>
+                    </div>
+                </div>
+                
+                <!-- Navigation & Search Hub -->
+                <div class="header-nav-hub" style="display: flex; gap: 20px; align-items: center; justify-content: center;">
+                    
+                    <!-- Back to Product Button -->
+                    <a id="back-to-product" href="#" class="back-to-product" style="
+                        display: flex; align-items: center; gap: 8px;
+                        background: rgba(255,255,255,0.15); color: white;
+                        padding: 10px 16px; border-radius: 6px;
+                        text-decoration: none; font-weight: 600;
+                        transition: all 0.2s ease;
+                        border: 1px solid rgba(255,255,255,0.2);
+                    " onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                        <span class="back-icon" style="font-size: 1.1em;">←</span> 
+                        <span>Back to Product</span>
+                    </a>
+                    
+                    <!-- Style Search -->
+                    <div class="style-search-container" style="position: relative;">
+                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);">
+                            <span style="font-size: 1.1em;">🔍</span>
+                            <input type="text" id="style-search-input" placeholder="Search style (e.g., PC61)" autocomplete="off" style="
+                                background: none; border: none; color: white; outline: none;
+                                font-size: 0.95em; width: 180px;
+                                placeholder-color: rgba(255,255,255,0.7);
+                            ">
+                        </div>
+                        <div id="style-search-results" style="
+                            position: absolute; top: 100%; left: 0; right: 0;
+                            background: white; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                            max-height: 300px; overflow-y: auto; z-index: 1000;
+                            display: none;
+                        "></div>
+                    </div>
+                    
+                    <!-- Page Context Indicator -->
+                    <div class="page-context" style="
+                        background: rgba(255,255,255,0.1); 
+                        padding: 8px 12px; border-radius: 6px;
+                        font-size: 0.9em; border-left: 3px solid white;
+                    ">
+                        <div style="font-weight: bold;">Cap Embroidery Pricing</div>
+                        <div style="opacity: 0.8; font-size: 0.85em;" id="current-product-context">Select a product to get started</div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="header-quick-actions" style="display: flex; gap: 12px; align-items: center;">
+                    
+                    <!-- Quick Quote Toggle -->
+                    <button onclick="toggleQuickQuote()" style="
+                        background: rgba(255,255,255,0.2); color: white;
+                        border: 1px solid rgba(255,255,255,0.3);
+                        padding: 8px 12px; border-radius: 6px; cursor: pointer;
+                        font-size: 0.9em; font-weight: 600;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        📊 Quote
+                    </button>
+                    
+                    <!-- Sample Request -->
+                    <button onclick="requestSample()" style="
+                        background: rgba(255,255,255,0.2); color: white;
+                        border: 1px solid rgba(255,255,255,0.3);
+                        padding: 8px 12px; border-radius: 6px; cursor: pointer;
+                        font-size: 0.9em; font-weight: 600;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        🧵 Sample
+                    </button>
+                    
+                    <!-- Contact for Quote -->
+                    <button onclick="contactForQuote()" style="
+                        background: white; color: #2e5827;
+                        border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer;
+                        font-weight: bold; font-size: 0.95em;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">
+                        💬 Get Quote
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Breadcrumb Navigation -->
+        <div class="header-breadcrumb" style="
+            background: rgba(0,0,0,0.1);
+            padding: 8px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.85em;
+        ">
+            <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+                <nav style="display: flex; align-items: center; gap: 8px;">
+                    <a href="/" style="color: rgba(255,255,255,0.8); text-decoration: none;">Home</a>
+                    <span style="color: rgba(255,255,255,0.6);">›</span>
+                    <a href="/products" style="color: rgba(255,255,255,0.8); text-decoration: none;">Products</a>
+                    <span style="color: rgba(255,255,255,0.6);">›</span>
+                    <span id="breadcrumb-product" style="color: rgba(255,255,255,0.8);">Product</span>
+                    <span style="color: rgba(255,255,255,0.6);">›</span>
+                    <span style="color: white; font-weight: 600;">Cap Embroidery Pricing</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
-        <h1>Cap Embroidery Pricing</h1>
+        <!-- Removed the old h1 since we have it in the header now -->
 
         <!-- Compact Quick Quote Section -->
         <div class="quick-quote-banner" style="
@@ -467,15 +722,17 @@
     <script src="/shared_components/js/pricing-matrix-api.js"></script>
     <script src="/shared_components/js/dp5-helper.js"></script>
     <script src="/shared_components/js/product-quantity-ui.js"></script>
-    <script src="/shared_components/js/cart.js"></script>
-    <script src="/shared_components/js/cart-integration.js"></script>
-    <script src="/shared_components/js/cart-price-recalculator.js"></script>
-    <script src="/shared_components/js/add-to-cart.js"></script>
+    <!-- Cart functionality disabled for quote-only workflow -->
+    <!-- <script src="/shared_components/js/cart.js"></script> -->
+    <!-- <script src="/shared_components/js/cart-integration.js"></script> -->
+    <!-- <script src="/shared_components/js/cart-price-recalculator.js"></script> -->
+    <!-- <script src="/shared_components/js/add-to-cart.js"></script> -->
     <script src="/shared_components/js/pricing-calculator.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/cap-embroidery-controller.js"></script> <!-- Consolidated controller replacing 6 separate files -->
     <script src="/shared_components/js/hero-quantity-calculator.js"></script> <!-- Quantity-first UX calculator -->
     <script src="/shared_components/js/product-pricing-ui.js"></script> <!-- Added new script, removed defer -->
+    <script src="/shared_components/js/universal-header.js"></script> <!-- Universal header navigation and functionality -->
     
 </body>
 <script src="/shared_components/js/order-form-pdf.js"></script>
