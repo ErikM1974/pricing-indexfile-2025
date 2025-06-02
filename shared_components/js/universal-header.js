@@ -290,12 +290,271 @@
         },
 
         /**
-         * Navigate to product page
+         * Navigate to product - Universal method for all pricing pages
          */
-        navigateToProduct(styleNumber, colorCode = 'default') {
-            const productURL = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode)}`;
-            console.log('[UNIVERSAL-HEADER] Navigating to product:', productURL);
-            window.location.href = productURL;
+        navigateToProduct(styleNumber, colorCode = null) {
+            console.log('[UNIVERSAL-HEADER] Processing navigation request for:', styleNumber);
+            
+            // Determine current page type based on URL and context
+            const currentPage = this.getCurrentPageType();
+            console.log('[UNIVERSAL-HEADER] Current page type:', currentPage);
+            
+            if (currentPage === 'product' || currentPage === 'unknown') {
+                // If we're on the product page or unknown page, go to product page
+                const productURL = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode || 'default')}`;
+                console.log('[UNIVERSAL-HEADER] Navigating to product page:', productURL);
+                window.location.href = productURL;
+            } else {
+                // If we're on a pricing page, update the current page with new product
+                this.updateCurrentPricingPage(styleNumber, colorCode);
+            }
+        },
+
+        /**
+         * Determine current page type based on URL and context
+         */
+        getCurrentPageType() {
+            const url = window.location.href.toLowerCase();
+            
+            if (url.includes('cap-embroidery')) return 'cap-embroidery';
+            if (url.includes('embroidery')) return 'embroidery';
+            if (url.includes('screen-print')) return 'screen-print';
+            if (url.includes('dtg')) return 'dtg';
+            if (url.includes('dtf')) return 'dtf';
+            if (url.includes('product.html') || url.includes('/product')) return 'product';
+            
+            // Check page title or other indicators
+            const pageTitle = document.title.toLowerCase();
+            if (pageTitle.includes('cap embroidery')) return 'cap-embroidery';
+            if (pageTitle.includes('embroidery')) return 'embroidery';
+            if (pageTitle.includes('screen print')) return 'screen-print';
+            if (pageTitle.includes('dtg')) return 'dtg';
+            if (pageTitle.includes('dtf')) return 'dtf';
+            
+            return 'unknown';
+        },
+
+        /**
+         * Update current pricing page with new product - Universal for all pricing pages
+         */
+        async updateCurrentPricingPage(styleNumber, colorCode = null) {
+            console.log('[UNIVERSAL-HEADER] Updating current pricing page with:', styleNumber, colorCode);
+            
+            try {
+                // First, validate the product exists and get initial color if needed
+                const productData = await this.fetchProductData(styleNumber);
+                
+                if (!productData || !productData.colors || productData.colors.length === 0) {
+                    throw new Error('Product not found or has no color options');
+                }
+                
+                // Use provided color or default to first available color
+                const targetColor = colorCode || productData.colors[0].CATALOG_COLOR || productData.colors[0].COLOR_NAME;
+                
+                // Validate product suitability for current page (optional validation)
+                const currentPageType = this.getCurrentPageType();
+                const isProductSuitable = this.validateProductForPageType(productData, currentPageType);
+                
+                if (!isProductSuitable) {
+                    // Show warning but proceed anyway
+                    this.showNotification(`Note: ${styleNumber} may not be optimal for ${currentPageType} but loading anyway...`, 'warning');
+                }
+                
+                // Update URL parameters
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('StyleNumber', styleNumber);
+                newUrl.searchParams.set('COLOR', targetColor);
+                window.history.pushState({}, '', newUrl);
+                
+                // Update global variables that pricing systems depend on
+                window.selectedStyleNumber = styleNumber;
+                window.selectedCatalogColor = targetColor;
+                window.selectedColorName = productData.colors.find(c => 
+                    c.CATALOG_COLOR === targetColor || c.COLOR_NAME === targetColor
+                )?.COLOR_NAME || targetColor;
+                
+                // Update header context display
+                this.updateProductContext(styleNumber, targetColor);
+                
+                // Show loading notification
+                this.showNotification(`Loading ${styleNumber} pricing...`, 'info');
+                
+                // Trigger page-specific refresh based on current page type
+                this.triggerPageSpecificRefresh(styleNumber, targetColor, currentPageType);
+                
+                // Update product information display if available
+                this.updateProductDisplay(productData, targetColor);
+                
+                console.log('[UNIVERSAL-HEADER] Successfully updated pricing page with new product');
+                
+            } catch (error) {
+                console.error('[UNIVERSAL-HEADER] Failed to update pricing page:', error);
+                this.showNotification(`Error loading ${styleNumber}: ${error.message}`, 'error');
+                
+                // Fallback: redirect to product page
+                const productURL = `/product?StyleNumber=${encodeURIComponent(styleNumber)}`;
+                console.log('[UNIVERSAL-HEADER] Falling back to product page:', productURL);
+                window.location.href = productURL;
+            }
+        },
+
+        /**
+         * Fetch product data using the same API as other pages
+         */
+        async fetchProductData(styleNumber) {
+            const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            const productApiUrl = `${API_PROXY_BASE_URL}/api/product-colors?styleNumber=${encodeURIComponent(styleNumber)}`;
+            
+            console.log('[UNIVERSAL-HEADER] Fetching product data from:', productApiUrl);
+            
+            const response = await fetch(productApiUrl);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch product data: ${response.statusText}`);
+            }
+            
+            return await response.json();
+        },
+
+        /**
+         * Validate if product is suitable for current page type
+         */
+        validateProductForPageType(productData, pageType) {
+            if (!productData.productTitle) return true; // Can't validate without title
+            
+            const productTitle = productData.productTitle.toLowerCase();
+            
+            switch (pageType) {
+                case 'cap-embroidery':
+                    return productTitle.includes('cap') || productTitle.includes('hat') || 
+                           productTitle.includes('beanie') || productTitle.includes('visor');
+                
+                case 'embroidery':
+                    // Most apparel can be embroidered
+                    return !productTitle.includes('electronic') && !productTitle.includes('accessory');
+                
+                case 'dtg':
+                    // DTG works best on cotton garments
+                    return productTitle.includes('shirt') || productTitle.includes('tee') || 
+                           productTitle.includes('hoodie') || productTitle.includes('sweatshirt');
+                
+                case 'screen-print':
+                    // Screen print works on most apparel
+                    return !productTitle.includes('electronic') && !productTitle.includes('accessory');
+                
+                case 'dtf':
+                    // DTF works on various materials
+                    return true;
+                
+                default:
+                    return true;
+            }
+        },
+
+        /**
+         * Trigger page-specific refresh functions
+         */
+        triggerPageSpecificRefresh(styleNumber, colorCode, pageType) {
+            console.log('[UNIVERSAL-HEADER] Triggering refresh for page type:', pageType);
+            
+            // Universal triggers that work across all pricing pages
+            if (typeof window.updatePageForStyle === 'function') {
+                console.log('[UNIVERSAL-HEADER] Calling updatePageForStyle');
+                window.updatePageForStyle(styleNumber);
+            }
+            
+            if (typeof window.triggerPricingDataPageUpdates === 'function') {
+                console.log('[UNIVERSAL-HEADER] Calling triggerPricingDataPageUpdates');
+                window.triggerPricingDataPageUpdates(styleNumber, colorCode);
+            }
+            
+            // Page-specific triggers based on common patterns
+            switch (pageType) {
+                case 'cap-embroidery':
+                    if (typeof window.initDp7ApiFetch === 'function') {
+                        console.log('[UNIVERSAL-HEADER] Triggering cap embroidery refresh');
+                        window.initDp7ApiFetch(styleNumber);
+                    }
+                    break;
+                
+                case 'embroidery':
+                    if (typeof window.initDp5ApiFetch === 'function') {
+                        console.log('[UNIVERSAL-HEADER] Triggering embroidery refresh');
+                        window.initDp5ApiFetch(styleNumber);
+                    }
+                    break;
+                
+                case 'dtg':
+                    if (typeof window.initDp6ApiFetch === 'function') {
+                        console.log('[UNIVERSAL-HEADER] Triggering DTG refresh');
+                        window.initDp6ApiFetch(styleNumber);
+                    }
+                    break;
+                
+                case 'screen-print':
+                    if (typeof window.initDp8ApiFetch === 'function') {
+                        console.log('[UNIVERSAL-HEADER] Triggering screen print refresh');
+                        window.initDp8ApiFetch(styleNumber);
+                    }
+                    break;
+                
+                case 'dtf':
+                    if (typeof window.initDtfApiFetch === 'function') {
+                        console.log('[UNIVERSAL-HEADER] Triggering DTF refresh');
+                        window.initDtfApiFetch(styleNumber);
+                    }
+                    break;
+            }
+            
+            // Generic fallback triggers
+            if (typeof window.refreshPricingData === 'function') {
+                window.refreshPricingData(styleNumber, colorCode);
+            }
+            
+            if (typeof window.loadProductInfo === 'function') {
+                window.loadProductInfo(styleNumber, colorCode);
+            }
+        },
+
+        /**
+         * Update product display elements if they exist on the page
+         */
+        updateProductDisplay(productData, colorCode) {
+            // Update product title contexts
+            const titleElements = document.querySelectorAll('#product-title-context, #product-title, .product-title');
+            titleElements.forEach(el => {
+                if (el) el.textContent = productData.productTitle || 'Product Title';
+            });
+            
+            // Update style number contexts
+            const styleElements = document.querySelectorAll('#product-style-context, .product-style');
+            styleElements.forEach(el => {
+                if (el) el.textContent = productData.styleNumber || window.selectedStyleNumber;
+            });
+            
+            // Update product images if elements exist
+            const selectedColor = productData.colors?.find(c => 
+                c.CATALOG_COLOR === colorCode || c.COLOR_NAME === colorCode
+            ) || productData.colors?.[0];
+            
+            if (selectedColor) {
+                const mainImage = document.querySelector('#product-image-main, .product-image-main');
+                if (mainImage && selectedColor.MAIN_IMAGE_URL) {
+                    mainImage.src = selectedColor.MAIN_IMAGE_URL;
+                    mainImage.alt = `${productData.productTitle} - ${selectedColor.COLOR_NAME}`;
+                }
+                
+                // Update color swatch if exists
+                const colorSwatch = document.querySelector('#pricing-color-swatch');
+                const colorName = document.querySelector('#pricing-color-name');
+                if (colorSwatch && selectedColor.COLOR_SQUARE_IMAGE) {
+                    colorSwatch.style.backgroundImage = `url(${selectedColor.COLOR_SQUARE_IMAGE})`;
+                }
+                if (colorName) {
+                    colorName.textContent = selectedColor.COLOR_NAME || colorCode;
+                }
+            }
+            
+            console.log('[UNIVERSAL-HEADER] Updated product display elements');
         },
 
         /**
@@ -419,12 +678,23 @@
          */
         showNotification(message, type = 'info') {
             const notification = document.createElement('div');
+            
+            let backgroundColor;
+            switch (type) {
+                case 'success': backgroundColor = '#28a745'; break;
+                case 'error': backgroundColor = '#dc3545'; break;
+                case 'warning': backgroundColor = '#ffc107'; break;
+                case 'info': 
+                default: backgroundColor = '#007bff'; break;
+            }
+            
             notification.style.cssText = `
                 position: fixed; top: 20px; right: 20px; z-index: 10000;
-                padding: 12px 20px; border-radius: 6px; color: white; font-weight: bold;
+                padding: 12px 20px; border-radius: 6px; color: ${type === 'warning' ? '#212529' : 'white'}; font-weight: bold;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 transform: translateX(100%); transition: transform 0.3s ease;
-                ${type === 'success' ? 'background: #28a745;' : type === 'error' ? 'background: #dc3545;' : 'background: #007bff;'}
+                background: ${backgroundColor};
+                max-width: 300px; word-wrap: break-word;
             `;
             notification.textContent = message;
             document.body.appendChild(notification);
@@ -432,11 +702,16 @@
             // Animate in
             setTimeout(() => notification.style.transform = 'translateX(0)', 100);
             
-            // Auto remove
+            // Auto remove (longer for warnings and errors)
+            const duration = (type === 'warning' || type === 'error') ? 5000 : 3000;
             setTimeout(() => {
                 notification.style.transform = 'translateX(100%)';
-                setTimeout(() => document.body.removeChild(notification), 300);
-            }, 3000);
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, duration);
         },
 
         /**
