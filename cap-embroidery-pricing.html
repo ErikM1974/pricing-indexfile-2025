@@ -258,11 +258,13 @@
         ">
             <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
                 <nav style="display: flex; align-items: center; gap: 8px;">
-                    <a href="/" style="color: rgba(255,255,255,0.8); text-decoration: none;">Home</a>
+                    <a href="javascript:void(0)" onclick="goToHome()" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.2s; cursor: pointer;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'" title="Go to home page">Home</a>
                     <span style="color: rgba(255,255,255,0.6);">›</span>
-                    <a href="/products" style="color: rgba(255,255,255,0.8); text-decoration: none;">Products</a>
+                    <span style="color: rgba(255,255,255,0.6);">Products</span>
                     <span style="color: rgba(255,255,255,0.6);">›</span>
-                    <span id="breadcrumb-product" style="color: rgba(255,255,255,0.8);">Product</span>
+                    <a id="breadcrumb-product-link" href="#" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                        <span id="breadcrumb-product">Product</span>
+                    </a>
                     <span style="color: rgba(255,255,255,0.6);">›</span>
                     <span style="color: white; font-weight: 600;">Cap Embroidery Pricing</span>
                 </nav>

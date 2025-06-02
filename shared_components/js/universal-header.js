@@ -52,7 +52,6 @@
             this.setupURLParameters();
             this.setupStyleSearch();
             this.setupBackToProduct();
-            this.setupProductContext();
             this.bindHeaderActions();
             
             console.log('[UNIVERSAL-HEADER] Universal header system ready');
@@ -67,12 +66,21 @@
             const colorCode = urlParams.get('COLOR');
             
             if (styleNumber && colorCode) {
+                const productURL = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode)}`;
+                
                 // Update back to product button
                 const backBtn = document.getElementById('back-to-product');
                 if (backBtn) {
-                    const backURL = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode)}`;
-                    backBtn.href = backURL;
-                    console.log('[UNIVERSAL-HEADER] Back to product URL set:', backURL);
+                    backBtn.href = productURL;
+                    console.log('[UNIVERSAL-HEADER] Back to product URL set:', productURL);
+                }
+                
+                // Update breadcrumb product link
+                const breadcrumbProductLink = document.getElementById('breadcrumb-product-link');
+                if (breadcrumbProductLink) {
+                    breadcrumbProductLink.href = productURL;
+                    breadcrumbProductLink.title = `Go back to ${styleNumber} - ${colorCode} product page`;
+                    console.log('[UNIVERSAL-HEADER] Breadcrumb product link set:', productURL);
                 }
                 
                 // Update product context
@@ -80,6 +88,16 @@
                 
                 // Store current product
                 headerState.currentProduct = { styleNumber, colorCode };
+            } else {
+                // If no product context, disable the product link
+                const breadcrumbProductLink = document.getElementById('breadcrumb-product-link');
+                if (breadcrumbProductLink) {
+                    breadcrumbProductLink.href = '#';
+                    breadcrumbProductLink.style.cursor = 'default';
+                    breadcrumbProductLink.style.opacity = '0.6';
+                    breadcrumbProductLink.title = 'No product selected';
+                    breadcrumbProductLink.onclick = (e) => e.preventDefault();
+                }
             }
         },
 
@@ -231,11 +249,12 @@
         },
 
         /**
-         * Update product context display
+         * Update product context display and breadcrumb navigation
          */
         updateProductContext(styleNumber, colorCode = null) {
             const contextElement = document.getElementById('current-product-context');
-            const breadcrumbElement = document.getElementById('breadcrumb-product');
+            const breadcrumbProductElement = document.getElementById('breadcrumb-product');
+            const breadcrumbProductLink = document.getElementById('breadcrumb-product-link');
             
             if (contextElement) {
                 const displayText = colorCode ? 
@@ -244,8 +263,16 @@
                 contextElement.textContent = displayText;
             }
             
-            if (breadcrumbElement) {
-                breadcrumbElement.textContent = styleNumber;
+            // Update breadcrumb product link to go to actual product page
+            if (breadcrumbProductElement) {
+                breadcrumbProductElement.textContent = styleNumber;
+            }
+            
+            if (breadcrumbProductLink && styleNumber && colorCode) {
+                const productURL = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode)}`;
+                breadcrumbProductLink.href = productURL;
+                breadcrumbProductLink.title = `Go back to ${styleNumber} - ${colorCode} product page`;
+                console.log('[UNIVERSAL-HEADER] Breadcrumb product link updated:', productURL);
             }
             
             console.log('[UNIVERSAL-HEADER] Product context updated:', styleNumber, colorCode);
@@ -310,6 +337,17 @@
             window.contactForQuote = () => {
                 console.log('[UNIVERSAL-HEADER] Contact for quote requested');
                 this.initiateQuoteContact();
+            };
+            
+            // Home navigation functionality
+            window.goToHome = () => {
+                console.log('[UNIVERSAL-HEADER] Navigating to home page');
+                // Get the current URL origin and navigate to index.html
+                const currentOrigin = window.location.origin;
+                const homePath = currentOrigin.includes('localhost') ? 
+                    `${currentOrigin}/index.html` : 
+                    `${currentOrigin}/index.html`;
+                window.location.href = homePath;
             };
         },
 
