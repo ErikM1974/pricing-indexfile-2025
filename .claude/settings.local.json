@@ -9,7 +9,10 @@
       "Bash(cp:*)",
       "Bash(python3:*)",
       "Bash(ls:*)",
-      "Bash(diff:*)"
+      "Bash(diff:*)",
+      "Bash(rm:*)",
+      "Bash(node:*)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   }
