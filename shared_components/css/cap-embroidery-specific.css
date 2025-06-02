@@ -1,0 +1,358 @@
+/* Cap Embroidery Specific Styles */
+/* Styles unique to the cap embroidery pricing page */
+
+/* Pricing header specific styles */
+.pricing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+/* Stitch count selector styling */
+.stitch-count-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--primary-color);
+    position: relative;
+}
+
+.stitch-count-selector label {
+    font-size: 0.95em;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.stitch-count-selector select {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 2px solid #ddd;
+    font-weight: bold;
+    background: white;
+    min-width: 80px;
+    transition: all 0.3s ease;
+}
+
+.stitch-count-selector select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+    outline: none;
+}
+
+#stitch-count-indicator {
+    font-size: 0.8em;
+    color: var(--primary-color);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Selected color indicator */
+.selected-color-indicator {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    background-color: var(--primary-light);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--primary-color);
+    box-shadow: var(--shadow-xs);
+}
+
+.mini-color-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 0 8px;
+    border: 2px solid var(--border-color);
+    display: inline-block;
+    vertical-align: middle;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    background-size: cover;
+    background-position: center;
+    box-sizing: border-box;
+    aspect-ratio: 1/1;
+    transition: all 0.3s ease;
+}
+
+.mini-color-swatch:hover {
+    transform: scale(1.1);
+    border-color: var(--primary-color);
+}
+
+.mini-color-swatch.active-swatch {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.mini-color-swatch.fallback-swatch {
+    background-image: radial-gradient(circle, transparent 0%, rgba(255,255,255,0.05) 100%);
+}
+
+.mini-color-swatch.clickable {
+    cursor: pointer;
+    position: relative;
+}
+
+.mini-color-swatch.clickable::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mini-color-swatch.clickable:hover::after {
+    opacity: 1;
+}
+
+#pricing-color-name {
+    color: var(--primary-color);
+}
+
+/* Left column color swatches improvements */
+.color-swatches-left-column .color-swatches-container {
+    border: 1px solid var(--border-light);
+}
+
+.color-swatches-left-column .swatch-wrapper {
+    width: 60px;
+    min-height: 70px;
+}
+
+.color-swatches-left-column .color-swatch {
+    width: 45px;
+    height: 45px;
+}
+
+/* Pricing grid styling */
+.active-tier-highlight {
+    background-color: var(--primary-light) !important;
+    font-weight: bold;
+    color: var(--primary-color) !important;
+}
+
+.pricing-grid {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.pricing-grid th {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 8px;
+}
+
+.pricing-grid td {
+    padding: 10px 8px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.pricing-grid tbody tr:nth-child(even) {
+    background-color: var(--background-ultralight, #fdfdfd);
+}
+
+.pricing-grid th:first-child, 
+.pricing-grid td:first-child {
+    text-align: left;
+    padding-left: 15px;
+}
+
+/* Current pricing level highlight */
+#custom-pricing-grid tbody tr.current-pricing-level-highlight td {
+    background-color: var(--primary-extralight, #e6f7ff) !important;
+    font-weight: bold;
+}
+
+#custom-pricing-grid tbody tr.current-pricing-level-highlight td:first-child {
+    color: var(--primary-dark, #004170);
+}
+
+/* Pricing grid container styling */
+.pricing-grid-container {
+    position: relative;
+    transition: opacity 0.3s ease;
+}
+
+.pricing-grid-container.updating {
+    opacity: 0.7;
+}
+
+/* Table caption styling for stitch count indicator */
+#custom-pricing-grid caption {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Stitch count awareness for pricing grid */
+#custom-pricing-grid[data-current-stitch-count="5000"] {
+    border-left: 4px solid #28a745;
+}
+
+#custom-pricing-grid[data-current-stitch-count="8000"] {
+    border-left: 4px solid #007bff;
+}
+
+#custom-pricing-grid[data-current-stitch-count="10000"] {
+    border-left: 4px solid #dc3545;
+}
+
+/* Stitch count indicator in section title */
+.section-title .stitch-indicator {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 4px 8px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: normal;
+    animation: pulse 2s ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Loading overlay for pricing updates */
+#pricing-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 1.1em;
+    backdrop-filter: blur(2px);
+}
+
+/* Success notification */
+#pricing-update-success {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10000;
+    font-weight: bold;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    border-left: 4px solid #1e7e34;
+}
+
+/* Back logo specific styles (if implemented) */
+.back-logo-option {
+    background-color: var(--primary-light);
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    margin: 15px 0;
+    border-left: 3px solid var(--primary-color);
+}
+
+.back-logo-selector {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: var(--radius-sm);
+}
+
+/* Static product info styling */
+.static-product-info {
+    padding: 15px;
+    background-color: var(--background-light);
+    border-radius: var(--radius-sm);
+    margin-top: 15px;
+}
+
+/* Responsive adjustments for cap embroidery */
+@media (max-width: 768px) {
+    .pricing-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .stitch-count-selector {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .selected-color-indicator {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .color-swatches-left-column .color-swatches {
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stitch-count-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .stitch-count-selector select {
+        width: 100%;
+    }
+    
+    .mini-color-swatch {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .selected-color-indicator {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .color-swatches-left-column .color-swatches {
+        max-height: 180px;
+        gap: 5px;
+    }
+    
+    .color-swatches-left-column .swatch-wrapper {
+        width: 50px;
+        min-height: 60px;
+        margin: 3px;
+    }
+    
+    .color-swatches-left-column .color-swatch {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .color-swatches-left-column .color-name {
+        font-size: 0.7em;
+    }
+}

@@ -1,0 +1,621 @@
+/* Universal Cart and Add to Cart UI Components */
+/* Reusable across all pricing pages with cart functionality */
+
+/* Single row quantity layout */
+.single-row-quantity-container {
+    margin-bottom: var(--spacing-md);
+    overflow-x: auto;
+    width: 100%;
+}
+
+/* Quantity matrix and input table styling */
+.quantity-matrix,
+.quantity-input-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    max-width: 100%;
+}
+
+.quantity-matrix th,
+.quantity-matrix td,
+.quantity-input-table th,
+.quantity-input-table td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* First column (labels) should be narrower */
+.quantity-input-table th:first-child,
+.quantity-input-table td:first-child {
+    width: 80px;
+    max-width: 80px;
+}
+
+/* Size columns should have fixed width */
+.quantity-input-table th:not(:first-child),
+.quantity-input-table td:not(:first-child) {
+    width: 120px;
+    max-width: 120px;
+}
+
+.quantity-matrix th,
+.quantity-input-table th {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.quantity-matrix th:first-child,
+.quantity-matrix td:first-child,
+.quantity-input-table th:first-child,
+.quantity-input-table td:first-child {
+    text-align: left;
+    font-weight: bold;
+    width: 80px;
+    max-width: 80px;
+}
+
+/* Price display row styling */
+#price-display-row td {
+    font-weight: bold;
+    color: var(--primary-color);
+    border-top: 1px solid var(--primary-light);
+    vertical-align: top;
+    padding: 8px;
+    text-align: center;
+}
+
+/* Ensure price displays are properly contained */
+.size-price-display {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* Quantity input styling */
+.quantity-input {
+    width: 40px;
+    text-align: center;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.quantity-btn {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background-color: var(--primary-light);
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.quantity-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.quantity-input-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+/* Pricing tier info */
+.pricing-tier-info {
+    background-color: var(--primary-light);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border-left: 3px solid var(--primary-color);
+}
+
+.tier-explanation h4,
+.ltm-explanation h4 {
+    margin-top: 0;
+    color: var(--primary-color);
+    font-size: 1.1em;
+}
+
+.tier-progress {
+    margin-top: var(--spacing-sm);
+    background-color: var(--white);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+}
+
+.tier-progress-bar {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.tier-point {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    position: relative;
+}
+
+.tier-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    border: 2px solid var(--primary-color);
+}
+
+.tier-dot.active {
+    background-color: var(--primary-color);
+}
+
+.tier-label {
+    margin-top: 5px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.tier-line {
+    position: absolute;
+    top: 8px;
+    height: 2px;
+    width: 100%;
+    background-color: var(--primary-light);
+    z-index: 0;
+}
+
+.tier-progress-fill {
+    position: absolute;
+    top: 8px;
+    height: 2px;
+    background-color: var(--primary-color);
+    z-index: 0;
+}
+
+.tier-progress-text {
+    text-align: center;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.ltm-explanation {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.ltm-applied {
+    font-weight: bold;
+    color: #856404;
+}
+
+.ltm-per-item {
+    color: #dc3545;
+}
+
+/* Enhanced Price Breakdown Card Styles */
+.price-breakdown-card {
+    font-size: 0.75em;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 110px;
+    box-sizing: border-box;
+    text-align: left;
+    background-color: #fff;
+}
+
+.price-breakdown-card .price-breakdown-header {
+    color: white;
+    font-weight: bold;
+    padding: 4px;
+    text-align: center;
+    font-size: 0.8em;
+    background-color: #17a2b8;
+}
+
+.price-breakdown-card.ltm-active .price-breakdown-header {
+    background-color: #17a2b8;
+}
+
+.price-breakdown-card.standard .price-breakdown-header {
+    background-color: #6c757d;
+}
+
+.price-breakdown-card .price-breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 4px;
+    border-bottom: 1px solid #f0f0f0;
+    line-height: 1.2;
+    font-size: 0.75em;
+    background-color: #e8f4ff;
+}
+
+.price-breakdown-card .price-breakdown-row:last-child {
+    border-bottom: none;
+    background-color: rgba(0,0,0,0.03);
+    font-weight: bold;
+    font-size: 1.05em;
+}
+
+.price-breakdown-card .price-breakdown-row span:first-child {
+    color: #333;
+    font-weight: normal;
+}
+
+.price-breakdown-card .price-breakdown-row span:last-child {
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+}
+
+.price-breakdown-card.ltm-active {
+    background-color: #fff;
+}
+
+.price-breakdown-card.ltm-active .price-breakdown-row.unit-price span:last-child,
+.price-breakdown-card.ltm-active .price-breakdown-row.total-price span:last-child {
+    color: #004085;
+}
+
+.price-breakdown-card.standard {
+    background-color: #f8f9fa;
+}
+
+.price-breakdown-card.standard .price-breakdown-row.unit-price span:last-child,
+.price-breakdown-card.standard .price-breakdown-row.total-price span:last-child {
+    color: var(--primary-color);
+}
+
+/* Ensure pricing boxes fit properly in table cells */
+.quantity-input-table td.price-display.has-breakdown {
+    padding: 4px !important;
+    vertical-align: top;
+    width: 120px;
+    max-width: 120px;
+    text-align: center;
+}
+
+/* Table styling */
+.quantity-input-table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.quantity-input-table th,
+.quantity-input-table td {
+    border: 1px solid #ddd;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.quantity-input-table .size-header-row td,
+.quantity-input-table .size-header-row th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    padding: 8px;
+}
+
+.quantity-input-table .quantity-input-row td:first-child,
+.quantity-input-table .price-display-row td:first-child {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    width: 80px;
+    max-width: 80px;
+}
+
+.quantity-input-table .quantity-input-row td:not(:first-child) {
+    background-color: #fff;
+    padding: 5px;
+}
+
+.quantity-input-table .price-display-row td:not(:first-child) {
+    background-color: #fff;
+    padding: 4px;
+    vertical-align: top;
+}
+
+/* Size column width consistency */
+.quantity-input-table td:not(:first-child),
+.quantity-input-table th:not(:first-child) {
+    width: 120px;
+    max-width: 120px;
+}
+
+/* Enhanced Grid-based layout for add to cart */
+.size-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin: 15px 0 25px 0;
+    padding: 5px;
+}
+
+.size-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background-color: var(--primary-light);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add subtle pattern to size cards */
+.size-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.1) 75%, transparent 75%, transparent);
+    background-size: 10px 10px;
+    opacity: 0.5;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.size-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-color: var(--primary-color);
+}
+
+.size-label {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    position: relative;
+    z-index: 1;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--primary-color);
+    background-color: white;
+    color: var(--primary-color);
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.quantity-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.quantity-btn.decrease {
+    border-radius: 4px 0 0 4px;
+}
+
+.quantity-btn.increase {
+    border-radius: 0 4px 4px 0;
+}
+
+.quantity-input {
+    width: 40px;
+    height: 30px;
+    border: 1px solid var(--primary-color);
+    border-left: none;
+    border-right: none;
+    text-align: center;
+    font-size: 1em;
+}
+
+.price-display {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-top: 5px;
+    text-align: center;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9em;
+    position: relative;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.price-display .dynamic-unit-price {
+    margin-left: 5px;
+    font-weight: normal;
+}
+
+/* Enhanced cart summary styling */
+.cart-summary {
+    background-color: var(--primary-light);
+    padding: 20px;
+    border-radius: var(--radius-sm);
+    margin-top: 20px;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: var(--primary-dark);
+}
+
+.ltm-fee-notice {
+    background-color: #e8f4ff;
+    color: #004085;
+    padding: 10px 15px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-left: 3px solid #b8daff;
+}
+
+.ltm-icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+.add-to-cart-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 14px 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.add-to-cart-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.add-to-cart-button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.add-to-cart-button::before {
+    content: '🛒 ';
+    margin-right: 8px;
+}
+
+/* Responsive adjustments for cart UI */
+@media (max-width: 768px) {
+    .pricing-tier-info {
+        padding: var(--spacing-sm);
+    }
+    
+    .tier-explanation h4,
+    .ltm-explanation h4 {
+        font-size: 1em;
+    }
+    
+    .size-grid-container {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+    }
+    
+    .size-card {
+        padding: 10px;
+    }
+    
+    .size-label {
+        font-size: 1.1em;
+        margin-bottom: 8px;
+    }
+    
+    .quantity-btn {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .quantity-input {
+        width: 35px;
+        height: 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tier-explanation h4,
+    .ltm-explanation h4 {
+        font-size: 0.9em;
+    }
+    
+    .tier-progress-bar {
+        margin-top: 10px;
+    }
+    
+    .tier-dot {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .tier-label {
+        font-size: 0.7em;
+    }
+    
+    .tier-line {
+        top: 6px;
+    }
+    
+    .size-grid-container {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 8px;
+    }
+    
+    .size-card {
+        padding: 8px;
+    }
+    
+    .size-label {
+        font-size: 1em;
+        margin-bottom: 5px;
+    }
+    
+    .quantity-btn {
+        width: 22px;
+        height: 22px;
+        font-size: 0.9em;
+    }
+    
+    .quantity-input {
+        width: 30px;
+        height: 22px;
+        font-size: 0.9em;
+    }
+}
