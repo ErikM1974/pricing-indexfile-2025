@@ -50,28 +50,11 @@
 
         setStitchCount: function(count) {
             const numCount = parseInt(count);
-            if (!isNaN(numCount) && numCount >= 5000) {
+            if (!isNaN(numCount) && numCount > 0) {
                 BACK_LOGO_CONFIG.stitchCount = numCount;
-                // Calculate price: $5 base for 5,000 stitches + $1 for each additional 1,000 stitches
-                const additionalThousands = Math.max(0, Math.ceil((numCount - 5000) / 1000));
-                BACK_LOGO_CONFIG.price = 5.00 + additionalThousands;
-                console.log(`[CAP-EMB-BACK-LOGO] Back logo stitch count set to ${numCount}, additional thousands: ${additionalThousands}, price: $${BACK_LOGO_CONFIG.price.toFixed(2)}`);
-                
-                // Trigger UI update
-                if (window.updateCartTotal) {
-                    window.updateCartTotal();
-                }
-            } else if (!isNaN(numCount) && numCount < 5000) {
-                // Enforce minimum of 5,000 stitches
-                BACK_LOGO_CONFIG.stitchCount = 5000;
-                BACK_LOGO_CONFIG.price = 5.00;
-                console.log(`[CAP-EMB-BACK-LOGO] Stitch count ${numCount} below minimum, set to 5000 stitches, price: $5.00`);
-                
-                // Update the UI input to reflect the minimum
-                const stitchInput = document.getElementById('back-logo-stitch-count');
-                if (stitchInput) {
-                    stitchInput.value = 5000;
-                }
+                // Calculate price based on stitch count (same as front logo pricing)
+                BACK_LOGO_CONFIG.price = Math.ceil(numCount / 1000);
+                console.log(`[CAP-EMB-BACK-LOGO] Back logo stitch count set to ${numCount}, price: $${BACK_LOGO_CONFIG.price}`);
                 
                 // Trigger UI update
                 if (window.updateCartTotal) {

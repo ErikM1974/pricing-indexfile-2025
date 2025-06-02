@@ -16,15 +16,18 @@
             const basePricing = originalCalculatePricing.call(this, sizeQuantities, existingCartQuantity, pricingData);
             
             // Check if back logo is enabled
-            const isBackLogoEnabled = window.CapEmbroideryBackLogoAddon && window.CapEmbroideryBackLogoAddon.isEnabled();
+            const isBackLogoEnabled = window.capEmbroideryBackLogo && window.capEmbroideryBackLogo.isEnabled();
             
             if (!isBackLogoEnabled) {
                 return basePricing;
             }
             
-            // Get back logo stitch count and price from the add-on system
-            const backLogoStitchCount = window.CapEmbroideryBackLogoAddon ? window.CapEmbroideryBackLogoAddon.getStitchCount() : 5000;
-            const pricePerItem = window.CapEmbroideryBackLogoAddon ? window.CapEmbroideryBackLogoAddon.getPrice() : 5.00;
+            // Get back logo stitch count from dropdown
+            const backLogoStitchSelect = document.getElementById('back-logo-stitch-count');
+            const backLogoStitchCount = backLogoStitchSelect ? parseInt(backLogoStitchSelect.value) : 5000;
+            
+            // Calculate price based on stitch count (same as front logo pricing)
+            const pricePerItem = Math.ceil(backLogoStitchCount / 1000);
             
             const backLogoDetails = {
                 enabled: true,
@@ -92,12 +95,15 @@
         console.log('[CAP-EMB-ADAPTER-ENHANCED] Enhancing add to cart data');
         
         // Check if back logo is enabled
-        const isBackLogoEnabled = window.CapEmbroideryBackLogoAddon && window.CapEmbroideryBackLogoAddon.isEnabled();
+        const isBackLogoEnabled = window.capEmbroideryBackLogo && window.capEmbroideryBackLogo.isEnabled();
         
         if (isBackLogoEnabled) {
-            // Get back logo stitch count and price from the add-on system
-            const backLogoStitchCount = window.CapEmbroideryBackLogoAddon ? window.CapEmbroideryBackLogoAddon.getStitchCount() : 5000;
-            const pricePerItem = window.CapEmbroideryBackLogoAddon ? window.CapEmbroideryBackLogoAddon.getPrice() : 5.00;
+            // Get back logo stitch count from dropdown
+            const backLogoStitchSelect = document.getElementById('back-logo-stitch-count');
+            const backLogoStitchCount = backLogoStitchSelect ? parseInt(backLogoStitchSelect.value) : 5000;
+            
+            // Calculate price based on stitch count (same as front logo pricing)
+            const pricePerItem = Math.ceil(backLogoStitchCount / 1000);
             
             const backLogoDetails = {
                 enabled: true,
