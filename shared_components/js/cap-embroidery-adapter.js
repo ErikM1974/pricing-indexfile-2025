@@ -8,20 +8,31 @@ window.capEmbroideryMasterData = null; // Global storage for cap embroidery pric
 
     const CAP_EMBROIDERY_APP_KEY = 'a0e150004ecd0739f853449c8d7f'; // Keep for reference
     
-    // Function to fix the "72-9999" label
+    // Function to fix tier labels to correct cap embroidery format
     function fixTierLabels() {
-        // Use a more aggressive approach to find and fix the label
+        // Use a more aggressive approach to find and fix the labels
         const elements = document.querySelectorAll('td, th');
         let found = false;
         
         elements.forEach(function(element) {
-            // Check for exact match or contains
-            if (element.textContent.trim() === '72-9999' ||
-                element.textContent.trim() === '72-99999' ||
-                element.textContent.includes('72-9999')) {
+            const text = element.textContent.trim();
+            
+            // Fix common tier label issues
+            if (text === '72-9999' || text === '72-99999' || text.includes('72-9999')) {
                 console.log("[ADAPTER:CAP-EMB] Found '72-9999' label, changing to '72+'");
                 element.textContent = '72+';
                 found = true;
+            }
+            // Fix 48-10000 to 48-71 if it appears
+            else if (text === '48-10000' || text.includes('48-10000')) {
+                console.log("[ADAPTER:CAP-EMB] Found '48-10000' label, changing to '48-71'");
+                element.textContent = '48-71';
+                found = true;
+            }
+            // Ensure correct tier structure
+            else if (text === '1-11' || text === '12-23' || text === '24-47' || text === '48-71') {
+                // These are correct, no change needed
+                console.log(`[ADAPTER:CAP-EMB] Correct tier label found: ${text}`);
             }
         });
         

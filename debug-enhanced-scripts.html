@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Enhanced Scripts</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 6px; }
+        .console-output { background: #1e1e1e; color: #00ff00; padding: 10px; border-radius: 4px; font-family: monospace; max-height: 300px; overflow-y: auto; }
+        .add-to-cart-section { border: 2px solid blue; padding: 20px; margin: 20px 0; }
+        .section-title { color: #2e5827; font-size: 1.2em; margin-bottom: 15px; }
+        button { background: #2e5827; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Debug Enhanced Scripts</h1>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output" class="console-output">
+            <div>Console output will appear here...</div>
+        </div>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>DOM Structure Test</h2>
+        
+        <!-- Test Target for Cap Embroidery -->
+        <div id="cap-test-area">
+            <h3>Cap Embroidery Test Area</h3>
+            <div id="add-to-cart-section" class="add-to-cart-section">
+                <h3 class="section-title">Add to Quote (Cap Embroidery)</h3>
+                <p>Back logo option should appear here</p>
+            </div>
+        </div>
+        
+        <!-- Test Target for Regular Embroidery -->
+        <div id="emb-test-area">
+            <h3>Regular Embroidery Test Area</h3>
+            <div class="add-to-cart-section">
+                <h3 class="section-title">Add to Quote (Regular Embroidery)</h3>
+                <p>Additional logo option should appear here</p>
+            </div>
+        </div>
+        
+        <button onclick="testCapEnhanced()">Test Cap Enhanced</button>
+        <button onclick="testEmbEnhanced()">Test Embroidery Enhanced</button>
+        <button onclick="checkScriptStatus()">Check Script Status</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Manual Script Loading</h2>
+        <button onclick="loadCapEnhanced()">Load Cap Enhanced Script</button>
+        <button onclick="loadEmbEnhanced()">Load Embroidery Enhanced Script</button>
+        <div id="script-status">
+            <p>Script loading status will appear here</p>
+        </div>
+    </div>
+    
+    <script>
+        // Override console.log to capture output
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        function logToDiv(level, ...args) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+            const color = level === 'ERROR' ? '#ff6b6b' : level === 'WARN' ? '#ffa726' : '#00ff00';
+            output.innerHTML += `<div style="color: ${color}">[${timestamp}] ${level}: ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+            
+            // Still call original
+            if (level === 'ERROR') originalError(...args);
+            else if (level === 'WARN') originalWarn(...args);
+            else originalLog(...args);
+        }
+        
+        console.log = (...args) => logToDiv('LOG', ...args);
+        console.warn = (...args) => logToDiv('WARN', ...args);
+        console.error = (...args) => logToDiv('ERROR', ...args);
+        
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = '<div>Console cleared...</div>';
+        }
+        
+        function checkScriptStatus() {
+            console.log('=== Script Status Check ===');
+            console.log('window.CapEmbroideryEnhanced:', typeof window.CapEmbroideryEnhanced);
+            console.log('window.EmbroideryEnhanced:', typeof window.EmbroideryEnhanced);
+            
+            // Check if DOM elements exist
+            const addToCartSections = document.querySelectorAll('.add-to-cart-section');
+            console.log('Found .add-to-cart-section elements:', addToCartSections.length);
+            
+            addToCartSections.forEach((section, index) => {
+                const title = section.querySelector('.section-title');
+                console.log(`Section ${index}: has title = ${!!title}`);
+            });
+        }
+        
+        function testCapEnhanced() {
+            console.log('=== Testing Cap Enhanced ===');
+            
+            if (typeof window.CapEmbroideryEnhanced === 'undefined') {
+                console.error('CapEmbroideryEnhanced not loaded');
+                return;
+            }
+            
+            // Test the getBackLogoDetails function
+            if (typeof window.CapEmbroideryEnhanced.getBackLogoDetails === 'function') {
+                const details = window.CapEmbroideryEnhanced.getBackLogoDetails();
+                console.log('Back logo details:', details);
+            }
+            
+            // Check if back logo checkbox exists
+            const checkbox = document.getElementById('back-logo-checkbox');
+            console.log('Back logo checkbox found:', !!checkbox);
+            
+            if (checkbox) {
+                checkbox.checked = true;
+                checkbox.dispatchEvent(new Event('change'));
+                console.log('Back logo checkbox toggled');
+            }
+        }
+        
+        function testEmbEnhanced() {
+            console.log('=== Testing Embroidery Enhanced ===');
+            
+            if (typeof window.EmbroideryEnhanced === 'undefined') {
+                console.error('EmbroideryEnhanced not loaded');
+                return;
+            }
+            
+            // Test the getAdditionalLogoDetails function
+            if (typeof window.EmbroideryEnhanced.getAdditionalLogoDetails === 'function') {
+                const details = window.EmbroideryEnhanced.getAdditionalLogoDetails();
+                console.log('Additional logo details:', details);
+            }
+            
+            // Check if additional logo checkbox exists
+            const checkbox = document.getElementById('additional-logo-checkbox');
+            console.log('Additional logo checkbox found:', !!checkbox);
+            
+            if (checkbox) {
+                checkbox.checked = true;
+                checkbox.dispatchEvent(new Event('change'));
+                console.log('Additional logo checkbox toggled');
+            }
+        }
+        
+        function loadCapEnhanced() {
+            const script = document.createElement('script');
+            script.src = '/shared_components/js/cap-embroidery-enhanced.js';
+            script.onload = () => {
+                document.getElementById('script-status').innerHTML += '<div style="color: green">Cap enhanced script loaded successfully</div>';
+                console.log('Cap enhanced script loaded');
+            };
+            script.onerror = () => {
+                document.getElementById('script-status').innerHTML += '<div style="color: red">Cap enhanced script failed to load</div>';
+                console.error('Cap enhanced script failed to load');
+            };
+            document.head.appendChild(script);
+        }
+        
+        function loadEmbEnhanced() {
+            const script = document.createElement('script');
+            script.src = '/shared_components/js/embroidery-enhanced.js';
+            script.onload = () => {
+                document.getElementById('script-status').innerHTML += '<div style="color: green">Embroidery enhanced script loaded successfully</div>';
+                console.log('Embroidery enhanced script loaded');
+            };
+            script.onerror = () => {
+                document.getElementById('script-status').innerHTML += '<div style="color: red">Embroidery enhanced script failed to load</div>';
+                console.error('Embroidery enhanced script failed to load');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
+            checkScriptStatus();
+        });
+        
+        // Try to load scripts automatically
+        window.addEventListener('load', function() {
+            console.log('Window Load Complete');
+            
+            // Load scripts with a delay
+            setTimeout(() => {
+                console.log('Loading scripts...');
+                loadCapEnhanced();
+                loadEmbEnhanced();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

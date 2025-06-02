@@ -14,8 +14,8 @@
         console.log('[CAP-EMB-ENHANCED] DOM ready, attempting to initialize UI enhancements immediately...');
             
         try {
-            // Add back logo UI
-            addBackLogoOption();
+            // Add back logo UI - DISABLED: Using new independent back logo add-on system instead
+            // addBackLogoOption();
         } catch (error) {
             console.error('[CAP-EMB-ENHANCED] Error adding back logo option:', error);
         }

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Color Behavior - No Page Reload</title>
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .swatch-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70px;
+            cursor: pointer;
+        }
+        
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            margin-bottom: 4px;
+            background-size: cover;
+            background-position: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .color-swatch:hover {
+            border-color: #2f661e;
+        }
+        
+        .color-swatch.active {
+            border-color: #2f661e;
+            box-shadow: 0 0 0 3px #eaf2e9;
+        }
+        
+        .color-name {
+            font-size: 0.75em;
+            text-align: center;
+            color: #333;
+            width: 100%;
+            padding: 0 2px;
+            word-wrap: break-word;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Color Behavior Test</h1>
+    <p>This page tests whether color changes happen without page reloads (like DTG) or with page reloads (old behavior).</p>
+    
+    <div class="test-section">
+        <h2>Current Status</h2>
+        <div id="current-url">URL: <code id="url-display"></code></div>
+        <div id="page-load-count">Page loads: <span id="load-counter">1</span></div>
+        <div id="color-status">Selected color: <span id="selected-color">None</span></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Color Swatches</h2>
+        <p>Click a color below. If it works like DTG (no page reload), you'll see the URL and status update without the page counter increasing.</p>
+        
+        <div class="color-swatches" id="color-swatches">
+            <!-- Color swatches will be dynamically added here by pricing-pages.js -->
+        </div>
+        
+        <div id="test-status" class="status" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Manual Test Colors</h2>
+        <p>If no colors appear above, click these test colors:</p>
+        <div class="color-swatches">
+            <div class="swatch-wrapper">
+                <div class="color-swatch" style="background-color: red;" data-color-name="Red" data-catalog-color="RED"></div>
+                <span class="color-name">Red</span>
+            </div>
+            <div class="swatch-wrapper">
+                <div class="color-swatch" style="background-color: blue;" data-color-name="Blue" data-catalog-color="BLUE"></div>
+                <span class="color-name">Blue</span>
+            </div>
+            <div class="swatch-wrapper">
+                <div class="color-swatch" style="background-color: green;" data-color-name="Green" data-catalog-color="GREEN"></div>
+                <span class="color-name">Green</span>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/pricing-pages.js"></script>
+    
+    <script>
+        // Track page loads
+        let pageLoadCount = parseInt(sessionStorage.getItem('pageLoadCount') || '0') + 1;
+        sessionStorage.setItem('pageLoadCount', pageLoadCount.toString());
+        document.getElementById('load-counter').textContent = pageLoadCount;
+        
+        // Update URL display
+        function updateDisplay() {
+            document.getElementById('url-display').textContent = window.location.href;
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const color = urlParams.get('COLOR') || 'None';
+            document.getElementById('selected-color').textContent = color;
+        }
+        
+        updateDisplay();
+        
+        // Listen for URL changes (for dynamic updates without page reload)
+        window.addEventListener('popstate', updateDisplay);
+        
+        // Override history.pushState to detect dynamic URL changes
+        const originalPushState = history.pushState;
+        history.pushState = function(...args) {
+            originalPushState.apply(this, args);
+            setTimeout(updateDisplay, 100); // Small delay to ensure URL is updated
+            showStatus('✅ URL updated dynamically (no page reload)!', 'success');
+        };
+        
+        // Add manual test color click handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            const manualSwatches = document.querySelectorAll('.swatch-wrapper .color-swatch[data-color-name]');
+            manualSwatches.forEach(swatch => {
+                swatch.addEventListener('click', function() {
+                    const colorData = {
+                        COLOR_NAME: this.dataset.colorName,
+                        CATALOG_COLOR: this.dataset.catalogColor
+                    };
+                    
+                    if (window.handleColorSwatchClick) {
+                        // Use the advanced function from pricing-pages.js
+                        window.handleColorSwatchClick(colorData);
+                    } else {
+                        // Fallback to old behavior (page reload)
+                        const currentUrl = new URL(window.location.href);
+                        currentUrl.searchParams.set('COLOR', colorData.CATALOG_COLOR);
+                        showStatus('⚠️ Page will reload (old behavior)', 'error');
+                        setTimeout(() => {
+                            window.location.href = currentUrl.toString();
+                        }, 1000);
+                    }
+                });
+            });
+        });
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('test-status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Log when pricing-pages.js functions are available
+        setTimeout(() => {
+            if (window.handleColorSwatchClick) {
+                console.log('✅ Advanced color handling available');
+                showStatus('✅ Advanced color handling loaded', 'success');
+            } else {
+                console.log('❌ Advanced color handling not available');
+                showStatus('❌ Fallback to old color handling', 'error');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

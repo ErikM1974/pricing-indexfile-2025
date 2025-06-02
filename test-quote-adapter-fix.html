@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Quote Adapter Fix</title>
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/quote-system.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .test-section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .test-title { color: #2e5827; font-size: 1.4em; margin-bottom: 15px; }
+        .console-output { background: #1e1e1e; color: #00ff00; padding: 10px; border-radius: 4px; font-family: monospace; height: 200px; overflow-y: auto; }
+        button { background: #2e5827; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #1e3d1b; }
+        .status { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; margin-left: 10px; }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .section-title { color: #2e5827; font-size: 1.2em; margin-bottom: 15px; }
+        .add-to-cart-section { border: 2px solid #2e5827; padding: 20px; margin: 20px 0; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Test Quote Adapter Fix</h1>
+    <p>Testing the fix for back logo and additional logo functionality in quote adapters</p>
+    
+    <div class="test-section">
+        <h2 class="test-title">Console Output</h2>
+        <div id="console-output" class="console-output">
+            <div>Test console output...</div>
+        </div>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+    
+    <div class="test-section">
+        <h2 class="test-title">Cap Embroidery Test</h2>
+        
+        <!-- Mock add-to-cart section for cap embroidery -->
+        <div id="cap-add-to-cart-section" class="add-to-cart-section">
+            <h3 class="section-title">Cap Embroidery Quote Builder</h3>
+            <p>Quote adapter will replace this content...</p>
+        </div>
+        
+        <button onclick="testCapQuoteAdapter()">Initialize Cap Quote Adapter</button>
+        <button onclick="testCapBackLogo()">Test Cap Back Logo</button>
+    </div>
+    
+    <div class="test-section">
+        <h2 class="test-title">Regular Embroidery Test</h2>
+        
+        <!-- Mock add-to-cart section for embroidery -->
+        <div id="emb-add-to-cart-section" class="add-to-cart-section">
+            <h3 class="section-title">Embroidery Quote Builder</h3>
+            <p>Quote adapter will replace this content...</p>
+        </div>
+        
+        <button onclick="testEmbQuoteAdapter()">Initialize Embroidery Quote Adapter</button>
+        <button onclick="testEmbAdditionalLogo()">Test Additional Logo</button>
+    </div>
+    
+    <div class="test-section">
+        <h2 class="test-title">Test Results</h2>
+        <div id="test-results">
+            <p>Test results will appear here...</p>
+        </div>
+    </div>
+    
+    <!-- Mock Product Context -->
+    <div style="display: none;">
+        <div id="product-title-context">Test Product</div>
+        <div id="product-style-context">TEST-001</div>
+        <div id="pricing-color-name">Navy Blue</div>
+    </div>
+    
+    <!-- JavaScript Files -->
+    <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/quote-adapter-base.js"></script>
+    <script src="/shared_components/js/cap-embroidery-quote-adapter.js"></script>
+    <script src="/shared_components/js/embroidery-quote-adapter.js"></script>
+    
+    <script>
+        // Override console functions to capture output
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        function logToDiv(level, ...args) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+            const color = level === 'ERROR' ? '#ff6b6b' : level === 'WARN' ? '#ffa726' : '#00ff00';
+            output.innerHTML += `<div style="color: ${color}">[${timestamp}] ${level}: ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+            
+            // Still call original
+            if (level === 'ERROR') originalError(...args);
+            else if (level === 'WARN') originalWarn(...args);
+            else originalLog(...args);
+        }
+        
+        console.log = (...args) => logToDiv('LOG', ...args);
+        console.warn = (...args) => logToDiv('WARN', ...args);
+        console.error = (...args) => logToDiv('ERROR', ...args);
+        
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = '<div>Console cleared...</div>';
+        }
+        
+        function addResult(message, isSuccess = true) {
+            const results = document.getElementById('test-results');
+            const status = isSuccess ? 'success' : 'error';
+            results.innerHTML += `<div>${message} <span class="status ${status}">${isSuccess ? 'PASS' : 'FAIL'}</span></div>`;
+        }
+        
+        function testCapQuoteAdapter() {
+            console.log('=== Testing Cap Quote Adapter ===');
+            
+            if (typeof window.CapEmbroideryQuoteAdapter === 'undefined') {
+                addResult('CapEmbroideryQuoteAdapter class not available', false);
+                return;
+            }
+            
+            // Create adapter instance
+            const adapter = new window.CapEmbroideryQuoteAdapter();
+            
+            // Replace the add-to-cart section for testing
+            const section = document.getElementById('cap-add-to-cart-section');
+            section.id = 'add-to-cart-section'; // Temporarily change ID
+            
+            // Initialize adapter
+            adapter.setupUI();
+            
+            // Check if back logo elements were created
+            const backLogoCheckbox = document.getElementById('back-logo-checkbox');
+            const backLogoDetails = document.getElementById('back-logo-details');
+            const backLogoStitchInput = document.getElementById('back-logo-stitch-count');
+            const backLogoPriceDisplay = document.getElementById('back-logo-price');
+            
+            addResult('Back logo checkbox created', !!backLogoCheckbox);
+            addResult('Back logo details section created', !!backLogoDetails);
+            addResult('Back logo stitch input created', !!backLogoStitchInput);
+            addResult('Back logo price display created', !!backLogoPriceDisplay);
+            
+            if (backLogoCheckbox && backLogoDetails) {
+                // Test checkbox functionality
+                backLogoCheckbox.checked = true;
+                backLogoCheckbox.dispatchEvent(new Event('change'));
+                
+                const isVisible = backLogoDetails.style.display === 'block';
+                addResult('Back logo details show when checked', isVisible);
+            }
+            
+            // Restore original ID
+            section.id = 'cap-add-to-cart-section';
+            
+            console.log('Cap quote adapter test completed');
+        }
+        
+        function testEmbQuoteAdapter() {
+            console.log('=== Testing Embroidery Quote Adapter ===');
+            
+            if (typeof window.EmbroideryQuoteAdapter === 'undefined') {
+                addResult('EmbroideryQuoteAdapter class not available', false);
+                return;
+            }
+            
+            // Create adapter instance
+            const adapter = new window.EmbroideryQuoteAdapter();
+            
+            // Replace the add-to-cart section for testing
+            const section = document.getElementById('emb-add-to-cart-section');
+            section.id = 'add-to-cart-section'; // Temporarily change ID
+            
+            // Initialize adapter
+            adapter.setupUI();
+            
+            // Check if additional logo elements were created
+            const additionalLogoCheckbox = document.getElementById('additional-logo-checkbox');
+            const additionalLogoDetails = document.getElementById('additional-logo-details');
+            const additionalLogoStitchInput = document.getElementById('additional-logo-stitch-count');
+            const additionalLogoPriceDisplay = document.getElementById('additional-logo-price');
+            
+            addResult('Additional logo checkbox created', !!additionalLogoCheckbox);
+            addResult('Additional logo details section created', !!additionalLogoDetails);
+            addResult('Additional logo stitch input created', !!additionalLogoStitchInput);
+            addResult('Additional logo price display created', !!additionalLogoPriceDisplay);
+            
+            if (additionalLogoCheckbox && additionalLogoDetails) {
+                // Test checkbox functionality
+                additionalLogoCheckbox.checked = true;
+                additionalLogoCheckbox.dispatchEvent(new Event('change'));
+                
+                const isVisible = additionalLogoDetails.style.display === 'block';
+                addResult('Additional logo details show when checked', isVisible);
+            }
+            
+            // Restore original ID
+            section.id = 'emb-add-to-cart-section';
+            
+            console.log('Embroidery quote adapter test completed');
+        }
+        
+        function testCapBackLogo() {
+            console.log('=== Testing Cap Back Logo Pricing ===');
+            
+            const stitchInput = document.getElementById('back-logo-stitch-count');
+            const priceDisplay = document.getElementById('back-logo-price');
+            
+            if (!stitchInput || !priceDisplay) {
+                addResult('Cap back logo elements not found', false);
+                return;
+            }
+            
+            // Test different stitch counts
+            const testCases = [
+                { stitches: 5000, expected: 5.00 },
+                { stitches: 8000, expected: 8.00 },
+                { stitches: 10000, expected: 10.00 },
+                { stitches: 3000, expected: 5.00 } // Should use minimum
+            ];
+            
+            testCases.forEach(testCase => {
+                stitchInput.value = testCase.stitches;
+                stitchInput.dispatchEvent(new Event('input'));
+                
+                const displayText = priceDisplay.textContent;
+                const actualPrice = parseFloat(displayText.replace(/[^\d.]/g, ''));
+                const isCorrect = Math.abs(actualPrice - testCase.expected) < 0.01;
+                
+                addResult(`${testCase.stitches} stitches = $${testCase.expected.toFixed(2)} (got $${actualPrice.toFixed(2)})`, isCorrect);
+            });
+        }
+        
+        function testEmbAdditionalLogo() {
+            console.log('=== Testing Embroidery Additional Logo Pricing ===');
+            
+            const stitchInput = document.getElementById('additional-logo-stitch-count');
+            const priceDisplay = document.getElementById('additional-logo-price');
+            
+            if (!stitchInput || !priceDisplay) {
+                addResult('Additional logo elements not found', false);
+                return;
+            }
+            
+            // Test different stitch counts
+            const testCases = [
+                { stitches: 8000, expected: 8.00 },
+                { stitches: 10000, expected: 10.00 },
+                { stitches: 15000, expected: 15.00 },
+                { stitches: 5000, expected: 8.00 } // Should use minimum
+            ];
+            
+            testCases.forEach(testCase => {
+                stitchInput.value = testCase.stitches;
+                stitchInput.dispatchEvent(new Event('input'));
+                
+                const displayText = priceDisplay.textContent;
+                const actualPrice = parseFloat(displayText.replace(/[^\d.]/g, ''));
+                const isCorrect = Math.abs(actualPrice - testCase.expected) < 0.01;
+                
+                addResult(`${testCase.stitches} stitches = $${testCase.expected.toFixed(2)} (got $${actualPrice.toFixed(2)})`, isCorrect);
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test page loaded');
+            console.log('Available classes:', {
+                QuoteAdapterBase: typeof window.QuoteAdapterBase,
+                CapEmbroideryQuoteAdapter: typeof window.CapEmbroideryQuoteAdapter,
+                EmbroideryQuoteAdapter: typeof window.EmbroideryQuoteAdapter
+            });
+        });
+    </script>
+</body>
+</html>

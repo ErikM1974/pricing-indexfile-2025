@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Pricing | NWCA</title>
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/dtg-brand-override.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        .improved-layout {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-md);
+            overflow: hidden;
+        }
+        
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 15px;
+        }
+        
+        .product-context-column .product-header {
+             background-color: var(--background-light, #f8f9fa);
+        }
+        
+        .product-title-area {
+            flex: 1;
+        }
+        
+        .product-title-area h2 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.5em;
+        }
+        
+        .navigation-area {
+            margin-left: 20px;
+        }
+        
+        .product-content {
+            display: flex;
+            padding: 20px;
+            justify-content: space-between;
+        }
+        
+        .product-image-column {
+            flex: 0 0 380px;
+            margin-right: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .product-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Ensure product image area doesn't get overlapped */
+        #product-image-display-area {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .color-swatches-column {
+            flex: 1;
+            min-width: 650px;
+            padding: 10px;
+        }
+        
+        /* Enhanced Product Image Gallery Styles */
+        .product-image-gallery {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .main-image-container {
+            position: relative;
+            width: 100%;
+            background-color: #f8f9fa;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 15px;
+        }
+        
+        .main-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            min-height: 400px;
+            object-fit: contain;
+            background-color: white;
+        }
+        
+        .image-loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .main-image-container.loading .image-loading-spinner {
+            display: block;
+        }
+        
+        .image-thumbnails {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--primary-light);
+        }
+        
+        .image-thumbnails::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .image-thumbnails::-webkit-scrollbar-track {
+            background: var(--primary-light);
+            border-radius: 3px;
+        }
+        
+        .image-thumbnails::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        .thumbnail-item {
+            flex: 0 0 80px;
+            height: 80px;
+            border: 2px solid transparent;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+            position: relative;
+        }
+        
+        .thumbnail-item:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .thumbnail-item.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .thumbnail-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .thumbnail-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 0.7em;
+            padding: 2px 4px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .image-zoom-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .main-image-container:hover .image-zoom-overlay {
+            opacity: 1;
+        }
+        
+        .zoom-icon {
+            font-size: 20px;
+        }
+        
+        .selected-color-display {
+            margin-top: 10px;
+            text-align: center;
+            padding: 10px;
+            background-color: var(--primary-light);
+            border-radius: var(--radius-sm);
+            font-size: 0.9em;
+            border-left: 3px solid var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .selected-color-display strong {
+            font-weight: bold;
+            color: var(--primary-color);
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .color-swatches-container.compact {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--background-light);
+            border-radius: var(--radius-sm);
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .color-swatches-container.compact .section-title {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .color-swatches-container.compact .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-height: 350px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 10px 15px;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--primary-light);
+            position: relative;
+            contain: layout;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-track {
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        /* Simplified Swatch Styles */
+        .swatch-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70px;
+            min-height: 75px;
+            margin: 5px;
+            cursor: pointer;
+            justify-content: flex-start;
+            position: relative !important;
+            z-index: 1;
+        }
+
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            margin-bottom: 4px;
+            background-size: cover;
+            background-position: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            position: relative !important;
+        }
+
+        .color-swatch:hover {
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .color-name {
+            font-size: 0.75em;
+            text-align: center;
+            color: var(--text-color);
+            width: 100%;
+            line-height: normal;
+            padding: 0 2px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            display: block;
+        }
+
+        /* Pulse animation for highlighting a swatch */
+        @keyframes pulse-highlight {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 128, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0); }
+        }
+
+        .color-swatch.pulse-highlight {
+            animation: pulse-highlight 1s ease;
+            border-color: var(--primary-color);
+        }
+        
+        /* Column layout styles */
+        .product-page-columns-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+        
+        .product-context-column {
+            flex: 0 0 350px;
+        }
+        
+        .product-interactive-column {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .color-swatches-left-column .color-swatches-container {
+            border: 1px solid var(--border-light);
+        }
+        
+        .color-swatches-left-column .swatch-wrapper {
+            width: 60px;
+            min-height: 70px;
+        }
+        
+        .color-swatches-left-column .color-swatch {
+            width: 45px;
+            height: 45px;
+        }
+        
+        .product-image-container-context img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .active-tier-highlight {
+            background-color: var(--primary-light) !important;
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+
+        .pricing-grid {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        
+        .pricing-grid th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 8px;
+        }
+        
+        .pricing-grid td {
+            padding: 10px 8px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .pricing-grid tbody tr:nth-child(even) {
+            background-color: var(--background-ultralight, #fdfdfd);
+        }
+        
+        .pricing-grid th:first-child, .pricing-grid td:first-child {
+            text-align: left;
+            padding-left: 15px;
+        }
+        
+        #custom-pricing-grid tbody tr.current-pricing-level-highlight td {
+            background-color: var(--primary-extralight, #e6f7ff) !important;
+            font-weight: bold;
+        }
+        
+        #custom-pricing-grid tbody tr.current-pricing-level-highlight td:first-child {
+            color: var(--primary-dark, #004170);
+        }
+        
+        .pricing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .selected-color-indicator {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            background-color: var(--primary-light);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--primary-color);
+            box-shadow: var(--shadow-xs);
+        }
+        
+        .mini-color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 0 8px;
+            border: 2px solid var(--border-color);
+            display: inline-block;
+            vertical-align: middle;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            background-size: cover;
+            background-position: center;
+            box-sizing: border-box;
+            aspect-ratio: 1/1;
+            transition: all 0.3s ease;
+        }
+        
+        #pricing-color-name {
+            color: var(--primary-color);
+        }
+        
+        .mini-color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+        
+        .mini-color-swatch.active-swatch {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+        
+        .mini-color-swatch.fallback-swatch {
+            background-image: radial-gradient(circle, transparent 0%, rgba(255,255,255,0.05) 100%);
+        }
+        
+        .mini-color-swatch.clickable {
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .mini-color-swatch.clickable::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .mini-color-swatch.clickable:hover::after {
+            opacity: 1;
+        }
+        
+        #custom-pricing-grid tbody tr.initial-message-row td {
+            background-color: #f8f9fa !important;
+            color: #333 !important;
+            font-style: italic;
+            padding: 30px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .product-page-columns-container {
+                flex-direction: column;
+            }
+            .product-context-column {
+                flex: 0 0 auto;
+                position: static;
+                height: auto;
+                margin-bottom: 20px;
+            }
+            .color-swatches-left-column .color-swatches {
+                max-height: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .navigation-area {
+                margin-left: 0;
+                margin-top: 10px;
+                align-self: flex-start;
+            }
+            
+            .product-content {
+                flex-direction: column;
+            }
+            
+            .product-image-column {
+                flex: 0 0 auto;
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .color-swatches-column {
+                width: 100%;
+            }
+            
+            .color-swatches-container.compact {
+                margin-top: 10px;
+            }
+            
+            .color-swatches-container.compact .color-swatches {
+                grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+                max-height: 200px;
+            }
+            
+            .product-image-container {
+                position: sticky;
+                top: 0;
+                background-color: var(--white);
+                z-index: 10;
+                padding: 10px;
+                border-radius: var(--radius-sm);
+                box-shadow: var(--shadow-sm);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .color-swatches-container.compact .color-swatches {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+                gap: 5px;
+            }
+            
+            .color-swatch {
+                width: 35px !important;
+                height: 35px !important;
+                aspect-ratio: 1 / 1 !important;
+                min-width: 35px !important;
+                min-height: 35px !important;
+                max-width: 35px !important;
+                max-height: 35px !important;
+            }
+            
+            .color-name {
+                font-size: 0.65em;
+            }
+            
+            .selected-color-display {
+                padding: 8px;
+                font-size: 0.8em;
+            }
+            
+            .show-more-colors {
+                display: block;
+                margin-top: 10px;
+                text-align: center;
+                padding: 8px;
+                background-color: var(--primary-light);
+                color: var(--primary-color);
+                border: none;
+                border-radius: var(--radius-sm);
+                font-weight: bold;
+                cursor: pointer;
+            }
+            
+            .color-swatches-container.compact .color-swatches.collapsed {
+                max-height: 120px;
+                overflow-y: hidden;
+            }
+            
+            .color-swatches-left-column .color-swatches {
+                max-height: 180px;
+                gap: 5px;
+            }
+            
+            .color-swatches-left-column .swatch-wrapper {
+                width: 50px;
+                min-height: 60px;
+                margin: 3px;
+            }
+            
+            .color-swatches-left-column .color-swatch {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .color-swatches-left-column .color-name {
+                font-size: 0.7em;
+            }
+        }
+        
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DTG Pricing</h1>
+        
+        <!-- Hidden search input for script compatibility -->
+        <input type="text" id="style-search-input" style="display: none;" />
+        <button id="search-button" style="display: none;"></button>
+
+        <!-- Two-Column Layout Container -->
+        <div class="product-page-columns-container">
+
+            <!-- Left Column: Product Context -->
+            <div class="product-context-column">
+                <div class="product-header">
+                    <div class="product-title-area">
+                        <h2 id="product-title-context">Product Title</h2>
+                        <div class="product-meta" style="padding-top: 8px; margin-bottom: 5px;">
+                            <span class="meta-item">Style: <strong id="product-style-context">Style Number</strong></span>
+                        </div>
+                    </div>
+                    <div class="navigation-area">
+                        <a id="back-to-product" href="/product.html" class="back-to-product">
+                            <span class="back-icon">←</span> Back to Product
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Product Image Gallery -->
+                <div class="product-image-gallery" id="product-image-gallery">
+                    <div class="main-image-container" id="main-image-container">
+                        <img id="product-image-main" src="" alt="Product Image" class="product-image">
+                        <div class="image-loading-spinner"></div>
+                        <div class="image-zoom-overlay">
+                            <span class="zoom-icon">🔍</span>
+                        </div>
+                    </div>
+                    <div class="image-thumbnails" id="image-thumbnails">
+                        <!-- Thumbnails will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <div class="static-product-info" style="padding:15px; background-color: var(--background-light); border-radius: var(--radius-sm); margin-top:15px;">
+                    <p>Pricing includes a full-color DTG print on one location.</p>
+                </div>
+                
+                
+                <!-- Color Swatches in left column -->
+                <div class="color-swatches-left-column" style="margin-top:15px;">
+                    <div class="color-swatches-container compact">
+                        <h3 class="section-title">Available Colors</h3>
+                        <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 5px; max-height: 300px;">
+                            <!-- Color swatches will be dynamically added here by pricing-pages.js -->
+                        </div>
+                        <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Elements -->
+            <div class="product-interactive-column">
+                <div class="pricing-content-interactive">
+                    <!-- Hidden Caspio Matrix - Keep this for data source -->
+                    <div id="pricing-calculator" class="pricing-calculator" style="display:none !important; width:0; height:0; border:0; visibility: hidden;">
+                        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150002eb9491a50104c1d99d7/emb"></script>
+                        <div class="loading-message">Loading pricing data...</div>
+                    </div>
+                    
+                    <!-- Parent Print Location Selector -->
+                    <div id="parent-location-selector-container" style="margin-bottom: 20px; padding: 15px; background-color: var(--background-light, #f8f9fa); border-radius: var(--radius-sm); text-align:center;">
+                      <label for="parent-dtg-location-select" style="margin-right: 8px; font-weight: bold; font-size: 1em;">Select Print Location:</label>
+                      <select id="parent-dtg-location-select" style="padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 0.9em; min-width: 200px;">
+                        <option value="">-- Select Location --</option>
+                        <option value="LC">Left Chest Only</option>
+                        <option value="FF">Full Front Only</option>
+                        <option value="FB">Full Back Only</option>
+                        <option value="JF">Jumbo Front Only</option>
+                        <option value="JB">Jumbo Back Only</option>
+                        <option value="LC_FB">Left Chest + Full Back</option>
+                        <option value="FF_FB">Full Front + Full Back</option>
+                        <option value="JF_JB">Jumbo Front + Jumbo Back</option>
+                      </select>
+                    </div>
+                    
+                    <div class="pricing-section">
+                        <div class="pricing-header" style="margin-bottom: 20px;">
+                             <h3 class="section-title" style="font-size: 1.3em; margin: 0;">Detailed Pricing per Quantity Tier</h3>
+                             <div class="selected-color-indicator">
+                                <span>Selected Color:</span>
+                                <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches"></div>
+                                <strong id="pricing-color-name">Color Name</strong>
+                            </div>
+                        </div>
+                        
+                        <div class="pricing-grid-container">
+                            <!-- Beautiful initial state -->
+                            <div id="pricing-initial-state" style="text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                                <div style="background: white; display: inline-block; padding: 40px 60px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#2e5827" stroke-width="2" style="margin-bottom: 20px;">
+                                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                                        <path d="M12 8v4m0 4h.01"/>
+                                    </svg>
+                                    <h3 style="color: #2e5827; font-size: 1.5em; margin: 0 0 10px 0; font-weight: 600;">Select a Print Location</h3>
+                                    <p style="color: #666; margin: 0; font-size: 1.1em;">Choose your print location above to view custom pricing</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Loading spinner for pricing table -->
+                            <div id="pricing-table-loading" style="display: none; text-align: center; padding: 60px 20px;">
+                                <div style="position: relative; display: inline-block;">
+                                    <div style="width: 60px; height: 60px; border: 4px solid #e8f5e9; border-top: 4px solid #2e5827; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border: 3px solid #c8e6c9; border-top: 3px solid #4caf50; border-radius: 50%; animation: spin 1.5s linear infinite reverse;"></div>
+                                </div>
+                                <p style="margin-top: 25px; color: #2e5827; font-size: 1.2em; font-weight: 500;">Loading your custom pricing...</p>
+                            </div>
+                            
+                            <table class="pricing-grid" id="custom-pricing-grid" style="display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease;">
+                                <thead>
+                                    <tr id="pricing-header-row">
+                                        <!-- Size headers will be dynamically populated -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Pricing data will be dynamically added here -->
+                                </tbody>
+                            </table>
+                            
+                            <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                                <p><strong>Note:</strong> Prices shown are per item and include a full-color DTG print on the selected location.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- DTG Quote System Integration -->
+                    <div id="add-to-cart-section">
+                        <!-- Quote system will be initialized by dtg-quote-system.js -->
+                        <div id="size-quantity-grid-container" style="margin: 20px 0; padding: 15px; background-color: var(--background-light); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                            <h4 style="margin-top: 0; color: var(--primary-color);">Quick Add to Quote</h4>
+                            <div id="size-quantity-grid">
+                                <!-- Size quantity grid will be populated here by DP5-Helper -->
+                            </div>
+                        </div>
+                        
+                        <!-- Quote Summary Section -->
+                        <div id="quote-container" class="quote-section" style="margin-top: 20px;">
+                            <div id="quote-summary-header" style="background-color: var(--primary-light); padding: 15px; border-radius: var(--radius-sm); margin-bottom: 15px;">
+                                <h3 style="margin: 0; color: var(--primary-color);">Quote Summary</h3>
+                            </div>
+                            <div id="quote-items-list" style="margin-bottom: 15px;">
+                                <!-- Quote items will be populated here -->
+                            </div>
+                            <div id="quote-subtotal" style="padding: 10px; border-bottom: 1px solid var(--border-color);">
+                                <!-- Subtotal will be shown here -->
+                            </div>
+                            <div id="quote-ltm" class="ltm-row" style="padding: 10px; border-bottom: 1px solid var(--border-color); display: none;">
+                                <!-- LTM fees will be shown here -->
+                            </div>
+                            <div id="quote-total" style="padding: 15px; font-weight: bold; font-size: 1.2em; background-color: var(--primary-light); border-radius: var(--radius-sm);">
+                                <!-- Total will be shown here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Image Modal for Zoom Functionality -->
+    <div id="image-modal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8);">
+        <div class="modal-content" style="margin: auto; display: block; width: 80%; max-width: 700px; position: relative; top: 50%; transform: translateY(-50%);">
+            <span class="close-modal" style="position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer;">&times;</span>
+            <img id="modal-image" style="width: 100%; height: auto; border-radius: 5px;">
+            <div id="modal-caption" style="margin: auto; display: block; width: 80%; max-width: 700px; text-align: center; color: #ccc; padding: 10px 0; height: 150px;"></div>
+        </div>
+    </div>
+    
+    <!-- JavaScript Files -->
+    <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/pricing-matrix-capture.js"></script>
+    <script src="/shared_components/js/pricing-matrix-capture-fix.js"></script>
+    <script src="/shared_components/js/pricing-matrix-api.js"></script>
+    <script src="/shared_components/js/dp5-helper.js"></script>
+    <script src="/product-url-handler.js"></script>
+    <script src="/shared_components/js/dtg-page-setup.js"></script>
+    <!-- DTG Page Bridge Functions -->
+    <script>
+        // Bridge function for DTG page setup
+        window.loadProductDetails = function(styleNumber) {
+            console.log('[DTG-BRIDGE] loadProductDetails called for:', styleNumber);
+            
+            if (window.DTGPageSetup && typeof window.DTGPageSetup.fetchProductDetails === 'function') {
+                window.DTGPageSetup.fetchProductDetails(styleNumber);
+            } else {
+                console.log('[DTG-BRIDGE] DTGPageSetup not ready yet');
+            }
+        };
+        
+        // Bridge function to initialize product context from URL parameters
+        window.initializeProductFromURL = function() {
+            console.log('[DTG-BRIDGE] initializeProductFromURL called');
+            
+            if (window.DTGPageSetup && typeof window.DTGPageSetup.updateProductContext === 'function') {
+                window.DTGPageSetup.updateProductContext();
+            } else {
+                console.log('[DTG-BRIDGE] DTGPageSetup not ready yet for URL initialization');
+            }
+        };
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[DTG-BRIDGE] DOM ready, initializing from URL...');
+            
+            // Wait for DTG page setup to be ready
+            const checkReady = setInterval(() => {
+                if (window.DTGPageSetup) {
+                    clearInterval(checkReady);
+                    window.initializeProductFromURL();
+                }
+            }, 100);
+        });
+    </script>
+    <!-- Image modal setup -->
+    <script>
+        // Setup image modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('image-modal');
+            const modalImage = document.getElementById('modal-image');
+            const closeModal = document.querySelector('.close-modal');
+            
+            // Close modal when clicking the X
+            if (closeModal) {
+                closeModal.addEventListener('click', function() {
+                    modal.style.display = 'none';
+                });
+            }
+            
+            // Close modal when clicking outside the image
+            if (modal) {
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Setup main image click to open modal
+            document.addEventListener('click', function(event) {
+                if (event.target.matches('#main-product-image-dp2')) {
+                    modal.style.display = 'block';
+                    modalImage.src = event.target.src;
+                }
+            });
+        });
+    </script>
+    <!-- Minimal cart integration function for DTG adapter -->
+    <script>
+        // Provide minimal initCartIntegrationWithData function for DTG adapter
+        window.initCartIntegrationWithData = async function(caspioEventData) {
+            console.log('[DTG-CART] Minimal cart integration called with data:', caspioEventData);
+            // Just acknowledge the call without creating legacy cart UI
+            return Promise.resolve();
+        };
+    </script>
+    <script src="/shared_components/js/dtg-adapter.js"></script>
+    <script src="/shared_components/js/pricing-fallback-adapter.js"></script>
+    <script src="/shared_components/js/dtg-quote-system.js"></script>
+    
+</body>
+</html>
