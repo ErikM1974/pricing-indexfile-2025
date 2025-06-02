@@ -140,6 +140,27 @@
                     this.showSearchResults();
                 }
             });
+
+            // Handle Enter key - matches product page behavior
+            searchInput.addEventListener('keydown', (e) => {
+                console.log('[UNIVERSAL-HEADER] Keydown event detected, key:', e.key);
+                
+                if (e.key === 'Enter') {
+                    console.log('[UNIVERSAL-HEADER] Enter key detected');
+                    e.preventDefault();
+                    
+                    const styleNumber = searchInput.value.trim();
+                    console.log('[UNIVERSAL-HEADER] Style number from input:', styleNumber);
+                    
+                    if (styleNumber) {
+                        console.log('[UNIVERSAL-HEADER] Enter key pressed with valid value:', styleNumber);
+                        this.hideSearchResults();
+                        this.navigateToProduct(styleNumber);
+                    } else {
+                        console.warn('[UNIVERSAL-HEADER] Empty style number, not processing');
+                    }
+                }
+            });
             
             // Hide results when clicking outside
             document.addEventListener('click', (e) => {
@@ -152,25 +173,54 @@
         },
 
         /**
-         * Perform product search (mock implementation)
+         * Perform product search using the same API as product page
          */
         async performSearch(query) {
             headerState.isSearching = true;
             console.log('[UNIVERSAL-HEADER] Searching for:', query);
             
-            // Mock search implementation - replace with actual API call
-            const results = mockProducts.filter(product => 
-                product.style.toLowerCase().includes(query.toLowerCase()) ||
-                product.name.toLowerCase().includes(query.toLowerCase())
-            ).slice(0, HEADER_CONFIG.maxSearchResults);
+            // Use the same API endpoint as the product page
+            const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            const searchUrl = `${API_PROXY_BASE_URL}/api/stylesearch?term=${encodeURIComponent(query)}`;
             
-            headerState.searchResults = results;
-            this.displaySearchResults(results);
+            try {
+                console.log('[UNIVERSAL-HEADER] API URL:', searchUrl);
+                const response = await fetch(searchUrl);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('[UNIVERSAL-HEADER] API Response Text:', errorText);
+                    throw new Error(`API Error ${response.status}: ${response.statusText}`);
+                }
+                
+                const suggestions = await response.json();
+                console.log('[UNIVERSAL-HEADER] Suggestions received from API:', suggestions);
+                
+                headerState.searchResults = suggestions;
+                this.displaySearchResults(suggestions);
+                
+            } catch (error) {
+                console.error('[UNIVERSAL-HEADER] Failed to fetch suggestions:', error);
+                
+                // Fallback to mock data if API fails
+                console.log('[UNIVERSAL-HEADER] Using fallback mock data');
+                const fallbackResults = mockProducts.filter(product => 
+                    product.style.toLowerCase().includes(query.toLowerCase()) ||
+                    product.name.toLowerCase().includes(query.toLowerCase())
+                ).slice(0, HEADER_CONFIG.maxSearchResults);
+                
+                headerState.searchResults = fallbackResults.map(product => ({
+                    label: `${product.style} - ${product.name}`,
+                    value: product.style
+                }));
+                this.displaySearchResults(headerState.searchResults);
+            }
+            
             headerState.isSearching = false;
         },
 
         /**
-         * Display search results in dropdown
+         * Display search results in dropdown - matches product page format
          */
         displaySearchResults(results) {
             const searchResults = document.getElementById('style-search-results');
@@ -183,14 +233,12 @@
                     </div>
                 `;
             } else {
-                searchResults.innerHTML = results.map(product => `
-                    <div class="search-result-item" data-style="${product.style}" style="
+                searchResults.innerHTML = results.map(suggestion => `
+                    <div class="search-result-item" data-style="${suggestion.value}" style="
                         padding: 12px; border-bottom: 1px solid #eee; cursor: pointer;
                         transition: background-color 0.2s ease;
                     " onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='white'">
-                        <div style="font-weight: bold; color: #2e5827; font-size: 0.95em;">${product.style}</div>
-                        <div style="font-size: 0.85em; color: #666; margin-top: 2px;">${product.name}</div>
-                        <div style="font-size: 0.8em; color: #999; margin-top: 1px;">${product.category}</div>
+                        <div style="font-weight: bold; color: #2e5827; font-size: 0.95em;">${suggestion.label}</div>
                     </div>
                 `).join('');
                 
@@ -198,12 +246,27 @@
                 searchResults.querySelectorAll('.search-result-item').forEach(item => {
                     item.addEventListener('click', () => {
                         const styleNumber = item.dataset.style;
-                        this.navigateToProduct(styleNumber);
+                        this.handleSearchSelection(styleNumber, item.textContent);
                     });
                 });
             }
             
             this.showSearchResults();
+        },
+
+        /**
+         * Handle search selection - matches product page behavior
+         */
+        handleSearchSelection(selectedStyleNumber, selectedLabel) {
+            console.log('[UNIVERSAL-HEADER] Style selected:', selectedStyleNumber);
+            
+            const searchInput = document.getElementById('style-search-input');
+            if (searchInput) {
+                searchInput.value = selectedStyleNumber;
+            }
+            
+            this.hideSearchResults();
+            this.navigateToProduct(selectedStyleNumber);
         },
 
         /**
