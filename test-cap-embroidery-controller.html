@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cap Embroidery Controller</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Cap Embroidery Controller Test</h1>
+    
+    <div class="test-section">
+        <h2>Controller Loading Test</h2>
+        <div id="controller-test">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Global Objects Test</h2>
+        <div id="globals-test">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Back Logo Test</h2>
+        <input type="checkbox" id="back-logo-checkbox"> Enable Back Logo
+        <input type="number" id="back-logo-stitch-count" value="5000" min="5000" step="1000"> Stitch Count
+        <div id="back-logo-test">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Stitch Count Selector Test</h2>
+        <select id="client-stitch-count-select">
+            <option value="5000">5,000 stitches</option>
+            <option value="8000" selected>8,000 stitches</option>
+            <option value="10000">10,000 stitches</option>
+        </select>
+        <div id="stitch-test">Testing...</div>
+    </div>
+
+    <!-- Load the consolidated controller -->
+    <script src="/shared_components/js/cap-embroidery-controller.js"></script>
+    
+    <script>
+        // Test the controller after DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Testing cap embroidery controller...');
+            
+            // Test 1: Controller Loading
+            const controllerDiv = document.getElementById('controller-test');
+            if (window.CapEmbroideryController) {
+                controllerDiv.innerHTML = '<span class="success">✓ CapEmbroideryController loaded successfully</span>';
+                console.log('CapEmbroideryController:', window.CapEmbroideryController);
+            } else {
+                controllerDiv.innerHTML = '<span class="error">✗ CapEmbroideryController not found</span>';
+            }
+            
+            // Test 2: Global Objects
+            const globalsDiv = document.getElementById('globals-test');
+            let globalsResults = [];
+            
+            if (window.capEmbroideryBackLogo) {
+                globalsResults.push('<span class="success">✓ capEmbroideryBackLogo global available</span>');
+            } else {
+                globalsResults.push('<span class="error">✗ capEmbroideryBackLogo global missing</span>');
+            }
+            
+            if (window.CapEmbroideryAdapter) {
+                globalsResults.push('<span class="success">✓ CapEmbroideryAdapter compatibility global available</span>');
+            } else {
+                globalsResults.push('<span class="error">✗ CapEmbroideryAdapter compatibility global missing</span>');
+            }
+            
+            globalsDiv.innerHTML = globalsResults.join('<br>');
+            
+            // Test 3: Back Logo Functionality
+            const backLogoDiv = document.getElementById('back-logo-test');
+            if (window.capEmbroideryBackLogo) {
+                try {
+                    const isEnabled = window.capEmbroideryBackLogo.isEnabled();
+                    const price = window.capEmbroideryBackLogo.getPricePerItem();
+                    const stitchCount = window.capEmbroideryBackLogo.getStitchCount();
+                    
+                    backLogoDiv.innerHTML = `
+                        <span class="success">✓ Back logo functions working</span><br>
+                        <span class="info">Enabled: ${isEnabled}</span><br>
+                        <span class="info">Price: $${price.toFixed(2)}</span><br>
+                        <span class="info">Stitch Count: ${stitchCount}</span>
+                    `;
+                } catch (error) {
+                    backLogoDiv.innerHTML = `<span class="error">✗ Back logo functions error: ${error.message}</span>`;
+                }
+            } else {
+                backLogoDiv.innerHTML = '<span class="error">✗ Back logo functions not available</span>';
+            }
+            
+            // Test 4: Stitch Count Selector
+            const stitchDiv = document.getElementById('stitch-test');
+            const stitchSelector = document.getElementById('client-stitch-count-select');
+            if (stitchSelector) {
+                try {
+                    // Test changing stitch count
+                    stitchSelector.addEventListener('change', function() {
+                        stitchDiv.innerHTML = `<span class="info">Stitch count changed to: ${this.value}</span>`;
+                    });
+                    stitchDiv.innerHTML = '<span class="success">✓ Stitch count selector found and event listener attached</span>';
+                } catch (error) {
+                    stitchDiv.innerHTML = `<span class="error">✗ Stitch count selector error: ${error.message}</span>`;
+                }
+            } else {
+                stitchDiv.innerHTML = '<span class="error">✗ Stitch count selector not found</span>';
+            }
+            
+            // Test controller initialization
+            setTimeout(() => {
+                if (window.CapEmbroideryController && typeof window.CapEmbroideryController.initialize === 'function') {
+                    console.log('Testing controller initialization...');
+                    try {
+                        window.CapEmbroideryController.initialize();
+                        console.log('Controller initialization completed');
+                    } catch (error) {
+                        console.error('Controller initialization error:', error);
+                    }
+                }
+            }, 1000);
+        });
+        
+        // Listen for pricing data events
+        window.addEventListener('caspioCapPricingCalculated', function(event) {
+            console.log('Received caspioCapPricingCalculated event:', event.detail);
+        });
+        
+        window.addEventListener('pricingDataUpdated', function(event) {
+            console.log('Received pricingDataUpdated event:', event.detail);
+        });
+    </script>
+</body>
+</html>
