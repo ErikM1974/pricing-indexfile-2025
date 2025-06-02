@@ -7,18 +7,16 @@
 
     // Configuration
     const HERO_CONFIG = {
-        defaultQuantity: 50,
+        defaultQuantity: 24,
         minQuantity: 1,
         maxQuantity: 10000,
         incrementStep: 1,
         ltmThreshold: 24,
         ltmFee: 50.00,
         tierThresholds: {
-            tier1: { min: 1, max: 11, next: 12 },
-            tier2: { min: 12, max: 23, next: 24 },
-            tier3: { min: 24, max: 47, next: 48 },
-            tier4: { min: 48, max: 71, next: 72 },
-            tier5: { min: 72, max: 999999, next: null }
+            tier1: { min: 24, max: 47, next: 48 },
+            tier2: { min: 48, max: 71, next: 72 },
+            tier3: { min: 72, max: 999999, next: null }
         }
     };
 
@@ -45,6 +43,7 @@
             this.waitForPricingData().then(() => {
                 this.setupUI();
                 this.setupStitchCountListener();
+                this.setupBackLogoListener();
                 this.updateDisplay();
             });
             
@@ -227,6 +226,55 @@
         },
 
         /**
+         * Setup back logo listener for quick quote updates
+         */
+        setupBackLogoListener() {
+            console.log('[HERO-CALC] Setting up back logo listener for quick quote updates');
+            
+            const backLogoCheckbox = document.getElementById('back-logo-checkbox');
+            if (backLogoCheckbox) {
+                // Listen for checkbox changes
+                backLogoCheckbox.addEventListener('change', (e) => {
+                    console.log('[HERO-CALC] Back logo checkbox changed:', e.target.checked);
+                    
+                    // Update back logo state
+                    this.updateBackLogoState();
+                    
+                    // Update display immediately
+                    this.updateDisplay();
+                });
+                
+                console.log('[HERO-CALC] Back logo checkbox listener attached');
+            } else {
+                console.warn('[HERO-CALC] Back logo checkbox not found');
+            }
+            
+            // Also listen for back logo stitch count changes
+            const backLogoIncrement = document.getElementById('back-logo-increment');
+            const backLogoDecrement = document.getElementById('back-logo-decrement');
+            
+            if (backLogoIncrement) {
+                backLogoIncrement.addEventListener('click', () => {
+                    console.log('[HERO-CALC] Back logo stitch count incremented');
+                    setTimeout(() => {
+                        this.updateBackLogoState();
+                        this.updateDisplay();
+                    }, 100);
+                });
+            }
+            
+            if (backLogoDecrement) {
+                backLogoDecrement.addEventListener('click', () => {
+                    console.log('[HERO-CALC] Back logo stitch count decremented');
+                    setTimeout(() => {
+                        this.updateBackLogoState();
+                        this.updateDisplay();
+                    }, 100);
+                });
+            }
+        },
+
+        /**
          * Set quantity and update display
          */
         setQuantity(quantity) {
@@ -250,9 +298,23 @@
          * Update back logo state from cap embroidery controller
          */
         updateBackLogoState() {
-            if (window.capEmbroideryBackLogo) {
+            // Try multiple sources for back logo state
+            if (window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.isEnabled) {
+                heroState.backLogoEnabled = window.CapEmbroideryBackLogo.isEnabled();
+                heroState.backLogoPrice = heroState.backLogoEnabled ? window.CapEmbroideryBackLogo.getPrice() : 0;
+                console.log('[HERO-CALC] Back logo state from CapEmbroideryBackLogo:', heroState.backLogoEnabled, heroState.backLogoPrice);
+            } else if (window.capEmbroideryBackLogo) {
                 heroState.backLogoEnabled = window.capEmbroideryBackLogo.isEnabled();
                 heroState.backLogoPrice = heroState.backLogoEnabled ? window.capEmbroideryBackLogo.getPricePerItem() : 0;
+                console.log('[HERO-CALC] Back logo state from capEmbroideryBackLogo:', heroState.backLogoEnabled, heroState.backLogoPrice);
+            } else {
+                // Fallback: check checkbox directly
+                const backLogoCheckbox = document.getElementById('back-logo-checkbox');
+                if (backLogoCheckbox) {
+                    heroState.backLogoEnabled = backLogoCheckbox.checked;
+                    heroState.backLogoPrice = heroState.backLogoEnabled ? 5.00 : 0; // Default $5 back logo
+                    console.log('[HERO-CALC] Back logo state from checkbox fallback:', heroState.backLogoEnabled, heroState.backLogoPrice);
+                }
             }
         },
 
@@ -269,41 +331,64 @@
         },
 
         /**
-         * Get price per unit for given quantity
+         * Get base price for given quantity (always uses 24+ pricing for under 24)
          */
         getPriceForQuantity(quantity) {
-            const tier = this.getTierForQuantity(quantity);
-            if (!tier) return 0;
+            // For quantities under 24, always use the 24-piece price (tier1)
+            if (quantity < HERO_CONFIG.ltmThreshold) {
+                return this.getTier1Price();
+            }
             
-            // Find matching tier price
+            // For 24+, find the appropriate tier
+            const tier = this.getTierForQuantity(quantity);
+            if (!tier) return this.getTier1Price(); // fallback to tier1
+            
+            // Find matching tier price from Caspio data
             for (const [tierKey, price] of Object.entries(heroState.tierPrices)) {
-                // Match tier key patterns like "24-47", "48-71", etc.
+                // Match tier key patterns like "24-47", "48-71", "72+"
                 if (tierKey.includes(`${tier.min}-`) || 
-                    (tier.name === 'tier5' && tierKey.includes('72'))) {
+                    (tier.name === 'tier3' && (tierKey.includes('72') || tierKey.includes('72+')))) {
                     return price;
                 }
             }
             
-            // Fallback pricing if no match found
-            const fallbackPrices = { tier1: 15.00, tier2: 14.00, tier3: 12.50, tier4: 11.50, tier5: 10.50 };
+            // Fallback pricing if no Caspio data found
+            const fallbackPrices = { tier1: 12.50, tier2: 11.50, tier3: 10.50 };
             return fallbackPrices[tier.name] || 12.50;
         },
 
         /**
+         * Get tier 1 (24-piece) base price for LTM calculations
+         */
+        getTier1Price() {
+            // Try to find 24-47 tier price from Caspio data
+            for (const [tierKey, price] of Object.entries(heroState.tierPrices)) {
+                if (tierKey.includes('24-47') || tierKey.includes('24-')) {
+                    return price;
+                }
+            }
+            
+            // Fallback if no Caspio data
+            return 12.50;
+        },
+
+        /**
          * Calculate total pricing including all fees
+         * For under 24: uses 24-piece base price + distributed LTM fee + back logo
+         * For 24+: uses appropriate tier price + back logo
          */
         calculateTotalPricing(quantity) {
             const basePrice = this.getPriceForQuantity(quantity);
             let unitPrice = basePrice;
             
-            // Add LTM fee if under threshold
+            // Add LTM fee if under 24 caps (distributed across quantity)
             let ltmFeePerUnit = 0;
             if (quantity < HERO_CONFIG.ltmThreshold) {
                 ltmFeePerUnit = HERO_CONFIG.ltmFee / quantity;
                 unitPrice += ltmFeePerUnit;
             }
             
-            // Add back logo fee
+            // Add back logo fee if enabled
             if (heroState.backLogoEnabled) {
                 unitPrice += heroState.backLogoPrice;
             }
@@ -355,18 +440,47 @@
          * Update the hero display with current pricing
          */
         updateDisplay() {
+            // Update back logo state before calculating
+            this.updateBackLogoState();
+            
             const pricing = this.calculateTotalPricing(heroState.currentQuantity);
             
             // Update total price
             const totalPriceEl = document.getElementById('hero-total-price');
             if (totalPriceEl) {
-                totalPriceEl.textContent = `$${pricing.totalPrice.toFixed(2)} TOTAL`;
+                totalPriceEl.textContent = `$${pricing.totalPrice.toFixed(2)}`;
             }
             
-            // Update unit price
+            // Update unit price with detailed breakdown showing main price + additions
             const unitPriceEl = document.getElementById('hero-unit-price');
             if (unitPriceEl) {
-                unitPriceEl.textContent = `$${pricing.unitPrice.toFixed(2)} per cap`;
+                let priceBreakdown = '';
+                
+                // Start with base cap price from pricing table
+                priceBreakdown = `$${pricing.basePrice.toFixed(2)}`;
+                
+                // Add back logo if enabled
+                if (pricing.backLogoPrice > 0) {
+                    priceBreakdown += ` + $${pricing.backLogoPrice.toFixed(2)} Back Logo`;
+                }
+                
+                // Add LTM fee if applicable
+                if (pricing.hasLTMFee && pricing.ltmFeePerUnit > 0) {
+                    priceBreakdown += ` + $${pricing.ltmFeePerUnit.toFixed(2)} LTM`;
+                }
+                
+                // Show final total per cap
+                priceBreakdown += ` = $${pricing.unitPrice.toFixed(2)} per cap`;
+                
+                unitPriceEl.textContent = priceBreakdown;
+            }
+            
+            // Update stitch count display
+            const stitchInfoEl = document.querySelector('.quick-quote-banner div:last-child div:last-child');
+            if (stitchInfoEl) {
+                const stitchText = `Pricing based on ${heroState.currentStitchCount.toLocaleString()} stitches`;
+                const backLogoText = heroState.backLogoEnabled ? ' + back logo' : '';
+                stitchInfoEl.textContent = stitchText + backLogoText;
             }
             
             // Update tier info

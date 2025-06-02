@@ -11,9 +11,9 @@
         sampleRequestAPI: '/api/samples/request',
         quoteRequestAPI: '/api/quotes/request',
         contactInfo: {
-            phone: '(555) 123-4567',
-            email: 'quotes@nwcustomapparel.com',
-            hours: 'Mon-Fri 8AM-6PM PST'
+            phone: '253-922-5793',
+            email: 'sales@nwcustomapparel.com',
+            hours: '9AM-5PM'
         },
         searchDelay: 300, // Debounce delay for search
         maxSearchResults: 10
@@ -465,6 +465,39 @@
             if (typeof window.triggerPricingDataPageUpdates === 'function') {
                 console.log('[UNIVERSAL-HEADER] Calling triggerPricingDataPageUpdates');
                 window.triggerPricingDataPageUpdates(styleNumber, colorCode);
+            }
+
+            // Update URL parameters first for pricing-pages.js functions to read
+            const url = new URL(window.location);
+            url.searchParams.set('StyleNumber', styleNumber);
+            url.searchParams.set('COLOR', colorCode);
+            window.history.pushState({}, '', url);
+            console.log('[UNIVERSAL-HEADER] URL updated for pricing-pages.js:', url.search);
+
+            // Trigger pricing-pages.js update if available (for color swatches and product context)
+            // The pricing-pages.js functions are in the global scope, not under a namespace
+            if (typeof window.updateProductContext === 'function') {
+                console.log('[UNIVERSAL-HEADER] Calling updateProductContext from pricing-pages.js');
+                // This function reads URL parameters, so we don't need to pass them
+                window.updateProductContext();
+            }
+
+            // Force refresh product details and colors (matches product page pattern)
+            if (typeof window.fetchProductDetails === 'function') {
+                console.log('[UNIVERSAL-HEADER] Calling fetchProductDetails from pricing-pages.js');
+                window.fetchProductDetails(styleNumber);
+            }
+
+            // Call DP5Helper functions if available for color swatches
+            if (window.DP5Helper) {
+                if (typeof window.DP5Helper.refreshColorSwatches === 'function') {
+                    console.log('[UNIVERSAL-HEADER] Calling DP5Helper.refreshColorSwatches');
+                    window.DP5Helper.refreshColorSwatches();
+                }
+                if (typeof window.DP5Helper.fetchAndDisplayColors === 'function') {
+                    console.log('[UNIVERSAL-HEADER] Calling DP5Helper.fetchAndDisplayColors');
+                    window.DP5Helper.fetchAndDisplayColors(styleNumber);
+                }
             }
             
             // Page-specific triggers based on common patterns
