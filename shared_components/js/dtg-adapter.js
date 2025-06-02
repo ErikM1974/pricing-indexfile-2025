@@ -484,7 +484,44 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         }
     }
     
+    // Enhanced loading simulation
+    function simulateEnhancedLoading() {
+        const loadingSteps = [
+            { progress: 20, status: 'Loading your custom pricing...', step: 'Connecting to pricing database...' },
+            { progress: 40, status: 'Processing location data...', step: 'Fetching DTG print locations...' },
+            { progress: 60, status: 'Calculating pricing tiers...', step: 'Processing quantity discounts...' },
+            { progress: 80, status: 'Finalizing your pricing...', step: 'Applying location-specific rates...' },
+            { progress: 100, status: 'Complete!', step: 'Your pricing is ready' }
+        ];
+        
+        let currentStep = 0;
+        
+        const updateProgress = () => {
+            if (currentStep >= loadingSteps.length) return;
+            
+            const step = loadingSteps[currentStep];
+            const statusEl = document.getElementById('loading-status');
+            const stepEl = document.getElementById('loading-step');
+            const progressEl = document.getElementById('loading-progress-bar');
+            
+            if (statusEl) statusEl.textContent = step.status;
+            if (stepEl) stepEl.textContent = step.step;
+            if (progressEl) progressEl.style.width = step.progress + '%';
+            
+            currentStep++;
+            
+            if (currentStep < loadingSteps.length) {
+                setTimeout(updateProgress, 600 + Math.random() * 400);
+            }
+        };
+        
+        // Start the simulation
+        setTimeout(updateProgress, 500);
+    }
+
     function showLoadingState() {
+        console.log('[DTG-ADAPTER] Showing enhanced loading state');
+        
         const initialState = document.getElementById('pricing-initial-state');
         const loadingSpinner = document.getElementById('pricing-table-loading');
         const pricingGrid = document.getElementById('custom-pricing-grid');
@@ -492,16 +529,12 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         if (initialState) initialState.style.display = 'none';
         if (loadingSpinner) {
             loadingSpinner.style.display = 'block';
-            // Ensure spinner is visible with smooth transition
-            setTimeout(() => {
-                if (loadingSpinner) {
-                    loadingSpinner.style.opacity = '1';
-                }
-            }, 50);
+            // Start enhanced loading simulation
+            simulateEnhancedLoading();
         }
         if (pricingGrid) {
             pricingGrid.style.opacity = '0';
-            pricingGrid.style.transform = 'translateY(10px)';
+            pricingGrid.style.transform = 'translateY(20px)';
         }
     }
 
