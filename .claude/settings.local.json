@@ -12,7 +12,11 @@
       "Bash(diff:*)",
       "Bash(rm:*)",
       "Bash(node:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(/home/erik/.nvm/versions/node/v18.20.8/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -n \"cap-embroidery-adapter\\.js|cap-embroidery-back-logo\\.js|test-back-logo-debug\\.html|test-back-logo-quote-debug\\.html|test-cap-embroidery-fixes\\.html\" --type html --type js)",
+      "Bash(git checkout:*)",
+      "Bash(git reset:*)",
+      "Bash(git tag:*)"
     ],
     "deny": []
   }

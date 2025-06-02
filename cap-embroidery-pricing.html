@@ -18,246 +18,446 @@
     <div class="container">
         <h1>Cap Embroidery Pricing</h1>
 
-        <!-- New Two-Column Layout Container -->
-        <div class="product-page-columns-container">
+        <!-- Compact Quick Quote Section -->
+        <div class="quick-quote-banner" style="
+            margin: 15px 0; 
+            padding: 15px 20px; 
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f4ff 100%); 
+            border-radius: 8px; 
+            border: 1px solid #c3d9ff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        ">
+            <div>
+                <h3 style="font-size: 1.2em; color: #0056b3; margin: 0 0 5px 0; font-weight: bold;">Quick Quote Calculator</h3>
+                <p style="font-size: 0.9em; color: #666; margin: 0;">Enter quantity for instant pricing</p>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="hero-quantity-decrease" type="button" style="
+                    width: 36px; height: 36px; 
+                    border: none; background: #0056b3; color: white; 
+                    font-size: 18px; font-weight: bold; cursor: pointer;
+                    border-radius: 4px;
+                ">−</button>
+                
+                <input id="hero-quantity-input" type="number" min="1" max="10000" value="50" style="
+                    width: 80px; height: 36px; 
+                    border: 2px solid #0056b3; text-align: center; 
+                    font-size: 16px; font-weight: bold; color: #0056b3;
+                    background: white; border-radius: 4px;
+                ">
+                
+                <button id="hero-quantity-increase" type="button" style="
+                    width: 36px; height: 36px; 
+                    border: none; background: #0056b3; color: white; 
+                    font-size: 18px; font-weight: bold; cursor: pointer;
+                    border-radius: 4px;
+                ">+</button>
+                
+                <span style="font-size: 0.9em; color: #333; font-weight: 600;">caps</span>
+            </div>
+            
+            <div style="text-align: right;">
+                <div id="hero-total-price" style="font-size: 1.6em; font-weight: bold; color: #2e5827; margin-bottom: 2px;">$625.00</div>
+                <div id="hero-unit-price" style="font-size: 0.9em; color: #666;">$12.50 per cap</div>
+                <div style="font-size: 0.75em; color: #888; margin-top: 2px;">Pricing based on 8,000 stitches</div>
+            </div>
+        </div>
+        
+        <!-- Compact notifications -->
+        <div id="hero-optimization-tip" style="
+            background: #e8f5e8; 
+            border: 1px solid #2e5827; 
+            border-radius: 6px; 
+            padding: 10px 15px; 
+            margin: 10px 0;
+            font-size: 0.9em;
+            color: #2e5827;
+            display: none;
+        ">
+            💡 <span id="optimization-message">Add 22 more caps for better pricing!</span>
+        </div>
+        
+        <div id="hero-ltm-warning" style="
+            background: #f8d7da; 
+            border: 1px solid #dc3545; 
+            border-radius: 6px; 
+            padding: 10px 15px; 
+            margin: 10px 0;
+            font-size: 0.9em;
+            color: #721c24;
+            display: none;
+        ">
+            ⚠️ <span id="ltm-message">Orders under 24 caps include a $50 setup fee</span>
+        </div>
 
-            <!-- Left Column: Product Context (Potentially Sticky) -->
-            <div class="product-context-column">
-                <div class="product-header"> <!-- Re-using existing header for product title area -->
-                    <div class="product-title-area">
-                        <h2 id="product-title-context">Product Title</h2> <!-- New ID to avoid conflict if original #product-title is used elsewhere by JS -->
-                        <div class="product-meta" style="padding-top: 8px; margin-bottom: 5px;"> <!-- Adjusted padding/margin -->
-                            <span class="meta-item">Style: <strong id="product-style-context">Style Number</strong></span>
-                            <!-- Selected Color display removed from here, will rely on the one in the right column -->
+
+        <!-- Modern Branded Layout -->
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            
+            <!-- Hidden Caspio Matrix - Keep this for data source -->
+            <div id="pricing-calculator" class="pricing-calculator" style="display:none !important; width:0; height:0; border:0; visibility: hidden;">
+                <div class="loading-message">Loading pricing data...</div>
+            </div>
+            
+            <!-- Product Information Card -->
+            <div style="
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                margin: 20px 0;
+                overflow: hidden;
+                border-top: 4px solid #2e5827;
+            ">
+                <div style="
+                    background: linear-gradient(135deg, #2e5827 0%, #3e6837 100%);
+                    color: white;
+                    padding: 20px;
+                ">
+                    <h2 style="margin: 0 0 10px 0; font-size: 1.8em; font-weight: bold;">Product Information</h2>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div>
+                            <h3 id="product-title-context" style="margin: 0; font-size: 1.3em;">Product Title</h3>
+                            <div style="margin-top: 5px; opacity: 0.9;">
+                                Style: <strong id="product-style-context">Style Number</strong>
+                            </div>
                         </div>
                     </div>
-                    <div class="navigation-area">
-                        <a id="back-to-product" href="#" class="back-to-product">
-                            <span class="back-icon">←</span> Back to Product
-                        </a>
-                    </div>
-                </div>
-                <!-- Enhanced Product Image Gallery -->
-                <div class="product-image-gallery" id="product-image-gallery">
-                    <div class="main-image-container" id="main-image-container">
-                        <img id="product-image-main" src="" alt="Product Image" class="product-image">
-                        <div class="image-loading-spinner"></div>
-                        <div class="image-zoom-overlay">
-                            <span class="zoom-icon">🔍</span>
-                        </div>
-                    </div>
-                    <div class="image-thumbnails" id="image-thumbnails">
-                        <!-- Thumbnails will be dynamically added here -->
-                    </div>
-                </div>
-                <div class="static-product-info" style="padding:15px; background-color: var(--background-light); border-radius: var(--radius-sm); margin-top:15px;">
-                    <p>Pricing Includes an 8,000 stitch embroidered logo on one location.</p>
-                    <!-- Other static info can go here -->
                 </div>
                 
-                
-                <!-- Color Swatches moved to left column below product image -->
-                <div class="color-swatches-left-column" style="margin-top:15px;">
-                    <div class="color-swatches-container compact">
-                        <h3 class="section-title">Available Colors</h3>
-                        <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 5px; max-height: 300px;">
-                            <!-- Color swatches will be dynamically added here by pricing-pages.js -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 30px;">
+                    <!-- Product Image -->
+                    <div>
+                        <div id="product-image-gallery" style="position: relative;">
+                            <div id="main-image-container" style="position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                                <img id="product-image-main" src="" alt="Product Image" style="width: 100%; height: auto; display: block;">
+                                <div class="image-loading-spinner"></div>
+                                <div class="image-zoom-overlay" style="
+                                    position: absolute; top: 10px; right: 10px;
+                                    background: rgba(0,0,0,0.7); color: white;
+                                    padding: 8px; border-radius: 4px; font-size: 1.2em;
+                                ">🔍</div>
+                            </div>
+                            <div id="image-thumbnails" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                                <!-- Thumbnails will be dynamically added here -->
+                            </div>
                         </div>
-                        <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
+                    </div>
+                    
+                    <!-- Product Details & Colors -->
+                    <div>
+                        <div style="
+                            background: #f8f9fa;
+                            padding: 20px;
+                            border-radius: 8px;
+                            border-left: 4px solid #2e5827;
+                            margin-bottom: 20px;
+                        ">
+                            <h4 style="margin: 0 0 10px 0; color: #2e5827; font-size: 1.1em;">What's Included</h4>
+                            <p style="margin: 0; color: #333;">Pricing includes an 8,000 stitch embroidered logo on one location.</p>
+                        </div>
+                        
+                        <!-- Color Selection -->
+                        <div>
+                            <h4 style="margin: 0 0 15px 0; color: #333; font-size: 1.1em;">Selected Color</h4>
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                                <div id="pricing-color-swatch" style="
+                                    width: 50px; height: 50px;
+                                    border-radius: 8px;
+                                    border: 3px solid #ddd;
+                                    cursor: pointer;
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                "></div>
+                                <div>
+                                    <strong id="pricing-color-name" style="color: #333; font-size: 1.1em;">Color Name</strong>
+                                    <div style="font-size: 0.9em; color: #666; margin-top: 2px;">Click to view all colors</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Color Swatches -->
+                            <div id="color-swatches" style="
+                                display: grid;
+                                grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+                                gap: 8px;
+                                max-height: 200px;
+                                overflow-y: auto;
+                                padding: 10px;
+                                background: #f8f9fa;
+                                border-radius: 8px;
+                            ">
+                                <!-- Color swatches will be dynamically added here -->
+                            </div>
+                            <button id="show-more-colors" style="
+                                margin-top: 10px;
+                                padding: 8px 16px;
+                                background: #2e5827;
+                                color: white;
+                                border: none;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                font-size: 0.9em;
+                                display: none;
+                            ">Show More Colors</button>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Right Column: Interactive Elements (Scrollable) -->
-            <div class="product-interactive-column">
-
-                <!-- Original .product-context and .pricing-content are now effectively merged or reorganized -->
-                <!-- The content of .pricing-content (pricing grid, add to cart) goes into this right column -->
+            
+            <!-- Customization Options Card -->
+            <div style="
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                margin: 20px 0;
+                overflow: hidden;
+                border-top: 4px solid #2e5827;
+            ">
+                <div style="
+                    background: linear-gradient(135deg, #2e5827 0%, #3e6837 100%);
+                    color: white;
+                    padding: 20px;
+                ">
+                    <h2 style="margin: 0; font-size: 1.6em; font-weight: bold;">Customization Options</h2>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9;">Adjust your embroidery details (updates pricing above)</p>
+                </div>
                 
-                <!-- Pricing Content (Grid, Tabs, Add to Cart Section) -->
-                <div class="pricing-content-interactive"> <!-- New wrapper for clarity -->
-                    <!-- Hidden Caspio Matrix - Keep this for data source -->
-                    <div id="pricing-calculator" class="pricing-calculator" style="display:none !important; width:0; height:0; border:0; visibility: hidden;">
-                        <div class="loading-message">Loading pricing data...</div>
-                    </div>
-                    
-                    <!-- Custom Pricing Grid - Enhanced now that it's at the top -->
-                    <div class="pricing-section">
-                        <div class="pricing-header" style="margin-bottom: 20px;">
-                            <!-- Enhanced header with more prominence -->
-                             <h3 class="section-title" style="font-size: 1.3em; margin: 0;">Detailed Pricing per Quantity Tier</h3>
-                             <div style="display: flex; align-items: center; gap: 15px;"> <!-- Wrapper for dropdown and color indicator -->
-                                 <div class="stitch-count-selector" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--primary-light); border-radius: var(--radius-sm); border: 1px solid var(--primary-color);">
-                                     <label for="client-stitch-count-select" style="font-size: 0.95em; font-weight: bold; color: var(--primary-color);">Stitch Count:</label>
-                                     <select id="client-stitch-count-select" name="client-stitch-count-select" style="padding: 6px 10px; border-radius: 4px; border: 2px solid #ddd; font-weight: bold; background: white; min-width: 80px;">
-                                         <option value="5000">5,000</option>
-                                         <option value="8000" selected>8,000</option>
-                                         <option value="10000">10,000</option>
-                                     </select>
-                                     <span id="stitch-count-indicator" style="font-size: 0.8em; color: var(--primary-color); opacity: 0; transition: opacity 0.3s ease;">Updated!</span>
-                                 </div>
-                                 <div class="selected-color-indicator">
-                                <span>Selected Color:</span>
-                                <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches"></div>
-                                <strong id="pricing-color-name">Color Name</strong>
-                            </div>
+                <div style="padding: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <!-- Stitch Count Selection -->
+                    <div style="
+                        background: #f8f9fa;
+                        padding: 20px;
+                        border-radius: 8px;
+                        border-left: 4px solid #2e5827;
+                    ">
+                        <h3 style="margin: 0 0 15px 0; color: #333; font-size: 1.2em;">Front Logo Stitch Count</h3>
+                        <div style="margin-bottom: 15px;">
+                            <select id="client-stitch-count-select" name="client-stitch-count-select" style="
+                                width: 100%;
+                                padding: 12px 16px;
+                                border: 2px solid #ddd;
+                                border-radius: 8px;
+                                font-size: 1em;
+                                font-weight: bold;
+                                background: white;
+                                color: #333;
+                                cursor: pointer;
+                            ">
+                                <option value="5000">5,000 stitches</option>
+                                <option value="8000" selected>8,000 stitches (Standard)</option>
+                                <option value="10000">10,000 stitches</option>
+                            </select>
+                            <span id="stitch-count-indicator" style="
+                                display: block;
+                                margin-top: 8px;
+                                font-size: 0.9em;
+                                color: #2e5827;
+                                font-weight: bold;
+                                opacity: 0;
+                                transition: opacity 0.3s ease;
+                            ">✓ Quick quote updated!</span>
                         </div>
-                        
-                        
-                        <div class="pricing-grid-container">
-                            <table class="pricing-grid" id="custom-pricing-grid">
-                                <thead>
-                                    <tr id="pricing-header-row">
-                                        <th>Quantity</th>
-                                        <!-- Size headers will be dynamically populated. JS needs to add data-tier-label to these THs. -->
-                                        <!-- Example: <th data-tier-label="1-23">1-23</th> -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Pricing data will be dynamically added here -->
-                                </tbody>
-                            </table>
-                            
-                            <!-- Added helpful pricing explanation -->
-                            <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                                <p><strong>Note:</strong> Prices shown are per item and include an 8,000 stitch embroidered logo.</p>
-                            </div>
-                            
-                            <!-- Pricing info tabs removed as per user request -->
-                            
+                        <div style="font-size: 0.9em; color: #666;">
+                            Higher stitch counts allow for more detailed designs but may increase cost.
                         </div>
                     </div>
                     
-                    <!-- Back Logo Add-On Section - Optimal Placement -->
-                    <div class="back-logo-addon-section" style="margin: 25px 0; padding: 20px; background: linear-gradient(135deg, #f8f9ff 0%, #e8f4ff 100%); border-radius: 12px; border: 2px solid #e3f2fd; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                            <input type="checkbox" id="back-logo-checkbox" style="width: 20px; height: 20px; margin-right: 12px; cursor: pointer; transform: scale(1.2);">
-                            <label for="back-logo-checkbox" style="font-size: 1.1em; font-weight: bold; color: var(--primary-color); cursor: pointer; user-select: none;">
-                                🎯 Add Back Logo Embroidery
+                    <!-- Back Logo Option -->
+                    <div style="
+                        background: #f8f9fa;
+                        padding: 20px;
+                        border-radius: 8px;
+                        border-left: 4px solid #2e5827;
+                    ">
+                        <h3 style="margin: 0 0 15px 0; color: #333; font-size: 1.2em;">Back Logo Embroidery</h3>
+                        <div style="margin-bottom: 15px;">
+                            <label style="
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                cursor: pointer;
+                                font-weight: bold;
+                                color: #333;
+                            ">
+                                <input type="checkbox" id="back-logo-checkbox" style="
+                                    width: 20px;
+                                    height: 20px;
+                                    cursor: pointer;
+                                    accent-color: #2e5827;
+                                ">
+                                Add embroidered back logo (+$5.00 per cap)
                             </label>
                         </div>
                         
-                        <div id="back-logo-details" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,86,179,0.2);">
-                            <div class="back-logo-controls" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-                                
-                                <!-- Stitch Count with Increment Arrows -->
-                                <div class="stitch-count-control" style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-weight: 600; color: #333; margin-right: 8px;">Stitch Count:</span>
-                                    <div class="increment-control" style="display: flex; align-items: center; background: white; border-radius: 8px; border: 2px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                        <button id="back-logo-decrement" type="button" style="
-                                            width: 36px; height: 36px; 
-                                            border: none; background: transparent; 
-                                            font-size: 18px; font-weight: bold; color: var(--primary-color); 
-                                            cursor: pointer; border-radius: 6px 0 0 6px;
-                                            display: flex; align-items: center; justify-content: center;
-                                            transition: background-color 0.2s ease;
-                                        " onmouseover="this.style.backgroundColor='#f0f8ff'" onmouseout="this.style.backgroundColor='transparent'">−</button>
-                                        
-                                        <span id="back-logo-stitch-display" style="
-                                            padding: 8px 16px; font-weight: bold; color: #333; 
-                                            background: #f8f9ff; min-width: 80px; text-align: center;
-                                            border-left: 1px solid #ddd; border-right: 1px solid #ddd;
-                                        ">5,000</span>
-                                        
-                                        <button id="back-logo-increment" type="button" style="
-                                            width: 36px; height: 36px; 
-                                            border: none; background: transparent; 
-                                            font-size: 18px; font-weight: bold; color: var(--primary-color); 
-                                            cursor: pointer; border-radius: 0 6px 6px 0;
-                                            display: flex; align-items: center; justify-content: center;
-                                            transition: background-color 0.2s ease;
-                                        " onmouseover="this.style.backgroundColor='#f0f8ff'" onmouseout="this.style.backgroundColor='transparent'">+</button>
-                                    </div>
-                                    <span style="font-size: 0.85em; color: #666; margin-left: 8px;">(5K-15K)</span>
-                                </div>
-                                
-                                <!-- Price Display -->
-                                <div class="price-display-section" style="display: flex; align-items: center; gap: 10px;">
-                                    <span style="font-weight: 600; color: #333;">Additional Cost:</span>
-                                    <div id="back-logo-price" style="
-                                        padding: 8px 16px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); 
-                                        color: white; border-radius: 8px; font-weight: bold; font-size: 1.1em;
-                                        box-shadow: 0 2px 6px rgba(40,167,69,0.3);
-                                    ">$5.00 per item</div>
+                        <div id="back-logo-details" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Stitch Count:</label>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button id="back-logo-decrement" type="button" style="
+                                        width: 40px;
+                                        height: 40px;
+                                        border: none;
+                                        background: #2e5827;
+                                        color: white;
+                                        font-size: 18px;
+                                        font-weight: bold;
+                                        cursor: pointer;
+                                        border-radius: 6px;
+                                    ">−</button>
+                                    
+                                    <span id="back-logo-stitch-display" style="
+                                        padding: 8px 16px;
+                                        background: white;
+                                        border: 2px solid #ddd;
+                                        border-radius: 6px;
+                                        font-weight: bold;
+                                        color: #333;
+                                        min-width: 80px;
+                                        text-align: center;
+                                    ">5,000</span>
+                                    
+                                    <button id="back-logo-increment" type="button" style="
+                                        width: 40px;
+                                        height: 40px;
+                                        border: none;
+                                        background: #2e5827;
+                                        color: white;
+                                        font-size: 18px;
+                                        font-weight: bold;
+                                        cursor: pointer;
+                                        border-radius: 6px;
+                                    ">+</button>
+                                    
+                                    <span style="font-size: 0.9em; color: #666; margin-left: 8px;">(5K-15K)</span>
                                 </div>
                             </div>
                             
-                            <!-- Back Logo Summary Info -->
-                            <div id="back-logo-pricing-display" style="display: none; margin-top: 15px; padding: 12px 16px; background: rgba(40,167,69,0.1); border-radius: 8px; border-left: 4px solid #28a745;">
-                                <div style="font-size: 0.95em; color: #155724;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span><strong>📍 Back Logo:</strong> <span id="back-logo-display-stitch-count">5,000 stitches</span></span>
-                                        <span id="back-logo-display-price" style="font-weight: bold; color: #28a745;">$5.00 per item</span>
-                                    </div>
-                                </div>
+                            <div style="
+                                background: #e8f5e8;
+                                padding: 12px;
+                                border-radius: 6px;
+                                border-left: 4px solid #2e5827;
+                            ">
+                                <strong id="back-logo-price" style="color: #2e5827; font-size: 1.1em;">Additional Cost: $5.00 per cap</strong>
                             </div>
                         </div>
+                        
+                        <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                            Optional upgrade for branding on both sides of the cap.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pricing Table Card -->
+            <div style="
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                margin: 20px 0;
+                overflow: hidden;
+                border-top: 4px solid #2e5827;
+            ">
+                <div style="
+                    background: linear-gradient(135deg, #2e5827 0%, #3e6837 100%);
+                    color: white;
+                    padding: 20px;
+                ">
+                    <h2 style="margin: 0; font-size: 1.6em; font-weight: bold;">Detailed Pricing by Quantity</h2>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9;">Volume discounts automatically applied</p>
+                </div>
+                
+                <div style="padding: 30px;">
+                    <div style="overflow-x: auto;">
+                        <table id="custom-pricing-grid" style="
+                            width: 100%;
+                            border-collapse: collapse;
+                            background: white;
+                            border-radius: 8px;
+                            overflow: hidden;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        ">
+                            <thead>
+                                <tr id="pricing-header-row" style="background: #2e5827; color: white;">
+                                    <th style="padding: 15px; text-align: left; font-weight: bold;">Quantity Range</th>
+                                    <!-- Size headers will be dynamically populated -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Pricing data will be dynamically added here -->
+                            </tbody>
+                        </table>
                     </div>
                     
-                    <!-- Add to Cart Section - Enhanced UI -->
-                    <div class="add-to-cart-section">
-                        <h3 class="section-title" style="font-size: 1.3em; margin-top: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light);">Add to Cart</h3>
-                        
-                        <div class="size-grid-container" id="size-grid-container">
-                            <!-- Populated by product-quantity-ui.js or similar.
-                                 Each size card needs a place for dynamic unit price.
-                            Example of a size card structure that JS will populate:
-                            <div class="size-card">
-                                <div class="size-label">M</div>
-                                <div class="quantity-controls">
-                                    <button class="quantity-btn decrease" aria-label="Decrease quantity">-</button>
-                                    <input type="number" class="quantity-input" value="0" min="0" data-size="M" data-base-price="15.99">
-                                    <button class="quantity-btn increase" aria-label="Increase quantity">+</button>
-                                </div>
-                                <div class="price-display">
-                                    Unit Price: <span class="dynamic-unit-price">$0.00</span>
-                                </div>
-                            </div>
-                             -->
-                        </div>
-                        <div id="quantity-matrix">
-                            <!-- Will be populated by JavaScript -->
-                        </div>
-                        
-                        
-                        <div id="cart-contents-info" class="cart-contents-info" style="display: none; margin-bottom: 15px; padding: 10px; background-color: #f0f8ff; border-radius: 5px; border: 1px solid #d0e3ff; font-size: 0.9em;">
-                            <!-- Will be dynamically populated by JavaScript -->
-                        </div>
-                        
-                        <!-- The "pricing-tier-info" div that was here has been removed as per user request -->
-                        
-                        <div class="size-quantity-grid" id="size-quantity-grid" style="display: none;">
-                        </div>
-                        
-                        <!-- This .cart-summary will be the sticky summary -->
-                        <div class="cart-summary" id="sticky-product-cart-summary">
-                            <div class="cart-total">
-                                <div>
-                                    <span class="total-label">Total Quantity:</span> <span class="total-quantity">0</span>
-                                </div>
-                                <div>
-                                    <span class="total-label">Est. Total:</span>
-                                    <span class="total-amount total-price" data-tier-key="" data-total-quantity="0" data-ltm-fee-applies="false">$0.00</span>
-                                </div>
-                            </div>
-                            <div class="ltm-fee-notice" style="display: none;">
-                                <span class="ltm-icon" style="font-style: normal; font-weight: bold; color: #0056b3;">ℹ️</span>
-                                <div style="flex: 1;">
-                                    <div class="ltm-text" style="font-weight: bold;">Less Than Minimum fee applies</div>
-                                    <div class="ltm-detail-text" style="font-size: 0.85em; margin-top: 5px; color: #6c757d;"></div>
-                                </div>
-                            </div>
-                            <button id="add-to-cart-button" class="add-to-cart-button">
-                                Add to Cart
-                            </button>
-                            <button id="view-cart-summary-button" class="view-cart-button" style="display: none; margin-top: 10px; width: 100%; padding: 10px; background-color: #17a2b8; color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 1em;">
-                                View Cart (<span class="cart-count-display">0</span>)
-                            </button>
-                        </div>
+                    <div style="
+                        margin-top: 20px;
+                        padding: 15px;
+                        background: #f8f9fa;
+                        border-radius: 8px;
+                        border-left: 4px solid #2e5827;
+                    ">
+                        <p style="margin: 0; color: #333; font-size: 0.95em;">
+                            <strong>Note:</strong> Prices shown include embroidered logo on front. Back logo and setup fees calculated separately.
+                        </p>
                     </div>
-                </div> <!-- End .pricing-content-interactive -->
-            </div> <!-- End .product-interactive-column -->
-        </div> <!-- End .product-page-columns-container -->
+                </div>
+            </div>
+            
+            <!-- Call to Action Card -->
+            <div style="
+                background: linear-gradient(135deg, #2e5827 0%, #3e6837 100%);
+                border-radius: 8px;
+                box-shadow: 0 4px 16px rgba(46,88,39,0.3);
+                margin: 30px 0;
+                text-align: center;
+                color: white;
+                padding: 40px 30px;
+            ">
+                <h2 style="margin: 0 0 15px 0; font-size: 2em; font-weight: bold;">Ready for Your Quote?</h2>
+                <p style="margin: 0 0 25px 0; font-size: 1.1em; opacity: 0.9;">
+                    Contact us with your quantity and customization details for a personalized quote.
+                </p>
+                
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <button style="
+                        background: white;
+                        color: #2e5827;
+                        border: none;
+                        padding: 15px 30px;
+                        border-radius: 8px;
+                        font-size: 1.1em;
+                        font-weight: bold;
+                        cursor: pointer;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                        transition: transform 0.2s ease;
+                    " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        📞 Call for Quote: (555) 123-4567
+                    </button>
+                    
+                    <button style="
+                        background: rgba(255,255,255,0.2);
+                        color: white;
+                        border: 2px solid white;
+                        padding: 15px 30px;
+                        border-radius: 8px;
+                        font-size: 1.1em;
+                        font-weight: bold;
+                        cursor: pointer;
+                        transition: background 0.2s ease;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        ✉️ Email Quote Request
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+                    <p style="margin: 0;">💚 <strong>Why Choose NW Custom Apparel?</strong></p>
+                    <p style="margin: 5px 0 0 0;">Local Pacific Northwest company • Fast turnaround • Quality embroidery</p>
+                </div>
+            </div>
+        </div>
     </div> <!-- End .container -->
     
     <!-- JavaScript Files -->
@@ -274,6 +474,7 @@
     <script src="/shared_components/js/pricing-calculator.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/cap-embroidery-controller.js"></script> <!-- Consolidated controller replacing 6 separate files -->
+    <script src="/shared_components/js/hero-quantity-calculator.js"></script> <!-- Quantity-first UX calculator -->
     <script src="/shared_components/js/product-pricing-ui.js"></script> <!-- Added new script, removed defer -->
     
 </body>
