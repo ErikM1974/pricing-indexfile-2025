@@ -213,25 +213,67 @@
             this.state.currentPreset = presetIndex;
             this.state.customMode = false;
 
-            // Update quantity through controller if available
+            // Try multiple methods to update quantity
+            let updated = false;
+
+            // Method 1: Use QuantityManager if available
             if (NWCA.controllers.capEmbroidery && NWCA.controllers.capEmbroidery.QuantityManager && NWCA.controllers.capEmbroidery.QuantityManager.updateQuantity) {
                 NWCA.controllers.capEmbroidery.QuantityManager.updateQuantity(quantity, 'quantity-shortcuts');
-            } else {
-                // Fallback: update hero input directly
-                const heroInput = document.getElementById('hero-quantity-input');
-                if (heroInput) {
-                    heroInput.value = quantity;
-                    // Trigger both input and change events for compatibility
-                    heroInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    heroInput.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-                
-                // Also emit the event manually for other components
-                NWCA.events.emit('quantityChanged', {
-                    quantity: quantity,
-                    source: 'quantity-shortcuts'
-                });
+                updated = true;
             }
+
+            // Method 2: Use HeroQuantityCalculator if available
+            if (window.HeroQuantityCalculator && typeof window.HeroQuantityCalculator.setQuantity === 'function') {
+                logger.log('QUANTITY-SHORTCUTS', 'Using HeroQuantityCalculator.setQuantity');
+                window.HeroQuantityCalculator.setQuantity(quantity);
+                updated = true;
+            }
+
+            // Method 3: Fallback to direct input update
+            const heroInput = document.getElementById('hero-quantity-input');
+            if (heroInput && !updated) {
+                logger.log('QUANTITY-SHORTCUTS', 'Using fallback input update');
+                heroInput.value = quantity;
+                // Try to trigger the event in a way that mimics real user input
+                try {
+                    // Try InputEvent first (more realistic)
+                    if (window.InputEvent) {
+                        const inputEvent = new InputEvent('input', { 
+                            bubbles: true, 
+                            cancelable: true,
+                            inputType: 'insertText',
+                            data: quantity.toString()
+                        });
+                        heroInput.dispatchEvent(inputEvent);
+                    } else {
+                        // Fallback to regular Event
+                        const inputEvent = new Event('input', { bubbles: true, cancelable: true });
+                        heroInput.dispatchEvent(inputEvent);
+                    }
+                } catch (e) {
+                    // Final fallback
+                    logger.warn('QUANTITY-SHORTCUTS', 'Error dispatching input event:', e);
+                    heroInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                heroInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            // Method 4: Try to call the hero calculator's event handler directly
+            if (heroInput && window.HeroQuantityCalculator) {
+                logger.log('QUANTITY-SHORTCUTS', 'Attempting direct hero calculator update');
+                // Simulate the input event handler behavior
+                const parsedQty = parseInt(quantity) || 24;
+                const clampedQty = Math.max(1, Math.min(10000, parsedQty));
+                if (window.HeroQuantityCalculator.setQuantity) {
+                    window.HeroQuantityCalculator.setQuantity(clampedQty);
+                }
+            }
+            
+            // Always emit the event for other components
+            NWCA.events.emit('quantityChanged', {
+                quantity: quantity,
+                source: 'quantity-shortcuts'
+            });
 
             // Update UI
             this.updateActiveState();
