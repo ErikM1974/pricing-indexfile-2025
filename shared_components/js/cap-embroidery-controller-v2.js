@@ -250,6 +250,110 @@
             }
         },
 
+        // Unified Quantity Manager - Single source of truth for all quantities
+        QuantityManager: {
+            // Current quantity state
+            state: {
+                selectedQuantity: NWCA.CONSTANTS ? NWCA.CONSTANTS.QUANTITIES.DEFAULT : 24,
+                sizeDistribution: {},
+                totalQuantity: 0
+            },
+
+            /**
+             * Initialize quantity manager
+             */
+            initialize() {
+                logger.log('CAP-CONTROLLER', 'Initializing Quantity Manager');
+                this.bindQuantityListeners();
+                this.syncAllQuantityDisplays();
+            },
+
+            /**
+             * Update selected quantity from any source
+             * @param {number} quantity - New quantity
+             * @param {string} source - Source of update (hero, grid, quote, etc.)
+             */
+            updateQuantity(quantity, source = 'unknown') {
+                const newQty = parseInt(quantity);
+                const CONSTANTS = NWCA.CONSTANTS || {};
+                const minQty = CONSTANTS.QUANTITIES?.MIN || 1;
+                const maxQty = CONSTANTS.QUANTITIES?.MAX || 10000;
+                
+                if (isNaN(newQty) || newQty < minQty || newQty > maxQty) {
+                    logger.warn('CAP-CONTROLLER', `Invalid quantity: ${quantity} from ${source}`);
+                    return false;
+                }
+
+                logger.log('CAP-CONTROLLER', `Quantity updated to ${newQty} from ${source}`);
+                this.state.selectedQuantity = newQty;
+                
+                // Emit quantity change event
+                NWCA.events.emit('quantityChanged', {
+                    quantity: newQty,
+                    source: source,
+                    hasLTM: this.hasLTMFee(newQty)
+                });
+
+                // Sync all displays
+                this.syncAllQuantityDisplays();
+                
+                return true;
+            },
+
+            /**
+             * Check if quantity has LTM fee
+             */
+            hasLTMFee(quantity) {
+                const ltmThreshold = NWCA.CONSTANTS?.QUANTITIES?.LTM_THRESHOLD || 24;
+                return quantity < ltmThreshold;
+            },
+
+            /**
+             * Get current quantity
+             */
+            getCurrentQuantity() {
+                return this.state.selectedQuantity;
+            },
+
+            /**
+             * Sync all quantity displays
+             */
+            syncAllQuantityDisplays() {
+                const quantity = this.state.selectedQuantity;
+                
+                // Update hero quantity input
+                const heroInput = document.getElementById(NWCA.CONSTANTS?.ELEMENTS?.HERO_QUANTITY_INPUT || 'hero-quantity-input');
+                if (heroInput && heroInput.value != quantity) {
+                    heroInput.value = quantity;
+                }
+
+                // Update any other quantity displays
+                document.querySelectorAll('[data-quantity-display]').forEach(el => {
+                    el.textContent = quantity;
+                });
+
+                logger.log('CAP-CONTROLLER', `All quantity displays synced to ${quantity}`);
+            },
+
+            /**
+             * Bind listeners to quantity inputs
+             */
+            bindQuantityListeners() {
+                // Hero quantity input
+                const heroInput = document.getElementById(NWCA.CONSTANTS?.ELEMENTS?.HERO_QUANTITY_INPUT || 'hero-quantity-input');
+                if (heroInput) {
+                    heroInput.addEventListener('change', (e) => {
+                        this.updateQuantity(e.target.value, 'hero-input');
+                    });
+                }
+
+                // Listen for quantity change events from other sources
+                NWCA.events.on('externalQuantityUpdate', (data) => {
+                    this.updateQuantity(data.quantity, data.source || 'external');
+                });
+            }
+        },
+
         // UI Management Module
         UIManager: {
             /**
@@ -963,6 +1067,9 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
                 // Initialize UI enhancements
                 NWCA.controllers.capEmbroidery.UIManager.enhanceStitchCountSelector();
                 
+                // Initialize Quantity Manager
+                NWCA.controllers.capEmbroidery.QuantityManager.initialize();
+                
                 // Initialize back logo UI
                 NWCA.controllers.capEmbroidery.BackLogoManager.initializeUI();
                 
@@ -994,14 +1101,15 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
         async waitForDependencies() {
             return new Promise((resolve) => {
                 let checkCount = 0;
-                const maxChecks = 50; // 5 seconds max
+                const maxChecks = NWCA.CONSTANTS?.UI?.MAX_POLLING_ATTEMPTS || 50;
                 
                 const checkInterval = setInterval(() => {
                     checkCount++;
                     
                     // Check for required globals
+                    const stitchCountId = NWCA.CONSTANTS?.ELEMENTS?.STITCH_COUNT_SELECT || 'client-stitch-count-select';
                     const hasRequiredGlobals = window.NWCAPricingCalculator && 
-                                             document.getElementById('client-stitch-count-select');
+                                             document.getElementById(stitchCountId);
                     
                     if (hasRequiredGlobals || checkCount >= maxChecks) {
                         clearInterval(checkInterval);
@@ -1091,12 +1199,13 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
             logger.log('CAP-CONTROLLER', 'Starting tier label checker');
             
             let checkCount = 0;
-            const maxChecks = NWCA.config.ui.maxPollingAttempts;
+            const maxChecks = NWCA.CONSTANTS?.UI?.MAX_POLLING_ATTEMPTS || NWCA.config.ui.maxPollingAttempts;
             
             // Check immediately
             NWCA.controllers.capEmbroidery.DataManager.fixTierLabels();
             
             // Then set up interval
+            const pollingInterval = NWCA.CONSTANTS?.UI?.POLLING_INTERVAL || NWCA.config.ui.pollingInterval;
             const checkInterval = setInterval(() => {
                 checkCount++;
                 
@@ -1108,7 +1217,7 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
                     logger.log('CAP-CONTROLLER', 'Max label checks reached, stopping');
                     clearInterval(checkInterval);
                 }
-            }, NWCA.config.ui.pollingInterval);
+            }, pollingInterval);
         }
     };
 

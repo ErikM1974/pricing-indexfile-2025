@@ -22,6 +22,18 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
             return;
         }
 
+        // Check if we're in quote-only mode
+        if (window.NWCA && NWCA.config && NWCA.config.features && !NWCA.config.features.cartEnabled) {
+            console.log("[PRICING-MATRIX:SAVE] Quote mode active, skipping server save");
+            return;
+        }
+        
+        // Also check app config for quote mode
+        if (window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.FEATURES && NWCA_APP_CONFIG.FEATURES.QUOTE_MODE) {
+            console.log("[PRICING-MATRIX:SAVE] Quote-only workflow detected, skipping pricing matrix server save");
+            return;
+        }
+
         // Attempt to get the current SessionID from NWCACart
         let currentSessionId = null;
         if (window.NWCACart && typeof window.NWCACart.getCartState === 'function') {

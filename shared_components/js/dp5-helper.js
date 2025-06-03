@@ -365,6 +365,18 @@
     }
     
     function updateAddToCartSection(sizes) {
+        // Check if we're in quote-only mode
+        if (window.NWCA && NWCA.config && NWCA.config.features && !NWCA.config.features.cartEnabled) {
+            console.log("[DP5-HELPER] Quote mode active, skipping add-to-cart UI update");
+            return;
+        }
+        
+        // Also check app config for quote mode
+        if (window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.FEATURES && NWCA_APP_CONFIG.FEATURES.QUOTE_MODE) {
+            console.log("[DP5-HELPER] Quote-only workflow detected, skipping cart container creation");
+            return;
+        }
+        
         // Only skip if the add to cart UI itself has ALREADY been initialized by this function or add-to-cart.js
         // The directFixApplied flag is more about whether the pricing grid was from direct scrape vs. event.
         if (window.addToCartInitialized) {
