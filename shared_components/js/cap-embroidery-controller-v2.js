@@ -72,9 +72,34 @@
             /**
              * Updates the custom pricing grid display based on selected stitch count
              */
-            updateCapPricingDisplay() {
+            async updateCapPricingDisplay() {
                 logger.log('CAP-CONTROLLER', 'updateCapPricingDisplay called');
                 
+                // Use error boundary if available
+                if (NWCA.ui && NWCA.ui.errorBoundary) {
+                    const pricingGrid = document.getElementById(NWCA.CONSTANTS?.ELEMENTS?.PRICING_GRID || 'custom-pricing-grid');
+                    const gridContainer = pricingGrid ? (pricingGrid.closest('.pricing-table-container') || pricingGrid.parentElement) : null;
+                    
+                    await NWCA.ui.errorBoundary(
+                        () => this._updateCapPricingDisplayCore(),
+                        {
+                            loadingContainer: gridContainer,
+                            loadingMessage: NWCA.CONSTANTS?.MESSAGES?.LOADING_PRICING || 'Updating pricing...',
+                            errorContainer: gridContainer,
+                            errorMessage: 'Unable to update pricing. Please try again.',
+                            showLoading: true
+                        }
+                    );
+                } else {
+                    // Fallback to original method
+                    this._updateCapPricingDisplayCore();
+                }
+            },
+
+            /**
+             * Core pricing update logic
+             */
+            _updateCapPricingDisplayCore() {
                 // Show loading indicator
                 NWCA.controllers.capEmbroidery.UIManager.showLoadingIndicator();
                 
@@ -360,53 +385,70 @@
              * Show loading indicator for pricing updates
              */
             showLoadingIndicator() {
-                const pricingGrid = document.getElementById('custom-pricing-grid');
+                const pricingGrid = document.getElementById(NWCA.CONSTANTS?.ELEMENTS?.PRICING_GRID || 'custom-pricing-grid');
                 if (!pricingGrid) return;
                 
-                let loadingOverlay = document.getElementById('pricing-loading-overlay');
-                if (!loadingOverlay) {
-                    loadingOverlay = document.createElement('div');
-                    loadingOverlay.id = 'pricing-loading-overlay';
-                    loadingOverlay.style.cssText = `
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background: rgba(255, 255, 255, 0.9);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        z-index: 1000;
-                        border-radius: var(--radius-sm);
-                        font-weight: bold;
-                        color: var(--primary-color);
-                        font-size: 1.1em;
-                        backdrop-filter: blur(2px);
-                    `;
-                    loadingOverlay.innerHTML = `
-                        <div style="text-align: center;">
-                            <div style="margin-bottom: 8px;">🔄</div>
-                            <div>Updating pricing...</div>
-                        </div>
-                    `;
-                    
-                    const gridContainer = pricingGrid.closest('.pricing-grid-container') || pricingGrid.parentElement;
-                    if (gridContainer) {
-                        gridContainer.style.position = 'relative';
-                        gridContainer.appendChild(loadingOverlay);
+                // Use new UI component if available
+                if (NWCA.ui && NWCA.ui.LoadingOverlay) {
+                    const gridContainer = pricingGrid.closest('.pricing-table-container') || pricingGrid.parentElement;
+                    NWCA.ui.LoadingOverlay.show(gridContainer, NWCA.CONSTANTS?.MESSAGES?.LOADING_PRICING || 'Updating pricing...', { blur: true });
+                } else {
+                    // Fallback to old method
+                    let loadingOverlay = document.getElementById('pricing-loading-overlay');
+                    if (!loadingOverlay) {
+                        loadingOverlay = document.createElement('div');
+                        loadingOverlay.id = 'pricing-loading-overlay';
+                        loadingOverlay.style.cssText = `
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background: rgba(255, 255, 255, 0.9);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            z-index: 1000;
+                            border-radius: var(--radius-sm);
+                            font-weight: bold;
+                            color: var(--primary-color);
+                            font-size: 1.1em;
+                            backdrop-filter: blur(2px);
+                        `;
+                        loadingOverlay.innerHTML = `
+                            <div style="text-align: center;">
+                                <div style="margin-bottom: 8px;">🔄</div>
+                                <div>Updating pricing...</div>
+                            </div>
+                        `;
+                        
+                        const gridContainer = pricingGrid.closest('.pricing-table-container') || pricingGrid.parentElement;
+                        if (gridContainer) {
+                            gridContainer.style.position = 'relative';
+                            gridContainer.appendChild(loadingOverlay);
+                        }
                     }
+                    loadingOverlay.style.display = 'flex';
                 }
-                loadingOverlay.style.display = 'flex';
             },
 
             /**
              * Hide loading indicator
              */
             hideLoadingIndicator() {
-                const loadingOverlay = document.getElementById('pricing-loading-overlay');
-                if (loadingOverlay) {
-                    loadingOverlay.style.display = 'none';
+                // Use new UI component if available
+                if (NWCA.ui && NWCA.ui.LoadingOverlay) {
+                    const pricingGrid = document.getElementById(NWCA.CONSTANTS?.ELEMENTS?.PRICING_GRID || 'custom-pricing-grid');
+                    if (pricingGrid) {
+                        const gridContainer = pricingGrid.closest('.pricing-table-container') || pricingGrid.parentElement;
+                        NWCA.ui.LoadingOverlay.hide(gridContainer);
+                    }
+                } else {
+                    // Fallback to old method
+                    const loadingOverlay = document.getElementById('pricing-loading-overlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = 'none';
+                    }
                 }
             },
 

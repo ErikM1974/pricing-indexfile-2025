@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Components Test</title>
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/ui-components.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .test-container {
+            position: relative;
+            min-height: 200px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>NWCA UI Components Test</h1>
+    
+    <div class="test-section">
+        <h2>Loading Overlay Tests</h2>
+        <div class="test-container" id="loading-test-container">
+            <p>This container will show loading overlays</p>
+            <p>Click the buttons below to test different loading states</p>
+        </div>
+        <div class="button-group">
+            <button onclick="testLoading('default')">Default Loading</button>
+            <button onclick="testLoading('custom')">Custom Message</button>
+            <button onclick="testLoading('blur')">With Blur</button>
+            <button onclick="testLoading('timeout')">Auto-hide (3s)</button>
+            <button onclick="hideLoading()">Hide Loading</button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Error Display Tests</h2>
+        <div class="test-container" id="error-test-container">
+            <p>Error messages will appear here</p>
+        </div>
+        <div class="button-group">
+            <button onclick="testError('inline')">Inline Error</button>
+            <button onclick="testError('floating')">Floating Error</button>
+            <button onclick="testError('permanent')">Non-dismissible Error</button>
+            <button onclick="clearErrors()">Clear Errors</button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Success Message Tests</h2>
+        <div class="test-container" id="success-test-container">
+            <p>Success messages will appear here</p>
+        </div>
+        <div class="button-group">
+            <button onclick="testSuccess('default')">Default Success</button>
+            <button onclick="testSuccess('top')">Top Banner Success</button>
+            <button onclick="testSuccess('custom')">Custom Duration (5s)</button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Form Validation Tests</h2>
+        <form id="test-form" style="max-width: 400px;">
+            <div style="margin-bottom: 15px;">
+                <label for="test-email">Email Address:</label>
+                <input type="email" id="test-email" style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="test-quantity">Quantity:</label>
+                <input type="number" id="test-quantity" min="1" max="100" style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+            <div class="button-group">
+                <button type="button" onclick="validateForm()">Validate Form</button>
+                <button type="button" onclick="clearFormValidation()">Clear Validation</button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="test-section">
+        <h2>Error Boundary Test</h2>
+        <div class="test-container" id="boundary-test-container">
+            <p>This will test the error boundary utility</p>
+        </div>
+        <div class="button-group">
+            <button onclick="testErrorBoundary('success')">Successful Operation</button>
+            <button onclick="testErrorBoundary('error')">Failed Operation</button>
+        </div>
+    </div>
+    
+    <script src="/shared_components/js/nwca-namespace.js"></script>
+    <script src="/shared_components/js/constants.js"></script>
+    <script src="/shared_components/js/ui-components.js"></script>
+    
+    <script>
+        // Loading overlay tests
+        function testLoading(type) {
+            const container = document.getElementById('loading-test-container');
+            
+            switch(type) {
+                case 'default':
+                    NWCA.ui.LoadingOverlay.show(container);
+                    break;
+                case 'custom':
+                    NWCA.ui.LoadingOverlay.show(container, 'Processing your request...');
+                    break;
+                case 'blur':
+                    NWCA.ui.LoadingOverlay.show(container, 'Loading with blur effect', { blur: true });
+                    break;
+                case 'timeout':
+                    NWCA.ui.LoadingOverlay.show(container, 'Auto-hiding in 3 seconds', { timeout: 3000 });
+                    break;
+            }
+        }
+        
+        function hideLoading() {
+            NWCA.ui.LoadingOverlay.hide('loading-test-container');
+        }
+        
+        // Error display tests
+        function testError(type) {
+            switch(type) {
+                case 'inline':
+                    NWCA.ui.ErrorDisplay.show('This is an inline error message', {
+                        container: '#error-test-container'
+                    });
+                    break;
+                case 'floating':
+                    NWCA.ui.ErrorDisplay.show('This is a floating error message that appears in the corner');
+                    break;
+                case 'permanent':
+                    NWCA.ui.ErrorDisplay.show('This error cannot be dismissed', {
+                        container: '#error-test-container',
+                        dismissible: false,
+                        duration: 0
+                    });
+                    break;
+            }
+        }
+        
+        function clearErrors() {
+            NWCA.ui.ErrorDisplay.clearContainer('#error-test-container');
+            document.querySelectorAll('.nwca-error-floating').forEach(el => el.remove());
+        }
+        
+        // Success message tests
+        function testSuccess(type) {
+            switch(type) {
+                case 'default':
+                    NWCA.ui.SuccessMessage.show('Operation completed successfully!', {
+                        container: '#success-test-container'
+                    });
+                    break;
+                case 'top':
+                    NWCA.ui.SuccessMessage.show('Success! Your changes have been saved.', {
+                        position: 'top'
+                    });
+                    break;
+                case 'custom':
+                    NWCA.ui.SuccessMessage.show('This message will stay for 5 seconds', {
+                        duration: 5000
+                    });
+                    break;
+            }
+        }
+        
+        // Form validation tests
+        function validateForm() {
+            const email = document.getElementById('test-email');
+            const quantity = document.getElementById('test-quantity');
+            
+            // Clear previous errors
+            NWCA.ui.ValidationFeedback.clearFormErrors('#test-form');
+            
+            // Validate email
+            if (!email.value || !email.value.includes('@')) {
+                NWCA.ui.ValidationFeedback.showFieldError(email, 'Please enter a valid email address');
+            }
+            
+            // Validate quantity
+            const qty = parseInt(quantity.value);
+            if (!qty || qty < 1 || qty > 100) {
+                NWCA.ui.ValidationFeedback.showFieldError(quantity, 'Quantity must be between 1 and 100');
+            }
+        }
+        
+        function clearFormValidation() {
+            NWCA.ui.ValidationFeedback.clearFormErrors('#test-form');
+        }
+        
+        // Error boundary tests
+        async function testErrorBoundary(type) {
+            const container = document.getElementById('boundary-test-container');
+            
+            if (type === 'success') {
+                await NWCA.ui.errorBoundary(
+                    async () => {
+                        // Simulate async operation
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        NWCA.ui.SuccessMessage.show('Operation completed!', { container });
+                        return 'Success!';
+                    },
+                    {
+                        loadingContainer: container,
+                        loadingMessage: 'Performing operation...',
+                        errorContainer: container
+                    }
+                );
+            } else {
+                try {
+                    await NWCA.ui.errorBoundary(
+                        async () => {
+                            // Simulate async operation that fails
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            throw new Error('Simulated error for testing');
+                        },
+                        {
+                            loadingContainer: container,
+                            loadingMessage: 'Trying operation...',
+                            errorContainer: container,
+                            errorMessage: 'Operation failed! This is a custom error message.',
+                            onError: (error) => {
+                                console.error('Custom error handler:', error);
+                            }
+                        }
+                    );
+                } catch (error) {
+                    // Error is re-thrown by errorBoundary
+                    console.log('Caught error:', error.message);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/shared_components/css/universal-quantity-ui.css">
     <link rel="stylesheet" href="/shared_components/css/cap-embroidery-specific.css">
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/ui-components.css">
     
 <!-- jsPDF Libraries for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -125,13 +126,19 @@
             </div>
             
             <div class="quick-quote-controls">
-                <button id="hero-quantity-decrease" type="button" class="hero-quantity-btn">−</button>
+                <button id="hero-quantity-decrease" type="button" class="hero-quantity-btn" aria-label="Decrease quantity" aria-controls="hero-quantity-input">−</button>
                 
-                <input id="hero-quantity-input" type="number" min="1" max="10000" value="24" class="hero-quantity-input">
+                <input id="hero-quantity-input" type="number" min="1" max="10000" value="24" class="hero-quantity-input" 
+                       aria-label="Quantity of caps" 
+                       aria-describedby="hero-total-price hero-ltm-warning"
+                       role="spinbutton"
+                       aria-valuemin="1"
+                       aria-valuemax="10000"
+                       aria-valuenow="24">
                 
-                <button id="hero-quantity-increase" type="button" class="hero-quantity-btn">+</button>
+                <button id="hero-quantity-increase" type="button" class="hero-quantity-btn" aria-label="Increase quantity" aria-controls="hero-quantity-input">+</button>
                 
-                <span class="quantity-label">caps</span>
+                <span class="quantity-label" id="quantity-label-text">caps</span>
             </div>
             
             <div class="quick-quote-pricing">
@@ -228,12 +235,14 @@
                     <div class="form-section">
                         <h3>Front Logo Stitch Count</h3>
                         <div style="margin-bottom: 15px;">
-                            <select id="client-stitch-count-select" name="client-stitch-count-select" class="stitch-count-select">
+                            <select id="client-stitch-count-select" name="client-stitch-count-select" class="stitch-count-select"
+                                    aria-label="Front logo stitch count"
+                                    aria-describedby="stitch-count-note">
                                 <option value="5000">5,000 stitches</option>
                                 <option value="8000" selected>8,000 stitches (Standard)</option>
                                 <option value="10000">10,000 stitches</option>
                             </select>
-                            <span id="stitch-count-indicator" class="form-feedback">✓ Quick quote updated!</span>
+                            <span id="stitch-count-indicator" class="form-feedback" role="status" aria-live="polite">✓ Quick quote updated!</span>
                         </div>
                         <div class="form-note">
                             Higher stitch counts allow for more detailed designs but may increase cost.
@@ -244,8 +253,10 @@
                     <div class="form-section">
                         <h3>Back Logo Embroidery</h3>
                         <div style="margin-bottom: 15px;">
-                            <label class="back-logo-checkbox-container">
-                                <input type="checkbox" id="back-logo-checkbox" class="back-logo-checkbox">
+                            <label class="back-logo-checkbox-container" for="back-logo-checkbox">
+                                <input type="checkbox" id="back-logo-checkbox" class="back-logo-checkbox"
+                                       aria-describedby="back-logo-note"
+                                       aria-controls="back-logo-details">
                                 Add embroidered back logo (+$5.00 per cap)
                             </label>
                         </div>
@@ -253,14 +264,21 @@
                         <div id="back-logo-details" class="back-logo-details">
                             <div style="margin-bottom: 15px;">
                                 <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Stitch Count:</label>
-                                <div class="stitch-counter">
-                                    <button id="back-logo-decrement" type="button" class="stitch-counter-btn">−</button>
+                                <div class="stitch-counter" role="group" aria-label="Back logo stitch count">
+                                    <button id="back-logo-decrement" type="button" class="stitch-counter-btn" 
+                                            aria-label="Decrease back logo stitch count"
+                                            aria-controls="back-logo-stitch-display">−</button>
                                     
-                                    <span id="back-logo-stitch-display" class="stitch-counter-display">5,000</span>
+                                    <span id="back-logo-stitch-display" class="stitch-counter-display" 
+                                          role="status" 
+                                          aria-live="polite"
+                                          aria-label="Current back logo stitch count">5,000</span>
                                     
-                                    <button id="back-logo-increment" type="button" class="stitch-counter-btn">+</button>
+                                    <button id="back-logo-increment" type="button" class="stitch-counter-btn"
+                                            aria-label="Increase back logo stitch count"
+                                            aria-controls="back-logo-stitch-display">+</button>
                                     
-                                    <span class="stitch-counter-range">(5K-15K)</span>
+                                    <span class="stitch-counter-range" aria-label="Stitch count range">(5K-15K)</span>
                                 </div>
                             </div>
                             
@@ -383,6 +401,7 @@
     <!-- NWCA Global Namespace - MUST LOAD FIRST -->
     <script src="/shared_components/js/nwca-namespace.js"></script>
     <script src="/shared_components/js/constants.js"></script> <!-- Global constants -->
+    <script src="/shared_components/js/ui-components.js"></script> <!-- UI components for loading/error states -->
     <script src="/shared_components/js/pricing-pages.js"></script>
     <script src="/shared_components/js/utils.js"></script> <!-- Moved up and removed defer -->
     <script src="/shared_components/js/pricing-matrix-capture.js"></script>
