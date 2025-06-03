@@ -64,6 +64,16 @@
                 this.updateBackLogoState();
                 this.updateDisplay();
             });
+            
+            // Listen for quantity changes from other sources (Phase 2: Quantity Shortcuts)
+            if (window.NWCA && window.NWCA.events) {
+                window.NWCA.events.on('quantityChanged', (data) => {
+                    if (data.source !== 'hero-calculator') {
+                        console.log('[HERO-CALC] Quantity changed from external source:', data);
+                        this.setQuantity(data.quantity);
+                    }
+                });
+            }
         },
 
         /**
@@ -292,6 +302,14 @@
             window.dispatchEvent(new CustomEvent('heroQuantityChanged', {
                 detail: { quantity: quantity }
             }));
+            
+            // Also emit through NWCA events if available
+            if (window.NWCA && window.NWCA.events) {
+                window.NWCA.events.emit('quantityChanged', {
+                    quantity: quantity,
+                    source: 'hero-calculator'
+                });
+            }
         },
 
         /**
