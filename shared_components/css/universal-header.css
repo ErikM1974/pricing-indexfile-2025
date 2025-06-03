@@ -1,0 +1,360 @@
+/* Universal Header Styles */
+
+/* Base Universal Header Structure */
+.universal-header {
+    background: linear-gradient(135deg, #2e5827 0%, #3e6837 100%);
+    color: white;
+    padding: 0;
+    box-shadow: 0 4px 12px rgba(46,88,39,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Header Top Bar */
+.header-top-bar {
+    background: rgba(0,0,0,0.1);
+    padding: 8px 0;
+    font-size: 0.85em;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.header-top-bar-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contact-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.header-action-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.header-action-btn:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* Header Main Section */
+.header-main {
+    padding: 15px 0;
+}
+
+.header-main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 30px;
+    align-items: center;
+}
+
+/* Header Brand/Logo */
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-logo-box {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #2e5827;
+    font-size: 1.2em;
+}
+
+.header-brand-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.header-brand-tagline {
+    font-size: 0.8em;
+    opacity: 0.9;
+    line-height: 1;
+}
+
+/* Header Navigation Hub */
+.header-nav-hub {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Back to Product Button */
+.back-to-product {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.back-to-product:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+.back-icon {
+    font-size: 1.1em;
+}
+
+/* Style Search Container */
+.style-search-container {
+    position: relative;
+}
+
+.style-search-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.15);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.style-search-icon {
+    font-size: 1.1em;
+}
+
+.style-search-input {
+    background: none;
+    border: none;
+    color: white;
+    outline: none;
+    font-size: 0.95em;
+    width: 180px;
+}
+
+.style-search-input::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+.style-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+/* Page Context Indicator */
+.page-context {
+    background: rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    border-left: 3px solid white;
+}
+
+.page-context-title {
+    font-weight: bold;
+}
+
+.page-context-subtitle {
+    opacity: 0.8;
+    font-size: 0.85em;
+}
+
+/* Header Quick Actions */
+.header-quick-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.quick-action-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.quick-action-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.primary-action-btn {
+    background: white;
+    color: #2e5827;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.95em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+.primary-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Header Breadcrumb */
+.header-breadcrumb {
+    background: rgba(0,0,0,0.1);
+    padding: 8px 0;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.85em;
+}
+
+.header-breadcrumb-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.header-breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.breadcrumb-link {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    transition: color 0.2s;
+    cursor: pointer;
+}
+
+.breadcrumb-link:hover {
+    color: white;
+}
+
+.breadcrumb-separator {
+    color: rgba(255,255,255,0.6);
+}
+
+.breadcrumb-current {
+    color: white;
+    font-weight: 600;
+}
+
+/* Mobile responsiveness for universal header */
+@media (max-width: 768px) {
+    .universal-header .header-main > div {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+        text-align: center;
+    }
+    
+    .header-nav-hub {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    .header-quick-actions {
+        justify-content: center !important;
+        flex-wrap: wrap;
+    }
+    
+    .style-search-container input {
+        width: 200px !important;
+    }
+    
+    .contact-info {
+        flex-direction: column !important;
+        gap: 8px !important;
+        text-align: center;
+    }
+    
+    .header-actions {
+        flex-wrap: wrap;
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-top-bar {
+        display: none; /* Hide top bar on very small screens */
+    }
+    
+    .header-brand div:first-child {
+        font-size: 1em !important;
+    }
+    
+    .header-brand div:last-child {
+        font-size: 0.7em !important;
+    }
+    
+    .back-to-product span:last-child {
+        display: none; /* Hide text, keep only arrow */
+    }
+    
+    .page-context {
+        display: none; /* Hide on very small screens */
+    }
+}
+
+/* Improved search results positioning */
+#style-search-results {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Smooth transitions for interactive elements */
+.universal-header button, .universal-header a {
+    transition: all 0.2s ease;
+}
+
+/* Print styles */
+@media print {
+    .universal-header {
+        position: static !important;
+        box-shadow: none !important;
+        background: white !important;
+        color: black !important;
+        border-bottom: 2px solid #2e5827;
+    }
+    
+    .header-top-bar, .header-quick-actions {
+        display: none !important;
+    }
+}
