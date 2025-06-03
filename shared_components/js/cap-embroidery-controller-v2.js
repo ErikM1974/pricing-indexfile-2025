@@ -1089,8 +1089,18 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
             console.log('[CAP-CONTROLLER-V2] Direct console log: Starting initialization');
 
             // Only initialize on cap embroidery pages
-            const isCapEmbroidery = window.location.href.toLowerCase().includes('cap-embroidery') || 
-                                   document.title.toLowerCase().includes('cap embroidery');
+            const currentUrl = window.location.href.toLowerCase();
+            const currentTitle = document.title.toLowerCase();
+            const isCapEmbroidery = currentUrl.includes('cap-embroidery') || 
+                                   currentUrl.includes('cap_embroidery') ||
+                                   currentUrl.includes('capembroidery') ||
+                                   currentTitle.includes('cap embroidery');
+            
+            console.log('[CAP-CONTROLLER-V2] Page check:', {
+                url: currentUrl,
+                title: currentTitle,
+                isCapEmbroidery: isCapEmbroidery
+            });
             
             if (!isCapEmbroidery) {
                 logger.log('CAP-CONTROLLER', 'Not a cap embroidery page, skipping initialization');
