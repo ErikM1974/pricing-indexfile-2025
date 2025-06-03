@@ -162,24 +162,45 @@
                 }
             });
 
-            // Handle Enter key - matches product page behavior
+            // Handle keyboard navigation
+            let selectedIndex = -1;
             searchInput.addEventListener('keydown', (e) => {
                 console.log('[UNIVERSAL-HEADER] Keydown event detected, key:', e.key);
                 
-                if (e.key === 'Enter') {
+                const results = searchResults.querySelectorAll('.search-result-item');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, results.length - 1);
+                    this.highlightSearchResult(results, selectedIndex);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, -1);
+                    this.highlightSearchResult(results, selectedIndex);
+                } else if (e.key === 'Enter') {
                     console.log('[UNIVERSAL-HEADER] Enter key detected');
                     e.preventDefault();
                     
-                    const styleNumber = searchInput.value.trim();
-                    console.log('[UNIVERSAL-HEADER] Style number from input:', styleNumber);
-                    
-                    if (styleNumber) {
-                        console.log('[UNIVERSAL-HEADER] Enter key pressed with valid value:', styleNumber);
-                        this.hideSearchResults();
-                        this.navigateToProduct(styleNumber);
+                    if (selectedIndex >= 0 && results[selectedIndex]) {
+                        // Select highlighted result
+                        const selectedStyle = results[selectedIndex].dataset.style;
+                        this.handleSearchSelection(selectedStyle, results[selectedIndex].textContent);
                     } else {
-                        console.warn('[UNIVERSAL-HEADER] Empty style number, not processing');
+                        // Use input value directly
+                        const styleNumber = searchInput.value.trim();
+                        console.log('[UNIVERSAL-HEADER] Style number from input:', styleNumber);
+                        
+                        if (styleNumber) {
+                            console.log('[UNIVERSAL-HEADER] Enter key pressed with valid value:', styleNumber);
+                            this.hideSearchResults();
+                            this.navigateToProduct(styleNumber);
+                        } else {
+                            console.warn('[UNIVERSAL-HEADER] Empty style number, not processing');
+                        }
                     }
+                } else if (e.key === 'Escape') {
+                    this.hideSearchResults();
+                    selectedIndex = -1;
                 }
             });
             
@@ -255,10 +276,7 @@
                 `;
             } else {
                 searchResults.innerHTML = results.map(suggestion => `
-                    <div class="search-result-item" data-style="${suggestion.value}" style="
-                        padding: 12px; border-bottom: 1px solid #eee; cursor: pointer;
-                        transition: background-color 0.2s ease;
-                    " onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='white'">
+                    <div class="search-result-item" data-style="${suggestion.value}">
                         <div style="font-weight: bold; color: #2e5827; font-size: 0.95em;">${suggestion.label}</div>
                     </div>
                 `).join('');
@@ -666,63 +684,58 @@
             
             // Share quote functionality
             window.shareQuote = () => {
-                console.log('[UNIVERSAL-HEADER] Share quote requested - Coming Soon');
-                this.showNotification('Share feature coming soon!', 'info');
-                // Original functionality:
-                // if (navigator.share) {
-                //     navigator.share({
-                //         title: 'Custom Apparel Quote - NW Custom Apparel',
-                //         text: 'Check out this custom apparel quote',
-                //         url: window.location.href
-                //     }).catch(err => console.log('Error sharing:', err));
-                // } else {
-                //     // Fallback: copy URL to clipboard
-                //     navigator.clipboard.writeText(window.location.href).then(() => {
-                //         this.showNotification('Quote URL copied to clipboard!', 'success');
-                //     }).catch(err => {
-                //         console.error('[UNIVERSAL-HEADER] Could not copy URL:', err);
-                //         this.showNotification('Could not copy URL', 'error');
-                //     });
-                // }
+                console.log('[UNIVERSAL-HEADER] Share quote requested');
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Custom Apparel Quote - NW Custom Apparel',
+                        text: 'Check out this custom apparel quote',
+                        url: window.location.href
+                    }).catch(err => console.log('Error sharing:', err));
+                } else {
+                    // Fallback: copy URL to clipboard
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                        this.showNotification('Quote URL copied to clipboard!', 'success');
+                    }).catch(err => {
+                        console.error('[UNIVERSAL-HEADER] Could not copy URL:', err);
+                        this.showNotification('Could not copy URL', 'error');
+                    });
+                }
             };
             
             // Toggle help functionality
             window.toggleHelp = () => {
-                console.log('[UNIVERSAL-HEADER] Help toggle requested - Coming Soon');
-                this.showNotification('Help feature coming soon!', 'info');
-                // Original functionality:
-                // this.showHelpModal();
+                console.log('[UNIVERSAL-HEADER] Help toggle requested');
+                this.showHelpModal();
             };
             
             // Toggle quick quote
             window.toggleQuickQuote = () => {
-                console.log('[UNIVERSAL-HEADER] Quick quote toggle requested - Coming Soon');
-                this.showNotification('Quick Quote feature coming soon!', 'info');
-                // Original functionality:
-                // const quickQuote = document.querySelector('.quick-quote-banner');
-                // if (quickQuote) {
-                //     headerState.quickQuoteVisible = !headerState.quickQuoteVisible;
-                //     quickQuote.style.display = headerState.quickQuoteVisible ? 'flex' : 'none';
+                console.log('[UNIVERSAL-HEADER] Quick quote toggle requested');
+                const quickQuote = document.querySelector('.quick-quote-banner');
+                if (quickQuote) {
+                    headerState.quickQuoteVisible = !headerState.quickQuoteVisible;
+                    quickQuote.style.display = headerState.quickQuoteVisible ? 'flex' : 'none';
                     
-                //     const button = event.target; // Ensure event is passed or defined if used
-                //     button.textContent = headerState.quickQuoteVisible ? '📊 Quote' : '📊 Show Quote';
-                // }
+                    // Update button text if we can find it
+                    const button = document.querySelector('[onclick*="toggleQuickQuote"]');
+                    if (button) {
+                        button.textContent = headerState.quickQuoteVisible ? '📊 Quote' : '📊 Show Quote';
+                    }
+                } else {
+                    this.showNotification('Quick Quote calculator not available on this page', 'info');
+                }
             };
             
             // Request sample functionality
             window.requestSample = () => {
-                console.log('[UNIVERSAL-HEADER] Sample request initiated - Coming Soon');
-                this.showNotification('Sample Request feature coming soon!', 'info');
-                // Original functionality:
-                // this.showSampleRequestModal();
+                console.log('[UNIVERSAL-HEADER] Sample request initiated');
+                this.showSampleRequestModal();
             };
             
             // Contact for quote functionality
             window.contactForQuote = () => {
-                console.log('[UNIVERSAL-HEADER] Contact for quote requested - Coming Soon');
-                this.showNotification('Get Quote feature coming soon!', 'info');
-                // Original functionality:
-                // this.initiateQuoteContact();
+                console.log('[UNIVERSAL-HEADER] Contact for quote requested');
+                this.initiateQuoteContact();
             };
             
             // Home navigation functionality
@@ -735,6 +748,22 @@
                     `${currentOrigin}/index.html`;
                 window.location.href = homePath;
             };
+        },
+
+        /**
+         * Highlight search result for keyboard navigation
+         */
+        highlightSearchResult(results, index) {
+            results.forEach((result, i) => {
+                if (i === index) {
+                    result.style.backgroundColor = '#f8f9fa';
+                    result.style.outline = '2px solid #2e5827';
+                    result.style.outlineOffset = '-2px';
+                } else {
+                    result.style.backgroundColor = 'white';
+                    result.style.outline = 'none';
+                }
+            });
         },
 
         /**
@@ -880,7 +909,7 @@
                     
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Notes (optional):</label>
-                        <textarea placeholder="Special requests or notes..." style="
+                        <textarea id="sample-notes" placeholder="Special requests or notes..." style="
                             width: 100%; padding: 8px 12px; border: 2px solid #ddd;
                             border-radius: 6px; height: 60px; resize: vertical;
                         "></textarea>
@@ -891,7 +920,7 @@
                             background: #6c757d; color: white; border: none;
                             padding: 10px 20px; border-radius: 6px; cursor: pointer;
                         ">Cancel</button>
-                        <button onclick="alert('Sample request submitted! We\\'ll contact you soon.'); this.closest('div[style*=\"position: fixed\"]').remove();" style="
+                        <button onclick="window.UniversalHeader.submitSampleRequest()" style="
                             background: #2e5827; color: white; border: none;
                             padding: 10px 20px; border-radius: 6px; cursor: pointer;
                             font-weight: bold;
@@ -908,6 +937,33 @@
                     document.body.removeChild(modal);
                 }
             });
+        },
+
+        /**
+         * Submit sample request
+         */
+        submitSampleRequest() {
+            const emailInput = document.querySelector('input[type="email"]');
+            const notesInput = document.getElementById('sample-notes');
+            
+            if (emailInput && emailInput.value) {
+                const email = emailInput.value;
+                const notes = notesInput ? notesInput.value : '';
+                const product = headerState.currentProduct ?
+                    `${headerState.currentProduct.styleNumber} - ${headerState.currentProduct.colorCode}` :
+                    'No product selected';
+                
+                console.log('[UNIVERSAL-HEADER] Sample request submitted:', { email, product, notes });
+                
+                // In a real implementation, this would send to an API
+                this.showNotification('Sample request submitted! We\'ll contact you soon.', 'success');
+                
+                // Close modal
+                const modal = document.querySelector('div[style*="position: fixed"]');
+                if (modal) modal.remove();
+            } else {
+                this.showNotification('Please enter your email address', 'warning');
+            }
         },
 
         /**

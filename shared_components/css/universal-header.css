@@ -63,10 +63,10 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 30px;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    gap: 15px;
 }
 
 /* Header Brand/Logo */
@@ -74,25 +74,13 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    flex: 0 0 auto; /* Don't grow or shrink */
 }
 
-/* .header-logo-box {
-    width: 40px;
-    height: 40px;
-    background: white;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: #2e5827;
-    font-size: 1.2em;
-} */
-
 .header-logo-img {
-    height: 40px; /* Or your desired height */
-    width: auto;  /* To maintain aspect ratio */
-    vertical-align: middle; /* Or adjust as needed for alignment with text */
+    height: 40px;
+    width: auto;
+    vertical-align: middle;
 }
 
 .header-brand-name {
@@ -110,9 +98,10 @@
 /* Header Navigation Hub */
 .header-nav-hub {
     display: flex;
-    gap: 20px;
+    gap: 10px; /* Further reduced for tighter spacing */
     align-items: center;
     justify-content: center;
+    flex: 0 1 auto; /* Don't grow unnecessarily */
 }
 
 /* Back to Product Button */
@@ -132,6 +121,8 @@
 
 .back-to-product:hover {
     background: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .back-icon {
@@ -141,6 +132,7 @@
 /* Style Search Container */
 .style-search-container {
     position: relative;
+    flex: 0 1 auto; /* Can shrink if needed */
 }
 
 .style-search-input-wrapper {
@@ -163,7 +155,7 @@
     color: white;
     outline: none;
     font-size: 0.95em;
-    width: 180px;
+    width: 160px; /* Slightly reduced width */
 }
 
 .style-search-input::placeholder {
@@ -187,10 +179,14 @@
 /* Page Context Indicator */
 .page-context {
     background: rgba(255,255,255,0.1);
-    padding: 8px 12px;
+    padding: 6px 10px; /* Reduced padding */
     border-radius: 6px;
-    font-size: 0.9em;
+    font-size: 0.85em; /* Slightly smaller */
     border-left: 3px solid white;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 0 1 auto; /* Can shrink if needed */
 }
 
 .page-context-title {
@@ -205,24 +201,30 @@
 /* Header Quick Actions */
 .header-quick-actions {
     display: flex;
-    gap: 12px;
+    gap: 8px; /* Reduced gap */
     align-items: center;
+    flex: 0 0 auto; /* Don't grow or shrink */
 }
 
 .quick-action-btn {
     background: rgba(255,255,255,0.2);
     color: white;
     border: 1px solid rgba(255,255,255,0.3);
-    padding: 8px 12px;
+    padding: 10px 14px; /* Slightly increased for consistency */
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.9em;
     font-weight: 600;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .quick-action-btn:hover {
     background: rgba(255,255,255,0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .primary-action-btn {
@@ -285,20 +287,21 @@
 
 /* Mobile responsiveness for universal header */
 @media (max-width: 768px) {
-    .universal-header .header-main > div {
-        grid-template-columns: 1fr !important;
-        gap: 15px !important;
+    .header-main-content {
+        flex-direction: column !important;
+        gap: 12px !important;
         text-align: center;
     }
     
     .header-nav-hub {
         flex-direction: column !important;
-        gap: 10px !important;
+        gap: 8px !important; /* Reduced from 10px */
     }
     
     .header-quick-actions {
         justify-content: center !important;
         flex-wrap: wrap;
+        gap: 8px !important;
     }
     
     .style-search-container input {
@@ -307,13 +310,19 @@
     
     .contact-info {
         flex-direction: column !important;
-        gap: 8px !important;
+        gap: 5px !important; /* Reduced from 8px */
         text-align: center;
     }
     
     .header-actions {
         flex-wrap: wrap;
         justify-content: center !important;
+        gap: 8px !important;
+    }
+    
+    /* Hide page context on mobile to save space */
+    .page-context {
+        display: none !important;
     }
 }
 
@@ -343,11 +352,36 @@
 #style-search-results {
     box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
     border: 1px solid rgba(0,0,0,0.1);
+    margin-top: 4px;
+}
+
+/* Search result hover effects */
+.search-result-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fa;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
 }
 
 /* Smooth transitions for interactive elements */
-.universal-header button, .universal-header a {
+.universal-header button,
+.universal-header a {
     transition: all 0.2s ease;
+}
+
+/* Ensure consistent icon sizing */
+.universal-header button i,
+.universal-header a i {
+    font-size: 1em;
+    line-height: 1;
 }
 
 /* Print styles */

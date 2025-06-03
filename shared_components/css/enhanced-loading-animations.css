@@ -230,13 +230,14 @@
     position: relative;
 }
 
+/* Removed dollar sign prefix - prices already include $ 
 .price-cell::before {
     content: '$';
     font-size: 14px;
     opacity: 0.7;
     position: relative;
     top: -2px;
-}
+}*/
 
 /* Tier badges */
 .tier-badge {

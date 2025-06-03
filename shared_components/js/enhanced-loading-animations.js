@@ -292,10 +292,10 @@
             const priceCells = table.querySelectorAll('td:not(:first-child)');
             priceCells.forEach(cell => {
                 const text = cell.textContent.trim();
-                if (text.match(/^\$?\d+(\.\d+)?$/)) {
+                if (text.match(/^\$?\d+(\\.?\d+)?$/)) {
                     cell.classList.add('price-cell');
-                    // Remove $ if present and let CSS add it
-                    cell.textContent = text.replace('$', '');
+                    // Keep the dollar sign as is (CSS no longer adds one)
+                    // cell.textContent = text.replace('$', '');
                 }
             });
 
