@@ -645,53 +645,63 @@
             
             // Share quote functionality
             window.shareQuote = () => {
-                console.log('[UNIVERSAL-HEADER] Share quote requested');
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Custom Apparel Quote - NW Custom Apparel',
-                        text: 'Check out this custom apparel quote',
-                        url: window.location.href
-                    }).catch(err => console.log('Error sharing:', err));
-                } else {
-                    // Fallback: copy URL to clipboard
-                    navigator.clipboard.writeText(window.location.href).then(() => {
-                        this.showNotification('Quote URL copied to clipboard!', 'success');
-                    }).catch(err => {
-                        console.error('[UNIVERSAL-HEADER] Could not copy URL:', err);
-                        this.showNotification('Could not copy URL', 'error');
-                    });
-                }
+                console.log('[UNIVERSAL-HEADER] Share quote requested - Coming Soon');
+                this.showNotification('Share feature coming soon!', 'info');
+                // Original functionality:
+                // if (navigator.share) {
+                //     navigator.share({
+                //         title: 'Custom Apparel Quote - NW Custom Apparel',
+                //         text: 'Check out this custom apparel quote',
+                //         url: window.location.href
+                //     }).catch(err => console.log('Error sharing:', err));
+                // } else {
+                //     // Fallback: copy URL to clipboard
+                //     navigator.clipboard.writeText(window.location.href).then(() => {
+                //         this.showNotification('Quote URL copied to clipboard!', 'success');
+                //     }).catch(err => {
+                //         console.error('[UNIVERSAL-HEADER] Could not copy URL:', err);
+                //         this.showNotification('Could not copy URL', 'error');
+                //     });
+                // }
             };
             
             // Toggle help functionality
             window.toggleHelp = () => {
-                console.log('[UNIVERSAL-HEADER] Help toggle requested');
-                this.showHelpModal();
+                console.log('[UNIVERSAL-HEADER] Help toggle requested - Coming Soon');
+                this.showNotification('Help feature coming soon!', 'info');
+                // Original functionality:
+                // this.showHelpModal();
             };
             
             // Toggle quick quote
             window.toggleQuickQuote = () => {
-                console.log('[UNIVERSAL-HEADER] Quick quote toggle requested');
-                const quickQuote = document.querySelector('.quick-quote-banner');
-                if (quickQuote) {
-                    headerState.quickQuoteVisible = !headerState.quickQuoteVisible;
-                    quickQuote.style.display = headerState.quickQuoteVisible ? 'flex' : 'none';
+                console.log('[UNIVERSAL-HEADER] Quick quote toggle requested - Coming Soon');
+                this.showNotification('Quick Quote feature coming soon!', 'info');
+                // Original functionality:
+                // const quickQuote = document.querySelector('.quick-quote-banner');
+                // if (quickQuote) {
+                //     headerState.quickQuoteVisible = !headerState.quickQuoteVisible;
+                //     quickQuote.style.display = headerState.quickQuoteVisible ? 'flex' : 'none';
                     
-                    const button = event.target;
-                    button.textContent = headerState.quickQuoteVisible ? '📊 Quote' : '📊 Show Quote';
-                }
+                //     const button = event.target; // Ensure event is passed or defined if used
+                //     button.textContent = headerState.quickQuoteVisible ? '📊 Quote' : '📊 Show Quote';
+                // }
             };
             
             // Request sample functionality
             window.requestSample = () => {
-                console.log('[UNIVERSAL-HEADER] Sample request initiated');
-                this.showSampleRequestModal();
+                console.log('[UNIVERSAL-HEADER] Sample request initiated - Coming Soon');
+                this.showNotification('Sample Request feature coming soon!', 'info');
+                // Original functionality:
+                // this.showSampleRequestModal();
             };
             
             // Contact for quote functionality
             window.contactForQuote = () => {
-                console.log('[UNIVERSAL-HEADER] Contact for quote requested');
-                this.initiateQuoteContact();
+                console.log('[UNIVERSAL-HEADER] Contact for quote requested - Coming Soon');
+                this.showNotification('Get Quote feature coming soon!', 'info');
+                // Original functionality:
+                // this.initiateQuoteContact();
             };
             
             // Home navigation functionality

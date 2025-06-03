@@ -2232,33 +2232,33 @@ async function handleAddToCart() {
       viewCartButton.style.marginLeft = '15px';
       
       // Create button instead of a simple link
-      const button = document.createElement('button');
-      button.className = 'view-cart-button';
-      button.style.backgroundColor = '#0056b3';
-      button.style.color = 'white';
-      button.style.border = 'none';
-      button.style.borderRadius = '4px';
-      button.style.padding = '6px 12px';
-      button.style.cursor = 'pointer';
-      button.style.fontWeight = 'bold';
-      button.style.fontSize = '0.9em';
-      button.style.display = 'flex';
-      button.style.alignItems = 'center';
+      // const button = document.createElement('button');
+      // button.className = 'view-cart-button';
+      // button.style.backgroundColor = '#0056b3';
+      // button.style.color = 'white';
+      // button.style.border = 'none';
+      // button.style.borderRadius = '4px';
+      // button.style.padding = '6px 12px';
+      // button.style.cursor = 'pointer';
+      // button.style.fontWeight = 'bold';
+      // button.style.fontSize = '0.9em';
+      // button.style.display = 'flex';
+      // button.style.alignItems = 'center';
       
       // Add shopping cart icon
-      const cartIcon = document.createElement('span');
-      cartIcon.innerHTML = '🛒'; // Simple cart emoji, could use SVG or icon font instead
-      cartIcon.style.marginRight = '5px';
+      // const cartIcon = document.createElement('span');
+      // cartIcon.innerHTML = '🛒'; // Simple cart emoji, could use SVG or icon font instead
+      // cartIcon.style.marginRight = '5px';
       
       // Add text label
-      const buttonText = document.createElement('span');
-      buttonText.textContent = 'View Cart';
-      buttonText.className = 'view-cart-text';
+      // const buttonText = document.createElement('span');
+      // buttonText.textContent = 'View Cart';
+      // buttonText.className = 'view-cart-text';
       
       // Assemble button
-      button.appendChild(cartIcon);
-      button.appendChild(buttonText);
-      viewCartButton.appendChild(button);
+      // button.appendChild(cartIcon);
+      // button.appendChild(buttonText);
+      // viewCartButton.appendChild(button);
   
       // Function to update cart count
       async function updateCartCount() {
@@ -2351,11 +2351,11 @@ async function handleAddToCart() {
       });
   
       // Add to page using our actual insertion point (either the original or our created one)
-      actualInsertionPoint.appendChild(viewCartButton);
-      debugCart("VIEW-CART", "View Cart button added successfully");
+      // actualInsertionPoint.appendChild(viewCartButton);
+      // debugCart("VIEW-CART", "View Cart button added successfully");
       
       // Also add a floating cart button for mobile/responsive views
-      addFloatingCartButton(navigateToCart);
+      // addFloatingCartButton(navigateToCart);
   }
   
   // Add a floating "View Cart" button that's always visible at the bottom of the screen
