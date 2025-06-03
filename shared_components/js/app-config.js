@@ -63,16 +63,17 @@ window.NWCA_APP_CONFIG = window.NWCA_APP_CONFIG || {};
         // Example: MODAL_DEFAULT_WIDTH: "500px"
     };
 
-    // Add more configuration categories as needed
-
-})(window.NWCA_APP_CONFIG);
-
-// Ensure this script is loaded before any scripts that depend on NWCA_APP_CONFIG
     // Cart functionality disabled - using quote-only workflow
     CONFIG.FEATURES = {
         CART_ENABLED: false,
         QUOTE_MODE: true
     };
+
+    // Add more configuration categories as needed
+
+})(window.NWCA_APP_CONFIG);
+
+// Ensure this script is loaded before any scripts that depend on NWCA_APP_CONFIG
 
     // Example usage in another file:
     // if (quantity < NWCA_APP_CONFIG.FEES.LTM_CAP_MINIMUM_QUANTITY) { ... }
