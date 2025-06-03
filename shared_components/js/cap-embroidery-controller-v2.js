@@ -1272,11 +1272,12 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
             logger.log('CAP-CONTROLLER', 'Initializing Phase 2 features');
 
             // Feature 1: Quick Quantity Shortcuts
-            if (NWCA.ui.QuantityShortcuts) {
+            if (NWCA.ui && NWCA.ui.QuantityShortcuts) {
+                // Wait a bit longer to ensure pricing data is loaded
                 setTimeout(() => {
                     const container = document.getElementById('quantity-shortcuts-container');
                     if (container) {
-                        NWCA.ui.QuantityShortcuts.initialize(container, {
+                        const initialized = NWCA.ui.QuantityShortcuts.initialize(container, {
                             presets: [
                                 { label: 'Dozen', value: 12, highlight: false },
                                 { label: '2 Dozen', value: 24, highlight: true, note: 'Most Popular' },
@@ -1286,11 +1287,23 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
                                 { label: 'Custom', value: 'custom', highlight: false }
                             ]
                         });
-                        logger.log('CAP-CONTROLLER', 'Quantity shortcuts initialized');
+                        
+                        if (initialized) {
+                            logger.log('CAP-CONTROLLER', 'Quantity shortcuts initialized successfully');
+                            
+                            // Set initial active state based on current quantity
+                            const currentQty = this.QuantityManager.getCurrentQuantity();
+                            if (currentQty) {
+                                NWCA.events.emit('quantityChanged', {
+                                    quantity: currentQty,
+                                    source: 'initial-load'
+                                });
+                            }
+                        }
                     } else {
                         logger.warn('CAP-CONTROLLER', 'Quantity shortcuts container not found');
                     }
-                }, 500); // Small delay to ensure DOM is ready
+                }, 1000); // Increased delay to ensure everything is ready
             } else {
                 logger.log('CAP-CONTROLLER', 'Quantity shortcuts module not loaded');
             }

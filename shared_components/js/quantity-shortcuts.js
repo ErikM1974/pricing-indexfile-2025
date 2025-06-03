@@ -213,8 +213,8 @@
             this.state.currentPreset = presetIndex;
             this.state.customMode = false;
 
-            // Update quantity through controller
-            if (NWCA.controllers.capEmbroidery && NWCA.controllers.capEmbroidery.QuantityManager) {
+            // Update quantity through controller if available
+            if (NWCA.controllers.capEmbroidery && NWCA.controllers.capEmbroidery.QuantityManager && NWCA.controllers.capEmbroidery.QuantityManager.updateQuantity) {
                 NWCA.controllers.capEmbroidery.QuantityManager.updateQuantity(quantity, 'quantity-shortcuts');
             } else {
                 // Fallback: update hero input directly
@@ -223,6 +223,12 @@
                     heroInput.value = quantity;
                     heroInput.dispatchEvent(new Event('change', { bubbles: true }));
                 }
+                
+                // Also emit the event manually for other components
+                NWCA.events.emit('quantityChanged', {
+                    quantity: quantity,
+                    source: 'quantity-shortcuts'
+                });
             }
 
             // Update UI
@@ -325,7 +331,19 @@
             const savingsIndicator = document.getElementById('quantity-shortcuts-savings');
             if (!savingsIndicator || this.state.customMode) return;
 
-            const currentQty = NWCA.controllers.capEmbroidery?.QuantityManager?.getCurrentQuantity() || 24;
+            // Get current quantity from various sources
+            let currentQty = 24; // default
+            
+            // Try to get from QuantityManager first
+            if (NWCA.controllers.capEmbroidery?.QuantityManager?.getCurrentQuantity) {
+                currentQty = NWCA.controllers.capEmbroidery.QuantityManager.getCurrentQuantity();
+            } else {
+                // Fallback to hero input
+                const heroInput = document.getElementById('hero-quantity-input');
+                if (heroInput && heroInput.value) {
+                    currentQty = parseInt(heroInput.value) || 24;
+                }
+            }
 
             // Find next tier break point
             const tierBreaks = [24, 48, 72, 144];
@@ -339,7 +357,7 @@
                     savingsIndicator.innerHTML = `
                         <span class="savings-message">
                             <span class="savings-icon">💰</span>
-                            Add ${nextTier - currentQty} more for ${formatters.percent(savings.percentSaved)} savings!
+                            Add ${nextTier - currentQty} more for ${formatters.percentage(savings.percentSaved)} savings!
                         </span>
                     `;
                     savingsIndicator.classList.add('has-savings');
