@@ -1321,6 +1321,8 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
             }
 
             // Feature 2: Mobile-Optimized Collapsible Menu
+            // TEMPORARILY DISABLED - Using ultimate fix instead
+            /*
             if (NWCA.ui && NWCA.ui.CollapsibleMenu) {
                 setTimeout(() => {
                     NWCA.ui.CollapsibleMenu.initialize({
@@ -1336,6 +1338,8 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
             } else {
                 logger.log('CAP-CONTROLLER', 'Mobile collapsible menu module not loaded');
             }
+            */
+            logger.log('CAP-CONTROLLER', 'Mobile collapsible menu temporarily disabled - using ultimate fix');
 
             // Feature 3-7: To be implemented in subsequent phases
             // - Enhanced Loading Animations
