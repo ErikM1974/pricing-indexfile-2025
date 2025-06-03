@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Quantity Shortcuts Integration</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug-output { 
+            background: #f0f0f0; 
+            padding: 15px; 
+            margin: 20px 0; 
+            border: 1px solid #ccc;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .test-btn {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .test-btn:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Quantity Shortcuts Debug Test</h1>
+    
+    <div>
+        <h2>Manual Test Input</h2>
+        <input type="number" id="hero-quantity-input" value="24" style="font-size: 20px; padding: 10px;">
+        <button class="test-btn" onclick="checkHeroCalculator()">Check HeroQuantityCalculator</button>
+        <button class="test-btn" onclick="testDirectSetQuantity()">Test Direct setQuantity</button>
+        <button class="test-btn" onclick="testInputEvents()">Test Input Events</button>
+    </div>
+
+    <div class="debug-output" id="debug-output"></div>
+
+    <script>
+        const output = document.getElementById('debug-output');
+        const log = (msg) => {
+            const time = new Date().toLocaleTimeString();
+            output.innerHTML += `[${time}] ${msg}\n`;
+            console.log(msg);
+        };
+
+        // Mock hero calculator for testing
+        window.HeroQuantityCalculator = {
+            setQuantity: function(qty) {
+                log(`HeroQuantityCalculator.setQuantity called with: ${qty}`);
+                document.getElementById('hero-quantity-input').value = qty;
+                return true;
+            },
+            initialize: function() {
+                log('HeroQuantityCalculator.initialize called');
+            }
+        };
+
+        // Check what's available
+        function checkHeroCalculator() {
+            log('\n=== Checking HeroQuantityCalculator ===');
+            log(`window.HeroQuantityCalculator exists: ${!!window.HeroQuantityCalculator}`);
+            
+            if (window.HeroQuantityCalculator) {
+                log(`Type: ${typeof window.HeroQuantityCalculator}`);
+                log(`Methods: ${Object.keys(window.HeroQuantityCalculator).join(', ')}`);
+                log(`setQuantity is function: ${typeof window.HeroQuantityCalculator.setQuantity === 'function'}`);
+            }
+        }
+
+        // Test direct setQuantity
+        function testDirectSetQuantity() {
+            log('\n=== Testing Direct setQuantity ===');
+            if (window.HeroQuantityCalculator && window.HeroQuantityCalculator.setQuantity) {
+                window.HeroQuantityCalculator.setQuantity(48);
+                log('Called HeroQuantityCalculator.setQuantity(48)');
+            } else {
+                log('HeroQuantityCalculator.setQuantity not available');
+            }
+        }
+
+        // Test input events
+        function testInputEvents() {
+            log('\n=== Testing Input Events ===');
+            const input = document.getElementById('hero-quantity-input');
+            
+            // Add event listeners to see what fires
+            const events = ['input', 'change', 'keyup', 'keydown', 'blur'];
+            events.forEach(eventType => {
+                input.addEventListener(eventType, (e) => {
+                    log(`Event fired: ${eventType}, value: ${e.target.value}`);
+                }, { once: true });
+            });
+
+            // Try different event types
+            log('Setting value to 72...');
+            input.value = 72;
+
+            // Method 1: Basic Event
+            log('Dispatching basic input event...');
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+
+            // Method 2: InputEvent
+            if (window.InputEvent) {
+                log('Dispatching InputEvent...');
+                const inputEvent = new InputEvent('input', {
+                    bubbles: true,
+                    cancelable: true,
+                    inputType: 'insertText',
+                    data: '72'
+                });
+                input.dispatchEvent(inputEvent);
+            }
+
+            // Method 3: Change event
+            log('Dispatching change event...');
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        // Listen to input changes
+        document.getElementById('hero-quantity-input').addEventListener('input', (e) => {
+            log(`Input event listener: value changed to ${e.target.value}`);
+        });
+
+        // Initial check
+        window.addEventListener('load', () => {
+            log('Page loaded, checking environment...');
+            checkHeroCalculator();
+        });
+    </script>
+</body>
+</html>
