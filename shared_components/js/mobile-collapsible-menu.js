@@ -88,6 +88,12 @@
          * Initialize collapsible sections
          */
         initializeSections() {
+            // Only wrap sections if on mobile
+            if (!this.state.isMobile) {
+                logger.log('COLLAPSIBLE-MENU', 'Desktop mode - skipping section wrapping');
+                return;
+            }
+
             this.config.sections.forEach(sectionConfig => {
                 const element = document.getElementById(sectionConfig.id);
                 if (!element) {
@@ -400,18 +406,44 @@
          * Update display based on screen size
          */
         updateDisplay() {
+            const wasMobile = document.body.classList.contains('collapsible-menu-active');
+            
             if (this.state.isMobile) {
                 document.body.classList.add('collapsible-menu-active');
+                
+                // If switching from desktop to mobile, reinitialize
+                if (!wasMobile && Object.keys(this.state.sections).length === 0) {
+                    this.initializeSections();
+                    this.bindEventListeners();
+                    this.applyInitialState();
+                }
             } else {
                 document.body.classList.remove('collapsible-menu-active');
-                // Open all sections on desktop
-                Object.keys(this.state.sections).forEach(sectionId => {
-                    const section = this.state.sections[sectionId];
-                    if (!section.isOpen) {
-                        this.toggleSection(sectionId);
-                    }
-                });
+                
+                // If switching from mobile to desktop, unwrap sections
+                if (wasMobile) {
+                    this.unwrapSections();
+                }
             }
+        },
+
+        /**
+         * Unwrap sections for desktop mode
+         */
+        unwrapSections() {
+            Object.values(this.state.sections).forEach(section => {
+                if (section.wrapper && section.element) {
+                    // Move element back to original position
+                    if (section.wrapper.parentNode) {
+                        section.wrapper.parentNode.insertBefore(section.element, section.wrapper);
+                        section.wrapper.remove();
+                    }
+                }
+            });
+            
+            // Clear state
+            this.state.sections = {};
+            logger.log('COLLAPSIBLE-MENU', 'Sections unwrapped for desktop mode');
         },
 
         /**

@@ -107,25 +107,34 @@
     transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Desktop Overrides */
+/* Desktop Overrides - Always show content on desktop */
 @media (min-width: 769px) {
-    body:not(.collapsible-menu-active) .collapsible-section {
-        border: none;
-        margin-bottom: 0;
-        background: transparent;
+    .collapsible-section {
+        border: none !important;
+        margin-bottom: 0 !important;
+        background: transparent !important;
+        overflow: visible !important;
     }
 
-    body:not(.collapsible-menu-active) .collapsible-header {
-        display: none;
+    .collapsible-header {
+        display: none !important;
     }
 
-    body:not(.collapsible-menu-active) .collapsible-content {
+    .collapsible-content {
         height: auto !important;
-        overflow: visible;
+        overflow: visible !important;
+        display: block !important;
+        opacity: 1 !important;
     }
 
-    body:not(.collapsible-menu-active) .collapsible-content > * {
-        padding: 0;
+    .collapsible-content > * {
+        padding: 0 !important;
+    }
+    
+    /* Ensure the content-card styles are preserved */
+    .content-card {
+        display: block !important;
+        visibility: visible !important;
     }
 }
 

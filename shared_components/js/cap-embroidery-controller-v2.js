@@ -1271,6 +1271,7 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
          */
         initializePhase2Features() {
             logger.log('CAP-CONTROLLER', 'Initializing Phase 2 features');
+            console.log('[CAP-CONTROLLER-V2] Direct log: Initializing Phase 2 features');
 
             // Feature 1: Quick Quantity Shortcuts
             if (NWCA.ui && NWCA.ui.QuantityShortcuts) {
