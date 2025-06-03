@@ -372,6 +372,8 @@
     </footer>
     
     <!-- JavaScript Files -->
+    <!-- NWCA Global Namespace - MUST LOAD FIRST -->
+    <script src="/shared_components/js/nwca-namespace.js"></script>
     <script src="/shared_components/js/pricing-pages.js"></script>
     <script src="/shared_components/js/utils.js"></script> <!-- Moved up and removed defer -->
     <script src="/shared_components/js/pricing-matrix-capture.js"></script>
@@ -385,11 +387,11 @@
     <!-- <script src="/shared_components/js/add-to-cart.js"></script> -->
     <script src="/shared_components/js/pricing-calculator.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/shared_components/js/cap-embroidery-controller.js"></script> <!-- Consolidated controller replacing 6 separate files -->
+    <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script> <!-- V2: Using NWCA namespace -->
     <script src="/shared_components/js/hero-quantity-calculator.js"></script> <!-- Quantity-first UX calculator -->
     <script src="/shared_components/js/product-pricing-ui.js"></script> <!-- Added new script, removed defer -->
     <script src="/shared_components/js/universal-header.js"></script> <!-- Universal header navigation and functionality -->
+    <script src="/shared_components/js/order-form-pdf.js"></script> <!-- PDF generation module -->
     
 </body>
-<script src="/shared_components/js/order-form-pdf.js"></script>
 </html>
