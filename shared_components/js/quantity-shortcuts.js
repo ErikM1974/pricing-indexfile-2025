@@ -221,6 +221,8 @@
                 const heroInput = document.getElementById('hero-quantity-input');
                 if (heroInput) {
                     heroInput.value = quantity;
+                    // Trigger both input and change events for compatibility
+                    heroInput.dispatchEvent(new Event('input', { bubbles: true }));
                     heroInput.dispatchEvent(new Event('change', { bubbles: true }));
                 }
                 

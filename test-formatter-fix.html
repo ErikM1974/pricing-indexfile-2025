@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Formatter Fix</title>
+</head>
+<body>
+    <h1>Formatter Test</h1>
+    <div id="output"></div>
+
+    <script src="/shared_components/js/nwca-namespace.js"></script>
+    <script>
+        // Test the formatters
+        const output = document.getElementById('output');
+        
+        // Test currency formatter
+        output.innerHTML += '<p>Currency test: ' + NWCA.utils.formatters.currency(12.50) + '</p>';
+        
+        // Test number formatter
+        output.innerHTML += '<p>Number test: ' + NWCA.utils.formatters.number(1234) + '</p>';
+        
+        // Test percentage formatter (not percent!)
+        output.innerHTML += '<p>Percentage test: ' + NWCA.utils.formatters.percentage(0.15) + '</p>';
+        output.innerHTML += '<p>Percentage with decimals: ' + NWCA.utils.formatters.percentage(0.1234, 2) + '</p>';
+        
+        // Show what's available
+        output.innerHTML += '<p>Available formatters: ' + Object.keys(NWCA.utils.formatters).join(', ') + '</p>';
+    </script>
+</body>
+</html>

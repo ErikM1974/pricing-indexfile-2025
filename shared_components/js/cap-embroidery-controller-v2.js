@@ -1086,6 +1086,7 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
             }
 
             logger.log('CAP-CONTROLLER', 'Starting initialization...');
+            console.log('[CAP-CONTROLLER-V2] Direct console log: Starting initialization');
 
             // Only initialize on cap embroidery pages
             const isCapEmbroidery = window.location.href.toLowerCase().includes('cap-embroidery') || 
