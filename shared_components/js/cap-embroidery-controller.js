@@ -511,37 +511,40 @@
             },
 
             /**
-             * Enhanced add to cart handler
+             * Enhanced quote request handler (adapted from cart-based workflow)
              */
             handleAddToCartEnhanced() {
-                console.log('[CAP-CONTROLLER] Enhanced add to cart called');
+                console.log('[CAP-CONTROLLER] Quote request initiated');
                 
                 // Validate product first
                 if (!CapEmbroideryController.ValidationManager.validateBeforeAddToCart()) {
                     return false;
                 }
                 
-                // Store back logo details for cart
+                // Prepare quote details with back logo support
+                const quoteDetails = {
+                    productTitle: document.querySelector('#product-title-context, #product-title, .product-title')?.textContent?.trim() || 'Cap Product',
+                    styleNumber: window.selectedStyleNumber || 'Unknown',
+                    colorName: window.selectedColorName || 'Unknown',
+                    stitchCount: CapEmbroideryController.state.currentStitchCount,
+                    backLogo: null
+                };
+                
+                // Include back logo details if enabled
                 if (CapEmbroideryController.state.backLogo.enabled) {
-                    window.capEmbroideryBackLogoDetails = {
+                    quoteDetails.backLogo = {
                         enabled: true,
                         stitchCount: CapEmbroideryController.state.backLogo.stitchCount,
                         pricePerItem: CapEmbroideryController.state.backLogo.pricePerItem
                     };
                 }
                 
-                // Call original add to cart
-                if (window.handleAddToCartWithValidation) {
-                    return window.handleAddToCartWithValidation.call(this);
-                } else if (window.handleAddToCart) {
-                    return window.handleAddToCart.call(this);
-                }
-                
-                return false;
+                // Trigger quote request instead of cart action
+                return CapEmbroideryController.QuoteManager.requestQuote(quoteDetails);
             },
 
             /**
-             * Override pricing calculator
+             * Override pricing calculator for quote workflow
              */
             overridePricingCalculator() {
                 if (window.NWCAPricingCalculator) {
@@ -550,10 +553,177 @@
                         window.NWCAPricingCalculator.originalCalculatePricing = window.NWCAPricingCalculator.calculatePricing;
                     }
                     
-                    // Override with our enhanced version
+                    // Override with our enhanced version that supports back logo for quote calculations
                     window.NWCAPricingCalculator.calculatePricing = CapEmbroideryController.CartManager.calculatePricingWithBackLogo;
-                    console.log('[CAP-CONTROLLER] Pricing calculator overridden with back logo support');
+                    console.log('[CAP-CONTROLLER] Pricing calculator overridden for quote workflow with back logo support');
                 }
+            }
+        },
+
+        // Quote Management Module (replaces cart functionality)
+        QuoteManager: {
+            /**
+             * Request quote with product and customization details
+             */
+            requestQuote(quoteDetails) {
+                console.log('[CAP-CONTROLLER] Processing quote request with details:', quoteDetails);
+                
+                try {
+                    // Build comprehensive quote information
+                    const quoteInfo = CapEmbroideryController.QuoteManager.buildQuoteInfo(quoteDetails);
+                    
+                    // Display quote request modal or redirect
+                    CapEmbroideryController.QuoteManager.showQuoteRequestModal(quoteInfo);
+                    
+                    return true;
+                } catch (error) {
+                    console.error('[CAP-CONTROLLER] Quote request failed:', error);
+                    alert('Unable to process quote request. Please contact us directly.');
+                    return false;
+                }
+            },
+
+            /**
+             * Build comprehensive quote information
+             */
+            buildQuoteInfo(quoteDetails) {
+                const quoteInfo = {
+                    timestamp: new Date().toISOString(),
+                    productInfo: {
+                        title: quoteDetails.productTitle,
+                        styleNumber: quoteDetails.styleNumber,
+                        colorName: quoteDetails.colorName
+                    },
+                    embroideryDetails: {
+                        frontStitchCount: quoteDetails.stitchCount,
+                        backLogo: quoteDetails.backLogo
+                    },
+                    pageUrl: window.location.href,
+                    contactInfo: {
+                        phone: '253-922-5793',
+                        email: 'sales@nwcustomapparel.com'
+                    }
+                };
+
+                console.log('[CAP-CONTROLLER] Built quote info:', quoteInfo);
+                return quoteInfo;
+            },
+
+            /**
+             * Show quote request modal with pre-filled information
+             */
+            showQuoteRequestModal(quoteInfo) {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(0,0,0,0.6); z-index: 10000;
+                    display: flex; align-items: center; justify-content: center;
+                    padding: 20px;
+                `;
+                
+                // Build embroidery details description
+                let embroideryDescription = `${quoteInfo.embroideryDetails.frontStitchCount.toLocaleString()} stitch front embroidery`;
+                if (quoteInfo.embroideryDetails.backLogo && quoteInfo.embroideryDetails.backLogo.enabled) {
+                    embroideryDescription += ` + ${quoteInfo.embroideryDetails.backLogo.stitchCount.toLocaleString()} stitch back logo`;
+                }
+
+                // Build email subject and body
+                const emailSubject = `Cap Embroidery Quote Request - ${quoteInfo.productInfo.styleNumber}`;
+                const emailBody = `Hi! I would like to request a quote for cap embroidery.
+
+Product Details:
+- Style: ${quoteInfo.productInfo.styleNumber}
+- Product: ${quoteInfo.productInfo.title}
+- Color: ${quoteInfo.productInfo.colorName}
+
+Embroidery Details:
+- ${embroideryDescription}
+
+Please provide pricing for:
+- Quantity: [Please specify quantity needed]
+- Timeline: [Please specify when needed]
+
+Additional notes:
+[Any special requirements or questions]
+
+Thank you!
+
+---
+Quote requested from: ${quoteInfo.pageUrl}
+Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
+
+                modal.innerHTML = `
+                    <div style="
+                        background: white; border-radius: 12px; padding: 30px;
+                        max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+                        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                    ">
+                        <h3 style="margin: 0 0 20px 0; color: #2e5827; font-size: 1.5em; text-align: center;">🧵 Request Cap Embroidery Quote</h3>
+                        
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2e5827;">
+                            <h4 style="margin: 0 0 10px 0; color: #2e5827;">Product Details:</h4>
+                            <p style="margin: 0 0 5px 0;"><strong>Style:</strong> ${quoteInfo.productInfo.styleNumber}</p>
+                            <p style="margin: 0 0 5px 0;"><strong>Product:</strong> ${quoteInfo.productInfo.title}</p>
+                            <p style="margin: 0 0 5px 0;"><strong>Color:</strong> ${quoteInfo.productInfo.colorName}</p>
+                            <p style="margin: 0;"><strong>Embroidery:</strong> ${embroideryDescription}</p>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 10px 0; color: #333;">Choose how to request your quote:</h4>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <button onclick="window.location.href='mailto:${quoteInfo.contactInfo.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}'; this.closest('div[style*=\\"position: fixed\\"]').remove();" style="
+                                background: #2e5827; color: white; border: none;
+                                padding: 15px 20px; border-radius: 8px; cursor: pointer;
+                                font-weight: bold; font-size: 1.1em;
+                                transition: background 0.2s ease;
+                            " onmouseover="this.style.background='#1e3a1b'" onmouseout="this.style.background='#2e5827'">
+                                ✉️ Email Quote Request
+                            </button>
+                            
+                            <button onclick="window.location.href='tel:${quoteInfo.contactInfo.phone}'; this.closest('div[style*=\\"position: fixed\\"]').remove();" style="
+                                background: #007bff; color: white; border: none;
+                                padding: 15px 20px; border-radius: 8px; cursor: pointer;
+                                font-weight: bold; font-size: 1.1em;
+                                transition: background 0.2s ease;
+                            " onmouseover="this.style.background='#0056b3'" onmouseout="this.style.background='#007bff'">
+                                📞 Call ${quoteInfo.contactInfo.phone}
+                            </button>
+                            
+                            <button onclick="navigator.clipboard.writeText(\`${emailBody.replace(/`/g, '\\`')}\`).then(() => alert('Quote details copied to clipboard!')); this.closest('div[style*=\\"position: fixed\\"]').remove();" style="
+                                background: #6c757d; color: white; border: none;
+                                padding: 12px 20px; border-radius: 8px; cursor: pointer;
+                                font-weight: bold; transition: background 0.2s ease;
+                            " onmouseover="this.style.background='#545b62'" onmouseout="this.style.background='#6c757d'">
+                                📋 Copy Quote Details
+                            </button>
+                        </div>
+
+                        <div style="margin-top: 20px; text-align: center;">
+                            <button onclick="this.closest('div[style*=\\"position: fixed\\"]').remove()" style="
+                                background: none; border: 1px solid #ccc; color: #666;
+                                padding: 8px 16px; border-radius: 6px; cursor: pointer;
+                            ">Cancel</button>
+                        </div>
+
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; font-size: 0.9em; color: #666; text-align: center;">
+                            <p style="margin: 0;">Northwest Custom Apparel • Family Owned Since 1977</p>
+                            <p style="margin: 5px 0 0 0;">📍 Milton, WA • Hours: 9AM-5PM</p>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // Close on background click
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        document.body.removeChild(modal);
+                    }
+                });
+
+                console.log('[CAP-CONTROLLER] Quote request modal displayed');
             }
         },
 
@@ -840,21 +1010,47 @@
         },
 
         /**
-         * Set up add to cart handler with delay to ensure other scripts have loaded
+         * Set up quote request handler (adapted from cart workflow)
          */
         setupAddToCartHandler() {
             setTimeout(() => {
-                const addToCartBtn = document.getElementById('add-to-cart-button');
-                if (addToCartBtn) {
-                    // Remove existing listeners by cloning
-                    const newBtn = addToCartBtn.cloneNode(true);
-                    addToCartBtn.parentNode.replaceChild(newBtn, addToCartBtn);
+                // Look for various button IDs that might be used for cart/quote actions
+                const buttonSelectors = [
+                    '#add-to-cart-button',
+                    '#request-quote-button', 
+                    '.add-to-cart-btn',
+                    '.request-quote-btn',
+                    'button[onclick*="addToCart"]',
+                    'button[onclick*="handleAddToCart"]'
+                ];
+                
+                let targetButton = null;
+                for (const selector of buttonSelectors) {
+                    targetButton = document.querySelector(selector);
+                    if (targetButton) break;
+                }
+                
+                if (targetButton) {
+                    // Update button text to reflect quote workflow
+                    const currentText = targetButton.textContent.trim();
+                    if (currentText.toLowerCase().includes('cart')) {
+                        targetButton.textContent = currentText.replace(/add to cart/i, 'Request Quote')
+                                                                .replace(/cart/i, 'Quote');
+                    } else if (!currentText.toLowerCase().includes('quote')) {
+                        targetButton.textContent = 'Request Quote';
+                    }
                     
-                    // Add our enhanced listener
+                    // Remove existing listeners by cloning
+                    const newBtn = targetButton.cloneNode(true);
+                    targetButton.parentNode.replaceChild(newBtn, targetButton);
+                    
+                    // Add our enhanced quote listener
                     newBtn.addEventListener('click', CapEmbroideryController.CartManager.handleAddToCartEnhanced);
-                    console.log('[CAP-CONTROLLER] Enhanced add to cart handler installed');
+                    console.log('[CAP-CONTROLLER] Quote request handler installed on button:', newBtn.textContent);
                     
                     CapEmbroideryController.state.ui.addToCartButton = newBtn;
+                } else {
+                    console.log('[CAP-CONTROLLER] No cart/quote button found to convert');
                 }
             }, 2000); // Wait for other scripts to load
         },
