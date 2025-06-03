@@ -1,0 +1,249 @@
+/**
+ * Quantity Shortcuts Styles
+ * Phase 2 Feature 1: Quick Quantity Shortcuts
+ */
+
+/* Main container */
+.quantity-shortcuts {
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--bg-light, #f8f9fa);
+    border-radius: var(--radius-lg, 12px);
+    border: 1px solid var(--border-color, #e9ecef);
+}
+
+/* Title */
+.quantity-shortcuts-title {
+    font-weight: 600;
+    color: var(--text-primary, #333);
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+/* Buttons container */
+.quantity-shortcuts-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Individual shortcut button */
+.quantity-shortcut-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 16px;
+    min-width: 100px;
+    background: white;
+    border: 2px solid var(--border-color, #ddd);
+    border-radius: var(--radius-md, 8px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.quantity-shortcut-btn:hover {
+    border-color: var(--primary-color, #007bff);
+    background: var(--bg-hover, #f0f8ff);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.quantity-shortcut-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Active state */
+.quantity-shortcut-btn.active {
+    background: var(--primary-color, #007bff);
+    color: white;
+    border-color: var(--primary-color, #007bff);
+}
+
+.quantity-shortcut-btn.active:hover {
+    background: var(--primary-dark, #0056b3);
+    border-color: var(--primary-dark, #0056b3);
+}
+
+/* Highlighted buttons */
+.quantity-shortcut-btn.highlighted {
+    border-color: var(--success-color, #28a745);
+    position: relative;
+}
+
+.quantity-shortcut-btn.highlighted::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #28a745, #20c997);
+    border-radius: var(--radius-md, 8px);
+    opacity: 0.2;
+    z-index: -1;
+}
+
+/* Button content */
+.shortcut-label {
+    font-weight: 600;
+    font-size: 1em;
+    margin-bottom: 2px;
+}
+
+.shortcut-value {
+    font-size: 0.85em;
+    color: var(--text-secondary, #666);
+    opacity: 0.8;
+}
+
+.quantity-shortcut-btn.active .shortcut-value {
+    color: white;
+    opacity: 0.9;
+}
+
+/* Note badge */
+.shortcut-note {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--success-color, #28a745);
+    color: white;
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Savings indicator */
+.quantity-shortcuts-savings {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    color: var(--text-primary, #333);
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+}
+
+.savings-message,
+.max-savings-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--success-light, #d4edda);
+    color: var(--success-dark, #155724);
+    border-radius: var(--radius-sm, 6px);
+    animation: slideIn 0.3s ease;
+}
+
+.max-savings-message {
+    background: var(--info-light, #d1ecf1);
+    color: var(--info-dark, #0c5460);
+}
+
+.custom-mode-indicator {
+    color: var(--text-secondary, #666);
+    font-style: italic;
+}
+
+.savings-icon {
+    font-size: 1.2em;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.price-updating {
+    animation: pulse 0.3s ease;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .quantity-shortcuts {
+        padding: 15px;
+    }
+
+    .quantity-shortcuts-buttons {
+        gap: 8px;
+    }
+
+    .quantity-shortcut-btn {
+        min-width: 80px;
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
+
+    .shortcut-note {
+        font-size: 0.65em;
+        padding: 2px 6px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .quantity-shortcut-btn,
+    .savings-message,
+    .max-savings-message,
+    .price-updating {
+        animation: none;
+        transition: none;
+    }
+    
+    .quantity-shortcut-btn:hover {
+        transform: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .quantity-shortcut-btn {
+        border-width: 3px;
+    }
+
+    .quantity-shortcut-btn.active {
+        outline: 2px solid white;
+        outline-offset: -4px;
+    }
+
+    .shortcut-note {
+        font-weight: 700;
+        outline: 1px solid white;
+    }
+}
+
+/* Screen reader only text */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}

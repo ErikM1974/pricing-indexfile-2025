@@ -1124,6 +1124,9 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
                 // Start tier label checker
                 NWCA.controllers.capEmbroidery.startLabelChecker();
                 
+                // Initialize Phase 2 Features
+                NWCA.controllers.capEmbroidery.initializePhase2Features();
+                
                 NWCA.controllers.capEmbroidery.state.initialized = true;
                 logger.log('CAP-CONTROLLER', 'Initialization complete');
                 
@@ -1260,6 +1263,45 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
                     clearInterval(checkInterval);
                 }
             }, pollingInterval);
+        },
+
+        /**
+         * Initialize Phase 2 Features
+         */
+        initializePhase2Features() {
+            logger.log('CAP-CONTROLLER', 'Initializing Phase 2 features');
+
+            // Feature 1: Quick Quantity Shortcuts
+            if (NWCA.ui.QuantityShortcuts) {
+                setTimeout(() => {
+                    const container = document.getElementById('quantity-shortcuts-container');
+                    if (container) {
+                        NWCA.ui.QuantityShortcuts.initialize(container, {
+                            presets: [
+                                { label: 'Dozen', value: 12, highlight: false },
+                                { label: '2 Dozen', value: 24, highlight: true, note: 'Most Popular' },
+                                { label: '4 Dozen', value: 48, highlight: false },
+                                { label: '6 Dozen', value: 72, highlight: true, note: 'Best Value' },
+                                { label: 'Gross', value: 144, highlight: false },
+                                { label: 'Custom', value: 'custom', highlight: false }
+                            ]
+                        });
+                        logger.log('CAP-CONTROLLER', 'Quantity shortcuts initialized');
+                    } else {
+                        logger.warn('CAP-CONTROLLER', 'Quantity shortcuts container not found');
+                    }
+                }, 500); // Small delay to ensure DOM is ready
+            } else {
+                logger.log('CAP-CONTROLLER', 'Quantity shortcuts module not loaded');
+            }
+
+            // Feature 2-7: To be implemented in subsequent phases
+            // - Mobile-Optimized Collapsible Menu
+            // - Enhanced Loading Animations
+            // - Smart Input Validation
+            // - Keyboard Navigation Support
+            // - Price Comparison View
+            // - Auto-Save Quote Draft
         }
     };
 
