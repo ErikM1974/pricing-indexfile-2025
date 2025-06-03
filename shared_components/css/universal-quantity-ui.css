@@ -1,0 +1,237 @@
+/* Universal Quantity UI Components */
+/* Reusable across all pricing pages for quantity selection */
+
+/* Single row quantity layout */
+.single-row-quantity-container {
+    margin-bottom: var(--spacing-md);
+    overflow-x: auto;
+    width: 100%;
+}
+
+/* Quantity matrix and input table styling */
+.quantity-matrix,
+.quantity-input-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    max-width: 100%;
+}
+
+.quantity-matrix th,
+.quantity-matrix td,
+.quantity-input-table th,
+.quantity-input-table td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* First column (labels) should be narrower */
+.quantity-input-table th:first-child,
+.quantity-input-table td:first-child {
+    width: 80px;
+    max-width: 80px;
+}
+
+/* Size columns should have fixed width */
+.quantity-input-table th:not(:first-child),
+.quantity-input-table td:not(:first-child) {
+    width: 120px;
+    max-width: 120px;
+}
+
+/* Quantity input styling */
+.quantity-input {
+    width: 60px;
+    padding: 8px;
+    border: 2px solid #ddd;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.quantity-input:hover {
+    border-color: var(--primary-color);
+}
+
+.quantity-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* Quantity buttons */
+.quantity-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.quantity-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.quantity-btn:active {
+    transform: scale(0.95);
+}
+
+/* Quantity controls container */
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Size labels */
+.size-label {
+    font-weight: bold;
+    color: var(--text-dark);
+    background: #f8f9fa;
+}
+
+/* Inventory indicators */
+.inventory-indicator {
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 0.8em;
+    padding: 2px 6px;
+    border-radius: 12px;
+}
+
+.inventory-low {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.inventory-out {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .quantity-matrix,
+    .quantity-input-table {
+        font-size: 0.9em;
+    }
+    
+    .quantity-matrix th,
+    .quantity-matrix td,
+    .quantity-input-table th,
+    .quantity-input-table td {
+        padding: 6px;
+    }
+    
+    .quantity-input {
+        width: 50px;
+        padding: 6px;
+        font-size: 0.9em;
+    }
+    
+    .quantity-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .quantity-matrix,
+    .quantity-input-table {
+        font-size: 0.8em;
+    }
+    
+    .quantity-matrix th,
+    .quantity-matrix td,
+    .quantity-input-table th,
+    .quantity-input-table td {
+        padding: 4px;
+    }
+    
+    .quantity-input {
+        width: 40px;
+        padding: 4px;
+        font-size: 0.8em;
+    }
+    
+    .quantity-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 16px;
+    }
+}
+
+/* Grid layout for size quantity items */
+.size-quantity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: var(--spacing-md);
+}
+
+.size-quantity-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: var(--radius-md);
+    border: 1px solid #e9ecef;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.size-quantity-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.size-quantity-item .size-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+}
+
+.size-quantity-item .price-info {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-top: 8px;
+}
+
+/* Totals display */
+.quantity-totals {
+    background: var(--primary-light);
+    padding: 15px;
+    border-radius: var(--radius-md);
+    margin-top: 20px;
+    text-align: center;
+}
+
+.quantity-totals .total-label {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.quantity-totals .total-value {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: var(--primary-dark);
+}

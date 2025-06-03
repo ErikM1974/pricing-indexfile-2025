@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dead Cart Code Removal Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .warning {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        .console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background: white;
+        }
+        h1 {
+            color: #2e5827;
+        }
+        h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dead Cart Code Removal Test</h1>
+    <p>This page tests that all cart-related code has been properly removed or disabled.</p>
+    
+    <div class="test-section">
+        <h2>Cart Global Variables Test</h2>
+        <div id="cart-globals-result" class="test-result">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Feature Flags Test</h2>
+        <div id="feature-flags-result" class="test-result">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Quote System Test</h2>
+        <div id="quote-system-result" class="test-result">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>CSS Classes Test</h2>
+        <div id="css-classes-result" class="test-result">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output" class="console-output"></div>
+    </div>
+    
+    <script>
+        // Console capture
+        const consoleOutput = document.getElementById('console-output');
+        const originalConsole = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error
+        };
+        
+        function addToConsole(type, message) {
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? '#f44336' : type === 'warn' ? '#ff9800' : '#d4d4d4';
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalConsole.log(...args);
+            addToConsole('log', args.join(' '));
+        };
+        console.warn = function(...args) {
+            originalConsole.warn(...args);
+            addToConsole('warn', args.join(' '));
+        };
+        console.error = function(...args) {
+            originalConsole.error(...args);
+            addToConsole('error', args.join(' '));
+        };
+        
+        // Test 1: Check cart global variables
+        function testCartGlobals() {
+            const result = document.getElementById('cart-globals-result');
+            let html = '<h3>Cart Global Variables:</h3><ul>';
+            
+            const cartGlobals = [
+                'window.NWCACart',
+                'window.Cart',
+                'window.cart',
+                'window.addToCart',
+                'window.cartSystem',
+                'window.detectAvailableCartSystem',
+                'window.cartItemAdded',
+                'window.updateCartTotal'
+            ];
+            
+            let foundCount = 0;
+            cartGlobals.forEach(global => {
+                const exists = eval(`typeof ${global} !== 'undefined'`);
+                if (exists) foundCount++;
+                html += `<li>${global}: <span class="${exists ? 'error' : 'success'}">${exists ? 'FOUND (should be removed!)' : 'Not found ✓'}</span></li>`;
+            });
+            
+            html += '</ul>';
+            html += `<p class="${foundCount > 0 ? 'error' : 'success'}">
+                ${foundCount === 0 ? '✅ All cart globals have been removed!' : `❌ ${foundCount} cart globals still exist`}
+            </p>`;
+            
+            result.innerHTML = html;
+        }
+        
+        // Test 2: Check feature flags
+        function testFeatureFlags() {
+            const result = document.getElementById('feature-flags-result');
+            let html = '<h3>Feature Flags:</h3><ul>';
+            
+            // Check NWCA namespace
+            if (window.NWCA && window.NWCA.config && window.NWCA.config.features) {
+                const features = window.NWCA.config.features;
+                html += `<li>Cart Enabled: <span class="${features.cartEnabled === false ? 'success' : 'error'}">${features.cartEnabled === false ? 'FALSE ✓' : 'TRUE (should be false!)'}</span></li>`;
+            }
+            
+            // Check app config
+            if (window.NWCA_APP_CONFIG && window.NWCA_APP_CONFIG.FEATURES) {
+                const features = window.NWCA_APP_CONFIG.FEATURES;
+                html += `<li>Cart Enabled (App Config): <span class="${features.CART_ENABLED === false ? 'success' : 'error'}">${features.CART_ENABLED === false ? 'FALSE ✓' : 'TRUE (should be false!)'}</span></li>`;
+                html += `<li>Quote Mode: <span class="${features.QUOTE_MODE === true ? 'success' : 'error'}">${features.QUOTE_MODE === true ? 'TRUE ✓' : 'FALSE (should be true!)'}</span></li>`;
+            }
+            
+            html += '</ul>';
+            result.innerHTML = html;
+        }
+        
+        // Test 3: Check quote system
+        function testQuoteSystem() {
+            const result = document.getElementById('quote-system-result');
+            let html = '<h3>Quote System Components:</h3><ul>';
+            
+            const quoteComponents = [
+                'window.QuoteAdapterBase',
+                'window.CapEmbroideryQuoteAdapter',
+                'window.capEmbroideryQuoteAdapter'
+            ];
+            
+            let foundCount = 0;
+            quoteComponents.forEach(component => {
+                const exists = eval(`typeof ${component} !== 'undefined'`);
+                if (exists) foundCount++;
+                html += `<li>${component}: <span class="${exists ? 'success' : 'warning'}">${exists ? 'Found ✓' : 'Not found'}</span></li>`;
+            });
+            
+            html += '</ul>';
+            html += `<p class="${foundCount > 0 ? 'success' : 'warning'}">
+                ${foundCount > 0 ? `✅ ${foundCount} quote components loaded` : '⚠️ No quote components found (may not be loaded yet)'}
+            </p>`;
+            
+            result.innerHTML = html;
+        }
+        
+        // Test 4: Check CSS classes
+        function testCSSClasses() {
+            const result = document.getElementById('css-classes-result');
+            let html = '<h3>Cart-Related CSS Elements:</h3><ul>';
+            
+            const cartSelectors = [
+                '#cart-navigation',
+                '.cart-nav',
+                '.view-cart-nav',
+                '#view-cart-button',
+                '.add-to-cart-button',
+                '#cart-summary',
+                '.cart-total'
+            ];
+            
+            let foundCount = 0;
+            cartSelectors.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                const found = elements.length > 0;
+                if (found) foundCount++;
+                html += `<li>${selector}: <span class="${found ? 'warning' : 'success'}">${found ? `Found ${elements.length} element(s)` : 'Not found ✓'}</span></li>`;
+            });
+            
+            // Check if universal-quantity-ui.css is loaded
+            const stylesheets = Array.from(document.styleSheets);
+            const hasQuantityUI = stylesheets.some(sheet => sheet.href && sheet.href.includes('universal-quantity-ui.css'));
+            const hasCartUI = stylesheets.some(sheet => sheet.href && sheet.href.includes('universal-cart-ui.css'));
+            
+            html += '</ul>';
+            html += '<h3>Stylesheet Status:</h3><ul>';
+            html += `<li>universal-quantity-ui.css: <span class="${hasQuantityUI ? 'success' : 'error'}">${hasQuantityUI ? 'Loaded ✓' : 'Not loaded'}</span></li>`;
+            html += `<li>universal-cart-ui.css: <span class="${hasCartUI ? 'error' : 'success'}">${hasCartUI ? 'Still loaded!' : 'Not loaded ✓'}</span></li>`;
+            html += '</ul>';
+            
+            result.innerHTML = html;
+        }
+        
+        // Run tests after page loads
+        window.addEventListener('load', () => {
+            console.log('Starting dead cart code removal tests...');
+            
+            setTimeout(() => {
+                testCartGlobals();
+                testFeatureFlags();
+                testQuoteSystem();
+                testCSSClasses();
+                
+                console.log('All tests completed!');
+            }, 1000); // Give scripts time to load
+        });
+    </script>
+    
+    <!-- Load NWCA namespace and app config to test feature flags -->
+    <script src="/shared_components/js/nwca-namespace.js"></script>
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/shared_components/js/quote-adapter-base.js"></script>
+    <script src="/shared_components/js/cap-embroidery-quote-adapter.js"></script>
+</body>
+</html>

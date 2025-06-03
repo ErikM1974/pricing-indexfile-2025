@@ -25,8 +25,9 @@
             stylesearch: '/api/stylesearch',
             inventory: '/api/inventory',
             pricingMatrix: '/api/pricing-matrix',
-            cartSessions: '/api/cart-sessions',
-            cartItems: '/api/cart-items'
+            // Cart endpoints - deprecated (quote-only workflow)
+            cartSessions: '/api/cart-sessions',  // DEPRECATED
+            cartItems: '/api/cart-items'          // DEPRECATED
         },
         
         // Pricing configuration

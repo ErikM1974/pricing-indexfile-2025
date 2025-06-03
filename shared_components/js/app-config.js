@@ -25,12 +25,12 @@ window.NWCA_APP_CONFIG = window.NWCA_APP_CONFIG || {};
         },
         STITCH_COUNT_MISMATCH_MODAL: {
             TITLE: "Stitch Count Mismatch",
-            BODY_LINE_1: "Your cart contains caps with <strong>%EXISTING_STITCH_COUNT% stitches</strong>.",
+            BODY_LINE_1: "Your quote contains caps with <strong>%EXISTING_STITCH_COUNT% stitches</strong>.",
             BODY_LINE_2: "You are trying to add caps with <strong>%NEW_STITCH_COUNT% stitches</strong>.",
             BODY_LINE_3: "All caps in a single order must have the same stitch count for production.",
-            BODY_LINE_4: "Would you like to clear your current cart and add this item?",
+            BODY_LINE_4: "Would you like to start a new quote with this item?",
             CANCEL_BUTTON: "Cancel",
-            PROCEED_BUTTON: "Clear Cart & Add"
+            PROCEED_BUTTON: "Start New Quote"
         },
         LTM_FEE_NOTICE_CAP: {
             TITLE: "Less Than Minimum Fee - Cap Orders",
@@ -68,6 +68,12 @@ window.NWCA_APP_CONFIG = window.NWCA_APP_CONFIG || {};
 })(window.NWCA_APP_CONFIG);
 
 // Ensure this script is loaded before any scripts that depend on NWCA_APP_CONFIG
-// Example usage in another file:
-// if (quantity < NWCA_APP_CONFIG.FEES.LTM_THRESHOLD_QUANTITY) { ... }
-// alert(NWCA_APP_CONFIG.MESSAGES.STITCH_COUNT_MISMATCH_BODY);
+    // Cart functionality disabled - using quote-only workflow
+    CONFIG.FEATURES = {
+        CART_ENABLED: false,
+        QUOTE_MODE: true
+    };
+
+    // Example usage in another file:
+    // if (quantity < NWCA_APP_CONFIG.FEES.LTM_CAP_MINIMUM_QUANTITY) { ... }
+    // alert(NWCA_APP_CONFIG.MESSAGES.PRICING_UNAVAILABLE_BODY_1);
