@@ -1309,8 +1309,24 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
                 logger.log('CAP-CONTROLLER', 'Quantity shortcuts module not loaded');
             }
 
-            // Feature 2-7: To be implemented in subsequent phases
-            // - Mobile-Optimized Collapsible Menu
+            // Feature 2: Mobile-Optimized Collapsible Menu
+            if (NWCA.ui && NWCA.ui.CollapsibleMenu) {
+                setTimeout(() => {
+                    NWCA.ui.CollapsibleMenu.initialize({
+                        sections: [
+                            { id: 'product-info', title: 'Product Information', icon: '🧢', defaultOpen: true },
+                            { id: 'customization', title: 'Customization Options', icon: '🎨', defaultOpen: true },
+                            { id: 'pricing-details', title: 'Pricing Details', icon: '💰', defaultOpen: false },
+                            { id: 'quote-builder', title: 'Quote Builder', icon: '📋', defaultOpen: false }
+                        ]
+                    });
+                    logger.log('CAP-CONTROLLER', 'Mobile collapsible menu initialized');
+                }, 1200); // Slightly after quantity shortcuts
+            } else {
+                logger.log('CAP-CONTROLLER', 'Mobile collapsible menu module not loaded');
+            }
+
+            // Feature 3-7: To be implemented in subsequent phases
             // - Enhanced Loading Animations
             // - Smart Input Validation
             // - Keyboard Navigation Support

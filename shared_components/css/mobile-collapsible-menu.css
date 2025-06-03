@@ -1,0 +1,265 @@
+/**
+ * Mobile Collapsible Menu Styles
+ * Phase 2 Feature 2: Mobile-Optimized Collapsible Menu
+ */
+
+/* Collapsible Section Structure */
+.collapsible-section {
+    margin-bottom: 1px;
+    background: white;
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: var(--radius-md, 8px);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.collapsible-section + .collapsible-section {
+    margin-top: -1px; /* Collapse borders */
+}
+
+/* Header */
+.collapsible-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--bg-light, #f8f9fa);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    position: relative;
+    min-height: 60px;
+}
+
+.collapsible-header:hover {
+    background: var(--bg-hover, #e9ecef);
+}
+
+.collapsible-header:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--primary-color, #007bff);
+}
+
+.collapsible-header:active {
+    background: var(--bg-active, #dee2e6);
+}
+
+/* Header Content */
+.collapsible-icon {
+    font-size: 1.5em;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.collapsible-title {
+    flex: 1;
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--text-primary, #333);
+}
+
+/* Indicators */
+.collapsible-indicators {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.progress-indicator {
+    color: var(--success-color, #28a745);
+    font-weight: bold;
+    animation: checkmarkPulse 0.5s ease;
+}
+
+@keyframes checkmarkPulse {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.collapse-indicator {
+    display: flex;
+    transition: transform 0.3s ease;
+    color: var(--text-secondary, #666);
+}
+
+.collapsible-section.open .collapse-indicator {
+    transform: rotate(180deg);
+}
+
+/* Content */
+.collapsible-content {
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+.collapsible-section:not(.open) .collapsible-content {
+    height: 0;
+}
+
+.collapsible-content > * {
+    padding: 20px;
+}
+
+/* Animation Classes */
+.collapsible-section.opening .collapsible-content,
+.collapsible-section.closing .collapsible-content {
+    transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Desktop Overrides */
+@media (min-width: 769px) {
+    body:not(.collapsible-menu-active) .collapsible-section {
+        border: none;
+        margin-bottom: 0;
+        background: transparent;
+    }
+
+    body:not(.collapsible-menu-active) .collapsible-header {
+        display: none;
+    }
+
+    body:not(.collapsible-menu-active) .collapsible-content {
+        height: auto !important;
+        overflow: visible;
+    }
+
+    body:not(.collapsible-menu-active) .collapsible-content > * {
+        padding: 0;
+    }
+}
+
+/* Mobile Specific */
+@media (max-width: 768px) {
+    .collapsible-section {
+        border-radius: 0;
+        margin-left: -20px;
+        margin-right: -20px;
+        border-left: none;
+        border-right: none;
+    }
+
+    .collapsible-header {
+        padding: 16px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .collapsible-section.open .collapsible-header {
+        border-bottom: 1px solid var(--border-color, #e9ecef);
+    }
+
+    .collapsible-content > * {
+        padding: 16px;
+    }
+
+    /* Swipe Hint */
+    .collapsible-header::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 4px;
+        background: var(--border-color, #dee2e6);
+        border-radius: 2px;
+        opacity: 0.5;
+    }
+}
+
+/* Progress Bar (optional) */
+.collapsible-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--bg-light, #f8f9fa);
+    z-index: 1000;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+}
+
+body.collapsible-menu-active .collapsible-progress-bar {
+    transform: translateY(0);
+}
+
+.collapsible-progress-fill {
+    height: 100%;
+    background: var(--primary-color, #007bff);
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* Specific Section Styling */
+#collapsible-product-info .collapsible-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+#collapsible-customization .collapsible-header {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+#collapsible-pricing-details .collapsible-header {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+#collapsible-quote-builder .collapsible-header {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .collapsible-content {
+        transition: none;
+    }
+    
+    .collapse-indicator {
+        transition: none;
+    }
+    
+    .collapsible-section.opening .collapsible-content,
+    .collapsible-section.closing .collapsible-content {
+        transition: none;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .collapsible-header {
+        border: 2px solid currentColor;
+    }
+
+    .collapsible-section.open .collapsible-header {
+        border-bottom-width: 2px;
+    }
+
+    .progress-indicator {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+    }
+}
+
+/* Dark Mode Support (if implemented) */
+@media (prefers-color-scheme: dark) {
+    .collapsible-section {
+        background: var(--dark-bg, #1a1a1a);
+        border-color: var(--dark-border, #333);
+    }
+
+    .collapsible-header {
+        background: var(--dark-bg-light, #2a2a2a);
+    }
+
+    .collapsible-header:hover {
+        background: var(--dark-bg-hover, #333);
+    }
+
+    .collapsible-title {
+        color: var(--dark-text-primary, #fff);
+    }
+}
