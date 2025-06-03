@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/shared_components/css/quantity-shortcuts.css">
     <link rel="stylesheet" href="/shared_components/css/mobile-collapsible-menu.css">
     <link rel="stylesheet" href="/shared_components/css/mobile-collapsible-fix.css">
+    <link rel="stylesheet" href="/shared_components/css/clean-color-swatches.css">
     
 <!-- jsPDF Libraries for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -208,22 +209,23 @@
                             <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
                         </div>
                         
-                        <!-- Color Selection -->
-                        <div>
-                            <h4 class="section-header">Selected Color</h4>
-                            <div class="color-selection-container">
-                                <div id="pricing-color-swatch" class="selected-color-swatch"></div>
-                                <div class="color-info">
-                                    <strong id="pricing-color-name" class="color-info-name">Color Name</strong>
-                                    <div class="color-info-note">Click to view all colors</div>
+                        <!-- Clean Color Selection -->
+                        <div class="clean-color-section">
+                            <h4 class="section-header">Select Color</h4>
+                            
+                            <!-- Selected Color Display -->
+                            <div class="clean-selected-display">
+                                <div id="pricing-color-swatch" class="clean-selected-swatch"></div>
+                                <div class="clean-selected-info">
+                                    <h3 id="pricing-color-name">Select a Color</h3>
+                                    <p>Choose from available colors below</p>
                                 </div>
                             </div>
                             
-                            <!-- Color Swatches -->
-                            <div id="color-swatches" class="color-grid">
+                            <!-- Color Swatches Grid -->
+                            <div id="color-swatches" class="clean-color-grid">
                                 <!-- Color swatches will be dynamically added here -->
                             </div>
-                            <button id="show-more-colors" class="show-more-colors-btn">Show More Colors</button>
                         </div>
                     </div>
                 </div>
@@ -427,6 +429,7 @@
     <!-- Temporarily disabled original collapsible menu -->
     <!-- <script src="/shared_components/js/mobile-collapsible-menu.js"></script> -->
     <script src="/shared_components/js/mobile-collapsible-ultimate-fix.js"></script> <!-- Ultimate fix for mobile accordion -->
+    <script src="/shared_components/js/clean-color-adapter.js"></script> <!-- Clean color swatch implementation -->
     
 </body>
 </html>
