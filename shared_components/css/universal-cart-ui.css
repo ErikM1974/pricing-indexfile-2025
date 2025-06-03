@@ -1,6 +1,14 @@
 /* Universal Cart and Add to Cart UI Components */
 /* Reusable across all pricing pages with cart functionality */
 
+/* Hide cart navigation elements - cart functionality disabled */
+#cart-navigation,
+.cart-nav,
+.view-cart-nav,
+[id*="cart-nav"] {
+    display: none !important;
+}
+
 /* Single row quantity layout */
 .single-row-quantity-container {
     margin-bottom: var(--spacing-md);

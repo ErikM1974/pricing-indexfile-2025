@@ -49,12 +49,33 @@
         initialize() {
             console.log('[UNIVERSAL-HEADER] Initializing universal header system');
             
+            this.removeLogoText();
             this.setupURLParameters();
             this.setupStyleSearch();
             this.setupBackToProduct();
             this.bindHeaderActions();
             
             console.log('[UNIVERSAL-HEADER] Universal header system ready');
+        },
+
+        /**
+         * Remove logo text by replacing the logo image with text-free version
+         */
+        removeLogoText() {
+            console.log('[UNIVERSAL-HEADER] Removing logo text globally');
+            
+            // Find the logo image element
+            const logoImg = document.querySelector('.header-logo-img');
+            
+            if (logoImg) {
+                // Replace with the text-free logo
+                const textFreeLogoUrl = 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1';
+                logoImg.src = textFreeLogoUrl;
+                logoImg.alt = 'NW Custom Apparel Logo';
+                console.log('[UNIVERSAL-HEADER] Logo image replaced with text-free version');
+            } else {
+                console.warn('[UNIVERSAL-HEADER] Logo image element not found');
+            }
         },
 
         /**

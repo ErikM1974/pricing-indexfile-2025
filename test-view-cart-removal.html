@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test View Cart Removal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #218838;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>View Cart Button Removal Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Verify View Cart Button is Removed</h2>
+        <p>This test will simulate adding an item to cart and verify the View Cart button is not shown.</p>
+        <button class="test-button" onclick="testViewCartRemoval()">Run Test</button>
+        <div id="test1-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Check for Cart-Related Elements</h2>
+        <p>This test will scan the DOM for any remaining cart-related elements.</p>
+        <button class="test-button" onclick="scanForCartElements()">Scan Page</button>
+        <div id="test2-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Log</h2>
+        <div id="test-log" class="log">Test results will appear here...</div>
+    </div>
+    
+    <!-- Include the pricing pages script to test -->
+    <script src="/shared_components/js/pricing-pages.js"></script>
+    
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#333';
+            logDiv.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function testViewCartRemoval() {
+            log('Starting View Cart removal test...');
+            const resultDiv = document.getElementById('test1-result');
+            
+            try {
+                // Check if showSuccessWithViewCartButton function exists
+                if (typeof showSuccessWithViewCartButton === 'function') {
+                    log('Found showSuccessWithViewCartButton function');
+                    
+                    // Create test product data
+                    const testProductData = {
+                        styleNumber: 'TEST123',
+                        color: 'Blue',
+                        embellishmentType: 'cap-embroidery',
+                        totalQuantity: 10,
+                        sizes: [
+                            { size: 'S', quantity: 5, totalPrice: 125 },
+                            { size: 'M', quantity: 5, totalPrice: 125 }
+                        ],
+                        imageUrl: null,
+                        pricingInfo: {
+                            ltmFeeApplied: false
+                        }
+                    };
+                    
+                    // Call the function to create notification
+                    showSuccessWithViewCartButton(testProductData);
+                    log('Called showSuccessWithViewCartButton');
+                    
+                    // Wait a moment for DOM to update
+                    setTimeout(() => {
+                        // Check for View Cart button
+                        const viewCartButtons = document.querySelectorAll('.view-cart, button[onclick*="cart"], button[onclick*="Cart"]');
+                        const notificationContainer = document.getElementById('cart-notification-container');
+                        
+                        if (viewCartButtons.length === 0) {
+                            resultDiv.innerHTML = '<span class="success">✓ Test Passed: No View Cart buttons found</span>';
+                            log('Success: No View Cart buttons found in notification', 'success');
+                        } else {
+                            resultDiv.innerHTML = `<span class="error">✗ Test Failed: Found ${viewCartButtons.length} View Cart button(s)</span>`;
+                            log(`Error: Found ${viewCartButtons.length} View Cart button(s)`, 'error');
+                            viewCartButtons.forEach(btn => {
+                                log(`Found button: ${btn.textContent} with class: ${btn.className}`, 'error');
+                            });
+                        }
+                        
+                        // Check notification content
+                        if (notificationContainer) {
+                            const hasViewCartText = notificationContainer.innerHTML.toLowerCase().includes('view cart');
+                            if (hasViewCartText) {
+                                log('Warning: Notification contains "View Cart" text', 'error');
+                            } else {
+                                log('Notification does not contain "View Cart" text', 'success');
+                            }
+                            
+                            // Clean up
+                            setTimeout(() => {
+                                if (notificationContainer && notificationContainer.parentNode) {
+                                    notificationContainer.parentNode.removeChild(notificationContainer);
+                                    log('Cleaned up test notification');
+                                }
+                            }, 2000);
+                        }
+                    }, 500);
+                    
+                } else {
+                    resultDiv.innerHTML = '<span class="error">✗ showSuccessWithViewCartButton function not found</span>';
+                    log('Error: showSuccessWithViewCartButton function not found', 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ Test Error: ${error.message}</span>`;
+                log(`Test error: ${error.message}`, 'error');
+            }
+        }
+        
+        function scanForCartElements() {
+            log('Starting scan for cart-related elements...');
+            const resultDiv = document.getElementById('test2-result');
+            const cartElements = [];
+            
+            // Scan for various cart-related selectors
+            const selectors = [
+                '.view-cart',
+                '.view-cart-button',
+                '.view-cart-btn',
+                '#view-cart',
+                'button[onclick*="viewCart"]',
+                'button[onclick*="view-cart"]',
+                'a[href*="/cart"]',
+                '*[class*="view-cart"]',
+                '*[id*="view-cart"]'
+            ];
+            
+            selectors.forEach(selector => {
+                try {
+                    const elements = document.querySelectorAll(selector);
+                    if (elements.length > 0) {
+                        elements.forEach(el => {
+                            const info = {
+                                selector: selector,
+                                tagName: el.tagName,
+                                text: el.textContent.trim().substring(0, 50),
+                                className: el.className,
+                                id: el.id
+                            };
+                            cartElements.push(info);
+                            log(`Found element matching "${selector}": ${el.tagName} - "${info.text}"`, 'error');
+                        });
+                    }
+                } catch (e) {
+                    // Some selectors might throw errors, ignore them
+                }
+            });
+            
+            // Also check for text content
+            const allElements = document.getElementsByTagName('*');
+            for (let el of allElements) {
+                if (el.textContent && el.textContent.toLowerCase().includes('view cart') && 
+                    !el.querySelector('*') && // Only leaf nodes
+                    !el.textContent.toLowerCase().includes('test')) { // Exclude test elements
+                    cartElements.push({
+                        selector: 'text content',
+                        tagName: el.tagName,
+                        text: el.textContent.trim(),
+                        className: el.className,
+                        id: el.id
+                    });
+                    log(`Found "View Cart" text in ${el.tagName} element`, 'error');
+                }
+            }
+            
+            if (cartElements.length === 0) {
+                resultDiv.innerHTML = '<span class="success">✓ No cart-related elements found</span>';
+                log('Success: No cart-related elements found on page', 'success');
+            } else {
+                resultDiv.innerHTML = `<span class="error">✗ Found ${cartElements.length} cart-related element(s)</span>`;
+                log(`Found ${cartElements.length} cart-related elements`, 'error');
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            log('Test page loaded, ready to run tests');
+        });
+    </script>
+</body>
+</html>
