@@ -1,0 +1,453 @@
+/**
+ * Enhanced Loading Animations
+ * Phase 2 Feature 3: Skeleton screens and progressive loading
+ * Includes improved pricing table design
+ */
+
+/* ========================================
+   SKELETON LOADING ANIMATIONS
+   ======================================== */
+
+/* Base skeleton animation */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.skeleton {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+        90deg,
+        #f0f0f0 25%,
+        #e0e0e0 37%,
+        #f0f0f0 63%
+    );
+    background-size: 1000px 100%;
+    border-radius: 4px;
+}
+
+/* Product Image Skeleton */
+.image-skeleton {
+    width: 100%;
+    height: 400px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-skeleton::before {
+    content: '🖼️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    opacity: 0.3;
+}
+
+.image-skeleton.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.2) 20%,
+        rgba(255, 255, 255, 0.5) 60%,
+        transparent 100%
+    );
+    animation: shimmer 2s infinite;
+}
+
+/* Color Swatch Skeleton */
+.color-skeleton {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.color-skeleton-item {
+    text-align: center;
+}
+
+.color-skeleton-swatch {
+    width: 70px;
+    height: 70px;
+    border-radius: 10px;
+    margin: 0 auto 8px;
+}
+
+.color-skeleton-text {
+    height: 14px;
+    width: 60%;
+    margin: 0 auto;
+}
+
+/* Pricing Table Skeleton */
+.pricing-skeleton {
+    width: 100%;
+}
+
+.pricing-skeleton-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+}
+
+.pricing-skeleton-cell {
+    flex: 1;
+    height: 20px;
+}
+
+.pricing-skeleton-cell:first-child {
+    flex: 1.5;
+}
+
+/* Quote Summary Skeleton */
+.quote-skeleton {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.quote-skeleton-line {
+    height: 16px;
+    margin-bottom: 12px;
+}
+
+.quote-skeleton-line.title {
+    width: 40%;
+    height: 24px;
+    margin-bottom: 20px;
+}
+
+.quote-skeleton-line.short {
+    width: 60%;
+}
+
+.quote-skeleton-line.price {
+    width: 30%;
+    height: 28px;
+    margin-top: 20px;
+}
+
+/* ========================================
+   ENHANCED PRICING TABLE DESIGN
+   ======================================== */
+
+/* Modern pricing table */
+.pricing-table-container {
+    overflow-x: auto;
+    margin: 0 -20px;
+    padding: 0 20px;
+}
+
+.pricing-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Header styling */
+.pricing-table thead {
+    background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+    color: white;
+}
+
+.pricing-table th {
+    padding: 16px 20px;
+    font-weight: 600;
+    text-align: left;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.pricing-table th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.pricing-table th:last-child {
+    border-top-right-radius: 12px;
+}
+
+/* Body styling */
+.pricing-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.pricing-table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.01);
+}
+
+.pricing-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e9ecef;
+    color: #495057;
+}
+
+/* Quantity range styling */
+.pricing-table td:first-child {
+    font-weight: 600;
+    color: #212529;
+    background: #f8f9fa;
+    position: relative;
+}
+
+.pricing-table td:first-child::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #1a73e8;
+}
+
+/* Price cells */
+.price-cell {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a73e8;
+    position: relative;
+}
+
+.price-cell::before {
+    content: '$';
+    font-size: 14px;
+    opacity: 0.7;
+    position: relative;
+    top: -2px;
+}
+
+/* Tier badges */
+.tier-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tier-badge.best-value {
+    background: #d4f4dd;
+    color: #0f5132;
+}
+
+.tier-badge.popular {
+    background: #fff3cd;
+    color: #664d03;
+}
+
+/* Inventory indicators */
+.inventory-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 8px;
+    position: relative;
+}
+
+.inventory-indicator.in-stock {
+    background: #28a745;
+}
+
+.inventory-indicator.low-stock {
+    background: #ffc107;
+}
+
+.inventory-indicator.out-of-stock {
+    background: #dc3545;
+}
+
+.inventory-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    margin-bottom: 4px;
+}
+
+.inventory-indicator:hover .inventory-tooltip {
+    opacity: 1;
+}
+
+/* Mobile responsive table */
+@media (max-width: 768px) {
+    .pricing-table {
+        font-size: 14px;
+    }
+    
+    .pricing-table th,
+    .pricing-table td {
+        padding: 12px 16px;
+    }
+    
+    .price-cell {
+        font-size: 16px;
+    }
+    
+    /* Make table scrollable with sticky first column */
+    .pricing-table-container {
+        position: relative;
+    }
+    
+    .pricing-table td:first-child,
+    .pricing-table th:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 10;
+        background: #f8f9fa;
+    }
+    
+    .pricing-table th:first-child {
+        background: #1a73e8;
+    }
+}
+
+/* ========================================
+   LOADING STATE CLASSES
+   ======================================== */
+
+/* Hide content while loading */
+.loading-hidden {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.loading-complete {
+    opacity: 1;
+}
+
+/* Stagger animations */
+.stagger-animation {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.stagger-animation:nth-child(1) { animation-delay: 0.1s; }
+.stagger-animation:nth-child(2) { animation-delay: 0.2s; }
+.stagger-animation:nth-child(3) { animation-delay: 0.3s; }
+.stagger-animation:nth-child(4) { animation-delay: 0.4s; }
+.stagger-animation:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Progressive image loading */
+.progressive-image {
+    position: relative;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+.progressive-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.progressive-image.loaded img {
+    opacity: 1;
+}
+
+.progressive-image .placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(20px);
+    transform: scale(1.1);
+}
+
+/* ========================================
+   PRICING TABLE ENHANCEMENTS
+   ======================================== */
+
+/* Add visual hierarchy with alternating rows */
+.pricing-table tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Highlight on hover with smooth transition */
+.pricing-table tbody tr {
+    position: relative;
+    cursor: pointer;
+}
+
+.pricing-table tbody tr::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(26, 115, 232, 0.05) 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.pricing-table tbody tr:hover::after {
+    opacity: 1;
+}
+
+/* Add visual cues for best prices */
+.best-price {
+    position: relative;
+    color: #0f5132 !important;
+    font-weight: 700 !important;
+}
+
+.best-price::after {
+    content: '✨';
+    position: absolute;
+    top: -8px;
+    right: -20px;
+    font-size: 16px;
+    animation: sparkle 2s ease infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0.5; transform: scale(1) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+}
