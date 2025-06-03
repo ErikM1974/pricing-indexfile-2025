@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Auto-Save Quote Feature</title>
+    <link rel="stylesheet" href="/shared_components/css/auto-save-quote.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-controls {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .test-controls input, .test-controls select {
+            margin: 10px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .test-button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            background: #1a73e8;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .test-button:hover {
+            background: #1557b0;
+        }
+        .test-status {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            background: #e9ecef;
+        }
+        .content-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .card-header {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        #quote-builder {
+            min-height: 100px;
+        }
+        .test-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 30px;
+        }
+        .test-info h3 {
+            margin-top: 0;
+            color: #0c5460;
+        }
+        .hidden-elements {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container test-container">
+        <h1>🧪 Auto-Save Quote Feature Test</h1>
+        
+        <div class="test-controls">
+            <h3>Test Controls</h3>
+            
+            <div>
+                <label>Quantity:</label>
+                <input type="number" id="hero-quantity-input" value="24" min="1" max="1000">
+                
+                <label>Stitch Count:</label>
+                <select id="client-stitch-count-select">
+                    <option value="5000">5,000 stitches</option>
+                    <option value="8000" selected>8,000 stitches</option>
+                    <option value="10000">10,000 stitches</option>
+                </select>
+                
+                <label>
+                    <input type="checkbox" id="back-logo-checkbox">
+                    Add Back Logo
+                </label>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <button class="test-button" onclick="triggerChange()">Trigger Change (Mark Dirty)</button>
+                <button class="test-button" onclick="clearLocalStorage()">Clear Local Storage</button>
+                <button class="test-button" onclick="checkLocalStorage()">Check Local Storage</button>
+                <button class="test-button" onclick="simulatePageReload()">Simulate Page Reload</button>
+            </div>
+        </div>
+
+        <div class="test-status" id="status">
+            Status: Ready to test
+        </div>
+
+        <!-- Simulated quote builder section -->
+        <div id="quote-builder" class="content-card">
+            <div class="card-header">
+                <h2>Quote Builder</h2>
+                <!-- Save button will be added here -->
+            </div>
+            <div class="card-content">
+                <p>This is where the quote builder content would appear.</p>
+            </div>
+        </div>
+
+        <!-- Hidden elements for quote data -->
+        <div class="hidden-elements">
+            <div id="product-title-context">Test Cap Product</div>
+            <div id="product-style-context">TC101</div>
+            <div id="pricing-color-name">Navy Blue</div>
+            <div id="hero-unit-price">$12.50 per cap</div>
+            <div id="hero-total-price">$300.00</div>
+            <div id="back-logo-stitch-display">5,000</div>
+        </div>
+
+        <div class="test-info">
+            <h3>Test Scenarios</h3>
+            <ol>
+                <li><strong>Auto-Save Indicator:</strong> Make changes and wait 2 seconds to see "Draft saved" indicator</li>
+                <li><strong>Manual Save:</strong> Click "Save Quote" button in Quote Builder section</li>
+                <li><strong>Save Modal:</strong> Fill out customer information and save to API</li>
+                <li><strong>Recovery:</strong> Clear storage, make changes, reload page to see recovery notification</li>
+                <li><strong>Dirty State:</strong> Make changes and try to leave the page</li>
+                <li><strong>Local Storage:</strong> Check what's being saved automatically</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Create NWCA namespace
+        window.NWCA = window.NWCA || {};
+        NWCA.ui = NWCA.ui || {};
+        
+        // Load auto-save script
+        const script = document.createElement('script');
+        script.src = '/shared_components/js/auto-save-quote.js';
+        script.onload = function() {
+            updateStatus('Auto-save script loaded successfully!');
+        };
+        script.onerror = function() {
+            updateStatus('Failed to load auto-save script!', 'error');
+        };
+        document.body.appendChild(script);
+        
+        // Helper functions
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = `Status: ${message}`;
+            status.style.background = type === 'error' ? '#f8d7da' : '#d1ecf1';
+            console.log('[TEST]', message);
+        }
+        
+        function triggerChange() {
+            // Dispatch quote updated event
+            document.dispatchEvent(new CustomEvent('quoteUpdated', {
+                detail: { source: 'test' }
+            }));
+            updateStatus('Triggered quote update event - check for auto-save in 2 seconds');
+        }
+        
+        function clearLocalStorage() {
+            localStorage.removeItem('nwca_quote_draft');
+            localStorage.removeItem('nwca_session_id');
+            updateStatus('Cleared local storage');
+        }
+        
+        function checkLocalStorage() {
+            const draft = localStorage.getItem('nwca_quote_draft');
+            const session = localStorage.getItem('nwca_session_id');
+            
+            if (draft) {
+                const data = JSON.parse(draft);
+                updateStatus(`Found draft: ${data.quantity} items, Quote ID: ${data.quoteID}`);
+                console.log('Draft data:', data);
+            } else {
+                updateStatus('No draft found in local storage');
+            }
+            
+            if (session) {
+                console.log('Session ID:', session);
+            }
+        }
+        
+        function simulatePageReload() {
+            // Save current state
+            if (NWCA.ui.AutoSaveQuote && NWCA.ui.AutoSaveQuote.state.isDirty) {
+                NWCA.ui.AutoSaveQuote.saveQuoteDraft();
+            }
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+        
+        // Set up input listeners
+        document.getElementById('hero-quantity-input').addEventListener('input', function() {
+            updateStatus(`Quantity changed to ${this.value}`);
+        });
+        
+        document.getElementById('client-stitch-count-select').addEventListener('change', function() {
+            updateStatus(`Stitch count changed to ${this.value}`);
+        });
+        
+        document.getElementById('back-logo-checkbox').addEventListener('change', function() {
+            updateStatus(`Back logo ${this.checked ? 'enabled' : 'disabled'}`);
+        });
+    </script>
+</body>
+</html>
