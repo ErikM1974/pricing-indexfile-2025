@@ -398,10 +398,14 @@
                 const savings = this.calculateSavings(currentQty, nextTier);
                 
                 if (savings && savings.percentSaved > this.config.savingsThreshold) {
+                    // Format the savings message with both percentage and dollar amount
+                    const percentText = formatters.percentage(savings.percentSaved);
+                    const amountText = savings.amountSaved ? ` ($${savings.amountSaved.toFixed(2)} per item)` : '';
+                    
                     savingsIndicator.innerHTML = `
                         <span class="savings-message">
                             <span class="savings-icon">💰</span>
-                            Add ${nextTier - currentQty} more for ${formatters.percentage(savings.percentSaved)} savings!
+                            Add ${nextTier - currentQty} more for ${percentText} savings${amountText}!
                         </span>
                     `;
                     savingsIndicator.classList.add('has-savings');
@@ -425,8 +429,65 @@
          * Calculate potential savings
          */
         calculateSavings(currentQty, nextQty) {
-            // This would normally pull from actual pricing data
-            // For now, using estimated savings based on typical tier structures
+            // Try to get actual pricing data
+            let currentPrice = null;
+            let nextPrice = null;
+
+            // Method 1: Try to get from hero calculator state
+            if (window.HeroQuantityCalculator && window.HeroQuantityCalculator.getUnitPrice) {
+                // This method might not exist, but we'll try
+                currentPrice = window.HeroQuantityCalculator.getUnitPrice(currentQty);
+                nextPrice = window.HeroQuantityCalculator.getUnitPrice(nextQty);
+            }
+
+            // Method 2: Try to calculate from pricing data
+            if (!currentPrice && window.nwcaPricingData && window.nwcaPricingData.prices) {
+                const prices = window.nwcaPricingData.prices;
+                const tierData = window.nwcaPricingData.tierData || {};
+                
+                // Find which tier each quantity falls into
+                const findTierPrice = (qty) => {
+                    for (const [tierKey, tierInfo] of Object.entries(tierData)) {
+                        if (tierInfo.MinQuantity <= qty && qty <= tierInfo.MaxQuantity) {
+                            // Get price for first size (usually OSFA for caps)
+                            const firstSize = Object.keys(prices)[0];
+                            return prices[firstSize]?.[tierKey];
+                        }
+                    }
+                    return null;
+                };
+
+                currentPrice = findTierPrice(currentQty);
+                nextPrice = findTierPrice(nextQty);
+            }
+
+            // Method 3: Try to read from displayed price
+            if (!currentPrice) {
+                const unitPriceElement = document.getElementById('hero-unit-price');
+                if (unitPriceElement) {
+                    const match = unitPriceElement.textContent.match(/\$(\d+\.?\d*)/);
+                    if (match) {
+                        currentPrice = parseFloat(match[1]);
+                    }
+                }
+            }
+
+            // Calculate actual savings if we have both prices
+            if (currentPrice && nextPrice && currentPrice > nextPrice) {
+                const percentSaved = (currentPrice - nextPrice) / currentPrice;
+                const amountSaved = currentPrice - nextPrice;
+                
+                logger.log('QUANTITY-SHORTCUTS', 
+                    `Actual savings: ${currentQty} @ $${currentPrice} → ${nextQty} @ $${nextPrice} = ${(percentSaved * 100).toFixed(1)}%`);
+                
+                return {
+                    percentSaved: percentSaved,
+                    amountSaved: amountSaved
+                };
+            }
+
+            // Fallback to estimated savings if we can't calculate actual
+            logger.log('QUANTITY-SHORTCUTS', 'Using estimated savings - actual pricing data not available');
             const estimatedSavings = {
                 '24': { '48': 0.08, '72': 0.12 },
                 '48': { '72': 0.06, '144': 0.10 },
@@ -440,7 +501,7 @@
             if (savings) {
                 return {
                     percentSaved: savings,
-                    amountSaved: savings * 100 // Placeholder calculation
+                    amountSaved: savings * currentPrice // Better estimate using current price
                 };
             }
 
