@@ -294,8 +294,8 @@
                 const text = cell.textContent.trim();
                 if (text.match(/^\$?\d+(\.\d+)?$/)) {
                     cell.classList.add('price-cell');
-                    // Remove $ if present and let CSS add it
-                    cell.textContent = text.replace('$', '');
+                    // Keep the dollar sign as-is since CSS no longer adds it
+                    // cell.textContent = text.replace('$', '');
                 }
             });
 

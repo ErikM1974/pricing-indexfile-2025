@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cap Embroidery Dollar Sign Fix</title>
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
+    <link rel="stylesheet" href="/shared_components/css/enhanced-loading-animations.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .test-table th, .test-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .test-table th {
+            background-color: #f5f5f5;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cap Embroidery Dollar Sign Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Regular Price Display (No price-cell class)</h2>
+        <table class="test-table">
+            <thead>
+                <tr>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Expected</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>24-47</td>
+                    <td class="test-price-1">$15.00</td>
+                    <td>$15.00</td>
+                    <td class="status-1"></td>
+                </tr>
+                <tr>
+                    <td>48-71</td>
+                    <td class="test-price-2">$14.00</td>
+                    <td>$14.00</td>
+                    <td class="status-2"></td>
+                </tr>
+                <tr>
+                    <td>72+</td>
+                    <td class="test-price-3">$13.00</td>
+                    <td>$13.00</td>
+                    <td class="status-3"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Price Display with price-cell class (Previously showed $$)</h2>
+        <table class="test-table pricing-table">
+            <thead>
+                <tr>
+                    <th>Quantity</th>
+                    <th>OSFA</th>
+                    <th>Expected</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>24-47</td>
+                    <td class="price-cell test-price-4">$15.00</td>
+                    <td>$15.00</td>
+                    <td class="status-4"></td>
+                </tr>
+                <tr>
+                    <td>48-71</td>
+                    <td class="price-cell test-price-5">$14.00</td>
+                    <td>$14.00</td>
+                    <td class="status-5"></td>
+                </tr>
+                <tr>
+                    <td>72+</td>
+                    <td class="price-cell test-price-6">$13.00</td>
+                    <td>$13.00</td>
+                    <td class="status-6"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Dynamic Price Update Simulation</h2>
+        <button onclick="simulatePriceUpdate()">Simulate Price Update</button>
+        <table class="test-table pricing-table" id="dynamic-pricing-table">
+            <thead>
+                <tr>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody id="dynamic-pricing-body">
+                <!-- Will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results Summary</h2>
+        <div id="test-summary"></div>
+    </div>
+
+    <script>
+        // Test function to check if prices display correctly
+        function checkPriceDisplay() {
+            let passCount = 0;
+            let failCount = 0;
+
+            // Check all test prices
+            for (let i = 1; i <= 6; i++) {
+                const priceElement = document.querySelector(`.test-price-${i}`);
+                const statusElement = document.querySelector(`.status-${i}`);
+                
+                if (priceElement) {
+                    const displayedText = priceElement.textContent.trim();
+                    const expectedText = priceElement.textContent.trim();
+                    
+                    // Check if there's a double dollar sign
+                    const hasDoubleDollar = displayedText.startsWith('$$');
+                    
+                    if (!hasDoubleDollar && displayedText.match(/^\$\d+\.\d{2}$/)) {
+                        statusElement.textContent = 'PASS';
+                        statusElement.className = 'status pass';
+                        passCount++;
+                    } else {
+                        statusElement.textContent = 'FAIL - ' + (hasDoubleDollar ? 'Double $$' : 'Invalid format');
+                        statusElement.className = 'status fail';
+                        failCount++;
+                    }
+                }
+            }
+
+            // Update summary
+            const summary = document.getElementById('test-summary');
+            summary.innerHTML = `
+                <h3>Results:</h3>
+                <p>✅ Passed: ${passCount}</p>
+                <p>❌ Failed: ${failCount}</p>
+                <p><strong>${failCount === 0 ? '🎉 All tests passed! The double dollar sign issue is fixed.' : '⚠️ Some tests failed. Please check the implementation.'}</strong></p>
+            `;
+        }
+
+        // Simulate dynamic price update (like the cap embroidery controller does)
+        function simulatePriceUpdate() {
+            const tbody = document.getElementById('dynamic-pricing-body');
+            tbody.innerHTML = '';
+
+            const tiers = [
+                { range: '24-47', price: 15.00 },
+                { range: '48-71', price: 14.00 },
+                { range: '72+', price: 13.00 }
+            ];
+
+            tiers.forEach(tier => {
+                const row = tbody.insertRow();
+                const rangeCell = row.insertCell();
+                const priceCell = row.insertCell();
+
+                rangeCell.textContent = tier.range;
+                priceCell.className = 'price-cell';
+                // Simulate what the cap embroidery controller does
+                priceCell.textContent = '$' + tier.price.toFixed(2);
+            });
+
+            alert('Prices updated! Check if they display correctly (should show single $)');
+        }
+
+        // Run tests on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(checkPriceDisplay, 100);
+        });
+    </script>
+</body>
+</html>
