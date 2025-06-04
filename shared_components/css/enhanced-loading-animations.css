@@ -230,14 +230,17 @@
     position: relative;
 }
 
-/* Removed dollar sign prefix - prices already include $ 
+/* Temporarily disabled to fix double dollar sign issue in cap embroidery pricing
+   The JavaScript already formats prices with $ included */
+/*
 .price-cell::before {
     content: '$';
     font-size: 14px;
     opacity: 0.7;
     position: relative;
     top: -2px;
-}*/
+}
+*/
 
 /* Tier badges */
 .tier-badge {
