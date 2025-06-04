@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Embroidery Pricing | Northwest Custom Apparel</title>
+    
+    <!-- Optimized CSS - Only 4 files instead of 19 -->
+    <link rel="stylesheet" href="/shared_components/css/core-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/features-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/cap-embroidery-specific.css">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Critical inline styles for above-the-fold content -->
+    <style>
+        /* Prevent layout shift */
+        .universal-header { min-height: 140px; }
+        .container { min-height: 100vh; }
+        .spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #2e5827; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <!-- Universal Navigation Header -->
+    <header class="universal-header">
+        <!-- Top Bar with Company Info -->
+        <div class="header-top-bar">
+            <div class="header-top-bar-content">
+                <div class="contact-info">
+                    <span>📞 253-922-5793</span>
+                    <span>✉️ sales@nwcustomapparel.com</span>
+                    <span>🕒 9AM-5PM</span>
+                </div>
+                <div class="header-actions">
+                    <button onclick="window.print()" class="header-action-btn">
+                        🖨️ Print Quote
+                    </button>
+                    <button onclick="shareQuote()" class="header-action-btn">
+                        📤 Share
+                    </button>
+                    <button onclick="toggleHelp()" class="header-action-btn">
+                        ❓ Help
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Header Navigation -->
+        <div class="header-main">
+            <div class="header-main-content">
+                
+                <!-- Logo & Company Brand -->
+                <div class="header-brand">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" 
+                         alt="NW Custom Apparel Logo" 
+                         class="header-logo-img"
+                         loading="lazy">
+                </div>
+                
+                <!-- Navigation & Search Hub -->
+                <div class="header-nav-hub">
+                    
+                    <!-- Back to Product Button -->
+                    <a id="back-to-product" href="#" class="back-to-product">
+                        <span class="back-icon">←</span> 
+                        <span>Back to Product</span>
+                    </a>
+                    
+                    <!-- Style Search -->
+                    <div class="style-search-container">
+                        <div class="style-search-input-wrapper">
+                            <span class="style-search-icon">🔍</span>
+                            <input type="text" 
+                                   id="style-search-input" 
+                                   placeholder="Search style (e.g., PC61)" 
+                                   autocomplete="off" 
+                                   class="style-search-input">
+                        </div>
+                        <div id="style-search-results" class="style-search-results"></div>
+                    </div>
+                    
+                    <!-- Page Context Indicator -->
+                    <div class="page-context">
+                        <div class="page-context-title">Cap Embroidery Pricing</div>
+                        <div class="page-context-subtitle" id="current-product-context">Select a product to get started</div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="header-quick-actions">
+                    
+                    <!-- Quick Quote Toggle -->
+                    <button onclick="toggleQuickQuote()" class="quick-action-btn">
+                        📊 Quote
+                    </button>
+                    
+                    <!-- Sample Request -->
+                    <button onclick="requestSample()" class="quick-action-btn">
+                        🧵 Sample
+                    </button>
+                    
+                    <!-- Contact for Quote -->
+                    <button onclick="contactForQuote()" class="primary-action-btn">
+                        💬 Get Quote
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Breadcrumb Navigation -->
+        <div class="header-breadcrumb">
+            <div class="header-breadcrumb-content">
+                <nav class="header-breadcrumb-nav">
+                    <a href="javascript:void(0)" onclick="goToHome()" class="breadcrumb-link" title="Go to home page">Home</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span class="breadcrumb-separator">Products</span>
+                    <span class="breadcrumb-separator">›</span>
+                    <a id="breadcrumb-product-link" href="#" class="breadcrumb-link">
+                        <span id="breadcrumb-product">Product</span>
+                    </a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span class="breadcrumb-current">Cap Embroidery Pricing</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Initial loading state -->
+        <div id="initial-loader" style="text-align: center; padding: 60px;">
+            <div class="spinner"></div>
+            <p style="margin-top: 20px; color: #6c757d;">Loading pricing calculator...</p>
+        </div>
+
+        <!-- Main content (hidden initially) -->
+        <div id="main-content" style="display: none;">
+            <!-- Compact Quick Quote Section -->
+            <div class="quick-quote-banner">
+                <div>
+                    <h3 class="quick-quote-title">Quick Quote Calculator</h3>
+                    <p class="quick-quote-subtitle">Enter quantity for instant pricing</p>
+                </div>
+                
+                <div class="quick-quote-controls">
+                    <button id="hero-quantity-decrease" type="button" class="hero-quantity-btn" aria-label="Decrease quantity">−</button>
+                    
+                    <input id="hero-quantity-input" 
+                           type="number" 
+                           min="1" 
+                           max="10000" 
+                           value="24" 
+                           class="hero-quantity-input" 
+                           aria-label="Quantity of caps">
+                    
+                    <button id="hero-quantity-increase" type="button" class="hero-quantity-btn" aria-label="Increase quantity">+</button>
+                    
+                    <span class="quantity-label" id="quantity-label-text">caps</span>
+                </div>
+                
+                <div class="quick-quote-pricing">
+                    <div id="hero-total-price" class="hero-total-price">$625.00</div>
+                    <div id="hero-unit-price" class="hero-unit-price">$12.50 per cap</div>
+                    <div class="hero-pricing-note">Pricing based on 8,000 stitches</div>
+                </div>
+            </div>
+            
+            <!-- Quantity Shortcuts -->
+            <div id="quantity-shortcuts-container"></div>
+            
+            <!-- Compact notifications -->
+            <div id="hero-optimization-tip" class="hero-optimization-tip">
+                💡 <span id="optimization-message">Add 22 more caps for better pricing!</span>
+            </div>
+            
+            <div id="hero-ltm-warning" class="hero-ltm-warning">
+                ⚠️ <span id="ltm-message">Orders under 24 caps include a $50 setup fee</span>
+            </div>
+
+            <!-- Modern Branded Layout -->
+            <div class="main-content-wrapper">
+                
+                <!-- Hidden Caspio Matrix - Keep this for data source -->
+                <div id="pricing-calculator" class="pricing-calculator hidden-calculator">
+                    <div class="loading-message">Loading pricing data...</div>
+                </div>
+                
+                <!-- Product Information Card -->
+                <div class="content-card" id="product-info">
+                    <div class="card-header">
+                        <h2 class="large">Product Information</h2>
+                        <div class="card-header-content">
+                            <div>
+                                <h3 id="product-title-context" class="product-title">Product Title</h3>
+                                <div class="product-context-info">
+                                    Style: <strong id="product-style-context">Style Number</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-content card-grid">
+                        <!-- Product Image -->
+                        <div>
+                            <div id="product-image-gallery" class="image-gallery-enhanced">
+                                <div id="main-image-container" class="image-container-enhanced">
+                                    <img id="product-image-main" src="" alt="Product Image" class="product-main-image" loading="lazy">
+                                    <div class="image-loading-spinner"></div>
+                                    <div class="image-zoom-overlay zoom-overlay-enhanced">🔍</div>
+                                </div>
+                                <div id="image-thumbnails" class="image-thumbnails-enhanced">
+                                    <!-- Thumbnails will be dynamically added here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Details & Colors -->
+                        <div class="product-details-section">
+                            <div class="info-panel">
+                                <h4>What's Included</h4>
+                                <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
+                            </div>
+                            
+                            <!-- Clean Color Selection -->
+                            <div class="clean-color-section">
+                                <h4 class="section-header">Select Color</h4>
+                                
+                                <!-- Selected Color Display -->
+                                <div class="clean-selected-display">
+                                    <div id="pricing-color-swatch" class="clean-selected-swatch"></div>
+                                    <div class="clean-selected-info">
+                                        <h3 id="pricing-color-name">Select a Color</h3>
+                                        <p>Choose from available colors below</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Color Swatches Grid -->
+                                <div id="color-swatches" class="clean-color-grid">
+                                    <!-- Color swatches will be dynamically added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customization Options Card -->
+                <div class="content-card" id="customization">
+                    <div class="card-header">
+                        <h2>Customization Options</h2>
+                        <p>Adjust your embroidery details (updates pricing above)</p>
+                    </div>
+                    
+                    <div class="card-content card-grid">
+                        <!-- Stitch Count Selection -->
+                        <div class="form-section">
+                            <h3>Front Logo Stitch Count</h3>
+                            <div style="margin-bottom: 15px;">
+                                <select id="client-stitch-count-select" name="client-stitch-count-select" class="stitch-count-select">
+                                    <option value="5000">5,000 stitches</option>
+                                    <option value="8000" selected>8,000 stitches (Standard)</option>
+                                    <option value="10000">10,000 stitches</option>
+                                </select>
+                                <span id="stitch-count-indicator" class="form-feedback">✓ Quick quote updated!</span>
+                            </div>
+                            <div class="form-note">
+                                Higher stitch counts allow for more detailed designs but may increase cost.
+                            </div>
+                        </div>
+                        
+                        <!-- Back Logo Option -->
+                        <div class="form-section">
+                            <h3>Back Logo Embroidery</h3>
+                            <div style="margin-bottom: 15px;">
+                                <label class="back-logo-checkbox-container" for="back-logo-checkbox">
+                                    <input type="checkbox" id="back-logo-checkbox" class="back-logo-checkbox">
+                                    Add embroidered back logo (+$5.00 per cap)
+                                </label>
+                            </div>
+                            
+                            <div id="back-logo-details" class="back-logo-details">
+                                <div style="margin-bottom: 15px;">
+                                    <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Stitch Count:</label>
+                                    <div class="stitch-counter">
+                                        <button id="back-logo-decrement" type="button" class="stitch-counter-btn">−</button>
+                                        <span id="back-logo-stitch-display" class="stitch-counter-display">5,000</span>
+                                        <button id="back-logo-increment" type="button" class="stitch-counter-btn">+</button>
+                                        <span class="stitch-counter-range">(5K-15K)</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="cost-display">
+                                    <strong id="back-logo-price">Additional Cost: $5.00 per cap</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="form-note">
+                                Optional upgrade for branding on both sides of the cap.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pricing Table Card -->
+                <div class="content-card" id="pricing-details">
+                    <div class="card-header">
+                        <h2>Detailed Pricing by Quantity</h2>
+                        <p>Volume discounts automatically applied</p>
+                    </div>
+                    
+                    <div class="card-content">
+                        <div class="pricing-table-container">
+                            <table id="custom-pricing-grid" class="pricing-table">
+                                <thead>
+                                    <tr id="pricing-header-row" class="pricing-table-header">
+                                        <th>Quantity Range</th>
+                                        <!-- Size headers will be dynamically populated -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Pricing data will be dynamically added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="card-note">
+                            <p>
+                                <strong>Note:</strong> Prices shown include embroidered logo on front. Back logo and setup fees calculated separately.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quote Builder Section -->
+                <div id="quote-builder" class="content-card quote-builder-section">
+                    <div id="add-to-cart-section">
+                        <!-- Quote adapter will inject content here -->
+                    </div>
+                </div>
+                
+                <!-- Call to Action Card -->
+                <div class="cta-card">
+                    <h2 class="cta-title">Ready for Your Quote?</h2>
+                    <p class="cta-subtitle">
+                        Contact us with your quantity and customization details for a personalized quote.
+                    </p>
+                    
+                    <div class="cta-buttons">
+                        <button class="cta-btn-primary">
+                            📞 Call for Quote: 253-922-5793
+                        </button>
+                        
+                        <button class="cta-btn-secondary">
+                            ✉️ Email Quote Request
+                        </button>
+                    </div>
+                    
+                    <div class="cta-features">
+                        <p>💚 <strong>Why Choose Northwest Custom Apparel?</strong></p>
+                        <p>Family Owned and Operated Since 1977 • Milton, WA • Quality embroidery</p>
+                        <p>📍 2025 Freeman Road East Milton, WA 98354</p>
+                        <p>📱 You can text us at 253-922-5793</p>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End main content -->
+    </div> <!-- End .container -->
+    
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-grid">
+                
+                <!-- Company Info -->
+                <div class="footer-column">
+                    <h3>Northwest Custom Apparel</h3>
+                    <p class="tagline">Family Owned and Operated Since 1977</p>
+                    <p class="address">📍 2025 Freeman Road East</p>
+                    <p class="address">Milton, WA 98354</p>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <p>📞 Call: <a href="tel:253-922-5793" class="footer-link">253-922-5793</a></p>
+                    <p>📱 Text: <a href="sms:253-922-5793" class="footer-link">253-922-5793</a></p>
+                    <p>✉️ Email: <a href="mailto:sales@nwcustomapparel.com" class="footer-link">sales@nwcustomapparel.com</a></p>
+                    <p>🕒 Hours: 9AM-5PM</p>
+                </div>
+                
+                <!-- Quote Requests -->
+                <div class="footer-column">
+                    <h3>Request a Quote</h3>
+                    <p class="tagline">Send quote requests to:</p>
+                    <p>✉️ <a href="mailto:sales@nwcustomapparel.com?subject=Cap Embroidery Quote Request" class="footer-link underlined">sales@nwcustomapparel.com</a></p>
+                    <p class="footer-quote-note">Include: quantity, design details, and deadline</p>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="footer-copyright">
+                <p>&copy; 2025 Northwest Custom Apparel. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript Files - Optimized Loading -->
+    <!-- Core Bundle - Essential functionality -->
+    <script src="/shared_components/js/core-bundle.js"></script>
+    
+    <!-- Page-specific functionality -->
+    <script>
+        // Initialize core functionality immediately
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loader and show content
+            document.getElementById('initial-loader').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        });
+    </script>
+    
+    <!-- Lazy load jsPDF for printing (only when needed) -->
+    <script>
+        function loadPrintLibraries() {
+            if (!window.jspdf) {
+                const script1 = document.createElement('script');
+                script1.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                script1.async = true;
+                document.head.appendChild(script1);
+                
+                script1.onload = function() {
+                    const script2 = document.createElement('script');
+                    script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js';
+                    script2.async = true;
+                    document.head.appendChild(script2);
+                };
+            }
+        }
+        
+        // Load print libraries when print button is hovered
+        document.querySelector('[onclick="window.print()"]')?.addEventListener('mouseenter', loadPrintLibraries, { once: true });
+    </script>
+    
+    <!-- Load remaining functionality after page is interactive -->
+    <script>
+        // Defer loading of non-critical scripts
+        window.addEventListener('load', function() {
+            // Load features bundle after 100ms
+            setTimeout(function() {
+                const featuresScript = document.createElement('script');
+                featuresScript.src = '/shared_components/js/features-bundle.js';
+                featuresScript.async = true;
+                document.body.appendChild(featuresScript);
+            }, 100);
+            
+            // Load page-specific scripts after 500ms
+            setTimeout(function() {
+                const scripts = [
+                    '/shared_components/js/pricing-matrix-capture.js',
+                    '/shared_components/js/cap-embroidery-controller-v2.js',
+                    '/shared_components/js/hero-quantity-calculator.js',
+                    '/shared_components/js/universal-header.js',
+                    '/shared_components/js/header-button-functions.js',
+                    '/shared_components/js/quote-adapter-base.js',
+                    '/shared_components/js/cap-embroidery-quote-adapter.js'
+                ];
+                
+                scripts.forEach(function(src, index) {
+                    setTimeout(function() {
+                        const script = document.createElement('script');
+                        script.src = src;
+                        script.async = true;
+                        document.body.appendChild(script);
+                    }, index * 100); // Stagger loading
+                });
+            }, 500);
+        });
+    </script>
+    
+</body>
+</html>
