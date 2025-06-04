@@ -1,0 +1,107 @@
+/**
+ * Hero Pricing Emphasis Styles
+ * Makes per-unit price the primary focus instead of total
+ */
+
+/* Quick Quote Pricing Area */
+.quick-quote-pricing {
+    text-align: center;
+    padding: 20px;
+}
+
+/* Primary Price (Per Unit) - Make this the hero */
+.hero-price-primary {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.hero-price-primary .hero-price-amount {
+    font-size: 48px !important;
+    font-weight: 700;
+    color: #2e5827;
+    line-height: 1;
+}
+
+.hero-price-primary .hero-price-label {
+    font-size: 20px;
+    font-weight: 500;
+    color: #495057;
+}
+
+/* Secondary Price (Total) - Make this supporting info */
+.hero-price-secondary {
+    font-size: 18px !important;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.hero-price-secondary .hero-price-prefix {
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+/* Note stays the same */
+.hero-pricing-note {
+    font-size: 14px;
+    color: #6c757d;
+    opacity: 0.9;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .hero-price-primary .hero-price-amount {
+        font-size: 36px !important;
+    }
+    
+    .hero-price-primary .hero-price-label {
+        font-size: 18px;
+    }
+    
+    .hero-price-secondary {
+        font-size: 16px !important;
+    }
+}
+
+/* Animation when price updates */
+.hero-price-amount {
+    transition: all 0.3s ease;
+}
+
+.hero-price-amount.updating {
+    transform: scale(1.1);
+    color: #1a73e8;
+}
+
+/* Visual hierarchy helpers */
+.quick-quote-pricing::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background: #2e5827;
+    margin: 0 auto 20px;
+    border-radius: 2px;
+}
+
+/* Comparison styling - emphasize savings */
+.hero-price-primary.has-savings {
+    position: relative;
+}
+
+.hero-price-primary.has-savings::after {
+    content: 'Best Value!';
+    position: absolute;
+    top: -20px;
+    right: 50%;
+    transform: translateX(50%);
+    background: #28a745;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
