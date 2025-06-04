@@ -413,33 +413,48 @@
     </footer>
     
     <!-- JavaScript Files -->
-    <!-- NWCA Global Namespace - MUST LOAD FIRST -->
-    <script src="/shared_components/js/nwca-namespace.js"></script>
+    <!-- Base Layer - Core dependencies -->
+    <script src="/shared_components/js/nwca-namespace.js"></script> <!-- NWCA Global Namespace - MUST LOAD FIRST -->
     <script src="/shared_components/js/constants.js"></script> <!-- Global constants -->
+    <script src="/shared_components/js/app-config.js"></script> <!-- Application configuration -->
+    <script src="/shared_components/js/utils.js"></script> <!-- General utility functions -->
+    
+    <!-- Data Layer - Pricing system -->
+    <script src="/shared_components/js/pricing-matrix-api.js"></script> <!-- API communication -->
+    <script src="/shared_components/js/pricing-matrix-capture.js"></script> <!-- Captures pricing from Caspio -->
+    <script src="/shared_components/js/pricing-calculator.js"></script> <!-- Core pricing calculations -->
+    <script src="/shared_components/js/dp5-helper.js"></script> <!-- DP5 integration helper -->
+    
+    <!-- Quote System Base -->
+    <script src="/shared_components/js/quote-adapter-base.js"></script> <!-- Base class for quote adapters -->
+    
+    <!-- UI Foundation -->
     <script src="/shared_components/js/ui-components.js"></script> <!-- UI components for loading/error states -->
-    <script src="/shared_components/js/pricing-pages.js"></script>
-    <script src="/shared_components/js/utils.js"></script> <!-- Moved up and removed defer -->
-    <script src="/shared_components/js/pricing-matrix-capture.js"></script>
-    <script src="/shared_components/js/pricing-matrix-api.js"></script>
-    <script src="/shared_components/js/dp5-helper.js"></script>
-    <script src="/shared_components/js/product-quantity-ui.js"></script>
-    <script src="/shared_components/js/pricing-calculator.js"></script>
-    <script src="/shared_components/js/app-config.js"></script>
-    <script src="/shared_components/js/quote-adapter-base.js"></script> <!-- Quote system base -->
-    <script src="/shared_components/js/cap-embroidery-quote-adapter.js"></script> <!-- Cap embroidery quote adapter -->
-    <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script> <!-- V2: Using NWCA namespace -->
-    <script src="/shared_components/js/hero-quantity-calculator.js"></script> <!-- Quantity-first UX calculator -->
-    <script src="/shared_components/js/hero-pricing-updater.js"></script> <!-- Hero pricing display updater -->
-    <script src="/shared_components/js/product-pricing-ui.js"></script> <!-- Added new script, removed defer -->
-    <script src="/shared_components/js/universal-header.js"></script> <!-- Universal header navigation and functionality -->
+    <script src="/shared_components/js/pricing-pages.js"></script> <!-- Common pricing page functionality -->
+    
+    <!-- Hero Section & Product UI -->
+    <script src="/shared_components/js/hero-quantity-calculator.js"></script> <!-- Hero quantity calculator -->
+    <script src="/shared_components/js/hero-pricing-updater.js"></script> <!-- Hero pricing display -->
+    <script src="/shared_components/js/product-quantity-ui.js"></script> <!-- Quantity UI components -->
+    <script src="/shared_components/js/product-pricing-ui.js"></script> <!-- Product pricing UI -->
+    
+    <!-- Cap Embroidery Specific - Load after dependencies -->
+    <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script> <!-- Main controller (depends on NWCA, pricing) -->
+    <script src="/shared_components/js/cap-embroidery-back-logo.js"></script> <!-- Back logo functionality -->
+    <script src="/shared_components/js/cap-embroidery-validation.js"></script> <!-- Validation utilities -->
+    <script src="/shared_components/js/cap-embroidery-cart-integration.js"></script> <!-- Cart integration -->
+    <script src="/shared_components/js/cap-embroidery-quote-adapter.js"></script> <!-- Quote adapter (depends on base) -->
+    
+    <!-- Additional Features -->
+    <script src="/shared_components/js/universal-header.js"></script> <!-- Universal header functionality -->
     <script src="/shared_components/js/header-button-functions.js"></script> <!-- Header button implementations -->
-    <script src="/shared_components/js/order-form-pdf.js"></script> <!-- PDF generation module -->
-    <script src="/shared_components/js/quantity-shortcuts.js"></script> <!-- Phase 2 Feature 1: Quick quantity shortcuts -->
-    <script src="/shared_components/js/mobile-collapsible-ultimate-fix.js"></script> <!-- Ultimate fix for mobile accordion -->
-    <script src="/shared_components/js/clean-color-adapter.js"></script> <!-- Clean color swatch implementation -->
-    <script src="/shared_components/js/enhanced-loading-animations.js"></script> <!-- Phase 2 Feature 3: Enhanced loading animations -->
-    <script src="/shared_components/js/auto-save-quote.js"></script> <!-- Phase 2 Feature 7: Auto-save quote draft -->
-    <script src="/shared_components/js/keyboard-navigation.js"></script> <!-- Phase 2 Feature 5: Keyboard navigation support -->
+    <script src="/shared_components/js/order-form-pdf.js"></script> <!-- PDF generation -->
+    <script src="/shared_components/js/quantity-shortcuts.js"></script> <!-- Quick quantity shortcuts -->
+    <script src="/shared_components/js/mobile-collapsible-ultimate-fix.js"></script> <!-- Mobile accordion -->
+    <script src="/shared_components/js/clean-color-adapter.js"></script> <!-- Color swatch implementation -->
+    <script src="/shared_components/js/enhanced-loading-animations.js"></script> <!-- Loading animations -->
+    <script src="/shared_components/js/auto-save-quote.js"></script> <!-- Auto-save quote draft -->
+    <script src="/shared_components/js/keyboard-navigation.js"></script> <!-- Keyboard navigation support -->
     
 </body>
 </html>
