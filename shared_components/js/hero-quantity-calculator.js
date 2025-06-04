@@ -463,15 +463,33 @@
             
             const pricing = this.calculateTotalPricing(heroState.currentQuantity);
             
-            // Update total price
+            // Update total price - preserve the "Total:" prefix
             const totalPriceEl = document.getElementById('hero-total-price');
             if (totalPriceEl) {
-                totalPriceEl.textContent = `$${pricing.totalPrice.toFixed(2)}`;
+                // Check if it has the new structure
+                const hasPrefix = totalPriceEl.querySelector('.hero-price-prefix');
+                if (hasPrefix) {
+                    totalPriceEl.innerHTML = '<span class="hero-price-prefix">Total:</span> $' + pricing.totalPrice.toFixed(2);
+                } else {
+                    totalPriceEl.textContent = `$${pricing.totalPrice.toFixed(2)}`;
+                }
             }
             
-            // Update unit price with detailed breakdown showing main price + additions
+            // Update unit price - check for new structure first
+            const unitPriceAmountEl = document.querySelector('.hero-price-amount');
             const unitPriceEl = document.getElementById('hero-unit-price');
-            if (unitPriceEl) {
+            
+            if (unitPriceAmountEl) {
+                // New structure - just update the price amount
+                unitPriceAmountEl.textContent = `$${pricing.unitPrice.toFixed(2)}`;
+                
+                // Add animation effect
+                unitPriceAmountEl.classList.add('updating');
+                setTimeout(() => {
+                    unitPriceAmountEl.classList.remove('updating');
+                }, 300);
+            } else if (unitPriceEl) {
+                // Fallback to old structure
                 let priceBreakdown = '';
                 
                 // Start with base cap price from pricing table
