@@ -23,7 +23,9 @@
       "Bash(git restore:*)",
       "Bash(mkdir:*)",
       "Bash(mv:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

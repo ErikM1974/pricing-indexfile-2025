@@ -8,10 +8,8 @@
     <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-layout.css">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-quantity-ui.css">
     <link rel="stylesheet" href="/shared_components/css/cap-embroidery-specific.css">
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
-    <link rel="stylesheet" href="/shared_components/css/ui-components.css">
     <link rel="stylesheet" href="/shared_components/css/quantity-shortcuts.css">
     <link rel="stylesheet" href="/shared_components/css/mobile-collapsible-menu.css">
     <link rel="stylesheet" href="/shared_components/css/clean-color-swatches.css">
@@ -110,7 +108,7 @@
                 <nav class="header-breadcrumb-nav">
                     <a href="javascript:void(0)" onclick="goToHome()" class="breadcrumb-link" title="Go to home page">Home</a>
                     <span class="breadcrumb-separator">›</span>
-                    <span class="breadcrumb-separator">Products</span>
+                    <span>Products</span>
                     <span class="breadcrumb-separator">›</span>
                     <a id="breadcrumb-product-link" href="#" class="breadcrumb-link">
                         <span id="breadcrumb-product">Product</span>
@@ -200,7 +198,8 @@
                     <div>
                         <div id="product-image-gallery" class="image-gallery-enhanced">
                             <div id="main-image-container" class="image-container-enhanced">
-                                <img id="product-image-main" src="" alt="Product Image" class="product-main-image">
+                                <img id="product-image-main" src="" alt="Product Image" class="product-main-image" 
+                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/400x400/f8f9fa/6c757d?text=Image+Not+Available'; this.alt='Image not available';">
                                 <div class="image-loading-spinner"></div>
                                 <div class="image-zoom-overlay zoom-overlay-enhanced">🔍</div>
                             </div>
