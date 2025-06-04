@@ -20,7 +20,10 @@
       "Bash(git merge:*)",
       "Bash(git stash:*)",
       "Bash(git commit:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(true)"
     ],
     "deny": []
   }
