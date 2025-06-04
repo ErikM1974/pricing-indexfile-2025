@@ -511,12 +511,29 @@
                 unitPriceEl.textContent = priceBreakdown;
             }
             
-            // Update stitch count display
-            const stitchInfoEl = document.querySelector('.quick-quote-banner div:last-child div:last-child');
-            if (stitchInfoEl) {
-                const stitchText = `Pricing based on ${heroState.currentStitchCount.toLocaleString()} stitches`;
-                const backLogoText = heroState.backLogoEnabled ? ' + back logo' : '';
-                stitchInfoEl.textContent = stitchText + backLogoText;
+            // Update pricing breakdown display
+            const pricingNoteEl = document.querySelector('.hero-pricing-note');
+            if (pricingNoteEl) {
+                let breakdownHTML = '<div style="line-height: 1.6;">';
+                
+                // Front logo
+                breakdownHTML += `Front logo (${heroState.currentStitchCount.toLocaleString()} stitches): <strong>$${pricing.basePrice.toFixed(2)}</strong>`;
+                
+                // Back logo if enabled
+                if (heroState.backLogoEnabled && pricing.backLogoPrice > 0) {
+                    breakdownHTML += `<br>Back logo: <strong>+$${pricing.backLogoPrice.toFixed(2)}</strong>`;
+                }
+                
+                // LTM fee if applicable
+                if (pricing.hasLTMFee && pricing.ltmFeePerUnit > 0) {
+                    breakdownHTML += `<br>Setup fee (per cap): <strong>+$${pricing.ltmFeePerUnit.toFixed(2)}</strong>`;
+                }
+                
+                // Total per cap
+                breakdownHTML += `<br><span style="border-top: 1px solid #dee2e6; display: inline-block; padding-top: 4px; margin-top: 4px;">Total per cap: <strong style="color: #2e5827;">$${pricing.unitPrice.toFixed(2)}</strong></span>`;
+                
+                breakdownHTML += '</div>';
+                pricingNoteEl.innerHTML = breakdownHTML;
             }
             
             // Update tier info
