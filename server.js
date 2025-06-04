@@ -11,6 +11,20 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// CORS middleware - MUST be before other middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
+
 // Force HTTPS in production (Heroku)
 app.use((req, res, next) => {
   // Skip for localhost development
@@ -723,11 +737,211 @@ app.get('/api/cart-integration.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'cart-integration.js'));
 });
 
-// Quote endpoints are handled by the main Caspio API
-// The quote system uses existing API endpoints:
-// - /api/quote_sessions (for quote sessions)
-// - /api/quote_items (for quote items) 
-// - /api/quote_analytics (for analytics)
+// Quote API endpoints are now available on Caspio proxy
+
+// Quote Sessions API - GET all sessions
+app.get('/api/quote_sessions', async (req, res) => {
+  try {
+    let endpoint = '/quote_sessions';
+    if (req.query.quoteID) {
+      endpoint += `?filter=QuoteID='${req.query.quoteID}'`;
+    } else if (req.query.sessionID) {
+      endpoint += `?filter=SessionID='${req.query.sessionID}'`;
+    }
+    
+    const data = await makeApiRequest(endpoint);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote sessions:', error);
+    res.status(500).json({ error: 'Failed to fetch quote sessions', details: error.message });
+  }
+});
+
+// GET single session by ID
+app.get('/api/quote_sessions/:id', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/quote_sessions/${req.params.id}`);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote session:', error);
+    res.status(500).json({ error: 'Failed to fetch quote session' });
+  }
+});
+
+app.get('/api/quote_sessions/session/:sessionId', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/quote_sessions?filter=SessionID='${req.params.sessionId}'`);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote session by session ID:', error);
+    res.status(500).json({ error: 'Failed to fetch quote session by session ID' });
+  }
+});
+
+app.get('/api/quote_sessions/quote/:quoteId', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/quote_sessions?filter=QuoteID='${req.params.quoteId}'`);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote session by quote ID:', error);
+    res.status(500).json({ error: 'Failed to fetch quote session by quote ID' });
+  }
+});
+
+// CREATE new session
+app.post('/api/quote_sessions', async (req, res) => {
+  try {
+    const data = await makeApiRequest('/quote_sessions', 'POST', req.body);
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Error creating quote session:', error);
+    res.status(500).json({ error: 'Failed to create quote session' });
+  }
+});
+
+// UPDATE session
+app.put('/api/quote_sessions/:id', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/quote_sessions/${req.params.id}`, 'PUT', req.body);
+    res.json(data);
+  } catch (error) {
+    console.error('Error updating quote session:', error);
+    res.status(500).json({ error: 'Failed to update quote session' });
+  }
+});
+
+// DELETE session
+app.delete('/api/quote_sessions/:id', async (req, res) => {
+  try {
+    await makeApiRequest(`/quote_sessions/${req.params.id}`, 'DELETE');
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting quote session:', error);
+    res.status(500).json({ error: 'Failed to delete quote session' });
+  }
+});
+
+// Quote Items API
+app.get('/api/quote_items', async (req, res) => {
+  try {
+    const data = await makeApiRequest('/quote_items');
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote items:', error);
+    res.status(500).json({ error: 'Failed to fetch quote items' });
+  }
+});
+
+app.get('/api/quote_items/:id', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/quote_items/${req.params.id}`);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote item:', error);
+    res.status(500).json({ error: 'Failed to fetch quote item' });
+  }
+});
+
+app.get('/api/quote_items/session/:sessionId', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/quote_items?filter=SessionID='${req.params.sessionId}'`);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote items by session ID:', error);
+    res.status(500).json({ error: 'Failed to fetch quote items by session ID' });
+  }
+});
+
+app.post('/api/quote_items', async (req, res) => {
+  try {
+    const data = await makeApiRequest('/quote_items', 'POST', req.body);
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Error creating quote item:', error);
+    res.status(500).json({ error: 'Failed to create quote item' });
+  }
+});
+
+app.put('/api/quote_items/:id', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/quote_items/${req.params.id}`, 'PUT', req.body);
+    res.json(data);
+  } catch (error) {
+    console.error('Error updating quote item:', error);
+    res.status(500).json({ error: 'Failed to update quote item' });
+  }
+});
+
+app.delete('/api/quote_items/:id', async (req, res) => {
+  try {
+    await makeApiRequest(`/quote_items/${req.params.id}`, 'DELETE');
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting quote item:', error);
+    res.status(500).json({ error: 'Failed to delete quote item' });
+  }
+});
+
+// Quote Analytics API
+app.get('/api/quote_analytics', async (req, res) => {
+  try {
+    const data = await makeApiRequest('/quote_analytics');
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch quote analytics' });
+  }
+});
+
+app.get('/api/quote_analytics/:id', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/quote_analytics/${req.params.id}`);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch quote analytics' });
+  }
+});
+
+app.get('/api/quote_analytics/session/:sessionId', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/quote_analytics?filter=SessionID='${req.params.sessionId}'`);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote analytics by session ID:', error);
+    res.status(500).json({ error: 'Failed to fetch quote analytics by session ID' });
+  }
+});
+
+app.post('/api/quote_analytics', async (req, res) => {
+  try {
+    const data = await makeApiRequest('/quote_analytics', 'POST', req.body);
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Error creating quote analytics:', error);
+    res.status(500).json({ error: 'Failed to create quote analytics' });
+  }
+});
+
+app.put('/api/quote_analytics/:id', async (req, res) => {
+  try {
+    const data = await makeApiRequest(`/quote_analytics/${req.params.id}`, 'PUT', req.body);
+    res.json(data);
+  } catch (error) {
+    console.error('Error updating quote analytics:', error);
+    res.status(500).json({ error: 'Failed to update quote analytics' });
+  }
+});
+
+app.delete('/api/quote_analytics/:id', async (req, res) => {
+  try {
+    await makeApiRequest(`/quote_analytics/${req.params.id}`, 'DELETE');
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting quote analytics:', error);
+    res.status(500).json({ error: 'Failed to delete quote analytics' });
+  }
+});
 
 // Start the server
 app.listen(PORT, () => {

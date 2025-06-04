@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Connection Debugger - NWCA Quote System</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .api-endpoint {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .debug-tips {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .debug-tips h3 {
+            color: #495057;
+            margin-top: 0;
+        }
+        .debug-tips ul {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        .debug-tips li {
+            margin-bottom: 8px;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Quote API Connection Debugger</h1>
+        <div class="api-endpoint">
+            API Base URL: https://nwca-pricing-2025-36f83dd69067.herokuapp.com/api
+        </div>
+
+        <!-- Basic Connection Test -->
+        <div class="test-section">
+            <h2>1. Basic Connection Test</h2>
+            <p>Tests if the API server is reachable</p>
+            <button class="test-button" onclick="testBasicConnection()">Test Basic Connection</button>
+            <div id="basic-status"></div>
+        </div>
+
+        <!-- CORS Test -->
+        <div class="test-section">
+            <h2>2. CORS Headers Test</h2>
+            <p>Checks if Cross-Origin Resource Sharing is properly configured</p>
+            <button class="test-button" onclick="testCORS()">Test CORS Headers</button>
+            <div id="cors-status"></div>
+        </div>
+
+        <!-- Endpoints Test -->
+        <div class="test-section">
+            <h2>3. API Endpoints Test</h2>
+            <p>Tests different API endpoints</p>
+            <button class="test-button" onclick="testEndpoint('/quotes', 'GET')">GET /quotes</button>
+            <button class="test-button" onclick="testEndpoint('/quotes', 'POST')">POST /quotes</button>
+            <button class="test-button" onclick="testEndpoint('/health', 'GET')">GET /health</button>
+            <button class="test-button" onclick="testEndpoint('/', 'GET')">GET / (root)</button>
+            <div id="endpoint-status"></div>
+        </div>
+
+        <!-- Detailed Fetch Test -->
+        <div class="test-section">
+            <h2>4. Detailed Fetch Analysis</h2>
+            <p>Performs a detailed analysis of the fetch request</p>
+            <button class="test-button" onclick="detailedFetchTest()">Run Detailed Test</button>
+            <div id="detailed-status"></div>
+        </div>
+
+        <!-- Network Timing Test -->
+        <div class="test-section">
+            <h2>5. Network Performance Test</h2>
+            <p>Measures network latency and response times</p>
+            <button class="test-button" onclick="testNetworkTiming()">Test Network Performance</button>
+            <div id="timing-status"></div>
+        </div>
+
+        <!-- Debug Tips -->
+        <div class="debug-tips">
+            <h3>🛠️ Browser Console Debugging Tips</h3>
+            <ul>
+                <li>Open DevTools: Press <code>F12</code> or <code>Ctrl+Shift+I</code> (Windows/Linux) or <code>Cmd+Option+I</code> (Mac)</li>
+                <li>Check the <strong>Console</strong> tab for JavaScript errors</li>
+                <li>Check the <strong>Network</strong> tab to see all HTTP requests:
+                    <ul>
+                        <li>Look for red requests (failed)</li>
+                        <li>Click on a request to see headers, response, and timing</li>
+                        <li>Check the "Response Headers" for CORS headers</li>
+                    </ul>
+                </li>
+                <li>Common CORS errors:
+                    <ul>
+                        <li><code>No 'Access-Control-Allow-Origin' header</code> - Server needs CORS configuration</li>
+                        <li><code>CORS policy blocked</code> - Check allowed origins on server</li>
+                    </ul>
+                </li>
+                <li>Try these console commands:
+                    <ul>
+                        <li><code>fetch('https://nwca-pricing-2025-36f83dd69067.herokuapp.com/api/health').then(r => console.log(r))</code></li>
+                        <li><code>navigator.onLine</code> - Check if browser is online</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>🔧 Common Issues & Solutions</h3>
+            <ul>
+                <li><strong>Failed to fetch:</strong> Usually means network error, CORS issue, or server is down</li>
+                <li><strong>404 Not Found:</strong> Check if the endpoint path is correct</li>
+                <li><strong>500 Server Error:</strong> Server-side issue, check server logs</li>
+                <li><strong>Mixed Content:</strong> If your site is HTTPS, API must also be HTTPS</li>
+                <li><strong>Timeout:</strong> Server might be sleeping (common with free Heroku dynos)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://nwca-pricing-2025-36f83dd69067.herokuapp.com/api';
+
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `status ${type}`;
+            element.textContent = message;
+        }
+
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.className = 'status info';
+            element.innerHTML = 'Testing... <span class="loading"></span>';
+        }
+
+        async function testBasicConnection() {
+            showLoading('basic-status');
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'GET',
+                    mode: 'cors',
+                });
+                
+                const elapsed = Date.now() - startTime;
+                
+                if (response.ok) {
+                    showStatus('basic-status', 
+                        `✅ SUCCESS: Server is reachable!\nStatus: ${response.status} ${response.statusText}\nResponse Time: ${elapsed}ms`, 
+                        'success'
+                    );
+                } else {
+                    showStatus('basic-status', 
+                        `⚠️ Server responded with error:\nStatus: ${response.status} ${response.statusText}\nResponse Time: ${elapsed}ms`, 
+                        'warning'
+                    );
+                }
+            } catch (error) {
+                showStatus('basic-status', 
+                    `❌ FAILED: Cannot reach server\nError: ${error.message}\n\nPossible causes:\n- Server is down\n- CORS not configured\n- Network issues\n- Invalid URL`, 
+                    'error'
+                );
+                console.error('Basic connection test error:', error);
+            }
+        }
+
+        async function testCORS() {
+            showLoading('cors-status');
+            
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const corsHeaders = {
+                    'access-control-allow-origin': response.headers.get('access-control-allow-origin'),
+                    'access-control-allow-methods': response.headers.get('access-control-allow-methods'),
+                    'access-control-allow-headers': response.headers.get('access-control-allow-headers'),
+                    'access-control-allow-credentials': response.headers.get('access-control-allow-credentials'),
+                };
+                
+                let corsStatus = '📋 CORS Headers Found:\n';
+                let hasCORS = false;
+                
+                for (const [header, value] of Object.entries(corsHeaders)) {
+                    if (value) {
+                        corsStatus += `\n${header}: ${value}`;
+                        hasCORS = true;
+                    }
+                }
+                
+                if (!hasCORS) {
+                    corsStatus = '❌ No CORS headers found!\nThe server needs to send Access-Control-Allow-Origin headers.';
+                    showStatus('cors-status', corsStatus, 'error');
+                } else {
+                    corsStatus = '✅ CORS is configured!\n' + corsStatus;
+                    showStatus('cors-status', corsStatus, 'success');
+                }
+                
+            } catch (error) {
+                showStatus('cors-status', 
+                    `❌ CORS test failed\nError: ${error.message}\n\nThis usually means CORS is not properly configured on the server.`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testEndpoint(endpoint, method = 'GET') {
+            showLoading('endpoint-status');
+            const url = `${API_BASE}${endpoint}`;
+            
+            try {
+                const options = {
+                    method: method,
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+                
+                if (method === 'POST') {
+                    options.body = JSON.stringify({
+                        test: true,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                
+                const response = await fetch(url, options);
+                const contentType = response.headers.get('content-type');
+                let responseData = '';
+                
+                if (contentType && contentType.includes('application/json')) {
+                    responseData = await response.json();
+                    responseData = JSON.stringify(responseData, null, 2);
+                } else {
+                    responseData = await response.text();
+                }
+                
+                if (response.ok) {
+                    showStatus('endpoint-status', 
+                        `✅ ${method} ${endpoint} - SUCCESS\nStatus: ${response.status}\nResponse:\n${responseData}`, 
+                        'success'
+                    );
+                } else {
+                    showStatus('endpoint-status', 
+                        `⚠️ ${method} ${endpoint} - Error\nStatus: ${response.status}\nResponse:\n${responseData}`, 
+                        'warning'
+                    );
+                }
+            } catch (error) {
+                showStatus('endpoint-status', 
+                    `❌ ${method} ${endpoint} - FAILED\nError: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function detailedFetchTest() {
+            showLoading('detailed-status');
+            let details = '🔍 Detailed Fetch Analysis:\n\n';
+            
+            // Test 1: Basic fetch with all details
+            details += '1. Testing basic fetch...\n';
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch(`${API_BASE}/health`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    credentials: 'omit',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                details += `   ✅ Fetch succeeded\n`;
+                details += `   Status: ${response.status} ${response.statusText}\n`;
+                details += `   Type: ${response.type}\n`;
+                details += `   URL: ${response.url}\n`;
+                details += `   Redirected: ${response.redirected}\n\n`;
+                
+                // Log all headers
+                details += '2. Response Headers:\n';
+                response.headers.forEach((value, key) => {
+                    details += `   ${key}: ${value}\n`;
+                });
+                
+            } catch (error) {
+                details += `   ❌ Fetch failed: ${error.message}\n`;
+                details += `   Error type: ${error.name}\n`;
+                
+                if (error.name === 'AbortError') {
+                    details += '   Timeout: Request took longer than 5 seconds\n';
+                }
+            }
+            
+            // Test 2: Check if it's a network issue
+            details += '\n3. Network connectivity check:\n';
+            details += `   Browser online: ${navigator.onLine}\n`;
+            
+            // Test 3: Try different request modes
+            details += '\n4. Testing different request modes:\n';
+            const modes = ['cors', 'no-cors', 'same-origin'];
+            
+            for (const mode of modes) {
+                try {
+                    const response = await fetch(`${API_BASE}/health`, { mode });
+                    details += `   ${mode}: ✅ Success (Status: ${response.status})\n`;
+                } catch (error) {
+                    details += `   ${mode}: ❌ Failed (${error.message})\n`;
+                }
+            }
+            
+            showStatus('detailed-status', details, 'info');
+        }
+
+        async function testNetworkTiming() {
+            showLoading('timing-status');
+            let timingInfo = '⏱️ Network Performance Analysis:\n\n';
+            
+            const iterations = 3;
+            const timings = [];
+            
+            for (let i = 0; i < iterations; i++) {
+                const startTime = performance.now();
+                
+                try {
+                    const response = await fetch(`${API_BASE}/health`, {
+                        method: 'GET',
+                        mode: 'cors',
+                        cache: 'no-cache'
+                    });
+                    
+                    const endTime = performance.now();
+                    const duration = Math.round(endTime - startTime);
+                    timings.push(duration);
+                    
+                    timingInfo += `Test ${i + 1}: ${duration}ms - ${response.ok ? '✅' : '❌'} Status ${response.status}\n`;
+                    
+                    // Small delay between tests
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                } catch (error) {
+                    timingInfo += `Test ${i + 1}: ❌ Failed - ${error.message}\n`;
+                }
+            }
+            
+            if (timings.length > 0) {
+                const avg = Math.round(timings.reduce((a, b) => a + b, 0) / timings.length);
+                const min = Math.min(...timings);
+                const max = Math.max(...timings);
+                
+                timingInfo += `\n📊 Statistics:\n`;
+                timingInfo += `Average: ${avg}ms\n`;
+                timingInfo += `Min: ${min}ms\n`;
+                timingInfo += `Max: ${max}ms\n`;
+                
+                if (avg > 1000) {
+                    timingInfo += '\n⚠️ High latency detected. Possible causes:\n';
+                    timingInfo += '- Server location far from client\n';
+                    timingInfo += '- Server is waking up from sleep (Heroku free tier)\n';
+                    timingInfo += '- Network congestion\n';
+                }
+            }
+            
+            showStatus('timing-status', timingInfo, 'info');
+        }
+
+        // Auto-run basic test on page load
+        window.addEventListener('load', () => {
+            console.log('🚀 API Connection Debugger loaded');
+            console.log('API Base URL:', API_BASE);
+            console.log('Run testBasicConnection() to start');
+        });
+    </script>
+</body>
+</html>

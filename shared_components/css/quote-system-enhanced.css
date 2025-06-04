@@ -1,0 +1,612 @@
+/* Enhanced Quote System Styles */
+/* For Northwest Custom Apparel - January 2025 */
+
+:root {
+    --nwca-green: #006847;
+    --nwca-green-light: #00855a;
+    --nwca-green-dark: #005138;
+    --nwca-green-hover: #007d55;
+    --nwca-green-bg: #f0f5ef;
+    --quote-panel-width: 480px;
+    --panel-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    --transition-speed: 0.3s;
+}
+
+/* Side Panel Quote System */
+.quote-panel-enhanced {
+    position: fixed;
+    top: 0;
+    right: -var(--quote-panel-width);
+    width: var(--quote-panel-width);
+    height: 100vh;
+    background: white;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+.quote-panel-enhanced.is-open {
+    right: 0;
+}
+
+.quote-panel-header {
+    background: var(--nwca-green);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.quote-panel-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.quote-panel-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.quote-panel-close:hover {
+    opacity: 1;
+}
+
+/* Customer Info Section */
+.customer-info-section {
+    padding: 20px;
+    background: var(--nwca-green-bg);
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.customer-info-form {
+    display: grid;
+    gap: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.form-group input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--nwca-green);
+}
+
+/* Quote Items Section */
+.quote-items-section {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.quote-item-enhanced {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.quote-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 10px;
+}
+
+.quote-item-title {
+    font-weight: 600;
+    color: #333;
+}
+
+.quote-item-remove {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.quote-item-remove:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.quote-item-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.quote-item-colors {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #dee2e6;
+}
+
+.color-variant {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.color-swatch-mini {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+}
+
+/* Quote Summary Section */
+.quote-summary-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-top: 2px solid var(--nwca-green);
+}
+
+.quote-totals-enhanced {
+    margin-bottom: 20px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.95rem;
+}
+
+.total-row.grand-total {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--nwca-green);
+    border-top: 2px solid #e0e0e0;
+    padding-top: 15px;
+    margin-top: 10px;
+}
+
+/* Quote Actions */
+.quote-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.quote-action-btn {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.quote-action-btn.primary {
+    background: var(--nwca-green);
+    color: white;
+    grid-column: 1 / -1;
+}
+
+.quote-action-btn.primary:hover {
+    background: var(--nwca-green-dark);
+}
+
+.quote-action-btn.secondary {
+    background: white;
+    color: var(--nwca-green);
+    border: 1px solid var(--nwca-green);
+}
+
+.quote-action-btn.secondary:hover {
+    background: var(--nwca-green-bg);
+}
+
+/* Floating Toggle Button */
+.quote-toggle-floating {
+    position: fixed;
+    right: 20px;
+    bottom: 100px;
+    background: var(--nwca-green);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 15px 25px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(46, 88, 39, 0.3);
+    transition: all 0.3s;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quote-toggle-floating:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 88, 39, 0.4);
+}
+
+.quote-badge {
+    background: white;
+    color: var(--nwca-green);
+    border-radius: 50%;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* Color Matrix Modal */
+.color-matrix-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.color-matrix-modal.is-open {
+    display: flex;
+}
+
+.color-matrix-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.color-matrix-header {
+    background: var(--nwca-green);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.color-matrix-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.color-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.color-selection-item {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.color-selection-item.selected {
+    border-color: var(--nwca-green);
+    background: var(--nwca-green-bg);
+}
+
+.color-swatch-large {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    margin: 0 auto 10px;
+    border: 1px solid #ddd;
+}
+
+.color-name {
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.color-quantity-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.color-matrix-footer {
+    padding: 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selected-count {
+    font-weight: 500;
+    color: var(--nwca-green);
+}
+
+/* My Quotes Modal */
+.my-quotes-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.my-quotes-modal.is-open {
+    display: flex;
+}
+
+.my-quotes-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.my-quotes-header {
+    background: var(--nwca-green);
+    color: white;
+    padding: 20px;
+}
+
+.my-quotes-search {
+    padding: 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.search-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.search-btn {
+    padding: 10px 20px;
+    background: var(--nwca-green);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.my-quotes-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.quote-list-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quote-list-item:hover {
+    border-color: var(--nwca-green);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.quote-list-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.quote-id {
+    font-weight: 600;
+    color: var(--nwca-green);
+}
+
+.quote-date {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.quote-list-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.quote-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.quote-status.active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.quote-status.expired {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Auto-save indicator */
+.auto-save-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.85rem;
+    color: #28a745;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.auto-save-indicator.saving {
+    opacity: 1;
+}
+
+.auto-save-spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #28a745;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .quote-panel-enhanced {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .color-matrix-content,
+    .my-quotes-content {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .quote-actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quote-action-btn.primary {
+        grid-column: 1;
+    }
+}
+
+/* Success/Error Messages */
+.quote-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 3000;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.quote-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.quote-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Loading State */
+.quote-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #666;
+}
+
+.quote-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--nwca-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 15px;
+}

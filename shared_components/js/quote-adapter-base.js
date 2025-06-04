@@ -40,7 +40,10 @@
 
         // Initialize the quote system
         init() {
-            console.log(`[QUOTE:${this.embellishmentType.toUpperCase()}] Initializing quote system`);
+            // Only log in debug mode
+            if (window.DEBUG_MODE) {
+                console.log(`[QUOTE:${this.embellishmentType.toUpperCase()}] Initializing quote system`);
+            }
             this.loadSession();
             this.setupUI();
             this.bindEvents();
@@ -67,7 +70,7 @@
                         this.updateQuoteSummary();
                     }
                 } catch (e) {
-                    console.error(`[QUOTE:${this.embellishmentType.toUpperCase()}] Error loading saved quote:`, e);
+                    console.error(`[QUOTE:${this.embellishmentType.toUpperCase()}] Error loading saved quote:`, e.message);
                 }
             }
         }
@@ -655,7 +658,14 @@
                 ...data
             };
             
-            console.log(`[ANALYTICS:${this.embellishmentType.toUpperCase()}]`, eventType, analyticsData);
+            // Only log in debug mode
+            if (window.DEBUG_MODE) {
+                console.log(`[ANALYTICS:${this.embellishmentType.toUpperCase()}]`, eventType, analyticsData);
+            }
+            
+            // Temporarily disable analytics API calls until backend is fixed
+            // TODO: Re-enable when API endpoint is working
+            return;
             
             try {
                 const response = await fetch(`${this.config.apiBaseUrl}/quote_analytics`, {
@@ -666,11 +676,14 @@
                     body: JSON.stringify(analyticsData)
                 });
                 
-                if (response.ok) {
+                if (response.ok && window.DEBUG_MODE) {
                     console.log(`[ANALYTICS:${this.embellishmentType.toUpperCase()}] Event logged successfully`);
                 }
             } catch (error) {
-                console.warn(`[ANALYTICS:${this.embellishmentType.toUpperCase()}] Failed to log event:`, error);
+                // Silently fail - analytics is not critical
+                if (window.DEBUG_MODE) {
+                    console.warn(`[ANALYTICS:${this.embellishmentType.toUpperCase()}] Failed to log event:`, error);
+                }
             }
         }
     }

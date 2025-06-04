@@ -789,8 +789,10 @@
             calculatePricingWithBackLogo(sizeQuantities, existingCartQuantity, pricingData) {
                 logger.log('CAP-CONTROLLER', 'Calculating pricing with back logo support');
                 
-                // Get base pricing calculation
-                const originalCalculatePricing = window.NWCAPricingCalculator ? window.NWCAPricingCalculator.calculatePricing : null;
+                // Get base pricing calculation - use the stored original function
+                const originalCalculatePricing = window.NWCAPricingCalculator && window.NWCAPricingCalculator.originalCalculatePricing 
+                    ? window.NWCAPricingCalculator.originalCalculatePricing 
+                    : null;
                 if (!originalCalculatePricing) {
                     logger.error('CAP-CONTROLLER', 'Original pricing calculator not found');
                     return null;
@@ -1360,6 +1362,43 @@ Date: ${new Date(quoteInfo.timestamp).toLocaleString()}`;
         initializeUI: () => NWCA.controllers.capEmbroidery.BackLogoManager.initializeUI(),
         incrementStitchCount: () => NWCA.controllers.capEmbroidery.BackLogoManager.incrementStitchCount(),
         decrementStitchCount: () => NWCA.controllers.capEmbroidery.BackLogoManager.decrementStitchCount()
+    };
+    
+    // Add color matrix functionality
+    window.capEmbroideryController = {
+        openColorMatrix: function() {
+            // Get current product info
+            const productTitle = document.getElementById('product-title-context')?.textContent || 'Cap';
+            const styleNumber = document.getElementById('product-style-context')?.textContent || '';
+            const productImage = document.getElementById('product-image-main')?.src || '';
+            
+            // Get available colors from the color swatches
+            const colorSwatches = document.querySelectorAll('#color-swatches .clean-swatch-item');
+            const colors = Array.from(colorSwatches).map(swatch => {
+                const colorName = swatch.querySelector('.clean-swatch-name')?.textContent || 
+                                swatch.getAttribute('data-color-name') || '';
+                const colorImg = swatch.querySelector('img');
+                
+                return {
+                    name: colorName,
+                    code: colorName.toUpperCase().replace(/\s+/g, '_'),
+                    hex: null, // We don't have hex values from images
+                    image: colorImg?.src
+                };
+            });
+            
+            // Trigger color matrix
+            const event = new CustomEvent('openColorMatrix', {
+                detail: {
+                    productName: productTitle,
+                    styleNumber: styleNumber,
+                    imageUrl: productImage,
+                    colors: colors,
+                    stitchCount: NWCA.controllers.capEmbroidery.state.currentStitchCount || 8000
+                }
+            });
+            document.dispatchEvent(event);
+        }
     };
 
     // Expose main controller for legacy compatibility

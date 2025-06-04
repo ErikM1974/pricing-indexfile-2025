@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Quote API CRUD Testing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button.delete {
+            background-color: #f44336;
+        }
+        button.delete:hover {
+            background-color: #da190b;
+        }
+        button.update {
+            background-color: #2196F3;
+        }
+        button.update:hover {
+            background-color: #0b7dda;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .response {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #f44336;
+        }
+        .info {
+            color: #2196F3;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Complete Quote API CRUD Testing</h1>
+        <p>Test all CRUD operations for Quote Sessions, Quote Items, and Quote Analytics</p>
+    </div>
+
+    <!-- Quote Sessions Section -->
+    <div class="container">
+        <h2>1. Quote Sessions CRUD</h2>
+        
+        <div class="section">
+            <h3>CREATE - New Quote Session</h3>
+            <div class="grid">
+                <div>
+                    <div class="form-group">
+                        <label>Session ID:</label>
+                        <input type="text" id="create-session-id" placeholder="Auto-generated if empty">
+                    </div>
+                    <div class="form-group">
+                        <label>Quote ID:</label>
+                        <input type="text" id="create-quote-id" placeholder="e.g., Q-2025-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Name:</label>
+                        <input type="text" id="create-customer-name" value="Test Customer">
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Email:</label>
+                        <input type="email" id="create-customer-email" value="test@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Amount:</label>
+                        <input type="number" id="create-total-amount" value="1234.56" step="0.01">
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label>Status:</label>
+                        <select id="create-status">
+                            <option value="Draft">Draft</option>
+                            <option value="Active">Active</option>
+                            <option value="Expired">Expired</option>
+                            <option value="Converted">Converted</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes:</label>
+                        <textarea id="create-notes" rows="3">Test quote created via API</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Embellishment Type:</label>
+                        <input type="text" id="create-embellishment-type" value="Cap Embroidery">
+                    </div>
+                    <button onclick="createQuoteSession()">Create Quote Session</button>
+                </div>
+            </div>
+            <div id="create-response" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>READ - Get Quote Sessions</h3>
+            <div class="button-group">
+                <button onclick="getAllSessions()">Get All Sessions</button>
+                <button onclick="getSessionBySessionId()">Get By Session ID</button>
+                <button onclick="getSessionByQuoteId()">Get By Quote ID</button>
+                <button onclick="getSessionByPkId()">Get By PK_ID</button>
+            </div>
+            <div class="form-group">
+                <label>Search Value:</label>
+                <input type="text" id="read-search-value" placeholder="Enter Session ID, Quote ID, or PK_ID">
+            </div>
+            <div id="read-response" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>UPDATE - Modify Quote Session</h3>
+            <div class="grid">
+                <div>
+                    <div class="form-group">
+                        <label>PK_ID to Update:</label>
+                        <input type="text" id="update-pk-id" placeholder="Enter PK_ID">
+                    </div>
+                    <div class="form-group">
+                        <label>New Status:</label>
+                        <select id="update-status">
+                            <option value="">Keep Current</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Active">Active</option>
+                            <option value="Expired">Expired</option>
+                            <option value="Converted">Converted</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>New Total Amount:</label>
+                        <input type="number" id="update-total-amount" step="0.01" placeholder="Leave empty to keep current">
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label>New Notes:</label>
+                        <textarea id="update-notes" rows="3" placeholder="Leave empty to keep current"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>New Customer Email:</label>
+                        <input type="email" id="update-customer-email" placeholder="Leave empty to keep current">
+                    </div>
+                    <button class="update" onclick="updateQuoteSession()">Update Quote Session</button>
+                </div>
+            </div>
+            <div id="update-response" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>DELETE - Remove Quote Session</h3>
+            <div class="form-group">
+                <label>PK_ID to Delete:</label>
+                <input type="text" id="delete-pk-id" placeholder="Enter PK_ID">
+            </div>
+            <div class="button-group">
+                <button class="delete" onclick="deleteQuoteSession()">Hard Delete (Remove Record)</button>
+                <button class="update" onclick="softDeleteQuoteSession()">Soft Delete (Set Status)</button>
+            </div>
+            <div id="delete-response" class="response"></div>
+        </div>
+    </div>
+
+    <!-- Quote Items Section -->
+    <div class="container">
+        <h2>2. Quote Items CRUD</h2>
+        
+        <div class="section">
+            <h3>CREATE - New Quote Item</h3>
+            <div class="grid">
+                <div>
+                    <div class="form-group">
+                        <label>Session ID (FK):</label>
+                        <input type="text" id="item-session-id" placeholder="Session ID from Quote Session">
+                    </div>
+                    <div class="form-group">
+                        <label>Item Name:</label>
+                        <input type="text" id="item-name" value="Test Item">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity:</label>
+                        <input type="number" id="item-quantity" value="100">
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label>Unit Price:</label>
+                        <input type="number" id="item-unit-price" value="12.50" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Price:</label>
+                        <input type="number" id="item-total-price" value="1250.00" step="0.01">
+                    </div>
+                    <button onclick="createQuoteItem()">Create Quote Item</button>
+                </div>
+            </div>
+            <div id="item-create-response" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>READ - Get Quote Items</h3>
+            <div class="form-group">
+                <label>Session ID:</label>
+                <input type="text" id="item-read-session-id" placeholder="Enter Session ID">
+            </div>
+            <button onclick="getQuoteItems()">Get Items for Session</button>
+            <div id="item-read-response" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>UPDATE - Modify Quote Item</h3>
+            <div class="form-group">
+                <label>Item PK_ID:</label>
+                <input type="text" id="item-update-pk-id" placeholder="Enter Item PK_ID">
+            </div>
+            <div class="form-group">
+                <label>New Quantity:</label>
+                <input type="number" id="item-update-quantity" placeholder="New quantity">
+            </div>
+            <div class="form-group">
+                <label>New Unit Price:</label>
+                <input type="number" id="item-update-unit-price" step="0.01" placeholder="New unit price">
+            </div>
+            <button class="update" onclick="updateQuoteItem()">Update Quote Item</button>
+            <div id="item-update-response" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>DELETE - Remove Quote Item</h3>
+            <div class="form-group">
+                <label>Item PK_ID:</label>
+                <input type="text" id="item-delete-pk-id" placeholder="Enter Item PK_ID">
+            </div>
+            <button class="delete" onclick="deleteQuoteItem()">Delete Quote Item</button>
+            <div id="item-delete-response" class="response"></div>
+        </div>
+    </div>
+
+    <!-- Quote Analytics Section -->
+    <div class="container">
+        <h2>3. Quote Analytics CRUD</h2>
+        
+        <div class="section">
+            <h3>CREATE - New Analytics Entry</h3>
+            <div class="grid">
+                <div>
+                    <div class="form-group">
+                        <label>Session ID (FK):</label>
+                        <input type="text" id="analytics-session-id" placeholder="Session ID from Quote Session">
+                    </div>
+                    <div class="form-group">
+                        <label>Event Type:</label>
+                        <select id="analytics-event-type">
+                            <option value="View">View</option>
+                            <option value="Edit">Edit</option>
+                            <option value="Download">Download</option>
+                            <option value="Email">Email</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label>User Agent:</label>
+                        <input type="text" id="analytics-user-agent" value="Test Browser">
+                    </div>
+                    <div class="form-group">
+                        <label>IP Address:</label>
+                        <input type="text" id="analytics-ip-address" value="127.0.0.1">
+                    </div>
+                    <button onclick="createAnalyticsEntry()">Create Analytics Entry</button>
+                </div>
+            </div>
+            <div id="analytics-create-response" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>READ - Get Analytics</h3>
+            <div class="form-group">
+                <label>Session ID:</label>
+                <input type="text" id="analytics-read-session-id" placeholder="Enter Session ID">
+            </div>
+            <button onclick="getAnalytics()">Get Analytics for Session</button>
+            <div id="analytics-read-response" class="response"></div>
+        </div>
+    </div>
+
+    <!-- Full Workflow Test -->
+    <div class="container">
+        <h2>4. Automated Full CRUD Workflow Test</h2>
+        <button onclick="runFullWorkflow()">Run Complete Test Workflow</button>
+        <div id="workflow-response" class="response"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        
+        // Helper function to display responses
+        function displayResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = JSON.stringify(data, null, 2);
+            element.className = isError ? 'response error' : 'response success';
+        }
+
+        // Quote Sessions CRUD
+        async function createQuoteSession() {
+            try {
+                const sessionId = document.getElementById('create-session-id').value || 
+                                `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                const quoteId = document.getElementById('create-quote-id').value || 
+                              `Q-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`;
+                
+                const data = {
+                    SessionID: sessionId,
+                    QuoteID: quoteId,
+                    CustomerName: document.getElementById('create-customer-name').value,
+                    CustomerEmail: document.getElementById('create-customer-email').value,
+                    TotalAmount: parseFloat(document.getElementById('create-total-amount').value),
+                    Status: document.getElementById('create-status').value,
+                    Notes: document.getElementById('create-notes').value,
+                    EmbellishmentType: document.getElementById('create-embellishment-type').value,
+                    CreatedDate: new Date().toISOString()
+                };
+
+                const response = await fetch(`${API_BASE}/quote_sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                displayResponse('create-response', result, !response.ok);
+                
+                // Store the created session ID for easy testing
+                if (result.data && result.data.SessionID) {
+                    document.getElementById('read-search-value').value = result.data.SessionID;
+                    document.getElementById('item-session-id').value = result.data.SessionID;
+                    document.getElementById('analytics-session-id').value = result.data.SessionID;
+                }
+            } catch (error) {
+                displayResponse('create-response', { error: error.message }, true);
+            }
+        }
+
+        async function getAllSessions() {
+            try {
+                const response = await fetch(`${API_BASE}/quote_sessions`);
+                const result = await response.json();
+                displayResponse('read-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('read-response', { error: error.message }, true);
+            }
+        }
+
+        async function getSessionBySessionId() {
+            try {
+                const sessionId = document.getElementById('read-search-value').value;
+                if (!sessionId) {
+                    displayResponse('read-response', { error: 'Please enter a Session ID' }, true);
+                    return;
+                }
+                const response = await fetch(`${API_BASE}/quote_sessions/session/${sessionId}`);
+                const result = await response.json();
+                displayResponse('read-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('read-response', { error: error.message }, true);
+            }
+        }
+
+        async function getSessionByQuoteId() {
+            try {
+                const quoteId = document.getElementById('read-search-value').value;
+                if (!quoteId) {
+                    displayResponse('read-response', { error: 'Please enter a Quote ID' }, true);
+                    return;
+                }
+                const response = await fetch(`${API_BASE}/quote_sessions/quote/${quoteId}`);
+                const result = await response.json();
+                displayResponse('read-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('read-response', { error: error.message }, true);
+            }
+        }
+
+        async function getSessionByPkId() {
+            try {
+                const pkId = document.getElementById('read-search-value').value;
+                if (!pkId) {
+                    displayResponse('read-response', { error: 'Please enter a PK_ID' }, true);
+                    return;
+                }
+                const response = await fetch(`${API_BASE}/quote_sessions/${pkId}`);
+                const result = await response.json();
+                displayResponse('read-response', result, !response.ok);
+                
+                // Pre-fill update form if successful
+                if (result.data) {
+                    document.getElementById('update-pk-id').value = pkId;
+                }
+            } catch (error) {
+                displayResponse('read-response', { error: error.message }, true);
+            }
+        }
+
+        async function updateQuoteSession() {
+            try {
+                const pkId = document.getElementById('update-pk-id').value;
+                if (!pkId) {
+                    displayResponse('update-response', { error: 'Please enter a PK_ID' }, true);
+                    return;
+                }
+
+                const updateData = {};
+                const status = document.getElementById('update-status').value;
+                const amount = document.getElementById('update-total-amount').value;
+                const notes = document.getElementById('update-notes').value;
+                const email = document.getElementById('update-customer-email').value;
+
+                if (status) updateData.Status = status;
+                if (amount) updateData.TotalAmount = parseFloat(amount);
+                if (notes) updateData.Notes = notes;
+                if (email) updateData.CustomerEmail = email;
+
+                updateData.UpdatedDate = new Date().toISOString();
+
+                const response = await fetch(`${API_BASE}/quote_sessions/${pkId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+                displayResponse('update-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('update-response', { error: error.message }, true);
+            }
+        }
+
+        async function deleteQuoteSession() {
+            try {
+                const pkId = document.getElementById('delete-pk-id').value;
+                if (!pkId) {
+                    displayResponse('delete-response', { error: 'Please enter a PK_ID' }, true);
+                    return;
+                }
+
+                if (!confirm('Are you sure you want to permanently delete this quote session?')) {
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/quote_sessions/${pkId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                displayResponse('delete-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('delete-response', { error: error.message }, true);
+            }
+        }
+
+        async function softDeleteQuoteSession() {
+            try {
+                const pkId = document.getElementById('delete-pk-id').value;
+                if (!pkId) {
+                    displayResponse('delete-response', { error: 'Please enter a PK_ID' }, true);
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/quote_sessions/${pkId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        Status: 'Deleted',
+                        UpdatedDate: new Date().toISOString()
+                    })
+                });
+
+                const result = await response.json();
+                displayResponse('delete-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('delete-response', { error: error.message }, true);
+            }
+        }
+
+        // Quote Items CRUD
+        async function createQuoteItem() {
+            try {
+                const data = {
+                    SessionID: document.getElementById('item-session-id').value,
+                    ItemName: document.getElementById('item-name').value,
+                    Quantity: parseInt(document.getElementById('item-quantity').value),
+                    UnitPrice: parseFloat(document.getElementById('item-unit-price').value),
+                    TotalPrice: parseFloat(document.getElementById('item-total-price').value),
+                    CreatedDate: new Date().toISOString()
+                };
+
+                const response = await fetch(`${API_BASE}/quote_items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                displayResponse('item-create-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('item-create-response', { error: error.message }, true);
+            }
+        }
+
+        async function getQuoteItems() {
+            try {
+                const sessionId = document.getElementById('item-read-session-id').value;
+                if (!sessionId) {
+                    displayResponse('item-read-response', { error: 'Please enter a Session ID' }, true);
+                    return;
+                }
+                const response = await fetch(`${API_BASE}/quote_items/session/${sessionId}`);
+                const result = await response.json();
+                displayResponse('item-read-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('item-read-response', { error: error.message }, true);
+            }
+        }
+
+        async function updateQuoteItem() {
+            try {
+                const pkId = document.getElementById('item-update-pk-id').value;
+                if (!pkId) {
+                    displayResponse('item-update-response', { error: 'Please enter an Item PK_ID' }, true);
+                    return;
+                }
+
+                const updateData = {};
+                const quantity = document.getElementById('item-update-quantity').value;
+                const unitPrice = document.getElementById('item-update-unit-price').value;
+
+                if (quantity) {
+                    updateData.Quantity = parseInt(quantity);
+                }
+                if (unitPrice) {
+                    updateData.UnitPrice = parseFloat(unitPrice);
+                    if (quantity) {
+                        updateData.TotalPrice = updateData.Quantity * updateData.UnitPrice;
+                    }
+                }
+
+                const response = await fetch(`${API_BASE}/quote_items/${pkId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+                displayResponse('item-update-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('item-update-response', { error: error.message }, true);
+            }
+        }
+
+        async function deleteQuoteItem() {
+            try {
+                const pkId = document.getElementById('item-delete-pk-id').value;
+                if (!pkId) {
+                    displayResponse('item-delete-response', { error: 'Please enter an Item PK_ID' }, true);
+                    return;
+                }
+
+                if (!confirm('Are you sure you want to delete this quote item?')) {
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/quote_items/${pkId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                displayResponse('item-delete-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('item-delete-response', { error: error.message }, true);
+            }
+        }
+
+        // Quote Analytics CRUD
+        async function createAnalyticsEntry() {
+            try {
+                const data = {
+                    SessionID: document.getElementById('analytics-session-id').value,
+                    EventType: document.getElementById('analytics-event-type').value,
+                    UserAgent: document.getElementById('analytics-user-agent').value,
+                    IPAddress: document.getElementById('analytics-ip-address').value,
+                    CreatedDate: new Date().toISOString()
+                };
+
+                const response = await fetch(`${API_BASE}/quote_analytics`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                displayResponse('analytics-create-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('analytics-create-response', { error: error.message }, true);
+            }
+        }
+
+        async function getAnalytics() {
+            try {
+                const sessionId = document.getElementById('analytics-read-session-id').value;
+                if (!sessionId) {
+                    displayResponse('analytics-read-response', { error: 'Please enter a Session ID' }, true);
+                    return;
+                }
+                const response = await fetch(`${API_BASE}/quote_analytics/session/${sessionId}`);
+                const result = await response.json();
+                displayResponse('analytics-read-response', result, !response.ok);
+            } catch (error) {
+                displayResponse('analytics-read-response', { error: error.message }, true);
+            }
+        }
+
+        // Full Workflow Test
+        async function runFullWorkflow() {
+            const log = [];
+            const addLog = (message, data = null) => {
+                log.push({ message, data, timestamp: new Date().toISOString() });
+                displayResponse('workflow-response', log);
+            };
+
+            try {
+                addLog('Starting full CRUD workflow test...');
+
+                // 1. Create a quote session
+                const sessionId = `test_${Date.now()}`;
+                const createData = {
+                    SessionID: sessionId,
+                    QuoteID: `TEST-${Date.now()}`,
+                    CustomerName: 'Workflow Test Customer',
+                    CustomerEmail: 'workflow@test.com',
+                    TotalAmount: 999.99,
+                    Status: 'Draft',
+                    Notes: 'Created by automated workflow test',
+                    EmbellishmentType: 'Test Type',
+                    CreatedDate: new Date().toISOString()
+                };
+
+                addLog('Creating quote session...', createData);
+                const createResponse = await fetch(`${API_BASE}/quote_sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(createData)
+                });
+                const createResult = await createResponse.json();
+                addLog('Quote session created', createResult);
+
+                if (!createResult.data || !createResult.data.PK_ID) {
+                    throw new Error('Failed to create quote session');
+                }
+
+                const pkId = createResult.data.PK_ID;
+
+                // 2. Read the created session
+                addLog('Reading created session...');
+                const readResponse = await fetch(`${API_BASE}/quote_sessions/${pkId}`);
+                const readResult = await readResponse.json();
+                addLog('Quote session retrieved', readResult);
+
+                // 3. Create a quote item
+                addLog('Creating quote item...');
+                const itemData = {
+                    SessionID: sessionId,
+                    ItemName: 'Workflow Test Item',
+                    Quantity: 50,
+                    UnitPrice: 19.99,
+                    TotalPrice: 999.50,
+                    CreatedDate: new Date().toISOString()
+                };
+                const itemResponse = await fetch(`${API_BASE}/quote_items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(itemData)
+                });
+                const itemResult = await itemResponse.json();
+                addLog('Quote item created', itemResult);
+
+                // 4. Create analytics entry
+                addLog('Creating analytics entry...');
+                const analyticsData = {
+                    SessionID: sessionId,
+                    EventType: 'View',
+                    UserAgent: 'Workflow Test Agent',
+                    IPAddress: '192.168.1.1',
+                    CreatedDate: new Date().toISOString()
+                };
+                const analyticsResponse = await fetch(`${API_BASE}/quote_analytics`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(analyticsData)
+                });
+                const analyticsResult = await analyticsResponse.json();
+                addLog('Analytics entry created', analyticsResult);
+
+                // 5. Update the session
+                addLog('Updating quote session...');
+                const updateData = {
+                    Status: 'Active',
+                    TotalAmount: 1999.99,
+                    Notes: 'Updated by workflow test',
+                    UpdatedDate: new Date().toISOString()
+                };
+                const updateResponse = await fetch(`${API_BASE}/quote_sessions/${pkId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+                const updateResult = await updateResponse.json();
+                addLog('Quote session updated', updateResult);
+
+                // 6. Get all related data
+                addLog('Getting all items for session...');
+                const itemsResponse = await fetch(`${API_BASE}/quote_items/session/${sessionId}`);
+                const itemsResult = await itemsResponse.json();
+                addLog('Quote items retrieved', itemsResult);
+
+                addLog('Getting all analytics for session...');
+                const analyticsGetResponse = await fetch(`${API_BASE}/quote_analytics/session/${sessionId}`);
+                const analyticsGetResult = await analyticsGetResponse.json();
+                addLog('Analytics retrieved', analyticsGetResult);
+
+                // 7. Soft delete (set status to Deleted)
+                addLog('Soft deleting quote session...');
+                const softDeleteResponse = await fetch(`${API_BASE}/quote_sessions/${pkId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        Status: 'Deleted',
+                        UpdatedDate: new Date().toISOString()
+                    })
+                });
+                const softDeleteResult = await softDeleteResponse.json();
+                addLog('Quote session soft deleted', softDeleteResult);
+
+                addLog('✅ Full workflow test completed successfully!');
+            } catch (error) {
+                addLog('❌ Workflow test failed', { error: error.message });
+            }
+        }
+    </script>
+</body>
+</html>

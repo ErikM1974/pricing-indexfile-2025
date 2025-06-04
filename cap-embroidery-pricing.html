@@ -17,6 +17,11 @@
     <link rel="stylesheet" href="/shared_components/css/auto-save-quote.css">
     <link rel="stylesheet" href="/shared_components/css/hero-pricing-emphasis.css">
     <link rel="stylesheet" href="/shared_components/css/keyboard-navigation.css">
+    <link rel="stylesheet" href="/shared_components/css/quote-system.css">
+    <link rel="stylesheet" href="/shared_components/css/quote-system-api.css">
+    <!-- Replaced with simple dropdown: <link rel="stylesheet" href="/shared_components/css/quote-system-enhanced.css"> -->
+    <link rel="stylesheet" href="/shared_components/css/quote-dropdown-simple.css">
+    <link rel="stylesheet" href="/shared_components/css/color-matrix.css">
     
 <!-- jsPDF Libraries for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -43,6 +48,7 @@
                     <button onclick="toggleHelp()" class="header-action-btn">
                         ❓ Help
                     </button>
+                    <!-- Quote dropdown will be injected here by JS -->
                 </div>
             </div>
         </div>
@@ -199,7 +205,7 @@
                         <div id="product-image-gallery" class="image-gallery-enhanced">
                             <div id="main-image-container" class="image-container-enhanced">
                                 <img id="product-image-main" src="" alt="Product Image" class="product-main-image" 
-                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/400x400/f8f9fa/6c757d?text=Image+Not+Available'; this.alt='Image not available';">
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y4ZjlmYSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIwMCIgeT0iMjAwIiBmaWxsPSIjNmM3NTdkIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiPkltYWdlIE5vdCBBdmFpbGFibGU8L3RleHQ+PC9zdmc+'; this.alt='Image not available';">
                                 <div class="image-loading-spinner"></div>
                                 <div class="image-zoom-overlay zoom-overlay-enhanced">🔍</div>
                             </div>
@@ -218,7 +224,12 @@
                         
                         <!-- Clean Color Selection -->
                         <div class="clean-color-section">
-                            <h4 class="section-header">Select Color</h4>
+                            <h4 class="section-header">
+                                Select Color
+                                <button class="btn-secondary" style="float: right; font-size: 14px;" onclick="capEmbroideryController.openColorMatrix()">
+                                    + Add Multiple Colors
+                                </button>
+                            </h4>
                             
                             <!-- Selected Color Display -->
                             <div class="clean-selected-display">
@@ -347,6 +358,8 @@
                 </div>
             </div>
             
+            <!-- Removed floating button - using header dropdown instead -->
+            
             <!-- Call to Action Card -->
             <div class="cta-card">
                 <h2 class="cta-title">Ready for Your Quote?</h2>
@@ -414,7 +427,8 @@
     
     <!-- JavaScript Files -->
     <!-- Base Layer - Core dependencies -->
-    <script src="/shared_components/js/nwca-namespace.js"></script> <!-- NWCA Global Namespace - MUST LOAD FIRST -->
+    <script src="/shared_components/js/debug-config.js"></script> <!-- Debug configuration - MUST LOAD FIRST -->
+    <script src="/shared_components/js/nwca-namespace.js"></script> <!-- NWCA Global Namespace -->
     <script src="/shared_components/js/constants.js"></script> <!-- Global constants -->
     <script src="/shared_components/js/app-config.js"></script> <!-- Application configuration -->
     <script src="/shared_components/js/utils.js"></script> <!-- General utility functions -->
@@ -426,6 +440,7 @@
     <script src="/shared_components/js/dp5-helper.js"></script> <!-- DP5 integration helper -->
     
     <!-- Quote System Base -->
+    <script src="/shared_components/js/quote-api-client.js"></script> <!-- Quote API client -->
     <script src="/shared_components/js/quote-adapter-base.js"></script> <!-- Base class for quote adapters -->
     
     <!-- UI Foundation -->
@@ -442,10 +457,12 @@
     <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script> <!-- Main controller (depends on NWCA, pricing) -->
     <script src="/shared_components/js/cap-embroidery-back-logo.js"></script> <!-- Back logo functionality -->
     <script src="/shared_components/js/cap-embroidery-validation.js"></script> <!-- Validation utilities -->
-    <script src="/shared_components/js/cap-embroidery-cart-integration.js"></script> <!-- Cart integration -->
     <script src="/shared_components/js/cap-embroidery-quote-adapter.js"></script> <!-- Quote adapter (depends on base) -->
     
     <!-- Additional Features -->
+    <!-- Replaced with simple dropdown: <script src="/shared_components/js/quote-system-manager.js"></script> -->
+    <script src="/shared_components/js/quote-dropdown-simple.js"></script> <!-- Simple quote dropdown -->
+    <script src="/shared_components/js/color-matrix-manager.js"></script> <!-- Color matrix manager -->
     <script src="/shared_components/js/universal-header.js"></script> <!-- Universal header functionality -->
     <script src="/shared_components/js/header-button-functions.js"></script> <!-- Header button implementations -->
     <script src="/shared_components/js/order-form-pdf.js"></script> <!-- PDF generation -->

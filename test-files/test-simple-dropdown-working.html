@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Simple Quote Dropdown</title>
+    
+    <!-- Base CSS -->
+    <link rel="stylesheet" href="/shared_components/css/core-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/quote-dropdown-simple.css">
+    
+    <style>
+        /* Mock header styles */
+        .universal-header {
+            background: #333;
+            color: white;
+            padding: 10px 0;
+        }
+        
+        .header-main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .header-action-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .header-action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .main-content {
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        .test-button {
+            padding: 10px 20px;
+            background: #5ab738;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:hover {
+            background: #4a9c2d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mock Header -->
+    <header class="universal-header">
+        <div class="header-main-content">
+            <div class="header-brand">
+                <h3 style="margin: 0;">NW Custom Apparel</h3>
+            </div>
+            
+            <div class="header-actions">
+                <button class="header-action-btn">
+                    🖨️ Print
+                </button>
+                <button class="header-action-btn">
+                    📤 Share
+                </button>
+                <button class="header-action-btn">
+                    ❓ Help
+                </button>
+                <!-- Quote dropdown will be injected here -->
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Simple Quote Dropdown Test</h1>
+        
+        <div class="test-section">
+            <h2>Test Quote Functions</h2>
+            <button class="test-button" onclick="addTestItem()">Add Item to Quote</button>
+            <button class="test-button" onclick="addMultipleItems()">Add 3 Items</button>
+            <button class="test-button" onclick="clearQuote()">Clear Quote</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>How it Works</h2>
+            <ol>
+                <li>Click "Add Item to Quote" to add items</li>
+                <li>The Quote button in the header will show a count badge</li>
+                <li>Click the Quote button to see the dropdown</li>
+                <li>Dropdown auto-closes when clicking outside</li>
+                <li>Click "View Full Quote" for detailed view</li>
+            </ol>
+        </div>
+        
+        <div class="test-section">
+            <h2>Features</h2>
+            <ul>
+                <li>✅ Clean integration into existing header</li>
+                <li>✅ No floating buttons</li>
+                <li>✅ Compact dropdown (360px wide)</li>
+                <li>✅ Auto-close on outside click</li>
+                <li>✅ Success notifications</li>
+                <li>✅ Item count badge</li>
+                <li>✅ Quick remove items</li>
+                <li>✅ Full quote modal</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/quote-adapter-base.js"></script>
+    <script src="/shared_components/js/cap-embroidery-quote-adapter.js"></script>
+    <script src="/shared_components/js/quote-dropdown-simple.js"></script>
+    
+    <script>
+        // Initialize quote adapter
+        window.capEmbroideryQuoteAdapter = new CapEmbroideryQuoteAdapter();
+        
+        // Test functions
+        function addTestItem() {
+            const item = {
+                id: 'item-' + Date.now(),
+                styleNumber: 'TEST-123',
+                productName: 'Test Cap',
+                color: ['Red', 'Blue', 'Green', 'Black'][Math.floor(Math.random() * 4)],
+                quantity: Math.floor(Math.random() * 48) + 12,
+                embellishmentType: 'Cap Embroidery',
+                stitchCount: 8000,
+                hasBackLogo: false,
+                baseUnitPrice: 15.00,
+                finalUnitPrice: 15.00,
+                lineTotal: 0
+            };
+            
+            item.lineTotal = item.quantity * item.finalUnitPrice;
+            
+            window.capEmbroideryQuoteAdapter.addItem(item);
+            
+            // Trigger events
+            document.dispatchEvent(new CustomEvent('quoteItemAdded', { detail: item }));
+        }
+        
+        function addMultipleItems() {
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => addTestItem(), i * 200);
+            }
+        }
+        
+        function clearQuote() {
+            window.capEmbroideryQuoteAdapter.clearItems();
+            document.dispatchEvent(new CustomEvent('quoteUpdated'));
+        }
+    </script>
+</body>
+</html>

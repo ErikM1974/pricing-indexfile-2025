@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Quote API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Quote API Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Create Quote Session</h2>
+        <button onclick="createQuoteSession()">Create Session</button>
+        <div id="createResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Get All Sessions</h2>
+        <button onclick="getAllSessions()">Get All Sessions</button>
+        <div id="getResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Update Session</h2>
+        <input type="text" id="updateId" placeholder="Session ID" style="margin-right: 10px;">
+        <button onclick="updateSession()">Update Session</button>
+        <div id="updateResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: Delete Session</h2>
+        <input type="text" id="deleteId" placeholder="Session ID" style="margin-right: 10px;">
+        <button onclick="deleteSession()">Delete Session</button>
+        <div id="deleteResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        
+        function showResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = JSON.stringify(data, null, 2);
+            element.className = `result ${isError ? 'error' : 'success'}`;
+        }
+
+        async function createQuoteSession() {
+            try {
+                const testData = {
+                    QuoteID: `Q_${Date.now()}`,
+                    SessionID: `sess_${Date.now()}_test`,
+                    Status: 'Active',
+                    CustomerEmail: 'test@example.com',
+                    CustomerName: 'Test User',
+                    CompanyName: 'Test Company',
+                    Phone: '555-1234',
+                    TotalQuantity: 75,
+                    SubtotalAmount: 200.00,
+                    LTMFeeTotal: 0,
+                    TotalAmount: 200.00,
+                    ExpiresAt: new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+                    Notes: JSON.stringify({
+                        pricingType: 'cap-embroidery',
+                        items: [
+                            { quantity: 25, unitPrice: 3.00, total: 75.00 },
+                            { quantity: 50, unitPrice: 2.50, total: 125.00 }
+                        ]
+                    })
+                };
+
+                const response = await fetch(`${API_BASE}/quote_sessions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const result = await response.json();
+                showResult('createResult', result, !response.ok);
+                
+                // Auto-populate the ID fields for convenience
+                if (result.PK_ID) {
+                    document.getElementById('updateId').value = result.PK_ID;
+                    document.getElementById('deleteId').value = result.PK_ID;
+                }
+            } catch (error) {
+                showResult('createResult', { error: error.message }, true);
+            }
+        }
+
+        async function getAllSessions() {
+            try {
+                const response = await fetch(`${API_BASE}/quote_sessions`);
+                const result = await response.json();
+                showResult('getResult', result, !response.ok);
+            } catch (error) {
+                showResult('getResult', { error: error.message }, true);
+            }
+        }
+
+        async function updateSession() {
+            try {
+                const id = document.getElementById('updateId').value;
+                if (!id) {
+                    showResult('updateResult', { error: 'Please enter a session ID' }, true);
+                    return;
+                }
+
+                const updateData = {
+                    CustomerName: 'Updated Test User',
+                    TotalAmount: 250.00,
+                    Status: 'Completed',
+                    UpdatedAt: new Date().toISOString()
+                };
+
+                const response = await fetch(`${API_BASE}/quote_sessions/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+                showResult('updateResult', result, !response.ok);
+            } catch (error) {
+                showResult('updateResult', { error: error.message }, true);
+            }
+        }
+
+        async function deleteSession() {
+            try {
+                const id = document.getElementById('deleteId').value;
+                if (!id) {
+                    showResult('deleteResult', { error: 'Please enter a session ID' }, true);
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/quote_sessions/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                showResult('deleteResult', result, !response.ok);
+            } catch (error) {
+                showResult('deleteResult', { error: error.message }, true);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Cap Embroidery Complete Features</title>
+    
+    <!-- Base CSS -->
+    <link rel="stylesheet" href="/shared_components/css/core-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/cap-embroidery-specific.css">
+    
+    <!-- Quote System CSS -->
+    <link rel="stylesheet" href="/shared_components/css/quote-system.css">
+    <link rel="stylesheet" href="/shared_components/css/quote-system-api.css">
+    <link rel="stylesheet" href="/shared_components/css/quote-system-enhanced.css">
+    <link rel="stylesheet" href="/shared_components/css/color-matrix.css">
+    
+    <!-- Feature CSS -->
+    <link rel="stylesheet" href="/shared_components/css/clean-color-swatches.css">
+    <link rel="stylesheet" href="/shared_components/css/hero-pricing-emphasis.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-quantity-ui.css">
+    <link rel="stylesheet" href="/shared_components/css/auto-save-quote.css">
+    
+    <style>
+        body {
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        
+        .test-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .test-button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #5ab738;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .status-box {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+        }
+        
+        .error-box {
+            background: #ffebee;
+            border: 1px solid #f44336;
+        }
+        
+        /* Mock color swatches */
+        .mock-colors {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .clean-swatch-item {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .clean-swatch-box {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 5px;
+            border-radius: 4px;
+        }
+        
+        .clean-swatch-name {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cap Embroidery Complete Features Test</h1>
+    
+    <!-- Feature 1: Customer CRUD -->
+    <div class="test-section">
+        <h2>1. Customer CRUD Operations</h2>
+        <button class="test-button btn-primary" onclick="testCreateCustomer()">Create Customer</button>
+        <button class="test-button btn-secondary" onclick="testGetCustomer()">Get Customer</button>
+        <button class="test-button btn-secondary" onclick="testUpdateCustomer()">Update Customer</button>
+        <div id="customer-status" class="status-box" style="display:none;"></div>
+    </div>
+    
+    <!-- Feature 2: Color Matrix -->
+    <div class="test-section">
+        <h2>2. Color Matrix</h2>
+        <p>Mock product colors:</p>
+        <div id="color-swatches" class="mock-colors">
+            <div class="clean-swatch-item" data-color-name="Red">
+                <div class="clean-swatch-box" style="background: red;"></div>
+                <div class="clean-swatch-name">Red</div>
+            </div>
+            <div class="clean-swatch-item" data-color-name="Blue">
+                <div class="clean-swatch-box" style="background: blue;"></div>
+                <div class="clean-swatch-name">Blue</div>
+            </div>
+            <div class="clean-swatch-item" data-color-name="Green">
+                <div class="clean-swatch-box" style="background: green;"></div>
+                <div class="clean-swatch-name">Green</div>
+            </div>
+            <div class="clean-swatch-item" data-color-name="Black">
+                <div class="clean-swatch-box" style="background: black;"></div>
+                <div class="clean-swatch-name">Black</div>
+            </div>
+        </div>
+        <button class="test-button btn-primary" onclick="testColorMatrix()">Open Color Matrix</button>
+        <div id="color-matrix-status" class="status-box" style="display:none;"></div>
+    </div>
+    
+    <!-- Feature 3: Quote Management -->
+    <div class="test-section">
+        <h2>3. Quote Management Panel</h2>
+        <button class="test-button btn-primary" onclick="toggleQuickQuote()">Open Quote Panel</button>
+        <button class="test-button btn-secondary" onclick="testAddItemToQuote()">Add Test Item</button>
+        <button class="test-button btn-secondary" onclick="testAutoSave()">Test Auto-Save</button>
+        <div id="quote-status" class="status-box" style="display:none;"></div>
+    </div>
+    
+    <!-- Feature 4: My Quotes Search -->
+    <div class="test-section">
+        <h2>4. My Quotes Search</h2>
+        <input type="email" id="test-email" placeholder="Enter email" value="test@example.com" style="padding: 8px; margin-right: 10px;">
+        <button class="test-button btn-primary" onclick="testQuoteSearch()">Search Quotes</button>
+        <div id="search-status" class="status-box" style="display:none;"></div>
+    </div>
+    
+    <!-- Feature 5: Quote Operations -->
+    <div class="test-section">
+        <h2>5. Quote Operations</h2>
+        <button class="test-button btn-secondary" onclick="testDuplicateQuote()">Duplicate Quote</button>
+        <button class="test-button btn-secondary" onclick="testExpiredQuotes()">Check Expired Quotes</button>
+        <button class="test-button btn-secondary" onclick="testClearQuote()">Clear Quote</button>
+        <div id="operations-status" class="status-box" style="display:none;"></div>
+    </div>
+    
+    <!-- Floating Quote Button -->
+    <button class="quote-toggle-floating" onclick="toggleQuickQuote()">
+        <span>📼 View Quote</span>
+        <span class="quote-badge" id="quote-item-count">0</span>
+    </button>
+    
+    <!-- Hidden elements for testing -->
+    <div style="display: none;">
+        <div id="product-title-context">Test Cap Product</div>
+        <div id="product-style-context">TEST-123</div>
+        <img id="product-image-main" src="test.jpg" alt="Test">
+    </div>
+    
+    <!-- Scripts -->
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/quote-api-client.js"></script>
+    <script src="/shared_components/js/quote-adapter-base.js"></script>
+    <script src="/shared_components/js/cap-embroidery-quote-adapter.js"></script>
+    <script src="/shared_components/js/quote-system-manager.js"></script>
+    <script src="/shared_components/js/color-matrix-manager.js"></script>
+    
+    <script>
+        // Initialize quote adapter
+        window.capEmbroideryQuoteAdapter = new CapEmbroideryQuoteAdapter();
+        
+        // Test functions
+        let testCustomerId = null;
+        
+        async function testCreateCustomer() {
+            const status = document.getElementById('customer-status');
+            status.style.display = 'block';
+            status.className = 'status-box';
+            
+            try {
+                const customer = await window.quoteAPIClient.createCustomer({
+                    Name: 'Test Customer',
+                    Email: 'test@example.com',
+                    Phone: '555-123-4567',
+                    Company: 'Test Company'
+                });
+                
+                testCustomerId = customer.CustomerID || customer.PK_ID;
+                status.innerHTML = `✅ Customer created successfully!<br>ID: ${testCustomerId}`;
+            } catch (error) {
+                status.className = 'status-box error-box';
+                status.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        async function testGetCustomer() {
+            const status = document.getElementById('customer-status');
+            status.style.display = 'block';
+            status.className = 'status-box';
+            
+            try {
+                const customer = await window.quoteAPIClient.getCustomerByEmail('test@example.com');
+                if (customer) {
+                    testCustomerId = customer.CustomerID || customer.PK_ID;
+                    status.innerHTML = `✅ Customer found!<br>Name: ${customer.Name}<br>Email: ${customer.Email}`;
+                } else {
+                    status.innerHTML = '❌ No customer found with that email';
+                }
+            } catch (error) {
+                status.className = 'status-box error-box';
+                status.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        async function testUpdateCustomer() {
+            const status = document.getElementById('customer-status');
+            status.style.display = 'block';
+            
+            if (!testCustomerId) {
+                status.className = 'status-box error-box';
+                status.innerHTML = '❌ Please create or get a customer first';
+                return;
+            }
+            
+            try {
+                const updated = await window.quoteAPIClient.updateCustomer(testCustomerId, {
+                    Phone: '555-987-6543',
+                    Notes: 'Updated via test'
+                });
+                
+                status.className = 'status-box';
+                status.innerHTML = `✅ Customer updated successfully!`;
+            } catch (error) {
+                status.className = 'status-box error-box';
+                status.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        function testColorMatrix() {
+            const status = document.getElementById('color-matrix-status');
+            status.style.display = 'block';
+            status.className = 'status-box';
+            
+            // Mock the cap embroidery controller method
+            window.capEmbroideryController = {
+                openColorMatrix: function() {
+                    const colors = [
+                        { name: 'Red', code: 'RED', hex: '#ff0000' },
+                        { name: 'Blue', code: 'BLUE', hex: '#0000ff' },
+                        { name: 'Green', code: 'GREEN', hex: '#00ff00' },
+                        { name: 'Black', code: 'BLACK', hex: '#000000' }
+                    ];
+                    
+                    const event = new CustomEvent('openColorMatrix', {
+                        detail: {
+                            productName: 'Test Cap',
+                            styleNumber: 'TEST-123',
+                            imageUrl: 'test.jpg',
+                            colors: colors,
+                            stitchCount: 8000
+                        }
+                    });
+                    document.dispatchEvent(event);
+                }
+            };
+            
+            window.capEmbroideryController.openColorMatrix();
+            status.innerHTML = '✅ Color matrix opened!';
+        }
+        
+        function testAddItemToQuote() {
+            const status = document.getElementById('quote-status');
+            status.style.display = 'block';
+            status.className = 'status-box';
+            
+            const item = {
+                styleNumber: 'TEST-123',
+                productName: 'Test Cap',
+                color: 'Blue',
+                colorCode: 'BLUE',
+                quantity: 24,
+                embellishmentType: 'Cap Embroidery',
+                stitchCount: 8000,
+                hasBackLogo: false,
+                baseUnitPrice: 15.00,
+                finalUnitPrice: 15.00,
+                lineTotal: 360.00
+            };
+            
+            window.capEmbroideryQuoteAdapter.addItem(item);
+            status.innerHTML = '✅ Item added to quote!';
+            
+            // Update badge
+            window.quoteSystemManager.updateQuoteBadge();
+        }
+        
+        async function testAutoSave() {
+            const status = document.getElementById('quote-status');
+            status.style.display = 'block';
+            status.className = 'status-box';
+            
+            try {
+                await window.quoteSystemManager.saveQuote();
+                status.innerHTML = '✅ Quote saved successfully!';
+            } catch (error) {
+                status.className = 'status-box error-box';
+                status.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        async function testQuoteSearch() {
+            const status = document.getElementById('search-status');
+            status.style.display = 'block';
+            status.className = 'status-box';
+            
+            const email = document.getElementById('test-email').value;
+            
+            try {
+                const quotes = await window.quoteAPIClient.getQuotesByCustomerEmail(email);
+                status.innerHTML = `✅ Found ${quotes.length} quotes for ${email}`;
+                
+                if (quotes.length > 0) {
+                    status.innerHTML += '<br>Quote IDs: ' + quotes.map(q => q.QuoteID).join(', ');
+                }
+            } catch (error) {
+                status.className = 'status-box error-box';
+                status.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        async function testDuplicateQuote() {
+            const status = document.getElementById('operations-status');
+            status.style.display = 'block';
+            status.className = 'status-box';
+            
+            if (!window.quoteSystemManager.currentQuote) {
+                status.innerHTML = '⚠️ Please save a quote first';
+                return;
+            }
+            
+            try {
+                await window.quoteSystemManager.duplicateQuote();
+                status.innerHTML = '✅ Quote duplicated successfully!';
+            } catch (error) {
+                status.className = 'status-box error-box';
+                status.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        function testExpiredQuotes() {
+            const status = document.getElementById('operations-status');
+            status.style.display = 'block';
+            status.className = 'status-box';
+            
+            // Mock expired quote check
+            const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 30);
+            
+            status.innerHTML = `✅ Quotes expire on: ${expirationDate.toLocaleDateString()}<br>`;
+            status.innerHTML += 'Expired quotes are automatically filtered out in search results.';
+        }
+        
+        function testClearQuote() {
+            const status = document.getElementById('operations-status');
+            status.style.display = 'block';
+            status.className = 'status-box';
+            
+            window.quoteSystemManager.clearQuote();
+            status.innerHTML = '✅ Quote cleared!';
+        }
+    </script>
+</body>
+</html>

@@ -21,11 +21,15 @@
             this.currentStitchCount = CAP_EMBROIDERY_CONFIG.defaultStitchCount;
             this.backLogoEnabled = false;
             this.currentPricingData = null;
+            this.apiClient = window.quoteAPIClient || null;
         }
 
         // Override setupUI to include cap embroidery specific elements
         setupUI() {
-            console.log('[CAP-EMB-QUOTE] Setting up cap embroidery quote UI');
+            // Reduce logging to prevent memory issues
+            if (window.DEBUG_MODE) {
+                console.log('[CAP-EMB-QUOTE] Setting up cap embroidery quote UI');
+            }
             
             // Replace "Add to Cart" section with quote builder
             const cartSection = document.getElementById('add-to-cart-section');
@@ -38,6 +42,9 @@
 
             // Setup stitch count selector
             this.setupStitchCountSelector();
+            
+            // Populate the size quantity grid
+            this.populateSizeQuantityGrid();
         }
 
         // Get cap embroidery specific quote builder HTML
@@ -90,7 +97,7 @@
             if (stitchCountSelect) {
                 stitchCountSelect.addEventListener('change', (e) => {
                     this.currentStitchCount = e.target.value;
-                    console.log('[CAP-EMB-QUOTE] Stitch count changed to:', this.currentStitchCount);
+                    // Reduce logging
                     
                     // Update pricing if we have current pricing data
                     if (this.currentPricingData) {
@@ -103,56 +110,178 @@
                 
             }
         }
+        
+        // Populate the size quantity grid
+        populateSizeQuantityGrid() {
+            const gridContainer = document.getElementById('size-quantity-grid');
+            if (!gridContainer) return;
+            
+            // Cap embroidery typically uses OS (One Size) but let's check for available sizes
+            const sizes = this.getAvailableSizes();
+            
+            // Create a simple table for size quantity inputs
+            let html = '<table class="size-quantity-table" style="width: 100%; border-collapse: collapse;">';
+            html += '<thead><tr>';
+            html += '<th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Size</th>';
+            html += '<th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Quantity</th>';
+            html += '<th style="padding: 10px; text-align: right; border-bottom: 2px solid #ddd;">Unit Price</th>';
+            html += '</tr></thead>';
+            html += '<tbody>';
+            
+            sizes.forEach(size => {
+                html += '<tr>';
+                html += `<td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>${size}</strong></td>`;
+                html += '<td style="padding: 10px; text-align: center; border-bottom: 1px solid #eee;">';
+                html += `<input type="number" class="quantity-input" data-size="${size}" min="0" value="0" style="width: 80px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 4px;">`;
+                html += '</td>';
+                html += `<td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">`;
+                html += `<span class="size-price-display" data-size="${size}">$0.00</span>`;
+                html += '</td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            
+            // Add total row
+            html += '<div style="margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 4px;">';
+            html += '<div style="display: flex; justify-content: space-between; align-items: center;">';
+            html += '<span><strong>Total Quantity:</strong> <span class="total-quantity">0</span></span>';
+            html += '<span><strong>Total Price:</strong> <span class="total-price">$0.00</span></span>';
+            html += '</div>';
+            html += '</div>';
+            
+            gridContainer.innerHTML = html;
+            
+            // Add event listeners to quantity inputs
+            const quantityInputs = gridContainer.querySelectorAll('.quantity-input');
+            quantityInputs.forEach(input => {
+                input.addEventListener('input', () => this.updateQuantityTotals());
+            });
+        }
+        
+        // Get available sizes (for caps, typically just OS)
+        getAvailableSizes() {
+            // Check if we have size data from the pricing system
+            if (this.currentPricingData && this.currentPricingData.sizes) {
+                return this.currentPricingData.sizes;
+            }
+            
+            // Default for cap embroidery
+            return ['OS']; // One Size
+        }
+        
+        // Update quantity totals
+        updateQuantityTotals() {
+            let totalQuantity = 0;
+            let totalPrice = 0;
+            
+            const quantityInputs = document.querySelectorAll('.quantity-input[data-size]');
+            quantityInputs.forEach(input => {
+                const qty = parseInt(input.value) || 0;
+                const size = input.getAttribute('data-size');
+                totalQuantity += qty;
+                
+                if (qty > 0 && this.currentPricingData) {
+                    const basePrice = this.getBasePriceForSize(size);
+                    const backLogoPrice = this.backLogoEnabled ? this.getCurrentBackLogoPrice() : 0;
+                    const unitPrice = basePrice + backLogoPrice;
+                    totalPrice += unitPrice * qty;
+                }
+            });
+            
+            // Update displays
+            const totalQtyEl = document.querySelector('.total-quantity');
+            const totalPriceEl = document.querySelector('.total-price');
+            
+            if (totalQtyEl) totalQtyEl.textContent = totalQuantity;
+            if (totalPriceEl) totalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+            
+            // Update pricing display for tier pricing
+            this.updatePricingDisplay();
+        }
 
         // Override bindEvents to include cap embroidery specific events
         bindEvents() {
             super.bindEvents();
             
+            // Clean up any existing event listeners first
+            if (this.boundHandleAddToQuote) {
+                const oldBtn = document.getElementById('add-to-quote-btn');
+                if (oldBtn) {
+                    oldBtn.removeEventListener('click', this.boundHandleAddToQuote);
+                }
+            }
+            
             // Add to quote button
             const addToQuoteBtn = document.getElementById('add-to-quote-btn');
             if (addToQuoteBtn) {
-                addToQuoteBtn.addEventListener('click', () => this.handleAddToQuote());
+                this.boundHandleAddToQuote = () => this.handleAddToQuote();
+                addToQuoteBtn.addEventListener('click', this.boundHandleAddToQuote);
             }
 
+            // Store event listeners for cleanup
+            this.eventHandlers = this.eventHandlers || {};
+            
+            // Remove existing listeners before adding new ones
+            this.cleanupEventListeners();
+            
             // Listen for pricing data updates
-            document.addEventListener('pricingDataUpdated', (e) => {
-                console.log('[CAP-EMB-QUOTE] Pricing data updated:', e.detail);
+            this.eventHandlers.pricingDataUpdated = (e) => {
                 this.currentPricingData = e.detail;
+                // Check if we need to update available sizes
+                const currentSizes = this.getAvailableSizes();
+                const gridContainer = document.getElementById('size-quantity-grid');
+                if (gridContainer && currentSizes.length > 0) {
+                    const existingInputs = gridContainer.querySelectorAll('.quantity-input[data-size]');
+                    // If no inputs exist or sizes changed, repopulate
+                    if (existingInputs.length === 0) {
+                        this.populateSizeQuantityGrid();
+                    }
+                }
                 this.updatePricingDisplay();
-            });
+            };
+            document.addEventListener('pricingDataUpdated', this.eventHandlers.pricingDataUpdated);
 
             // Listen for color selection changes
-            document.addEventListener('colorSelected', (e) => {
-                console.log('[CAP-EMB-QUOTE] Color selected:', e.detail);
-            });
+            this.eventHandlers.colorSelected = (e) => {
+                // Handle color selection if needed
+            };
+            document.addEventListener('colorSelected', this.eventHandlers.colorSelected);
             
             // Listen for back logo add-on changes
-            document.addEventListener('backLogoToggled', (e) => {
-                console.log('[CAP-EMB-QUOTE] Back logo toggled:', e.detail);
+            this.eventHandlers.backLogoToggled = (e) => {
                 this.backLogoEnabled = e.detail.enabled;
                 this.updatePricingDisplay();
-            });
+            };
+            document.addEventListener('backLogoToggled', this.eventHandlers.backLogoToggled);
             
-            document.addEventListener('backLogoUpdated', (e) => {
-                console.log('[CAP-EMB-QUOTE] Back logo updated:', e.detail);
+            this.eventHandlers.backLogoUpdated = (e) => {
                 this.updatePricingDisplay();
-            });
+            };
+            document.addEventListener('backLogoUpdated', this.eventHandlers.backLogoUpdated);
         }
 
 
         // Get current back logo price from the independent add-on system
+        // Cleanup event listeners to prevent memory leaks
+        cleanupEventListeners() {
+            if (this.eventHandlers) {
+                Object.entries(this.eventHandlers).forEach(([event, handler]) => {
+                    document.removeEventListener(event, handler);
+                });
+            }
+        }
+        
+        // Get current quote items (for quote dropdown)
+        getItems() {
+            return this.currentQuote ? this.currentQuote.items : [];
+        }
+
         getCurrentBackLogoPrice() {
-            console.log('[CAP-EMB-QUOTE] getCurrentBackLogoPrice called');
-            console.log('[CAP-EMB-QUOTE] CapEmbroideryBackLogoAddon available:', !!window.CapEmbroideryBackLogoAddon);
-            
             if (window.CapEmbroideryBackLogoAddon) {
-                console.log('[CAP-EMB-QUOTE] Addon state:', window.CapEmbroideryBackLogoAddon.getState());
-                const price = window.CapEmbroideryBackLogoAddon.getPrice();
-                console.log('[CAP-EMB-QUOTE] Getting back logo price from addon system:', price);
-                return price;
+                return window.CapEmbroideryBackLogoAddon.getPrice();
             }
             // Fallback calculation
-            console.log('[CAP-EMB-QUOTE] Using fallback back logo price: 5.00');
             return 5.00;
         }
 
@@ -164,58 +293,53 @@
             const backLogoEnabled = window.CapEmbroideryBackLogoAddon ? window.CapEmbroideryBackLogoAddon.isEnabled() : false;
 
             // Update size quantity grid with current prices
-            const sizeInputs = document.querySelectorAll('.quantity-input[data-size]');
-            sizeInputs.forEach(input => {
-                const size = input.getAttribute('data-size');
-                const priceDisplay = input.closest('td').querySelector('.size-price-display');
+            const priceDisplays = document.querySelectorAll('.size-price-display[data-size]');
+            priceDisplays.forEach(display => {
+                const size = display.getAttribute('data-size');
                 
-                if (priceDisplay && this.currentPricingData.prices) {
+                if (this.currentPricingData.prices) {
                     const basePrice = this.getBasePriceForSize(size);
                     const currentBackLogoPrice = this.getCurrentBackLogoPrice();
                     const totalPrice = basePrice + (backLogoEnabled ? currentBackLogoPrice : 0);
-                    priceDisplay.textContent = `$${totalPrice.toFixed(2)}`;
+                    display.textContent = `$${totalPrice.toFixed(2)}`;
                 }
             });
+            
+            // Update totals
+            this.updateQuantityTotals();
         }
 
         // Get base price for a specific size
         getBasePriceForSize(size) {
-            console.log('[CAP-EMB-QUOTE] getBasePriceForSize called for size:', size);
-            console.log('[CAP-EMB-QUOTE] Current stitch count:', this.currentStitchCount);
-            console.log('[CAP-EMB-QUOTE] Current pricing data:', this.currentPricingData);
-            
             if (!this.currentPricingData || !this.currentPricingData.prices) {
-                console.log('[CAP-EMB-QUOTE] No pricing data available');
                 return 0;
             }
             
             // Check if we have direct size pricing structure
             if (this.currentPricingData.prices[size]) {
-                console.log('[CAP-EMB-QUOTE] Found size pricing structure:', this.currentPricingData.prices[size]);
-                
                 // We need to determine which tier to use for a single item (should be lowest tier)
                 const tierPrices = this.currentPricingData.prices[size];
-                const tierKeys = Object.keys(tierPrices);
+                const tierKeys = Object.keys(tierPrices).sort((a, b) => {
+                    // Sort tiers by minimum quantity
+                    const aMin = parseInt(a.split('-')[0]) || 0;
+                    const bMin = parseInt(b.split('-')[0]) || 0;
+                    return aMin - bMin;
+                });
                 
                 if (tierKeys.length > 0) {
                     // Use the first tier (lowest quantity tier) for base pricing
                     const firstTier = tierKeys[0];
-                    const price = tierPrices[firstTier];
-                    console.log('[CAP-EMB-QUOTE] Using tier', firstTier, 'price:', price);
-                    return price;
+                    return tierPrices[firstTier];
                 }
             }
             
             // Fallback: try the old key format
             const priceKey = `${this.currentStitchCount}_${size}`;
-            const fallbackPrice = this.currentPricingData.prices[priceKey] || 0;
-            console.log('[CAP-EMB-QUOTE] Using fallback price key', priceKey, ':', fallbackPrice);
-            return fallbackPrice;
+            return this.currentPricingData.prices[priceKey] || 0;
         }
 
         // Handle add to quote
         async handleAddToQuote() {
-            console.log('[CAP-EMB-QUOTE] Adding to quote...');
             
             // Validate product selection
             const productTitle = document.getElementById('product-title-context')?.textContent;
@@ -250,17 +374,24 @@
             const backLogoStitchCount = window.CapEmbroideryBackLogoAddon ? window.CapEmbroideryBackLogoAddon.getStitchCount() : 0;
             const backLogoPrice = backLogoEnabled ? this.getCurrentBackLogoPrice() : 0;
             
-            console.log('[CAP-EMB-QUOTE] Back logo state before creating quote item:', {
-                backLogoEnabled,
-                backLogoStitchCount,
-                backLogoPrice
-            });
+            // Only log in debug mode
+            if (window.DEBUG_MODE) {
+                console.log('[CAP-EMB-QUOTE] Back logo state:', {
+                    backLogoEnabled,
+                    backLogoStitchCount,
+                    backLogoPrice
+                });
+            }
+
+            // Get product image
+            const productImage = document.getElementById('product-image-main')?.src || '';
 
             // Create quote item
             const itemData = {
                 styleNumber: styleNumber,
                 productName: productTitle,
                 color: selectedColor,
+                colorCode: selectedColor.toUpperCase().replace(/\s+/g, '_'),
                 quantity: totalQuantity,
                 baseUnitPrice: pricing.baseUnitPrice,
                 stitchCount: this.currentStitchCount,
@@ -268,14 +399,103 @@
                 backLogoStitchCount: backLogoStitchCount,
                 backLogoPrice: backLogoPrice,
                 sizeBreakdown: sizeQuantities,
-                sizePricing: pricing.sizePricing
+                sizePricing: pricing.sizePricing,
+                imageURL: productImage,
+                pricingTier: this.determinePricingTier(totalQuantity)
             };
             
-            console.log('[CAP-EMB-QUOTE] Item data being passed to createQuoteItem:', itemData);
             const quoteItem = this.createQuoteItem(itemData);
 
-            // Add to quote
+            // Create quote session if this is the first item
+            if (!this.currentQuote.id && this.apiClient) {
+                try {
+                    const sessionData = {
+                        QuoteID: this.apiClient.generateQuoteID(),
+                        SessionID: this.apiClient.generateSessionID(),
+                        Status: 'Active',
+                        CustomerEmail: '', // Will be filled when saving/emailing
+                        CustomerName: '',
+                        CompanyName: '',
+                        Phone: '',
+                        TotalQuantity: totalQuantity,
+                        SubtotalAmount: 0,
+                        LTMFeeTotal: 0,
+                        TotalAmount: 0,
+                        CreatedAt: new Date().toISOString(),
+                        UpdatedAt: new Date().toISOString(),
+                        ExpiresAt: new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+                        Notes: JSON.stringify({
+                            embellishmentType: 'cap-embroidery',
+                            createdFrom: window.location.href
+                        })
+                    };
+
+                    const response = await this.apiClient.createQuoteSession(sessionData);
+                    
+                    // Update local quote with API response
+                    this.currentQuote.id = response.QuoteID || sessionData.QuoteID;
+                    this.currentQuote.sessionId = response.SessionID || sessionData.SessionID;
+                    this.currentQuote.apiId = response.PK_ID;
+                    
+                    console.log('[CAP-EMB-QUOTE] Quote session created:', this.currentQuote.id);
+                } catch (error) {
+                    console.error('[CAP-EMB-QUOTE] Failed to create quote session:', error);
+                    // Generate local IDs as fallback
+                    this.currentQuote.id = 'LOCAL_' + Date.now();
+                    this.currentQuote.sessionId = 'LOCAL_SESS_' + Date.now();
+                }
+            }
+
+            // Add to quote locally
             this.addItemToQuote(quoteItem);
+
+            // Save item to API if we have a quote ID
+            if (this.apiClient && this.currentQuote.id && !this.currentQuote.id.startsWith('LOCAL_')) {
+                try {
+                    // Store cap-specific data in SizeBreakdown field along with sizes
+                    const extendedData = {
+                        sizes: quoteItem.sizeBreakdown || {},
+                        capDetails: {
+                            stitchCount: quoteItem.stitchCount,
+                            hasBackLogo: quoteItem.hasBackLogo,
+                            backLogoStitchCount: quoteItem.backLogoStitchCount || 0,
+                            backLogoPrice: quoteItem.backLogoPrice || 0
+                        }
+                    };
+
+                    const apiItemData = {
+                        QuoteID: this.currentQuote.id,
+                        LineNumber: quoteItem.lineNumber,
+                        StyleNumber: quoteItem.styleNumber,
+                        ProductName: quoteItem.productName,
+                        Color: quoteItem.color,
+                        ColorCode: quoteItem.colorCode,
+                        EmbellishmentType: 'cap-embroidery',
+                        PrintLocation: quoteItem.hasBackLogo ? 'CAP_FRONT_BACK' : 'CAP_FRONT',
+                        PrintLocationName: quoteItem.hasBackLogo ? 'Cap Front & Back' : 'Cap Front',
+                        Quantity: quoteItem.quantity,
+                        HasLTM: quoteItem.hasLTM ? 'Yes' : 'No',
+                        BaseUnitPrice: quoteItem.baseUnitPrice,
+                        LTMPerUnit: quoteItem.ltmPerUnit,
+                        FinalUnitPrice: quoteItem.finalUnitPrice,
+                        LineTotal: quoteItem.lineTotal,
+                        SizeBreakdown: JSON.stringify(extendedData), // Contains both sizes and cap details
+                        PricingTier: quoteItem.pricingTier,
+                        ImageURL: quoteItem.imageURL,
+                        AddedAt: new Date().toISOString()
+                    };
+
+                    const savedItem = await this.apiClient.createQuoteItem(apiItemData);
+                    quoteItem.apiId = savedItem.PK_ID;
+                    
+                    // Update quote session totals
+                    await this.updateQuoteSessionTotals();
+                    
+                } catch (error) {
+                    console.error('[CAP-EMB-QUOTE] Failed to save item to API:', error);
+                    // Continue anyway - item is saved locally
+                }
+            }
 
             // Reset form
             this.resetQuoteBuilder();
@@ -299,12 +519,8 @@
 
         // Calculate pricing for the current selection
         calculatePricing(sizeQuantities) {
-            console.log('[CAP-EMB-QUOTE] calculatePricing called with sizeQuantities:', sizeQuantities);
-            
             // Use the actual pricing calculator to get accurate pricing
             if (window.NWCAPricingCalculator && window.nwcaPricingData) {
-                console.log('[CAP-EMB-QUOTE] Using NWCAPricingCalculator for accurate pricing');
-                
                 const existingCartQuantity = 0; // For quotes, we start fresh
                 const calculatedPricing = window.NWCAPricingCalculator.calculatePricing(
                     sizeQuantities, 
@@ -312,23 +528,17 @@
                     window.nwcaPricingData
                 );
                 
-                console.log('[CAP-EMB-QUOTE] Calculated pricing from calculator:', calculatedPricing);
-                
                 // Extract the base unit price (without LTM, without back logo)
                 let totalBasePrice = 0;
                 let totalQuantity = 0;
                 
-                console.log('[CAP-EMB-QUOTE] Calculated pricing items:', calculatedPricing.items);
-                
                 Object.entries(calculatedPricing.items || {}).forEach(([size, item]) => {
-                    console.log('[CAP-EMB-QUOTE] Processing item for size:', size, item);
                     if (item.quantity > 0) {
                         // The item object from pricing calculator has these properties:
                         // - baseUnitPrice: the base tier price (what we want)
                         // - unitPrice: base + fees 
                         // - displayUnitPrice: base + fees + back logo (if added by enhanced adapter)
                         const basePrice = item.baseUnitPrice || 0;
-                        console.log('[CAP-EMB-QUOTE] Using base price:', basePrice, 'for quantity:', item.quantity);
                         totalBasePrice += basePrice * item.quantity;
                         totalQuantity += item.quantity;
                     }
@@ -336,16 +546,11 @@
                 
                 const baseUnitPrice = totalQuantity > 0 ? totalBasePrice / totalQuantity : 0;
                 
-                console.log('[CAP-EMB-QUOTE] Extracted base unit price:', baseUnitPrice);
-                
                 return {
                     baseUnitPrice: baseUnitPrice,  // Front logo price only
                     sizePricing: calculatedPricing.items || {}
                 };
             }
-            
-            // Fallback to original method if calculator not available
-            console.log('[CAP-EMB-QUOTE] Falling back to manual calculation');
             
             let totalBasePrice = 0;
             let totalQuantity = 0;
@@ -402,12 +607,6 @@
 
         // Override getItemDetailsHTML for cap embroidery specific details with front/back logo breakdown
         getItemDetailsHTML(item) {
-            console.log('[CAP-EMB-QUOTE] getItemDetailsHTML called with item:', item);
-            console.log('[CAP-EMB-QUOTE] Back logo check:', {
-                hasBackLogo: item.hasBackLogo,
-                backLogoStitchCount: item.backLogoStitchCount,
-                backLogoPrice: item.backLogoPrice
-            });
             
             let detailsHTML = `<div class="quote-item-breakdown">`;
             
@@ -452,36 +651,36 @@
 
         // Override createQuoteItem to include back logo price in final calculations
         createQuoteItem(itemData) {
-            console.log('[CAP-EMB-QUOTE] Creating quote item with data:', itemData);
-            
             // Create base item using parent method
             const baseItem = super.createQuoteItem(itemData);
             
             // Add back logo price to final unit price if back logo is enabled
             if (itemData.hasBackLogo && itemData.backLogoPrice > 0) {
-                console.log('[CAP-EMB-QUOTE] Adding back logo price to final calculation:', {
-                    baseUnitPrice: itemData.baseUnitPrice,
-                    ltmPerUnit: baseItem.ltmPerUnit,
-                    backLogoPrice: itemData.backLogoPrice,
-                    newFinalUnitPrice: itemData.baseUnitPrice + baseItem.ltmPerUnit + itemData.backLogoPrice
-                });
                 baseItem.finalUnitPrice = itemData.baseUnitPrice + baseItem.ltmPerUnit + itemData.backLogoPrice;
                 baseItem.lineTotal = baseItem.finalUnitPrice * itemData.quantity;
             }
             
-            console.log('[CAP-EMB-QUOTE] Final quote item:', baseItem);
             return baseItem;
         }
 
         // Override getAdditionalItemData for cap embroidery specific fields
         getAdditionalItemData(item) {
+            // Store cap-specific data in SizeBreakdown field along with sizes
+            const extendedData = {
+                sizes: item.sizeBreakdown || {},
+                capDetails: {
+                    stitchCount: item.stitchCount,
+                    hasBackLogo: item.hasBackLogo,
+                    backLogoStitchCount: item.backLogoStitchCount || 0,
+                    backLogoPrice: item.backLogoPrice || 0
+                }
+            };
+
             return {
-                StitchCount: item.stitchCount,
-                HasBackLogo: item.hasBackLogo ? "Yes" : "No",
-                BackLogoStitchCount: item.backLogoStitchCount || 0,
-                BackLogoPrice: item.backLogoPrice || 0,
-                SizeBreakdown: JSON.stringify(item.sizeBreakdown || {}),
-                SizePricing: JSON.stringify(item.sizePricing || {})
+                PrintLocation: item.hasBackLogo ? 'CAP_FRONT_BACK' : 'CAP_FRONT',
+                PrintLocationName: item.hasBackLogo ? 'Cap Front & Back' : 'Cap Front',
+                SizeBreakdown: JSON.stringify(extendedData),
+                PricingTier: this.determinePricingTier(item.quantity)
             };
         }
 
@@ -527,19 +726,267 @@
             }
         }
 
+        // Update quote session totals in the API
+        async updateQuoteSessionTotals() {
+            if (!this.apiClient || !this.currentQuote.apiId) return;
+            
+            try {
+                const updates = {
+                    TotalQuantity: this.currentQuote.totalQuantity,
+                    SubtotalAmount: this.currentQuote.subtotal,
+                    LTMFeeTotal: this.currentQuote.ltmTotal,
+                    TotalAmount: this.currentQuote.grandTotal,
+                    UpdatedAt: new Date().toISOString()
+                };
+                
+                await this.apiClient.updateQuoteSession(this.currentQuote.apiId, updates);
+                console.log('[CAP-EMB-QUOTE] Quote session totals updated');
+            } catch (error) {
+                console.error('[CAP-EMB-QUOTE] Failed to update quote session totals:', error);
+            }
+        }
+
         // Override convertApiItemToQuoteItem for cap embroidery specific conversion
         convertApiItemToQuoteItem(apiItem) {
             const baseItem = super.convertApiItemToQuoteItem(apiItem);
             
+            // Parse extended data from SizeBreakdown field
+            let sizeBreakdown = {};
+            let capDetails = {
+                stitchCount: '8000',
+                hasBackLogo: false,
+                backLogoStitchCount: 0,
+                backLogoPrice: 0
+            };
+            
+            if (apiItem.SizeBreakdown) {
+                try {
+                    const extendedData = JSON.parse(apiItem.SizeBreakdown);
+                    if (extendedData.sizes) {
+                        sizeBreakdown = extendedData.sizes;
+                    }
+                    if (extendedData.capDetails) {
+                        capDetails = extendedData.capDetails;
+                    }
+                } catch (e) {
+                    // Fallback for old format (just sizes)
+                    try {
+                        sizeBreakdown = JSON.parse(apiItem.SizeBreakdown);
+                    } catch (e2) {
+                        console.error('[CAP-EMB-QUOTE] Error parsing SizeBreakdown:', e2);
+                    }
+                }
+            }
+            
+            // Check PrintLocation for back logo indicator
+            const hasBackLogo = capDetails.hasBackLogo || 
+                               apiItem.PrintLocation === 'CAP_FRONT_BACK' ||
+                               apiItem.PrintLocationName?.includes('Back');
+            
             // Add cap embroidery specific fields
             return {
                 ...baseItem,
-                stitchCount: apiItem.StitchCount || '8000',
-                hasBackLogo: apiItem.HasBackLogo === "Yes",
-                backLogoPrice: parseFloat(apiItem.BackLogoPrice) || 0,
-                sizeBreakdown: apiItem.SizeBreakdown ? JSON.parse(apiItem.SizeBreakdown) : {},
+                stitchCount: capDetails.stitchCount || '8000',
+                hasBackLogo: hasBackLogo,
+                backLogoStitchCount: capDetails.backLogoStitchCount || 0,
+                backLogoPrice: capDetails.backLogoPrice || 0,
+                sizeBreakdown: sizeBreakdown,
                 sizePricing: apiItem.SizePricing ? JSON.parse(apiItem.SizePricing) : {}
             };
+        }
+
+        // Determine pricing tier based on quantity
+        determinePricingTier(quantity) {
+            if (quantity >= 72) return '72+';
+            if (quantity >= 48) return '48-71';
+            if (quantity >= 24) return '24-47';
+            return '1-23';
+        }
+
+        // Save item to API
+        async saveItemToAPI(item) {
+            if (!this.apiClient) return;
+            
+            try {
+                const apiItem = this.apiClient.formatQuoteItemForAPI(item, this.currentQuote.id, item.lineNumber);
+                const savedItem = await this.apiClient.createQuoteItem(apiItem);
+                
+                // Update local item with API ID
+                item.apiId = savedItem.PK_ID;
+                // Item saved successfully
+                
+                // Track analytics
+                await this.apiClient.trackEvent({
+                    SessionID: this.currentQuote.sessionId,
+                    QuoteID: this.currentQuote.id,
+                    EventType: 'item_added',
+                    StyleNumber: item.styleNumber,
+                    Color: item.color,
+                    Quantity: item.quantity,
+                    PriceShown: item.finalUnitPrice
+                });
+                
+            } catch (error) {
+                console.error('[CAP-EMB-QUOTE] Failed to save item to API:', error);
+                throw error;
+            }
+        }
+
+        // Override saveQuote to ensure quote session exists
+        async saveQuote() {
+            try {
+                if (!this.apiClient) {
+                    console.warn('[CAP-EMB-QUOTE] API client not available, falling back to base save');
+                    return super.saveQuote();
+                }
+
+                // Create or update quote session
+                if (!this.currentQuote.id) {
+                    this.currentQuote.id = this.apiClient.generateQuoteID();
+                }
+
+                let quoteSession;
+                const existingSession = await this.apiClient.getQuoteSessionByQuoteID(this.currentQuote.id);
+                
+                if (existingSession) {
+                    // Update existing session
+                    quoteSession = await this.apiClient.updateQuoteSession(existingSession.PK_ID, {
+                        Status: 'Active',
+                        Notes: `Cap Embroidery Quote - ${this.currentQuote.items.length} items, Total: $${this.currentQuote.grandTotal.toFixed(2)}`
+                    });
+                } else {
+                    // Create new session
+                    const sessionData = {
+                        QuoteID: this.currentQuote.id,
+                        SessionID: this.currentQuote.sessionId,
+                        Status: 'Active',
+                        Notes: `Cap Embroidery Quote - ${this.currentQuote.items.length} items, Total: $${this.currentQuote.grandTotal.toFixed(2)}`
+                    };
+                    
+                    quoteSession = await this.apiClient.createQuoteSession(sessionData);
+                }
+
+                // Quote session saved successfully
+
+                // Save each item that doesn't have an API ID
+                for (const item of this.currentQuote.items) {
+                    if (!item.apiId) {
+                        await this.saveItemToAPI(item);
+                    }
+                }
+
+                // Show success with copy-able quote ID
+                this.showQuoteSavedModal(this.currentQuote.id);
+
+                // Track analytics
+                await this.apiClient.trackEvent({
+                    SessionID: this.currentQuote.sessionId,
+                    QuoteID: this.currentQuote.id,
+                    EventType: 'quote_saved',
+                    Quantity: this.currentQuote.totalQuantity,
+                    PriceShown: this.currentQuote.grandTotal
+                });
+
+            } catch (error) {
+                console.error('[CAP-EMB-QUOTE] Error saving quote:', error);
+                alert('Error saving quote: ' + error.message);
+            }
+        }
+
+        // Show quote saved modal with copy functionality
+        showQuoteSavedModal(quoteID) {
+            const modal = document.createElement('div');
+            modal.className = 'quote-saved-modal';
+            modal.innerHTML = `
+                <div class="modal-overlay" onclick="this.parentElement.remove()"></div>
+                <div class="modal-content">
+                    <h3>✅ Quote Saved Successfully!</h3>
+                    <div class="quote-id-display">
+                        <label>Quote ID:</label>
+                        <div class="quote-id-copy">
+                            <input type="text" value="${quoteID}" readonly id="quote-id-input">
+                            <button onclick="navigator.clipboard.writeText('${quoteID}').then(() => {
+                                this.textContent = '✅ Copied!';
+                                setTimeout(() => this.textContent = '📋 Copy', 2000);
+                            })">📋 Copy</button>
+                        </div>
+                    </div>
+                    <p>Share this ID to retrieve your quote later</p>
+                    <button class="modal-close-btn" onclick="this.closest('.quote-saved-modal').remove()">
+                        Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Override loadQuote to use API client
+        async loadQuote(quoteId) {
+            if (!this.apiClient) {
+                return super.loadQuote(quoteId);
+            }
+
+            try {
+                
+                // Get quote session
+                const quoteSession = await this.apiClient.getQuoteSessionByQuoteID(quoteId);
+                if (!quoteSession) {
+                    throw new Error('Quote not found');
+                }
+
+                // Get quote items
+                const apiItems = await this.apiClient.getQuoteItems(quoteId);
+                
+                // Reset current quote
+                this.currentQuote = this.initializeQuote();
+                this.currentQuote.id = quoteSession.QuoteID;
+                this.currentQuote.sessionId = quoteSession.SessionID;
+
+                // Convert and add items
+                for (const apiItem of apiItems) {
+                    const localItem = this.apiClient.convertAPIItemToLocal(apiItem);
+                    this.currentQuote.items.push(localItem);
+                }
+
+                // Update totals and display
+                this.updateQuoteTotals();
+                this.updateQuoteSummary();
+                this.saveQuoteToStorage();
+
+                // Track analytics
+                await this.apiClient.trackEvent({
+                    SessionID: this.currentQuote.sessionId,
+                    QuoteID: quoteId,
+                    EventType: 'quote_loaded'
+                });
+
+                return {
+                    session: quoteSession,
+                    items: apiItems
+                };
+
+            } catch (error) {
+                console.error('[CAP-EMB-QUOTE] Error loading quote:', error);
+                throw error;
+            }
+        }
+
+        // Override removeItem to also remove from API
+        async removeItem(itemId) {
+            const item = this.currentQuote.items.find(i => i.id === itemId);
+            
+            // Remove from API if it has an API ID
+            if (item && item.apiId && this.apiClient) {
+                try {
+                    await this.apiClient.deleteQuoteItem(item.apiId);
+                    // Item removed successfully
+                } catch (error) {
+                    console.error('[CAP-EMB-QUOTE] Failed to remove item from API:', error);
+                }
+            }
+
+            // Remove locally
+            super.removeItem(itemId);
         }
     }
 
@@ -554,6 +1001,13 @@
     } else {
         capEmbroideryQuoteAdapter.init();
     }
+
+    // Cleanup on page unload to prevent memory leaks
+    window.addEventListener('beforeunload', () => {
+        if (capEmbroideryQuoteAdapter.cleanupEventListeners) {
+            capEmbroideryQuoteAdapter.cleanupEventListeners();
+        }
+    });
 
     // Export to global scope
     window.capEmbroideryQuoteAdapter = capEmbroideryQuoteAdapter;
