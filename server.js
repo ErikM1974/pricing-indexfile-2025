@@ -791,78 +791,62 @@ app.get('/api/quote_sessions/quote/:quoteId', async (req, res) => {
 // CREATE new session
 app.post('/api/quote_sessions', async (req, res) => {
   try {
-    const url = `${API_BASE_URL}/quote_sessions`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req.body)
-    });
+    console.log('[QUOTE API] Creating quote session with QuoteID:', req.body.QuoteID);
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`API Error (${response.status}): ${errorText}`);
-      throw new Error(`API request failed with status ${response.status}`);
-    }
+    // Use makeApiRequest like other endpoints - it should handle the location header
+    const data = await makeApiRequest('/quote_sessions', 'POST', req.body);
+    console.log('[QUOTE API] Raw response from proxy:', JSON.stringify(data));
     
-    // Get the location header which contains the created record URL
-    const location = response.headers.get('location');
-    console.log('[QUOTE API] Location header:', location);
-    console.log('[QUOTE API] Response status:', response.status);
-    console.log('[QUOTE API] All headers:', [...response.headers.entries()]);
-    
-    // Extract PK_ID from location URL
-    let pkId = null;
-    if (location) {
-      // Try different patterns for the location URL
-      const patterns = [
-        /\/records\/(\d+)$/,  // Pattern 1: /records/123
-        /\/(\d+)$/,           // Pattern 2: /123
-        /PK_ID=(\d+)/         // Pattern 3: PK_ID=123
-      ];
-      
-      for (const pattern of patterns) {
-        const match = location.match(pattern);
+    // Check if we have a valid response
+    if (data) {
+      // If PK_ID is "records", it means the proxy couldn't parse the location header
+      if (data.PK_ID === 'records' && data.location) {
+        console.log('[QUOTE API] Got "records" as PK_ID, attempting to extract from location:', data.location);
+        
+        // Try to extract ID from location
+        const match = data.location.match(/\/(\d+)$/);
         if (match) {
-          pkId = match[1];
-          console.log('[QUOTE API] Extracted PK_ID:', pkId);
-          break;
+          data.PK_ID = match[1];
+          console.log('[QUOTE API] Extracted PK_ID:', data.PK_ID);
         }
+      }
+      
+      // If we have a valid PK_ID now, return the data
+      if (data.PK_ID && data.PK_ID !== 'records') {
+        res.status(201).json(data);
+        return;
       }
     }
     
-    // Get the created record
-    if (pkId && pkId !== 'records') {
-      try {
-        const createdRecord = await makeApiRequest(`/quote_sessions/${pkId}`);
-        console.log('[QUOTE API] Retrieved created record:', createdRecord);
-        res.status(201).json(createdRecord);
-      } catch (fetchError) {
-        console.error('[QUOTE API] Error fetching created record:', fetchError);
-        // Try fallback
-        const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${req.body.QuoteID}'`);
-        if (sessions && sessions.length > 0) {
-          res.status(201).json(sessions[0]);
-        } else {
-          // Return what we sent with PK_ID
-          res.status(201).json({ ...req.body, PK_ID: 'TEMP_' + Date.now(), success: true });
-        }
-      }
+    // Fallback: try to get by QuoteID
+    console.log('[QUOTE API] No valid PK_ID in response, trying fallback with QuoteID:', req.body.QuoteID);
+    
+    // Wait a moment for Caspio to process
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${req.body.QuoteID}'`);
+    console.log('[QUOTE API] Fallback query result:', sessions ? sessions.length + ' sessions found' : 'null');
+    
+    if (sessions && Array.isArray(sessions) && sessions.length > 0) {
+      console.log('[QUOTE API] Found session via fallback:', sessions[0]);
+      res.status(201).json(sessions[0]);
     } else {
-      // Fallback: try to get by QuoteID with proper filter
-      console.log('[QUOTE API] No valid PK_ID found, trying fallback with QuoteID:', req.body.QuoteID);
-      const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${req.body.QuoteID}'`);
-      if (sessions && sessions.length > 0) {
-        console.log('[QUOTE API] Found session via fallback:', sessions[0]);
-        res.status(201).json(sessions[0]);
-      } else {
-        // Return what we sent with temporary ID
-        console.log('[QUOTE API] Returning temporary response');
-        res.status(201).json({ ...req.body, PK_ID: 'TEMP_' + Date.now(), success: true });
-      }
+      // Return what we sent with temporary ID
+      console.log('[QUOTE API] Could not find created session, returning temporary response');
+      res.status(201).json({ 
+        ...req.body, 
+        PK_ID: 'TEMP_' + Date.now(), 
+        success: true,
+        _note: 'This is a temporary response - quote may still be saved in Caspio' 
+      });
     }
   } catch (error) {
-    console.error('Error creating quote session:', error);
-    res.status(500).json({ error: 'Failed to create quote session' });
+    console.error('[QUOTE API] Error creating quote session:', error.message);
+    console.error('[QUOTE API] Stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to create quote session',
+      details: error.message 
+    });
   }
 });
 
@@ -921,78 +905,67 @@ app.get('/api/quote_items/session/:sessionId', async (req, res) => {
 
 app.post('/api/quote_items', async (req, res) => {
   try {
-    const url = `${API_BASE_URL}/quote_items`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req.body)
-    });
+    console.log('[QUOTE ITEMS API] Creating quote item for QuoteID:', req.body.QuoteID);
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`API Error (${response.status}): ${errorText}`);
-      throw new Error(`API request failed with status ${response.status}`);
-    }
+    // Use makeApiRequest like other endpoints - it should handle the location header
+    const data = await makeApiRequest('/quote_items', 'POST', req.body);
+    console.log('[QUOTE ITEMS API] Raw response from proxy:', JSON.stringify(data));
     
-    // Get the location header which contains the created record URL
-    const location = response.headers.get('location');
-    console.log('[QUOTE ITEMS API] Location header:', location);
-    
-    // Extract PK_ID from location URL
-    let pkId = null;
-    if (location) {
-      // Try different patterns for the location URL
-      const patterns = [
-        /\/records\/(\d+)$/,  // Pattern 1: /records/123
-        /\/(\d+)$/,           // Pattern 2: /123
-        /PK_ID=(\d+)/         // Pattern 3: PK_ID=123
-      ];
-      
-      for (const pattern of patterns) {
-        const match = location.match(pattern);
+    // Check if we have a valid response
+    if (data) {
+      // If PK_ID is "records", it means the proxy couldn't parse the location header
+      if (data.PK_ID === 'records' && data.location) {
+        console.log('[QUOTE ITEMS API] Got "records" as PK_ID, attempting to extract from location:', data.location);
+        
+        // Try to extract ID from location
+        const match = data.location.match(/\/(\d+)$/);
         if (match) {
-          pkId = match[1];
-          console.log('[QUOTE ITEMS API] Extracted PK_ID:', pkId);
-          break;
+          data.PK_ID = match[1];
+          console.log('[QUOTE ITEMS API] Extracted PK_ID:', data.PK_ID);
         }
+      }
+      
+      // If we have a valid PK_ID now, return the data
+      if (data.PK_ID && data.PK_ID !== 'records') {
+        res.status(201).json(data);
+        return;
       }
     }
     
-    // Get the created record
-    if (pkId && pkId !== 'records') {
-      try {
-        const createdRecord = await makeApiRequest(`/quote_items/${pkId}`);
-        console.log('[QUOTE ITEMS API] Retrieved created record:', createdRecord);
-        res.status(201).json(createdRecord);
-      } catch (fetchError) {
-        console.error('[QUOTE ITEMS API] Error fetching created record:', fetchError);
-        // Try fallback
-        const items = await makeApiRequest(`/quote_items?filter=QuoteID='${req.body.QuoteID}'`);
-        const newItem = items.find(item => item.LineNumber === req.body.LineNumber);
-        if (newItem) {
-          res.status(201).json(newItem);
-        } else {
-          // Return what we sent with PK_ID
-          res.status(201).json({ ...req.body, PK_ID: 'TEMP_' + Date.now(), success: true });
-        }
-      }
-    } else {
-      // Fallback: try to get by QuoteID and LineNumber with proper filter
-      console.log('[QUOTE ITEMS API] No valid PK_ID found, trying fallback with QuoteID:', req.body.QuoteID);
-      const items = await makeApiRequest(`/quote_items?filter=QuoteID='${req.body.QuoteID}'`);
+    // Fallback: try to get by QuoteID and LineNumber
+    console.log('[QUOTE ITEMS API] No valid PK_ID in response, trying fallback with QuoteID:', req.body.QuoteID);
+    
+    // Wait a moment for Caspio to process
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const items = await makeApiRequest(`/quote_items?filter=QuoteID='${req.body.QuoteID}'`);
+    console.log('[QUOTE ITEMS API] Fallback query result:', items ? items.length + ' items found' : 'null');
+    
+    if (items && Array.isArray(items)) {
       const newItem = items.find(item => item.LineNumber === req.body.LineNumber);
       if (newItem) {
         console.log('[QUOTE ITEMS API] Found item via fallback:', newItem);
         res.status(201).json(newItem);
-      } else {
-        // Return what we sent with temporary ID
-        console.log('[QUOTE ITEMS API] Returning temporary response');
-        res.status(201).json({ ...req.body, PK_ID: 'TEMP_' + Date.now(), success: true });
+        return;
       }
     }
+    
+    // Return what we sent with temporary ID
+    console.log('[QUOTE ITEMS API] Could not find created item, returning temporary response');
+    res.status(201).json({ 
+      ...req.body, 
+      PK_ID: 'TEMP_' + Date.now(), 
+      success: true,
+      _note: 'This is a temporary response - item may still be saved in Caspio' 
+    });
+    
   } catch (error) {
-    console.error('Error creating quote item:', error);
-    res.status(500).json({ error: 'Failed to create quote item' });
+    console.error('[QUOTE ITEMS API] Error creating quote item:', error.message);
+    console.error('[QUOTE ITEMS API] Stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to create quote item',
+      details: error.message 
+    });
   }
 });
 
