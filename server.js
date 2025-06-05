@@ -807,6 +807,8 @@ app.post('/api/quote_sessions', async (req, res) => {
     // Get the location header which contains the created record URL
     const location = response.headers.get('location');
     console.log('[QUOTE API] Location header:', location);
+    console.log('[QUOTE API] Response status:', response.status);
+    console.log('[QUOTE API] All headers:', [...response.headers.entries()]);
     
     // Extract PK_ID from location URL
     let pkId = null;

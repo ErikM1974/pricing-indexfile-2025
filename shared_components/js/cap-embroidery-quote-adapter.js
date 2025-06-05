@@ -8,12 +8,12 @@
     // Force debug logs to always show during development
     const forceDebug = true; // Set to false in production
     
-    if (forceDebug || window.DEBUG_MODE) {
-        console.log('[CAP-EMB-QUOTE] === MODULE START ===');
-        console.log('[CAP-EMB-QUOTE] Cap embroidery quote adapter module loading...');
-        console.log('[CAP-EMB-QUOTE] Current URL:', window.location.href);
-        console.log('[CAP-EMB-QUOTE] DEBUG_MODE:', window.DEBUG_MODE);
-    }
+    // Always log module start
+    console.log('[CAP-EMB-QUOTE] === MODULE START ===');
+    console.log('[CAP-EMB-QUOTE] Cap embroidery quote adapter module loading...');
+    console.log('[CAP-EMB-QUOTE] Current URL:', window.location.href);
+    console.log('[CAP-EMB-QUOTE] DEBUG_MODE:', window.DEBUG_MODE);
+    console.log('[CAP-EMB-QUOTE] Force debug:', forceDebug);
 
     // Cap embroidery specific configuration
     const CAP_EMBROIDERY_CONFIG = {
@@ -577,13 +577,22 @@
                     this.currentQuote.sessionId = response.SessionID || sessionData.SessionID;
                     this.currentQuote.apiId = response.PK_ID;
                     
-                    // Extra validation
+                    // Extra validation and workaround for "records" issue
                     if (!this.currentQuote.apiId || this.currentQuote.apiId === 'records') {
                         console.error('[CAP-EMB-QUOTE] Invalid API ID received:', this.currentQuote.apiId);
-                        console.error('[CAP-EMB-QUOTE] Full response:', JSON.stringify(response));
-                        // Use temporary ID if we didn't get a valid one
-                        if (response.PK_ID && response.PK_ID.startsWith('TEMP_')) {
-                            this.currentQuote.apiId = response.PK_ID;
+                        
+                        // Try to extract ID from location if available
+                        if (response.location) {
+                            const match = response.location.match(/\/(\d+)$/);
+                            if (match) {
+                                this.currentQuote.apiId = match[1];
+                                console.log('[CAP-EMB-QUOTE] Extracted ID from location:', this.currentQuote.apiId);
+                            }
+                        }
+                        
+                        // If still no valid ID, generate temporary one
+                        if (!this.currentQuote.apiId || this.currentQuote.apiId === 'records') {
+                            this.currentQuote.apiId = 'TEMP_' + Date.now();
                             console.log('[CAP-EMB-QUOTE] Using temporary ID:', this.currentQuote.apiId);
                         }
                     }
