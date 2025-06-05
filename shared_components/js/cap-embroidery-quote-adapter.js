@@ -27,6 +27,30 @@
             this.cumulativePricing = true; // Enable cumulative pricing
         }
 
+        // Initialize the adapter
+        init() {
+            console.log('[CAP-EMB-QUOTE] Initializing cap embroidery quote adapter');
+            
+            // Initialize API client if available
+            if (window.quoteAPIClient) {
+                this.apiClient = window.quoteAPIClient;
+            }
+            
+            // Set up the UI
+            this.setupUI();
+            
+            // Initialize event listeners
+            this.bindEvents();
+            
+            // Check for existing quote
+            this.checkForActiveQuote().then(activeQuote => {
+                if (activeQuote) {
+                    this.displayQuoteSummary(activeQuote);
+                    this.updatePricingDisplay();
+                }
+            });
+        }
+
         // Override setupUI to include cap embroidery specific elements
         setupUI() {
             // Reduce logging to prevent memory issues
@@ -236,7 +260,10 @@
 
         // Override bindEvents to include cap embroidery specific events
         bindEvents() {
-            super.bindEvents();
+            // Only call parent bindEvents if it exists
+            if (super.bindEvents) {
+                super.bindEvents();
+            }
             
             // Clean up any existing event listeners first
             if (this.boundHandleAddToQuote) {
