@@ -94,25 +94,8 @@
                 }
             });
             
-            // Handle Caspio response format
-            console.log('[QUOTE-API] createQuoteSession raw response:', response);
-            
-            // Check if response has a data property (from server wrapper)
-            if (response && response.data) {
-                console.log('[QUOTE-API] Response has data property');
-                if (Array.isArray(response.data) && response.data.length > 0) {
-                    console.log('[QUOTE-API] Data is array, extracting first item');
-                    return response.data[0];
-                }
-                return response.data;
-            }
-            
-            // Check if response itself is an array
-            if (Array.isArray(response) && response.length > 0) {
-                console.log('[QUOTE-API] Response is array, extracting first item');
-                return response[0];
-            }
-            
+            // Server now handles Caspio response and returns the created record
+            console.log('[QUOTE-API] createQuoteSession response:', response);
             return response;
         }
 
@@ -145,25 +128,8 @@
                 data: itemData
             });
             
-            // Handle Caspio response format
-            console.log('[QUOTE-API] createQuoteItem raw response:', response);
-            
-            // Check if response has a data property (from server wrapper)
-            if (response && response.data) {
-                console.log('[QUOTE-API] Response has data property');
-                if (Array.isArray(response.data) && response.data.length > 0) {
-                    console.log('[QUOTE-API] Data is array, extracting first item');
-                    return response.data[0];
-                }
-                return response.data;
-            }
-            
-            // Check if response itself is an array
-            if (Array.isArray(response) && response.length > 0) {
-                console.log('[QUOTE-API] Response is array, extracting first item');
-                return response[0];
-            }
-            
+            // Server now handles Caspio response and returns the created record
+            console.log('[QUOTE-API] createQuoteItem response:', response);
             return response;
         }
 

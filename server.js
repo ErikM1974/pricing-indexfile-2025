@@ -791,8 +791,46 @@ app.get('/api/quote_sessions/quote/:quoteId', async (req, res) => {
 // CREATE new session
 app.post('/api/quote_sessions', async (req, res) => {
   try {
-    const data = await makeApiRequest('/quote_sessions', 'POST', req.body);
-    res.status(201).json(data);
+    const url = `${API_BASE_URL}/quote_sessions`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API Error (${response.status}): ${errorText}`);
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+    
+    // Get the location header which contains the created record URL
+    const location = response.headers.get('location');
+    console.log('Location header:', location);
+    
+    // Extract PK_ID from location URL
+    let pkId = null;
+    if (location) {
+      const match = location.match(/\/records\/(\d+)$/);
+      if (match) {
+        pkId = match[1];
+      }
+    }
+    
+    // Get the created record
+    if (pkId) {
+      const createdRecord = await makeApiRequest(`/quote_sessions/${pkId}`);
+      res.status(201).json(createdRecord);
+    } else {
+      // Fallback: try to get by QuoteID
+      const sessions = await makeApiRequest(`/quote_sessions?QuoteID=${req.body.QuoteID}`);
+      if (sessions && sessions.length > 0) {
+        res.status(201).json(sessions[0]);
+      } else {
+        // Return what we sent with success flag
+        res.status(201).json({ ...req.body, success: true });
+      }
+    }
   } catch (error) {
     console.error('Error creating quote session:', error);
     res.status(500).json({ error: 'Failed to create quote session' });
@@ -854,8 +892,47 @@ app.get('/api/quote_items/session/:sessionId', async (req, res) => {
 
 app.post('/api/quote_items', async (req, res) => {
   try {
-    const data = await makeApiRequest('/quote_items', 'POST', req.body);
-    res.status(201).json(data);
+    const url = `${API_BASE_URL}/quote_items`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API Error (${response.status}): ${errorText}`);
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+    
+    // Get the location header which contains the created record URL
+    const location = response.headers.get('location');
+    console.log('Location header:', location);
+    
+    // Extract PK_ID from location URL
+    let pkId = null;
+    if (location) {
+      const match = location.match(/\/records\/(\d+)$/);
+      if (match) {
+        pkId = match[1];
+      }
+    }
+    
+    // Get the created record
+    if (pkId) {
+      const createdRecord = await makeApiRequest(`/quote_items/${pkId}`);
+      res.status(201).json(createdRecord);
+    } else {
+      // Fallback: try to get by QuoteID and LineNumber
+      const items = await makeApiRequest(`/quote_items?QuoteID=${req.body.QuoteID}`);
+      const newItem = items.find(item => item.LineNumber === req.body.LineNumber);
+      if (newItem) {
+        res.status(201).json(newItem);
+      } else {
+        // Return what we sent with success flag
+        res.status(201).json({ ...req.body, success: true });
+      }
+    }
   } catch (error) {
     console.error('Error creating quote item:', error);
     res.status(500).json({ error: 'Failed to create quote item' });
