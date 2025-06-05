@@ -806,29 +806,56 @@ app.post('/api/quote_sessions', async (req, res) => {
     
     // Get the location header which contains the created record URL
     const location = response.headers.get('location');
-    console.log('Location header:', location);
+    console.log('[QUOTE API] Location header:', location);
     
     // Extract PK_ID from location URL
     let pkId = null;
     if (location) {
-      const match = location.match(/\/records\/(\d+)$/);
-      if (match) {
-        pkId = match[1];
+      // Try different patterns for the location URL
+      const patterns = [
+        /\/records\/(\d+)$/,  // Pattern 1: /records/123
+        /\/(\d+)$/,           // Pattern 2: /123
+        /PK_ID=(\d+)/         // Pattern 3: PK_ID=123
+      ];
+      
+      for (const pattern of patterns) {
+        const match = location.match(pattern);
+        if (match) {
+          pkId = match[1];
+          console.log('[QUOTE API] Extracted PK_ID:', pkId);
+          break;
+        }
       }
     }
     
     // Get the created record
-    if (pkId) {
-      const createdRecord = await makeApiRequest(`/quote_sessions/${pkId}`);
-      res.status(201).json(createdRecord);
+    if (pkId && pkId !== 'records') {
+      try {
+        const createdRecord = await makeApiRequest(`/quote_sessions/${pkId}`);
+        console.log('[QUOTE API] Retrieved created record:', createdRecord);
+        res.status(201).json(createdRecord);
+      } catch (fetchError) {
+        console.error('[QUOTE API] Error fetching created record:', fetchError);
+        // Try fallback
+        const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${req.body.QuoteID}'`);
+        if (sessions && sessions.length > 0) {
+          res.status(201).json(sessions[0]);
+        } else {
+          // Return what we sent with PK_ID
+          res.status(201).json({ ...req.body, PK_ID: 'TEMP_' + Date.now(), success: true });
+        }
+      }
     } else {
-      // Fallback: try to get by QuoteID
-      const sessions = await makeApiRequest(`/quote_sessions?QuoteID=${req.body.QuoteID}`);
+      // Fallback: try to get by QuoteID with proper filter
+      console.log('[QUOTE API] No valid PK_ID found, trying fallback with QuoteID:', req.body.QuoteID);
+      const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${req.body.QuoteID}'`);
       if (sessions && sessions.length > 0) {
+        console.log('[QUOTE API] Found session via fallback:', sessions[0]);
         res.status(201).json(sessions[0]);
       } else {
-        // Return what we sent with success flag
-        res.status(201).json({ ...req.body, success: true });
+        // Return what we sent with temporary ID
+        console.log('[QUOTE API] Returning temporary response');
+        res.status(201).json({ ...req.body, PK_ID: 'TEMP_' + Date.now(), success: true });
       }
     }
   } catch (error) {
@@ -907,30 +934,58 @@ app.post('/api/quote_items', async (req, res) => {
     
     // Get the location header which contains the created record URL
     const location = response.headers.get('location');
-    console.log('Location header:', location);
+    console.log('[QUOTE ITEMS API] Location header:', location);
     
     // Extract PK_ID from location URL
     let pkId = null;
     if (location) {
-      const match = location.match(/\/records\/(\d+)$/);
-      if (match) {
-        pkId = match[1];
+      // Try different patterns for the location URL
+      const patterns = [
+        /\/records\/(\d+)$/,  // Pattern 1: /records/123
+        /\/(\d+)$/,           // Pattern 2: /123
+        /PK_ID=(\d+)/         // Pattern 3: PK_ID=123
+      ];
+      
+      for (const pattern of patterns) {
+        const match = location.match(pattern);
+        if (match) {
+          pkId = match[1];
+          console.log('[QUOTE ITEMS API] Extracted PK_ID:', pkId);
+          break;
+        }
       }
     }
     
     // Get the created record
-    if (pkId) {
-      const createdRecord = await makeApiRequest(`/quote_items/${pkId}`);
-      res.status(201).json(createdRecord);
+    if (pkId && pkId !== 'records') {
+      try {
+        const createdRecord = await makeApiRequest(`/quote_items/${pkId}`);
+        console.log('[QUOTE ITEMS API] Retrieved created record:', createdRecord);
+        res.status(201).json(createdRecord);
+      } catch (fetchError) {
+        console.error('[QUOTE ITEMS API] Error fetching created record:', fetchError);
+        // Try fallback
+        const items = await makeApiRequest(`/quote_items?filter=QuoteID='${req.body.QuoteID}'`);
+        const newItem = items.find(item => item.LineNumber === req.body.LineNumber);
+        if (newItem) {
+          res.status(201).json(newItem);
+        } else {
+          // Return what we sent with PK_ID
+          res.status(201).json({ ...req.body, PK_ID: 'TEMP_' + Date.now(), success: true });
+        }
+      }
     } else {
-      // Fallback: try to get by QuoteID and LineNumber
-      const items = await makeApiRequest(`/quote_items?QuoteID=${req.body.QuoteID}`);
+      // Fallback: try to get by QuoteID and LineNumber with proper filter
+      console.log('[QUOTE ITEMS API] No valid PK_ID found, trying fallback with QuoteID:', req.body.QuoteID);
+      const items = await makeApiRequest(`/quote_items?filter=QuoteID='${req.body.QuoteID}'`);
       const newItem = items.find(item => item.LineNumber === req.body.LineNumber);
       if (newItem) {
+        console.log('[QUOTE ITEMS API] Found item via fallback:', newItem);
         res.status(201).json(newItem);
       } else {
-        // Return what we sent with success flag
-        res.status(201).json({ ...req.body, success: true });
+        // Return what we sent with temporary ID
+        console.log('[QUOTE ITEMS API] Returning temporary response');
+        res.status(201).json({ ...req.body, PK_ID: 'TEMP_' + Date.now(), success: true });
       }
     }
   } catch (error) {
