@@ -94,6 +94,17 @@ async function makeApiRequest(endpoint, method = 'GET', body = null) {
   }
 }
 
+// Server status endpoint for debugging
+app.get('/api/status', (req, res) => {
+  res.json({
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    nodeVersion: process.version,
+    apiBaseUrl: API_BASE_URL,
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // Serve index.html as the root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));

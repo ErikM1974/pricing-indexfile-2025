@@ -8,12 +8,13 @@
     // Force debug logs to always show during development
     const forceDebug = true; // Set to false in production
     
-    // Always log module start
-    console.log('[CAP-EMB-QUOTE] === MODULE START ===');
+    // Always log module start - with timestamp to verify fresh load
+    console.log('[CAP-EMB-QUOTE] === MODULE START === ' + new Date().toISOString());
     console.log('[CAP-EMB-QUOTE] Cap embroidery quote adapter module loading...');
     console.log('[CAP-EMB-QUOTE] Current URL:', window.location.href);
     console.log('[CAP-EMB-QUOTE] DEBUG_MODE:', window.DEBUG_MODE);
     console.log('[CAP-EMB-QUOTE] Force debug:', forceDebug);
+    console.log('[CAP-EMB-QUOTE] Script version: 2.0'); // Increment this to verify cache refresh
 
     // Cap embroidery specific configuration
     const CAP_EMBROIDERY_CONFIG = {
