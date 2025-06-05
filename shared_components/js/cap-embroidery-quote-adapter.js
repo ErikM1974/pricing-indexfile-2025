@@ -71,9 +71,14 @@
             // Check for existing active quote
             this.checkForActiveQuote().then(activeQuote => {
                 if (activeQuote) {
+                    console.log('[CAP-EMB-QUOTE] Found active quote on page load');
                     this.displayQuoteSummary(activeQuote);
                     this.updatePricingDisplay();
+                } else {
+                    console.log('[CAP-EMB-QUOTE] No active quote found on page load');
                 }
+            }).catch(error => {
+                console.error('[CAP-EMB-QUOTE] Error checking for active quote:', error);
             });
 
             // Setup stitch count selector
