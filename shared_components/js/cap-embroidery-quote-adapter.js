@@ -15,13 +15,16 @@
         brandColor: '#2e5827'
     };
 
-    class CapEmbroideryQuoteAdapter extends window.QuoteAdapterBase {
+    class CapEmbroideryQuoteAdapter extends window.BaseQuoteSystem {
         constructor() {
-            super('cap-embroidery', CAP_EMBROIDERY_CONFIG);
+            super();
+            this.embellishmentType = 'cap-embroidery';
+            this.config = CAP_EMBROIDERY_CONFIG;
             this.currentStitchCount = CAP_EMBROIDERY_CONFIG.defaultStitchCount;
             this.backLogoEnabled = false;
             this.currentPricingData = null;
             this.apiClient = window.quoteAPIClient || null;
+            this.cumulativePricing = true; // Enable cumulative pricing
         }
 
         // Override setupUI to include cap embroidery specific elements
@@ -39,6 +42,14 @@
 
             // Add quote summary panel
             this.addQuoteSummaryPanel();
+            
+            // Check for existing active quote
+            this.checkForActiveQuote().then(activeQuote => {
+                if (activeQuote) {
+                    this.displayQuoteSummary(activeQuote);
+                    this.updatePricingDisplay();
+                }
+            });
 
             // Setup stitch count selector
             this.setupStitchCountSelector();
@@ -59,6 +70,12 @@
                         <h4 style="margin-top: 0; color: var(--primary-color);">Enter Quantities by Size</h4>
                         <div id="size-quantity-grid">
                             <!-- Size quantity grid will be populated here -->
+                        </div>
+                        
+                        <!-- Bundle Savings Display -->
+                        <div id="bundle-savings-display" style="display: none; margin-top: 15px; padding: 15px; background-color: #e8f5e9; border: 1px solid #4caf50; border-radius: 4px;">
+                            <div style="color: #2e7d32; font-weight: bold; margin-bottom: 10px;">💰 Bundle Savings Available!</div>
+                            <div id="bundle-savings-details"></div>
                         </div>
                     </div>
 
@@ -176,16 +193,21 @@
             let totalPrice = 0;
             
             const quantityInputs = document.querySelectorAll('.quantity-input[data-size]');
+            const sizeQuantities = {};
+            
             quantityInputs.forEach(input => {
                 const qty = parseInt(input.value) || 0;
                 const size = input.getAttribute('data-size');
                 totalQuantity += qty;
                 
-                if (qty > 0 && this.currentPricingData) {
-                    const basePrice = this.getBasePriceForSize(size);
-                    const backLogoPrice = this.backLogoEnabled ? this.getCurrentBackLogoPrice() : 0;
-                    const unitPrice = basePrice + backLogoPrice;
-                    totalPrice += unitPrice * qty;
+                if (qty > 0) {
+                    sizeQuantities[size] = qty;
+                    if (this.currentPricingData) {
+                        const basePrice = this.getBasePriceForSize(size);
+                        const backLogoPrice = this.backLogoEnabled ? this.getCurrentBackLogoPrice() : 0;
+                        const unitPrice = basePrice + backLogoPrice;
+                        totalPrice += unitPrice * qty;
+                    }
                 }
             });
             
@@ -195,6 +217,18 @@
             
             if (totalQtyEl) totalQtyEl.textContent = totalQuantity;
             if (totalPriceEl) totalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+            
+            // Check for bundle savings
+            if (totalQuantity > 0 && this.currentQuote.totalQuantity > 0) {
+                const mockItem = {
+                    quantity: totalQuantity,
+                    sizeBreakdown: sizeQuantities
+                };
+                const bundleSavings = this.showBundleSavings(mockItem);
+                this.displayBundleSavings(bundleSavings);
+            } else {
+                this.hideBundleSavings();
+            }
             
             // Update pricing display for tier pricing
             this.updatePricingDisplay();
@@ -336,6 +370,23 @@
             // Fallback: try the old key format
             const priceKey = `${this.currentStitchCount}_${size}`;
             return this.currentPricingData.prices[priceKey] || 0;
+        }
+
+        // Override getTierPrice for cap embroidery specific pricing
+        getTierPrice(item, tier) {
+            if (!this.currentPricingData || !this.currentPricingData.prices) {
+                return super.getTierPrice(item, tier);
+            }
+            
+            // For cap embroidery with current stitch count
+            const prices = this.currentPricingData.prices;
+            const sizeKey = Object.keys(prices)[0]; // Usually 'OS' or 'One Size'
+            
+            if (prices[sizeKey] && prices[sizeKey][tier]) {
+                return prices[sizeKey][tier];
+            }
+            
+            return super.getTierPrice(item, tier);
         }
 
         // Handle add to quote
