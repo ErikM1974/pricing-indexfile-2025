@@ -437,6 +437,9 @@
             // Get product image
             const productImage = document.getElementById('product-image-main')?.src || '';
 
+            // Capture product image with validation
+            const productImage = await this.captureProductImage(selectedColor);
+
             // Create quote item
             const itemData = {
                 styleNumber: styleNumber,
@@ -454,6 +457,19 @@
                 imageURL: productImage,
                 pricingTier: this.determinePricingTier(totalQuantity)
             };
+            
+            // Show bundle savings if quote exists
+            if (this.currentQuote.totalQuantity > 0) {
+                const mockItem = {
+                    quantity: totalQuantity,
+                    baseUnitPrice: pricing.baseUnitPrice
+                };
+                const bundleSavings = this.showBundleSavings(mockItem, pricing.baseUnitPrice);
+                this.displayBundleSavings(bundleSavings);
+                
+                // Wait for user to see savings
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
             
             const quoteItem = this.createQuoteItem(itemData);
 
@@ -1038,6 +1054,225 @@
 
             // Remove locally
             super.removeItem(itemId);
+        }
+
+        // Display bundle savings comparison
+        displayBundleSavings(savingsInfo) {
+            const savingsDisplay = document.getElementById('bundle-savings-display');
+            const savingsDetails = document.getElementById('bundle-savings-details');
+            
+            if (!savingsDisplay || !savingsDetails) return;
+            
+            if (savingsInfo.showSavings) {
+                savingsDisplay.style.display = 'block';
+                savingsDetails.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        <strong>Price if ordered alone:</strong> $${savingsInfo.alonePrice.toFixed(2)} per cap
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>Price with bundle (${savingsInfo.bundleQuantity} total):</strong> 
+                        <span style="color: #2e7d32; font-weight: bold;">$${savingsInfo.bundlePrice.toFixed(2)} per cap</span>
+                    </div>
+                    <div style="background-color: #fff3cd; padding: 10px; border-radius: 4px; border: 1px solid #ffeaa7;">
+                        <strong>You save: $${savingsInfo.savings.toFixed(2)} total!</strong>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                        ${savingsInfo.message}
+                    </div>
+                `;
+            } else {
+                savingsDisplay.style.display = 'none';
+            }
+        }
+
+        // Hide bundle savings display
+        hideBundleSavings() {
+            const savingsDisplay = document.getElementById('bundle-savings-display');
+            if (savingsDisplay) {
+                savingsDisplay.style.display = 'none';
+            }
+        }
+
+        // Add quote summary panel to page
+        addQuoteSummaryPanel() {
+            // Check if panel already exists
+            if (document.getElementById('cumulative-quote-summary')) return;
+            
+            // Create summary panel
+            const summaryPanel = document.createElement('div');
+            summaryPanel.id = 'cumulative-quote-summary';
+            summaryPanel.className = 'quote-summary-panel';
+            summaryPanel.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: white;
+                border: 2px solid ${this.config.brandColor};
+                border-radius: 8px;
+                padding: 15px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1000;
+                min-width: 250px;
+                display: none;
+            `;
+            
+            summaryPanel.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="margin: 0; color: ${this.config.brandColor};">Active Quote</h4>
+                    <button onclick="window.capEmbroideryQuoteAdapter.hideSummaryPanel()" 
+                            style="background: none; border: none; cursor: pointer; font-size: 20px;">×</button>
+                </div>
+                <div id="quote-summary-content">
+                    <!-- Summary content will be populated here -->
+                </div>
+                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                    <button onclick="window.capEmbroideryQuoteAdapter.showQuoteDetails()" 
+                            style="flex: 1; padding: 8px; background: ${this.config.brandColor}; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        View Details
+                    </button>
+                    <button onclick="window.capEmbroideryQuoteAdapter.clearQuote()" 
+                            style="flex: 1; padding: 8px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Clear Quote
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(summaryPanel);
+        }
+
+        // Display quote summary
+        displayQuoteSummary(quote = null) {
+            const summaryPanel = document.getElementById('cumulative-quote-summary');
+            if (!summaryPanel) return;
+            
+            const quoteData = quote || this.currentQuote;
+            
+            if (quoteData && quoteData.totalQuantity > 0) {
+                const summaryContent = document.getElementById('quote-summary-content');
+                if (summaryContent) {
+                    const currentTier = this.determinePricingTier(quoteData.totalQuantity);
+                    
+                    summaryContent.innerHTML = `
+                        <div style="margin-bottom: 8px;">
+                            <strong>Total Items:</strong> ${quoteData.totalQuantity} caps
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <strong>Current Tier:</strong> ${currentTier}
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <strong>Subtotal:</strong> $${quoteData.subtotal.toFixed(2)}
+                        </div>
+                        ${quoteData.ltmTotal > 0 ? `
+                            <div style="margin-bottom: 8px; color: #dc3545;">
+                                <strong>LTM Fee:</strong> $${quoteData.ltmTotal.toFixed(2)}
+                            </div>
+                        ` : ''}
+                        <div style="font-size: 1.1em; color: ${this.config.brandColor};">
+                            <strong>Total:</strong> $${quoteData.grandTotal.toFixed(2)}
+                        </div>
+                    `;
+                }
+                summaryPanel.style.display = 'block';
+            } else {
+                summaryPanel.style.display = 'none';
+            }
+        }
+
+        // Update pricing display based on cumulative quantity
+        updatePricingDisplay() {
+            if (!this.currentPricingData) return;
+            
+            const totalQuantity = this.currentQuote.totalQuantity;
+            const currentPageQuantity = this.getTotalQuantityFromInputs();
+            const combinedQuantity = totalQuantity + currentPageQuantity;
+            
+            // Update pricing table to show current tier
+            const pricingCells = document.querySelectorAll('.price-cell');
+            pricingCells.forEach(cell => {
+                cell.classList.remove('active-tier');
+            });
+            
+            // Highlight active tier
+            const activeTier = this.determinePricingTier(combinedQuantity);
+            const tierElement = document.querySelector(`[data-tier="${activeTier}"]`);
+            if (tierElement) {
+                tierElement.classList.add('active-tier');
+            }
+            
+            // Update any tier indicators
+            const tierIndicators = document.querySelectorAll('.current-tier-indicator');
+            tierIndicators.forEach(indicator => {
+                indicator.textContent = `Current Tier: ${activeTier} (${combinedQuantity} total)`;
+            });
+        }
+
+        // Get total quantity from current page inputs
+        getTotalQuantityFromInputs() {
+            let total = 0;
+            const quantityInputs = document.querySelectorAll('.quantity-input[data-size]');
+            quantityInputs.forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+            return total;
+        }
+
+        // Hide summary panel
+        hideSummaryPanel() {
+            const summaryPanel = document.getElementById('cumulative-quote-summary');
+            if (summaryPanel) {
+                summaryPanel.style.display = 'none';
+            }
+        }
+
+        // Show quote details (opens quote modal)
+        showQuoteDetails() {
+            if (this.openQuoteModal) {
+                this.openQuoteModal();
+            }
+        }
+
+        // Capture product image with color validation
+        async captureProductImage(selectedColor) {
+            const imageElement = document.getElementById('product-image-main');
+            if (!imageElement) return '';
+            
+            const imageSrc = imageElement.src;
+            
+            // Check if image URL contains color identifier
+            const colorSlug = selectedColor.toLowerCase().replace(/\s+/g, '-');
+            if (imageSrc.includes(colorSlug) || imageSrc.includes(selectedColor.toLowerCase())) {
+                return imageSrc; // Confident it's correct
+            }
+            
+            // If unsure, wait brief moment for image to settle
+            await new Promise(resolve => setTimeout(resolve, 200));
+            return imageElement.src;
+        }
+
+        // Override addItemToQuote to use cumulative pricing
+        async addItemToQuote(item) {
+            // Use cumulative pricing from base class
+            const addedItem = await super.addItemToQuote(item);
+            
+            // Update the display after adding
+            this.displayQuoteSummary();
+            this.updatePricingDisplay();
+            
+            // Clear the quantity inputs after successful add
+            const quantityInputs = document.querySelectorAll('.quantity-input[data-size]');
+            quantityInputs.forEach(input => {
+                input.value = 0;
+            });
+            
+            // Update quick quote display
+            this.updateQuickQuote();
+            
+            // Hide bundle savings after add
+            setTimeout(() => {
+                this.hideBundleSavings();
+            }, 2000);
+            
+            return addedItem;
         }
     }
 
