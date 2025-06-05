@@ -30,6 +30,7 @@
         // Initialize the adapter
         init() {
             console.log('[CAP-EMB-QUOTE] Initializing cap embroidery quote adapter');
+            console.log('[CAP-EMB-QUOTE] Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this)).filter(m => typeof this[m] === 'function'));
             
             // Initialize API client if available
             if (window.quoteAPIClient) {
@@ -213,6 +214,7 @@
         
         // Update quantity totals
         updateQuantityTotals() {
+            console.log('[CAP-EMB-QUOTE] updateQuantityTotals called');
             let totalQuantity = 0;
             let totalPrice = 0;
             
@@ -524,11 +526,19 @@
                     const response = await this.apiClient.createQuoteSession(sessionData);
                     
                     console.log('[CAP-EMB-QUOTE] Quote session response:', response);
+                    console.log('[CAP-EMB-QUOTE] Response type:', typeof response);
+                    console.log('[CAP-EMB-QUOTE] Response keys:', response ? Object.keys(response) : 'null');
                     
                     // Update local quote with API response
                     this.currentQuote.id = response.QuoteID || sessionData.QuoteID;
                     this.currentQuote.sessionId = response.SessionID || sessionData.SessionID;
                     this.currentQuote.apiId = response.PK_ID;
+                    
+                    // Extra validation
+                    if (!this.currentQuote.apiId || this.currentQuote.apiId === 'records') {
+                        console.error('[CAP-EMB-QUOTE] Invalid API ID received:', this.currentQuote.apiId);
+                        console.error('[CAP-EMB-QUOTE] Full response:', JSON.stringify(response));
+                    }
                     
                     console.log('[CAP-EMB-QUOTE] Quote session created:', {
                         id: this.currentQuote.id,
@@ -1339,6 +1349,34 @@
             this.updateQuoteSummary();
             this.saveQuoteToStorage();
             this.hideSummaryPanel();
+        }
+        
+        // Update quick quote display (reset quantities)
+        updateQuickQuoteDisplay() {
+            console.log('[CAP-EMB-QUOTE] updateQuickQuoteDisplay called');
+            
+            // Reset quantity totals display
+            const totalQtyEl = document.querySelector('.total-quantity');
+            const totalPriceEl = document.querySelector('.total-price');
+            
+            if (totalQtyEl) totalQtyEl.textContent = '0';
+            if (totalPriceEl) totalPriceEl.textContent = '$0.00';
+            
+            // Update quantity totals to reflect cleared inputs
+            this.updateQuantityTotals();
+            
+            // Show quote was added successfully
+            const addButton = document.getElementById('add-to-quote-btn');
+            if (addButton) {
+                const originalText = addButton.textContent;
+                addButton.textContent = '✓ Added to Quote!';
+                addButton.style.backgroundColor = '#4caf50';
+                
+                setTimeout(() => {
+                    addButton.textContent = originalText;
+                    addButton.style.backgroundColor = '';
+                }, 2000);
+            }
         }
 
         // Show quote details (opens quote modal)

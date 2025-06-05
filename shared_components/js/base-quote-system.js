@@ -309,8 +309,12 @@
 
         // Add item to quote with cumulative pricing
         async addItemToQuote(item) {
+            console.log('[BASE-QUOTE] addItemToQuote called with:', item);
+            
             // Calculate cumulative pricing before adding
             const cumulativePricing = this.calculateCumulativePricing(item, this.currentQuote.totalQuantity);
+            
+            console.log('[BASE-QUOTE] Cumulative pricing calculated:', cumulativePricing);
             
             // Store pricing comparison
             item.pricingComparison = {
@@ -321,6 +325,9 @@
             
             // Add to quote
             this.currentQuote.items.push(item);
+            
+            console.log('[BASE-QUOTE] Item added. Total items:', this.currentQuote.items.length);
+            console.log('[BASE-QUOTE] Current quote state:', this.currentQuote);
             
             // Recalculate all prices
             await this.recalculateAllPrices();
