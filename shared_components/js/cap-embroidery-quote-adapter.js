@@ -523,12 +523,18 @@
 
                     const response = await this.apiClient.createQuoteSession(sessionData);
                     
+                    console.log('[CAP-EMB-QUOTE] Quote session response:', response);
+                    
                     // Update local quote with API response
                     this.currentQuote.id = response.QuoteID || sessionData.QuoteID;
                     this.currentQuote.sessionId = response.SessionID || sessionData.SessionID;
                     this.currentQuote.apiId = response.PK_ID;
                     
-                    console.log('[CAP-EMB-QUOTE] Quote session created:', this.currentQuote.id);
+                    console.log('[CAP-EMB-QUOTE] Quote session created:', {
+                        id: this.currentQuote.id,
+                        sessionId: this.currentQuote.sessionId,
+                        apiId: this.currentQuote.apiId
+                    });
                 } catch (error) {
                     console.error('[CAP-EMB-QUOTE] Failed to create quote session:', error);
                     // Generate local IDs as fallback
@@ -538,7 +544,7 @@
             }
 
             // Add to quote locally
-            this.addItemToQuote(quoteItem);
+            await this.addItemToQuote(quoteItem);
 
             // Save item to API if we have a quote ID
             if (this.apiClient && this.currentQuote.id && !this.currentQuote.id.startsWith('LOCAL_')) {
@@ -842,7 +848,13 @@
 
         // Update quote session totals in the API
         async updateQuoteSessionTotals() {
-            if (!this.apiClient || !this.currentQuote.apiId) return;
+            if (!this.apiClient) return;
+            
+            // Check if we have a valid API ID
+            if (!this.currentQuote.apiId || this.currentQuote.apiId === 'records') {
+                console.warn('[CAP-EMB-QUOTE] Invalid or missing API ID, skipping update');
+                return;
+            }
             
             try {
                 const updates = {
@@ -853,10 +865,12 @@
                     UpdatedAt: new Date().toISOString()
                 };
                 
+                console.log('[CAP-EMB-QUOTE] Updating quote session with ID:', this.currentQuote.apiId);
                 await this.apiClient.updateQuoteSession(this.currentQuote.apiId, updates);
                 console.log('[CAP-EMB-QUOTE] Quote session totals updated');
             } catch (error) {
                 console.error('[CAP-EMB-QUOTE] Failed to update quote session totals:', error);
+                // Don't throw, just log the error
             }
         }
 
@@ -1308,6 +1322,25 @@
             }
         }
 
+        // Get total for quote dropdown
+        getTotal() {
+            return this.currentQuote ? this.currentQuote.grandTotal : 0;
+        }
+
+        // Get current quote
+        getQuote() {
+            return this.currentQuote;
+        }
+
+        // Clear quote
+        clearQuote() {
+            this.currentQuote = this.initializeQuote();
+            this.updateQuoteTotals();
+            this.updateQuoteSummary();
+            this.saveQuoteToStorage();
+            this.hideSummaryPanel();
+        }
+
         // Show quote details (opens quote modal)
         showQuoteDetails() {
             if (this.openQuoteModal) {
@@ -1349,7 +1382,7 @@
             });
             
             // Update quick quote display
-            this.updateQuickQuote();
+            this.updateQuickQuoteDisplay();
             
             // Hide bundle savings after add
             setTimeout(() => {

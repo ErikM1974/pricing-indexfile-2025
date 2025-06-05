@@ -277,7 +277,15 @@
 
         // Update quote session totals in API
         async updateQuoteSessionTotals() {
-            if (!this.apiClient || !this.currentQuote.apiId) return;
+            if (!this.apiClient) return;
+            
+            // Check if we have a valid API ID
+            if (!this.currentQuote.apiId || this.currentQuote.apiId === 'records' || !this.currentQuote.id || this.currentQuote.id.startsWith('LOCAL_')) {
+                if (this.DEBUG_MODE) {
+                    console.log('[BASE-QUOTE] Skipping API update - no valid session');
+                }
+                return;
+            }
             
             try {
                 const updates = {
@@ -295,6 +303,7 @@
                 }
             } catch (error) {
                 console.error('[BASE-QUOTE] Failed to update quote session totals:', error);
+                // Don't throw, just log the error
             }
         }
 
