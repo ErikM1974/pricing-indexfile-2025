@@ -86,13 +86,21 @@
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 30);
             
-            return this.request(this.endpoints.quoteSessions, {
+            const response = await this.request(this.endpoints.quoteSessions, {
                 method: 'POST',
                 data: {
                     ...sessionData,
                     ExpiresAt: expirationDate.toISOString()
                 }
             });
+            
+            // Handle Caspio response format - it might return an array
+            if (Array.isArray(response) && response.length > 0) {
+                console.log('[QUOTE-API] createQuoteSession returned array, extracting first item');
+                return response[0];
+            }
+            
+            return response;
         }
 
         async getQuoteSession(id) {
@@ -119,10 +127,18 @@
 
         // Quote Item Methods
         async createQuoteItem(itemData) {
-            return this.request(this.endpoints.quoteItems, {
+            const response = await this.request(this.endpoints.quoteItems, {
                 method: 'POST',
                 data: itemData
             });
+            
+            // Handle Caspio response format - it might return an array
+            if (Array.isArray(response) && response.length > 0) {
+                console.log('[QUOTE-API] createQuoteItem returned array, extracting first item');
+                return response[0];
+            }
+            
+            return response;
         }
 
         async getQuoteItems(quoteID) {
