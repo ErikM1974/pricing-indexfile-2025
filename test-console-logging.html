@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console Logging Test</title>
+</head>
+<body>
+    <h1>Console Logging Test</h1>
+    <p>Open the browser console to see the logs.</p>
+    
+    <div id="add-to-cart-section">
+        <p>This is the add-to-cart section that will be replaced.</p>
+    </div>
+    
+    <script>
+        // Enable debug mode
+        window.DEBUG_MODE = true;
+        console.log('Debug mode enabled');
+    </script>
+    
+    <!-- Load only the essential dependencies -->
+    <script src="/shared_components/js/base-quote-system.js"></script>
+    <script src="/shared_components/js/cap-embroidery-quote-adapter.js"></script>
+    
+    <script>
+        console.log('=== After scripts loaded ===');
+        console.log('window.BaseQuoteSystem:', window.BaseQuoteSystem);
+        console.log('window.capEmbroideryQuoteAdapter:', window.capEmbroideryQuoteAdapter);
+        
+        // Try manual initialization after a delay
+        setTimeout(() => {
+            console.log('=== Attempting manual init after delay ===');
+            if (window.capEmbroideryQuoteAdapter && window.capEmbroideryQuoteAdapter.init) {
+                window.capEmbroideryQuoteAdapter.init();
+            } else {
+                console.error('Adapter not available for manual init');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -4,6 +4,11 @@
 
 (function() {
     'use strict';
+    
+    console.log('[CAP-EMB-QUOTE] === MODULE START ===');
+    console.log('[CAP-EMB-QUOTE] Cap embroidery quote adapter module loading...');
+    console.log('[CAP-EMB-QUOTE] Current URL:', window.location.href);
+    console.log('[CAP-EMB-QUOTE] DEBUG_MODE:', window.DEBUG_MODE);
 
     // Cap embroidery specific configuration
     const CAP_EMBROIDERY_CONFIG = {
@@ -17,7 +22,12 @@
 
     class CapEmbroideryQuoteAdapter extends window.BaseQuoteSystem {
         constructor() {
+            console.log('[CAP-EMB-QUOTE] Constructor called');
+            console.log('[CAP-EMB-QUOTE] BaseQuoteSystem available:', !!window.BaseQuoteSystem);
+            
             super();
+            
+            console.log('[CAP-EMB-QUOTE] Super constructor completed');
             this.embellishmentType = 'cap-embroidery';
             this.config = CAP_EMBROIDERY_CONFIG;
             this.currentStitchCount = CAP_EMBROIDERY_CONFIG.defaultStitchCount;
@@ -25,31 +35,54 @@
             this.currentPricingData = null;
             this.apiClient = window.quoteAPIClient || null;
             this.cumulativePricing = true; // Enable cumulative pricing
+            console.log('[CAP-EMB-QUOTE] Constructor completed successfully');
         }
 
         // Initialize the adapter
         init() {
-            console.log('[CAP-EMB-QUOTE] Initializing cap embroidery quote adapter');
-            console.log('[CAP-EMB-QUOTE] Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this)).filter(m => typeof this[m] === 'function'));
+            console.log('[CAP-EMB-QUOTE] === INIT METHOD CALLED ===');
+            console.log('[CAP-EMB-QUOTE] this.embellishmentType:', this.embellishmentType);
+            console.log('[CAP-EMB-QUOTE] this.cumulativePricing:', this.cumulativePricing);
+            console.log('[CAP-EMB-QUOTE] Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this)).filter(m => typeof this[m] === 'function').slice(0, 10) + '...'); // Show first 10 methods
             
-            // Initialize API client if available
-            if (window.quoteAPIClient) {
-                this.apiClient = window.quoteAPIClient;
-            }
-            
-            // Set up the UI
-            this.setupUI();
-            
-            // Initialize event listeners
-            this.bindEvents();
-            
-            // Check for existing quote
-            this.checkForActiveQuote().then(activeQuote => {
-                if (activeQuote) {
-                    this.displayQuoteSummary(activeQuote);
-                    this.updatePricingDisplay();
+            try {
+                // Initialize API client if available
+                console.log('[CAP-EMB-QUOTE] Checking for API client...');
+                if (window.quoteAPIClient) {
+                    this.apiClient = window.quoteAPIClient;
+                    console.log('[CAP-EMB-QUOTE] API client set');
+                } else {
+                    console.log('[CAP-EMB-QUOTE] No API client available');
                 }
-            });
+                
+                // Set up the UI
+                console.log('[CAP-EMB-QUOTE] Calling setupUI()...');
+                this.setupUI();
+                console.log('[CAP-EMB-QUOTE] setupUI() completed');
+                
+                // Initialize event listeners
+                console.log('[CAP-EMB-QUOTE] Calling bindEvents()...');
+                this.bindEvents();
+                console.log('[CAP-EMB-QUOTE] bindEvents() completed');
+                
+                // Check for existing quote
+                console.log('[CAP-EMB-QUOTE] Checking for active quote...');
+                this.checkForActiveQuote().then(activeQuote => {
+                    console.log('[CAP-EMB-QUOTE] Active quote check completed:', !!activeQuote);
+                    if (activeQuote) {
+                        this.displayQuoteSummary(activeQuote);
+                        this.updatePricingDisplay();
+                    }
+                }).catch(error => {
+                    console.error('[CAP-EMB-QUOTE] Error checking for active quote:', error);
+                });
+                
+                console.log('[CAP-EMB-QUOTE] === INIT METHOD COMPLETED ===');
+            } catch (error) {
+                console.error('[CAP-EMB-QUOTE] Error in init method:', error);
+                console.error('[CAP-EMB-QUOTE] Init error stack:', error.stack);
+                throw error; // Re-throw to be caught by outer handler
+            }
         }
 
         // Override setupUI to include cap embroidery specific elements
@@ -1427,41 +1460,89 @@
 
         // Override addItemToQuote to use cumulative pricing
         async addItemToQuote(item) {
-            // Use cumulative pricing from base class
-            const addedItem = await super.addItemToQuote(item);
+            console.log('[CAP-EMB-QUOTE] addItemToQuote called in adapter');
             
-            // Update the display after adding
-            this.displayQuoteSummary();
-            this.updatePricingDisplay();
-            
-            // Clear the quantity inputs after successful add
-            const quantityInputs = document.querySelectorAll('.quantity-input[data-size]');
-            quantityInputs.forEach(input => {
-                input.value = 0;
-            });
-            
-            // Update quick quote display
-            this.updateQuickQuoteDisplay();
-            
-            // Hide bundle savings after add
-            setTimeout(() => {
-                this.hideBundleSavings();
-            }, 2000);
-            
-            return addedItem;
+            try {
+                // Use cumulative pricing from base class
+                const addedItem = await super.addItemToQuote(item);
+                
+                console.log('[CAP-EMB-QUOTE] Item added successfully, updating displays');
+                
+                // Update the display after adding
+                this.displayQuoteSummary();
+                this.updatePricingDisplay();
+                
+                // Clear the quantity inputs after successful add
+                const quantityInputs = document.querySelectorAll('.quantity-input[data-size]');
+                quantityInputs.forEach(input => {
+                    input.value = 0;
+                });
+                
+                // Update quick quote display
+                this.updateQuickQuoteDisplay();
+                
+                // Hide bundle savings after add
+                setTimeout(() => {
+                    this.hideBundleSavings();
+                }, 2000);
+                
+                return addedItem;
+            } catch (error) {
+                console.error('[CAP-EMB-QUOTE] Error in addItemToQuote:', error);
+                throw error;
+            }
         }
     }
 
     // Create and initialize the adapter
-    const capEmbroideryQuoteAdapter = new CapEmbroideryQuoteAdapter();
+    let capEmbroideryQuoteAdapter;
     
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            capEmbroideryQuoteAdapter.init();
-        });
-    } else {
-        capEmbroideryQuoteAdapter.init();
+    try {
+        console.log('[CAP-EMB-QUOTE] Creating adapter instance...');
+        console.log('[CAP-EMB-QUOTE] BaseQuoteSystem exists:', !!window.BaseQuoteSystem);
+        console.log('[CAP-EMB-QUOTE] BaseQuoteSystem type:', typeof window.BaseQuoteSystem);
+        
+        if (!window.BaseQuoteSystem) {
+            console.error('[CAP-EMB-QUOTE] ERROR: BaseQuoteSystem not found! Check script load order.');
+            console.error('[CAP-EMB-QUOTE] Available globals:', Object.keys(window).filter(k => k.includes('Quote') || k.includes('Base')));
+            return;
+        }
+        
+        capEmbroideryQuoteAdapter = new CapEmbroideryQuoteAdapter();
+        console.log('[CAP-EMB-QUOTE] Adapter instance created successfully');
+        console.log('[CAP-EMB-QUOTE] Adapter embellishmentType:', capEmbroideryQuoteAdapter.embellishmentType);
+        
+        // Initialize when DOM is ready
+        console.log('[CAP-EMB-QUOTE] Document readyState:', document.readyState);
+        console.log('[CAP-EMB-QUOTE] Current URL:', window.location.href);
+        
+        const initAdapter = () => {
+            try {
+                console.log('[CAP-EMB-QUOTE] === INIT STARTED ===');
+                console.log('[CAP-EMB-QUOTE] Checking for required DOM elements...');
+                console.log('[CAP-EMB-QUOTE] add-to-cart-section exists:', !!document.getElementById('add-to-cart-section'));
+                console.log('[CAP-EMB-QUOTE] product-title-context exists:', !!document.getElementById('product-title-context'));
+                
+                console.log('[CAP-EMB-QUOTE] Calling init()...');
+                capEmbroideryQuoteAdapter.init();
+                console.log('[CAP-EMB-QUOTE] === INIT COMPLETED ===');
+            } catch (initError) {
+                console.error('[CAP-EMB-QUOTE] Error during init():', initError);
+                console.error('[CAP-EMB-QUOTE] Error stack:', initError.stack);
+            }
+        };
+        
+        if (document.readyState === 'loading') {
+            console.log('[CAP-EMB-QUOTE] Waiting for DOMContentLoaded...');
+            document.addEventListener('DOMContentLoaded', initAdapter);
+        } else {
+            console.log('[CAP-EMB-QUOTE] DOM already ready, waiting 100ms then calling init()...');
+            // Small delay to ensure other scripts have initialized
+            setTimeout(initAdapter, 100);
+        }
+    } catch (error) {
+        console.error('[CAP-EMB-QUOTE] FATAL ERROR creating adapter:', error);
+        console.error('[CAP-EMB-QUOTE] Stack trace:', error.stack);
     }
 
     // Cleanup on page unload to prevent memory leaks

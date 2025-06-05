@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Cap Embroidery Init Test</title>
+</head>
+<body>
+    <h1>Simple Initialization Test</h1>
+    <div id="console-output" style="background: #f0f0f0; padding: 20px; font-family: monospace; white-space: pre-wrap;"></div>
+    
+    <script>
+        // Capture console output
+        const output = document.getElementById('console-output');
+        const log = (msg, isError = false) => {
+            output.innerHTML += (isError ? '❌ ' : '✅ ') + msg + '\n';
+            console.log(msg);
+        };
+        
+        // Override console methods
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const msg = args.join(' ');
+            if (msg.includes('[CAP-EMB-QUOTE]')) {
+                output.innerHTML += '📝 ' + msg + '\n';
+            }
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            const msg = args.join(' ');
+            output.innerHTML += '❌ ERROR: ' + msg + '\n';
+        };
+        
+        window.DEBUG_MODE = true;
+        log('Debug mode enabled');
+    </script>
+    
+    <!-- Minimal dependencies -->
+    <script>
+        // Mock the required dependencies
+        window.NWCA = { version: '1.0' };
+        log('Created mock NWCA');
+        
+        // Create a minimal BaseQuoteSystem
+        window.BaseQuoteSystem = class BaseQuoteSystem {
+            constructor() {
+                this.currentQuote = this.initializeQuote();
+                log('BaseQuoteSystem constructor called');
+            }
+            
+            initializeQuote() {
+                return {
+                    id: null,
+                    items: [],
+                    totalQuantity: 0,
+                    subtotal: 0,
+                    ltmTotal: 0,
+                    grandTotal: 0
+                };
+            }
+            
+            checkForActiveQuote() {
+                log('checkForActiveQuote called');
+                return Promise.resolve(null);
+            }
+            
+            addItemToQuote(item) {
+                log('addItemToQuote called');
+                return Promise.resolve(item);
+            }
+            
+            updateQuoteTotals() {
+                log('updateQuoteTotals called');
+            }
+            
+            displayQuoteSummary() {
+                log('displayQuoteSummary called');
+            }
+        };
+        log('Created BaseQuoteSystem class');
+        
+        // Mock quote API client
+        window.quoteAPIClient = {
+            generateQuoteID: () => 'TEST-' + Date.now(),
+            generateSessionID: () => 'SESSION-' + Date.now()
+        };
+        log('Created mock quoteAPIClient');
+    </script>
+    
+    <!-- Add the required DOM element -->
+    <div id="add-to-cart-section" style="border: 2px dashed #999; padding: 20px; margin: 20px 0;">
+        <p>This is the add-to-cart section</p>
+    </div>
+    
+    <!-- Load the cap embroidery adapter -->
+    <script src="/shared_components/js/cap-embroidery-quote-adapter.js"></script>
+    
+    <script>
+        setTimeout(() => {
+            log('\n=== Checking Results ===');
+            
+            if (window.capEmbroideryQuoteAdapter) {
+                log('✅ Adapter created successfully');
+                log('Embellishment type: ' + window.capEmbroideryQuoteAdapter.embellishmentType);
+                log('Cumulative pricing: ' + window.capEmbroideryQuoteAdapter.cumulativePricing);
+                
+                // Check if the UI was modified
+                const cartSection = document.getElementById('add-to-cart-section');
+                if (cartSection && cartSection.innerHTML.includes('quote-builder-container')) {
+                    log('✅ UI was modified by the adapter');
+                } else {
+                    log('❌ UI was NOT modified', true);
+                }
+            } else {
+                log('❌ Adapter was NOT created', true);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
