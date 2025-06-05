@@ -1187,8 +1187,15 @@
 
         // Add quote summary panel to page
         addQuoteSummaryPanel() {
+            console.log('[CAP-EMB-QUOTE] addQuoteSummaryPanel called');
+            
             // Check if panel already exists
-            if (document.getElementById('cumulative-quote-summary')) return;
+            if (document.getElementById('cumulative-quote-summary')) {
+                console.log('[CAP-EMB-QUOTE] Quote summary panel already exists');
+                return;
+            }
+            
+            console.log('[CAP-EMB-QUOTE] Creating quote summary panel');
             
             // Create summary panel
             const summaryPanel = document.createElement('div');
@@ -1234,10 +1241,17 @@
 
         // Display quote summary
         displayQuoteSummary(quote = null) {
+            console.log('[CAP-EMB-QUOTE] displayQuoteSummary called');
+            
             const summaryPanel = document.getElementById('cumulative-quote-summary');
-            if (!summaryPanel) return;
+            if (!summaryPanel) {
+                console.log('[CAP-EMB-QUOTE] Summary panel not found, creating it');
+                this.addQuoteSummaryPanel();
+                return this.displayQuoteSummary(quote); // Retry after creating
+            }
             
             const quoteData = quote || this.currentQuote;
+            console.log('[CAP-EMB-QUOTE] Quote data:', quoteData);
             
             if (quoteData && quoteData.totalQuantity > 0) {
                 const summaryContent = document.getElementById('quote-summary-content');
@@ -1264,8 +1278,10 @@
                         </div>
                     `;
                 }
+                console.log('[CAP-EMB-QUOTE] Showing summary panel');
                 summaryPanel.style.display = 'block';
             } else {
+                console.log('[CAP-EMB-QUOTE] No items in quote, hiding panel');
                 summaryPanel.style.display = 'none';
             }
         }

@@ -56,10 +56,10 @@
                     }
                     
                     const data = await response.json();
-                    // Only log in debug mode
-                    if (window.DEBUG_MODE) {
-                        console.log(`[QUOTE-API] Success`);
-                    }
+                    
+                    // Always log response for debugging quote issues
+                    console.log(`[QUOTE-API] Response:`, data);
+                    
                     return data;
                     
                 } catch (error) {
@@ -94,9 +94,22 @@
                 }
             });
             
-            // Handle Caspio response format - it might return an array
+            // Handle Caspio response format
+            console.log('[QUOTE-API] createQuoteSession raw response:', response);
+            
+            // Check if response has a data property (from server wrapper)
+            if (response && response.data) {
+                console.log('[QUOTE-API] Response has data property');
+                if (Array.isArray(response.data) && response.data.length > 0) {
+                    console.log('[QUOTE-API] Data is array, extracting first item');
+                    return response.data[0];
+                }
+                return response.data;
+            }
+            
+            // Check if response itself is an array
             if (Array.isArray(response) && response.length > 0) {
-                console.log('[QUOTE-API] createQuoteSession returned array, extracting first item');
+                console.log('[QUOTE-API] Response is array, extracting first item');
                 return response[0];
             }
             
@@ -132,9 +145,22 @@
                 data: itemData
             });
             
-            // Handle Caspio response format - it might return an array
+            // Handle Caspio response format
+            console.log('[QUOTE-API] createQuoteItem raw response:', response);
+            
+            // Check if response has a data property (from server wrapper)
+            if (response && response.data) {
+                console.log('[QUOTE-API] Response has data property');
+                if (Array.isArray(response.data) && response.data.length > 0) {
+                    console.log('[QUOTE-API] Data is array, extracting first item');
+                    return response.data[0];
+                }
+                return response.data;
+            }
+            
+            // Check if response itself is an array
             if (Array.isArray(response) && response.length > 0) {
-                console.log('[QUOTE-API] createQuoteItem returned array, extracting first item');
+                console.log('[QUOTE-API] Response is array, extracting first item');
                 return response[0];
             }
             
