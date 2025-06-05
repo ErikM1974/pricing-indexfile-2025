@@ -740,18 +740,40 @@
             return detailsHTML;
         }
 
-        // Override createQuoteItem to include back logo price in final calculations
+        // Create quote item from data
         createQuoteItem(itemData) {
-            // Create base item using parent method
-            const baseItem = super.createQuoteItem(itemData);
+            const lineNumber = this.currentQuote.items.length + 1;
+            const ltmFee = this.calculateLTMFee(this.currentQuote.totalQuantity + itemData.quantity, itemData.quantity);
+            const hasLTM = ltmFee > 0;
             
-            // Add back logo price to final unit price if back logo is enabled
-            if (itemData.hasBackLogo && itemData.backLogoPrice > 0) {
-                baseItem.finalUnitPrice = itemData.baseUnitPrice + baseItem.ltmPerUnit + itemData.backLogoPrice;
-                baseItem.lineTotal = baseItem.finalUnitPrice * itemData.quantity;
-            }
+            // Calculate final unit price including all add-ons
+            const finalUnitPrice = itemData.baseUnitPrice + ltmFee + (itemData.backLogoPrice || 0);
             
-            return baseItem;
+            const quoteItem = {
+                id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                lineNumber: lineNumber,
+                styleNumber: itemData.styleNumber,
+                productName: itemData.productName,
+                color: itemData.color,
+                colorCode: itemData.colorCode,
+                quantity: itemData.quantity,
+                baseUnitPrice: itemData.baseUnitPrice,
+                ltmPerUnit: ltmFee,
+                finalUnitPrice: finalUnitPrice,
+                lineTotal: finalUnitPrice * itemData.quantity,
+                hasLTM: hasLTM,
+                pricingTier: itemData.pricingTier || this.determinePricingTier(itemData.quantity),
+                sizeBreakdown: itemData.sizeBreakdown || {},
+                imageURL: itemData.imageURL || '',
+                // Cap embroidery specific fields
+                stitchCount: itemData.stitchCount,
+                hasBackLogo: itemData.hasBackLogo || false,
+                backLogoStitchCount: itemData.backLogoStitchCount || 0,
+                backLogoPrice: itemData.backLogoPrice || 0,
+                addedAt: new Date().toISOString()
+            };
+            
+            return quoteItem;
         }
 
         // Override getAdditionalItemData for cap embroidery specific fields
@@ -806,7 +828,8 @@
 
         // Override updateQuoteSummary to include cap embroidery specific LTM display
         updateQuoteSummary() {
-            super.updateQuoteSummary();
+            // Update quote summary display
+            this.displayQuoteSummary();
             
             // Update cap-specific LTM display if validation module is available
             if (window.CapEmbroideryValidation && this.currentQuote.ltmTotal > 0) {
@@ -839,7 +862,26 @@
 
         // Override convertApiItemToQuoteItem for cap embroidery specific conversion
         convertApiItemToQuoteItem(apiItem) {
-            const baseItem = super.convertApiItemToQuoteItem(apiItem);
+            // Use base convertApiItemToLocal if available, otherwise do manual conversion
+            const baseItem = this.convertApiItemToLocal ? this.convertApiItemToLocal(apiItem) : {
+                id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                apiId: apiItem.PK_ID,
+                lineNumber: apiItem.LineNumber,
+                styleNumber: apiItem.StyleNumber,
+                productName: apiItem.ProductName,
+                color: apiItem.Color,
+                colorCode: apiItem.ColorCode,
+                quantity: apiItem.Quantity,
+                baseUnitPrice: apiItem.BaseUnitPrice || 0,
+                ltmPerUnit: apiItem.LTMPerUnit || 0,
+                finalUnitPrice: apiItem.FinalUnitPrice || 0,
+                lineTotal: apiItem.LineTotal || 0,
+                hasLTM: apiItem.HasLTM === 'Yes',
+                sizeBreakdown: {},
+                pricingTier: apiItem.PricingTier,
+                imageURL: apiItem.ImageURL,
+                addedAt: apiItem.AddedAt
+            };
             
             // Parse extended data from SizeBreakdown field
             let sizeBreakdown = {};
@@ -927,8 +969,9 @@
         async saveQuote() {
             try {
                 if (!this.apiClient) {
-                    console.warn('[CAP-EMB-QUOTE] API client not available, falling back to base save');
-                    return super.saveQuote();
+                    console.warn('[CAP-EMB-QUOTE] API client not available, saving to local storage only');
+                    this.saveQuoteToStorage();
+                    return;
                 }
 
                 // Create or update quote session
@@ -1014,7 +1057,8 @@
         // Override loadQuote to use API client
         async loadQuote(quoteId) {
             if (!this.apiClient) {
-                return super.loadQuote(quoteId);
+                console.warn('[CAP-EMB-QUOTE] API client not available, cannot load quote');
+                return null;
             }
 
             try {
@@ -1238,6 +1282,22 @@
                 total += parseInt(input.value) || 0;
             });
             return total;
+        }
+
+        // Save quote to local storage
+        saveQuoteToStorage() {
+            try {
+                const quoteData = {
+                    quote: this.currentQuote,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('nwca_cap_embroidery_quote', JSON.stringify(quoteData));
+                if (this.currentQuote.sessionId) {
+                    localStorage.setItem('nwca_quote_session_id', this.currentQuote.sessionId);
+                }
+            } catch (error) {
+                console.error('[CAP-EMB-QUOTE] Failed to save quote to storage:', error);
+            }
         }
 
         // Hide summary panel
