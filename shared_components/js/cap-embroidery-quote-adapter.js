@@ -434,9 +434,6 @@
                 });
             }
 
-            // Get product image
-            const productImage = document.getElementById('product-image-main')?.src || '';
-
             // Capture product image with validation
             const productImage = await this.captureProductImage(selectedColor);
 
