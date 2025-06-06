@@ -1402,7 +1402,7 @@
             
             summaryPanel.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h4 style="margin: 0; color: ${this.config.brandColor};">Active Quote</h4>
+                    <h4 style="margin: 0; color: ${this.config.brandColor};">Quote Summary</h4>
                     <button onclick="window.capEmbroideryQuoteAdapter.hideSummaryPanel()" 
                             style="background: none; border: none; cursor: pointer; font-size: 20px;">×</button>
                 </div>
@@ -1465,6 +1465,7 @@
                     
                     // Build detailed line items HTML
                     let lineItemsHTML = '';
+                    console.log('[CAP-EMB-QUOTE] Quote items:', quoteData.items);
                     if (quoteData.items && quoteData.items.length > 0) {
                         lineItemsHTML = '<div style="margin: 15px 0; border-top: 1px solid #ddd; padding-top: 15px;">';
                         lineItemsHTML += '<h4 style="margin: 0 0 10px 0;">Quote Details:</h4>';
@@ -1549,6 +1550,7 @@
                         `;
                     }
                     
+                    console.log('[CAP-EMB-QUOTE] Setting enhanced summary content');
                     summaryContent.innerHTML = `
                         <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #ddd;">
                             <h4 style="margin: 0 0 10px 0;">Pricing Summary</h4>
