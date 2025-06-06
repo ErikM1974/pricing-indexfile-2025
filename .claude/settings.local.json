@@ -29,7 +29,8 @@
       "Bash(python:*)",
       "Bash(curl:*)",
       "Bash(kill:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(git ls-tree:*)"
     ],
     "deny": []
   }

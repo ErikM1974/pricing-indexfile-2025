@@ -20,9 +20,15 @@
         
         // Override console methods to prevent excessive logging
         console.log = function(...args) {
-            // Only log errors and critical warnings
+            // Only log errors, critical warnings, and initialization messages
             if (args[0] && typeof args[0] === 'string' && 
-                (args[0].includes('Error') || args[0].includes('Warning'))) {
+                (args[0].includes('Error') || 
+                 args[0].includes('Warning') ||
+                 args[0].includes('[CAP-EMB-BACK-LOGO]') ||
+                 args[0].includes('[HERO-BREAKDOWN]') ||
+                 args[0].includes('[BACK-LOGO-FORCE]') ||
+                 args[0].includes('[BACK-LOGO-INIT-FIX]') ||
+                 args[0].includes('Initializing'))) {
                 originalConsole.log.apply(console, args);
             }
         };

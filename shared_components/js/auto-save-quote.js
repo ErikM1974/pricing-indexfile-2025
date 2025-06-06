@@ -528,6 +528,11 @@
             if (text) text.textContent = 'Quote restored';
 
             console.log('[AUTO-SAVE] Draft restored successfully');
+            
+            // Dispatch custom event for other components
+            document.dispatchEvent(new CustomEvent('quoteDraftRestored', {
+                detail: { draft: draft }
+            }));
         },
 
         /**
