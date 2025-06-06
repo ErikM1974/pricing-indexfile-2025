@@ -198,8 +198,30 @@
                 
                 const pricingData = window.capEmbroideryQuoteAdapter.currentPricingData;
                 log('Current pricing data:', pricingData);
+                
+                // Also check the quote builder section
+                const sizeInputs = document.querySelectorAll('.quantity-input[data-size]');
+                if (sizeInputs.length > 0) {
+                    const displayedSizes = Array.from(sizeInputs).map(input => input.getAttribute('data-size'));
+                    log('Sizes displayed in quote builder:', displayedSizes);
+                } else {
+                    log('No size inputs found in quote builder');
+                }
             } else {
-                log('Quote adapter not initialized');
+                log('Quote adapter not initialized - attempting to initialize now');
+                
+                // Try to initialize the quote adapter
+                const quoteSection = document.querySelector('.quote-builder-section[data-embellishment-type="cap-embroidery"]');
+                if (quoteSection && window.CapEmbroideryQuoteAdapter) {
+                    window.capEmbroideryQuoteAdapter = new window.CapEmbroideryQuoteAdapter();
+                    window.capEmbroideryQuoteAdapter.init();
+                    log('Quote adapter initialized manually');
+                    
+                    // Send current pricing data
+                    setTimeout(() => {
+                        testPricingData();
+                    }, 100);
+                }
             }
         }
         
@@ -250,10 +272,25 @@
                 NWCA.controllers.capEmbroidery.state.masterData = mockMasterData;
                 log('Mock master data set');
                 
-                // Trigger initial display update
+                // Trigger initial display update and send pricing data to quote adapter
                 setTimeout(() => {
                     NWCA.controllers.capEmbroidery.DataManager.updateCapPricingDisplay();
                     log('Initial pricing display updated');
+                    
+                    // Wait a bit more for the quote adapter to initialize
+                    setTimeout(() => {
+                        // Send initial pricing data with sizes
+                        const initialPricingData = {
+                            stitchCount: '8000',
+                            prices: mockMasterData.allPriceProfiles['8000'],
+                            sizes: mockMasterData.groupedHeaders
+                        };
+                        
+                        log('Sending initial pricing data to quote adapter:', initialPricingData);
+                        window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
+                            detail: initialPricingData
+                        }));
+                    }, 200);
                 }, 100);
             }
         });
