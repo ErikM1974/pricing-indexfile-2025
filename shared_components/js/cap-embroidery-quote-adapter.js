@@ -389,7 +389,8 @@
             
             // Listen for pricing data updates
             this.eventHandlers.pricingDataUpdated = (e) => {
-                console.log('[CAP-EMB-QUOTE] Pricing data updated:', e.detail);
+                console.log('[CAP-EMB-QUOTE] Pricing data updated event received');
+                console.log('[CAP-EMB-QUOTE] Event detail:', e.detail);
                 this.currentPricingData = e.detail;
                 
                 // Check if we need to update available sizes
@@ -430,6 +431,7 @@
                 }
                 this.updatePricingDisplay();
             };
+            console.log('[CAP-EMB-QUOTE] Registering pricingDataUpdated event listener');
             document.addEventListener('pricingDataUpdated', this.eventHandlers.pricingDataUpdated);
 
             // Listen for color selection changes

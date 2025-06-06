@@ -113,6 +113,11 @@
         </table>
     </div>
     
+    <!-- Add to Cart Section (required by quote adapter) -->
+    <div id="add-to-cart-section">
+        <!-- Quote adapter will replace this content -->
+    </div>
+    
     <!-- Quote Builder -->
     <div class="quote-builder-section" data-embellishment-type="cap-embroidery">
         <!-- Quote adapter will inject content here -->
@@ -166,6 +171,11 @@
                 log(args.join(' '));
             }
         };
+        
+        // Add a global event listener to verify events are being dispatched
+        window.addEventListener('pricingDataUpdated', (e) => {
+            log('GLOBAL: pricingDataUpdated event captured', e.detail);
+        });
         
         // Test functions
         function testPricingData() {
