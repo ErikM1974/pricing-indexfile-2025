@@ -218,20 +218,18 @@
                     log('No size inputs found in quote builder');
                 }
             } else {
-                log('Quote adapter not initialized - attempting to initialize now');
+                log('Quote adapter not found in window.capEmbroideryQuoteAdapter');
+                log('Checking for CapEmbroideryQuoteAdapter class:', !!window.CapEmbroideryQuoteAdapter);
                 
-                // Try to initialize the quote adapter
-                const quoteSection = document.querySelector('.quote-builder-section[data-embellishment-type="cap-embroidery"]');
-                if (quoteSection && window.CapEmbroideryQuoteAdapter) {
-                    window.capEmbroideryQuoteAdapter = new window.CapEmbroideryQuoteAdapter();
-                    window.capEmbroideryQuoteAdapter.init();
-                    log('Quote adapter initialized manually');
-                    
-                    // Send current pricing data
-                    setTimeout(() => {
-                        testPricingData();
-                    }, 100);
-                }
+                // The adapter might be initializing, wait and retry
+                setTimeout(() => {
+                    if (window.capEmbroideryQuoteAdapter) {
+                        log('Quote adapter found after waiting');
+                        testSizeDetection();
+                    } else {
+                        log('Quote adapter still not found');
+                    }
+                }, 500);
             }
         }
         
@@ -300,7 +298,14 @@
                         window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
                             detail: initialPricingData
                         }));
-                    }, 200);
+                        
+                        // Also set it directly if the adapter exists
+                        if (window.capEmbroideryQuoteAdapter) {
+                            log('Setting pricing data directly on adapter');
+                            window.capEmbroideryQuoteAdapter.currentPricingData = initialPricingData;
+                            window.capEmbroideryQuoteAdapter.populateSizeQuantityGrid();
+                        }
+                    }, 500);
                 }, 100);
             }
         });
