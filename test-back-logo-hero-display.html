@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Back Logo Hero Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .hero-pricing-note {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        button {
+            background: #2e5827;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1f3a1b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Back Logo Hero Display Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="testBackLogoToggle()">Toggle Back Logo</button>
+        <button onclick="testBackLogoEvent()">Fire Back Logo Event</button>
+        <button onclick="testDirectUpdate()">Direct Update Hero Display</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Hero Pricing Note Display</h2>
+        <div class="hero-pricing-note">Pricing based on 8,000 stitches</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console" class="console-output"></div>
+    </div>
+
+    <script>
+        // Console override to display in page
+        const consoleDiv = document.getElementById('console');
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            consoleDiv.innerHTML += `<div>[LOG] ${message}</div>`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+
+        // Mock hero state
+        const heroState = {
+            currentQuantity: 24,
+            currentStitchCount: 8000,
+            backLogoEnabled: false,
+            backLogoPrice: 0
+        };
+
+        // Mock pricing
+        const mockPricing = {
+            quantity: 24,
+            basePrice: 12.50,
+            ltmFeePerUnit: 0,
+            backLogoPrice: 0,
+            unitPrice: 12.50,
+            totalPrice: 300.00,
+            hasLTMFee: false
+        };
+
+        // Test functions
+        function testBackLogoToggle() {
+            heroState.backLogoEnabled = !heroState.backLogoEnabled;
+            heroState.backLogoPrice = heroState.backLogoEnabled ? 5.00 : 0;
+            mockPricing.backLogoPrice = heroState.backLogoPrice;
+            mockPricing.unitPrice = mockPricing.basePrice + mockPricing.backLogoPrice;
+            
+            console.log('Back logo toggled:', {
+                enabled: heroState.backLogoEnabled,
+                price: heroState.backLogoPrice
+            });
+            
+            updateHeroDisplay();
+        }
+
+        function testBackLogoEvent() {
+            console.log('Dispatching backLogoChanged event');
+            window.dispatchEvent(new CustomEvent('backLogoChanged', {
+                detail: {
+                    enabled: true,
+                    price: 5.00,
+                    stitchCount: 5000
+                }
+            }));
+        }
+
+        function testDirectUpdate() {
+            console.log('Direct update of hero display');
+            updateHeroDisplay();
+        }
+
+        function updateHeroDisplay() {
+            const pricingNoteEl = document.querySelector('.hero-pricing-note');
+            if (pricingNoteEl) {
+                let breakdownHTML = '<div style="line-height: 1.6;">';
+                
+                // Front logo
+                breakdownHTML += `Front logo (${heroState.currentStitchCount.toLocaleString()} stitches): <strong>$${mockPricing.basePrice.toFixed(2)}</strong>`;
+                
+                // Back logo if enabled
+                if (heroState.backLogoEnabled && mockPricing.backLogoPrice > 0) {
+                    breakdownHTML += `<br>Back logo: <strong>+$${mockPricing.backLogoPrice.toFixed(2)}</strong>`;
+                }
+                
+                // LTM fee if applicable
+                if (mockPricing.hasLTMFee && mockPricing.ltmFeePerUnit > 0) {
+                    breakdownHTML += `<br>Setup fee (per cap): <strong>+$${mockPricing.ltmFeePerUnit.toFixed(2)}</strong>`;
+                }
+                
+                // Total per cap
+                breakdownHTML += `<br><span style="border-top: 1px solid #dee2e6; display: inline-block; padding-top: 4px; margin-top: 4px;">Total per cap: <strong style="color: #2e5827;">$${mockPricing.unitPrice.toFixed(2)}</strong></span>`;
+                
+                breakdownHTML += '</div>';
+                pricingNoteEl.innerHTML = breakdownHTML;
+                
+                console.log('Hero display updated with breakdown');
+            }
+        }
+
+        function clearConsole() {
+            consoleDiv.innerHTML = '';
+        }
+
+        // Listen for backLogoChanged event
+        window.addEventListener('backLogoChanged', (event) => {
+            console.log('Received backLogoChanged event:', event.detail);
+            heroState.backLogoEnabled = event.detail.enabled;
+            heroState.backLogoPrice = event.detail.price;
+            mockPricing.backLogoPrice = heroState.backLogoPrice;
+            mockPricing.unitPrice = mockPricing.basePrice + mockPricing.backLogoPrice;
+            updateHeroDisplay();
+        });
+
+        console.log('Test page loaded and ready');
+    </script>
+</body>
+</html>
