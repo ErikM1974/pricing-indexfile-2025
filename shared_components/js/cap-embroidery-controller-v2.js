@@ -215,10 +215,18 @@
                     window.nwcaPricingData.prices = prices;
                     window.nwcaPricingData.currentStitchCount = selectedStitchCount;
                     
-                    // Dispatch event for other components
-                    NWCA.events.emit('pricingDataUpdated', { stitchCount: selectedStitchCount, prices: prices });
+                    // Dispatch event for other components with size information
+                    NWCA.events.emit('pricingDataUpdated', { 
+                        stitchCount: selectedStitchCount, 
+                        prices: prices,
+                        sizes: sizeHeadersToDisplay 
+                    });
                     window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
-                        detail: { stitchCount: selectedStitchCount, prices: prices }
+                        detail: { 
+                            stitchCount: selectedStitchCount, 
+                            prices: prices,
+                            sizes: sizeHeadersToDisplay 
+                        }
                     }));
                 }
 

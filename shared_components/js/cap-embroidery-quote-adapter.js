@@ -251,10 +251,16 @@
             
             // Check if we have size data from the pricing system
             if (this.currentPricingData) {
-                // Check for sizes in the pricing data
+                // Check for sizes in the pricing data (sent from cap-embroidery-controller-v2)
                 if (this.currentPricingData.sizes && Array.isArray(this.currentPricingData.sizes)) {
                     console.log('[CAP-EMB-QUOTE] Using sizes from pricing data:', this.currentPricingData.sizes);
                     return this.currentPricingData.sizes;
+                }
+                
+                // Also check availableSizes property
+                if (this.currentPricingData.availableSizes && Array.isArray(this.currentPricingData.availableSizes)) {
+                    console.log('[CAP-EMB-QUOTE] Using availableSizes from pricing data:', this.currentPricingData.availableSizes);
+                    return this.currentPricingData.availableSizes;
                 }
                 
                 // Check if prices object has size keys

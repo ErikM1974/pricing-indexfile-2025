@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cap Size Detection</title>
+    
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="shared_components/css/core-styles.css">
+    <link rel="stylesheet" href="shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="shared_components/css/cap-embroidery-specific.css">
+    <link rel="stylesheet" href="shared_components/css/quote-system.css">
+    
+    <style>
+        body {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .debug-log {
+            background: #333;
+            color: #0f0;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cap Embroidery Size Detection Test</h1>
+    
+    <!-- Product Context -->
+    <div id="product-context" style="margin: 20px 0; padding: 20px; background: #e3f2fd; border-radius: 8px;">
+        <div id="product-title-context">Richardson 112 Trucker Cap</div>
+        <div id="product-style-context">112</div>
+        <div id="pricing-color-name">Navy/White</div>
+    </div>
+    
+    <!-- Stitch Count Selector -->
+    <div class="debug-section">
+        <h3>Select Stitch Count:</h3>
+        <select id="client-stitch-count-select" style="padding: 5px; font-size: 16px;">
+            <option value="4000">4,000</option>
+            <option value="6000">6,000</option>
+            <option value="8000" selected>8,000</option>
+            <option value="10000">10,000</option>
+            <option value="12000">12,000</option>
+        </select>
+    </div>
+    
+    <!-- Pricing Table (Hidden) -->
+    <div class="cbResultSetTable" style="display: none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Tier</th>
+                    <th>S/M</th>
+                    <th>M/L</th>
+                    <th>L/XL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>24-47</td>
+                    <td>25.00</td>
+                    <td>25.00</td>
+                    <td>25.00</td>
+                </tr>
+                <tr>
+                    <td>48-71</td>
+                    <td>23.00</td>
+                    <td>23.00</td>
+                    <td>23.00</td>
+                </tr>
+                <tr>
+                    <td>72+</td>
+                    <td>21.00</td>
+                    <td>21.00</td>
+                    <td>21.00</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pricing Display Grid -->
+    <div id="cap-embroidery-pricing-display">
+        <table id="custom-pricing-grid">
+            <thead>
+                <tr id="pricing-header-row"></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    
+    <!-- Quote Builder -->
+    <div class="quote-builder-section" data-embellishment-type="cap-embroidery">
+        <!-- Quote adapter will inject content here -->
+    </div>
+    
+    <!-- Debug Output -->
+    <div class="debug-section">
+        <h3>Debug Output:</h3>
+        <button class="test-button" onclick="testPricingData()">Test Pricing Data</button>
+        <button class="test-button" onclick="testSizeDetection()">Test Size Detection</button>
+        <button class="test-button" onclick="clearDebugLog()">Clear Log</button>
+        <div id="debug-log" class="debug-log"></div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="shared_components/js/nwca-namespace.js"></script>
+    <script src="shared_components/js/debug-config.js"></script>
+    <script src="shared_components/js/constants.js"></script>
+    <script src="shared_components/js/utils.js"></script>
+    <script src="shared_components/js/dp5-helper.js"></script>
+    <script src="shared_components/js/cap-embroidery-controller-v2.js"></script>
+    <script src="shared_components/js/cap-embroidery-back-logo.js"></script>
+    <script src="shared_components/js/base-quote-system.js"></script>
+    <script src="shared_components/js/quote-api-client.js"></script>
+    <script src="shared_components/js/cap-embroidery-quote-adapter.js"></script>
+    
+    <script>
+        // Debug logging
+        const debugLog = document.getElementById('debug-log');
+        
+        function log(message, data) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            if (data) {
+                logEntry.innerHTML += ': ' + JSON.stringify(data, null, 2);
+            }
+            debugLog.appendChild(logEntry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
+        
+        function clearDebugLog() {
+            debugLog.innerHTML = '';
+        }
+        
+        // Override console.log to capture debug output
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            if (args[0] && args[0].includes('[CAP-')) {
+                log(args.join(' '));
+            }
+        };
+        
+        // Test functions
+        function testPricingData() {
+            log('Testing pricing data event...');
+            
+            // Simulate pricing data with sizes
+            const testPricingData = {
+                stitchCount: '8000',
+                prices: {
+                    'S/M': { '24-47': 25, '48-71': 23, '72+': 21 },
+                    'M/L': { '24-47': 25, '48-71': 23, '72+': 21 },
+                    'L/XL': { '24-47': 25, '48-71': 23, '72+': 21 }
+                },
+                sizes: ['S/M', 'M/L', 'L/XL']
+            };
+            
+            log('Dispatching pricingDataUpdated event with data:', testPricingData);
+            
+            window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
+                detail: testPricingData
+            }));
+        }
+        
+        function testSizeDetection() {
+            log('Testing size detection...');
+            
+            if (window.capEmbroideryQuoteAdapter) {
+                const sizes = window.capEmbroideryQuoteAdapter.getAvailableSizes();
+                log('Detected sizes:', sizes);
+                
+                const pricingData = window.capEmbroideryQuoteAdapter.currentPricingData;
+                log('Current pricing data:', pricingData);
+            } else {
+                log('Quote adapter not initialized');
+            }
+        }
+        
+        // Initialize with mock data
+        window.addEventListener('DOMContentLoaded', () => {
+            log('Page loaded, initializing cap embroidery system...');
+            
+            // Mock master data for cap embroidery
+            const mockMasterData = {
+                allPriceProfiles: {
+                    '4000': {
+                        'S/M': { '24-47': 23, '48-71': 21, '72+': 19 },
+                        'M/L': { '24-47': 23, '48-71': 21, '72+': 19 },
+                        'L/XL': { '24-47': 23, '48-71': 21, '72+': 19 }
+                    },
+                    '6000': {
+                        'S/M': { '24-47': 24, '48-71': 22, '72+': 20 },
+                        'M/L': { '24-47': 24, '48-71': 22, '72+': 20 },
+                        'L/XL': { '24-47': 24, '48-71': 22, '72+': 20 }
+                    },
+                    '8000': {
+                        'S/M': { '24-47': 25, '48-71': 23, '72+': 21 },
+                        'M/L': { '24-47': 25, '48-71': 23, '72+': 21 },
+                        'L/XL': { '24-47': 25, '48-71': 23, '72+': 21 }
+                    },
+                    '10000': {
+                        'S/M': { '24-47': 26, '48-71': 24, '72+': 22 },
+                        'M/L': { '24-47': 26, '48-71': 24, '72+': 22 },
+                        'L/XL': { '24-47': 26, '48-71': 24, '72+': 22 }
+                    },
+                    '12000': {
+                        'S/M': { '24-47': 27, '48-71': 25, '72+': 23 },
+                        'M/L': { '24-47': 27, '48-71': 25, '72+': 23 },
+                        'L/XL': { '24-47': 27, '48-71': 25, '72+': 23 }
+                    }
+                },
+                tierDefinitions: {
+                    '24-47': { MinQuantity: 24, MaxQuantity: 47, TierLabel: '24-47', TierOrder: 1 },
+                    '48-71': { MinQuantity: 48, MaxQuantity: 71, TierLabel: '48-71', TierOrder: 2 },
+                    '72+': { MinQuantity: 72, MaxQuantity: 99999, TierLabel: '72+', TierOrder: 3 }
+                },
+                groupedHeaders: ['S/M', 'M/L', 'L/XL'],
+                embellishmentType: 'cap-embroidery'
+            };
+            
+            // Set up the controller state
+            if (NWCA.controllers.capEmbroidery) {
+                NWCA.controllers.capEmbroidery.state.masterData = mockMasterData;
+                log('Mock master data set');
+                
+                // Trigger initial display update
+                setTimeout(() => {
+                    NWCA.controllers.capEmbroidery.DataManager.updateCapPricingDisplay();
+                    log('Initial pricing display updated');
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
