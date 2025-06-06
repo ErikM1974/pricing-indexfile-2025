@@ -8,6 +8,7 @@
 
     // Helper function to update the pricing breakdown
     function updatePricingBreakdown() {
+        console.log('[HERO-BREAKDOWN] updatePricingBreakdown called');
         // Get current stitch count
         const stitchCountSelect = document.getElementById('client-stitch-count-select');
         const stitchCount = stitchCountSelect ? stitchCountSelect.value : '8000';
@@ -46,6 +47,17 @@
                 }
             }
             
+            // Get the actual displayed unit price from the hero section
+            const heroUnitPriceEl = document.querySelector('#hero-unit-price .hero-price-amount');
+            if (heroUnitPriceEl) {
+                // Use the displayed price instead of calculated price
+                const displayedPrice = parseFloat(heroUnitPriceEl.textContent.replace('$', ''));
+                if (!isNaN(displayedPrice) && displayedPrice > 0) {
+                    basePrice = displayedPrice;
+                    console.log('[HERO-BREAKDOWN] Using displayed unit price:', basePrice);
+                }
+            }
+            
             // Update base price display
             const basePriceSpan = document.getElementById('hero-base-price');
             if (basePriceSpan) {
@@ -55,16 +67,28 @@
             // Check if back logo is enabled
             let backLogoPrice = 0;
             const backLogoLine = document.getElementById('hero-back-logo-line');
+            console.log('[HERO-BREAKDOWN] Checking back logo:', {
+                addonExists: !!window.CapEmbroideryBackLogoAddon,
+                isEnabled: window.CapEmbroideryBackLogoAddon ? window.CapEmbroideryBackLogoAddon.isEnabled() : 'N/A',
+                backLogoLineFound: !!backLogoLine
+            });
+            
             if (window.CapEmbroideryBackLogoAddon && window.CapEmbroideryBackLogoAddon.isEnabled()) {
                 backLogoPrice = window.CapEmbroideryBackLogoAddon.getPrice();
+                console.log('[HERO-BREAKDOWN] Back logo enabled, price:', backLogoPrice);
+                
                 if (backLogoLine) {
                     backLogoLine.style.display = 'block';
                     const backLogoPriceSpan = document.getElementById('hero-back-logo-price');
                     if (backLogoPriceSpan) {
                         backLogoPriceSpan.textContent = backLogoPrice.toFixed(2);
                     }
+                    console.log('[HERO-BREAKDOWN] Back logo line shown');
+                } else {
+                    console.error('[HERO-BREAKDOWN] hero-back-logo-line element not found!');
                 }
             } else {
+                console.log('[HERO-BREAKDOWN] Back logo not enabled or addon not found');
                 if (backLogoLine) {
                     backLogoLine.style.display = 'none';
                 }
@@ -105,6 +129,9 @@
         console.log('[HERO-BREAKDOWN] Pricing data updated, refreshing breakdown');
         updatePricingBreakdown();
     });
+    
+    // Check if CapEmbroideryBackLogoAddon is available on load
+    console.log('[HERO-BREAKDOWN] Initial check - CapEmbroideryBackLogoAddon available:', !!window.CapEmbroideryBackLogoAddon);
     
     // Listen for quantity changes
     document.addEventListener('DOMContentLoaded', function() {

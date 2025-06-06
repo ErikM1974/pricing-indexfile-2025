@@ -30,6 +30,15 @@
                 }
             }));
             
+            // Also dispatch the events that other components are listening for
+            window.dispatchEvent(new CustomEvent('backLogoToggled', {
+                detail: {
+                    enabled: BACK_LOGO_CONFIG.enabled,
+                    price: BACK_LOGO_CONFIG.price,
+                    stitchCount: BACK_LOGO_CONFIG.stitchCount
+                }
+            }));
+            
             // Trigger UI update
             if (window.updateCartTotal) {
                 window.updateCartTotal();
@@ -65,6 +74,15 @@
                 BACK_LOGO_CONFIG.price = Math.ceil(numCount / 1000);
                 console.log(`[CAP-EMB-BACK-LOGO] Back logo stitch count set to ${numCount}, price: $${BACK_LOGO_CONFIG.price}`);
                 
+                // Dispatch event for components listening to stitch count changes
+                window.dispatchEvent(new CustomEvent('backLogoUpdated', {
+                    detail: {
+                        enabled: BACK_LOGO_CONFIG.enabled,
+                        price: BACK_LOGO_CONFIG.price,
+                        stitchCount: BACK_LOGO_CONFIG.stitchCount
+                    }
+                }));
+                
                 // Trigger UI update
                 if (window.updateCartTotal) {
                     window.updateCartTotal();
@@ -97,11 +115,20 @@
                     const pricingDisplaySectionDiv = document.getElementById('back-logo-pricing-display');
 
                     if (detailsDiv) {
-                        detailsDiv.style.setProperty('display', this.checked ? 'block' : 'none', 'important');
-                        console.log('[CAP-EMB-BACK-LOGO] Set detailsDiv.style.display to:', detailsDiv.style.display);
+                        if (this.checked) {
+                            detailsDiv.style.display = 'block';
+                            detailsDiv.classList.add('show');
+                            // Force a reflow to ensure the change takes effect
+                            detailsDiv.offsetHeight;
+                        } else {
+                            detailsDiv.style.display = 'none';
+                            detailsDiv.classList.remove('show');
+                        }
+                        console.log('[CAP-EMB-BACK-LOGO] Details div display:', detailsDiv.style.display, 'computed:', window.getComputedStyle(detailsDiv).display);
                     } else {
-                        console.warn('[CAP-EMB-BACK-LOGO] #back-logo-details not found in its own listener.');
+                        console.warn('[CAP-EMB-BACK-LOGO] #back-logo-details not found');
                     }
+                    
                     if (pricingDisplaySectionDiv) {
                         pricingDisplaySectionDiv.style.setProperty('display', this.checked ? 'block' : 'none', 'important');
                         console.log('[CAP-EMB-BACK-LOGO] Set pricingDisplaySectionDiv.style.display to:', pricingDisplaySectionDiv.style.display);
@@ -115,11 +142,18 @@
                             window.HeroQuantityCalculator.updateDisplay();
                         }, 100);
                     }
+                    
+                    // Also force hero breakdown update
+                    if (window.updateCapEmbroideryHeroBreakdown) {
+                        console.log('[CAP-EMB-BACK-LOGO] Forcing hero breakdown update');
+                        window.updateCapEmbroideryHeroBreakdown();
+                    }
 
                 });
                 
-                // Set initial state
-                checkbox.checked = BACK_LOGO_CONFIG.enabled;
+                // Set initial state from checkbox or config
+                BACK_LOGO_CONFIG.enabled = checkbox.checked;
+                console.log('[CAP-EMB-BACK-LOGO] Initial checkbox state:', checkbox.checked, 'Setting config to match');
             } else {
                 console.warn('[CAP-EMB-BACK-LOGO] No existing back logo checkbox found');
             }
@@ -164,6 +198,12 @@
                             window.HeroQuantityCalculator.updateDisplay();
                         }, 100);
                     }
+                    
+                    // Also force hero breakdown update
+                    if (window.updateCapEmbroideryHeroBreakdown) {
+                        console.log('[CAP-EMB-BACK-LOGO] Forcing hero breakdown update after stitch count change');
+                        window.updateCapEmbroideryHeroBreakdown();
+                    }
                 };
                 
                 // Remove existing listeners
@@ -203,6 +243,39 @@
             }
 
             console.log('[CAP-EMB-BACK-LOGO] Initialization complete');
+            
+            // Trigger initial update if back logo is enabled
+            if (BACK_LOGO_CONFIG.enabled) {
+                console.log('[CAP-EMB-BACK-LOGO] Back logo is enabled on init, triggering update');
+                // Dispatch events to notify other components
+                window.dispatchEvent(new CustomEvent('backLogoToggled', {
+                    detail: {
+                        enabled: BACK_LOGO_CONFIG.enabled,
+                        price: BACK_LOGO_CONFIG.price,
+                        stitchCount: BACK_LOGO_CONFIG.stitchCount
+                    }
+                }));
+                
+                // Force hero breakdown update
+                if (window.updateCapEmbroideryHeroBreakdown) {
+                    setTimeout(() => {
+                        window.updateCapEmbroideryHeroBreakdown();
+                    }, 500);
+                }
+            }
+        }
+    };
+    
+    // Create alias for compatibility with other components
+    window.CapEmbroideryBackLogoAddon = {
+        isEnabled: function() {
+            return window.capEmbroideryBackLogo.isEnabled();
+        },
+        getPrice: function() {
+            return window.capEmbroideryBackLogo.getPricePerItem();
+        },
+        getStitchCount: function() {
+            return window.capEmbroideryBackLogo.getStitchCount();
         }
     };
 
@@ -210,6 +283,8 @@
     function initialize() {
         // Only initialize on cap embroidery pages
         const isCapEmbroidery = window.location.href.toLowerCase().includes('cap-embroidery') || 
+                               window.location.href.toLowerCase().includes('cap_embroidery') ||
+                               window.location.href.toLowerCase().includes('test-back-logo') ||
                                document.title.toLowerCase().includes('cap embroidery');
         
         if (!isCapEmbroidery) {
