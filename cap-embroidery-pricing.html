@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="/shared_components/css/color-matrix.css">
     <link rel="stylesheet" href="/shared_components/css/cumulative-quote.css">
     <link rel="stylesheet" href="/shared_components/css/cumulative-quote-fix.css">
+    <link rel="stylesheet" href="/shared_components/css/hero-pricing-breakdown.css">
     
 <!-- jsPDF Libraries for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -161,6 +162,14 @@
                 </div>
                 <div id="hero-total-price" class="hero-total-price hero-price-secondary">
                     <span class="hero-price-prefix">Total:</span> $625.00
+                </div>
+                <div id="hero-pricing-breakdown" class="hero-pricing-breakdown" style="margin-top: 10px; font-size: 0.85em; color: #666; line-height: 1.4;">
+                    <div>Front logo (<span id="hero-stitch-count">8,000</span> stitches): $<span id="hero-base-price">12.50</span></div>
+                    <div id="hero-back-logo-line" style="display: none;">Back logo: +$<span id="hero-back-logo-price">5.00</span></div>
+                    <div id="hero-setup-fee-line" style="display: none;">Setup fee (per cap): +$<span id="hero-setup-fee">0.00</span></div>
+                    <div style="margin-top: 5px; padding-top: 5px; border-top: 1px solid #ddd;">
+                        <strong>Total per cap: $<span id="hero-total-per-cap">12.50</span></strong>
+                    </div>
                 </div>
                 <div class="hero-pricing-note">Pricing based on 8,000 stitches</div>
             </div>
@@ -467,6 +476,7 @@
     <!-- Cap Embroidery Specific - Load after dependencies -->
     <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script> <!-- Main controller (depends on NWCA, pricing) -->
     <script src="/shared_components/js/cap-embroidery-back-logo.js"></script> <!-- Back logo functionality -->
+    <script src="/shared_components/js/cap-embroidery-hero-breakdown.js"></script> <!-- Hero pricing breakdown -->
     <script src="/shared_components/js/cap-embroidery-validation.js"></script> <!-- Validation utilities -->
     <script src="/shared_components/js/cap-embroidery-quote-adapter.js?v=2.1"></script> <!-- Quote adapter (depends on base) - v2.1 with size handling fix -->
     
