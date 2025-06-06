@@ -1424,6 +1424,24 @@
             document.body.appendChild(summaryPanel);
         }
 
+        // Get tier price for a given quantity
+        getTierPrice(quantity) {
+            if (quantity >= 72) return 21;
+            if (quantity >= 48) return 23;
+            if (quantity >= 24) return 25;
+            return 0; // Below minimum
+        }
+        
+        // Get next tier info
+        getNextTierInfo(currentQuantity) {
+            if (currentQuantity < 48) {
+                return { tier: '48-71', minQty: 48, price: 23 };
+            } else if (currentQuantity < 72) {
+                return { tier: '72+', minQty: 72, price: 21 };
+            }
+            return null; // Already at highest tier
+        }
+        
         // Display quote summary
         displayQuoteSummary(quote = null) {
             console.log('[CAP-EMB-QUOTE] displayQuoteSummary called');
@@ -1443,24 +1461,127 @@
                 const summaryContent = document.getElementById('quote-summary-content');
                 if (summaryContent) {
                     const currentTier = this.determinePricingTier(quoteData.totalQuantity);
+                    const nextTier = this.getNextTierInfo(quoteData.totalQuantity);
+                    
+                    // Build detailed line items HTML
+                    let lineItemsHTML = '';
+                    if (quoteData.items && quoteData.items.length > 0) {
+                        lineItemsHTML = '<div style="margin: 15px 0; border-top: 1px solid #ddd; padding-top: 15px;">';
+                        lineItemsHTML += '<h4 style="margin: 0 0 10px 0;">Quote Details:</h4>';
+                        
+                        quoteData.items.forEach((item, index) => {
+                            const itemTotal = item.quantity * item.unitPrice;
+                            lineItemsHTML += `
+                                <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                                    <div style="font-weight: bold; color: #333;">Item ${index + 1}: ${item.productName}</div>
+                                    <div style="font-size: 0.9em; color: #666; margin: 5px 0;">
+                                        Style: ${item.styleNumber} | Color: ${item.color}
+                                    </div>
+                                    <div style="font-size: 0.9em; margin: 5px 0;">
+                                        Stitch Count: ${item.stitchCount || '8000'}
+                                        ${item.hasBackLogo ? ' | <span style="color: #28a745;">✓ Back Logo</span>' : ''}
+                                    </div>
+                                    <div style="margin-top: 8px;">
+                                        <table style="width: 100%; font-size: 0.9em;">
+                                            <tr>
+                                                <td>Quantity:</td>
+                                                <td style="text-align: right;">${item.quantity} caps</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Unit Price:</td>
+                                                <td style="text-align: right;">$${item.unitPrice.toFixed(2)}</td>
+                                            </tr>
+                                            <tr style="font-weight: bold;">
+                                                <td>Line Total:</td>
+                                                <td style="text-align: right;">$${itemTotal.toFixed(2)}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    ${item.sizeBreakdown ? `
+                                        <div style="margin-top: 8px; font-size: 0.85em; color: #666;">
+                                            Size Breakdown: ${Object.entries(item.sizeBreakdown)
+                                                .filter(([size, qty]) => qty > 0)
+                                                .map(([size, qty]) => `${size}: ${qty}`)
+                                                .join(', ')}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        });
+                        lineItemsHTML += '</div>';
+                    }
+                    
+                    // Calculate savings info
+                    let savingsHTML = '';
+                    if (quoteData.totalQuantity >= 48) {
+                        const basePrice = 25; // 24-47 tier price
+                        const currentPrice = quoteData.totalQuantity >= 72 ? 21 : 23;
+                        const totalSavings = (basePrice - currentPrice) * quoteData.totalQuantity;
+                        const percentSavings = ((basePrice - currentPrice) / basePrice * 100).toFixed(0);
+                        
+                        savingsHTML = `
+                            <div style="margin: 10px 0; padding: 10px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px;">
+                                <div style="color: #155724; font-weight: bold;">
+                                    💰 Volume Savings: $${totalSavings.toFixed(2)} (${percentSavings}% off)
+                                </div>
+                                <div style="font-size: 0.85em; color: #155724; margin-top: 5px;">
+                                    Unit price: $${currentPrice} (vs $${basePrice} for smaller quantities)
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Next tier info
+                    let nextTierHTML = '';
+                    if (nextTier) {
+                        const unitsToNext = nextTier.minQty - quoteData.totalQuantity;
+                        const potentialSavings = (this.getTierPrice(quoteData.totalQuantity) - nextTier.price) * nextTier.minQty;
+                        
+                        nextTierHTML = `
+                            <div style="margin: 10px 0; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px;">
+                                <div style="color: #856404; font-size: 0.9em;">
+                                    📈 Add ${unitsToNext} more caps to reach <strong>${nextTier.tier}</strong> pricing
+                                </div>
+                                <div style="color: #856404; font-size: 0.85em; margin-top: 5px;">
+                                    Save an additional $${potentialSavings.toFixed(2)} at $${nextTier.price}/unit
+                                </div>
+                            </div>
+                        `;
+                    }
                     
                     summaryContent.innerHTML = `
-                        <div style="margin-bottom: 8px;">
-                            <strong>Total Items:</strong> ${quoteData.totalQuantity} caps
-                        </div>
-                        <div style="margin-bottom: 8px;">
-                            <strong>Current Tier:</strong> ${currentTier}
-                        </div>
-                        <div style="margin-bottom: 8px;">
-                            <strong>Subtotal:</strong> $${quoteData.subtotal.toFixed(2)}
-                        </div>
-                        ${quoteData.ltmTotal > 0 ? `
-                            <div style="margin-bottom: 8px; color: #dc3545;">
-                                <strong>LTM Fee:</strong> $${quoteData.ltmTotal.toFixed(2)}
+                        <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #ddd;">
+                            <h4 style="margin: 0 0 10px 0;">Pricing Summary</h4>
+                            <div style="margin-bottom: 8px;">
+                                <strong>Total Quantity:</strong> ${quoteData.totalQuantity} caps
                             </div>
-                        ` : ''}
-                        <div style="font-size: 1.1em; color: ${this.config.brandColor};">
-                            <strong>Total:</strong> $${quoteData.grandTotal.toFixed(2)}
+                            <div style="margin-bottom: 8px;">
+                                <strong>Current Price Tier:</strong> ${currentTier}
+                                <span style="font-size: 0.85em; color: #666;">
+                                    (${this.getTierPrice(quoteData.totalQuantity)}/unit)
+                                </span>
+                            </div>
+                            ${savingsHTML}
+                            ${nextTierHTML}
+                        </div>
+                        
+                        ${lineItemsHTML}
+                        
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #ddd;">
+                            <div style="margin-bottom: 8px;">
+                                <strong>Subtotal:</strong> 
+                                <span style="float: right;">$${quoteData.subtotal.toFixed(2)}</span>
+                            </div>
+                            ${quoteData.ltmTotal > 0 ? `
+                                <div style="margin-bottom: 8px; color: #dc3545;">
+                                    <strong>LTM Fee:</strong> 
+                                    <span style="float: right;">$${quoteData.ltmTotal.toFixed(2)}</span>
+                                </div>
+                            ` : ''}
+                            <div style="font-size: 1.2em; font-weight: bold; color: ${this.config.brandColor}; margin-top: 10px;">
+                                <strong>Total:</strong> 
+                                <span style="float: right;">$${quoteData.grandTotal.toFixed(2)}</span>
+                            </div>
                         </div>
                     `;
                 }
