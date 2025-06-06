@@ -1467,8 +1467,18 @@
                 console.log('[CAP-EMB-QUOTE] Setting panel display to block');
                 summaryPanel.style.display = 'block';
                 
-                // Force style application
+                // Force the sidebar to be visible by overriding any transform/positioning issues
                 summaryPanel.style.setProperty('display', 'block', 'important');
+                summaryPanel.style.setProperty('transform', 'translateX(0)', 'important');
+                summaryPanel.style.setProperty('visibility', 'visible', 'important');
+                summaryPanel.style.setProperty('opacity', '1', 'important');
+                summaryPanel.style.setProperty('right', '20px', 'important');
+                summaryPanel.style.setProperty('bottom', '20px', 'important');
+                summaryPanel.style.setProperty('position', 'fixed', 'important');
+                summaryPanel.style.setProperty('z-index', '10000', 'important');
+                
+                // Add the is-open class in case CSS uses it
+                summaryPanel.classList.add('is-open');
                 
                 // Log computed styles for debugging
                 const computed = window.getComputedStyle(summaryPanel);
@@ -1477,6 +1487,9 @@
                     visibility: computed.visibility,
                     opacity: computed.opacity,
                     position: computed.position,
+                    transform: computed.transform,
+                    right: computed.right,
+                    bottom: computed.bottom,
                     zIndex: computed.zIndex
                 });
             } else {

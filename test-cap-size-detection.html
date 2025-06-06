@@ -128,6 +128,7 @@
         <h3>Debug Output:</h3>
         <button class="test-button" onclick="testPricingData()">Test Pricing Data</button>
         <button class="test-button" onclick="testSizeDetection()">Test Size Detection</button>
+        <button class="test-button" onclick="showQuoteSidebar()" style="background: #28a745;">Show Quote Sidebar</button>
         <button class="test-button" onclick="clearDebugLog()">Clear Log</button>
         <div id="debug-log" class="debug-log"></div>
     </div>
@@ -161,6 +162,37 @@
         
         function clearDebugLog() {
             debugLog.innerHTML = '';
+        }
+        
+        function showQuoteSidebar() {
+            log('Manually showing quote sidebar...');
+            const sidebar = document.getElementById('cumulative-quote-summary');
+            if (sidebar) {
+                // Force show the sidebar with all necessary styles
+                sidebar.style.cssText = `
+                    display: block !important;
+                    position: fixed !important;
+                    bottom: 20px !important;
+                    right: 20px !important;
+                    transform: translateX(0) !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    z-index: 10000 !important;
+                    background: white !important;
+                    border: 1px solid #ddd !important;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+                    padding: 20px !important;
+                    min-width: 300px !important;
+                `;
+                log('Sidebar styles applied');
+                
+                // Also try to display quote summary
+                if (window.capEmbroideryQuoteAdapter) {
+                    window.capEmbroideryQuoteAdapter.displayQuoteSummary();
+                }
+            } else {
+                log('Sidebar element not found!');
+            }
         }
         
         // Override console.log to capture debug output
@@ -304,6 +336,12 @@
                             log('Setting pricing data directly on adapter');
                             window.capEmbroideryQuoteAdapter.currentPricingData = initialPricingData;
                             window.capEmbroideryQuoteAdapter.populateSizeQuantityGrid();
+                            
+                            // Call updatePricingDisplay to show unit prices
+                            setTimeout(() => {
+                                log('Calling updatePricingDisplay to show unit prices');
+                                window.capEmbroideryQuoteAdapter.updatePricingDisplay();
+                            }, 200);
                         }
                     }, 500);
                 }, 100);
