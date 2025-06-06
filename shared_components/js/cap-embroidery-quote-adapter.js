@@ -14,7 +14,7 @@
     console.log('[CAP-EMB-QUOTE] Current URL:', window.location.href);
     console.log('[CAP-EMB-QUOTE] DEBUG_MODE:', window.DEBUG_MODE);
     console.log('[CAP-EMB-QUOTE] Force debug:', forceDebug);
-    console.log('[CAP-EMB-QUOTE] Script version: 2.0'); // Increment this to verify cache refresh
+    console.log('[CAP-EMB-QUOTE] Script version: 2.1'); // Increment this to verify cache refresh
 
     // Cap embroidery specific configuration
     const CAP_EMBROIDERY_CONFIG = {
@@ -245,14 +245,63 @@
             });
         }
         
-        // Get available sizes (for caps, typically just OS)
+        // Get available sizes (for caps, typically just OS but some have S/M, M/L, L/XL)
         getAvailableSizes() {
+            console.log('[CAP-EMB-QUOTE] Getting available sizes, currentPricingData:', this.currentPricingData);
+            
             // Check if we have size data from the pricing system
-            if (this.currentPricingData && this.currentPricingData.sizes) {
-                return this.currentPricingData.sizes;
+            if (this.currentPricingData) {
+                // Check for sizes in the pricing data
+                if (this.currentPricingData.sizes && Array.isArray(this.currentPricingData.sizes)) {
+                    console.log('[CAP-EMB-QUOTE] Using sizes from pricing data:', this.currentPricingData.sizes);
+                    return this.currentPricingData.sizes;
+                }
+                
+                // Check if prices object has size keys
+                if (this.currentPricingData.prices) {
+                    const priceKeys = Object.keys(this.currentPricingData.prices);
+                    console.log('[CAP-EMB-QUOTE] Price keys:', priceKeys);
+                    
+                    // Extract unique sizes from price keys
+                    // Price keys might be like "8000_S/M", "8000_M/L", etc.
+                    const sizes = new Set();
+                    
+                    // First check if we have tier-based pricing (e.g., {"S/M": {"24-47": 25, "48-71": 23}})
+                    for (const key of priceKeys) {
+                        if (key.includes('/') && !key.includes('_')) {
+                            // This looks like a size key (S/M, M/L, L/XL)
+                            sizes.add(key);
+                        }
+                    }
+                    
+                    // If we found sizes this way, use them
+                    if (sizes.size > 0) {
+                        const sizeArray = Array.from(sizes);
+                        console.log('[CAP-EMB-QUOTE] Extracted sizes from tier pricing:', sizeArray);
+                        return sizeArray;
+                    }
+                    
+                    // Otherwise try to extract from stitch_size format
+                    priceKeys.forEach(key => {
+                        const parts = key.split('_');
+                        if (parts.length >= 2) {
+                            const size = parts[parts.length - 1]; // Get last part
+                            if (size && size !== key) { // Make sure we actually split something
+                                sizes.add(size);
+                            }
+                        }
+                    });
+                    
+                    if (sizes.size > 0) {
+                        const sizeArray = Array.from(sizes);
+                        console.log('[CAP-EMB-QUOTE] Extracted sizes from price keys:', sizeArray);
+                        return sizeArray;
+                    }
+                }
             }
             
-            // Default for cap embroidery
+            // Default for cap embroidery - most caps are OS, but some have sized options
+            console.log('[CAP-EMB-QUOTE] Using default size: OS');
             return ['OS']; // One Size
         }
         
@@ -334,15 +383,43 @@
             
             // Listen for pricing data updates
             this.eventHandlers.pricingDataUpdated = (e) => {
+                console.log('[CAP-EMB-QUOTE] Pricing data updated:', e.detail);
                 this.currentPricingData = e.detail;
+                
                 // Check if we need to update available sizes
                 const currentSizes = this.getAvailableSizes();
                 const gridContainer = document.getElementById('size-quantity-grid');
+                
                 if (gridContainer && currentSizes.length > 0) {
                     const existingInputs = gridContainer.querySelectorAll('.quantity-input[data-size]');
-                    // If no inputs exist or sizes changed, repopulate
-                    if (existingInputs.length === 0) {
+                    const existingSizes = Array.from(existingInputs).map(input => input.getAttribute('data-size'));
+                    
+                    // Check if sizes have changed
+                    const sizesChanged = currentSizes.length !== existingSizes.length || 
+                                       !currentSizes.every(size => existingSizes.includes(size));
+                    
+                    if (existingInputs.length === 0 || sizesChanged) {
+                        console.log('[CAP-EMB-QUOTE] Sizes changed, repopulating grid. Old:', existingSizes, 'New:', currentSizes);
+                        // Save current quantities before repopulating
+                        const savedQuantities = {};
+                        existingInputs.forEach(input => {
+                            const size = input.getAttribute('data-size');
+                            const qty = parseInt(input.value) || 0;
+                            if (qty > 0) {
+                                savedQuantities[size] = qty;
+                            }
+                        });
+                        
+                        // Repopulate grid
                         this.populateSizeQuantityGrid();
+                        
+                        // Restore quantities for matching sizes
+                        Object.entries(savedQuantities).forEach(([size, qty]) => {
+                            const newInput = gridContainer.querySelector(`.quantity-input[data-size="${size}"]`);
+                            if (newInput) {
+                                newInput.value = qty;
+                            }
+                        });
                     }
                 }
                 this.updatePricingDisplay();
@@ -419,30 +496,60 @@
         // Get base price for a specific size
         getBasePriceForSize(size) {
             if (!this.currentPricingData || !this.currentPricingData.prices) {
+                console.log('[CAP-EMB-QUOTE] No pricing data available');
                 return 0;
             }
             
-            // Check if we have direct size pricing structure
-            if (this.currentPricingData.prices[size]) {
-                // We need to determine which tier to use for a single item (should be lowest tier)
-                const tierPrices = this.currentPricingData.prices[size];
+            const prices = this.currentPricingData.prices;
+            console.log('[CAP-EMB-QUOTE] Getting base price for size:', size, 'from prices:', prices);
+            
+            // Check if we have direct size pricing structure (e.g., prices["S/M"]["24-47"])
+            if (prices[size] && typeof prices[size] === 'object') {
+                // We have tier-based pricing for this size
+                const tierPrices = prices[size];
                 const tierKeys = Object.keys(tierPrices).sort((a, b) => {
                     // Sort tiers by minimum quantity
-                    const aMin = parseInt(a.split('-')[0]) || 0;
-                    const bMin = parseInt(b.split('-')[0]) || 0;
+                    const aMin = parseInt(a.split('-')[0]) || parseInt(a.replace('+', '')) || 0;
+                    const bMin = parseInt(b.split('-')[0]) || parseInt(b.replace('+', '')) || 0;
                     return aMin - bMin;
                 });
                 
                 if (tierKeys.length > 0) {
-                    // Use the first tier (lowest quantity tier) for base pricing
-                    const firstTier = tierKeys[0];
-                    return tierPrices[firstTier];
+                    // Get current quantity to determine tier
+                    const currentQty = this.getTotalQuantityFromInputs();
+                    const existingQty = this.currentQuote ? this.currentQuote.totalQuantity : 0;
+                    const totalQty = currentQty + existingQty;
+                    
+                    // Find appropriate tier
+                    let selectedTier = tierKeys[0]; // Default to first tier
+                    for (const tier of tierKeys) {
+                        const [min, max] = tier.split('-').map(s => parseInt(s.replace('+', '')) || 999999);
+                        if (totalQty >= min && (tier.includes('+') || totalQty <= max)) {
+                            selectedTier = tier;
+                            break;
+                        }
+                    }
+                    
+                    console.log('[CAP-EMB-QUOTE] Selected tier:', selectedTier, 'for quantity:', totalQty);
+                    return parseFloat(tierPrices[selectedTier]) || 0;
                 }
             }
             
-            // Fallback: try the old key format
-            const priceKey = `${this.currentStitchCount}_${size}`;
-            return this.currentPricingData.prices[priceKey] || 0;
+            // Try stitch count + size format (e.g., "8000_S/M")
+            const stitchSizeKey = `${this.currentStitchCount}_${size}`;
+            if (prices[stitchSizeKey]) {
+                console.log('[CAP-EMB-QUOTE] Found price with stitch+size key:', stitchSizeKey);
+                return parseFloat(prices[stitchSizeKey]) || 0;
+            }
+            
+            // Try just stitch count (for OS items)
+            if (size === 'OS' && prices[this.currentStitchCount]) {
+                console.log('[CAP-EMB-QUOTE] Found price with stitch count only:', this.currentStitchCount);
+                return parseFloat(prices[this.currentStitchCount]) || 0;
+            }
+            
+            console.log('[CAP-EMB-QUOTE] No price found for size:', size);
+            return 0;
         }
 
         // Override getTierPrice for cap embroidery specific pricing
