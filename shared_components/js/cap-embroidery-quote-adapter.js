@@ -1425,7 +1425,7 @@
         }
 
         // Get tier price for a given quantity
-        getTierPrice(quantity) {
+        getTierPriceByQuantity(quantity) {
             if (quantity >= 72) return 21;
             if (quantity >= 48) return 23;
             if (quantity >= 24) return 25;
@@ -1458,7 +1458,9 @@
             console.log('[CAP-EMB-QUOTE] Total quantity:', quoteData ? quoteData.totalQuantity : 0);
             
             if (quoteData && quoteData.totalQuantity > 0) {
+                console.log('[CAP-EMB-QUOTE] Quote has items, showing summary');
                 const summaryContent = document.getElementById('quote-summary-content');
+                console.log('[CAP-EMB-QUOTE] Summary content element:', summaryContent);
                 if (summaryContent) {
                     const currentTier = this.determinePricingTier(quoteData.totalQuantity);
                     const nextTier = this.getNextTierInfo(quoteData.totalQuantity);
@@ -1471,7 +1473,9 @@
                         lineItemsHTML += '<h4 style="margin: 0 0 10px 0;">Quote Details:</h4>';
                         
                         quoteData.items.forEach((item, index) => {
-                            const itemTotal = item.quantity * item.unitPrice;
+                            // Use finalUnitPrice or unitPrice, whichever is available
+                            const unitPrice = item.finalUnitPrice || item.unitPrice || 0;
+                            const itemTotal = item.lineTotal || (item.quantity * unitPrice);
                             lineItemsHTML += `
                                 <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
                                     <div style="font-weight: bold; color: #333;">Item ${index + 1}: ${item.productName}</div>
@@ -1490,7 +1494,7 @@
                                             </tr>
                                             <tr>
                                                 <td>Unit Price:</td>
-                                                <td style="text-align: right;">$${item.unitPrice.toFixed(2)}</td>
+                                                <td style="text-align: right;">$${unitPrice.toFixed(2)}</td>
                                             </tr>
                                             <tr style="font-weight: bold;">
                                                 <td>Line Total:</td>
@@ -1536,7 +1540,7 @@
                     let nextTierHTML = '';
                     if (nextTier) {
                         const unitsToNext = nextTier.minQty - quoteData.totalQuantity;
-                        const potentialSavings = (this.getTierPrice(quoteData.totalQuantity) - nextTier.price) * nextTier.minQty;
+                        const potentialSavings = (this.getTierPriceByQuantity(quoteData.totalQuantity) - nextTier.price) * nextTier.minQty;
                         
                         nextTierHTML = `
                             <div style="margin: 10px 0; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px;">
@@ -1560,7 +1564,7 @@
                             <div style="margin-bottom: 8px;">
                                 <strong>Current Price Tier:</strong> ${currentTier}
                                 <span style="font-size: 0.85em; color: #666;">
-                                    (${this.getTierPrice(quoteData.totalQuantity)}/unit)
+                                    ($${this.getTierPriceByQuantity(quoteData.totalQuantity)}/unit)
                                 </span>
                             </div>
                             ${savingsHTML}
@@ -1586,6 +1590,9 @@
                             </div>
                         </div>
                     `;
+                    console.log('[CAP-EMB-QUOTE] Enhanced summary HTML set successfully');
+                } else {
+                    console.log('[CAP-EMB-QUOTE] Summary content element not found!');
                 }
                 console.log('[CAP-EMB-QUOTE] Setting panel display to block');
                 summaryPanel.style.display = 'block';
