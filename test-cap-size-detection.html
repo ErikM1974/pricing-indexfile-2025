@@ -130,6 +130,7 @@
         <h3>Debug Output:</h3>
         <button class="test-button" onclick="testPricingData()">Test Pricing Data</button>
         <button class="test-button" onclick="testSizeDetection()">Test Size Detection</button>
+        <button class="test-button" onclick="updatePricing()" style="background: #ff9800;">Update Pricing</button>
         <button class="test-button" onclick="showQuoteSidebar()" style="background: #28a745;">Show Quote Sidebar</button>
         <button class="test-button" onclick="clearDebugLog()">Clear Log</button>
         <div id="debug-log" class="debug-log"></div>
@@ -194,6 +195,31 @@
                 }
             } else {
                 log('Sidebar element not found!');
+            }
+        }
+        
+        // Manual function to update pricing display
+        function updatePricing() {
+            log('Manually updating pricing...');
+            if (window.capEmbroideryQuoteAdapter) {
+                // Set pricing data if not already set
+                if (!window.capEmbroideryQuoteAdapter.currentPricingData) {
+                    const pricingData = {
+                        stitchCount: '8000',
+                        prices: {
+                            'S/M': { '24-47': 25, '48-71': 23, '72+': 21 },
+                            'M/L': { '24-47': 25, '48-71': 23, '72+': 21 },
+                            'L/XL': { '24-47': 25, '48-71': 23, '72+': 21 }
+                        },
+                        sizes: ['S/M', 'M/L', 'L/XL']
+                    };
+                    window.capEmbroideryQuoteAdapter.currentPricingData = pricingData;
+                    log('Pricing data set manually');
+                }
+                window.capEmbroideryQuoteAdapter.updatePricingDisplay();
+                log('Called updatePricingDisplay');
+            } else {
+                log('Quote adapter not found');
             }
         }
         
@@ -310,30 +336,33 @@
             };
             
             // Set up the controller state
-            if (NWCA.controllers.capEmbroidery) {
+            if (NWCA && NWCA.controllers && NWCA.controllers.capEmbroidery) {
                 NWCA.controllers.capEmbroidery.state.masterData = mockMasterData;
                 log('Mock master data set');
                 
                 // Trigger initial display update and send pricing data to quote adapter
                 setTimeout(() => {
-                    NWCA.controllers.capEmbroidery.DataManager.updateCapPricingDisplay();
-                    log('Initial pricing display updated');
+                    if (NWCA.controllers.capEmbroidery.DataManager) {
+                        NWCA.controllers.capEmbroidery.DataManager.updateCapPricingDisplay();
+                        log('Initial pricing display updated');
+                    } else {
+                        log('DataManager not available, sending pricing data directly');
+                    }
                     
-                    // Wait a bit more for the quote adapter to initialize
+                    // Send pricing data regardless of controller state
+                    const initialPricingData = {
+                        stitchCount: '8000',
+                        prices: mockMasterData.allPriceProfiles['8000'],
+                        sizes: mockMasterData.groupedHeaders
+                    };
+                    
+                    log('Sending initial pricing data to quote adapter:', initialPricingData);
+                    window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
+                        detail: initialPricingData
+                    }));
+                    
+                    // Also set it directly if the adapter exists
                     setTimeout(() => {
-                        // Send initial pricing data with sizes
-                        const initialPricingData = {
-                            stitchCount: '8000',
-                            prices: mockMasterData.allPriceProfiles['8000'],
-                            sizes: mockMasterData.groupedHeaders
-                        };
-                        
-                        log('Sending initial pricing data to quote adapter:', initialPricingData);
-                        window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
-                            detail: initialPricingData
-                        }));
-                        
-                        // Also set it directly if the adapter exists
                         if (window.capEmbroideryQuoteAdapter) {
                             log('Setting pricing data directly on adapter');
                             window.capEmbroideryQuoteAdapter.currentPricingData = initialPricingData;
@@ -344,9 +373,27 @@
                                 log('Calling updatePricingDisplay to show unit prices');
                                 window.capEmbroideryQuoteAdapter.updatePricingDisplay();
                             }, 200);
+                        } else {
+                            log('Quote adapter not available yet');
                         }
                     }, 500);
-                }, 100);
+                }, 300);
+            } else {
+                log('NWCA.controllers.capEmbroidery not available');
+                
+                // Still send pricing data even without controller
+                setTimeout(() => {
+                    const initialPricingData = {
+                        stitchCount: '8000',
+                        prices: mockMasterData.allPriceProfiles['8000'],
+                        sizes: mockMasterData.groupedHeaders
+                    };
+                    
+                    log('Sending initial pricing data without controller:', initialPricingData);
+                    window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
+                        detail: initialPricingData
+                    }));
+                }, 500);
             }
         });
     </script>

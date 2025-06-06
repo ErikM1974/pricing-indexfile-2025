@@ -395,7 +395,7 @@
             // Listen for pricing data updates
             this.eventHandlers.pricingDataUpdated = (e) => {
                 console.log('[CAP-EMB-QUOTE] Pricing data updated event received');
-                console.log('[CAP-EMB-QUOTE] Event detail:', e.detail);
+                console.log('[CAP-EMB-QUOTE] Event detail:', JSON.stringify(e.detail));
                 this.currentPricingData = e.detail;
                 
                 // Check if we need to update available sizes
