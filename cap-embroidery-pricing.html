@@ -357,6 +357,14 @@
                     <!-- Quote adapter will inject content here -->
                     <!-- This container exists to satisfy the quote adapter's expectations -->
                 </div>
+                
+                <!-- Debug button for testing sidebar -->
+                <div style="margin-top: 20px; text-align: center;">
+                    <button onclick="if(window.capEmbroideryQuoteAdapter) { window.capEmbroideryQuoteAdapter.displayQuoteSummary(); console.log('Manually triggered sidebar display'); } else { console.error('Quote adapter not found'); }" 
+                            style="background: #ff6b6b; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                        🔧 Debug: Show Quote Sidebar
+                    </button>
+                </div>
             </div>
             
             <!-- Removed floating button - using header dropdown instead -->

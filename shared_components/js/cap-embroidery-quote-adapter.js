@@ -1417,6 +1417,7 @@
             
             const quoteData = quote || this.currentQuote;
             console.log('[CAP-EMB-QUOTE] Quote data:', quoteData);
+            console.log('[CAP-EMB-QUOTE] Total quantity:', quoteData ? quoteData.totalQuantity : 0);
             
             if (quoteData && quoteData.totalQuantity > 0) {
                 const summaryContent = document.getElementById('quote-summary-content');
@@ -1443,8 +1444,21 @@
                         </div>
                     `;
                 }
-                console.log('[CAP-EMB-QUOTE] Showing summary panel');
+                console.log('[CAP-EMB-QUOTE] Setting panel display to block');
                 summaryPanel.style.display = 'block';
+                
+                // Force style application
+                summaryPanel.style.setProperty('display', 'block', 'important');
+                
+                // Log computed styles for debugging
+                const computed = window.getComputedStyle(summaryPanel);
+                console.log('[CAP-EMB-QUOTE] Panel computed styles:', {
+                    display: computed.display,
+                    visibility: computed.visibility,
+                    opacity: computed.opacity,
+                    position: computed.position,
+                    zIndex: computed.zIndex
+                });
             } else {
                 console.log('[CAP-EMB-QUOTE] No items in quote, hiding panel');
                 summaryPanel.style.display = 'none';

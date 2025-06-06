@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Sidebar Debug Test</title>
+    <link rel="stylesheet" href="/shared_components/css/cumulative-quote.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 300px; /* Space for fixed sidebar */
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            background: #2e5827;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1f3a1b;
+        }
+        .status-check {
+            margin: 10px 0;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .status-check.success {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .status-check.error {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quote Sidebar Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="createSidebar()">Create Sidebar Manually</button>
+        <button onclick="showSidebar()">Show Sidebar</button>
+        <button onclick="hideSidebar()">Hide Sidebar</button>
+        <button onclick="updateSidebarContent()">Update Sidebar Content</button>
+        <button onclick="simulateAddToQuote()">Simulate Add to Quote</button>
+        <button onclick="checkStatus()">Check Status</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Status Checks</h2>
+        <div id="status-checks"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console" class="console-output"></div>
+    </div>
+
+    <script>
+        // Console override to display in page
+        const consoleDiv = document.getElementById('console');
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            consoleDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+
+        // Mock quote data
+        const mockQuote = {
+            totalQuantity: 24,
+            subtotal: 300.00,
+            ltmTotal: 0,
+            grandTotal: 300.00,
+            items: [{
+                id: 'item_1',
+                quantity: 24,
+                productName: 'Test Cap',
+                color: 'Black',
+                unitPrice: 12.50
+            }]
+        };
+
+        // Create sidebar manually
+        function createSidebar() {
+            console.log('Creating sidebar manually...');
+            
+            // Remove existing if any
+            const existing = document.getElementById('cumulative-quote-summary');
+            if (existing) {
+                existing.remove();
+                console.log('Removed existing sidebar');
+            }
+            
+            // Create new sidebar
+            const summaryPanel = document.createElement('div');
+            summaryPanel.id = 'cumulative-quote-summary';
+            summaryPanel.className = 'quote-summary-panel';
+            summaryPanel.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: white;
+                border: 2px solid #2e5827;
+                border-radius: 8px;
+                padding: 15px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1000;
+                min-width: 250px;
+                display: none;
+            `;
+            
+            summaryPanel.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="margin: 0; color: #2e5827;">Active Quote</h4>
+                    <button onclick="hideSidebar()" 
+                            style="background: none; border: none; cursor: pointer; font-size: 20px;">×</button>
+                </div>
+                <div id="quote-summary-content">
+                    <!-- Summary content will be populated here -->
+                </div>
+                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                    <button onclick="alert('View Details clicked')" 
+                            style="flex: 1; padding: 8px; background: #2e5827; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        View Details
+                    </button>
+                    <button onclick="alert('Clear Quote clicked')" 
+                            style="flex: 1; padding: 8px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Clear Quote
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(summaryPanel);
+            console.log('Sidebar created and added to DOM');
+            
+            checkStatus();
+        }
+
+        // Show sidebar
+        function showSidebar() {
+            console.log('Attempting to show sidebar...');
+            const sidebar = document.getElementById('cumulative-quote-summary');
+            
+            if (sidebar) {
+                console.log('Sidebar found, current display:', sidebar.style.display);
+                sidebar.style.display = 'block';
+                console.log('Sidebar display set to block');
+                
+                // Check computed styles
+                const computed = window.getComputedStyle(sidebar);
+                console.log('Computed display:', computed.display);
+                console.log('Computed visibility:', computed.visibility);
+                console.log('Computed opacity:', computed.opacity);
+                console.log('Computed z-index:', computed.zIndex);
+            } else {
+                console.log('ERROR: Sidebar not found!');
+            }
+            
+            checkStatus();
+        }
+
+        // Hide sidebar
+        function hideSidebar() {
+            console.log('Hiding sidebar...');
+            const sidebar = document.getElementById('cumulative-quote-summary');
+            if (sidebar) {
+                sidebar.style.display = 'none';
+                console.log('Sidebar hidden');
+            }
+            checkStatus();
+        }
+
+        // Update sidebar content
+        function updateSidebarContent() {
+            console.log('Updating sidebar content...');
+            const content = document.getElementById('quote-summary-content');
+            
+            if (content) {
+                content.innerHTML = `
+                    <div style="margin-bottom: 8px;">
+                        <strong>Total Items:</strong> ${mockQuote.totalQuantity} caps
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>Current Tier:</strong> 24-47
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>Subtotal:</strong> $${mockQuote.subtotal.toFixed(2)}
+                    </div>
+                    <div style="font-size: 1.1em; color: #2e5827;">
+                        <strong>Total:</strong> $${mockQuote.grandTotal.toFixed(2)}
+                    </div>
+                `;
+                console.log('Content updated');
+            } else {
+                console.log('ERROR: Content container not found!');
+            }
+        }
+
+        // Simulate add to quote
+        function simulateAddToQuote() {
+            console.log('Simulating add to quote...');
+            
+            // Create sidebar if needed
+            if (!document.getElementById('cumulative-quote-summary')) {
+                createSidebar();
+            }
+            
+            // Update content
+            updateSidebarContent();
+            
+            // Show sidebar
+            showSidebar();
+            
+            console.log('Add to quote simulation complete');
+        }
+
+        // Check status
+        function checkStatus() {
+            const statusDiv = document.getElementById('status-checks');
+            statusDiv.innerHTML = '';
+            
+            const checks = [
+                {
+                    name: 'Sidebar Element Exists',
+                    test: () => !!document.getElementById('cumulative-quote-summary')
+                },
+                {
+                    name: 'Sidebar is Visible',
+                    test: () => {
+                        const sidebar = document.getElementById('cumulative-quote-summary');
+                        return sidebar && sidebar.style.display !== 'none';
+                    }
+                },
+                {
+                    name: 'Content Container Exists',
+                    test: () => !!document.getElementById('quote-summary-content')
+                },
+                {
+                    name: 'Has Content',
+                    test: () => {
+                        const content = document.getElementById('quote-summary-content');
+                        return content && content.innerHTML.trim().length > 0;
+                    }
+                },
+                {
+                    name: 'CSS Loaded',
+                    test: () => {
+                        const sidebar = document.getElementById('cumulative-quote-summary');
+                        if (!sidebar) return false;
+                        const computed = window.getComputedStyle(sidebar);
+                        return computed.position === 'fixed';
+                    }
+                }
+            ];
+            
+            checks.forEach(check => {
+                const result = check.test();
+                const div = document.createElement('div');
+                div.className = `status-check ${result ? 'success' : 'error'}`;
+                div.textContent = `${check.name}: ${result ? '✓ Pass' : '✗ Fail'}`;
+                statusDiv.appendChild(div);
+            });
+        }
+
+        function clearConsole() {
+            consoleDiv.innerHTML = '';
+        }
+
+        // Initial status check
+        console.log('Page loaded, running initial status check...');
+        checkStatus();
+    </script>
+</body>
+</html>
