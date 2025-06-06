@@ -125,6 +125,11 @@
             
             // Populate the size quantity grid
             this.populateSizeQuantityGrid();
+            
+            // Update pricing display after grid is populated
+            setTimeout(() => {
+                this.updatePricingDisplay();
+            }, 100);
         }
 
         // Get cap embroidery specific quote builder HTML
@@ -429,7 +434,10 @@
                         });
                     }
                 }
-                this.updatePricingDisplay();
+                // Ensure pricing display is updated after grid is populated
+                setTimeout(() => {
+                    this.updatePricingDisplay();
+                }, 100);
             };
             console.log('[CAP-EMB-QUOTE] Registering pricingDataUpdated event listener');
             document.addEventListener('pricingDataUpdated', this.eventHandlers.pricingDataUpdated);
@@ -479,6 +487,7 @@
 
         // Update pricing display based on current selections
         updatePricingDisplay() {
+            console.log('[CAP-EMB-QUOTE] updatePricingDisplay called, currentPricingData:', this.currentPricingData);
             if (!this.currentPricingData) return;
 
             // Check if back logo is enabled from the add-on system
@@ -486,6 +495,8 @@
 
             // Update size quantity grid with current prices
             const priceDisplays = document.querySelectorAll('.size-price-display[data-size]');
+            console.log('[CAP-EMB-QUOTE] Found price displays:', priceDisplays.length);
+            
             priceDisplays.forEach(display => {
                 const size = display.getAttribute('data-size');
                 
@@ -493,6 +504,7 @@
                     const basePrice = this.getBasePriceForSize(size);
                     const currentBackLogoPrice = this.getCurrentBackLogoPrice();
                     const totalPrice = basePrice + (backLogoEnabled ? currentBackLogoPrice : 0);
+                    console.log(`[CAP-EMB-QUOTE] Updating price for ${size}: base=${basePrice}, backLogo=${currentBackLogoPrice}, total=${totalPrice}`);
                     display.textContent = `$${totalPrice.toFixed(2)}`;
                 }
             });
