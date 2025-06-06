@@ -1,0 +1,89 @@
+/* Cumulative Quote Sidebar Display Fix */
+/* This file ensures the quote sidebar displays properly by overriding conflicting styles */
+
+/* Force the cumulative quote summary to be visible */
+#cumulative-quote-summary.quote-summary-panel {
+    /* Override any transform that might be hiding it */
+    transform: translateX(0) !important;
+    
+    /* Ensure it's visible */
+    visibility: visible !important;
+    opacity: 1 !important;
+    
+    /* Make sure display block takes effect */
+    display: block !important;
+    
+    /* Ensure proper positioning */
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    
+    /* High z-index to appear above other elements */
+    z-index: 10000 !important;
+    
+    /* Visual styles */
+    background-color: white !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    padding: 20px !important;
+    min-width: 300px !important;
+    max-width: 400px !important;
+}
+
+/* Ensure the sidebar is hidden when it should be */
+#cumulative-quote-summary.quote-summary-panel[style*="display: none"] {
+    display: none !important;
+}
+
+/* Animation for smooth appearance */
+#cumulative-quote-summary.quote-summary-panel {
+    transition: all 0.3s ease-in-out !important;
+}
+
+/* Ensure content inside is visible */
+#cumulative-quote-summary .quote-summary-header,
+#cumulative-quote-summary #quote-summary-content,
+#cumulative-quote-summary .quote-actions {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    #cumulative-quote-summary.quote-summary-panel {
+        bottom: 10px !important;
+        right: 10px !important;
+        left: 10px !important;
+        max-width: calc(100% - 20px) !important;
+        min-width: auto !important;
+    }
+}
+
+/* Ensure the close button is clickable */
+#cumulative-quote-summary .close-btn {
+    cursor: pointer !important;
+    z-index: 10001 !important;
+}
+
+/* Fix for any potential overflow issues */
+#cumulative-quote-summary {
+    overflow: visible !important;
+}
+
+/* Ensure quote actions buttons are visible and styled */
+#cumulative-quote-summary .quote-actions button {
+    display: inline-block !important;
+    margin: 5px !important;
+    padding: 8px 16px !important;
+    background-color: #0066cc !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+}
+
+#cumulative-quote-summary .quote-actions button:hover {
+    background-color: #0052a3 !important;
+}
