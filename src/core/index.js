@@ -12,6 +12,7 @@ import { PricingCalculator } from '../shared/components/pricing-calculator';
 import { QuoteSystem } from '../shared/components/quote-system';
 import { ColorSelector } from '../shared/components/color-selector';
 import { ImageGallery } from '../shared/components/image-gallery';
+import { PricingMatrix } from '../shared/components/pricing-matrix';
 
 // Import core styles
 import '../shared/styles/core.css';
@@ -108,4 +109,15 @@ if (document.readyState === 'loading') {
 }
 
 // Export for use in other modules
-export { CoreModule, EventBus, Logger, ApiClient, StorageManager };
+export { 
+  CoreModule, 
+  EventBus, 
+  Logger, 
+  ApiClient, 
+  StorageManager,
+  PricingCalculator,
+  QuoteSystem,
+  ColorSelector,
+  ImageGallery,
+  PricingMatrix
+};
