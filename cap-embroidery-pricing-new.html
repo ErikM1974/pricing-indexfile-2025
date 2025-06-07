@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Embroidery Pricing - New Era Structured Stretch Cotton Cap</title>
+    
+    <!-- Design System Styles -->
+    <link rel="stylesheet" href="src/shared/design-system/styles/reset.css">
+    <link rel="stylesheet" href="src/shared/design-system/styles/tokens.css">
+    <link rel="stylesheet" href="src/shared/design-system/styles/animations.css">
+    <link rel="stylesheet" href="src/shared/design-system/styles/utilities.css">
+    
+    <!-- Page Specific Styles -->
+    <style>
+        /* Hero Section */
+        .hero-section {
+            background: var(--background);
+            padding: var(--spacing-8) 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .product-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-8);
+            align-items: start;
+        }
+        
+        @media (max-width: 768px) {
+            .product-header {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Quick Quote Calculator */
+        .quick-quote {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .quick-quote h2 {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--spacing-2);
+        }
+        
+        .quick-quote-subtitle {
+            color: var(--text-muted);
+            font-size: var(--text-sm);
+            margin-bottom: var(--spacing-6);
+        }
+        
+        /* Quantity Input */
+        .quantity-input-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .quantity-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--duration-200) var(--ease-out);
+        }
+        
+        .quantity-btn:hover:not(:disabled) {
+            background: var(--color-primary-600);
+        }
+        
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .quantity-input {
+            width: 80px;
+            text-align: center;
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            padding: var(--spacing-2);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--background);
+            color: var(--text-primary);
+        }
+        
+        .quantity-label {
+            font-size: var(--text-lg);
+            color: var(--text-secondary);
+        }
+        
+        /* Pricing Display */
+        .pricing-display {
+            background: var(--muted);
+            padding: var(--spacing-4);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .unit-price {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--primary);
+        }
+        
+        .unit-label {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+        }
+        
+        .total-price {
+            font-size: var(--text-lg);
+            color: var(--text-primary);
+            margin-top: var(--spacing-2);
+        }
+        
+        /* Pricing Breakdown */
+        .pricing-breakdown {
+            border-top: 1px solid var(--border);
+            padding-top: var(--spacing-4);
+            margin-top: var(--spacing-4);
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-2) 0;
+            font-size: var(--text-sm);
+        }
+        
+        .breakdown-label {
+            color: var(--text-secondary);
+        }
+        
+        .breakdown-value {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+        
+        .breakdown-total {
+            font-weight: var(--font-bold);
+            font-size: var(--text-base);
+            border-top: 1px solid var(--border);
+            padding-top: var(--spacing-2);
+            margin-top: var(--spacing-2);
+        }
+        
+        /* Quick Select Buttons */
+        .quick-select {
+            margin-top: var(--spacing-4);
+        }
+        
+        .quick-select-label {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-2);
+        }
+        
+        .quick-select-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: var(--spacing-2);
+        }
+        
+        .quick-select-btn {
+            padding: var(--spacing-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--background);
+            cursor: pointer;
+            transition: all var(--duration-200) var(--ease-out);
+            text-align: center;
+        }
+        
+        .quick-select-btn:hover {
+            border-color: var(--primary);
+            background: var(--accent);
+        }
+        
+        .quick-select-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+        
+        .quick-select-qty {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+        }
+        
+        .quick-select-label-text {
+            font-size: var(--text-xs);
+            opacity: 0.8;
+        }
+        
+        .quick-select-badge {
+            font-size: var(--text-xs);
+            padding: var(--spacing-1);
+            background: var(--color-success-light);
+            color: var(--color-success-dark);
+            border-radius: var(--radius-sm);
+            margin-top: var(--spacing-1);
+        }
+        
+        /* Savings Tip */
+        .savings-tip {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            padding: var(--spacing-3);
+            background: var(--color-info-light);
+            color: var(--color-info-dark);
+            border-radius: var(--radius-md);
+            margin-top: var(--spacing-4);
+            font-size: var(--text-sm);
+        }
+        
+        .savings-tip-icon {
+            font-size: var(--text-lg);
+        }
+        
+        /* Product Info Section */
+        .product-info {
+            margin-top: var(--spacing-8);
+        }
+        
+        .product-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--spacing-2);
+        }
+        
+        .product-style {
+            color: var(--text-muted);
+            font-size: var(--text-sm);
+            margin-bottom: var(--spacing-4);
+        }
+        
+        /* Gallery Placeholder */
+        .gallery-placeholder {
+            background: var(--muted);
+            border-radius: var(--radius-lg);
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+        
+        /* Color Selection */
+        .color-section {
+            margin-top: var(--spacing-6);
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: var(--spacing-3);
+            margin-top: var(--spacing-4);
+        }
+        
+        .color-option {
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .color-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-md);
+            margin: 0 auto var(--spacing-2);
+            border: 2px solid transparent;
+            transition: all var(--duration-200) var(--ease-out);
+        }
+        
+        .color-option:hover .color-swatch {
+            transform: scale(1.1);
+        }
+        
+        .color-option.selected .color-swatch {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(var(--primary), 0.2);
+        }
+        
+        .color-name {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+        }
+        
+        /* Customization Options */
+        .customization-section {
+            margin-top: var(--spacing-8);
+        }
+        
+        .option-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .option-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--spacing-2);
+        }
+        
+        .option-description {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-4);
+        }
+        
+        /* Pricing Table */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--spacing-6);
+        }
+        
+        .pricing-table th {
+            background: var(--muted);
+            padding: var(--spacing-3);
+            text-align: left;
+            font-weight: var(--font-semibold);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+        
+        .pricing-table td {
+            padding: var(--spacing-3);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .pricing-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .price-cell {
+            font-weight: var(--font-medium);
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script type="module">
+        // Import necessary modules
+        import { initializeDesignSystem } from './src/shared/design-system/index.js';
+        import { 
+            createButton, 
+            createCard,
+            createTextInput,
+            createSelect,
+            createCheckbox,
+            createRadioGroup
+        } from './src/shared/design-system/components/index.js';
+        import { 
+            createContainer,
+            createGrid,
+            createStack
+        } from './src/shared/design-system/components/Layout.js';
+        import { showToast } from './src/shared/design-system/components/Toast.js';
+        
+        // Initialize design system
+        await initializeDesignSystem();
+        
+        // Cap Embroidery Pricing Logic
+        class CapEmbroideryPricing {
+            constructor() {
+                // State
+                this.state = {
+                    quantity: 31,
+                    basePrice: 0,
+                    unitPrice: 0,
+                    totalPrice: 0,
+                    frontLogoStitches: 8000,
+                    backLogoEnabled: false,
+                    backLogoStitches: 5000,
+                    backLogoPrice: 5,
+                    selectedColor: 'Cyber Green',
+                    style: 'NE1000'
+                };
+                
+                // Pricing matrix for NE1000
+                this.pricingTiers = [
+                    { min: 24, max: 47, price: 24 },
+                    { min: 48, max: 71, price: 23 },
+                    { min: 72, max: Infinity, price: 21 }
+                ];
+                
+                this.init();
+            }
+            
+            init() {
+                this.createUI();
+                this.updatePricing();
+                this.attachEventListeners();
+            }
+            
+            createUI() {
+                const app = document.getElementById('app');
+                const container = createContainer({ padding: true });
+                
+                // Hero Section
+                const heroSection = document.createElement('div');
+                heroSection.className = 'hero-section';
+                
+                const heroContainer = createContainer({ padding: true });
+                const productHeader = document.createElement('div');
+                productHeader.className = 'product-header';
+                
+                // Left side - Product Info and Gallery
+                const leftColumn = document.createElement('div');
+                
+                // Gallery placeholder
+                const galleryPlaceholder = document.createElement('div');
+                galleryPlaceholder.className = 'gallery-placeholder';
+                galleryPlaceholder.innerHTML = '<p>Product Image Gallery</p>';
+                leftColumn.appendChild(galleryPlaceholder);
+                
+                // Product info
+                const productInfo = document.createElement('div');
+                productInfo.className = 'product-info';
+                productInfo.innerHTML = `
+                    <h1 class="product-title">New Era - Structured Stretch Cotton Cap</h1>
+                    <p class="product-style">Style: NE1000</p>
+                    <div class="product-description">
+                        <h3>What's Included</h3>
+                        <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
+                    </div>
+                `;
+                leftColumn.appendChild(productInfo);
+                
+                // Right side - Quick Quote Calculator
+                const rightColumn = document.createElement('div');
+                const quickQuote = this.createQuickQuote();
+                rightColumn.appendChild(quickQuote);
+                
+                productHeader.appendChild(leftColumn);
+                productHeader.appendChild(rightColumn);
+                heroContainer.element.appendChild(productHeader);
+                heroSection.appendChild(heroContainer.element);
+                
+                // Main content
+                const mainContent = createContainer({ padding: true });
+                
+                // Color Selection
+                const colorSection = this.createColorSection();
+                mainContent.element.appendChild(colorSection);
+                
+                // Customization Options
+                const customizationSection = this.createCustomizationSection();
+                mainContent.element.appendChild(customizationSection);
+                
+                // Pricing Table
+                const pricingTable = this.createPricingTable();
+                mainContent.element.appendChild(pricingTable);
+                
+                // Append sections
+                container.element.appendChild(heroSection);
+                container.element.appendChild(mainContent.element);
+                app.appendChild(container.element);
+            }
+            
+            createQuickQuote() {
+                const quickQuote = document.createElement('div');
+                quickQuote.className = 'quick-quote';
+                
+                quickQuote.innerHTML = `
+                    <h2>Quick Quote Calculator</h2>
+                    <p class="quick-quote-subtitle">Enter quantity for instant pricing</p>
+                `;
+                
+                // Quantity input group
+                const quantityGroup = document.createElement('div');
+                quantityGroup.className = 'quantity-input-group';
+                
+                const decrementBtn = document.createElement('button');
+                decrementBtn.className = 'quantity-btn';
+                decrementBtn.innerHTML = '−';
+                decrementBtn.onclick = () => this.updateQuantity(this.state.quantity - 1);
+                
+                const quantityInput = document.createElement('input');
+                quantityInput.type = 'number';
+                quantityInput.className = 'quantity-input';
+                quantityInput.id = 'quantity-input';
+                quantityInput.value = this.state.quantity;
+                quantityInput.min = 1;
+                quantityInput.onchange = (e) => this.updateQuantity(parseInt(e.target.value) || 1);
+                
+                const incrementBtn = document.createElement('button');
+                incrementBtn.className = 'quantity-btn';
+                incrementBtn.innerHTML = '+';
+                incrementBtn.onclick = () => this.updateQuantity(this.state.quantity + 1);
+                
+                const quantityLabel = document.createElement('span');
+                quantityLabel.className = 'quantity-label';
+                quantityLabel.textContent = 'caps';
+                
+                quantityGroup.appendChild(decrementBtn);
+                quantityGroup.appendChild(quantityInput);
+                quantityGroup.appendChild(incrementBtn);
+                quantityGroup.appendChild(quantityLabel);
+                quickQuote.appendChild(quantityGroup);
+                
+                // Pricing display
+                const pricingDisplay = document.createElement('div');
+                pricingDisplay.className = 'pricing-display';
+                pricingDisplay.innerHTML = `
+                    <div class="unit-price" id="unit-price">$0.00</div>
+                    <div class="unit-label">per cap</div>
+                    <div class="total-price" id="total-price">Total: $0.00</div>
+                `;
+                quickQuote.appendChild(pricingDisplay);
+                
+                // Pricing breakdown
+                const breakdown = document.createElement('div');
+                breakdown.className = 'pricing-breakdown';
+                breakdown.id = 'pricing-breakdown';
+                quickQuote.appendChild(breakdown);
+                
+                // Quick select buttons
+                const quickSelect = document.createElement('div');
+                quickSelect.className = 'quick-select';
+                quickSelect.innerHTML = '<div class="quick-select-label">Quick Select:</div>';
+                
+                const quickSelectGrid = document.createElement('div');
+                quickSelectGrid.className = 'quick-select-grid';
+                
+                const quantities = [
+                    { qty: 12, label: 'Dozen' },
+                    { qty: 24, label: '2 Dozen', badge: 'Most Popular' },
+                    { qty: 48, label: '4 Dozen' },
+                    { qty: 72, label: '6 Dozen', badge: 'Best Value' },
+                    { qty: 144, label: 'Gross' }
+                ];
+                
+                quantities.forEach(({ qty, label, badge }) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'quick-select-btn';
+                    if (qty === this.state.quantity) btn.classList.add('active');
+                    btn.innerHTML = `
+                        <div class="quick-select-qty">${qty}</div>
+                        <div class="quick-select-label-text">${label}</div>
+                        ${badge ? `<div class="quick-select-badge">${badge}</div>` : ''}
+                    `;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.quick-select-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.updateQuantity(qty);
+                    };
+                    quickSelectGrid.appendChild(btn);
+                });
+                
+                quickSelect.appendChild(quickSelectGrid);
+                quickQuote.appendChild(quickSelect);
+                
+                // Savings tip
+                const savingsTip = document.createElement('div');
+                savingsTip.className = 'savings-tip';
+                savingsTip.id = 'savings-tip';
+                quickQuote.appendChild(savingsTip);
+                
+                return quickQuote;
+            }
+            
+            createColorSection() {
+                const section = document.createElement('div');
+                section.className = 'color-section';
+                
+                const card = createCard({
+                    header: { title: 'Select Color', subtitle: '+ Add Multiple Colors' },
+                    padding: 'large'
+                });
+                
+                const selectedColor = document.createElement('div');
+                selectedColor.innerHTML = `<p style="margin-bottom: var(--spacing-4);">Selected: <strong>${this.state.selectedColor}</strong></p>`;
+                
+                const colorGrid = document.createElement('div');
+                colorGrid.className = 'color-grid';
+                
+                const colors = [
+                    { name: 'Black', hex: '#000000' },
+                    { name: 'Camo', hex: '#7d7d5a' },
+                    { name: 'Cyber Green', hex: '#00ff00' },
+                    { name: 'Dark Green', hex: '#004d00' },
+                    { name: 'Deep Navy', hex: '#000080' },
+                    { name: 'Graphite', hex: '#41424c' },
+                    { name: 'Orange', hex: '#ff6600' },
+                    { name: 'Royal', hex: '#0033cc' },
+                    { name: 'Scarlet Red', hex: '#ff2400' },
+                    { name: 'Shark Teal', hex: '#008080' },
+                    { name: 'White', hex: '#ffffff' }
+                ];
+                
+                colors.forEach(color => {
+                    const option = document.createElement('div');
+                    option.className = 'color-option';
+                    if (color.name === this.state.selectedColor) option.classList.add('selected');
+                    
+                    const swatch = document.createElement('div');
+                    swatch.className = 'color-swatch';
+                    swatch.style.backgroundColor = color.hex;
+                    if (color.name === 'White') swatch.style.border = '1px solid var(--border)';
+                    
+                    const name = document.createElement('div');
+                    name.className = 'color-name';
+                    name.textContent = color.name;
+                    
+                    option.appendChild(swatch);
+                    option.appendChild(name);
+                    
+                    option.onclick = () => {
+                        document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+                        this.state.selectedColor = color.name;
+                        selectedColor.innerHTML = `<p style="margin-bottom: var(--spacing-4);">Selected: <strong>${color.name}</strong></p>`;
+                    };
+                    
+                    colorGrid.appendChild(option);
+                });
+                
+                const content = document.createElement('div');
+                content.appendChild(selectedColor);
+                content.appendChild(colorGrid);
+                
+                card.setBody(content);
+                section.appendChild(card.getElement());
+                
+                return section;
+            }
+            
+            createCustomizationSection() {
+                const section = document.createElement('div');
+                section.className = 'customization-section';
+                
+                const title = document.createElement('h2');
+                title.textContent = 'Customization Options';
+                title.style.marginBottom = 'var(--spacing-4)';
+                section.appendChild(title);
+                
+                const subtitle = document.createElement('p');
+                subtitle.textContent = 'Adjust your embroidery details (updates pricing above)';
+                subtitle.style.color = 'var(--text-muted)';
+                subtitle.style.marginBottom = 'var(--spacing-6)';
+                section.appendChild(subtitle);
+                
+                // Front logo stitch count
+                const frontLogoCard = document.createElement('div');
+                frontLogoCard.className = 'option-card';
+                frontLogoCard.innerHTML = `
+                    <h3 class="option-title">Front Logo Stitch Count</h3>
+                    <p class="option-description">Higher stitch counts allow for more detailed designs but may increase cost.</p>
+                `;
+                
+                const stitchSelect = createSelect({
+                    id: 'front-stitch-select',
+                    options: [
+                        { value: '8000', label: '8,000 stitches (Standard)' },
+                        { value: '10000', label: '10,000 stitches (+$1.00)' },
+                        { value: '15000', label: '15,000 stitches (+$2.00)' }
+                    ],
+                    value: '8000',
+                    onChange: (e) => {
+                        this.state.frontLogoStitches = parseInt(e.target.value);
+                        this.updatePricing();
+                        showToast('✓ Quick quote updated!', { type: 'success', duration: 2000 });
+                    }
+                });
+                
+                frontLogoCard.appendChild(stitchSelect.getElement());
+                section.appendChild(frontLogoCard);
+                
+                // Back logo option
+                const backLogoCard = document.createElement('div');
+                backLogoCard.className = 'option-card';
+                
+                const backLogoCheckbox = createCheckbox({
+                    id: 'back-logo-checkbox',
+                    label: 'Add embroidered back logo (+$5.00 per cap)',
+                    helper: 'Optional upgrade for branding on both sides of the cap.',
+                    onChange: (e) => {
+                        this.state.backLogoEnabled = e.target.checked;
+                        this.updatePricing();
+                    }
+                });
+                
+                backLogoCard.appendChild(backLogoCheckbox.getElement());
+                section.appendChild(backLogoCard);
+                
+                return section;
+            }
+            
+            createPricingTable() {
+                const section = document.createElement('div');
+                section.innerHTML = `
+                    <h2>Detailed Pricing by Quantity</h2>
+                    <p style="color: var(--text-muted); margin-bottom: var(--spacing-4);">Volume discounts automatically applied</p>
+                    <table class="pricing-table">
+                        <thead>
+                            <tr>
+                                <th>QTY</th>
+                                <th>S/M</th>
+                                <th>M/L</th>
+                                <th>L/XL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>24-47</td>
+                                <td class="price-cell">$24</td>
+                                <td class="price-cell">$24</td>
+                                <td class="price-cell">$24</td>
+                            </tr>
+                            <tr>
+                                <td>48-71</td>
+                                <td class="price-cell">$23</td>
+                                <td class="price-cell">$23</td>
+                                <td class="price-cell">$23</td>
+                            </tr>
+                            <tr>
+                                <td>72+</td>
+                                <td class="price-cell">$21</td>
+                                <td class="price-cell">$21</td>
+                                <td class="price-cell">$21</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+                return section;
+            }
+            
+            updateQuantity(qty) {
+                if (qty < 1) return;
+                this.state.quantity = qty;
+                document.getElementById('quantity-input').value = qty;
+                this.updatePricing();
+            }
+            
+            updatePricing() {
+                // Get base price from tier
+                const tier = this.pricingTiers.find(t => this.state.quantity >= t.min && this.state.quantity <= t.max);
+                this.state.basePrice = tier ? tier.price : this.pricingTiers[this.pricingTiers.length - 1].price;
+                
+                // Calculate additional costs
+                let additionalCosts = 0;
+                
+                // Front logo stitch count upcharge
+                if (this.state.frontLogoStitches > 8000) {
+                    additionalCosts += this.state.frontLogoStitches === 10000 ? 1 : 2;
+                }
+                
+                // Back logo cost
+                if (this.state.backLogoEnabled) {
+                    additionalCosts += this.state.backLogoPrice;
+                }
+                
+                // Calculate final prices
+                this.state.unitPrice = this.state.basePrice + additionalCosts;
+                this.state.totalPrice = this.state.unitPrice * this.state.quantity;
+                
+                // Update UI
+                this.updatePricingDisplay();
+                this.updateBreakdown();
+                this.updateSavingsTip();
+            }
+            
+            updatePricingDisplay() {
+                document.getElementById('unit-price').textContent = `$${this.state.unitPrice.toFixed(2)}`;
+                document.getElementById('total-price').textContent = `Total: $${this.state.totalPrice.toFixed(2)}`;
+            }
+            
+            updateBreakdown() {
+                const breakdown = document.getElementById('pricing-breakdown');
+                let html = '';
+                
+                // Base cap price
+                html += `
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Base cap price:</span>
+                        <span class="breakdown-value">$${this.state.basePrice.toFixed(2)}</span>
+                    </div>
+                `;
+                
+                // Front logo
+                const frontLogoText = this.state.frontLogoStitches === 8000 ? 'included' : 
+                    `+$${this.state.frontLogoStitches === 10000 ? '1.00' : '2.00'}`;
+                html += `
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Front logo (${this.state.frontLogoStitches.toLocaleString()} stitches):</span>
+                        <span class="breakdown-value">${frontLogoText}</span>
+                    </div>
+                `;
+                
+                // Back logo if enabled
+                if (this.state.backLogoEnabled) {
+                    html += `
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Back logo (${this.state.backLogoStitches.toLocaleString()} stitches):</span>
+                            <span class="breakdown-value">+$${this.state.backLogoPrice.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+                
+                // Total
+                html += `
+                    <div class="breakdown-item breakdown-total">
+                        <span class="breakdown-label">Your price:</span>
+                        <span class="breakdown-value">$${this.state.unitPrice.toFixed(2)} /cap</span>
+                    </div>
+                `;
+                
+                breakdown.innerHTML = html;
+            }
+            
+            updateSavingsTip() {
+                const savingsTip = document.getElementById('savings-tip');
+                
+                // Find next tier
+                const currentTierIndex = this.pricingTiers.findIndex(t => 
+                    this.state.quantity >= t.min && this.state.quantity <= t.max
+                );
+                
+                if (currentTierIndex > 0) {
+                    const nextTier = this.pricingTiers[currentTierIndex - 1];
+                    const capsNeeded = nextTier.min - this.state.quantity;
+                    
+                    if (capsNeeded > 0 && capsNeeded <= 20) {
+                        const currentTotal = this.state.unitPrice * this.state.quantity;
+                        const newUnitPrice = nextTier.price + (this.state.unitPrice - this.state.basePrice);
+                        const newTotal = newUnitPrice * nextTier.min;
+                        const savings = (this.state.unitPrice * nextTier.min) - newTotal;
+                        
+                        savingsTip.innerHTML = `
+                            <span class="savings-tip-icon">💡</span>
+                            <span>Add ${capsNeeded} more caps for Tier ${currentTierIndex} pricing and save $${savings.toFixed(2)}!</span>
+                        `;
+                        savingsTip.style.display = 'flex';
+                    } else {
+                        savingsTip.style.display = 'none';
+                    }
+                } else {
+                    savingsTip.style.display = 'none';
+                }
+            }
+            
+            attachEventListeners() {
+                // Quantity input validation
+                const quantityInput = document.getElementById('quantity-input');
+                quantityInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        quantityInput.blur();
+                    }
+                });
+            }
+        }
+        
+        // Initialize the pricing calculator
+        new CapEmbroideryPricing();
+    </script>
+</body>
+</html>

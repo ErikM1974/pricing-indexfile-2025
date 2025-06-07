@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NWCA Pricing Tool - Product Details</title>
+    <script src="tab-initializers.js"></script>
+    <link rel="stylesheet" href="product-styles.css">
+    <style>
+        /* Additional styles for the beta button */
+        .pricing-option-card.beta {
+            position: relative;
+            background-color: #e8f5e9;
+            border-color: #4caf50;
+        }
+        
+        .pricing-option-card.beta:hover {
+            background-color: #c8e6c9;
+            border-color: #388e3c;
+        }
+        
+        .beta-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff6b6b;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .beta-info {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        
+        /* Adjust grid for 6 items */
+        @media (min-width: 768px) {
+            .pricing-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: flex-start;
+            }
+            
+            .pricing-option-card {
+                flex-basis: calc(16.66% - 10px); /* 6 cards per row */
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .pricing-option-card {
+                flex-basis: calc(33.33% - 10px); /* 3 cards per row on medium screens */
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .pricing-option-card {
+                flex-basis: calc(50% - 10px); /* 2 cards per row on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Product Search and Details</h1>
+
+    <div class="back-button-container">
+        <a href="/index.html" class="back-to-gallery-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px; vertical-align: text-bottom;">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Gallery
+        </a>
+    </div>
+
+    <div class="style-search-container">
+        <div class="search-controls">
+            <label for="style-search-input">Search Style:</label>
+            <input type="text" id="style-search-input" placeholder="Enter Style (e.g., PC61)" autocomplete="off">
+            <button id="search-button">Search</button>
+        </div>
+        <a href="cart.html" class="view-cart-btn-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px; vertical-align: text-bottom;">
+                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            View Cart (<span id="cart-item-count-header" class="cart-count-display">0</span>)
+        </a>
+        <div id="style-suggestions-list" class="suggestions-hidden"></div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Pricing Options -->
+    <div class="pricing-options" style="padding: var(--spacing-lg); margin-top: var(--spacing-lg); border-top: 1px solid var(--border-color);">
+        <h3>Embellishment Options</h3>
+        <p>Click on any option below to view detailed pricing information:</p>
+        
+        <div class="pricing-links">
+            <a href="/pricing/embroidery?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card">
+                <div class="pricing-icon">🧵</div>
+                <h4>Embroidery Pricing</h4>
+            </a>
+            <a href="/pricing/cap-embroidery?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card">
+                <div class="pricing-icon">🧢</div>
+                <h4>Cap Embroidery Pricing</h4>
+            </a>
+            <!-- New Beta Option for Cap Embroidery -->
+            <a href="/cap-embroidery-pricing-integrated.html?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card beta" id="cap-embroidery-beta">
+                <span class="beta-badge">BETA</span>
+                <div class="pricing-icon">🧢</div>
+                <h4>Cap Embroidery<br>New System</h4>
+                <div class="beta-info">Try our updated version!</div>
+            </a>
+            <a href="/pricing/dtg?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card">
+                <div class="pricing-icon">👕</div>
+                <h4>DTG Pricing</h4>
+            </a>
+            <a href="/pricing/screen-print?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card">
+                <div class="pricing-icon">🖨️</div>
+                <h4>Screen Print Pricing</h4>
+            </a>
+            <a href="/pricing/dtf?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card">
+                <div class="pricing-icon">🎨</div>
+                <h4>DTF Pricing</h4>
+            </a>
+        </div>
+    </div>
+
+    <div id="product-info-area"></div>
+    <div id="swatch-area" style="display: none;"></div>
+
+    <div class="section-divider"></div>
+
+    <div class="tabs-container">
+        <div class="tab-nav">
+            <a href="#" class="tab-link active" data-tab-target="#inventory-panel">Inventory</a>
+        </div>
+        
+        <div class="tab-content">
+            <div id="inventory-panel" class="tab-content-panel active">
+                <div id="inventory-area">
+                    <p><i>Select a style to load inventory...</i></p>
+                </div>
+            </div>
+        
+
+            <div id="embroidery-panel" class="tab-content-panel">
+                <div id="dp5-wrapper">
+                    <div class="loading-message">Select a product to view embroidery pricing...</div>
+                </div>
+                <style>
+                    /* Ensure iframe is properly displayed */
+                    #embroidery-panel iframe {
+                        display: block !important;
+                        visibility: visible !important;
+                        height: 600px !important;
+                        width: 100% !important;
+                        border: none !important;
+                        opacity: 1 !important;
+                    }
+                </style>
+            </div>
+        
+            
+        
+        
+        </div>
+    </div>
+</div>
+
+<!-- Load all existing scripts as before -->
+<script src="product-page-logic.js"></script>
+<script src="product-page-cleanup.js"></script>
+<script src="inventory_function.js"></script>
+<script src="cart.js"></script>
+<script src="cart-integration.js"></script>
+<script src="cart-ui.js"></script>
+<script src="product-url-handler.js"></script>
+<script src="cart-price-recalculator.js"></script>
+
+<!-- Additional script to handle the beta button -->
+<script>
+// Extend the updatePricingLinks function to handle the beta button
+(function() {
+    const originalUpdatePricingLinks = window.updatePricingLinks;
+    
+    window.updatePricingLinks = function(styleNumber, colorCode) {
+        // Call the original function
+        if (originalUpdatePricingLinks) {
+            originalUpdatePricingLinks.call(this, styleNumber, colorCode);
+        }
+        
+        // Also update the beta button
+        const betaButton = document.getElementById('cap-embroidery-beta');
+        if (betaButton) {
+            const catalogColorToUse = window.selectedCatalogColor;
+            
+            if (styleNumber && catalogColorToUse && !String(catalogColorToUse).includes('{')) {
+                const newHref = `/cap-embroidery-pricing-integrated.html?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(catalogColorToUse)}`;
+                betaButton.setAttribute('href', newHref);
+                betaButton.classList.remove('pricing-link-disabled');
+            } else {
+                betaButton.classList.add('pricing-link-disabled');
+            }
+        }
+    };
+})();
+</script>
+</body>
+</html>

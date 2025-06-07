@@ -52,6 +52,13 @@
                 <div class="pricing-icon">🧢</div>
                 <h4>Cap Embroidery Pricing</h4> <!-- Changed to h4 -->
             </a>
+            <!-- New Beta Option for Cap Embroidery -->
+            <a href="/cap-embroidery-pricing-integrated.html?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card beta" id="cap-embroidery-beta">
+                <span class="beta-badge">BETA</span>
+                <div class="pricing-icon">🧢</div>
+                <h4>Cap Embroidery<br>New System</h4>
+                <div class="beta-info">Try our updated version!</div>
+            </a>
             <a href="/pricing/dtg?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card"> <!-- Removed inline styles, added class -->
                 <div class="pricing-icon">👕</div>
                 <h4>DTG Pricing</h4> <!-- Changed to h4 -->
@@ -165,5 +172,43 @@
 <script src="cart.js" defer></script>
     <script src="product-page-logic.js" defer></script>
     <!-- <script src="product-page-cleanup.js" defer></script> -->
+    
+    <!-- Beta button handler -->
+    <script>
+    // Extend the updatePricingLinks function to handle the beta button
+    document.addEventListener('DOMContentLoaded', function() {
+        // Store reference to original function after it's loaded
+        setTimeout(function() {
+            const originalUpdatePricingLinks = window.updatePricingLinks;
+            
+            window.updatePricingLinks = function(styleNumber, colorCode) {
+                // Call the original function
+                if (originalUpdatePricingLinks) {
+                    originalUpdatePricingLinks.call(this, styleNumber, colorCode);
+                }
+                
+                // Also update the beta button
+                const betaButton = document.getElementById('cap-embroidery-beta');
+                if (betaButton) {
+                    const catalogColorToUse = window.selectedCatalogColor;
+                    
+                    if (styleNumber && catalogColorToUse && !String(catalogColorToUse).includes('{')) {
+                        const newHref = `/cap-embroidery-pricing-integrated.html?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(catalogColorToUse)}`;
+                        betaButton.setAttribute('href', newHref);
+                        betaButton.classList.remove('pricing-link-disabled');
+                        
+                        // Add click tracking
+                        betaButton.onclick = function() {
+                            console.log('Beta cap embroidery clicked:', styleNumber, catalogColorToUse);
+                            // Could add analytics tracking here
+                        };
+                    } else {
+                        betaButton.classList.add('pricing-link-disabled');
+                    }
+                }
+            };
+        }, 100); // Small delay to ensure original function is loaded
+    });
+    </script>
 </body>
 </html>
