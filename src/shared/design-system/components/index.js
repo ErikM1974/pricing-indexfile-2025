@@ -89,6 +89,22 @@ export {
   tabStyles
 } from './Tabs.js';
 
+// Tooltip component
+export {
+  Tooltip,
+  createTooltip
+} from './Tooltip.js';
+
+// Footer component
+export {
+  Footer,
+  createFooter
+} from './Footer.js';
+
+// Import styles from new components
+import { Tooltip } from './Tooltip.js';
+import { Footer } from './Footer.js';
+
 // Aggregate all component styles
 export function getAllComponentStyles() {
   return [
@@ -99,7 +115,9 @@ export function getAllComponentStyles() {
     layoutStyles,
     toastStyles,
     loadingStyles,
-    tabStyles
+    tabStyles,
+    Tooltip.getStyles(),
+    Footer.getStyles()
   ].join('\n\n');
 }
 
