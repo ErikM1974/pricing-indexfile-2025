@@ -2,10 +2,10 @@
 // This replaces multiple duplicate scripts with a single consolidated module
 
 // Import core utilities
-import { EventBus } from '../shared/utils/event-bus';
-import { Logger } from '../shared/utils/logger';
-import { ApiClient } from '../shared/utils/api-client';
-import { StorageManager } from '../shared/utils/storage-manager';
+import { EventBus } from './event-bus';
+import { Logger } from './logger';
+import { ApiClient } from './api-client';
+import { StorageManager } from './storage-manager';
 
 // Import core components
 import { PricingCalculator } from '../shared/components/pricing-calculator';
