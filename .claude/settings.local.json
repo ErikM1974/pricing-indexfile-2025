@@ -31,7 +31,8 @@
       "Bash(kill:*)",
       "Bash(pkill:*)",
       "Bash(git ls-tree:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm test:*)"
     ],
     "deny": []
   }
