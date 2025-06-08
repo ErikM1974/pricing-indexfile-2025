@@ -846,7 +846,7 @@
                             <thead>
                                 <tr id="pricing-header-row" class="pricing-table-header">
                                     <th>Quantity Range</th>
-                                    <!-- Size headers will be dynamically populated -->
+                                    <th>Price per Cap</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -959,13 +959,30 @@
             // Initial pricing calculation (with fallback values)
             updatePricing();
             
+            // Populate initial pricing table
+            populateInitialPricingTable();
+            
             // Load Caspio data
             loadCaspioData();
             
             // Add client-stitch-count-select ID for compatibility
             const stitchSelect = document.getElementById('stitch-count');
             if (stitchSelect) {
-                stitchSelect.id = 'client-stitch-count-select';
+                // Add the ID that other scripts look for without removing the original
+                stitchSelect.setAttribute('data-client-id', 'client-stitch-count-select');
+                
+                // Create a reference so other scripts can find it
+                const stitchCountAlias = document.getElementById('client-stitch-count-select');
+                if (!stitchCountAlias) {
+                    window.document.getElementById = (function(originalGetElementById) {
+                        return function(id) {
+                            if (id === 'client-stitch-count-select') {
+                                return document.querySelector('#stitch-count');
+                            }
+                            return originalGetElementById.call(this, id);
+                        };
+                    })(window.document.getElementById);
+                }
             }
             
             // Listen for color selection events from DP5/clean-color-adapter
@@ -1000,8 +1017,13 @@
                 console.log('[Beta Page] Cap embroidery master data received', event.detail);
                 if (event.detail && event.detail.masterData) {
                     window.capEmbroideryMasterData = event.detail.masterData;
+                    console.log('[Beta Page] Master data structure:', window.capEmbroideryMasterData);
+                    
                     // Update pricing with new stitch count data
-                    updatePricingForStitchCount();
+                    if (window.capEmbroideryMasterData.allPriceProfiles) {
+                        console.log('[Beta Page] Available stitch count profiles:', Object.keys(window.capEmbroideryMasterData.allPriceProfiles));
+                        updatePricingForStitchCount();
+                    }
                 }
             });
             
@@ -1029,7 +1051,8 @@
             
             // Check if we have cap embroidery master data with stitch count profiles
             if (window.capEmbroideryMasterData && window.capEmbroideryMasterData.allPriceProfiles) {
-                const currentStitchCount = document.getElementById('stitch-count').value;
+                const stitchCountEl = document.getElementById('stitch-count');
+                const currentStitchCount = stitchCountEl ? stitchCountEl.value : state.frontLogoStitches.toString();
                 const stitchCountProfile = window.capEmbroideryMasterData.allPriceProfiles[currentStitchCount];
                 
                 if (stitchCountProfile && stitchCountProfile.OSFA) {
@@ -1185,7 +1208,13 @@
         
         // Handle stitch count change
         function handleStitchCountChange() {
-            const stitchCount = document.getElementById('stitch-count').value;
+            const stitchCountEl = document.getElementById('stitch-count');
+            if (!stitchCountEl) {
+                console.error('[Beta Page] Stitch count element not found');
+                return;
+            }
+            
+            const stitchCount = stitchCountEl.value;
             state.frontLogoStitches = parseInt(stitchCount);
             
             console.log('[Beta Page] Stitch count changed to:', stitchCount);
@@ -1512,6 +1541,33 @@
             if (swatchElement && colorImage) {
                 swatchElement.innerHTML = `<img src="${colorImage}" alt="${colorName}">`;
             }
+        }
+        
+        // Populate initial pricing table with fallback data
+        function populateInitialPricingTable() {
+            const tbody = document.querySelector('#custom-pricing-grid tbody');
+            if (!tbody) return;
+            
+            // Clear any existing rows
+            tbody.innerHTML = '';
+            
+            // Add default pricing rows
+            const defaultTiers = [
+                { range: '24-47', price: 24 },
+                { range: '48-71', price: 23 },
+                { range: '72+', price: 21 }
+            ];
+            
+            defaultTiers.forEach(tier => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${tier.range}</td>
+                    <td><strong>$${tier.price.toFixed(2)}</strong></td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            console.log('[Beta Page] Initial pricing table populated with default values');
         }
         
         // Fix pricing table to show 24-47 tier
