@@ -662,7 +662,7 @@
     <div id="pricing-calculator" class="pricing-calculator hidden-calculator">
         <div class="loading-message">Loading pricing data...</div>
         <!-- Caspio Deploy Script - This connects to your database -->
-        <script type="text/javascript" src="https://c7ect717.caspio.com/dp/A0E150005bf9a491cd164a31945f/emb"></script>
+        <div id="caspio-embed-container"></div>
     </div>
 
     <div id="app">
@@ -938,10 +938,22 @@
             
             // Listen for pricing data updates
             window.addEventListener('pricingDataLoaded', function(event) {
-                console.log('[Beta Page] Pricing data loaded event received');
-                // The existing cap-embroidery-controller will handle updating the pricing table
-                // We just need to ensure our pricing tiers are used for the calculator
+                console.log('[Beta Page] Pricing data loaded event received', event.detail);
+                
+                // Check if we need to add the 24-47 tier
+                setTimeout(function() {
+                    fixPricingTable();
+                }, 500);
             });
+            
+            // Also listen for the pricing table to be updated
+            const pricingGrid = document.getElementById('custom-pricing-grid');
+            if (pricingGrid) {
+                const observer = new MutationObserver(function() {
+                    fixPricingTable();
+                });
+                observer.observe(pricingGrid, { childList: true, subtree: true });
+            }
             
             // Set global variables that the controllers expect
             window.selectedStyleNumber = state.styleNumber;
@@ -951,7 +963,31 @@
             if (window.capEmbroideryController) {
                 console.log('[Beta Page] Cap embroidery controller found, initializing...');
             }
+            
+            // Load Caspio data via iframe
+            loadCaspioData();
         });
+        
+        // Load Caspio pricing data
+        function loadCaspioData() {
+            const container = document.getElementById('caspio-embed-container');
+            if (!container) return;
+            
+            // Create the iframe URL with the style parameter
+            const caspioSrc = `https://c3eku948.caspio.com/dp/a0e15000c5d8e1f2e9e94c3c9a5a/emb?StyleNumber=${encodeURIComponent(state.styleNumber)}`;
+            
+            // Create iframe
+            const iframe = document.createElement('iframe');
+            iframe.src = caspioSrc;
+            iframe.style.width = '100%';
+            iframe.style.height = '500px';
+            iframe.style.border = 'none';
+            iframe.style.position = 'absolute';
+            iframe.style.left = '-9999px';
+            
+            container.appendChild(iframe);
+            console.log('[Beta Page] Loading Caspio data for style:', state.styleNumber);
+        }
         
         function updateProductInfo() {
             // Update product title
@@ -1170,6 +1206,40 @@
             if (newValue >= 5000 && newValue <= 15000) {
                 state.backLogoStitches = newValue;
                 document.getElementById('back-logo-stitches').textContent = newValue.toLocaleString();
+            }
+        }
+        
+        // Fix pricing table to show 24-47 tier
+        function fixPricingTable() {
+            const tbody = document.querySelector('#custom-pricing-grid tbody');
+            if (!tbody) return;
+            
+            const rows = tbody.querySelectorAll('tr');
+            if (rows.length === 0) return;
+            
+            // Check if first row is 48-71
+            const firstRow = rows[0];
+            const firstCell = firstRow.querySelector('td');
+            if (firstCell && firstCell.textContent.includes('48-71')) {
+                console.log('[Beta Page] Adding missing 24-47 tier');
+                
+                // Create new row for 24-47
+                const newRow = document.createElement('tr');
+                const cells = firstRow.querySelectorAll('td');
+                
+                cells.forEach((cell, index) => {
+                    const newCell = document.createElement('td');
+                    if (index === 0) {
+                        newCell.textContent = '24-47';
+                    } else {
+                        // For cap embroidery, 24-47 should be $24
+                        newCell.innerHTML = '<strong>$24</strong>';
+                    }
+                    newRow.appendChild(newCell);
+                });
+                
+                // Insert at beginning
+                tbody.insertBefore(newRow, firstRow);
             }
         }
         
