@@ -965,6 +965,17 @@
             // Load Caspio data
             loadCaspioData();
             
+            // Try to extract pricing from existing table after a short delay
+            setTimeout(() => {
+                console.log('[Beta Page] Checking for existing pricing table data');
+                extractPricingFromTable();
+                if (state.pricingTiers.length > 0) {
+                    updatePricing();
+                    updatePricingDisplay();
+                    updateBreakdown();
+                }
+            }, 1000);
+            
             // Add client-stitch-count-select ID for compatibility
             const stitchSelect = document.getElementById('stitch-count');
             if (stitchSelect) {
@@ -1030,8 +1041,20 @@
             // Also listen for the pricing table to be updated
             const pricingGrid = document.getElementById('custom-pricing-grid');
             if (pricingGrid) {
-                const observer = new MutationObserver(function() {
-                    fixPricingTable();
+                const observer = new MutationObserver(function(mutations) {
+                    console.log('[Beta Page] Pricing table was modified');
+                    
+                    // Check if the table has data
+                    const tbody = pricingGrid.querySelector('tbody');
+                    if (tbody && tbody.querySelectorAll('tr').length > 0) {
+                        console.log('[Beta Page] Pricing table has data, extracting prices');
+                        setTimeout(() => {
+                            extractPricingFromTable();
+                            updatePricing();
+                            updatePricingDisplay();
+                            updateBreakdown();
+                        }, 100);
+                    }
                 });
                 observer.observe(pricingGrid, { childList: true, subtree: true });
             }
@@ -1295,10 +1318,62 @@
                 stitchDisplay.textContent = `${state.frontLogoStitches.toLocaleString()} stitch pricing shown`;
             }
             
+            // Force pricing recalculation with new tiers
+            if (state.pricingTiers.length > 0) {
+                console.log('[Beta Page] Forcing pricing update with new tiers');
+                updatePricing();
+                updatePricingDisplay();
+                updateBreakdown();
+            }
+            
             // Dispatch event for other components
             window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
                 detail: { stitchCount: state.frontLogoStitches }
             }));
+        }
+        
+        // Extract pricing from the displayed table
+        function extractPricingFromTable() {
+            const tbody = document.querySelector('#custom-pricing-grid tbody');
+            if (!tbody) return;
+            
+            const rows = tbody.querySelectorAll('tr');
+            const newTiers = [];
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 2) {
+                    const range = cells[0].textContent.trim();
+                    
+                    // Get the first price column (could be OSFA or S/M)
+                    let priceText = cells[1].textContent.trim();
+                    
+                    // If the table has size columns (S/M, M/L, L/XL), use the first one
+                    if (cells.length > 2 && priceText.includes('$')) {
+                        priceText = cells[1].textContent.trim();
+                    } else if (cells.length > 2) {
+                        // Skip header rows
+                        return;
+                    }
+                    
+                    const price = parseFloat(priceText.replace('$', ''));
+                    
+                    if (!isNaN(price)) {
+                        if (range.includes('24-47')) {
+                            newTiers.push({ min: 24, max: 47, price: price });
+                        } else if (range.includes('48-71')) {
+                            newTiers.push({ min: 48, max: 71, price: price });
+                        } else if (range.includes('72')) {
+                            newTiers.push({ min: 72, max: 99999, price: price });
+                        }
+                    }
+                }
+            });
+            
+            if (newTiers.length > 0) {
+                state.pricingTiers = newTiers;
+                console.log('[Beta Page] Extracted pricing tiers from table:', state.pricingTiers);
+            }
         }
         
         // Update the pricing table with new data
@@ -1349,9 +1424,15 @@
             });
             
             console.log('[Beta Page] Pricing table updated for stitch count:', currentStitchCount);
+            
+            // Extract the pricing from the table we just created
+            extractPricingFromTable();
         }
         
         function updatePricing() {
+            console.log('[Beta Page] updatePricing called with quantity:', state.quantity);
+            console.log('[Beta Page] Current pricing tiers:', state.pricingTiers);
+            
             // Get base price from tier
             let tier = null;
             
@@ -1362,6 +1443,7 @@
                     // Use last tier for 72+
                     tier = state.pricingTiers[state.pricingTiers.length - 1];
                 }
+                console.log('[Beta Page] Found tier for quantity', state.quantity, ':', tier);
             }
             
             // Fallback pricing if no Caspio data yet
@@ -1373,8 +1455,10 @@
                 } else {
                     state.basePrice = 24;
                 }
+                console.log('[Beta Page] Using fallback pricing:', state.basePrice);
             } else {
                 state.basePrice = tier.price;
+                console.log('[Beta Page] Using tier pricing:', state.basePrice);
             }
             
             // Calculate additional costs
