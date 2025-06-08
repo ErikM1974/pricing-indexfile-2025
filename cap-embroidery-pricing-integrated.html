@@ -503,6 +503,20 @@
             font-size: 18px;
         }
         
+        /* LTM Warning */
+        .ltm-warning {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #721c24;
+        }
+        
         /* Hide elements */
         .hidden {
             display: none !important;
@@ -657,12 +671,17 @@
             </div>
         </div>
     </header>
-
+    
     <!-- Hidden Caspio Matrix - Keep this for data source -->
     <div id="pricing-calculator" class="pricing-calculator hidden-calculator">
         <div class="loading-message">Loading pricing data...</div>
         <!-- Caspio Deploy Script - This connects to your database -->
         <div id="caspio-embed-container"></div>
+    </div>
+    
+    <!-- Hidden elements for compatibility -->
+    <div style="display: none;">
+        <h3 id="product-title-context" class="product-title">Product Title</h3>
     </div>
 
     <div id="app">
@@ -680,10 +699,6 @@
                         <div class="product-info">
                             <h1 class="product-title" id="product-title">Product Title</h1>
                             <p class="product-style">Style: <strong id="product-style-context"></strong></p>
-                            <!-- Hidden element for pricing-pages.js -->
-                            <div style="display: none;">
-                                <h3 id="product-title-context" class="product-title">Product Title</h3>
-                            </div>
                             <div class="product-description">
                                 <h3>What's Included</h3>
                                 <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
@@ -755,6 +770,12 @@
                                 <span id="savings-tip-text"></span>
                             </div>
                             
+                            <!-- LTM Warning -->
+                            <div class="ltm-warning" id="ltm-warning">
+                                <span>⚠️</span>
+                                <span id="ltm-warning-text">Orders under 24 caps include a $50 setup fee</span>
+                            </div>
+                            
                             <!-- Quick Select -->
                             <div class="quick-select">
                                 <span class="quick-select-label">Quick select:</span>
@@ -783,9 +804,9 @@
                     <div class="option-group">
                         <label for="stitch-count">Front Logo Stitch Count</label>
                         <select id="stitch-count" class="option-select" onchange="updatePricing()">
+                            <option value="5000">5,000 stitches</option>
                             <option value="8000" selected>8,000 stitches (Standard)</option>
-                            <option value="10000">10,000 stitches (+$1.00)</option>
-                            <option value="15000">15,000 stitches (+$2.00)</option>
+                            <option value="10000">10,000 stitches</option>
                         </select>
                     </div>
                     
@@ -803,7 +824,7 @@
                                 <button class="stitch-counter-btn" onclick="updateBackLogoStitches(1000)">+</button>
                                 <span class="stitch-counter-range">(5K-15K)</span>
                             </div>
-                            <div style="margin-top: 10px; font-weight: 500;">
+                            <div id="back-logo-price-display" style="margin-top: 10px; font-weight: 500;">
                                 Additional Cost: $5.00 per cap
                             </div>
                         </div>
@@ -888,9 +909,9 @@
     <!-- Cap Embroidery Specific -->
     <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script>
     <script src="/shared_components/js/clean-color-adapter.js"></script>
-    <script src="/shared_components/js/cap-embroidery-ltm-fix.js"></script>
+    <!-- IMPORTANT: NOT including cap-embroidery-ltm-fix.js as it has the $18 bug -->
 
-    <!-- Simple, working JavaScript with Caspio integration -->
+    <!-- Main Implementation -->
     <script>
         // Cap Embroidery Pricing Logic
         const state = {
@@ -904,28 +925,37 @@
             backLogoPrice: 5,
             selectedColor: '',
             styleNumber: '',
-            productTitle: ''
+            productTitle: '',
+            pricingData: null,
+            pricingTiers: [] // Will be populated from Caspio
         };
         
-        // Pricing tiers for NE1000
-        const pricingTiers = [
-            { min: 24, max: 47, price: 24 },
-            { min: 48, max: 71, price: 23 },
-            { min: 72, max: Infinity, price: 21 }
-        ];
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Parse URL parameters
+        // Parse URL parameters and set global variables IMMEDIATELY
+        (function() {
             const urlParams = new URLSearchParams(window.location.search);
             state.styleNumber = urlParams.get('StyleNumber') || 'NE1000';
             state.selectedColor = urlParams.get('COLOR') || 'Cyber Green';
             
+            // Set global variables BEFORE any scripts run
+            window.selectedStyleNumber = state.styleNumber;
+            window.selectedCatalogColor = state.selectedColor;
+            
+            console.log('[Beta Page] Initialized with:', {
+                styleNumber: state.styleNumber,
+                color: state.selectedColor
+            });
+        })();
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
             // Update product info
             updateProductInfo();
             
-            // Initial pricing calculation
+            // Initial pricing calculation (with fallback values)
             updatePricing();
+            
+            // Load Caspio data
+            loadCaspioData();
             
             // Listen for color selection events from DP5/clean-color-adapter
             document.addEventListener('colorSelected', function(event) {
@@ -939,6 +969,14 @@
             // Listen for pricing data updates
             window.addEventListener('pricingDataLoaded', function(event) {
                 console.log('[Beta Page] Pricing data loaded event received', event.detail);
+                
+                // Extract pricing tiers from event
+                if (event.detail && event.detail.prices) {
+                    extractPricingTiers(event.detail);
+                }
+                
+                // Update pricing with real data
+                updatePricing();
                 
                 // Check if we need to add the 24-47 tier
                 setTimeout(function() {
@@ -955,18 +993,44 @@
                 observer.observe(pricingGrid, { childList: true, subtree: true });
             }
             
-            // Set global variables that the controllers expect
-            window.selectedStyleNumber = state.styleNumber;
-            window.selectedCatalogColor = state.selectedColor;
-            
             // Initialize cap embroidery controller if available
             if (window.capEmbroideryController) {
                 console.log('[Beta Page] Cap embroidery controller found, initializing...');
             }
-            
-            // Load Caspio data via iframe
-            loadCaspioData();
         });
+        
+        // Extract pricing tiers from Caspio data
+        function extractPricingTiers(pricingData) {
+            console.log('[Beta Page] Extracting pricing tiers from:', pricingData);
+            
+            // Reset tiers
+            state.pricingTiers = [];
+            
+            // Look for OSFA pricing (cap embroidery uses one-size)
+            if (pricingData.prices && pricingData.prices.OSFA) {
+                const osfaPrices = pricingData.prices.OSFA;
+                
+                // Convert to our tier format
+                for (const [tierKey, price] of Object.entries(osfaPrices)) {
+                    if (tierKey.includes('24-47')) {
+                        state.pricingTiers.push({ min: 24, max: 47, price: parseFloat(price) });
+                    } else if (tierKey.includes('48-71')) {
+                        state.pricingTiers.push({ min: 48, max: 71, price: parseFloat(price) });
+                    } else if (tierKey.includes('72') || tierKey.includes('72+')) {
+                        state.pricingTiers.push({ min: 72, max: 99999, price: parseFloat(price) });
+                    }
+                }
+            }
+            
+            // Sort by min quantity
+            state.pricingTiers.sort((a, b) => a.min - b.min);
+            
+            console.log('[Beta Page] Extracted pricing tiers:', state.pricingTiers);
+            
+            // Store in global for other scripts
+            state.pricingData = pricingData;
+            window.nwcaPricingData = pricingData;
+        }
         
         // Load Caspio pricing data
         function loadCaspioData() {
@@ -1002,14 +1066,14 @@
             // Update UI
             document.getElementById('product-title').textContent = state.productTitle;
             document.getElementById('product-style-context').textContent = state.styleNumber;
+            document.getElementById('current-product-context').textContent = state.productTitle;
+            document.getElementById('breadcrumb-product').textContent = state.styleNumber;
             
             // Also update the hidden title context that pricing-pages.js looks for
             const titleContext = document.getElementById('product-title-context');
             if (titleContext) {
                 titleContext.textContent = state.productTitle;
             }
-            document.getElementById('current-product-context').textContent = state.productTitle;
-            document.getElementById('breadcrumb-product').textContent = state.styleNumber;
             
             // Update product image
             const imageUrl = `https://www.companycasuals.com/mmCOMPANYCASUALS/Images/${state.styleNumber}/${state.selectedColor.replace(/\s+/g, '_')}.jpg`;
@@ -1075,8 +1139,29 @@
         
         function updatePricing() {
             // Get base price from tier
-            const tier = pricingTiers.find(t => state.quantity >= t.min && state.quantity <= t.max);
-            state.basePrice = tier ? tier.price : pricingTiers[pricingTiers.length - 1].price;
+            let tier = null;
+            
+            // If we have Caspio data, use it
+            if (state.pricingTiers.length > 0) {
+                tier = state.pricingTiers.find(t => state.quantity >= t.min && state.quantity <= t.max);
+                if (!tier && state.quantity >= 72) {
+                    // Use last tier for 72+
+                    tier = state.pricingTiers[state.pricingTiers.length - 1];
+                }
+            }
+            
+            // Fallback pricing if no Caspio data yet
+            if (!tier) {
+                if (state.quantity >= 72) {
+                    state.basePrice = 21;
+                } else if (state.quantity >= 48) {
+                    state.basePrice = 23;
+                } else {
+                    state.basePrice = 24;
+                }
+            } else {
+                state.basePrice = tier.price;
+            }
             
             // Calculate additional costs
             let additionalCosts = 0;
@@ -1085,25 +1170,33 @@
             const stitchCount = parseInt(document.getElementById('stitch-count').value);
             state.frontLogoStitches = stitchCount;
             
+            // Stitch count pricing (need to check if this comes from Caspio)
             if (stitchCount === 10000) {
                 additionalCosts += 1;
-            } else if (stitchCount === 15000) {
-                additionalCosts += 2;
             }
+            // Note: 5,000 stitches might be cheaper, but we need Caspio data for that
             
-            // Back logo cost
+            // Back logo cost ($1 per 1,000 stitches)
             if (state.backLogoEnabled) {
+                state.backLogoPrice = Math.ceil(state.backLogoStitches / 1000);
                 additionalCosts += state.backLogoPrice;
             }
             
+            // Calculate LTM fee if under 24
+            let ltmFeePerUnit = 0;
+            if (state.quantity < 24) {
+                ltmFeePerUnit = 50 / state.quantity;
+            }
+            
             // Calculate final prices
-            state.unitPrice = state.basePrice + additionalCosts;
+            state.unitPrice = state.basePrice + additionalCosts + ltmFeePerUnit;
             state.totalPrice = state.unitPrice * state.quantity;
             
             // Update UI
             updatePricingDisplay();
             updateBreakdown();
             updateSavingsTip();
+            updateLTMWarning();
         }
         
         function updatePricingDisplay() {
@@ -1127,9 +1220,8 @@
             let frontLogoText = 'included';
             if (state.frontLogoStitches === 10000) {
                 frontLogoText = '+$1.00';
-            } else if (state.frontLogoStitches === 15000) {
-                frontLogoText = '+$2.00';
             }
+            // TODO: Handle 5,000 stitches when we get Caspio data
             
             html += `
                 <div class="breakdown-item">
@@ -1144,6 +1236,16 @@
                     <div class="breakdown-item">
                         <span class="breakdown-label">Back logo (${state.backLogoStitches.toLocaleString()} stitches):</span>
                         <span class="breakdown-value">+$${state.backLogoPrice.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+            
+            // LTM fee if applicable
+            if (state.quantity < 24) {
+                html += `
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Setup fee (< 24 caps):</span>
+                        <span class="breakdown-value">+$${(50/state.quantity).toFixed(2)}</span>
                     </div>
                 `;
             }
@@ -1164,16 +1266,22 @@
             const tipText = document.getElementById('savings-tip-text');
             
             // Find current tier
-            const currentTierIndex = pricingTiers.findIndex(t => 
-                state.quantity >= t.min && state.quantity <= t.max
-            );
+            let currentTierIndex = -1;
+            if (state.pricingTiers.length > 0) {
+                currentTierIndex = state.pricingTiers.findIndex(t => 
+                    state.quantity >= t.min && state.quantity <= t.max
+                );
+            }
             
             if (currentTierIndex > 0) {
-                const nextTier = pricingTiers[currentTierIndex - 1];
+                const nextTier = state.pricingTiers[currentTierIndex - 1];
                 const capsNeeded = nextTier.min - state.quantity;
                 
                 if (capsNeeded > 0 && capsNeeded <= 20) {
-                    const savings = (state.unitPrice - (nextTier.price + (state.unitPrice - state.basePrice))) * nextTier.min;
+                    const currentTotal = state.unitPrice * state.quantity;
+                    const newUnitPrice = nextTier.price + (state.unitPrice - state.basePrice);
+                    const newTotal = newUnitPrice * nextTier.min;
+                    const savings = (state.unitPrice * nextTier.min) - newTotal;
                     
                     tipText.textContent = `Add ${capsNeeded} more caps to save $${Math.abs(savings).toFixed(2)} total!`;
                     savingsTip.style.display = 'flex';
@@ -1182,6 +1290,18 @@
                 }
             } else {
                 savingsTip.style.display = 'none';
+            }
+        }
+        
+        function updateLTMWarning() {
+            const ltmWarning = document.getElementById('ltm-warning');
+            if (state.quantity < 24) {
+                ltmWarning.style.display = 'flex';
+                const perCap = (50 / state.quantity).toFixed(2);
+                document.getElementById('ltm-warning-text').textContent = 
+                    `Orders under 24 caps include a $50 setup fee (+$${perCap}/cap)`;
+            } else {
+                ltmWarning.style.display = 'none';
             }
         }
         
@@ -1206,6 +1326,30 @@
             if (newValue >= 5000 && newValue <= 15000) {
                 state.backLogoStitches = newValue;
                 document.getElementById('back-logo-stitches').textContent = newValue.toLocaleString();
+                
+                // Update price display
+                const price = Math.ceil(newValue / 1000);
+                document.getElementById('back-logo-price-display').textContent = 
+                    `Additional Cost: $${price.toFixed(2)} per cap`;
+                
+                // Update pricing if back logo is enabled
+                if (state.backLogoEnabled) {
+                    updatePricing();
+                }
+            }
+        }
+        
+        // Update selected color display
+        function updateSelectedColorDisplay(colorName, colorImage) {
+            const nameElement = document.getElementById('selected-color-name');
+            const swatchElement = document.getElementById('selected-color-swatch');
+            
+            if (nameElement) {
+                nameElement.textContent = colorName || 'Select a Color';
+            }
+            
+            if (swatchElement && colorImage) {
+                swatchElement.innerHTML = `<img src="${colorImage}" alt="${colorName}">`;
             }
         }
         
@@ -1232,8 +1376,10 @@
                     if (index === 0) {
                         newCell.textContent = '24-47';
                     } else {
-                        // For cap embroidery, 24-47 should be $24
-                        newCell.innerHTML = '<strong>$24</strong>';
+                        // Use the price from our pricing tiers if available
+                        const tier24 = state.pricingTiers.find(t => t.min === 24);
+                        const price = tier24 ? tier24.price : 24;
+                        newCell.innerHTML = `<strong>$${price}</strong>`;
                     }
                     newRow.appendChild(newCell);
                 });
@@ -1242,20 +1388,10 @@
                 tbody.insertBefore(newRow, firstRow);
             }
         }
-        
-        // Update selected color display
-        function updateSelectedColorDisplay(colorName, colorImage) {
-            const nameElement = document.getElementById('selected-color-name');
-            const swatchElement = document.getElementById('selected-color-swatch');
-            
-            if (nameElement) {
-                nameElement.textContent = colorName || 'Select a Color';
-            }
-            
-            if (swatchElement && colorImage) {
-                swatchElement.innerHTML = `<img src="${colorImage}" alt="${colorName}">`;
-            }
-        }
     </script>
+    
+    <!-- Beta Analytics and Feedback -->
+    <script src="/beta-analytics-tracker.js" defer></script>
+    <script src="/beta-feedback-widget.js" defer></script>
 </body>
 </html>

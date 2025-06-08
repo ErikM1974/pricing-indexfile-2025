@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Beta Pricing Test</title>
+</head>
+<body>
+    <h1>Testing Beta Cap Embroidery Pricing</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testBetaPricing() {
+            const results = document.getElementById('results');
+            let html = '<h2>Test Results:</h2>';
+            
+            try {
+                // Load the beta page in an iframe
+                const iframe = document.createElement('iframe');
+                iframe.src = '/cap-embroidery-pricing-integrated.html?StyleNumber=C112&COLOR=Black';
+                iframe.style.width = '100%';
+                iframe.style.height = '800px';
+                iframe.style.border = '2px solid #ccc';
+                
+                iframe.onload = function() {
+                    setTimeout(() => {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        
+                        // Check pricing for quantity 31
+                        const unitPrice = iframeDoc.getElementById('unit-price');
+                        const quantity = iframeDoc.getElementById('quantity-input');
+                        
+                        html += `<p><strong>Initial State:</strong><br>`;
+                        html += `Quantity: ${quantity ? quantity.value : 'Not found'}<br>`;
+                        html += `Unit Price: ${unitPrice ? unitPrice.textContent : 'Not found'}</p>`;
+                        
+                        // Check pricing table
+                        const pricingRows = iframeDoc.querySelectorAll('#custom-pricing-grid tbody tr');
+                        if (pricingRows.length > 0) {
+                            html += '<p><strong>Pricing Table:</strong><br>';
+                            pricingRows.forEach(row => {
+                                const cells = row.querySelectorAll('td');
+                                if (cells.length >= 2) {
+                                    html += `${cells[0].textContent}: ${cells[1].textContent}<br>`;
+                                }
+                            });
+                            html += '</p>';
+                        }
+                        
+                        // Check stitch count dropdown
+                        const stitchSelect = iframeDoc.getElementById('stitch-count');
+                        if (stitchSelect) {
+                            html += '<p><strong>Stitch Count Options:</strong><br>';
+                            Array.from(stitchSelect.options).forEach(opt => {
+                                html += `${opt.value}: ${opt.text}<br>`;
+                            });
+                            html += '</p>';
+                        }
+                        
+                        // Check console for errors
+                        if (iframe.contentWindow.console && iframe.contentWindow.console.errors) {
+                            html += '<p><strong>Console Errors:</strong><br>';
+                            html += iframe.contentWindow.console.errors.join('<br>');
+                            html += '</p>';
+                        }
+                        
+                        // Check if pricing data was loaded
+                        if (iframe.contentWindow.state) {
+                            html += '<p><strong>State Data:</strong><br>';
+                            html += `Base Price: $${iframe.contentWindow.state.basePrice}<br>`;
+                            html += `Pricing Tiers: ${JSON.stringify(iframe.contentWindow.state.pricingTiers)}</p>`;
+                        }
+                        
+                        results.innerHTML = html;
+                        
+                        // Also test different quantities
+                        setTimeout(() => {
+                            testDifferentQuantities(iframe);
+                        }, 2000);
+                        
+                    }, 5000); // Wait 5 seconds for Caspio data to load
+                };
+                
+                document.body.appendChild(iframe);
+                
+            } catch (error) {
+                html += `<p style="color: red;">Error: ${error.message}</p>`;
+                results.innerHTML = html;
+            }
+        }
+        
+        function testDifferentQuantities(iframe) {
+            const iframeWin = iframe.contentWindow;
+            const iframeDoc = iframe.contentDocument || iframeWin.document;
+            
+            let testResults = '<h3>Quantity Tests:</h3>';
+            
+            // Test quantity 24
+            iframeWin.state.quantity = 24;
+            iframeDoc.getElementById('quantity-input').value = 24;
+            iframeWin.updatePricing();
+            
+            setTimeout(() => {
+                const price24 = iframeDoc.getElementById('unit-price').textContent;
+                testResults += `Quantity 24: ${price24} (should be $24.00)<br>`;
+                
+                // Test quantity 47
+                iframeWin.state.quantity = 47;
+                iframeDoc.getElementById('quantity-input').value = 47;
+                iframeWin.updatePricing();
+                
+                setTimeout(() => {
+                    const price47 = iframeDoc.getElementById('unit-price').textContent;
+                    testResults += `Quantity 47: ${price47} (should be $24.00)<br>`;
+                    
+                    // Test quantity 48
+                    iframeWin.state.quantity = 48;
+                    iframeDoc.getElementById('quantity-input').value = 48;
+                    iframeWin.updatePricing();
+                    
+                    setTimeout(() => {
+                        const price48 = iframeDoc.getElementById('unit-price').textContent;
+                        testResults += `Quantity 48: ${price48} (should be $23.00)<br>`;
+                        
+                        // Test quantity 72
+                        iframeWin.state.quantity = 72;
+                        iframeDoc.getElementById('quantity-input').value = 72;
+                        iframeWin.updatePricing();
+                        
+                        setTimeout(() => {
+                            const price72 = iframeDoc.getElementById('unit-price').textContent;
+                            testResults += `Quantity 72: ${price72} (should be $21.00)<br>`;
+                            
+                            document.getElementById('results').innerHTML += testResults;
+                        }, 500);
+                    }, 500);
+                }, 500);
+            }, 500);
+        }
+        
+        // Start test when page loads
+        window.onload = testBetaPricing;
+    </script>
+</body>
+</html>
