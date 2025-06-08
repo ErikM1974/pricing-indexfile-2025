@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Fix Test</title>
+</head>
+<body>
+    <h1>Testing Design System Fix</h1>
+    <div id="status">Loading...</div>
+    
+    <script type="module">
+        const status = document.getElementById('status');
+        
+        try {
+            // Test the import
+            const module = await import('./src/shared/design-system/components/index.js');
+            status.innerHTML = '<p style="color: green;">✅ Module imported successfully!</p>';
+            
+            // Test getAllComponentStyles
+            if (module.getAllComponentStyles) {
+                try {
+                    const styles = module.getAllComponentStyles();
+                    status.innerHTML += '<p style="color: green;">✅ getAllComponentStyles() works!</p>';
+                    status.innerHTML += `<p>Generated ${styles.length} characters of CSS</p>`;
+                } catch (e) {
+                    status.innerHTML += `<p style="color: red;">❌ Error in getAllComponentStyles: ${e.message}</p>`;
+                }
+            }
+            
+            // Test component creation
+            if (module.createButton) {
+                status.innerHTML += '<p style="color: green;">✅ Components are accessible</p>';
+            }
+            
+        } catch (error) {
+            status.innerHTML = `<p style="color: red;">❌ Import failed: ${error.message}</p>`;
+            console.error(error);
+        }
+    </script>
+</body>
+</html>

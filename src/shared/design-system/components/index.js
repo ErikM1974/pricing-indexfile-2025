@@ -1,6 +1,18 @@
 // Design System Components - Main Export
 // Phase 6: UI Redesign
 
+// Import all style constants for getAllComponentStyles function
+import { buttonStyles } from './Button.js';
+import { cardStyles } from './Card.js';
+import { formStyles } from './Form.js';
+import { modalStyles } from './Modal.js';
+import { layoutStyles } from './Layout.js';
+import { toastStyles } from './Toast.js';
+import { loadingStyles } from './Loading.js';
+import { tabStyles } from './Tabs.js';
+import { Tooltip } from './Tooltip.js';
+import { Footer } from './Footer.js';
+
 // Button components
 export {
   Button,
@@ -100,10 +112,6 @@ export {
   Footer,
   createFooter
 } from './Footer.js';
-
-// Import styles from new components
-import { Tooltip } from './Tooltip.js';
-import { Footer } from './Footer.js';
 
 // Aggregate all component styles
 export function getAllComponentStyles() {
