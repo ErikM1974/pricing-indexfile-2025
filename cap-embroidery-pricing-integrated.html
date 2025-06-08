@@ -8,83 +8,166 @@
     <!-- Keep existing header styles for compatibility -->
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     
-    <!-- Design System Styles -->
-    <link rel="stylesheet" href="src/shared/design-system/styles/reset.css">
-    <link rel="stylesheet" href="src/shared/design-system/styles/tokens.css">
-    <link rel="stylesheet" href="src/shared/design-system/styles/animations.css">
-    <link rel="stylesheet" href="src/shared/design-system/styles/utilities.css">
-    
-    <!-- Page Specific Styles -->
+    <!-- Simple, clean styles without design system -->
     <style>
-        /* Compatibility layer for existing header */
-        .universal-header {
-            /* Keep existing header styles */
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #0052a3;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--gray-900);
+            background-color: var(--light);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
         
         /* Hero Section */
         .hero-section {
-            background: var(--background);
-            padding: var(--spacing-8) 0;
-            border-bottom: 1px solid var(--border);
+            background: white;
+            padding: 40px 0;
+            border-bottom: 1px solid var(--gray-300);
         }
         
         .product-header {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: var(--spacing-8);
+            gap: 40px;
             align-items: start;
         }
         
         @media (max-width: 768px) {
             .product-header {
                 grid-template-columns: 1fr;
+                gap: 30px;
             }
+        }
+        
+        /* Product Info */
+        .product-info {
+            margin-top: 20px;
+        }
+        
+        .product-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: var(--gray-900);
+        }
+        
+        .product-style {
+            color: var(--gray-600);
+            margin: 0 0 20px 0;
+        }
+        
+        .product-description h3 {
+            font-size: 18px;
+            margin: 20px 0 10px 0;
+        }
+        
+        .product-description p {
+            color: var(--gray-700);
+            margin: 0;
+        }
+        
+        /* Image Gallery */
+        .gallery-placeholder {
+            width: 100%;
+            height: 400px;
+            background: var(--gray-200);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .gallery-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .gallery-placeholder p {
+            color: var(--gray-600);
+            font-size: 18px;
+            margin: 0;
         }
         
         /* Quick Quote Calculator */
         .quick-quote {
-            background: var(--card);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-6);
-            box-shadow: var(--shadow-md);
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .quick-quote h2 {
-            font-size: var(--text-xl);
-            font-weight: var(--font-semibold);
-            margin-bottom: var(--spacing-2);
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 5px 0;
         }
         
         .quick-quote-subtitle {
-            color: var(--text-muted);
-            font-size: var(--text-sm);
-            margin-bottom: var(--spacing-6);
+            color: var(--gray-600);
+            margin: 0 0 30px 0;
         }
         
-        /* Quantity Input */
+        /* Quantity Controls */
         .quantity-input-group {
             display: flex;
             align-items: center;
-            gap: var(--spacing-2);
-            margin-bottom: var(--spacing-4);
+            gap: 10px;
+            margin-bottom: 20px;
         }
         
         .quantity-btn {
-            width: 2.5rem;
-            height: 2.5rem;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--primary);
-            color: var(--primary-foreground);
+            color: white;
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: 4px;
             cursor: pointer;
-            transition: all var(--duration-200) var(--ease-out);
+            font-size: 20px;
+            transition: background-color 0.2s;
         }
         
         .quantity-btn:hover:not(:disabled) {
-            background: var(--color-primary-600);
+            background: var(--primary-dark);
         }
         
         .quantity-btn:disabled {
@@ -95,300 +178,445 @@
         .quantity-input {
             width: 80px;
             text-align: center;
-            font-size: var(--text-xl);
-            font-weight: var(--font-semibold);
-            padding: var(--spacing-2);
-            border: 2px solid var(--border);
-            border-radius: var(--radius-md);
-            background: var(--background);
-            color: var(--text-primary);
+            font-size: 20px;
+            font-weight: 600;
+            padding: 8px;
+            border: 2px solid var(--gray-300);
+            border-radius: 4px;
         }
         
         .quantity-label {
-            font-size: var(--text-lg);
-            color: var(--text-secondary);
+            font-size: 18px;
+            color: var(--gray-700);
         }
         
         /* Pricing Display */
         .pricing-display {
-            background: var(--muted);
-            padding: var(--spacing-4);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--spacing-4);
+            background: var(--gray-100);
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
         }
         
         .unit-price {
-            font-size: var(--text-3xl);
-            font-weight: var(--font-bold);
+            font-size: 36px;
+            font-weight: 700;
             color: var(--primary);
+            margin: 0;
         }
         
         .unit-label {
-            font-size: var(--text-sm);
-            color: var(--text-muted);
+            font-size: 14px;
+            color: var(--gray-600);
         }
         
         .total-price {
-            font-size: var(--text-lg);
-            color: var(--text-primary);
-            margin-top: var(--spacing-2);
+            font-size: 18px;
+            color: var(--gray-900);
+            margin-top: 10px;
         }
         
         /* Pricing Breakdown */
         .pricing-breakdown {
-            border-top: 1px solid var(--border);
-            padding-top: var(--spacing-4);
-            margin-top: var(--spacing-4);
+            border-top: 1px solid var(--gray-300);
+            padding-top: 20px;
+            margin-top: 20px;
         }
         
         .breakdown-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: var(--spacing-2) 0;
-            font-size: var(--text-sm);
+            padding: 8px 0;
+            font-size: 14px;
         }
         
         .breakdown-label {
-            color: var(--text-secondary);
+            color: var(--gray-700);
         }
         
         .breakdown-value {
-            font-weight: var(--font-medium);
-            color: var(--text-primary);
+            font-weight: 500;
+            color: var(--gray-900);
         }
         
         .breakdown-total {
-            font-weight: var(--font-bold);
-            font-size: var(--text-base);
-            border-top: 1px solid var(--border);
-            padding-top: var(--spacing-2);
-            margin-top: var(--spacing-2);
+            font-weight: 600;
+            font-size: 16px;
+            border-top: 1px solid var(--gray-300);
+            padding-top: 8px;
+            margin-top: 8px;
         }
         
         /* Quick Select Buttons */
         .quick-select {
-            margin-top: var(--spacing-4);
+            margin-top: 20px;
         }
         
         .quick-select-label {
-            font-size: var(--text-sm);
-            color: var(--text-muted);
-            margin-bottom: var(--spacing-2);
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 10px;
+            display: block;
         }
         
         .quick-select-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: var(--spacing-2);
+            gap: 8px;
         }
         
         .quick-select-btn {
-            padding: var(--spacing-2);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            background: var(--background);
+            padding: 8px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            background: white;
             cursor: pointer;
-            transition: all var(--duration-200) var(--ease-out);
+            transition: all 0.2s;
             text-align: center;
+            font-size: 14px;
         }
         
         .quick-select-btn:hover {
             border-color: var(--primary);
-            background: var(--accent);
+            background: var(--gray-100);
         }
         
         .quick-select-btn.active {
-            border-color: var(--primary);
             background: var(--primary);
-            color: var(--primary-foreground);
+            color: white;
+            border-color: var(--primary);
         }
         
-        .quick-select-qty {
-            font-size: var(--text-lg);
-            font-weight: var(--font-semibold);
+        /* Main Content Sections */
+        .main-content {
+            padding: 40px 0;
         }
         
-        .quick-select-label-text {
-            font-size: var(--text-xs);
-            opacity: 0.8;
+        .content-section {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
-        .quick-select-badge {
-            font-size: var(--text-xs);
-            padding: var(--spacing-1);
-            background: var(--color-success-light);
-            color: var(--color-success-dark);
-            border-radius: var(--radius-sm);
-            margin-top: var(--spacing-1);
+        .content-section h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0 0 20px 0;
         }
         
-        /* Savings Tip */
-        .savings-tip {
+        /* Options */
+        .option-group {
+            margin-bottom: 25px;
+        }
+        
+        .option-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .option-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .checkbox-label {
             display: flex;
             align-items: center;
-            gap: var(--spacing-2);
-            padding: var(--spacing-3);
-            background: var(--color-info-light);
-            color: var(--color-info-dark);
-            border-radius: var(--radius-md);
-            margin-top: var(--spacing-4);
-            font-size: var(--text-sm);
+            cursor: pointer;
+            user-select: none;
         }
         
-        .savings-tip-icon {
-            font-size: var(--text-lg);
-        }
-        
-        /* Product Info Section */
-        .product-info {
-            margin-top: var(--spacing-8);
-        }
-        
-        .product-title {
-            font-size: var(--text-2xl);
-            font-weight: var(--font-bold);
-            margin-bottom: var(--spacing-2);
-        }
-        
-        .product-style {
-            color: var(--text-muted);
-            font-size: var(--text-sm);
-            margin-bottom: var(--spacing-4);
-        }
-        
-        /* Gallery Placeholder */
-        .gallery-placeholder {
-            background: var(--muted);
-            border-radius: var(--radius-lg);
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-        }
-        
-        /* Color Selection */
-        .color-section {
-            margin-top: var(--spacing-6);
-        }
-        
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: var(--spacing-3);
-            margin-top: var(--spacing-4);
-        }
-        
-        .color-option {
-            text-align: center;
+        .checkbox-label input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
         }
         
-        .color-swatch {
-            width: 60px;
-            height: 60px;
-            border-radius: var(--radius-md);
-            margin: 0 auto var(--spacing-2);
-            border: 2px solid transparent;
-            transition: all var(--duration-200) var(--ease-out);
+        /* Back Logo Details */
+        .back-logo-details {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--gray-100);
+            border-radius: 4px;
         }
         
-        .color-option:hover .color-swatch {
-            transform: scale(1.1);
+        .back-logo-details.active {
+            display: block;
         }
         
-        .color-option.selected .color-swatch {
+        /* Stitch Counter */
+        .stitch-counter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .stitch-counter-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--gray-300);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .stitch-counter-btn:hover {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(var(--primary), 0.2);
+            background: var(--gray-100);
         }
         
-        .color-name {
-            font-size: var(--text-xs);
-            color: var(--text-secondary);
+        .stitch-counter-display {
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
         }
         
-        /* Customization Options */
-        .customization-section {
-            margin-top: var(--spacing-8);
-        }
-        
-        .option-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-6);
-            margin-bottom: var(--spacing-4);
-        }
-        
-        .option-title {
-            font-size: var(--text-lg);
-            font-weight: var(--font-semibold);
-            margin-bottom: var(--spacing-2);
-        }
-        
-        .option-description {
-            font-size: var(--text-sm);
-            color: var(--text-muted);
-            margin-bottom: var(--spacing-4);
+        .stitch-counter-range {
+            color: var(--gray-600);
+            font-size: 14px;
         }
         
         /* Pricing Table */
         .pricing-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: var(--spacing-6);
+            margin-top: 20px;
+        }
+        
+        .pricing-table th,
+        .pricing-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
         }
         
         .pricing-table th {
-            background: var(--muted);
-            padding: var(--spacing-3);
-            text-align: left;
-            font-weight: var(--font-semibold);
-            font-size: var(--text-sm);
-            color: var(--text-secondary);
+            background: var(--gray-100);
+            font-weight: 600;
+            color: var(--gray-800);
         }
         
-        .pricing-table td {
-            padding: var(--spacing-3);
-            border-bottom: 1px solid var(--border);
+        .pricing-table tr:hover {
+            background: var(--gray-50);
         }
         
-        .pricing-table tr:last-child td {
-            border-bottom: none;
+        /* CTA Section */
+        .cta-section {
+            background: var(--gray-100);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 40px;
         }
         
-        .price-cell {
-            font-weight: var(--font-medium);
+        .cta-section h2 {
+            font-size: 28px;
+            margin: 0 0 10px 0;
+        }
+        
+        .cta-section p {
+            color: var(--gray-700);
+            margin: 0 0 30px 0;
+            font-size: 18px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: white;
             color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-100);
+        }
+        
+        /* Features */
+        .features {
+            margin-top: 30px;
+            line-height: 1.8;
+        }
+        
+        .features p {
+            margin: 5px 0;
+            color: var(--gray-700);
+        }
+        
+        /* Savings Tip */
+        .savings-tip {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #856404;
+        }
+        
+        .savings-tip-icon {
+            font-size: 18px;
+        }
+        
+        /* Hide elements */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Hidden Calculator */
+        .hidden-calculator {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        
+        /* Clean Color Grid */
+        .clean-color-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .clean-color-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+        
+        .clean-swatch-item {
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .clean-swatch-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .clean-swatch-item.active .clean-swatch-box {
+            box-shadow: 0 0 0 3px var(--primary);
+        }
+        
+        .clean-swatch-box {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid var(--gray-300);
+            transition: all 0.2s;
+            background: var(--gray-100);
+        }
+        
+        .clean-swatch-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .clean-swatch-name {
+            font-size: 12px;
+            margin-top: 6px;
+            color: var(--gray-700);
+            line-height: 1.2;
+        }
+        
+        /* Selected Color Display */
+        .selected-color-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--gray-100);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .selected-color-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid var(--gray-300);
+            overflow: hidden;
+        }
+        
+        .selected-color-swatch img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .selected-color-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            color: var(--gray-900);
+        }
+        
+        .selected-color-info p {
+            margin: 0;
+            color: var(--gray-600);
+            font-size: 14px;
         }
     </style>
-    
-    <!-- Keep jsPDF for compatibility -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
-    <!-- Keep existing header for compatibility -->
+    <!-- Universal Navigation Header -->
     <header class="universal-header">
-        <!-- Reuse existing header structure -->
         <div class="header-top-bar">
             <div class="header-top-bar-content">
                 <div class="contact-info">
                     <span>📞 253-922-5793</span>
                     <span>✉️ sales@nwcustomapparel.com</span>
                     <span>🕒 9AM-5PM</span>
-                </div>
-                <div class="header-actions">
-                    <button onclick="window.print()" class="header-action-btn">
-                        🖨️ Print Quote
-                    </button>
-                    <button onclick="shareQuote()" class="header-action-btn">
-                        📤 Share
-                    </button>
-                    <button onclick="toggleHelp()" class="header-action-btn">
-                        ❓ Help
-                    </button>
                 </div>
             </div>
         </div>
@@ -407,14 +635,8 @@
                     
                     <div class="page-context">
                         <div class="page-context-title">Cap Embroidery Pricing</div>
-                        <div class="page-context-subtitle" id="current-product-context">New Era - Structured Stretch Cotton Cap</div>
+                        <div class="page-context-subtitle" id="current-product-context">Select a product to get started</div>
                     </div>
-                </div>
-                
-                <div class="header-quick-actions">
-                    <button onclick="contactForQuote()" class="primary-action-btn">
-                        💬 Get Quote
-                    </button>
                 </div>
             </div>
         </div>
@@ -422,7 +644,7 @@
         <div class="header-breadcrumb">
             <div class="header-breadcrumb-content">
                 <nav class="header-breadcrumb-nav">
-                    <a href="javascript:void(0)" onclick="goToHome()" class="breadcrumb-link">Home</a>
+                    <a href="/" class="breadcrumb-link">Home</a>
                     <span class="breadcrumb-separator">›</span>
                     <span>Products</span>
                     <span class="breadcrumb-separator">›</span>
@@ -436,7 +658,214 @@
         </div>
     </header>
 
-    <div id="app"></div>
+    <!-- Hidden Caspio Matrix - Keep this for data source -->
+    <div id="pricing-calculator" class="pricing-calculator hidden-calculator">
+        <div class="loading-message">Loading pricing data...</div>
+    </div>
+
+    <div id="app">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="container">
+                <div class="product-header">
+                    <!-- Left Column - Product Info -->
+                    <div>
+                        <div class="gallery-placeholder">
+                            <img id="product-image" src="" alt="Product Image" style="display: none;">
+                            <p id="image-placeholder">Product Image Gallery</p>
+                        </div>
+                        
+                        <div class="product-info">
+                            <h1 class="product-title" id="product-title">Product Title</h1>
+                            <p class="product-style" id="product-style">Style: </p>
+                            <div class="product-description">
+                                <h3>What's Included</h3>
+                                <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
+                            </div>
+                            
+                            <!-- Color Selection -->
+                            <div class="color-selection" style="margin-top: 30px;">
+                                <h3>Select Color</h3>
+                                
+                                <!-- Selected Color Display -->
+                                <div class="selected-color-display">
+                                    <div id="selected-color-swatch" class="selected-color-swatch">
+                                        <!-- Color image will go here -->
+                                    </div>
+                                    <div class="selected-color-info">
+                                        <h3 id="selected-color-name">Select a Color</h3>
+                                        <p>Choose from available colors below</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Color Swatches Grid -->
+                                <div id="color-swatches" class="clean-color-grid">
+                                    <!-- Color swatches will be dynamically added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column - Quick Quote -->
+                    <div>
+                        <div class="quick-quote">
+                            <h2>Quick Quote Calculator</h2>
+                            <p class="quick-quote-subtitle">Enter quantity for instant pricing</p>
+                            
+                            <!-- Quantity Input -->
+                            <div class="quantity-input-group">
+                                <button class="quantity-btn" id="decrease-btn" onclick="updateQuantity(-1)">−</button>
+                                <input type="number" class="quantity-input" id="quantity-input" value="31" min="1" max="10000" onchange="handleQuantityChange()">
+                                <button class="quantity-btn" id="increase-btn" onclick="updateQuantity(1)">+</button>
+                                <span class="quantity-label">caps</span>
+                            </div>
+                            
+                            <!-- Pricing Display -->
+                            <div class="pricing-display">
+                                <div class="unit-price" id="unit-price">$24.00</div>
+                                <div class="unit-label">per cap</div>
+                                <div class="total-price" id="total-price">Total: $744.00</div>
+                            </div>
+                            
+                            <!-- Pricing Breakdown -->
+                            <div class="pricing-breakdown" id="pricing-breakdown">
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">Base cap price:</span>
+                                    <span class="breakdown-value">$24.00</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">Front logo (8,000 stitches):</span>
+                                    <span class="breakdown-value">included</span>
+                                </div>
+                                <div class="breakdown-item breakdown-total">
+                                    <span class="breakdown-label">Your price:</span>
+                                    <span class="breakdown-value">$24.00 /cap</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Savings Tip -->
+                            <div class="savings-tip" id="savings-tip">
+                                <span class="savings-tip-icon">💡</span>
+                                <span id="savings-tip-text"></span>
+                            </div>
+                            
+                            <!-- Quick Select -->
+                            <div class="quick-select">
+                                <span class="quick-select-label">Quick select:</span>
+                                <div class="quick-select-grid">
+                                    <button class="quick-select-btn" onclick="setQuantity(12)">1 Dozen</button>
+                                    <button class="quick-select-btn" onclick="setQuantity(24)">2 Dozen</button>
+                                    <button class="quick-select-btn" onclick="setQuantity(36)">3 Dozen</button>
+                                    <button class="quick-select-btn" onclick="setQuantity(48)">4 Dozen</button>
+                                    <button class="quick-select-btn" onclick="setQuantity(72)">6 Dozen</button>
+                                    <button class="quick-select-btn" onclick="setQuantity(144)">12 Dozen</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="container">
+                <!-- Customization Options -->
+                <div class="content-section">
+                    <h2>Customization Options</h2>
+                    
+                    <div class="option-group">
+                        <label for="stitch-count">Front Logo Stitch Count</label>
+                        <select id="stitch-count" class="option-select" onchange="updatePricing()">
+                            <option value="8000" selected>8,000 stitches (Standard)</option>
+                            <option value="10000">10,000 stitches (+$1.00)</option>
+                            <option value="15000">15,000 stitches (+$2.00)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="back-logo-checkbox" onchange="toggleBackLogo()">
+                            Add embroidered back logo (+$5.00 per cap)
+                        </label>
+                        
+                        <div class="back-logo-details" id="back-logo-details">
+                            <label>Back Logo Stitch Count:</label>
+                            <div class="stitch-counter">
+                                <button class="stitch-counter-btn" onclick="updateBackLogoStitches(-1000)">−</button>
+                                <span class="stitch-counter-display" id="back-logo-stitches">5,000</span>
+                                <button class="stitch-counter-btn" onclick="updateBackLogoStitches(1000)">+</button>
+                                <span class="stitch-counter-range">(5K-15K)</span>
+                            </div>
+                            <div style="margin-top: 10px; font-weight: 500;">
+                                Additional Cost: $5.00 per cap
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pricing Table -->
+                <div class="content-section">
+                    <h2>Pricing by Quantity</h2>
+                    <p style="color: var(--gray-600); margin-bottom: 20px;">Volume discounts automatically applied</p>
+                    
+                    <table class="pricing-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity Range</th>
+                                <th>Price per Cap</th>
+                                <th>You Save</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>24-47 caps</td>
+                                <td><strong>$24.00</strong></td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>48-71 caps</td>
+                                <td><strong>$23.00</strong></td>
+                                <td>$1.00 per cap</td>
+                            </tr>
+                            <tr>
+                                <td>72+ caps</td>
+                                <td><strong>$21.00</strong></td>
+                                <td>$3.00 per cap</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <p style="margin-top: 20px; font-size: 14px; color: var(--gray-600);">
+                        <strong>Note:</strong> Prices shown include embroidered logo on front. Back logo and stitch count upgrades are additional.
+                    </p>
+                </div>
+                
+                <!-- CTA Section -->
+                <div class="cta-section">
+                    <h2>Ready for Your Quote?</h2>
+                    <p>Contact us with your quantity and customization details for a personalized quote.</p>
+                    
+                    <div class="cta-buttons">
+                        <button class="btn btn-primary" onclick="window.location.href='tel:253-922-5793'">
+                            📞 Call for Quote: 253-922-5793
+                        </button>
+                        
+                        <button class="btn btn-secondary" onclick="window.location.href='mailto:sales@nwcustomapparel.com?subject=Cap Embroidery Quote Request'">
+                            ✉️ Email Quote Request
+                        </button>
+                    </div>
+                    
+                    <div class="features">
+                        <p>💚 <strong>Why Choose Northwest Custom Apparel?</strong></p>
+                        <p>Family Owned and Operated Since 1977 • Milton, WA • Quality embroidery</p>
+                        <p>📍 2025 Freeman Road East Milton, WA 98354</p>
+                        <p>📱 You can text us at 253-922-5793</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Keep existing header functionality -->
     <script src="/shared_components/js/header-button-functions.js"></script>
@@ -444,637 +873,310 @@
     <!-- Beta Analytics and Feedback -->
     <script src="/beta-analytics-tracker.js"></script>
     <script src="/beta-feedback-widget.js"></script>
+    
+    <!-- JavaScript Files from Original Page -->
+    <!-- Base Layer - Core dependencies -->
+    <script src="/shared_components/js/debug-config.js"></script>
+    <script src="/shared_components/js/nwca-namespace.js"></script>
+    <script src="/shared_components/js/constants.js"></script>
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/shared_components/js/utils.js"></script>
+    
+    <!-- Data Layer - Pricing system -->
+    <script src="/shared_components/js/pricing-matrix-api.js"></script>
+    <script src="/shared_components/js/pricing-matrix-capture.js"></script>
+    <script src="/shared_components/js/pricing-calculator.js"></script>
+    <script src="/shared_components/js/dp5-helper.js"></script>
+    
+    <!-- UI Components -->
+    <script src="/shared_components/js/ui-components.js"></script>
+    <script src="/shared_components/js/pricing-pages.js"></script>
+    
+    <!-- Cap Embroidery Specific -->
+    <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script>
+    <script src="/shared_components/js/clean-color-adapter.js"></script>
 
-    <script type="module">
-        // Import necessary modules
-        import { initializeDesignSystem } from './src/shared/design-system/index.js';
-        import { 
-            createButton, 
-            createCard,
-            createTextInput,
-            createSelect,
-            createCheckbox,
-            createRadioGroup
-        } from './src/shared/design-system/components/index.js';
-        import { 
-            createContainer,
-            createGrid,
-            createStack
-        } from './src/shared/design-system/components/Layout.js';
-        import { showToast } from './src/shared/design-system/components/Toast.js';
+    <!-- Simple, working JavaScript with Caspio integration -->
+    <script>
+        // Cap Embroidery Pricing Logic
+        const state = {
+            quantity: 31,
+            basePrice: 0,
+            unitPrice: 0,
+            totalPrice: 0,
+            frontLogoStitches: 8000,
+            backLogoEnabled: false,
+            backLogoStitches: 5000,
+            backLogoPrice: 5,
+            selectedColor: '',
+            styleNumber: '',
+            productTitle: ''
+        };
         
-        // Initialize design system
-        await initializeDesignSystem();
+        // Pricing tiers for NE1000
+        const pricingTiers = [
+            { min: 24, max: 47, price: 24 },
+            { min: 48, max: 71, price: 23 },
+            { min: 72, max: Infinity, price: 21 }
+        ];
         
-        // Cap Embroidery Pricing Logic with URL parameter support
-        class CapEmbroideryPricing {
-            constructor() {
-                // Parse URL parameters
-                const urlParams = new URLSearchParams(window.location.search);
-                const styleNumber = urlParams.get('StyleNumber') || 'NE1000';
-                const color = urlParams.get('COLOR') || 'Cyber Green';
-                
-                // State with URL parameters
-                this.state = {
-                    styleNumber: styleNumber,
-                    quantity: 31,
-                    basePrice: 0,
-                    unitPrice: 0,
-                    totalPrice: 0,
-                    frontLogoStitches: 8000,
-                    backLogoEnabled: false,
-                    backLogoStitches: 5000,
-                    backLogoPrice: 5,
-                    selectedColor: color,
-                    productTitle: this.getProductTitle(styleNumber),
-                    productImage: this.getProductImage(styleNumber, color)
-                };
-                
-                // Pricing matrix for NE1000
-                this.pricingTiers = [
-                    { min: 24, max: 47, price: 24 },
-                    { min: 48, max: 71, price: 23 },
-                    { min: 72, max: Infinity, price: 21 }
-                ];
-                
-                this.init();
-            }
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parse URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            state.styleNumber = urlParams.get('StyleNumber') || 'NE1000';
+            state.selectedColor = urlParams.get('COLOR') || 'Cyber Green';
             
-            getProductTitle(styleNumber) {
-                // Map style numbers to product titles
-                const titles = {
-                    'NE1000': 'New Era - Structured Stretch Cotton Cap',
-                    'C112': 'Port & Company - Snapback Trucker Cap',
-                    'PC800': 'Port & Company - Unstructured Sandwich Bill Cap'
-                };
-                return titles[styleNumber] || styleNumber;
-            }
+            // Update product info
+            updateProductInfo();
             
-            getProductImage(styleNumber, color) {
-                // Construct product image URL based on style and color
-                return `https://www.companycasuals.com/mmCOMPANYCASUALS/Images/${styleNumber}/${color.replace(/\s+/g, '_')}.jpg`;
-            }
+            // Initial pricing calculation
+            updatePricing();
             
-            init() {
-                this.createUI();
-                this.updatePricing();
-                this.attachEventListeners();
-                this.updateBreadcrumbs();
-            }
-            
-            updateBreadcrumbs() {
-                // Update breadcrumbs with product info
-                const productContext = document.getElementById('current-product-context');
-                if (productContext) {
-                    productContext.textContent = this.state.productTitle;
+            // Listen for color selection events from DP5/clean-color-adapter
+            document.addEventListener('colorSelected', function(event) {
+                if (event.detail && event.detail.colorName) {
+                    state.selectedColor = event.detail.colorName;
+                    updateProductInfo();
+                    updateSelectedColorDisplay(event.detail.colorName, event.detail.colorImage);
                 }
-                
-                const breadcrumbProduct = document.getElementById('breadcrumb-product');
-                if (breadcrumbProduct) {
-                    breadcrumbProduct.textContent = this.state.styleNumber;
-                }
-                
-                // Update back to product link
-                const backToProduct = document.getElementById('back-to-product');
-                if (backToProduct) {
-                    backToProduct.href = `/product/${this.state.styleNumber}`;
-                }
-            }
+            });
             
-            createUI() {
-                const app = document.getElementById('app');
-                const container = createContainer({ padding: true });
-                
-                // Hero Section
-                const heroSection = document.createElement('div');
-                heroSection.className = 'hero-section';
-                
-                const heroContainer = createContainer({ padding: true });
-                const productHeader = document.createElement('div');
-                productHeader.className = 'product-header';
-                
-                // Left side - Product Info and Gallery
-                const leftColumn = document.createElement('div');
-                
-                // Product image with actual product photo
-                const galleryPlaceholder = document.createElement('div');
-                galleryPlaceholder.className = 'gallery-placeholder';
-                const productImg = document.createElement('img');
-                productImg.src = this.state.productImage;
-                productImg.alt = this.state.productTitle;
-                productImg.style.width = '100%';
-                productImg.style.height = '100%';
-                productImg.style.objectFit = 'cover';
-                productImg.style.borderRadius = 'var(--radius-lg)';
-                productImg.onerror = function() {
-                    this.style.display = 'none';
-                    this.parentElement.innerHTML = '<p>Product Image Gallery</p>';
-                };
-                galleryPlaceholder.appendChild(productImg);
-                leftColumn.appendChild(galleryPlaceholder);
-                
-                // Product info
-                const productInfo = document.createElement('div');
-                productInfo.className = 'product-info';
-                productInfo.innerHTML = `
-                    <h1 class="product-title">${this.state.productTitle}</h1>
-                    <p class="product-style">Style: ${this.state.styleNumber}</p>
-                    <div class="product-description">
-                        <h3>What's Included</h3>
-                        <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
-                    </div>
-                `;
-                leftColumn.appendChild(productInfo);
-                
-                // Right side - Quick Quote Calculator
-                const rightColumn = document.createElement('div');
-                const quickQuote = this.createQuickQuote();
-                rightColumn.appendChild(quickQuote);
-                
-                productHeader.appendChild(leftColumn);
-                productHeader.appendChild(rightColumn);
-                heroContainer.element.appendChild(productHeader);
-                heroSection.appendChild(heroContainer.element);
-                
-                // Main content
-                const mainContent = createContainer({ padding: true });
-                
-                // Color Selection
-                const colorSection = this.createColorSection();
-                mainContent.element.appendChild(colorSection);
-                
-                // Customization Options
-                const customizationSection = this.createCustomizationSection();
-                mainContent.element.appendChild(customizationSection);
-                
-                // Pricing Table
-                const pricingTable = this.createPricingTable();
-                mainContent.element.appendChild(pricingTable);
-                
-                // CTA Section
-                const ctaSection = this.createCTASection();
-                mainContent.element.appendChild(ctaSection);
-                
-                // Append sections
-                container.element.appendChild(heroSection);
-                container.element.appendChild(mainContent.element);
-                app.appendChild(container.element);
-            }
+            // Listen for pricing data updates
+            window.addEventListener('pricingDataLoaded', function(event) {
+                console.log('[Beta Page] Pricing data loaded event received');
+                // The existing cap-embroidery-controller will handle updating the pricing table
+                // We just need to ensure our pricing tiers are used for the calculator
+            });
+        });
+        
+        function updateProductInfo() {
+            // Update product title
+            const titles = {
+                'NE1000': 'New Era - Structured Stretch Cotton Cap',
+                'C112': 'Port & Company - Snapback Trucker Cap',
+                'PC800': 'Port & Company - Unstructured Sandwich Bill Cap'
+            };
             
-            createQuickQuote() {
-                const quickQuote = document.createElement('div');
-                quickQuote.className = 'quick-quote';
-                
-                quickQuote.innerHTML = `
-                    <h2>Quick Quote Calculator</h2>
-                    <p class="quick-quote-subtitle">Enter quantity for instant pricing</p>
-                `;
-                
-                // Quantity input group
-                const quantityGroup = document.createElement('div');
-                quantityGroup.className = 'quantity-input-group';
-                
-                const decrementBtn = document.createElement('button');
-                decrementBtn.className = 'quantity-btn';
-                decrementBtn.innerHTML = '−';
-                decrementBtn.onclick = () => this.updateQuantity(this.state.quantity - 1);
-                
-                const quantityInput = document.createElement('input');
-                quantityInput.type = 'number';
-                quantityInput.className = 'quantity-input';
-                quantityInput.id = 'quantity-input';
-                quantityInput.value = this.state.quantity;
-                quantityInput.min = 1;
-                quantityInput.onchange = (e) => this.updateQuantity(parseInt(e.target.value) || 1);
-                
-                const incrementBtn = document.createElement('button');
-                incrementBtn.className = 'quantity-btn';
-                incrementBtn.innerHTML = '+';
-                incrementBtn.onclick = () => this.updateQuantity(this.state.quantity + 1);
-                
-                const quantityLabel = document.createElement('span');
-                quantityLabel.className = 'quantity-label';
-                quantityLabel.textContent = 'caps';
-                
-                quantityGroup.appendChild(decrementBtn);
-                quantityGroup.appendChild(quantityInput);
-                quantityGroup.appendChild(incrementBtn);
-                quantityGroup.appendChild(quantityLabel);
-                quickQuote.appendChild(quantityGroup);
-                
-                // Pricing display
-                const pricingDisplay = document.createElement('div');
-                pricingDisplay.className = 'pricing-display';
-                pricingDisplay.innerHTML = `
-                    <div class="unit-price" id="unit-price">$0.00</div>
-                    <div class="unit-label">per cap</div>
-                    <div class="total-price" id="total-price">Total: $0.00</div>
-                `;
-                quickQuote.appendChild(pricingDisplay);
-                
-                // Pricing breakdown
-                const breakdown = document.createElement('div');
-                breakdown.className = 'pricing-breakdown';
-                breakdown.id = 'pricing-breakdown';
-                quickQuote.appendChild(breakdown);
-                
-                // Quick select buttons
-                const quickSelect = document.createElement('div');
-                quickSelect.className = 'quick-select';
-                quickSelect.innerHTML = '<div class="quick-select-label">Quick Select:</div>';
-                
-                const quickSelectGrid = document.createElement('div');
-                quickSelectGrid.className = 'quick-select-grid';
-                
-                const quantities = [
-                    { qty: 12, label: 'Dozen' },
-                    { qty: 24, label: '2 Dozen', badge: 'Most Popular' },
-                    { qty: 48, label: '4 Dozen' },
-                    { qty: 72, label: '6 Dozen', badge: 'Best Value' },
-                    { qty: 144, label: 'Gross' }
-                ];
-                
-                quantities.forEach(({ qty, label, badge }) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'quick-select-btn';
-                    if (qty === this.state.quantity) btn.classList.add('active');
-                    btn.innerHTML = `
-                        <div class="quick-select-qty">${qty}</div>
-                        <div class="quick-select-label-text">${label}</div>
-                        ${badge ? `<div class="quick-select-badge">${badge}</div>` : ''}
-                    `;
-                    btn.onclick = () => {
-                        document.querySelectorAll('.quick-select-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        this.updateQuantity(qty);
-                    };
-                    quickSelectGrid.appendChild(btn);
-                });
-                
-                quickSelect.appendChild(quickSelectGrid);
-                quickQuote.appendChild(quickSelect);
-                
-                // Savings tip
-                const savingsTip = document.createElement('div');
-                savingsTip.className = 'savings-tip';
-                savingsTip.id = 'savings-tip';
-                quickQuote.appendChild(savingsTip);
-                
-                return quickQuote;
-            }
+            state.productTitle = titles[state.styleNumber] || state.styleNumber;
             
-            createColorSection() {
-                const section = document.createElement('div');
-                section.className = 'color-section';
-                
-                const card = createCard({
-                    header: { title: 'Select Color', subtitle: '+ Add Multiple Colors' },
-                    padding: 'large'
-                });
-                
-                const selectedColor = document.createElement('div');
-                selectedColor.innerHTML = `<p style="margin-bottom: var(--spacing-4);">Selected: <strong>${this.state.selectedColor}</strong></p>`;
-                
-                const colorGrid = document.createElement('div');
-                colorGrid.className = 'color-grid';
-                
-                const colors = [
-                    { name: 'Black', hex: '#000000' },
-                    { name: 'Camo', hex: '#7d7d5a' },
-                    { name: 'Cyber Green', hex: '#00ff00' },
-                    { name: 'Dark Green', hex: '#004d00' },
-                    { name: 'Deep Navy', hex: '#000080' },
-                    { name: 'Graphite', hex: '#41424c' },
-                    { name: 'Orange', hex: '#ff6600' },
-                    { name: 'Royal', hex: '#0033cc' },
-                    { name: 'Scarlet Red', hex: '#ff2400' },
-                    { name: 'Shark Teal', hex: '#008080' },
-                    { name: 'White', hex: '#ffffff' }
-                ];
-                
-                colors.forEach(color => {
-                    const option = document.createElement('div');
-                    option.className = 'color-option';
-                    if (color.name === this.state.selectedColor) option.classList.add('selected');
-                    
-                    const swatch = document.createElement('div');
-                    swatch.className = 'color-swatch';
-                    swatch.style.backgroundColor = color.hex;
-                    if (color.name === 'White') swatch.style.border = '1px solid var(--border)';
-                    
-                    const name = document.createElement('div');
-                    name.className = 'color-name';
-                    name.textContent = color.name;
-                    
-                    option.appendChild(swatch);
-                    option.appendChild(name);
-                    
-                    option.onclick = () => {
-                        document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
-                        option.classList.add('selected');
-                        this.state.selectedColor = color.name;
-                        selectedColor.innerHTML = `<p style="margin-bottom: var(--spacing-4);">Selected: <strong>${color.name}</strong></p>`;
-                        
-                        // Update product image
-                        const productImg = document.querySelector('.gallery-placeholder img');
-                        if (productImg) {
-                            productImg.src = this.getProductImage(this.state.styleNumber, color.name);
-                        }
-                    };
-                    
-                    colorGrid.appendChild(option);
-                });
-                
-                const content = document.createElement('div');
-                content.appendChild(selectedColor);
-                content.appendChild(colorGrid);
-                
-                card.setBody(content);
-                section.appendChild(card.getElement());
-                
-                return section;
-            }
+            // Update UI
+            document.getElementById('product-title').textContent = state.productTitle;
+            document.getElementById('product-style').textContent = 'Style: ' + state.styleNumber;
+            document.getElementById('current-product-context').textContent = state.productTitle;
+            document.getElementById('breadcrumb-product').textContent = state.styleNumber;
             
-            createCustomizationSection() {
-                const section = document.createElement('div');
-                section.className = 'customization-section';
-                
-                const title = document.createElement('h2');
-                title.textContent = 'Customization Options';
-                title.style.marginBottom = 'var(--spacing-4)';
-                section.appendChild(title);
-                
-                const subtitle = document.createElement('p');
-                subtitle.textContent = 'Adjust your embroidery details (updates pricing above)';
-                subtitle.style.color = 'var(--text-muted)';
-                subtitle.style.marginBottom = 'var(--spacing-6)';
-                section.appendChild(subtitle);
-                
-                // Front logo stitch count
-                const frontLogoCard = document.createElement('div');
-                frontLogoCard.className = 'option-card';
-                frontLogoCard.innerHTML = `
-                    <h3 class="option-title">Front Logo Stitch Count</h3>
-                    <p class="option-description">Higher stitch counts allow for more detailed designs but may increase cost.</p>
-                `;
-                
-                const stitchSelect = createSelect({
-                    id: 'front-stitch-select',
-                    options: [
-                        { value: '8000', label: '8,000 stitches (Standard)' },
-                        { value: '10000', label: '10,000 stitches (+$1.00)' },
-                        { value: '15000', label: '15,000 stitches (+$2.00)' }
-                    ],
-                    value: '8000',
-                    onChange: (e) => {
-                        this.state.frontLogoStitches = parseInt(e.target.value);
-                        this.updatePricing();
-                        showToast('✓ Quick quote updated!', { type: 'success', duration: 2000 });
-                    }
-                });
-                
-                frontLogoCard.appendChild(stitchSelect.getElement());
-                section.appendChild(frontLogoCard);
-                
-                // Back logo option
-                const backLogoCard = document.createElement('div');
-                backLogoCard.className = 'option-card';
-                
-                const backLogoCheckbox = createCheckbox({
-                    id: 'back-logo-checkbox',
-                    label: 'Add embroidered back logo (+$5.00 per cap)',
-                    helper: 'Optional upgrade for branding on both sides of the cap.',
-                    onChange: (e) => {
-                        this.state.backLogoEnabled = e.target.checked;
-                        this.updatePricing();
-                    }
-                });
-                
-                backLogoCard.appendChild(backLogoCheckbox.getElement());
-                section.appendChild(backLogoCard);
-                
-                return section;
-            }
+            // Update product image
+            const imageUrl = `https://www.companycasuals.com/mmCOMPANYCASUALS/Images/${state.styleNumber}/${state.selectedColor.replace(/\s+/g, '_')}.jpg`;
+            const productImage = document.getElementById('product-image');
+            const placeholder = document.getElementById('image-placeholder');
             
-            createPricingTable() {
-                const section = document.createElement('div');
-                section.innerHTML = `
-                    <h2>Detailed Pricing by Quantity</h2>
-                    <p style="color: var(--text-muted); margin-bottom: var(--spacing-4);">Volume discounts automatically applied</p>
-                    <table class="pricing-table">
-                        <thead>
-                            <tr>
-                                <th>QTY</th>
-                                <th>S/M</th>
-                                <th>M/L</th>
-                                <th>L/XL</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>24-47</td>
-                                <td class="price-cell">$24</td>
-                                <td class="price-cell">$24</td>
-                                <td class="price-cell">$24</td>
-                            </tr>
-                            <tr>
-                                <td>48-71</td>
-                                <td class="price-cell">$23</td>
-                                <td class="price-cell">$23</td>
-                                <td class="price-cell">$23</td>
-                            </tr>
-                            <tr>
-                                <td>72+</td>
-                                <td class="price-cell">$21</td>
-                                <td class="price-cell">$21</td>
-                                <td class="price-cell">$21</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                `;
-                return section;
-            }
+            productImage.src = imageUrl;
+            productImage.onload = function() {
+                productImage.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            productImage.onerror = function() {
+                productImage.style.display = 'none';
+                placeholder.style.display = 'block';
+            };
             
-            createCTASection() {
-                const section = document.createElement('div');
-                section.style.marginTop = 'var(--spacing-8)';
-                section.style.padding = 'var(--spacing-8)';
-                section.style.background = 'var(--muted)';
-                section.style.borderRadius = 'var(--radius-lg)';
-                section.style.textAlign = 'center';
-                
-                section.innerHTML = `
-                    <h2 style="margin-bottom: var(--spacing-4);">Ready for Your Quote?</h2>
-                    <p style="color: var(--text-muted); margin-bottom: var(--spacing-6);">
-                        Contact us with your quantity and customization details for a personalized quote.
-                    </p>
-                `;
-                
-                const buttonGroup = document.createElement('div');
-                buttonGroup.style.display = 'flex';
-                buttonGroup.style.justifyContent = 'center';
-                buttonGroup.style.gap = 'var(--spacing-4)';
-                buttonGroup.style.flexWrap = 'wrap';
-                
-                const callBtn = createButton({
-                    text: '📞 Call for Quote: 253-922-5793',
-                    variant: 'primary',
-                    size: 'large',
-                    onClick: () => window.location.href = 'tel:253-922-5793'
-                });
-                
-                const emailBtn = createButton({
-                    text: '✉️ Email Quote Request',
-                    variant: 'secondary',
-                    size: 'large',
-                    onClick: () => window.location.href = 'mailto:sales@nwcustomapparel.com?subject=Cap Embroidery Quote Request'
-                });
-                
-                buttonGroup.appendChild(callBtn.getElement());
-                buttonGroup.appendChild(emailBtn.getElement());
-                section.appendChild(buttonGroup);
-                
-                const features = document.createElement('div');
-                features.style.marginTop = 'var(--spacing-6)';
-                features.innerHTML = `
-                    <p>💚 <strong>Why Choose Northwest Custom Apparel?</strong></p>
-                    <p>Family Owned and Operated Since 1977 • Milton, WA • Quality embroidery</p>
-                    <p>📍 2025 Freeman Road East Milton, WA 98354</p>
-                    <p>📱 You can text us at 253-922-5793</p>
-                `;
-                
-                section.appendChild(features);
-                
-                return section;
-            }
+            // Update back to product link
+            const backLink = document.getElementById('back-to-product');
+            const breadcrumbLink = document.getElementById('breadcrumb-product-link');
+            const productUrl = `/product?StyleNumber=${state.styleNumber}&COLOR=${encodeURIComponent(state.selectedColor)}`;
             
-            updateQuantity(qty) {
-                if (qty < 1) return;
-                this.state.quantity = qty;
-                document.getElementById('quantity-input').value = qty;
-                this.updatePricing();
-            }
-            
-            updatePricing() {
-                // Get base price from tier
-                const tier = this.pricingTiers.find(t => this.state.quantity >= t.min && this.state.quantity <= t.max);
-                this.state.basePrice = tier ? tier.price : this.pricingTiers[this.pricingTiers.length - 1].price;
-                
-                // Calculate additional costs
-                let additionalCosts = 0;
-                
-                // Front logo stitch count upcharge
-                if (this.state.frontLogoStitches > 8000) {
-                    additionalCosts += this.state.frontLogoStitches === 10000 ? 1 : 2;
-                }
-                
-                // Back logo cost
-                if (this.state.backLogoEnabled) {
-                    additionalCosts += this.state.backLogoPrice;
-                }
-                
-                // Calculate final prices
-                this.state.unitPrice = this.state.basePrice + additionalCosts;
-                this.state.totalPrice = this.state.unitPrice * this.state.quantity;
-                
-                // Update UI
-                this.updatePricingDisplay();
-                this.updateBreakdown();
-                this.updateSavingsTip();
-            }
-            
-            updatePricingDisplay() {
-                document.getElementById('unit-price').textContent = `$${this.state.unitPrice.toFixed(2)}`;
-                document.getElementById('total-price').textContent = `Total: $${this.state.totalPrice.toFixed(2)}`;
-            }
-            
-            updateBreakdown() {
-                const breakdown = document.getElementById('pricing-breakdown');
-                let html = '';
-                
-                // Base cap price
-                html += `
-                    <div class="breakdown-item">
-                        <span class="breakdown-label">Base cap price:</span>
-                        <span class="breakdown-value">$${this.state.basePrice.toFixed(2)}</span>
-                    </div>
-                `;
-                
-                // Front logo
-                const frontLogoText = this.state.frontLogoStitches === 8000 ? 'included' : 
-                    `+$${this.state.frontLogoStitches === 10000 ? '1.00' : '2.00'}`;
-                html += `
-                    <div class="breakdown-item">
-                        <span class="breakdown-label">Front logo (${this.state.frontLogoStitches.toLocaleString()} stitches):</span>
-                        <span class="breakdown-value">${frontLogoText}</span>
-                    </div>
-                `;
-                
-                // Back logo if enabled
-                if (this.state.backLogoEnabled) {
-                    html += `
-                        <div class="breakdown-item">
-                            <span class="breakdown-label">Back logo (${this.state.backLogoStitches.toLocaleString()} stitches):</span>
-                            <span class="breakdown-value">+$${this.state.backLogoPrice.toFixed(2)}</span>
-                        </div>
-                    `;
-                }
-                
-                // Total
-                html += `
-                    <div class="breakdown-item breakdown-total">
-                        <span class="breakdown-label">Your price:</span>
-                        <span class="breakdown-value">$${this.state.unitPrice.toFixed(2)} /cap</span>
-                    </div>
-                `;
-                
-                breakdown.innerHTML = html;
-            }
-            
-            updateSavingsTip() {
-                const savingsTip = document.getElementById('savings-tip');
-                
-                // Find next tier
-                const currentTierIndex = this.pricingTiers.findIndex(t => 
-                    this.state.quantity >= t.min && this.state.quantity <= t.max
-                );
-                
-                if (currentTierIndex > 0) {
-                    const nextTier = this.pricingTiers[currentTierIndex - 1];
-                    const capsNeeded = nextTier.min - this.state.quantity;
-                    
-                    if (capsNeeded > 0 && capsNeeded <= 20) {
-                        const currentTotal = this.state.unitPrice * this.state.quantity;
-                        const newUnitPrice = nextTier.price + (this.state.unitPrice - this.state.basePrice);
-                        const newTotal = newUnitPrice * nextTier.min;
-                        const savings = (this.state.unitPrice * nextTier.min) - newTotal;
-                        
-                        savingsTip.innerHTML = `
-                            <span class="savings-tip-icon">💡</span>
-                            <span>Add ${capsNeeded} more caps for Tier ${currentTierIndex} pricing and save $${savings.toFixed(2)}!</span>
-                        `;
-                        savingsTip.style.display = 'flex';
-                    } else {
-                        savingsTip.style.display = 'none';
-                    }
-                } else {
-                    savingsTip.style.display = 'none';
-                }
-            }
-            
-            attachEventListeners() {
-                // Quantity input validation
-                const quantityInput = document.getElementById('quantity-input');
-                quantityInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        quantityInput.blur();
-                    }
-                });
+            backLink.href = productUrl;
+            breadcrumbLink.href = productUrl;
+        }
+        
+        function updateQuantity(delta) {
+            const newQty = state.quantity + delta;
+            if (newQty >= 1 && newQty <= 10000) {
+                state.quantity = newQty;
+                document.getElementById('quantity-input').value = newQty;
+                updatePricing();
             }
         }
         
-        // Initialize the pricing calculator
-        new CapEmbroideryPricing();
+        function handleQuantityChange() {
+            const input = document.getElementById('quantity-input');
+            const qty = parseInt(input.value) || 1;
+            
+            if (qty < 1) {
+                state.quantity = 1;
+                input.value = 1;
+            } else if (qty > 10000) {
+                state.quantity = 10000;
+                input.value = 10000;
+            } else {
+                state.quantity = qty;
+            }
+            
+            updatePricing();
+        }
+        
+        function setQuantity(qty) {
+            state.quantity = qty;
+            document.getElementById('quantity-input').value = qty;
+            updatePricing();
+            
+            // Update active button
+            document.querySelectorAll('.quick-select-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        function updatePricing() {
+            // Get base price from tier
+            const tier = pricingTiers.find(t => state.quantity >= t.min && state.quantity <= t.max);
+            state.basePrice = tier ? tier.price : pricingTiers[pricingTiers.length - 1].price;
+            
+            // Calculate additional costs
+            let additionalCosts = 0;
+            
+            // Front logo stitch count upcharge
+            const stitchCount = parseInt(document.getElementById('stitch-count').value);
+            state.frontLogoStitches = stitchCount;
+            
+            if (stitchCount === 10000) {
+                additionalCosts += 1;
+            } else if (stitchCount === 15000) {
+                additionalCosts += 2;
+            }
+            
+            // Back logo cost
+            if (state.backLogoEnabled) {
+                additionalCosts += state.backLogoPrice;
+            }
+            
+            // Calculate final prices
+            state.unitPrice = state.basePrice + additionalCosts;
+            state.totalPrice = state.unitPrice * state.quantity;
+            
+            // Update UI
+            updatePricingDisplay();
+            updateBreakdown();
+            updateSavingsTip();
+        }
+        
+        function updatePricingDisplay() {
+            document.getElementById('unit-price').textContent = `$${state.unitPrice.toFixed(2)}`;
+            document.getElementById('total-price').textContent = `Total: $${state.totalPrice.toFixed(2)}`;
+        }
+        
+        function updateBreakdown() {
+            const breakdown = document.getElementById('pricing-breakdown');
+            let html = '';
+            
+            // Base cap price
+            html += `
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Base cap price:</span>
+                    <span class="breakdown-value">$${state.basePrice.toFixed(2)}</span>
+                </div>
+            `;
+            
+            // Front logo
+            let frontLogoText = 'included';
+            if (state.frontLogoStitches === 10000) {
+                frontLogoText = '+$1.00';
+            } else if (state.frontLogoStitches === 15000) {
+                frontLogoText = '+$2.00';
+            }
+            
+            html += `
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Front logo (${state.frontLogoStitches.toLocaleString()} stitches):</span>
+                    <span class="breakdown-value">${frontLogoText}</span>
+                </div>
+            `;
+            
+            // Back logo if enabled
+            if (state.backLogoEnabled) {
+                html += `
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Back logo (${state.backLogoStitches.toLocaleString()} stitches):</span>
+                        <span class="breakdown-value">+$${state.backLogoPrice.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+            
+            // Total
+            html += `
+                <div class="breakdown-item breakdown-total">
+                    <span class="breakdown-label">Your price:</span>
+                    <span class="breakdown-value">$${state.unitPrice.toFixed(2)} /cap</span>
+                </div>
+            `;
+            
+            breakdown.innerHTML = html;
+        }
+        
+        function updateSavingsTip() {
+            const savingsTip = document.getElementById('savings-tip');
+            const tipText = document.getElementById('savings-tip-text');
+            
+            // Find current tier
+            const currentTierIndex = pricingTiers.findIndex(t => 
+                state.quantity >= t.min && state.quantity <= t.max
+            );
+            
+            if (currentTierIndex > 0) {
+                const nextTier = pricingTiers[currentTierIndex - 1];
+                const capsNeeded = nextTier.min - state.quantity;
+                
+                if (capsNeeded > 0 && capsNeeded <= 20) {
+                    const savings = (state.unitPrice - (nextTier.price + (state.unitPrice - state.basePrice))) * nextTier.min;
+                    
+                    tipText.textContent = `Add ${capsNeeded} more caps to save $${Math.abs(savings).toFixed(2)} total!`;
+                    savingsTip.style.display = 'flex';
+                } else {
+                    savingsTip.style.display = 'none';
+                }
+            } else {
+                savingsTip.style.display = 'none';
+            }
+        }
+        
+        function toggleBackLogo() {
+            const checkbox = document.getElementById('back-logo-checkbox');
+            const details = document.getElementById('back-logo-details');
+            
+            state.backLogoEnabled = checkbox.checked;
+            
+            if (checkbox.checked) {
+                details.classList.add('active');
+            } else {
+                details.classList.remove('active');
+            }
+            
+            updatePricing();
+        }
+        
+        function updateBackLogoStitches(delta) {
+            const newValue = state.backLogoStitches + delta;
+            
+            if (newValue >= 5000 && newValue <= 15000) {
+                state.backLogoStitches = newValue;
+                document.getElementById('back-logo-stitches').textContent = newValue.toLocaleString();
+            }
+        }
+        
+        // Update selected color display
+        function updateSelectedColorDisplay(colorName, colorImage) {
+            const nameElement = document.getElementById('selected-color-name');
+            const swatchElement = document.getElementById('selected-color-swatch');
+            
+            if (nameElement) {
+                nameElement.textContent = colorName || 'Select a Color';
+            }
+            
+            if (swatchElement && colorImage) {
+                swatchElement.innerHTML = `<img src="${colorImage}" alt="${colorName}">`;
+            }
+        }
     </script>
 </body>
 </html>
