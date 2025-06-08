@@ -203,6 +203,11 @@
             font-weight: 700;
             color: var(--primary);
             margin: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .unit-price.updating {
+            opacity: 0.5;
         }
         
         .unit-label {
@@ -834,7 +839,7 @@
                 <!-- Pricing Table -->
                 <div class="content-section" id="pricing-details">
                     <h2>Pricing by Quantity</h2>
-                    <p style="color: var(--gray-600); margin-bottom: 20px;">Volume discounts automatically applied</p>
+                    <p style="color: var(--gray-600); margin-bottom: 20px;">Volume discounts automatically applied • <span id="pricing-stitch-count-display">8,000 stitch pricing shown</span></p>
                     
                     <div class="pricing-table-container">
                         <table id="custom-pricing-grid" class="pricing-table">
@@ -1187,6 +1192,11 @@
             
             // Update pricing based on new stitch count
             updatePricingForStitchCount();
+            
+            // Force immediate update of quick quote calculator
+            updatePricing();
+            updatePricingDisplay();
+            updateBreakdown();
         }
         
         // Update pricing when stitch count changes
@@ -1226,6 +1236,12 @@
             
             // Update the pricing table
             updatePricingTable();
+            
+            // Update the stitch count display in pricing section
+            const stitchDisplay = document.getElementById('pricing-stitch-count-display');
+            if (stitchDisplay) {
+                stitchDisplay.textContent = `${state.frontLogoStitches.toLocaleString()} stitch pricing shown`;
+            }
             
             // Dispatch event for other components
             window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
@@ -1339,8 +1355,20 @@
         }
         
         function updatePricingDisplay() {
-            document.getElementById('unit-price').textContent = `$${state.unitPrice.toFixed(2)}`;
-            document.getElementById('total-price').textContent = `Total: $${state.totalPrice.toFixed(2)}`;
+            const unitPriceEl = document.getElementById('unit-price');
+            const totalPriceEl = document.getElementById('total-price');
+            
+            // Add updating class for visual feedback
+            unitPriceEl.classList.add('updating');
+            
+            // Update prices
+            unitPriceEl.textContent = `$${state.unitPrice.toFixed(2)}`;
+            totalPriceEl.textContent = `Total: $${state.totalPrice.toFixed(2)}`;
+            
+            // Remove updating class after animation
+            setTimeout(() => {
+                unitPriceEl.classList.remove('updating');
+            }, 300);
         }
         
         function updateBreakdown() {
