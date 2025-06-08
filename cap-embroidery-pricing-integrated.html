@@ -803,7 +803,7 @@
                     
                     <div class="option-group">
                         <label for="stitch-count">Front Logo Stitch Count</label>
-                        <select id="stitch-count" class="option-select" onchange="updatePricing()">
+                        <select id="stitch-count" class="option-select" onchange="handleStitchCountChange()">
                             <option value="5000">5,000 stitches</option>
                             <option value="8000" selected>8,000 stitches (Standard)</option>
                             <option value="10000">10,000 stitches</option>
@@ -957,6 +957,12 @@
             // Load Caspio data
             loadCaspioData();
             
+            // Add client-stitch-count-select ID for compatibility
+            const stitchSelect = document.getElementById('stitch-count');
+            if (stitchSelect) {
+                stitchSelect.id = 'client-stitch-count-select';
+            }
+            
             // Listen for color selection events from DP5/clean-color-adapter
             document.addEventListener('colorSelected', function(event) {
                 if (event.detail && event.detail.colorName) {
@@ -984,6 +990,16 @@
                 }, 500);
             });
             
+            // Listen for cap embroidery master data
+            window.addEventListener('caspioCapPricingCalculated', function(event) {
+                console.log('[Beta Page] Cap embroidery master data received', event.detail);
+                if (event.detail && event.detail.masterData) {
+                    window.capEmbroideryMasterData = event.detail.masterData;
+                    // Update pricing with new stitch count data
+                    updatePricingForStitchCount();
+                }
+            });
+            
             // Also listen for the pricing table to be updated
             const pricingGrid = document.getElementById('custom-pricing-grid');
             if (pricingGrid) {
@@ -1006,8 +1022,30 @@
             // Reset tiers
             state.pricingTiers = [];
             
-            // Look for OSFA pricing (cap embroidery uses one-size)
-            if (pricingData.prices && pricingData.prices.OSFA) {
+            // Check if we have cap embroidery master data with stitch count profiles
+            if (window.capEmbroideryMasterData && window.capEmbroideryMasterData.allPriceProfiles) {
+                const currentStitchCount = document.getElementById('stitch-count').value;
+                const stitchCountProfile = window.capEmbroideryMasterData.allPriceProfiles[currentStitchCount];
+                
+                if (stitchCountProfile && stitchCountProfile.OSFA) {
+                    console.log('[Beta Page] Using stitch count specific pricing for', currentStitchCount);
+                    const osfaPrices = stitchCountProfile.OSFA;
+                    
+                    // Convert to our tier format
+                    for (const [tierKey, price] of Object.entries(osfaPrices)) {
+                        if (tierKey.includes('24-47')) {
+                            state.pricingTiers.push({ min: 24, max: 47, price: parseFloat(price) });
+                        } else if (tierKey.includes('48-71')) {
+                            state.pricingTiers.push({ min: 48, max: 71, price: parseFloat(price) });
+                        } else if (tierKey.includes('72') || tierKey.includes('72+')) {
+                            state.pricingTiers.push({ min: 72, max: 99999, price: parseFloat(price) });
+                        }
+                    }
+                }
+            }
+            
+            // Fallback to general pricing if no stitch count specific data
+            if (state.pricingTiers.length === 0 && pricingData.prices && pricingData.prices.OSFA) {
                 const osfaPrices = pricingData.prices.OSFA;
                 
                 // Convert to our tier format
@@ -1036,6 +1074,9 @@
         function loadCaspioData() {
             const container = document.getElementById('caspio-embed-container');
             if (!container) return;
+            
+            // Clear any existing iframe
+            container.innerHTML = '';
             
             // Create the iframe URL with the style parameter
             const caspioSrc = `https://c3eku948.caspio.com/dp/a0e15000c5d8e1f2e9e94c3c9a5a/emb?StyleNumber=${encodeURIComponent(state.styleNumber)}`;
@@ -1137,6 +1178,111 @@
             event.target.classList.add('active');
         }
         
+        // Handle stitch count change
+        function handleStitchCountChange() {
+            const stitchCount = document.getElementById('stitch-count').value;
+            state.frontLogoStitches = parseInt(stitchCount);
+            
+            console.log('[Beta Page] Stitch count changed to:', stitchCount);
+            
+            // Update pricing based on new stitch count
+            updatePricingForStitchCount();
+        }
+        
+        // Update pricing when stitch count changes
+        function updatePricingForStitchCount() {
+            // If we have master data with stitch count profiles, update pricing tiers
+            if (window.capEmbroideryMasterData && window.capEmbroideryMasterData.allPriceProfiles) {
+                const currentStitchCount = state.frontLogoStitches.toString();
+                const stitchCountProfile = window.capEmbroideryMasterData.allPriceProfiles[currentStitchCount];
+                
+                if (stitchCountProfile) {
+                    console.log('[Beta Page] Found pricing profile for stitch count:', currentStitchCount);
+                    
+                    // Update pricing tiers with stitch count specific data
+                    state.pricingTiers = [];
+                    
+                    if (stitchCountProfile.OSFA) {
+                        const osfaPrices = stitchCountProfile.OSFA;
+                        
+                        for (const [tierKey, price] of Object.entries(osfaPrices)) {
+                            if (tierKey.includes('24-47')) {
+                                state.pricingTiers.push({ min: 24, max: 47, price: parseFloat(price) });
+                            } else if (tierKey.includes('48-71')) {
+                                state.pricingTiers.push({ min: 48, max: 71, price: parseFloat(price) });
+                            } else if (tierKey.includes('72') || tierKey.includes('72+')) {
+                                state.pricingTiers.push({ min: 72, max: 99999, price: parseFloat(price) });
+                            }
+                        }
+                        
+                        state.pricingTiers.sort((a, b) => a.min - b.min);
+                        console.log('[Beta Page] Updated pricing tiers for stitch count:', state.pricingTiers);
+                    }
+                }
+            }
+            
+            // Update all pricing displays
+            updatePricing();
+            
+            // Update the pricing table
+            updatePricingTable();
+            
+            // Dispatch event for other components
+            window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
+                detail: { stitchCount: state.frontLogoStitches }
+            }));
+        }
+        
+        // Update the pricing table with new data
+        function updatePricingTable() {
+            if (!window.capEmbroideryMasterData || !window.capEmbroideryMasterData.allPriceProfiles) {
+                console.log('[Beta Page] No master data available for pricing table update');
+                return;
+            }
+            
+            const currentStitchCount = state.frontLogoStitches.toString();
+            const stitchCountProfile = window.capEmbroideryMasterData.allPriceProfiles[currentStitchCount];
+            
+            if (!stitchCountProfile) {
+                console.log('[Beta Page] No pricing profile for stitch count:', currentStitchCount);
+                return;
+            }
+            
+            const tbody = document.querySelector('#custom-pricing-grid tbody');
+            if (!tbody) return;
+            
+            // Clear existing rows
+            tbody.innerHTML = '';
+            
+            // Add rows for each tier
+            const tiers = [
+                { range: '24-47', key: '24-47' },
+                { range: '48-71', key: '48-71' },
+                { range: '72+', key: '72+' }
+            ];
+            
+            tiers.forEach(tier => {
+                const row = document.createElement('tr');
+                const rangeCell = document.createElement('td');
+                rangeCell.textContent = tier.range;
+                row.appendChild(rangeCell);
+                
+                // Add price cell for OSFA
+                const priceCell = document.createElement('td');
+                if (stitchCountProfile.OSFA && stitchCountProfile.OSFA[tier.key]) {
+                    const price = parseFloat(stitchCountProfile.OSFA[tier.key]);
+                    priceCell.innerHTML = `<strong>$${price.toFixed(2)}</strong>`;
+                } else {
+                    priceCell.textContent = '-';
+                }
+                row.appendChild(priceCell);
+                
+                tbody.appendChild(row);
+            });
+            
+            console.log('[Beta Page] Pricing table updated for stitch count:', currentStitchCount);
+        }
+        
         function updatePricing() {
             // Get base price from tier
             let tier = null;
@@ -1166,15 +1312,8 @@
             // Calculate additional costs
             let additionalCosts = 0;
             
-            // Front logo stitch count upcharge
-            const stitchCount = parseInt(document.getElementById('stitch-count').value);
-            state.frontLogoStitches = stitchCount;
-            
-            // Stitch count pricing (need to check if this comes from Caspio)
-            if (stitchCount === 10000) {
-                additionalCosts += 1;
-            }
-            // Note: 5,000 stitches might be cheaper, but we need Caspio data for that
+            // Front logo stitch count is already included in the base price from Caspio
+            // No additional charge needed for front logo
             
             // Back logo cost ($1 per 1,000 stitches)
             if (state.backLogoEnabled) {
@@ -1216,17 +1355,11 @@
                 </div>
             `;
             
-            // Front logo
-            let frontLogoText = 'included';
-            if (state.frontLogoStitches === 10000) {
-                frontLogoText = '+$1.00';
-            }
-            // TODO: Handle 5,000 stitches when we get Caspio data
-            
+            // Front logo - price is included in base price from Caspio
             html += `
                 <div class="breakdown-item">
                     <span class="breakdown-label">Front logo (${state.frontLogoStitches.toLocaleString()} stitches):</span>
-                    <span class="breakdown-value">${frontLogoText}</span>
+                    <span class="breakdown-value">included</span>
                 </div>
             `;
             
