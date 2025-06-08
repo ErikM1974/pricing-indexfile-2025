@@ -6,11 +6,12 @@
     <title>Cap Embroidery Pricing | Northwest Custom Apparel</title>
     
     <!-- Keep existing header styles for compatibility -->
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     
     <!-- Essential styles for image gallery and color swatches -->
     <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
-    <link rel="stylesheet" href="/shared_components/css/clean-color-swatches.css">
+    <!-- Removed clean-color-swatches.css - using default dp5-helper styles -->
     <link rel="stylesheet" href="/shared_components/css/enhanced-loading-animations.css">
     
     <!-- Simple, clean styles without design system -->
@@ -35,6 +36,15 @@
             --gray-700: #495057;
             --gray-800: #343a40;
             --gray-900: #212529;
+            
+            /* Additional variables for color swatches */
+            --primary-color: var(--primary);
+            --primary-light: #cce5ff;
+            --background-light: var(--light);
+            --border-color: var(--gray-300);
+            --border-light: var(--gray-200);
+            --text-color: var(--gray-900);
+            --radius-sm: 4px;
         }
         
         * {
@@ -606,6 +616,112 @@
                 min-height: 300px;
             }
         }
+        
+        /* Color Swatch Styles from Embroidery Page */
+        .color-swatches-container.compact {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--background-light);
+            border-radius: var(--radius-sm);
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .color-swatches-container.compact .section-title {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .color-swatches-container.compact .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 10px 15px;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--primary-light);
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-track {
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        /* Simplified Swatch Styles */
+        .swatch-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70px;
+            min-height: 75px;
+            margin: 5px;
+            cursor: pointer;
+            justify-content: flex-start;
+        }
+
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            margin-bottom: 4px;
+            background-size: cover;
+            background-position: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .color-swatch:hover {
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .color-name {
+            font-size: 0.75em;
+            text-align: center;
+            color: var(--text-color);
+            width: 100%;
+            line-height: normal;
+            padding: 0 2px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            display: block;
+        }
+        
+        /* Responsive adjustments for swatches */
+        @media (max-width: 768px) {
+            .color-swatches-container.compact .color-swatches {
+                max-height: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .color-swatch {
+                width: 35px !important;
+                height: 35px !important;
+            }
+            
+            .color-name {
+                font-size: 0.65em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -701,27 +817,14 @@
                                 <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
                             </div>
                             
-                            <!-- Color Selection - Matching original structure -->
-                            <div class="clean-color-section" style="margin-top: 30px;">
-                                <h4 class="section-header">
-                                    Select Color
-                                    <button class="btn-secondary" style="float: right; font-size: 14px;" onclick="if(window.capEmbroideryController) capEmbroideryController.openColorMatrix()">
-                                        + Add Multiple Colors
-                                    </button>
-                                </h4>
-                                
-                                <!-- Selected Color Display -->
-                                <div class="clean-selected-display">
-                                    <div id="pricing-color-swatch" class="clean-selected-swatch"></div>
-                                    <div class="clean-selected-info">
-                                        <h3 id="pricing-color-name">Select a Color</h3>
-                                        <p>Choose from available colors below</p>
+                            <!-- Color Swatches styled like embroidery page -->
+                            <div class="color-swatches-left-column" style="margin-top:15px;">
+                                <div class="color-swatches-container compact">
+                                    <h3 class="section-title">Available Colors</h3>
+                                    <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 5px; max-height: 300px;">
+                                        <!-- Color swatches will be dynamically added here by dp5-helper -->
                                     </div>
-                                </div>
-                                
-                                <!-- Color Swatches Grid -->
-                                <div id="color-swatches" class="clean-color-grid">
-                                    <!-- Color swatches will be dynamically added here -->
+                                    <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
                                 </div>
                             </div>
                         </div>
@@ -905,7 +1008,7 @@
     
     <!-- Cap Embroidery Specific -->
     <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script>
-    <script src="/shared_components/js/clean-color-adapter.js"></script>
+    <!-- Removed clean-color-adapter.js - dp5-helper already handles color swatches -->
     <!-- IMPORTANT: NOT including cap-embroidery-ltm-fix.js as it has the $18 bug -->
     
     <!-- Beta Analytics and Feedback -->
