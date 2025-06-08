@@ -1040,6 +1040,18 @@
             if (window.capEmbroideryController) {
                 console.log('[Beta Page] Cap embroidery controller found, initializing...');
             }
+            
+            // Add event listener for stitch count changes
+            const stitchCountSelect = document.getElementById('stitch-count');
+            if (stitchCountSelect) {
+                console.log('[Beta Page] Adding stitch count change listener');
+                stitchCountSelect.addEventListener('change', function(e) {
+                    console.log('[Beta Page] Stitch count changed via event listener to:', e.target.value);
+                    handleStitchCountChange();
+                });
+            } else {
+                console.error('[Beta Page] Stitch count select element not found!');
+            }
         });
         
         // Extract pricing tiers from Caspio data
@@ -1206,8 +1218,8 @@
             event.target.classList.add('active');
         }
         
-        // Handle stitch count change
-        function handleStitchCountChange() {
+        // Handle stitch count change (make it global)
+        window.handleStitchCountChange = function() {
             const stitchCountEl = document.getElementById('stitch-count');
             if (!stitchCountEl) {
                 console.error('[Beta Page] Stitch count element not found');
@@ -1230,6 +1242,13 @@
         
         // Update pricing when stitch count changes
         function updatePricingForStitchCount() {
+            console.log('[Beta Page] updatePricingForStitchCount called');
+            console.log('[Beta Page] Current pricing data:', {
+                hasMasterData: !!window.capEmbroideryMasterData,
+                hasAllPriceProfiles: !!(window.capEmbroideryMasterData && window.capEmbroideryMasterData.allPriceProfiles),
+                currentStitchCount: state.frontLogoStitches
+            });
+            
             // If we have master data with stitch count profiles, update pricing tiers
             if (window.capEmbroideryMasterData && window.capEmbroideryMasterData.allPriceProfiles) {
                 const currentStitchCount = state.frontLogoStitches.toString();
@@ -1257,7 +1276,11 @@
                         state.pricingTiers.sort((a, b) => a.min - b.min);
                         console.log('[Beta Page] Updated pricing tiers for stitch count:', state.pricingTiers);
                     }
+                } else {
+                    console.log('[Beta Page] No pricing profile found for stitch count:', currentStitchCount);
                 }
+            } else {
+                console.log('[Beta Page] No master data available yet');
             }
             
             // Update all pricing displays
