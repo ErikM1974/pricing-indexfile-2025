@@ -661,6 +661,8 @@
     <!-- Hidden Caspio Matrix - Keep this for data source -->
     <div id="pricing-calculator" class="pricing-calculator hidden-calculator">
         <div class="loading-message">Loading pricing data...</div>
+        <!-- Caspio Deploy Script - This connects to your database -->
+        <script type="text/javascript" src="https://c7ect717.caspio.com/dp/A0E150005bf9a491cd164a31945f/emb"></script>
     </div>
 
     <div id="app">
@@ -677,7 +679,11 @@
                         
                         <div class="product-info">
                             <h1 class="product-title" id="product-title">Product Title</h1>
-                            <p class="product-style" id="product-style">Style: </p>
+                            <p class="product-style">Style: <strong id="product-style-context"></strong></p>
+                            <!-- Hidden element for pricing-pages.js -->
+                            <div style="display: none;">
+                                <h3 id="product-title-context" class="product-title">Product Title</h3>
+                            </div>
                             <div class="product-description">
                                 <h3>What's Included</h3>
                                 <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
@@ -805,36 +811,23 @@
                 </div>
                 
                 <!-- Pricing Table -->
-                <div class="content-section">
+                <div class="content-section" id="pricing-details">
                     <h2>Pricing by Quantity</h2>
                     <p style="color: var(--gray-600); margin-bottom: 20px;">Volume discounts automatically applied</p>
                     
-                    <table class="pricing-table">
-                        <thead>
-                            <tr>
-                                <th>Quantity Range</th>
-                                <th>Price per Cap</th>
-                                <th>You Save</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>24-47 caps</td>
-                                <td><strong>$24.00</strong></td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>48-71 caps</td>
-                                <td><strong>$23.00</strong></td>
-                                <td>$1.00 per cap</td>
-                            </tr>
-                            <tr>
-                                <td>72+ caps</td>
-                                <td><strong>$21.00</strong></td>
-                                <td>$3.00 per cap</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="pricing-table-container">
+                        <table id="custom-pricing-grid" class="pricing-table">
+                            <thead>
+                                <tr id="pricing-header-row" class="pricing-table-header">
+                                    <th>Quantity Range</th>
+                                    <!-- Size headers will be dynamically populated -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Pricing data will be dynamically added here -->
+                            </tbody>
+                        </table>
+                    </div>
                     
                     <p style="margin-top: 20px; font-size: 14px; color: var(--gray-600);">
                         <strong>Note:</strong> Prices shown include embroidered logo on front. Back logo and stitch count upgrades are additional.
@@ -895,6 +888,7 @@
     <!-- Cap Embroidery Specific -->
     <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script>
     <script src="/shared_components/js/clean-color-adapter.js"></script>
+    <script src="/shared_components/js/cap-embroidery-ltm-fix.js"></script>
 
     <!-- Simple, working JavaScript with Caspio integration -->
     <script>
@@ -948,6 +942,15 @@
                 // The existing cap-embroidery-controller will handle updating the pricing table
                 // We just need to ensure our pricing tiers are used for the calculator
             });
+            
+            // Set global variables that the controllers expect
+            window.selectedStyleNumber = state.styleNumber;
+            window.selectedCatalogColor = state.selectedColor;
+            
+            // Initialize cap embroidery controller if available
+            if (window.capEmbroideryController) {
+                console.log('[Beta Page] Cap embroidery controller found, initializing...');
+            }
         });
         
         function updateProductInfo() {
@@ -962,7 +965,13 @@
             
             // Update UI
             document.getElementById('product-title').textContent = state.productTitle;
-            document.getElementById('product-style').textContent = 'Style: ' + state.styleNumber;
+            document.getElementById('product-style-context').textContent = state.styleNumber;
+            
+            // Also update the hidden title context that pricing-pages.js looks for
+            const titleContext = document.getElementById('product-title-context');
+            if (titleContext) {
+                titleContext.textContent = state.productTitle;
+            }
             document.getElementById('current-product-context').textContent = state.productTitle;
             document.getElementById('breadcrumb-product').textContent = state.styleNumber;
             
