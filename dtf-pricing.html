@@ -719,6 +719,14 @@
         
         <!-- Hidden elements for compatibility with legacy scripts -->
         <div style="display: none;">
+            <div id="custom-pricing-grid">
+                <table>
+                    <thead>
+                        <tr id="pricing-header-row"></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
             <h2 id="product-title-context">Product Title</h2>
             <img id="product-image-main-hidden" src="" alt="">
         </div>
@@ -772,6 +780,10 @@
     <!-- JavaScript Files -->
     <script src="/shared_components/js/pricing-pages.js"></script>
     <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/pricing-matrix-capture.js"></script>
+    <script src="/shared_components/js/pricing-matrix-api.js"></script>
+    <script src="/shared_components/js/dp5-helper.js"></script>
+    <script src="/product-url-handler.js"></script>
     <script src="/shared_components/js/dtf-adapter.js"></script>
     <script src="/shared_components/js/quote-adapter-base.js"></script>
     <script src="/shared_components/js/dtf-quote-adapter.js"></script>
