@@ -384,7 +384,7 @@ class UniversalPricingGrid {
                 row.appendChild(tierCell);
 
                 // Price cells
-                headers.forEach(sizeGroup => {
+                headers.forEach((sizeGroup, colIndex) => {
                     const priceCell = document.createElement('td');
                     priceCell.className = 'price-cell';
                     
@@ -508,11 +508,15 @@ class UniversalPricingGrid {
             if (firstCell) {
                 // Add badges based on tier position
                 if (index === 0 && rows.length > 2) {
+                    // Add a space before the badge
+                    firstCell.appendChild(document.createTextNode(' '));
                     const badge = document.createElement('span');
                     badge.className = 'tier-badge popular';
                     badge.textContent = 'Popular';
                     firstCell.appendChild(badge);
                 } else if (index === rows.length - 1 && rows.length > 1) {
+                    // Add a space before the badge
+                    firstCell.appendChild(document.createTextNode(' '));
                     const badge = document.createElement('span');
                     badge.className = 'tier-badge best-value';
                     badge.textContent = 'Best Value';

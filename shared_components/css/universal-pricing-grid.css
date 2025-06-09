@@ -187,6 +187,33 @@
     border-radius: var(--radius-sm, 4px);
     overflow: hidden;
     table-layout: fixed; /* Ensure columns maintain consistent width */
+    display: table !important; /* Force table display */
+}
+
+/* Ensure proper table structure */
+.pricing-grid thead {
+    display: table-header-group !important;
+}
+
+.pricing-grid tbody {
+    display: table-row-group !important;
+}
+
+.pricing-grid tr {
+    display: table-row !important;
+    width: 100%;
+}
+
+.pricing-grid th,
+.pricing-grid td {
+    display: table-cell !important;
+}
+
+/* Ensure cells don't collapse or stack */
+.pricing-grid td.price-cell {
+    display: table-cell !important;
+    width: auto !important;
+    min-width: 80px !important;
 }
 
 .pricing-grid th {
@@ -195,11 +222,13 @@
     padding: 12px 8px;
     text-align: center;
     font-weight: 600;
+    width: auto; /* Let columns auto-size */
 }
 
 .pricing-grid th:first-child {
     text-align: left;
     padding-left: 15px;
+    width: 140px; /* Fixed width for quantity column */
 }
 
 .pricing-grid td {
@@ -334,7 +363,7 @@
 }
 
 /* Stagger animation for rows */
-.stagger-animation {
+.pricing-grid .stagger-animation {
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.5s ease forwards;
