@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Stitch Count Quick Quote Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .test-steps {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .test-steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .test-steps li {
+            margin-bottom: 10px;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .status-fixed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-issue {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        .result-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Test: Stitch Count Updates Quick Quote Calculator</h1>
+        
+        <p><span class="status-badge status-issue">Issue Reported</span> When you change the Front Logo Stitch Count, it correctly updates the "Pricing by Quantity" table but doesn't update the quick quote calculator's front logo price.</p>
+        
+        <p><span class="status-badge status-fixed">Fix Applied</span> Added code to ensure the quick quote calculator updates immediately when stitch count changes.</p>
+        
+        <div class="test-steps">
+            <h3>Test Steps:</h3>
+            <ol>
+                <li>Look at the <span class="highlight">Quick Quote Calculator</span> section at the top right</li>
+                <li>Note the current price (should be $24.00 per cap for quantity 31)</li>
+                <li>Scroll down to <span class="highlight">Customization Options</span></li>
+                <li>Change <span class="highlight">Front Logo Stitch Count</span> from "8,000 stitches" to "10,000 stitches"</li>
+                <li>Watch the Quick Quote Calculator - it should update immediately</li>
+                <li>The pricing breakdown should show "Front logo (10,000 stitches): included"</li>
+                <li>The price per cap should change based on the Caspio master bundle data</li>
+            </ol>
+        </div>
+        
+        <div class="test-controls">
+            <button onclick="injectTestData()">Inject Test Pricing Data</button>
+            <button onclick="checkCurrentState()">Check Current State</button>
+        </div>
+        
+        <div id="result-display" class="result-display" style="display:none;"></div>
+        
+        <h3>Beta Page with Fix:</h3>
+        <div class="iframe-container">
+            <iframe id="test-frame" src="/cap-embroidery-pricing-integrated.html?StyleNumber=NE1000&COLOR=Black"></iframe>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h3>What to Check:</h3>
+        <ul>
+            <li><strong>Immediate Update:</strong> The quick quote should update as soon as you change the stitch count</li>
+            <li><strong>Pricing Breakdown:</strong> Should show the new stitch count (e.g., "Front logo (10,000 stitches): included")</li>
+            <li><strong>Correct Pricing:</strong> The price should match the pricing table for the selected stitch count</li>
+            <li><strong>Console Messages:</strong> Open browser console (F12) to see debug messages about stitch count changes</li>
+        </ul>
+        
+        <h3>Expected Console Output:</h3>
+        <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;">
+[Beta Page] Stitch count changed to: 10000
+[Beta Page] updatePricingForStitchCount called
+[Beta Page] Found pricing profile for stitch count: 10000
+[Beta Page] Updated pricing tiers for stitch count: [...]
+[Beta Page] Forcing pricing update with new tiers
+        </pre>
+    </div>
+    
+    <script>
+        function injectTestData() {
+            const iframe = document.getElementById('test-frame').contentWindow;
+            
+            // Sample pricing data with different stitch counts
+            const testMasterData = {
+                allPriceProfiles: {
+                    "5000": {
+                        "OSFA": {
+                            "24-47": "22.00",
+                            "48-71": "21.00",
+                            "72+": "19.00"
+                        }
+                    },
+                    "8000": {
+                        "OSFA": {
+                            "24-47": "24.00",
+                            "48-71": "23.00",
+                            "72+": "21.00"
+                        }
+                    },
+                    "10000": {
+                        "OSFA": {
+                            "24-47": "26.00",
+                            "48-71": "25.00",
+                            "72+": "23.00"
+                        }
+                    }
+                }
+            };
+            
+            // Inject the master data
+            iframe.capEmbroideryMasterData = testMasterData;
+            
+            // Trigger the event
+            iframe.dispatchEvent(new CustomEvent('caspioCapPricingCalculated', {
+                detail: { masterData: testMasterData }
+            }));
+            
+            alert('Test pricing data injected! Now try changing the stitch count.');
+            
+            // Show the data
+            document.getElementById('result-display').style.display = 'block';
+            document.getElementById('result-display').innerHTML = '<strong>Injected Test Data:</strong><br>' + 
+                '5,000 stitches: $22.00 (24-47), $21.00 (48-71), $19.00 (72+)<br>' +
+                '8,000 stitches: $24.00 (24-47), $23.00 (48-71), $21.00 (72+)<br>' +
+                '10,000 stitches: $26.00 (24-47), $25.00 (48-71), $23.00 (72+)';
+        }
+        
+        function checkCurrentState() {
+            const iframe = document.getElementById('test-frame').contentWindow;
+            
+            const state = {
+                stitchCount: iframe.document.getElementById('stitch-count')?.value,
+                unitPrice: iframe.document.getElementById('unit-price')?.textContent,
+                quantity: iframe.document.getElementById('quantity-input')?.value,
+                breakdownText: iframe.document.getElementById('pricing-breakdown')?.textContent,
+                hasMasterData: !!iframe.capEmbroideryMasterData
+            };
+            
+            document.getElementById('result-display').style.display = 'block';
+            document.getElementById('result-display').innerHTML = 
+                '<strong>Current State:</strong><br>' +
+                'Stitch Count: ' + state.stitchCount + '<br>' +
+                'Unit Price: ' + state.unitPrice + '<br>' +
+                'Quantity: ' + state.quantity + '<br>' +
+                'Has Master Data: ' + state.hasMasterData + '<br>' +
+                'Breakdown includes: ' + (state.breakdownText?.includes(state.stitchCount) ? 'YES ✓' : 'NO ✗');
+        }
+    </script>
+</body>
+</html>

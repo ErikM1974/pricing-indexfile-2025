@@ -46,7 +46,8 @@ window.selectedCatalogColor = state.selectedColor;
 const tier = pricingTiers.find(t => quantity >= t.min && quantity <= t.max);
 const basePrice = tier.price;
 
-// Add stitch count upcharge
+// 
+
 if (stitchCount === 10000) additionalCosts += 1;
 
 // Add back logo (per 1,000 stitches)

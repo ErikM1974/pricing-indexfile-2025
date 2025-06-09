@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Screen Print Pricing | NWCA</title>
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     <style>
         /* Color swatch styles */
         .color-swatches {
@@ -382,8 +383,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
+    <div id="universal-header-container" data-page-type="screenprint"></div>
     <div class="container">
-        <h1>Screen Printing Pricing</h1>
+        <h1 style="display: none;">Screen Printing Pricing</h1>
 
         <!-- New Two-Column Layout Container -->
         <div class="product-page-columns-container">
@@ -397,7 +399,7 @@
                             <span class="meta-item">Style: <strong id="product-style-context">Loading...</strong></span>
                         </div>
                     </div>
-                    <div class="navigation-area">
+                    <div class="navigation-area" style="display: none;">
                         <a id="back-to-product" href="/product" class="back-to-product">
                             <span class="back-icon">←</span> Back to Product
                         </a>
@@ -684,6 +686,7 @@
     
     <!-- Enhanced Loading Experience -->
     <script src="/shared_components/js/screenprint-enhanced-loading.js"></script>
+    <script src="/shared_components/js/universal-header-component.js"></script>
     
 </body>
 </html>

@@ -111,15 +111,51 @@
         
         console.log("[DP5-HELPER] Using data for pricing grid. Headers:", dataToUse.headers);
         
+        // Extract individual sizes from headers that contain "/" (like S/M, M/L, L/XL)
         if (!dataToUse.uniqueSizes || dataToUse.uniqueSizes.length === 0) {
-            dataToUse.uniqueSizes = [...new Set(dataToUse.headers.filter(h => !h.includes('-') && !h.includes('/')))];
-            console.log("[DP5-HELPER] Derived uniqueSizes for grid update:", dataToUse.uniqueSizes);
+            const extractedSizes = [];
+            const sizeOrder = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+            
+            dataToUse.headers.forEach(header => {
+                if (header.includes('/')) {
+                    // Split S/M into S and M
+                    const sizes = header.split('/');
+                    sizes.forEach(size => {
+                        if (size && !extractedSizes.includes(size)) {
+                            extractedSizes.push(size);
+                        }
+                    });
+                } else if (!header.includes('-') && !extractedSizes.includes(header)) {
+                    extractedSizes.push(header);
+                }
+            });
+            
+            // Sort sizes in logical order
+            extractedSizes.sort((a, b) => {
+                const aIndex = sizeOrder.indexOf(a);
+                const bIndex = sizeOrder.indexOf(b);
+                if (aIndex === -1 && bIndex === -1) return 0;
+                if (aIndex === -1) return 1;
+                if (bIndex === -1) return -1;
+                return aIndex - bIndex;
+            });
+            
+            dataToUse.uniqueSizes = extractedSizes;
+            console.log("[DP5-HELPER] Extracted uniqueSizes from headers:", dataToUse.uniqueSizes);
         }
 
-        const pricingGrid = document.getElementById('custom-pricing-grid');
+        // Look for both the old custom-pricing-grid ID and the new universal pricing grid table
+        let pricingGrid = document.getElementById('custom-pricing-grid');
         if (!pricingGrid) {
-            console.warn("[DP5-HELPER] Custom pricing grid element not found.");
-            return;
+            // Try to find universal pricing grid table
+            const universalGrid = document.querySelector('[id$="-table"].pricing-grid');
+            if (universalGrid) {
+                pricingGrid = universalGrid;
+                console.log("[DP5-HELPER] Using universal pricing grid table:", universalGrid.id);
+            } else {
+                console.warn("[DP5-HELPER] No pricing grid element found (neither custom-pricing-grid nor universal grid).");
+                return;
+            }
         }
         
         const headerRow = document.getElementById('pricing-header-row') || pricingGrid.querySelector('thead tr');
@@ -332,6 +368,10 @@
         if (sizeGroup === 'S-XL') sizesToCheck = ['S', 'M', 'L', 'XL'];
         else if (sizeGroup === '2XL') sizesToCheck = ['2XL'];
         else if (sizeGroup === '3XL') sizesToCheck = ['3XL'];
+        else if (sizeGroup.includes('/')) {
+            // Handle S/M, M/L, L/XL format
+            sizesToCheck = sizeGroup.split('/');
+        }
         else sizesToCheck = [sizeGroup];
         
         let lowestInventory = Infinity;

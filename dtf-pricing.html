@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
     <link rel="stylesheet" href="/shared_components/css/quote-system.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     <!-- jsPDF Libraries for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -710,8 +711,9 @@
     </style>
 </head>
 <body>
+    <div id="universal-header-container" data-page-type="dtf"></div>
     <div class="container">
-        <h1>Direct-to-Film (DTF) Transfer Pricing</h1>
+        <h1 style="display: none;">Direct-to-Film (DTF) Transfer Pricing</h1>
 
         <!-- New Two-Column Layout Container -->
         <div class="product-page-columns-container">
@@ -725,7 +727,7 @@
                             <span class="meta-item">Style: <strong id="product-style-context">Loading...</strong></span>
                         </div>
                     </div>
-                    <div class="navigation-area">
+                    <div class="navigation-area" style="display: none;">
                         <a id="back-to-product" href="#" class="back-to-product">
                             <span class="back-icon">←</span> Back to Product
                         </a>
@@ -828,5 +830,6 @@
             accordion.classList.toggle('active');
         }
     </script>
+    <script src="/shared_components/js/universal-header-component.js"></script>
 </body>
 </html>

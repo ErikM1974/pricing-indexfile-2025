@@ -6,7 +6,13 @@
     <title>Cap Embroidery Pricing | Northwest Custom Apparel</title>
     
     <!-- Keep existing header styles for compatibility -->
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    
+    <!-- Essential styles for image gallery and color swatches -->
+    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
+    <!-- Removed clean-color-swatches.css - using default dp5-helper styles -->
+    <link rel="stylesheet" href="/shared_components/css/enhanced-loading-animations.css">
     
     <!-- Simple, clean styles without design system -->
     <style>
@@ -30,6 +36,15 @@
             --gray-700: #495057;
             --gray-800: #343a40;
             --gray-900: #212529;
+            
+            /* Additional variables for color swatches */
+            --primary-color: var(--primary);
+            --primary-light: #cce5ff;
+            --background-light: var(--light);
+            --border-color: var(--gray-300);
+            --border-light: var(--gray-200);
+            --text-color: var(--gray-900);
+            --radius-sm: 4px;
         }
         
         * {
@@ -99,30 +114,8 @@
             margin: 0;
         }
         
-        /* Image Gallery */
-        .gallery-placeholder {
-            width: 100%;
-            height: 400px;
-            background: var(--gray-200);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .gallery-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .gallery-placeholder p {
-            color: var(--gray-600);
-            font-size: 18px;
-            margin: 0;
-        }
+        /* Remove conflicting gallery styles - let the CSS files handle it */
+        /* Removed gallery-placeholder styles to avoid conflicts */
         
         /* Quick Quote Calculator */
         .quick-quote {
@@ -203,6 +196,11 @@
             font-weight: 700;
             color: var(--primary);
             margin: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .unit-price.updating {
+            opacity: 0.5;
         }
         
         .unit-label {
@@ -532,145 +530,203 @@
             overflow: hidden;
         }
         
-        /* Clean Color Grid */
-        .clean-color-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-top: 15px;
+        /* Remove conflicting color swatch styles - let the CSS files handle it */
+        /* Removed clean-color-grid and related styles to avoid conflicts */
+        
+        /* Ensure product main image displays properly */
+        .product-main-image {
+            width: 100%;
+            height: auto;
+            display: block;
         }
         
+        /* Ensure proper section headers */
+        .section-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+            color: var(--gray-900);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Fix button alignment in section header */
+        .section-header .btn-secondary {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        /* Enhanced gallery classes compatibility */
+        .image-gallery-enhanced {
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .image-container-enhanced {
+            position: relative;
+            width: 100%;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .image-container-enhanced img {
+            width: 100%;
+            height: auto;
+            display: block;
+            min-height: 400px;
+            object-fit: contain;
+            background-color: white;
+        }
+        
+        .image-thumbnails-enhanced {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        
+        .zoom-overlay-enhanced {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .image-container-enhanced:hover .zoom-overlay-enhanced {
+            opacity: 1;
+        }
+        
+        /* Ensure proper responsive behavior */
         @media (max-width: 768px) {
-            .clean-color-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
+            .image-container-enhanced img {
+                min-height: 300px;
             }
         }
         
-        .clean-swatch-item {
-            cursor: pointer;
-            text-align: center;
-            transition: transform 0.2s;
-        }
-        
-        .clean-swatch-item:hover {
-            transform: scale(1.05);
-        }
-        
-        .clean-swatch-item.active .clean-swatch-box {
-            box-shadow: 0 0 0 3px var(--primary);
-        }
-        
-        .clean-swatch-box {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid var(--gray-300);
-            transition: all 0.2s;
-            background: var(--gray-100);
-        }
-        
-        .clean-swatch-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .clean-swatch-name {
-            font-size: 12px;
-            margin-top: 6px;
-            color: var(--gray-700);
-            line-height: 1.2;
-        }
-        
-        /* Selected Color Display */
-        .selected-color-display {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        /* Color Swatch Styles from Embroidery Page */
+        .color-swatches-container.compact {
+            margin-top: 15px;
             padding: 15px;
-            background: var(--gray-100);
-            border-radius: 8px;
-            margin-bottom: 20px;
+            background-color: var(--background-light);
+            border-radius: var(--radius-sm);
+            border-top: 1px solid var(--border-light);
         }
         
-        .selected-color-swatch {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            border: 2px solid var(--gray-300);
-            overflow: hidden;
+        .color-swatches-container.compact .section-title {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--primary-color);
+            font-weight: bold;
         }
         
-        .selected-color-swatch img {
+        .color-swatches-container.compact .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 10px 15px;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--primary-light);
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-track {
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+        
+        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        /* Simplified Swatch Styles */
+        .swatch-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70px;
+            min-height: 75px;
+            margin: 5px;
+            cursor: pointer;
+            justify-content: flex-start;
+        }
+
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            margin-bottom: 4px;
+            background-size: cover;
+            background-position: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .color-swatch:hover {
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .color-name {
+            font-size: 0.75em;
+            text-align: center;
+            color: var(--text-color);
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            line-height: normal;
+            padding: 0 2px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            display: block;
         }
         
-        .selected-color-info h3 {
-            margin: 0 0 5px 0;
-            font-size: 18px;
-            color: var(--gray-900);
+        /* Responsive adjustments for swatches */
+        @media (max-width: 768px) {
+            .color-swatches-container.compact .color-swatches {
+                max-height: 200px;
+            }
         }
         
-        .selected-color-info p {
-            margin: 0;
-            color: var(--gray-600);
-            font-size: 14px;
+        @media (max-width: 480px) {
+            .color-swatch {
+                width: 35px !important;
+                height: 35px !important;
+            }
+            
+            .color-name {
+                font-size: 0.65em;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Universal Navigation Header -->
-    <header class="universal-header">
-        <div class="header-top-bar">
-            <div class="header-top-bar-content">
-                <div class="contact-info">
-                    <span>📞 253-922-5793</span>
-                    <span>✉️ sales@nwcustomapparel.com</span>
-                    <span>🕒 9AM-5PM</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="header-main">
-            <div class="header-main-content">
-                <div class="header-brand">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" alt="NW Custom Apparel Logo" class="header-logo-img">
-                </div>
-                
-                <div class="header-nav-hub">
-                    <a id="back-to-product" href="#" class="back-to-product">
-                        <span class="back-icon">←</span> 
-                        <span>Back to Product</span>
-                    </a>
-                    
-                    <div class="page-context">
-                        <div class="page-context-title">Cap Embroidery Pricing</div>
-                        <div class="page-context-subtitle" id="current-product-context">Select a product to get started</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="header-breadcrumb">
-            <div class="header-breadcrumb-content">
-                <nav class="header-breadcrumb-nav">
-                    <a href="/" class="breadcrumb-link">Home</a>
-                    <span class="breadcrumb-separator">›</span>
-                    <span>Products</span>
-                    <span class="breadcrumb-separator">›</span>
-                    <a id="breadcrumb-product-link" href="#" class="breadcrumb-link">
-                        <span id="breadcrumb-product">Product</span>
-                    </a>
-                    <span class="breadcrumb-separator">›</span>
-                    <span class="breadcrumb-current">Cap Embroidery Pricing</span>
-                </nav>
-            </div>
-        </div>
-    </header>
+    <!-- Universal Header -->
+    <div id="universal-header-container" data-page-type="cap-embroidery"></div>
     
     <!-- Hidden Caspio Matrix - Keep this for data source -->
     <div id="pricing-calculator" class="pricing-calculator hidden-calculator">
@@ -679,9 +735,12 @@
         <div id="caspio-embed-container"></div>
     </div>
     
-    <!-- Hidden elements for compatibility -->
+    <!-- Hidden elements for compatibility with pricing-pages.js -->
     <div style="display: none;">
         <h3 id="product-title-context" class="product-title">Product Title</h3>
+        <img id="product-image-context" src="" alt="">
+        <div id="product-color-context"></div>
+        <div id="selected-color-swatch-context"></div>
     </div>
 
     <div id="app">
@@ -691,9 +750,17 @@
                 <div class="product-header">
                     <!-- Left Column - Product Info -->
                     <div>
-                        <div class="gallery-placeholder">
-                            <img id="product-image" src="" alt="Product Image" style="display: none;">
-                            <p id="image-placeholder">Product Image Gallery</p>
+                        <!-- Product Image Gallery Structure matching original page -->
+                        <div id="product-image-gallery" class="image-gallery-enhanced product-image-gallery">
+                            <div id="main-image-container" class="image-container-enhanced main-image-container">
+                                <img id="product-image-main" src="" alt="Product Image" class="product-main-image" 
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y4ZjlmYSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIwMCIgeT0iMjAwIiBmaWxsPSIjNmM3NTdkIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiPkltYWdlIE5vdCBBdmFpbGFibGU8L3RleHQ+PC9zdmc+'; this.alt='Image not available';">
+                                <div class="image-loading-spinner"></div>
+                                <div class="image-zoom-overlay zoom-overlay-enhanced">🔍</div>
+                            </div>
+                            <div id="image-thumbnails" class="image-thumbnails-enhanced image-thumbnails">
+                                <!-- Thumbnails will be dynamically added here -->
+                            </div>
                         </div>
                         
                         <div class="product-info">
@@ -704,24 +771,14 @@
                                 <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
                             </div>
                             
-                            <!-- Color Selection -->
-                            <div class="color-selection" style="margin-top: 30px;">
-                                <h3>Select Color</h3>
-                                
-                                <!-- Selected Color Display -->
-                                <div class="selected-color-display">
-                                    <div id="selected-color-swatch" class="selected-color-swatch">
-                                        <!-- Color image will go here -->
+                            <!-- Color Swatches styled like embroidery page -->
+                            <div class="color-swatches-left-column" style="margin-top:15px;">
+                                <div class="color-swatches-container compact">
+                                    <h3 class="section-title">Available Colors</h3>
+                                    <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 5px; max-height: 300px;">
+                                        <!-- Color swatches will be dynamically added here by dp5-helper -->
                                     </div>
-                                    <div class="selected-color-info">
-                                        <h3 id="selected-color-name">Select a Color</h3>
-                                        <p>Choose from available colors below</p>
-                                    </div>
-                                </div>
-                                
-                                <!-- Color Swatches Grid -->
-                                <div id="color-swatches" class="clean-color-grid">
-                                    <!-- Color swatches will be dynamically added here -->
+                                    <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
                                 </div>
                             </div>
                         </div>
@@ -803,7 +860,7 @@
                     
                     <div class="option-group">
                         <label for="stitch-count">Front Logo Stitch Count</label>
-                        <select id="stitch-count" class="option-select" onchange="updatePricing()">
+                        <select id="stitch-count" class="option-select" onchange="handleStitchCountChange()">
                             <option value="5000">5,000 stitches</option>
                             <option value="8000" selected>8,000 stitches (Standard)</option>
                             <option value="10000">10,000 stitches</option>
@@ -834,14 +891,14 @@
                 <!-- Pricing Table -->
                 <div class="content-section" id="pricing-details">
                     <h2>Pricing by Quantity</h2>
-                    <p style="color: var(--gray-600); margin-bottom: 20px;">Volume discounts automatically applied</p>
+                    <p style="color: var(--gray-600); margin-bottom: 20px;">Volume discounts automatically applied • <span id="pricing-stitch-count-display">8,000 stitch pricing shown</span></p>
                     
                     <div class="pricing-table-container">
                         <table id="custom-pricing-grid" class="pricing-table">
                             <thead>
                                 <tr id="pricing-header-row" class="pricing-table-header">
                                     <th>Quantity Range</th>
-                                    <!-- Size headers will be dynamically populated -->
+                                    <th>Price per Cap</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -884,10 +941,6 @@
     <!-- Keep existing header functionality -->
     <script src="/shared_components/js/header-button-functions.js"></script>
     
-    <!-- Beta Analytics and Feedback -->
-    <script src="/beta-analytics-tracker.js"></script>
-    <script src="/beta-feedback-widget.js"></script>
-    
     <!-- JavaScript Files from Original Page -->
     <!-- Base Layer - Core dependencies -->
     <script src="/shared_components/js/debug-config.js"></script>
@@ -905,11 +958,19 @@
     <!-- UI Components -->
     <script src="/shared_components/js/ui-components.js"></script>
     <script src="/shared_components/js/pricing-pages.js"></script>
+    <script src="/shared_components/js/universal-image-gallery.js"></script>
     
     <!-- Cap Embroidery Specific -->
     <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script>
-    <script src="/shared_components/js/clean-color-adapter.js"></script>
+    <!-- Removed clean-color-adapter.js - dp5-helper already handles color swatches -->
     <!-- IMPORTANT: NOT including cap-embroidery-ltm-fix.js as it has the $18 bug -->
+    
+    <!-- Universal Header Component -->
+    <script src="/shared_components/js/universal-header-component.js"></script>
+    
+    <!-- Beta Analytics and Feedback -->
+    <script src="/beta-analytics-tracker.js" defer></script>
+    <script src="/beta-feedback-widget.js" defer></script>
 
     <!-- Main Implementation -->
     <script>
@@ -948,21 +1009,77 @@
         
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // IMPORTANT: Initialize pricing-pages.js functionality first
+            // This will handle product data loading, color swatches, and image gallery
+            if (window.PricingPageUI && typeof window.PricingPageUI.init === 'function') {
+                window.PricingPageUI.init();
+            }
+            
             // Update product info
             updateProductInfo();
             
-            // Initial pricing calculation (with fallback values)
-            updatePricing();
+            // Don't calculate pricing with fallback values immediately
+            // Wait for real data from Caspio
+            console.log('[Beta Page] Waiting for Caspio data before calculating initial pricing...');
+            
+            // Populate initial pricing table
+            populateInitialPricingTable();
             
             // Load Caspio data
             loadCaspioData();
             
-            // Listen for color selection events from DP5/clean-color-adapter
-            document.addEventListener('colorSelected', function(event) {
-                if (event.detail && event.detail.colorName) {
-                    state.selectedColor = event.detail.colorName;
-                    updateProductInfo();
-                    updateSelectedColorDisplay(event.detail.colorName, event.detail.colorImage);
+            // Try to extract pricing from existing table after a short delay
+            setTimeout(() => {
+                console.log('[Beta Page] Checking for existing pricing table data');
+                extractPricingFromTable();
+                if (state.pricingTiers.length > 0) {
+                    console.log('[Beta Page] Extracted pricing tiers, updating all displays');
+                    updatePricing();
+                    updatePricingDisplay();
+                    updateBreakdown();
+                }
+            }, 1000);
+            
+            // Also check again after a longer delay in case Caspio loads slowly
+            setTimeout(() => {
+                if (state.pricingTiers.length === 0) {
+                    console.log('[Beta Page] Re-checking for pricing data...');
+                    extractPricingFromTable();
+                    if (state.pricingTiers.length > 0) {
+                        console.log('[Beta Page] Found pricing data on second check');
+                        updatePricing();
+                        updatePricingDisplay();
+                        updateBreakdown();
+                    }
+                }
+            }, 2500);
+            
+            // Add client-stitch-count-select ID for compatibility
+            const stitchSelect = document.getElementById('stitch-count');
+            if (stitchSelect) {
+                // Add the ID that other scripts look for without removing the original
+                stitchSelect.setAttribute('data-client-id', 'client-stitch-count-select');
+                
+                // Create a reference so other scripts can find it
+                const stitchCountAlias = document.getElementById('client-stitch-count-select');
+                if (!stitchCountAlias) {
+                    window.document.getElementById = (function(originalGetElementById) {
+                        return function(id) {
+                            if (id === 'client-stitch-count-select') {
+                                return document.querySelector('#stitch-count');
+                            }
+                            return originalGetElementById.call(this, id);
+                        };
+                    })(window.document.getElementById);
+                }
+            }
+            
+            // Listen for color selection events from pricing-pages.js/clean-color-adapter
+            document.addEventListener('colorChanged', function(event) {
+                if (event.detail && event.detail.COLOR_NAME) {
+                    state.selectedColor = event.detail.COLOR_NAME;
+                    console.log('[Beta Page] Color changed to:', state.selectedColor);
+                    // Pricing recalculation will be triggered by other scripts
                 }
             });
             
@@ -977,18 +1094,54 @@
                 
                 // Update pricing with real data
                 updatePricing();
+                updatePricingDisplay();
+                updateBreakdown();
                 
                 // Check if we need to add the 24-47 tier
                 setTimeout(function() {
                     fixPricingTable();
+                    // Extract pricing again after fixing table
+                    extractPricingFromTable();
+                    if (state.pricingTiers.length > 0) {
+                        updatePricing();
+                        updatePricingDisplay();
+                        updateBreakdown();
+                    }
                 }, 500);
+            });
+            
+            // Listen for cap embroidery master data
+            window.addEventListener('caspioCapPricingCalculated', function(event) {
+                console.log('[Beta Page] Cap embroidery master data received', event.detail);
+                if (event.detail && event.detail.masterData) {
+                    window.capEmbroideryMasterData = event.detail.masterData;
+                    console.log('[Beta Page] Master data structure:', window.capEmbroideryMasterData);
+                    
+                    // Update pricing with new stitch count data
+                    if (window.capEmbroideryMasterData.allPriceProfiles) {
+                        console.log('[Beta Page] Available stitch count profiles:', Object.keys(window.capEmbroideryMasterData.allPriceProfiles));
+                        updatePricingForStitchCount();
+                    }
+                }
             });
             
             // Also listen for the pricing table to be updated
             const pricingGrid = document.getElementById('custom-pricing-grid');
             if (pricingGrid) {
-                const observer = new MutationObserver(function() {
-                    fixPricingTable();
+                const observer = new MutationObserver(function(mutations) {
+                    console.log('[Beta Page] Pricing table was modified');
+                    
+                    // Check if the table has data
+                    const tbody = pricingGrid.querySelector('tbody');
+                    if (tbody && tbody.querySelectorAll('tr').length > 0) {
+                        console.log('[Beta Page] Pricing table has data, extracting prices');
+                        setTimeout(() => {
+                            extractPricingFromTable();
+                            updatePricing();
+                            updatePricingDisplay();
+                            updateBreakdown();
+                        }, 100);
+                    }
                 });
                 observer.observe(pricingGrid, { childList: true, subtree: true });
             }
@@ -996,6 +1149,27 @@
             // Initialize cap embroidery controller if available
             if (window.capEmbroideryController) {
                 console.log('[Beta Page] Cap embroidery controller found, initializing...');
+            }
+            
+            // Add event listener for stitch count changes
+            const stitchCountSelect = document.getElementById('stitch-count');
+            if (stitchCountSelect) {
+                console.log('[Beta Page] Adding stitch count change listener');
+                stitchCountSelect.addEventListener('change', function(e) {
+                    console.log('[Beta Page] Stitch count changed via event listener to:', e.target.value);
+                    
+                    // Wait a bit for Caspio data if not loaded yet
+                    if (!window.capEmbroideryMasterData || !window.capEmbroideryMasterData.allPriceProfiles) {
+                        console.log('[Beta Page] Waiting for Caspio master data...');
+                        setTimeout(() => {
+                            handleStitchCountChange();
+                        }, 500);
+                    } else {
+                        handleStitchCountChange();
+                    }
+                });
+            } else {
+                console.error('[Beta Page] Stitch count select element not found!');
             }
         });
         
@@ -1006,8 +1180,31 @@
             // Reset tiers
             state.pricingTiers = [];
             
-            // Look for OSFA pricing (cap embroidery uses one-size)
-            if (pricingData.prices && pricingData.prices.OSFA) {
+            // Check if we have cap embroidery master data with stitch count profiles
+            if (window.capEmbroideryMasterData && window.capEmbroideryMasterData.allPriceProfiles) {
+                const stitchCountEl = document.getElementById('stitch-count');
+                const currentStitchCount = stitchCountEl ? stitchCountEl.value : state.frontLogoStitches.toString();
+                const stitchCountProfile = window.capEmbroideryMasterData.allPriceProfiles[currentStitchCount];
+                
+                if (stitchCountProfile && stitchCountProfile.OSFA) {
+                    console.log('[Beta Page] Using stitch count specific pricing for', currentStitchCount);
+                    const osfaPrices = stitchCountProfile.OSFA;
+                    
+                    // Convert to our tier format
+                    for (const [tierKey, price] of Object.entries(osfaPrices)) {
+                        if (tierKey.includes('24-47')) {
+                            state.pricingTiers.push({ min: 24, max: 47, price: parseFloat(price) });
+                        } else if (tierKey.includes('48-71')) {
+                            state.pricingTiers.push({ min: 48, max: 71, price: parseFloat(price) });
+                        } else if (tierKey.includes('72') || tierKey.includes('72+')) {
+                            state.pricingTiers.push({ min: 72, max: 99999, price: parseFloat(price) });
+                        }
+                    }
+                }
+            }
+            
+            // Fallback to general pricing if no stitch count specific data
+            if (state.pricingTiers.length === 0 && pricingData.prices && pricingData.prices.OSFA) {
                 const osfaPrices = pricingData.prices.OSFA;
                 
                 // Convert to our tier format
@@ -1036,6 +1233,9 @@
         function loadCaspioData() {
             const container = document.getElementById('caspio-embed-container');
             if (!container) return;
+            
+            // Clear any existing iframe
+            container.innerHTML = '';
             
             // Create the iframe URL with the style parameter
             const caspioSrc = `https://c3eku948.caspio.com/dp/a0e15000c5d8e1f2e9e94c3c9a5a/emb?StyleNumber=${encodeURIComponent(state.styleNumber)}`;
@@ -1075,21 +1275,6 @@
                 titleContext.textContent = state.productTitle;
             }
             
-            // Update product image
-            const imageUrl = `https://www.companycasuals.com/mmCOMPANYCASUALS/Images/${state.styleNumber}/${state.selectedColor.replace(/\s+/g, '_')}.jpg`;
-            const productImage = document.getElementById('product-image');
-            const placeholder = document.getElementById('image-placeholder');
-            
-            productImage.src = imageUrl;
-            productImage.onload = function() {
-                productImage.style.display = 'block';
-                placeholder.style.display = 'none';
-            };
-            productImage.onerror = function() {
-                productImage.style.display = 'none';
-                placeholder.style.display = 'block';
-            };
-            
             // Update back to product link
             const backLink = document.getElementById('back-to-product');
             const breadcrumbLink = document.getElementById('breadcrumb-product-link');
@@ -1097,6 +1282,8 @@
             
             backLink.href = productUrl;
             breadcrumbLink.href = productUrl;
+            
+            // Note: Product image and color swatches will be handled by pricing-pages.js
         }
         
         function updateQuantity(delta) {
@@ -1137,17 +1324,229 @@
             event.target.classList.add('active');
         }
         
+        // Handle stitch count change (make it global)
+        window.handleStitchCountChange = function() {
+            const stitchCountEl = document.getElementById('stitch-count');
+            if (!stitchCountEl) {
+                console.error('[Beta Page] Stitch count element not found');
+                return;
+            }
+            
+            const stitchCount = stitchCountEl.value;
+            state.frontLogoStitches = parseInt(stitchCount);
+            
+            console.log('[Beta Page] Stitch count changed to:', stitchCount);
+            
+            // Update pricing based on new stitch count
+            updatePricingForStitchCount();
+            
+            // Force immediate update of quick quote calculator
+            updatePricing();
+            updatePricingDisplay();
+            updateBreakdown();
+            
+            // Also update the displayed stitch count in the breakdown
+            const heroStitchEl = document.getElementById('hero-stitch-count');
+            if (heroStitchEl) {
+                heroStitchEl.textContent = state.frontLogoStitches.toLocaleString();
+            }
+        }
+        
+        // Update pricing when stitch count changes
+        function updatePricingForStitchCount() {
+            console.log('[Beta Page] updatePricingForStitchCount called');
+            console.log('[Beta Page] Current pricing data:', {
+                hasMasterData: !!window.capEmbroideryMasterData,
+                hasAllPriceProfiles: !!(window.capEmbroideryMasterData && window.capEmbroideryMasterData.allPriceProfiles),
+                currentStitchCount: state.frontLogoStitches
+            });
+            
+            // If we have master data with stitch count profiles, update pricing tiers
+            if (window.capEmbroideryMasterData && window.capEmbroideryMasterData.allPriceProfiles) {
+                const currentStitchCount = state.frontLogoStitches.toString();
+                const stitchCountProfile = window.capEmbroideryMasterData.allPriceProfiles[currentStitchCount];
+                
+                if (stitchCountProfile) {
+                    console.log('[Beta Page] Found pricing profile for stitch count:', currentStitchCount);
+                    console.log('[Beta Page] Stitch count profile data:', stitchCountProfile);
+                    
+                    // Update pricing tiers with stitch count specific data
+                    state.pricingTiers = [];
+                    
+                    if (stitchCountProfile.OSFA) {
+                        const osfaPrices = stitchCountProfile.OSFA;
+                        
+                        for (const [tierKey, price] of Object.entries(osfaPrices)) {
+                            if (tierKey.includes('24-47')) {
+                                state.pricingTiers.push({ min: 24, max: 47, price: parseFloat(price) });
+                            } else if (tierKey.includes('48-71')) {
+                                state.pricingTiers.push({ min: 48, max: 71, price: parseFloat(price) });
+                            } else if (tierKey.includes('72') || tierKey.includes('72+')) {
+                                state.pricingTiers.push({ min: 72, max: 99999, price: parseFloat(price) });
+                            }
+                        }
+                        
+                        state.pricingTiers.sort((a, b) => a.min - b.min);
+                        console.log('[Beta Page] Updated pricing tiers for stitch count:', state.pricingTiers);
+                    }
+                } else {
+                    console.log('[Beta Page] No pricing profile found for stitch count:', currentStitchCount);
+                    console.log('[Beta Page] Available stitch count profiles:', Object.keys(window.capEmbroideryMasterData.allPriceProfiles));
+                }
+            } else {
+                console.log('[Beta Page] No master data available yet');
+                
+                // Try to trigger data loading if not available
+                if (typeof window.capEmbroideryController !== 'undefined' && window.capEmbroideryController.calculatePricing) {
+                    console.log('[Beta Page] Attempting to trigger pricing calculation through controller');
+                    window.capEmbroideryController.calculatePricing();
+                }
+            }
+            
+            // Update all pricing displays
+            updatePricing();
+            
+            // Update the pricing table
+            updatePricingTable();
+            
+            // Update the stitch count display in pricing section
+            const stitchDisplay = document.getElementById('pricing-stitch-count-display');
+            if (stitchDisplay) {
+                stitchDisplay.textContent = `${state.frontLogoStitches.toLocaleString()} stitch pricing shown`;
+            }
+            
+            // Force pricing recalculation with new tiers
+            if (state.pricingTiers.length > 0) {
+                console.log('[Beta Page] Forcing pricing update with new tiers');
+                updatePricing();
+                updatePricingDisplay();
+                updateBreakdown();
+            }
+            
+            // Dispatch event for other components
+            window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
+                detail: { stitchCount: state.frontLogoStitches }
+            }));
+        }
+        
+        // Extract pricing from the displayed table
+        function extractPricingFromTable() {
+            const tbody = document.querySelector('#custom-pricing-grid tbody');
+            if (!tbody) return;
+            
+            const rows = tbody.querySelectorAll('tr');
+            const newTiers = [];
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 2) {
+                    const range = cells[0].textContent.trim();
+                    
+                    // Get the first price column (could be OSFA or S/M)
+                    let priceText = cells[1].textContent.trim();
+                    
+                    // If the table has size columns (S/M, M/L, L/XL), use the first one
+                    if (cells.length > 2 && priceText.includes('$')) {
+                        priceText = cells[1].textContent.trim();
+                    } else if (cells.length > 2) {
+                        // Skip header rows
+                        return;
+                    }
+                    
+                    const price = parseFloat(priceText.replace('$', ''));
+                    
+                    if (!isNaN(price)) {
+                        if (range.includes('24-47')) {
+                            newTiers.push({ min: 24, max: 47, price: price });
+                        } else if (range.includes('48-71')) {
+                            newTiers.push({ min: 48, max: 71, price: price });
+                        } else if (range.includes('72')) {
+                            newTiers.push({ min: 72, max: 99999, price: price });
+                        }
+                    }
+                }
+            });
+            
+            if (newTiers.length > 0) {
+                state.pricingTiers = newTiers;
+                console.log('[Beta Page] Extracted pricing tiers from table:', state.pricingTiers);
+            }
+        }
+        
+        // Update the pricing table with new data
+        function updatePricingTable() {
+            if (!window.capEmbroideryMasterData || !window.capEmbroideryMasterData.allPriceProfiles) {
+                console.log('[Beta Page] No master data available for pricing table update');
+                return;
+            }
+            
+            const currentStitchCount = state.frontLogoStitches.toString();
+            const stitchCountProfile = window.capEmbroideryMasterData.allPriceProfiles[currentStitchCount];
+            
+            if (!stitchCountProfile) {
+                console.log('[Beta Page] No pricing profile for stitch count:', currentStitchCount);
+                return;
+            }
+            
+            const tbody = document.querySelector('#custom-pricing-grid tbody');
+            if (!tbody) return;
+            
+            // Clear existing rows
+            tbody.innerHTML = '';
+            
+            // Add rows for each tier
+            const tiers = [
+                { range: '24-47', key: '24-47' },
+                { range: '48-71', key: '48-71' },
+                { range: '72+', key: '72+' }
+            ];
+            
+            tiers.forEach(tier => {
+                const row = document.createElement('tr');
+                const rangeCell = document.createElement('td');
+                rangeCell.textContent = tier.range;
+                row.appendChild(rangeCell);
+                
+                // Add price cell for OSFA
+                const priceCell = document.createElement('td');
+                if (stitchCountProfile.OSFA && stitchCountProfile.OSFA[tier.key]) {
+                    const price = parseFloat(stitchCountProfile.OSFA[tier.key]);
+                    priceCell.innerHTML = `<strong>$${price.toFixed(2)}</strong>`;
+                } else {
+                    priceCell.textContent = '-';
+                }
+                row.appendChild(priceCell);
+                
+                tbody.appendChild(row);
+            });
+            
+            console.log('[Beta Page] Pricing table updated for stitch count:', currentStitchCount);
+            
+            // Extract the pricing from the table we just created
+            extractPricingFromTable();
+        }
+        
         function updatePricing() {
+            console.log('[Beta Page] updatePricing called with quantity:', state.quantity);
+            console.log('[Beta Page] Current pricing tiers:', state.pricingTiers);
+            
             // Get base price from tier
             let tier = null;
             
             // If we have Caspio data, use it
             if (state.pricingTiers.length > 0) {
                 tier = state.pricingTiers.find(t => state.quantity >= t.min && state.quantity <= t.max);
-                if (!tier && state.quantity >= 72) {
-                    // Use last tier for 72+
-                    tier = state.pricingTiers[state.pricingTiers.length - 1];
+                if (!tier) {
+                    // For quantities below the first tier, use the first tier's price
+                    if (state.quantity < state.pricingTiers[0].min) {
+                        tier = state.pricingTiers[0];
+                        console.log('[Beta Page] Using first tier price for small quantity');
+                    } else if (state.quantity >= 72) {
+                        // Use last tier for 72+
+                        tier = state.pricingTiers[state.pricingTiers.length - 1];
+                    }
                 }
+                console.log('[Beta Page] Found tier for quantity', state.quantity, ':', tier);
             }
             
             // Fallback pricing if no Caspio data yet
@@ -1159,22 +1558,17 @@
                 } else {
                     state.basePrice = 24;
                 }
+                console.log('[Beta Page] Using fallback pricing:', state.basePrice);
             } else {
                 state.basePrice = tier.price;
+                console.log('[Beta Page] Using tier pricing:', state.basePrice);
             }
             
             // Calculate additional costs
             let additionalCosts = 0;
             
-            // Front logo stitch count upcharge
-            const stitchCount = parseInt(document.getElementById('stitch-count').value);
-            state.frontLogoStitches = stitchCount;
-            
-            // Stitch count pricing (need to check if this comes from Caspio)
-            if (stitchCount === 10000) {
-                additionalCosts += 1;
-            }
-            // Note: 5,000 stitches might be cheaper, but we need Caspio data for that
+            // Front logo stitch count is already included in the base price from Caspio
+            // No additional charge needed for front logo
             
             // Back logo cost ($1 per 1,000 stitches)
             if (state.backLogoEnabled) {
@@ -1200,8 +1594,20 @@
         }
         
         function updatePricingDisplay() {
-            document.getElementById('unit-price').textContent = `$${state.unitPrice.toFixed(2)}`;
-            document.getElementById('total-price').textContent = `Total: $${state.totalPrice.toFixed(2)}`;
+            const unitPriceEl = document.getElementById('unit-price');
+            const totalPriceEl = document.getElementById('total-price');
+            
+            // Add updating class for visual feedback
+            unitPriceEl.classList.add('updating');
+            
+            // Update prices
+            unitPriceEl.textContent = `$${state.unitPrice.toFixed(2)}`;
+            totalPriceEl.textContent = `Total: $${state.totalPrice.toFixed(2)}`;
+            
+            // Remove updating class after animation
+            setTimeout(() => {
+                unitPriceEl.classList.remove('updating');
+            }, 300);
         }
         
         function updateBreakdown() {
@@ -1216,17 +1622,11 @@
                 </div>
             `;
             
-            // Front logo
-            let frontLogoText = 'included';
-            if (state.frontLogoStitches === 10000) {
-                frontLogoText = '+$1.00';
-            }
-            // TODO: Handle 5,000 stitches when we get Caspio data
-            
+            // Front logo - price is included in base price from Caspio
             html += `
                 <div class="breakdown-item">
                     <span class="breakdown-label">Front logo (${state.frontLogoStitches.toLocaleString()} stitches):</span>
-                    <span class="breakdown-value">${frontLogoText}</span>
+                    <span class="breakdown-value">included</span>
                 </div>
             `;
             
@@ -1339,18 +1739,32 @@
             }
         }
         
-        // Update selected color display
-        function updateSelectedColorDisplay(colorName, colorImage) {
-            const nameElement = document.getElementById('selected-color-name');
-            const swatchElement = document.getElementById('selected-color-swatch');
+        
+        // Populate initial pricing table with fallback data
+        function populateInitialPricingTable() {
+            const tbody = document.querySelector('#custom-pricing-grid tbody');
+            if (!tbody) return;
             
-            if (nameElement) {
-                nameElement.textContent = colorName || 'Select a Color';
-            }
+            // Clear any existing rows
+            tbody.innerHTML = '';
             
-            if (swatchElement && colorImage) {
-                swatchElement.innerHTML = `<img src="${colorImage}" alt="${colorName}">`;
-            }
+            // Add default pricing rows
+            const defaultTiers = [
+                { range: '24-47', price: 24 },
+                { range: '48-71', price: 23 },
+                { range: '72+', price: 21 }
+            ];
+            
+            defaultTiers.forEach(tier => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${tier.range}</td>
+                    <td><strong>$${tier.price.toFixed(2)}</strong></td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            console.log('[Beta Page] Initial pricing table populated with default values');
         }
         
         // Fix pricing table to show 24-47 tier

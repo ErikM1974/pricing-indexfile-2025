@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     <link rel="stylesheet" href="/shared_components/css/quantity-shortcuts.css">
     <link rel="stylesheet" href="/shared_components/css/mobile-collapsible-menu.css">
-    <link rel="stylesheet" href="/shared_components/css/clean-color-swatches.css">
+    <!-- Removed clean-color-swatches.css - using default dp5-helper styles -->
     <link rel="stylesheet" href="/shared_components/css/enhanced-loading-animations.css">
     <link rel="stylesheet" href="/shared_components/css/auto-save-quote.css">
     <link rel="stylesheet" href="/shared_components/css/hero-pricing-emphasis.css">
@@ -235,8 +235,8 @@
                             <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
                         </div>
                         
-                        <!-- Clean Color Selection -->
-                        <div class="clean-color-section">
+                        <!-- Color Selection -->
+                        <div class="color-selection-section">
                             <h4 class="section-header">
                                 Select Color
                                 <button class="btn-secondary" style="float: right; font-size: 14px;" onclick="capEmbroideryController.openColorMatrix()">
@@ -244,18 +244,9 @@
                                 </button>
                             </h4>
                             
-                            <!-- Selected Color Display -->
-                            <div class="clean-selected-display">
-                                <div id="pricing-color-swatch" class="clean-selected-swatch"></div>
-                                <div class="clean-selected-info">
-                                    <h3 id="pricing-color-name">Select a Color</h3>
-                                    <p>Choose from available colors below</p>
-                                </div>
-                            </div>
-                            
                             <!-- Color Swatches Grid -->
-                            <div id="color-swatches" class="clean-color-grid">
-                                <!-- Color swatches will be dynamically added here -->
+                            <div id="color-swatches" class="color-grid">
+                                <!-- Color swatches will be dynamically added here by dp5-helper -->
                             </div>
                         </div>
                     </div>
@@ -491,7 +482,7 @@
     <script src="/shared_components/js/order-form-pdf.js"></script> <!-- PDF generation -->
     <script src="/shared_components/js/quantity-shortcuts.js"></script> <!-- Quick quantity shortcuts -->
     <script src="/shared_components/js/mobile-collapsible-ultimate-fix.js"></script> <!-- Mobile accordion -->
-    <script src="/shared_components/js/clean-color-adapter.js"></script> <!-- Color swatch implementation -->
+    <!-- Removed clean-color-adapter.js - dp5-helper.js already handles color swatches -->
     <script src="/shared_components/js/enhanced-loading-animations.js"></script> <!-- Loading animations -->
     <script src="/shared_components/js/auto-save-quote.js"></script> <!-- Auto-save quote draft -->
     <script src="/shared_components/js/keyboard-navigation.js"></script> <!-- Keyboard navigation support -->

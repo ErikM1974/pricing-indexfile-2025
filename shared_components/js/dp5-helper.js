@@ -43,12 +43,19 @@
             console.log("[DP5-HELPER] Event detail stringified:", JSON.stringify(event.detail));
             console.log("********************************************************************************");
             
+            // Check if this event has already been processed by dp5-helper to avoid loops
+            if (event.detail && event.detail._dp5Processed) {
+                console.log("[DP5-HELPER] Event already processed by dp5-helper, skipping");
+                return;
+            }
+            
             if (event.detail && event.detail.headers && event.detail.prices && (event.detail.tierData || event.detail.tiers)) {
                 console.log("[DP5-HELPER] Event passed primary validation (headers, prices, tierData/tiers exist). Event source might be:", event.detail.selectedLocationValue ? "dtg-adapter" : "pricing-matrix-capture/other");
                 const pricingDataFromEvent = {
                     headers: event.detail.headers,
                     prices: event.detail.prices,
-                    tiers: event.detail.tierData || event.detail.tiers, // Normalize here
+                    tiers: event.detail.tierData || event.detail.tiers, // Keep this for dp5-helper
+                    tierData: event.detail.tierData || event.detail.tiers, // Add this for Quick Quote Calculator
                     uniqueSizes: event.detail.uniqueSizes || (
                         event.detail.embellishmentType === 'cap-embroidery'
                             ? [...new Set(event.detail.headers)]
@@ -57,7 +64,8 @@
                     styleNumber: event.detail.styleNumber,
                     color: event.detail.color,
                     embellishmentType: event.detail.embellishmentType,
-                    isFallback: event.detail.isFallback || false
+                    isFallback: event.detail.isFallback || false,
+                    _dp5Processed: true // Mark as processed by dp5-helper
                 };
         
                 // **** ADD DEBUG LOG ****
@@ -67,6 +75,15 @@
                 // if (!window.directFixApplied) { // Temporarily remove this check to ensure adapter-driven updates are processed
                     console.log("[DP5-HELPER] Pricing data is available from event. Updating custom pricing grid (directFixApplied check bypassed for testing).");
                     updateCustomPricingGrid(pricingDataFromEvent);
+                    
+                    // Re-dispatch the event with the normalized data format
+                    // This ensures components expecting tierData will get it
+                    const normalizedEvent = new CustomEvent('pricingDataLoaded', {
+                        detail: pricingDataFromEvent,
+                        bubbles: true
+                    });
+                    window.dispatchEvent(normalizedEvent);
+                    console.log("[DP5-HELPER] Re-dispatched pricingDataLoaded event with normalized format");
                 // } else {
                 //     console.log("[DP5-HELPER] Skipping custom pricing grid update (via 'pricingDataLoaded' event) as DIRECT-FIX already applied it.");
                 // }
