@@ -778,8 +778,9 @@
     </div>
     
     <!-- JavaScript Files -->
-    <script src="/shared_components/js/pricing-pages.js"></script>
+    <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/pricing-pages.js"></script>
     <script src="/shared_components/js/pricing-matrix-capture.js"></script>
     <script src="/shared_components/js/pricing-matrix-api.js"></script>
     <script src="/shared_components/js/dp5-helper.js"></script>
@@ -794,6 +795,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[DTF] Page initialized with quote system');
             
+            // Initialize product context from URL parameters
+            if (window.initializeProductFromURL) {
+                window.initializeProductFromURL();
+            }
+            
             // Initialize Universal Product Display immediately
             let productDisplay = new UniversalProductDisplay({
                 containerId: 'product-display',
@@ -804,6 +810,9 @@
                 sticky: false,
                 infoBoxContent: 'DTF Transfer Printing: Vibrant, full-color designs with excellent durability and stretch. Perfect for both light and dark garments.'
             });
+            
+            // Store reference globally for debugging
+            window.productDisplay = productDisplay;
             
             // Dispatch event to signal DTF page is ready
             window.dispatchEvent(new CustomEvent('dtfPageReady', {
