@@ -205,12 +205,71 @@ class UniversalQuickQuoteCalculator {
     }
 
     updatePricingData(data) {
-        this.state.pricingData = data;
+        console.log('[QuickQuote] updatePricingData called with:', data);
+        
+        if (!data || !data.prices || !data.tierData) {
+            console.warn('[QuickQuote] Invalid pricing data received');
+            return;
+        }
+        
+        // Convert the pricing data format to match our expected structure
+        const pricingTiers = [];
+        
+        // Extract unique sizes from headers, handling slash-separated sizes
+        const uniqueSizes = [];
+        data.headers.forEach(header => {
+            if (header.includes('/')) {
+                // Split S/M into S and M
+                const sizes = header.split('/');
+                sizes.forEach(size => {
+                    if (size && !uniqueSizes.includes(size)) {
+                        uniqueSizes.push(size);
+                    }
+                });
+            } else if (!header.includes('-') && !uniqueSizes.includes(header)) {
+                uniqueSizes.push(header);
+            }
+        });
+        
+        // Process each tier
+        Object.keys(data.tierData).forEach(tierKey => {
+            const tierInfo = data.tierData[tierKey];
+            const tier = {
+                range: tierKey,
+                min: tierInfo.MinQuantity || 1,
+                max: tierInfo.MaxQuantity || 99999,
+                prices: {}
+            };
+            
+            // Get prices for each size group
+            data.headers.forEach(sizeGroup => {
+                if (data.prices[sizeGroup] && data.prices[sizeGroup][tierKey] !== undefined) {
+                    tier.prices[sizeGroup] = data.prices[sizeGroup][tierKey];
+                }
+            });
+            
+            pricingTiers.push(tier);
+        });
+        
+        // Sort tiers by minimum quantity
+        pricingTiers.sort((a, b) => a.min - b.min);
+        
+        this.state.pricingData = { 
+            tiers: pricingTiers, 
+            headers: data.headers,
+            uniqueSizes: uniqueSizes
+        };
+        
+        console.log('[QuickQuote] Processed pricing data:', this.state.pricingData);
         this.updatePricing();
     }
 
     observePricingTable() {
-        const pricingGrid = document.getElementById('custom-pricing-grid');
+        // Look for either custom-pricing-grid or universal pricing grid table
+        let pricingGrid = document.getElementById('custom-pricing-grid');
+        if (!pricingGrid) {
+            pricingGrid = document.querySelector('[id$="-table"].pricing-grid');
+        }
         if (!pricingGrid) return;
 
         const observer = new MutationObserver(() => {
@@ -222,7 +281,11 @@ class UniversalQuickQuoteCalculator {
     }
 
     extractPricingFromTable() {
-        const table = document.getElementById('custom-pricing-grid');
+        // Look for either custom-pricing-grid or universal pricing grid table
+        let table = document.getElementById('custom-pricing-grid');
+        if (!table) {
+            table = document.querySelector('[id$="-table"].pricing-grid');
+        }
         if (!table) return;
 
         const tbody = table.querySelector('tbody');

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
     <style>
         /* CSS Variables for consistency */
         :root {
@@ -668,153 +669,6 @@
             }
         }
         
-        /* Enhanced Loading Animations - DTG Style */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        @keyframes shimmer {
-            0% { background-position: -200px 0; }
-            100% { background-position: calc(200px + 100%) 0; }
-        }
-        
-        @keyframes progressPulse {
-            0%, 100% { transform: scaleX(1); }
-            50% { transform: scaleX(1.05); }
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Loading skeleton styles */
-        .skeleton-table {
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .skeleton-row {
-            display: flex;
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200px 100%;
-            animation: shimmer 2s infinite;
-        }
-        
-        .skeleton-cell {
-            flex: 1;
-            height: 20px;
-            background-color: #f5f5f5;
-            border-radius: 4px;
-            margin: 0 4px;
-        }
-        
-        .skeleton-header {
-            background-color: #2e5827;
-            color: white;
-            animation: none;
-        }
-        
-        .skeleton-header .skeleton-cell {
-            background-color: rgba(255,255,255,0.2);
-            height: 16px;
-        }
-        
-        /* Progress bar styles */
-        .loading-progress {
-            width: 100%;
-            height: 8px;
-            background-color: #e8f5e9;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-        
-        .loading-progress-bar {
-            height: 100%;
-            background: linear-gradient(45deg, #4caf50 25%, #66bb6a 25%, #66bb6a 50%, #4caf50 50%, #4caf50 75%, #66bb6a 75%);
-            background-size: 20px 20px;
-            border-radius: 4px;
-            animation: progressPulse 2s ease-in-out infinite;
-            transition: width 0.3s ease;
-        }
-        
-        /* Enhanced loading container */
-        .enhanced-loading-container {
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .enhanced-loading-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: shimmer 2s infinite;
-        }
-        
-        .loading-content {
-            background: white;
-            display: inline-block;
-            padding: 30px 40px;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 1;
-        }
-        
-        .loading-spinner-dual {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-        
-        .loading-spinner-outer {
-            width: 50px;
-            height: 50px;
-            border: 3px solid #e8f5e9;
-            border-top: 3px solid #2e5827;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        .loading-spinner-inner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
-            border: 2px solid #c8e6c9;
-            border-top: 2px solid #4caf50;
-            border-radius: 50%;
-            animation: spin 1.5s linear infinite reverse;
-        }
-        
-        .loading-status {
-            color: #2e5827;
-            font-size: 1.1em;
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-        
-        .loading-step {
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
         
         /* Header integration adjustments */
         .container {
@@ -916,29 +770,6 @@
             color: var(--gray-700);
         }
         
-        /* Pricing Table Adjustments */
-        .pricing-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        .pricing-table th,
-        .pricing-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--gray-200, #e9ecef);
-        }
-        
-        .pricing-table th {
-            background: var(--gray-100);
-            font-weight: 600;
-            color: var(--gray-800, #343a40);
-        }
-        
-        .pricing-table tr:hover {
-            background: var(--gray-50, #f8f9fa);
-        }
     </style>
 </head>
 <body>
@@ -1023,17 +854,10 @@
                         <div class="loading-message">Loading pricing data...</div>
                     </div>
                     
-                    <!-- Custom Pricing Grid - Enhanced now that it's at the top -->
-                    <div class="pricing-section">
-                        <div class="pricing-header" style="margin-bottom: 20px;">
-                            <!-- Enhanced header with more prominence -->
-                             <h3 class="section-title" style="font-size: 1.3em; margin: 0;">Detailed Pricing per Quantity Tier</h3>
-                             <div class="selected-color-indicator">
-                                <span>Selected Color:</span>
-                                <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches"></div>
-                                <strong id="pricing-color-name">Color Name</strong>
-                            </div>
-                        </div>
+                    <!-- Universal Pricing Grid Component -->
+                    <div id="pricing-grid-container">
+                        <!-- Universal pricing grid will be initialized here -->
+                    </div>
                         
                         <style>
                             /* Styles for .product-page-columns-container, .product-context-column, .product-interactive-column */
@@ -1074,48 +898,6 @@
                                 border-radius: var(--radius-sm);
                                 box-shadow: var(--shadow-sm);
                             }
-                             /* Highlight for active pricing tier */
-                            .active-tier-highlight {
-                                background-color: var(--primary-light) !important;
-                                font-weight: bold;
-                                color: var(--primary-color) !important;
-                            }
-
-                            /* Enhanced pricing grid styling */
-                            .pricing-grid {
-                                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                                border-radius: var(--radius-sm);
-                                overflow: hidden;
-                            }
-                            
-                            .pricing-grid th {
-                                background-color: var(--primary-color);
-                                color: white;
-                                padding: 12px 8px;
-                            }
-                            
-                            .pricing-grid td {
-                                padding: 10px 8px;
-                                text-align: center; /* Ensure prices are centered, or use right for currency */
-                                transition: background-color 0.3s ease; /* Smooth transition for highlight */
-                            }
-                            .pricing-grid tbody tr:nth-child(even) {
-                                background-color: var(--background-ultralight, #fdfdfd);
-                            }
-                            .pricing-grid th:first-child, .pricing-grid td:first-child { /* Quantity column */
-                                text-align: left;
-                                padding-left: 15px;
-                            }
-                            /* Styling for the currently applicable pricing tier row based on cart + page quantity */
-                            #custom-pricing-grid tbody tr.current-pricing-level-highlight td {
-                                background-color: var(--primary-extralight, #e6f7ff) !important; /* Use !important if needed to override even/odd styling */
-                                font-weight: bold;
-                            }
-                            #custom-pricing-grid tbody tr.current-pricing-level-highlight td:first-child {
-                                color: var(--primary-dark, #004170);
-                                /* Optional: Add a visual cue like a border */
-                                /* border-left: 3px solid var(--primary-color); */
-                            }
                             
                             @media (max-width: 1024px) { /* Breakpoint for stacking columns */
                                 .product-page-columns-container {
@@ -1134,243 +916,7 @@
                                 }
                             }
 
-                            /* Original pricing-header styles - can be adjusted */
-                            .pricing-header {
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                                margin-bottom: 15px;
-                                flex-wrap: wrap;
-                            }
-                            
-                            .selected-color-indicator {
-                                display: flex;
-                                align-items: center;
-                                font-size: 0.9em;
-                                background-color: var(--primary-light);
-                                padding: 8px 12px; /* Slightly increased padding */
-                                border-radius: var(--radius-sm);
-                                border-left: 3px solid var(--primary-color);
-                                box-shadow: var(--shadow-xs);
-                            }
-                            
-                            .mini-color-swatch {
-                                width: 30px;
-                                height: 30px;
-                                border-radius: 50%;
-                                margin: 0 8px;
-                                border: 2px solid var(--border-color);
-                                display: inline-block;
-                                vertical-align: middle;
-                                box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                                background-size: cover;
-                                background-position: center;
-                                box-sizing: border-box;
-                                aspect-ratio: 1/1;
-                            }
-                            
-                            #pricing-color-name {
-                                color: var(--primary-color);
-                            }
-                            
-                            /* Enhanced mini-swatch styles */
-                            .mini-color-swatch {
-                                transition: all 0.3s ease;
-                            }
-                            
-                            .mini-color-swatch:hover {
-                                transform: scale(1.1);
-                                border-color: var(--primary-color);
-                            }
-                            
-                            .mini-color-swatch.active-swatch {
-                                border-color: var(--primary-color);
-                                box-shadow: 0 0 0 2px var(--primary-light);
-                            }
-                            
-                            .mini-color-swatch.fallback-swatch {
-                                background-image: radial-gradient(circle, transparent 0%, rgba(255,255,255,0.05) 100%);
-                            }
-                            
-                            .mini-color-swatch.clickable {
-                                cursor: pointer;
-                                position: relative;
-                            }
-                            
-                            .mini-color-swatch.clickable::after {
-                                content: '';
-                                position: absolute;
-                                width: 100%;
-                                height: 100%;
-                                top: 0;
-                                left: 0;
-                                border-radius: 50%;
-                                background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-                                opacity: 0;
-                                transition: opacity 0.3s ease;
-                            }
-                            
-                            .mini-color-swatch.clickable:hover::after {
-                                opacity: 1;
-                            }
                         </style>
-                        
-                        <div class="pricing-grid-container">
-                            <!-- Beautiful initial state -->
-                            <div id="pricing-initial-state" class="enhanced-loading-container" style="display: block;">
-                                <div class="loading-content">
-                                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#2e5827" stroke-width="2" style="margin-bottom: 20px;">
-                                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                                        <path d="M12 8v4m0 4h.01"/>
-                                    </svg>
-                                    <h3 style="color: #2e5827; font-size: 1.5em; margin: 0 0 10px 0; font-weight: 600;">Loading Embroidery Pricing</h3>
-                                    <p style="color: #666; margin: 0; font-size: 1.1em;">Preparing your custom pricing data...</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Enhanced loading state -->
-                            <div id="pricing-table-loading" style="display: none;">
-                                <div class="enhanced-loading-container">
-                                    <div class="loading-content">
-                                        <div class="loading-spinner-dual">
-                                            <div class="loading-spinner-outer"></div>
-                                            <div class="loading-spinner-inner"></div>
-                                        </div>
-                                        <div class="loading-status" id="loading-status">Loading your custom pricing...</div>
-                                        <div class="loading-step" id="loading-step">Connecting to pricing database...</div>
-                                        <div class="loading-progress">
-                                            <div class="loading-progress-bar" id="loading-progress-bar" style="width: 0%;"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Skeleton table preview -->
-                                <div style="margin-top: 20px;">
-                                    <div class="skeleton-table">
-                                        <div class="skeleton-row skeleton-header">
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                        </div>
-                                        <div class="skeleton-row">
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                        </div>
-                                        <div class="skeleton-row">
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                        </div>
-                                        <div class="skeleton-row">
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <table class="pricing-grid" id="custom-pricing-grid" style="display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease;">
-                                <thead>
-                                    <tr id="pricing-header-row">
-                                        <th>Quantity</th>
-                                        <!-- Size headers will be dynamically populated. JS needs to add data-tier-label to these THs. -->
-                                        <!-- Example: <th data-tier-label="1-23">1-23</th> -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Pricing data will be dynamically added here -->
-                                </tbody>
-                            </table>
-                            
-                            <!-- Added helpful pricing explanation -->
-                            <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                                <p><strong>Note:</strong> Prices shown are per item and include an 8,000 stitch embroidered logo.</p>
-                            </div>
-                            
-                            <!-- Pricing info tabs removed as per user request -->
-                            
-                            <style>
-                                /* Tab styling */
-                                .pricing-info-tabs {
-                                    margin-top: 20px;
-                                    border: 1px solid var(--border-color);
-                                    border-radius: var(--radius-sm);
-                                    overflow: hidden;
-                                }
-                                
-                                .tab-headers {
-                                    display: flex;
-                                    background-color: var(--primary-light);
-                                    border-bottom: 1px solid var(--border-color);
-                                }
-                                
-                                .tab-header {
-                                    padding: 10px 15px;
-                                    background: none;
-                                    border: none;
-                                    cursor: pointer;
-                                    font-weight: 500;
-                                    color: var(--text-color);
-                                    transition: all 0.2s ease;
-                                    border-bottom: 3px solid transparent;
-                                }
-                                
-                                .tab-header:hover {
-                                    background-color: rgba(0,0,0,0.05);
-                                }
-                                
-                                .tab-header.active {
-                                    color: var(--primary-color);
-                                    border-bottom-color: var(--primary-color);
-                                    font-weight: 600;
-                                }
-                                
-                                .tab-content {
-                                    padding: 15px;
-                                }
-                                
-                                .tab-pane {
-                                    display: none;
-                                }
-                                
-                                .tab-pane.active {
-                                    display: block;
-                                }
-                                
-                                /* Responsive adjustments */
-                                @media (max-width: 768px) {
-                                    .tab-header {
-                                        padding: 8px 12px;
-                                        font-size: 0.9em;
-                                    }
-                                }
-                                
-                                @media (max-width: 480px) {
-                                    .tab-headers {
-                                        flex-wrap: wrap;
-                                    }
-                                    
-                                    .tab-header {
-                                        flex: 1 0 auto;
-                                        text-align: center;
-                                        padding: 8px 8px;
-                                        font-size: 0.8em;
-                                    }
-                                }
-                            </style>
-                            
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- CTA Section -->
@@ -1412,6 +958,9 @@
     <script src="/shared_components/js/universal-quick-quote-calculator.js"></script>
     <script src="/shared_components/js/embroidery-customization-options.js"></script>
     
+    <!-- Universal Pricing Grid Component -->
+    <script src="/shared_components/js/universal-pricing-grid.js"></script>
+    
     <!-- Enhanced Loading Experience -->
     <script src="/shared_components/js/embroidery-enhanced-loading.js"></script>
     
@@ -1441,6 +990,29 @@
             
             // Initialize Customization Options
             const customizationOptions = new EmbroideryCustomizationOptions(quickQuote);
+            
+            // Initialize Universal Pricing Grid
+            const pricingGrid = new UniversalPricingGrid({
+                containerId: 'pricing-grid-container',
+                showInventory: true,
+                inventoryThreshold: 10,
+                loadingAnimation: true,
+                showColorIndicator: true
+            });
+            
+            // Update color when changed
+            window.addEventListener('colorChanged', (event) => {
+                if (event.detail) {
+                    pricingGrid.updateSelectedColor(event.detail.COLOR_NAME, event.detail);
+                }
+            });
+            
+            // Highlight active tier when quantity changes
+            window.addEventListener('quantityChanged', (event) => {
+                if (event.detail && event.detail.totalQuantity) {
+                    pricingGrid.highlightActiveTier(event.detail.totalQuantity);
+                }
+            });
             
             // Header will auto-initialize from the component script
         });
