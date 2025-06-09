@@ -1175,7 +1175,16 @@
                 console.log('[Beta Page] Adding stitch count change listener');
                 stitchCountSelect.addEventListener('change', function(e) {
                     console.log('[Beta Page] Stitch count changed via event listener to:', e.target.value);
-                    handleStitchCountChange();
+                    
+                    // Wait a bit for Caspio data if not loaded yet
+                    if (!window.capEmbroideryMasterData || !window.capEmbroideryMasterData.allPriceProfiles) {
+                        console.log('[Beta Page] Waiting for Caspio master data...');
+                        setTimeout(() => {
+                            handleStitchCountChange();
+                        }, 500);
+                    } else {
+                        handleStitchCountChange();
+                    }
                 });
             } else {
                 console.error('[Beta Page] Stitch count select element not found!');
@@ -1353,6 +1362,12 @@
             updatePricing();
             updatePricingDisplay();
             updateBreakdown();
+            
+            // Also update the displayed stitch count in the breakdown
+            const heroStitchEl = document.getElementById('hero-stitch-count');
+            if (heroStitchEl) {
+                heroStitchEl.textContent = state.frontLogoStitches.toLocaleString();
+            }
         }
         
         // Update pricing when stitch count changes
@@ -1371,6 +1386,7 @@
                 
                 if (stitchCountProfile) {
                     console.log('[Beta Page] Found pricing profile for stitch count:', currentStitchCount);
+                    console.log('[Beta Page] Stitch count profile data:', stitchCountProfile);
                     
                     // Update pricing tiers with stitch count specific data
                     state.pricingTiers = [];
@@ -1393,9 +1409,16 @@
                     }
                 } else {
                     console.log('[Beta Page] No pricing profile found for stitch count:', currentStitchCount);
+                    console.log('[Beta Page] Available stitch count profiles:', Object.keys(window.capEmbroideryMasterData.allPriceProfiles));
                 }
             } else {
                 console.log('[Beta Page] No master data available yet');
+                
+                // Try to trigger data loading if not available
+                if (typeof window.capEmbroideryController !== 'undefined' && window.capEmbroideryController.calculatePricing) {
+                    console.log('[Beta Page] Attempting to trigger pricing calculation through controller');
+                    window.capEmbroideryController.calculatePricing();
+                }
             }
             
             // Update all pricing displays
