@@ -1007,19 +1007,19 @@
                 }
             }, 100);
             
-            // Initialize Universal Product Display with a slight delay to ensure data is ready
-            let productDisplay;
-            setTimeout(() => {
-                productDisplay = new UniversalProductDisplay({
-                    containerId: 'product-display',
-                    pageType: 'dtg',
-                    showBackButton: true,
-                    showInfoBox: true,
-                    showSelectedColor: true,
-                    sticky: false,
-                    infoBoxContent: 'Pricing includes a full-color DTG print on one location.'
-                });
-            }, 100);
+            // Initialize Universal Product Display immediately
+            let productDisplay = new UniversalProductDisplay({
+                containerId: 'product-display',
+                pageType: 'dtg',
+                showBackButton: true,
+                showInfoBox: true,
+                showSelectedColor: true,
+                sticky: false,
+                infoBoxContent: 'Pricing includes a full-color DTG print on one location.'
+            });
+            
+            // Store reference globally for debugging
+            window.productDisplay = productDisplay;
         });
     </script>
     <!-- Image modal setup -->

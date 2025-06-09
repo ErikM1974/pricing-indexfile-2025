@@ -90,6 +90,8 @@ class UniversalProductDisplay {
     }
 
     loadProductData() {
+        console.log('[UniversalProductDisplay] Loading product data...');
+        
         // Load from URL parameters and global state
         const urlParams = new URLSearchParams(window.location.search);
         
@@ -106,14 +108,21 @@ class UniversalProductDisplay {
                                   window.selectedColorName || 
                                   '';
         
+        console.log('[UniversalProductDisplay] Initial state:', {
+            productTitle: this.state.productTitle,
+            styleNumber: this.state.styleNumber,
+            selectedColor: this.state.selectedColor
+        });
+        
         // Get color data if available
         if (window.selectedColorData) {
             this.state.selectedColorData = window.selectedColorData;
+            console.log('[UniversalProductDisplay] Found selectedColorData:', window.selectedColorData);
         }
         
         // Also listen for product context updates and product colors ready
         window.addEventListener('productColorsReady', (event) => {
-            console.log('[UniversalProductDisplay] Product colors ready, updating display');
+            console.log('[UniversalProductDisplay] Product colors ready event received:', event.detail);
             if (event.detail) {
                 // Update product title from the API data
                 const titleEl = this.container.querySelector('#product-title-display');
@@ -130,6 +139,12 @@ class UniversalProductDisplay {
                     this.state.selectedColor = event.detail.selectedColor.COLOR_NAME || this.state.selectedColor;
                     this.state.selectedColorData = event.detail.selectedColor;
                     this.updateSelectedColor(this.state.selectedColorData);
+                }
+                
+                // Re-render gallery if we have new data
+                if (this.config.enableGallery) {
+                    console.log('[UniversalProductDisplay] Re-initializing gallery with new data');
+                    this.initializeSubComponents();
                 }
             }
         });
@@ -240,11 +255,26 @@ class UniversalProductDisplay {
 
     getBackUrl() {
         // Smart back URL detection
+        const urlParams = new URLSearchParams(window.location.search);
+        const styleNumber = urlParams.get('StyleNumber');
+        const color = urlParams.get('COLOR');
+        
+        // Build product page URL with current parameters
+        if (styleNumber) {
+            let backUrl = `/product.html?StyleNumber=${encodeURIComponent(styleNumber)}`;
+            if (color) {
+                backUrl += `&COLOR=${encodeURIComponent(color)}`;
+            }
+            return backUrl;
+        }
+        
+        // If we have a referrer from the same domain, use it
         if (document.referrer && document.referrer.includes(window.location.hostname)) {
             return document.referrer;
         }
+        
         // Fallback to products page
-        return '/products';
+        return '/product.html';
     }
 
     getColorSwatchStyle() {

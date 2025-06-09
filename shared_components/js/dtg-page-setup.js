@@ -115,32 +115,73 @@
                 selectedColorObject = productData.colors[0];
             }
 
-            // Update product image with selected color
-            if (selectedColorObject) {
-                updateProductImage(selectedColorObject);
-            }
+            // Store product data globally for Universal Product Display
+            window.productColors = productData.colors;
+            window.selectedColorData = selectedColorObject;
 
-            // Populate color swatches
-            populateColorSwatches(productData.colors);
+            // Dispatch productColorsReady event for Universal Product Display
+            console.log("DTG-PAGE-SETUP: Dispatching productColorsReady event");
+            window.dispatchEvent(new CustomEvent('productColorsReady', {
+                detail: {
+                    colors: productData.colors,
+                    selectedColor: selectedColorObject,
+                    productTitle: productData.productTitle
+                }
+            }));
 
-            // Update display for selected color
-            if (selectedColorObject) {
-                updateSelectedColorDisplay(selectedColorObject);
-                
-                // Mark the active swatch
-                const swatches = document.querySelectorAll('#color-swatches .color-swatch');
-                swatches.forEach(swatch => {
-                    if (swatch.dataset.catalogColor === selectedColorObject.CATALOG_COLOR) {
-                        swatch.classList.add('active');
-                    }
-                });
-            }
+            // Wait for Universal Product Display to be ready
+            waitForUniversalProductDisplay(() => {
+                // Update product image with selected color
+                if (selectedColorObject) {
+                    updateProductImage(selectedColorObject);
+                }
+
+                // Populate color swatches
+                populateColorSwatches(productData.colors);
+
+                // Update display for selected color
+                if (selectedColorObject) {
+                    updateSelectedColorDisplay(selectedColorObject);
+                    
+                    // Mark the active swatch
+                    const swatches = document.querySelectorAll('#color-swatches .color-swatch');
+                    swatches.forEach(swatch => {
+                        if (swatch.dataset.catalogColor === selectedColorObject.CATALOG_COLOR) {
+                            swatch.classList.add('active');
+                        }
+                    });
+                }
+            });
 
         } catch (error) {
             console.error('DTG-PAGE-SETUP: Error fetching product details:', error);
             const titleElContext = document.getElementById('product-title-context');
             if (titleElContext) titleElContext.textContent = 'Error Loading Product';
         }
+    }
+
+    // Helper function to wait for Universal Product Display elements
+    function waitForUniversalProductDisplay(callback) {
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max wait
+        
+        const checkElements = setInterval(() => {
+            attempts++;
+            
+            // Check if the required elements exist
+            const mainImage = document.getElementById('product-image-main');
+            const colorSwatches = document.getElementById('color-swatches');
+            
+            if ((mainImage || colorSwatches) || attempts >= maxAttempts) {
+                clearInterval(checkElements);
+                if (attempts >= maxAttempts) {
+                    console.warn('DTG-PAGE-SETUP: Timeout waiting for Universal Product Display elements');
+                } else {
+                    console.log('DTG-PAGE-SETUP: Universal Product Display elements found, proceeding');
+                }
+                callback();
+            }
+        }, 100);
     }
 
     function populateColorSwatches(colors) {
@@ -240,6 +281,7 @@
         // Update global state
         window.selectedColorName = colorData.COLOR_NAME;
         window.selectedCatalogColor = colorData.CATALOG_COLOR || colorData.COLOR_NAME;
+        window.selectedColorData = colorData;
 
         // Update active swatch styling in both containers
         const allSwatches = document.querySelectorAll('#color-swatches .color-swatch, #inline-swatch-area .color-swatch-item');
@@ -260,6 +302,11 @@
         const url = new URL(window.location);
         url.searchParams.set('COLOR', colorData.CATALOG_COLOR);
         window.history.replaceState({}, '', url);
+
+        // Dispatch colorChanged event for Universal Product Display
+        window.dispatchEvent(new CustomEvent('colorChanged', {
+            detail: colorData
+        }));
 
         // Trigger pricing updates if DTG adapter is loaded
         if (window.nwcaPricingData && typeof window.updateCustomPricingGrid === 'function') {
