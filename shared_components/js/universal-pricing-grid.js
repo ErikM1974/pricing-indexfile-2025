@@ -343,11 +343,13 @@ class UniversalPricingGrid {
                 this.elements.headerRow.removeChild(this.elements.headerRow.lastChild);
             }
             
-            // Add size headers
+            // Add size headers (skip 'Quantity' as it's already the first column)
             headers.forEach(sizeHeader => {
-                const th = document.createElement('th');
-                th.textContent = sizeHeader;
-                this.elements.headerRow.appendChild(th);
+                if (sizeHeader.toLowerCase() !== 'quantity') {
+                    const th = document.createElement('th');
+                    th.textContent = sizeHeader;
+                    this.elements.headerRow.appendChild(th);
+                }
             });
         }
 
@@ -383,8 +385,10 @@ class UniversalPricingGrid {
                 tierCell.textContent = tierLabel;
                 row.appendChild(tierCell);
 
-                // Price cells
+                // Price cells (skip 'Quantity' column)
                 headers.forEach((sizeGroup, colIndex) => {
+                    if (sizeGroup.toLowerCase() === 'quantity') return;
+                    
                     const priceCell = document.createElement('td');
                     priceCell.className = 'price-cell';
                     

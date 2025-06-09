@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cap Pricing Grid - Double Quantity Column Fix</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .warning {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .fix-description {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .code-highlight {
+            background: #fffde7;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #f0f4c3;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .button-group {
+            margin: 20px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.success {
+            background: #28a745;
+        }
+        button.success:hover {
+            background: #218838;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .highlight {
+            background: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Universal Pricing Grid - Double Quantity Column Fix</h1>
+    
+    <div class="test-section">
+        <h2>Problem Description</h2>
+        <p>The Universal Pricing Grid was showing two "Quantity" columns when used on the cap embroidery page.</p>
+        
+        <h3>Root Cause:</h3>
+        <ul>
+            <li>The pricing data includes a headers array: <code>['Quantity', 'OSFA']</code></li>
+            <li>The Universal Pricing Grid already has "Quantity" as the first column in its HTML template</li>
+            <li>When building the table, it was adding ALL headers from the array, resulting in duplicate "Quantity" columns</li>
+        </ul>
+        
+        <h3>Visual Example:</h3>
+        <table style="margin: 10px 0; border-collapse: collapse;">
+            <tr style="background: #f8d7da;">
+                <th style="border: 1px solid #dee2e6; padding: 8px;">Quantity</th>
+                <th style="border: 1px solid #dee2e6; padding: 8px;" class="error">Quantity</th>
+                <th style="border: 1px solid #dee2e6; padding: 8px;">OSFA</th>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #dee2e6; padding: 8px;">24-47</td>
+                <td style="border: 1px solid #dee2e6; padding: 8px;" class="error">-</td>
+                <td style="border: 1px solid #dee2e6; padding: 8px;">$24.00</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="fix-description">
+        <h3>✅ Solution Applied</h3>
+        <p>Modified the <code>buildPricingTable()</code> method in <code>universal-pricing-grid.js</code> to filter out "Quantity" from the headers array:</p>
+        
+        <div class="code-highlight">
+<strong>// In buildPricingTable() method:</strong>
+
+// Add size headers (skip 'Quantity' as it's already the first column)
+headers.forEach(sizeHeader => {
+    <span class="highlight">if (sizeHeader.toLowerCase() !== 'quantity') {</span>
+        const th = document.createElement('th');
+        th.textContent = sizeHeader;
+        this.elements.headerRow.appendChild(th);
+    <span class="highlight">}</span>
+});
+
+// Price cells (skip 'Quantity' column)
+headers.forEach((sizeGroup, colIndex) => {
+    <span class="highlight">if (sizeGroup.toLowerCase() === 'quantity') return;</span>
+    
+    const priceCell = document.createElement('td');
+    // ... rest of the code
+});</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Live Test</h2>
+        <p>The pricing grid below should show only one "Quantity" column:</p>
+        
+        <div class="button-group">
+            <button onclick="testWithQuantityInHeaders()">Test WITH 'Quantity' in headers</button>
+            <button onclick="testWithoutQuantityInHeaders()">Test WITHOUT 'Quantity' in headers</button>
+            <button class="success" onclick="window.location.href='/cap-embroidery-pricing-integrated.html'">View Fixed Cap Embroidery Page</button>
+        </div>
+        
+        <div id="test-results" class="test-result"></div>
+        
+        <!-- Container for Universal Pricing Grid -->
+        <div id="pricing-grid-container" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Result</h2>
+        <p>The table should display correctly with only these columns:</p>
+        <table style="margin: 10px 0; border-collapse: collapse;">
+            <tr style="background: #d4edda;">
+                <th style="border: 1px solid #dee2e6; padding: 8px;">Quantity</th>
+                <th style="border: 1px solid #dee2e6; padding: 8px;">OSFA</th>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #dee2e6; padding: 8px;">24-47</td>
+                <td style="border: 1px solid #dee2e6; padding: 8px;">$24.00</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #dee2e6; padding: 8px;">48-71</td>
+                <td style="border: 1px solid #dee2e6; padding: 8px;">$23.00</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #dee2e6; padding: 8px;">72+</td>
+                <td style="border: 1px solid #dee2e6; padding: 8px;">$21.00</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Load Universal Pricing Grid -->
+    <script src="/shared_components/js/universal-pricing-grid.js"></script>
+    
+    <script>
+        let pricingGrid;
+        const resultsDiv = document.getElementById('test-results');
+        
+        // Initialize the pricing grid
+        document.addEventListener('DOMContentLoaded', function() {
+            pricingGrid = new UniversalPricingGrid({
+                containerId: 'pricing-grid-container',
+                showInventory: false,
+                loadingAnimation: false,
+                showColorIndicator: false,
+                showSizes: false
+            });
+        });
+        
+        function testWithQuantityInHeaders() {
+            resultsDiv.innerHTML = '<p class="warning">Testing with "Quantity" in headers array...</p>';
+            
+            // This is what cap-embroidery-pricing-integrated.html sends
+            const testData = {
+                headers: ['Quantity', 'OSFA'], // This includes 'Quantity'
+                prices: {
+                    'OSFA': {
+                        '24-47': '24.00',
+                        '48-71': '23.00',
+                        '72-99+': '21.00'
+                    }
+                },
+                tierData: {
+                    '24-47': { MinQuantity: 24, MaxQuantity: 47 },
+                    '48-71': { MinQuantity: 48, MaxQuantity: 71 },
+                    '72-99+': { MinQuantity: 72 }
+                },
+                styleNumber: 'C112',
+                color: 'Black',
+                embellishmentType: 'cap-embroidery'
+            };
+            
+            // Dispatch the event
+            window.dispatchEvent(new CustomEvent('pricingDataLoaded', {
+                detail: testData
+            }));
+            
+            // Check the result after a short delay
+            setTimeout(() => {
+                const headerCells = document.querySelectorAll('#pricing-grid-container th');
+                const quantityCount = Array.from(headerCells).filter(th => th.textContent === 'Quantity').length;
+                
+                if (quantityCount === 1) {
+                    resultsDiv.innerHTML = '<p class="success">✅ SUCCESS: Only one "Quantity" column found!</p>';
+                } else {
+                    resultsDiv.innerHTML = `<p class="error">❌ ERROR: Found ${quantityCount} "Quantity" columns!</p>`;
+                }
+                
+                resultsDiv.innerHTML += `<p>Total columns: ${headerCells.length}</p>`;
+                resultsDiv.innerHTML += `<p>Column headers: ${Array.from(headerCells).map(th => th.textContent).join(', ')}</p>`;
+            }, 500);
+        }
+        
+        function testWithoutQuantityInHeaders() {
+            resultsDiv.innerHTML = '<p class="warning">Testing without "Quantity" in headers array...</p>';
+            
+            // Alternative test without 'Quantity' in headers
+            const testData = {
+                headers: ['OSFA'], // No 'Quantity' here
+                prices: {
+                    'OSFA': {
+                        '24-47': '24.00',
+                        '48-71': '23.00',
+                        '72-99+': '21.00'
+                    }
+                },
+                tierData: {
+                    '24-47': { MinQuantity: 24, MaxQuantity: 47 },
+                    '48-71': { MinQuantity: 48, MaxQuantity: 71 },
+                    '72-99+': { MinQuantity: 72 }
+                },
+                styleNumber: 'C112',
+                color: 'Black',
+                embellishmentType: 'cap-embroidery'
+            };
+            
+            // Dispatch the event
+            window.dispatchEvent(new CustomEvent('pricingDataLoaded', {
+                detail: testData
+            }));
+            
+            // Check the result after a short delay
+            setTimeout(() => {
+                const headerCells = document.querySelectorAll('#pricing-grid-container th');
+                const quantityCount = Array.from(headerCells).filter(th => th.textContent === 'Quantity').length;
+                
+                if (quantityCount === 1) {
+                    resultsDiv.innerHTML = '<p class="success">✅ SUCCESS: Only one "Quantity" column found!</p>';
+                } else {
+                    resultsDiv.innerHTML = `<p class="error">❌ ERROR: Found ${quantityCount} "Quantity" columns!</p>`;
+                }
+                
+                resultsDiv.innerHTML += `<p>Total columns: ${headerCells.length}</p>`;
+                resultsDiv.innerHTML += `<p>Column headers: ${Array.from(headerCells).map(th => th.textContent).join(', ')}</p>`;
+            }, 500);
+        }
+    </script>
+</body>
+</html>
