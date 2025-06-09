@@ -6,10 +6,20 @@
     <title>Embroidery Pricing | NWCA</title>
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
-    <link rel="stylesheet" href="/shared_components/css/quote-system.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
     <style>
+        /* CSS Variables for consistency */
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #0052a3;
+            --gray-100: #f8f9fa;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-900: #212529;
+            --white: #ffffff;
+        }
+        
         /* New layout styles for embroidery pricing page */
         /* Improved layout styles */
         .improved-layout {
@@ -815,6 +825,120 @@
         .product-header .navigation-area {
             display: none;
         }
+        
+        /* Main Content Sections */
+        .main-content {
+            padding: 40px 0;
+        }
+        
+        .content-section {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .content-section h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: var(--gray-100);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .cta-section h2 {
+            font-size: 28px;
+            margin: 0 0 10px 0;
+        }
+        
+        .cta-section p {
+            color: var(--gray-700);
+            margin: 0 0 30px 0;
+            font-size: 18px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-100);
+        }
+        
+        /* Features */
+        .features {
+            margin-top: 30px;
+            line-height: 1.8;
+        }
+        
+        .features p {
+            margin: 5px 0;
+            color: var(--gray-700);
+        }
+        
+        /* Pricing Table Adjustments */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .pricing-table th,
+        .pricing-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200, #e9ecef);
+        }
+        
+        .pricing-table th {
+            background: var(--gray-100);
+            font-weight: 600;
+            color: var(--gray-800, #343a40);
+        }
+        
+        .pricing-table tr:hover {
+            background: var(--gray-50, #f8f9fa);
+        }
     </style>
 </head>
 <body>
@@ -874,12 +998,26 @@
 
             <!-- Right Column: Interactive Elements (Scrollable) -->
             <div class="product-interactive-column">
-
-                <!-- Original .product-context and .pricing-content are now effectively merged or reorganized -->
-                <!-- The content of .pricing-content (pricing grid, add to cart) goes into this right column -->
+                <!-- Quick Quote Calculator -->
+                <div id="quick-quote-container">
+                    <!-- Quick Quote Calculator will be initialized here -->
+                </div>
+            </div> <!-- End .product-interactive-column -->
+        </div> <!-- End .product-page-columns-container -->
+        
+        <!-- Main Content Section (Below Hero) -->
+        <div class="main-content">
+            <div class="container">
+                <!-- Customization Options -->
+                <div id="customization-options-container">
+                    <!-- Customization options will be initialized here -->
+                </div>
                 
-                <!-- Pricing Content (Grid, Tabs, Add to Cart Section) -->
-                <div class="pricing-content-interactive"> <!-- New wrapper for clarity -->
+                <!-- Pricing Content (Moved from right column) -->
+                <div class="content-section" id="pricing-details">
+                    <h2>Pricing by Quantity</h2>
+                    <p style="color: var(--gray-600); margin-bottom: 20px;">Volume discounts automatically applied • Pricing includes an 8,000 stitch embroidered logo</p>
+                    
                     <!-- Hidden Caspio Matrix - Keep this for data source -->
                     <div id="pricing-calculator" class="pricing-calculator">
                         <div class="loading-message">Loading pricing data...</div>
@@ -1233,15 +1371,33 @@
                             
                         </div>
                     </div>
+                </div>
+                
+                <!-- CTA Section -->
+                <div class="cta-section">
+                    <h2>Ready for Your Quote?</h2>
+                    <p>Contact us with your quantity and customization details for a personalized quote.</p>
                     
-                    <!-- Embroidery Quote System Integration -->
-                    <div id="add-to-cart-section">
-                        <!-- Quote system will be initialized by embroidery-quote-adapter.js -->
+                    <div class="cta-buttons">
+                        <button class="btn btn-primary" onclick="window.location.href='tel:253-922-5793'">
+                            📞 Call for Quote: 253-922-5793
+                        </button>
+                        
+                        <button class="btn btn-secondary" onclick="window.location.href='mailto:sales@nwcustomapparel.com?subject=Embroidery Quote Request'">
+                            ✉️ Email Quote Request
+                        </button>
                     </div>
-                </div> <!-- End .pricing-content-interactive -->
-            </div> <!-- End .product-interactive-column -->
-        </div> <!-- End .product-page-columns-container -->
-    </div> <!-- End .container -->
+                    
+                    <div class="features">
+                        <p>💚 <strong>Why Choose Northwest Custom Apparel?</strong></p>
+                        <p>Family Owned and Operated Since 1977 • Milton, WA • Quality embroidery</p>
+                        <p>📍 2025 Freeman Road East Milton, WA 98354</p>
+                        <p>📱 You can text us at 253-922-5793</p>
+                    </div>
+                </div>
+            </div> <!-- End .container -->
+        </div> <!-- End .main-content -->
+    </div> <!-- End #app -->
     
     <!-- JavaScript Files -->
     <script src="/shared_components/js/app-config.js"></script>
@@ -1252,10 +1408,9 @@
     <script src="/shared_components/js/dp5-helper.js"></script>
     <script src="/product-url-handler.js"></script>
     
-    <!-- Quote System Scripts -->
-    <script src="/shared_components/js/quote-adapter-base.js"></script>
-    <script src="/shared_components/js/embroidery-quote-adapter.js"></script>
-    <script src="/shared_components/js/order-form-pdf.js"></script>
+    <!-- Quick Quote Calculator Scripts -->
+    <script src="/shared_components/js/universal-quick-quote-calculator.js"></script>
+    <script src="/shared_components/js/embroidery-customization-options.js"></script>
     
     <!-- Enhanced Loading Experience -->
     <script src="/shared_components/js/embroidery-enhanced-loading.js"></script>
@@ -1273,6 +1428,19 @@
             if (window.initializeProductFromURL) {
                 window.initializeProductFromURL();
             }
+            
+            // Initialize Quick Quote Calculator
+            const quickQuote = new UniversalQuickQuoteCalculator({
+                pageType: 'embroidery',
+                unitLabel: 'items',
+                defaultQuantity: 24,
+                includedStitches: 8000,
+                showPrimaryStitchCount: true,
+                showAdditionalLogos: true
+            });
+            
+            // Initialize Customization Options
+            const customizationOptions = new EmbroideryCustomizationOptions(quickQuote);
             
             // Header will auto-initialize from the component script
         });
