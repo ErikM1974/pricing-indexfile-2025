@@ -734,8 +734,9 @@
     <!-- Hidden Caspio Matrix - Keep this for data source -->
     <div id="pricing-calculator" class="pricing-calculator hidden-calculator">
         <div class="loading-message">Loading pricing data...</div>
-        <!-- Caspio Deploy Script - This connects to your database -->
-        <div id="caspio-embed-container"></div>
+        <div id="caspio-container">
+            <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150004ecd0739f853449c8d7f/emb"></script>
+        </div>
     </div>
     
     <!-- Hidden elements for compatibility with pricing-pages.js -->
@@ -952,6 +953,11 @@
 
     <!-- Main Implementation -->
     <script>
+        // Add missing function for embellishment type detection
+        window.getEmbellishmentTypeFromUrl = function() {
+            return 'cap-embroidery';
+        };
+        
         // Cap Embroidery Pricing Logic
         const state = {
             quantity: 31,
@@ -966,7 +972,8 @@
             styleNumber: '',
             productTitle: '',
             pricingData: null,
-            pricingTiers: [] // Will be populated from Caspio
+            pricingTiers: [], // Will be populated from Caspio
+            isUpdatingStitchCount: false // Add flag to prevent loops
         };
         
         // Parse URL parameters and set global variables IMMEDIATELY
@@ -1016,6 +1023,36 @@
             // Make it globally accessible
             window.pricingGrid = pricingGrid;
             
+            // Initialize with default pricing data immediately
+            const initialPricingData = {
+                headers: ['Quantity', 'OSFA'],
+                prices: {
+                    'OSFA': {
+                        '24-47': '24.00',
+                        '48-71': '23.00',
+                        '72-99+': '21.00'
+                    }
+                },
+                tierData: [
+                    { range: '24-47', prices: { 'OSFA': '24.00' } },
+                    { range: '48-71', prices: { 'OSFA': '23.00' } },
+                    { range: '72-99+', prices: { 'OSFA': '21.00' } }
+                ],
+                styleNumber: state.styleNumber,
+                color: state.selectedColor,
+                embellishmentType: 'cap-embroidery'
+            };
+            
+            // Add alias for compatibility
+            initialPricingData.tiers = initialPricingData.tierData;
+            
+            // Dispatch initial pricing data
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('pricingDataLoaded', {
+                    detail: initialPricingData
+                }));
+            }, 500);
+            
             // Update product info
             updateProductInfo();
             
@@ -1026,8 +1063,8 @@
             // Populate initial pricing table
             populateInitialPricingTable();
             
-            // Load Caspio data
-            loadCaspioData();
+            // Note: Caspio data will be loaded by pricing-pages.js
+            // loadCaspioData();
             
             // Try to extract pricing from existing table after a short delay
             setTimeout(() => {
@@ -1093,6 +1130,12 @@
             window.addEventListener('pricingDataLoaded', function(event) {
                 console.log('[Beta Page] Pricing data loaded event received', event.detail);
                 
+                // Skip if this event came from stitch count update to prevent loops
+                if (event.detail && event.detail._fromStitchCountUpdate) {
+                    console.log('[Beta Page] Skipping pricing data update - event from stitch count update');
+                    return;
+                }
+                
                 // Extract pricing tiers from event
                 if (event.detail && event.detail.prices) {
                     extractPricingTiers(event.detail);
@@ -1112,6 +1155,11 @@
                         updatePricing();
                         updatePricingDisplay();
                         updateBreakdown();
+                        
+                        // Only update pricing for stitch count if not already updating
+                        if (!state.isUpdatingStitchCount) {
+                            updatePricingForStitchCount();
+                        }
                     }
                 }, 500);
             });
@@ -1131,14 +1179,24 @@
                 }
             });
             
+            // Also listen for the cap embroidery pricing event from the controller
+            window.addEventListener('capEmbroideryPricingUpdated', function(event) {
+                console.log('[Beta Page] Cap embroidery pricing updated event received', event.detail);
+                if (event.detail && event.detail.prices) {
+                    // Extract and update pricing tiers
+                    extractPricingTiers(event.detail);
+                    updatePricingForStitchCount();
+                }
+            });
+            
             // Also listen for the pricing table to be updated
-            const pricingGrid = document.getElementById('custom-pricing-grid');
-            if (pricingGrid) {
+            const pricingTableElement = document.getElementById('custom-pricing-grid');
+            if (pricingTableElement) {
                 const observer = new MutationObserver(function(mutations) {
                     console.log('[Beta Page] Pricing table was modified');
                     
                     // Check if the table has data
-                    const tbody = pricingGrid.querySelector('tbody');
+                    const tbody = pricingTableElement.querySelector('tbody');
                     if (tbody && tbody.querySelectorAll('tr').length > 0) {
                         console.log('[Beta Page] Pricing table has data, extracting prices');
                         setTimeout(() => {
@@ -1149,12 +1207,21 @@
                         }, 100);
                     }
                 });
-                observer.observe(pricingGrid, { childList: true, subtree: true });
+                observer.observe(pricingTableElement, { childList: true, subtree: true });
             }
             
             // Initialize cap embroidery controller if available
-            if (window.capEmbroideryController) {
-                console.log('[Beta Page] Cap embroidery controller found, initializing...');
+            if (window.NWCA && window.NWCA.controllers && window.NWCA.controllers.capEmbroidery) {
+                console.log('[Beta Page] Cap embroidery controller found, setting global reference');
+                window.capEmbroideryController = window.NWCA.controllers.capEmbroidery;
+                
+                // Initialize the controller if it has an init method
+                if (window.capEmbroideryController.initialize) {
+                    console.log('[Beta Page] Initializing cap embroidery controller');
+                    window.capEmbroideryController.initialize();
+                }
+            } else {
+                console.log('[Beta Page] Cap embroidery controller not found in NWCA namespace');
             }
             
             // Add event listener for stitch count changes
@@ -1269,11 +1336,18 @@
             
             state.productTitle = titles[state.styleNumber] || state.styleNumber;
             
-            // Update UI
-            document.getElementById('product-title').textContent = state.productTitle;
-            document.getElementById('product-style-context').textContent = state.styleNumber;
-            document.getElementById('current-product-context').textContent = state.productTitle;
-            document.getElementById('breadcrumb-product').textContent = state.styleNumber;
+            // Update UI - check if elements exist before updating
+            const productTitleEl = document.getElementById('product-title');
+            if (productTitleEl) productTitleEl.textContent = state.productTitle;
+            
+            const productStyleEl = document.getElementById('product-style-context');
+            if (productStyleEl) productStyleEl.textContent = state.styleNumber;
+            
+            const currentProductEl = document.getElementById('current-product-context');
+            if (currentProductEl) currentProductEl.textContent = state.productTitle;
+            
+            const breadcrumbEl = document.getElementById('breadcrumb-product');
+            if (breadcrumbEl) breadcrumbEl.textContent = state.styleNumber;
             
             // Also update the hidden title context that pricing-pages.js looks for
             const titleContext = document.getElementById('product-title-context');
@@ -1286,8 +1360,8 @@
             const breadcrumbLink = document.getElementById('breadcrumb-product-link');
             const productUrl = `/product?StyleNumber=${state.styleNumber}&COLOR=${encodeURIComponent(state.selectedColor)}`;
             
-            backLink.href = productUrl;
-            breadcrumbLink.href = productUrl;
+            if (backLink) backLink.href = productUrl;
+            if (breadcrumbLink) breadcrumbLink.href = productUrl;
             
             // Note: Product image and color swatches will be handled by pricing-pages.js
         }
@@ -1342,6 +1416,12 @@
             state.frontLogoStitches = parseInt(stitchCount);
             
             console.log('[Beta Page] Stitch count changed to:', stitchCount);
+            console.log('[Beta Page] Current state:', {
+                hasController: !!window.capEmbroideryController,
+                hasMasterData: !!window.capEmbroideryMasterData,
+                hasProfiles: !!(window.capEmbroideryMasterData && window.capEmbroideryMasterData.allPriceProfiles),
+                pricingTiers: state.pricingTiers
+            });
             
             // Update pricing based on new stitch count
             updatePricingForStitchCount();
@@ -1356,11 +1436,21 @@
             if (heroStitchEl) {
                 heroStitchEl.textContent = state.frontLogoStitches.toLocaleString();
             }
+            
+            // Try to trigger cap controller calculation if available
+            if (window.capEmbroideryController && window.capEmbroideryController.calculatePricing) {
+                console.log('[Beta Page] Triggering cap controller pricing calculation');
+                window.capEmbroideryController.calculatePricing();
+            }
         }
         
         // Update pricing when stitch count changes
         function updatePricingForStitchCount() {
             console.log('[Beta Page] updatePricingForStitchCount called');
+            
+            // Set flag to prevent loops
+            state.isUpdatingStitchCount = true;
+            
             console.log('[Beta Page] Current pricing data:', {
                 hasMasterData: !!window.capEmbroideryMasterData,
                 hasAllPriceProfiles: !!(window.capEmbroideryMasterData && window.capEmbroideryMasterData.allPriceProfiles),
@@ -1433,6 +1523,53 @@
             window.dispatchEvent(new CustomEvent('pricingDataUpdated', {
                 detail: { stitchCount: state.frontLogoStitches }
             }));
+            
+            // Also dispatch pricingDataLoaded event for Universal Pricing Grid
+            // Convert cap embroidery data to Universal Pricing Grid format
+            if (state.pricingTiers.length > 0) {
+                const gridData = {
+                    headers: ['Quantity', 'OSFA'],
+                    prices: {
+                        'OSFA': {}
+                    },
+                    styleNumber: state.styleNumber,
+                    color: state.selectedColor,
+                    embellishmentType: 'cap-embroidery',
+                    _dp5Processed: true, // Mark as processed to prevent dp5-helper from re-processing
+                    _fromStitchCountUpdate: true // Additional flag to identify source
+                };
+                
+                // Convert pricing tiers to the expected format
+                const tierData = [];
+                state.pricingTiers.forEach(tier => {
+                    let rangeKey;
+                    if (tier.min === 72 && tier.max === 99999) {
+                        rangeKey = '72-99+';
+                    } else {
+                        rangeKey = `${tier.min}-${tier.max}`;
+                    }
+                    gridData.prices.OSFA[rangeKey] = tier.price.toFixed(2);
+                    
+                    // Add tier data in array format as expected by UniversalPricingGrid
+                    tierData.push({
+                        range: rangeKey,
+                        prices: { 'OSFA': tier.price.toFixed(2) }
+                    });
+                });
+                
+                // Add tierData and tiers (alias) to the event detail
+                gridData.tierData = tierData;
+                gridData.tiers = tierData; // Some components check for 'tiers' instead of 'tierData'
+                
+                window.dispatchEvent(new CustomEvent('pricingDataLoaded', {
+                    detail: gridData
+                }));
+            }
+            
+            // Clear flag after a short delay
+            setTimeout(() => {
+                state.isUpdatingStitchCount = false;
+            }, 100);
         }
         
         // Extract pricing from the displayed table
@@ -1758,6 +1895,15 @@
             
             // Clear any existing rows
             tbody.innerHTML = '';
+            
+            // Add header row if needed
+            const thead = document.querySelector('#custom-pricing-grid thead');
+            if (thead) {
+                const headerRow = document.getElementById('pricing-header-row');
+                if (headerRow) {
+                    headerRow.innerHTML = '<th>Quantity</th><th>OSFA</th>';
+                }
+            }
             
             // Add default pricing rows
             const defaultTiers = [

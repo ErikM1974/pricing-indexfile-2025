@@ -228,6 +228,20 @@
                             sizes: sizeHeadersToDisplay 
                         }
                     }));
+                    
+                    // Also dispatch pricingDataLoaded event for Universal Pricing Grid
+                    const gridData = {
+                        headers: sizeHeadersToDisplay,
+                        prices: prices,
+                        tierData: tierDefinitions,
+                        styleNumber: window.selectedStyleNumber || '',
+                        color: window.selectedColorName || '',
+                        embellishmentType: 'embroidery'
+                    };
+                    
+                    window.dispatchEvent(new CustomEvent('pricingDataLoaded', {
+                        detail: gridData
+                    }));
                 }
 
                 // Hide loading and show success
