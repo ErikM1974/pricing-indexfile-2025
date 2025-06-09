@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embroidery Pricing | NWCA</title>
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     <link rel="stylesheet" href="/shared_components/css/quote-system.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -804,11 +805,23 @@
             font-size: 0.9em;
             margin-top: 5px;
         }
+        
+        /* Header integration adjustments */
+        .container {
+            padding-top: 20px;
+        }
+        
+        /* Hide the old navigation area since we have it in the header now */
+        .product-header .navigation-area {
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <!-- Universal Header -->
+    <div id="universal-header-container" data-page-type="embroidery"></div>
+    
     <div class="container">
-        <h1>Embroidery Pricing</h1>
 
         <!-- New Two-Column Layout Container -->
         <div class="product-page-columns-container">
@@ -1247,6 +1260,9 @@
     <!-- Enhanced Loading Experience -->
     <script src="/shared_components/js/embroidery-enhanced-loading.js"></script>
     
+    <!-- Universal Header Component -->
+    <script src="/shared_components/js/universal-header-component.js"></script>
+    
     <!-- Initialize embroidery page -->
     <script>
         // Initialize when DOM is ready
@@ -1257,6 +1273,8 @@
             if (window.initializeProductFromURL) {
                 window.initializeProductFromURL();
             }
+            
+            // Header will auto-initialize from the component script
         });
     </script>
     
