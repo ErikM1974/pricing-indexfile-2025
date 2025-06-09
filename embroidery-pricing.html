@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
     <style>
         /* CSS Variables for consistency */
         :root {
@@ -770,6 +772,33 @@
             color: var(--gray-700);
         }
         
+        /* Two-column layout */
+        .product-page-columns-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+        
+        .product-context-column {
+            flex: 0 0 350px;
+        }
+        
+        .product-interactive-column {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        @media (max-width: 1024px) {
+            .product-page-columns-container {
+                flex-direction: column;
+            }
+            
+            .product-context-column {
+                flex: 0 0 auto;
+                margin-bottom: 20px;
+            }
+        }
+        
     </style>
 </head>
 <body>
@@ -777,54 +806,28 @@
     <div id="universal-header-container" data-page-type="embroidery"></div>
     
     <div class="container">
+        
+        <!-- Hidden elements for compatibility with legacy scripts -->
+        <div style="display: none;">
+            <div id="custom-pricing-grid">
+                <table>
+                    <thead>
+                        <tr id="pricing-header-row"></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <h2 id="product-title-context">Product Title</h2>
+            <img id="product-image-main-hidden" src="" alt="">
+        </div>
 
         <!-- New Two-Column Layout Container -->
         <div class="product-page-columns-container">
 
             <!-- Left Column: Product Context (Potentially Sticky) -->
             <div class="product-context-column">
-                <div class="product-header"> <!-- Re-using existing header for product title area -->
-                    <div class="product-title-area">
-                        <h2 id="product-title-context">Product Title</h2> <!-- New ID to avoid conflict if original #product-title is used elsewhere by JS -->
-                        <div class="product-meta" style="padding-top: 8px; margin-bottom: 5px;"> <!-- Adjusted padding/margin -->
-                            <span class="meta-item">Style: <strong id="product-style-context">Style Number</strong></span>
-                            <!-- Selected Color display removed from here, will rely on the one in the right column -->
-                        </div>
-                    </div>
-                    <div class="navigation-area">
-                        <a id="back-to-product" href="#" class="back-to-product">
-                            <span class="back-icon">←</span> Back to Product
-                        </a>
-                    </div>
-                </div>
-                <!-- Enhanced Product Image Gallery -->
-                <div class="product-image-gallery" id="product-image-gallery">
-                    <div class="main-image-container" id="main-image-container">
-                        <img id="product-image-main" src="" alt="Product Image" class="product-image">
-                        <div class="image-loading-spinner"></div>
-                        <div class="image-zoom-overlay">
-                            <span class="zoom-icon">🔍</span>
-                        </div>
-                    </div>
-                    <div class="image-thumbnails" id="image-thumbnails">
-                        <!-- Thumbnails will be dynamically added here -->
-                    </div>
-                </div>
-                <div class="static-product-info" style="padding:15px; background-color: var(--background-light); border-radius: var(--radius-sm); margin-top:15px;">
-                    <p id="embroidery-default-stitch-info">Pricing Includes an 8,000 stitch embroidered logo.</p>
-                    <!-- Other static info can go here -->
-                </div>
-                
-                <!-- Color Swatches moved to left column below product image -->
-                <div class="color-swatches-left-column" style="margin-top:15px;">
-                    <div class="color-swatches-container compact">
-                        <h3 class="section-title">Available Colors</h3>
-                        <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 5px; max-height: 300px;">
-                            <!-- Color swatches will be dynamically added here by pricing-pages.js -->
-                        </div>
-                        <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
-                    </div>
-                </div>
+                <!-- Universal Product Display Component will render here -->
+                <div id="product-display"></div>
             </div>
 
             <!-- Right Column: Interactive Elements (Scrollable) -->
@@ -859,64 +862,6 @@
                         <!-- Universal pricing grid will be initialized here -->
                     </div>
                         
-                        <style>
-                            /* Styles for .product-page-columns-container, .product-context-column, .product-interactive-column */
-                            /* These would go into pricing-pages-enhanced.css */
-                            .product-page-columns-container {
-                                display: flex;
-                                flex-direction: row;
-                                gap: 20px;
-                            }
-                            .product-context-column {
-                                flex: 0 0 350px; /* Adjust width as needed */
-                                /* position: sticky; top: 20px; /* Example for sticky */
-                                /* height: calc(100vh - 40px); overflow-y: auto; */
-                            }
-                            .product-interactive-column {
-                                flex: 1;
-                                min-width: 0; /* Prevents flexbox overflow issues */
-                            }
-                            
-                            /* Improved styling for color swatches in left column */
-                            .color-swatches-left-column .color-swatches-container {
-                                border: 1px solid var(--border-light);
-                            }
-                            
-                            .color-swatches-left-column .swatch-wrapper {
-                                width: 60px; /* Slightly smaller to fit better in left column */
-                                min-height: 70px;
-                            }
-                            
-                            .color-swatches-left-column .color-swatch {
-                                width: 45px;
-                                height: 45px;
-                            }
-                            .product-image-container-context img {
-                                width: 100%;
-                                height: auto;
-                                display: block;
-                                border-radius: var(--radius-sm);
-                                box-shadow: var(--shadow-sm);
-                            }
-                            
-                            @media (max-width: 1024px) { /* Breakpoint for stacking columns */
-                                .product-page-columns-container {
-                                    flex-direction: column;
-                                }
-                                .product-context-column {
-                                    flex: 0 0 auto; /* Reset flex basis */
-                                    position: static; /* Reset sticky for stacked view */
-                                    height: auto;
-                                    margin-bottom: 20px;
-                                }
-                                
-                                /* Adjust color swatches for mobile */
-                                .color-swatches-left-column .color-swatches {
-                                    max-height: 200px;
-                                }
-                            }
-
-                        </style>
                 </div>
                 
                 <!-- CTA Section -->
@@ -967,6 +912,10 @@
     <!-- Universal Header Component -->
     <script src="/shared_components/js/universal-header-component.js"></script>
     
+    <!-- Universal Product Display Component -->
+    <script src="/shared_components/js/universal-product-display.js"></script>
+    <script src="/shared_components/js/universal-image-gallery.js"></script>
+    
     <!-- Initialize embroidery page -->
     <script>
         // Initialize when DOM is ready
@@ -977,6 +926,19 @@
             if (window.initializeProductFromURL) {
                 window.initializeProductFromURL();
             }
+            
+            // Initialize Universal Product Display with a slight delay to ensure data is ready
+            let productDisplay;
+            setTimeout(() => {
+                productDisplay = new UniversalProductDisplay({
+                    containerId: 'product-display',
+                    pageType: 'embroidery',
+                    showBackButton: true,
+                    showInfoBox: true,
+                    showSelectedColor: true,
+                    sticky: false
+                });
+            }, 100);
             
             // Initialize Quick Quote Calculator
             const quickQuote = new UniversalQuickQuoteCalculator({

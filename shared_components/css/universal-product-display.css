@@ -1,0 +1,306 @@
+/**
+ * Universal Product Display Styles
+ * Styling for the modular product display component used across all pricing pages
+ */
+
+/* ==========================================================================
+   Base Component Styles
+   ========================================================================== */
+
+.universal-product-display {
+    width: 100%;
+    position: relative;
+}
+
+/* Smooth loading transitions */
+.upd-fade-in {
+    animation: updFadeIn 0.3s ease-in;
+}
+
+@keyframes updFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Column layout (default) */
+.universal-product-display.column-layout {
+    max-width: 350px;
+    width: 100%;
+}
+
+/* Hero layout option */
+.universal-product-display.hero-layout {
+    max-width: 100%;
+}
+
+/* Sticky option */
+.universal-product-display.sticky-display {
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+/* ==========================================================================
+   Header Section
+   ========================================================================== */
+
+.upd-header {
+    background-color: var(--white, #ffffff);
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: var(--radius-md, 8px);
+    padding: 15px 20px;
+    margin-bottom: 15px;
+}
+
+.upd-navigation {
+    margin-bottom: 10px;
+}
+
+.upd-back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--primary-color, #0066cc);
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+}
+
+.upd-back-button:hover {
+    color: var(--primary-dark, #0052a3);
+    transform: translateX(-3px);
+}
+
+.back-icon {
+    transition: transform 0.2s ease;
+}
+
+.upd-product-info {
+    position: relative;
+}
+
+.upd-product-title {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: var(--primary-color, #0066cc);
+    margin: 0 0 10px 0;
+    line-height: 1.3;
+}
+
+/* Selected Color Indicator */
+.upd-selected-color {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--primary-light, #e3f2fd);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    margin-bottom: 10px;
+    border: 1px solid var(--primary-color, #0066cc);
+}
+
+.upd-selected-color .color-label {
+    color: var(--gray-600, #6c757d);
+}
+
+.upd-selected-color .mini-color-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--white, #ffffff);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+}
+
+.upd-selected-color .color-name {
+    font-weight: 600;
+    color: var(--primary-dark, #0052a3);
+}
+
+.upd-product-meta {
+    color: var(--gray-600, #6c757d);
+    font-size: 0.9em;
+}
+
+.upd-product-meta .meta-item {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+/* ==========================================================================
+   Gallery Container
+   ========================================================================== */
+
+.upd-gallery-container {
+    margin-bottom: 15px;
+}
+
+/* Gallery styles are handled by universal-image-gallery.css */
+
+/* ==========================================================================
+   Info Box
+   ========================================================================== */
+
+.upd-info-box {
+    background-color: var(--background-light, #f8f9fa);
+    border-radius: var(--radius-sm, 4px);
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 3px solid var(--primary-color, #0066cc);
+}
+
+.upd-info-box p {
+    margin: 0;
+    color: var(--gray-700, #495057);
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   Color Swatches
+   ========================================================================== */
+
+.upd-color-swatches {
+    margin-top: 15px;
+}
+
+/* Most swatch styles come from dp5-helper, but we add container styling */
+.upd-color-swatches .color-swatches-container {
+    background-color: var(--background-light, #f8f9fa);
+    border: 1px solid var(--border-light, #e9ecef);
+    border-radius: var(--radius-sm, 4px);
+    padding: 15px;
+}
+
+.upd-color-swatches .section-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--primary-color, #0066cc);
+    margin: 0 0 10px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-light, #e9ecef);
+}
+
+/* Show More Colors Button */
+.show-more-colors {
+    display: none;
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: var(--primary-light, #e3f2fd);
+    color: var(--primary-color, #0066cc);
+    border: 1px solid var(--primary-color, #0066cc);
+    border-radius: var(--radius-sm, 4px);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.show-more-colors:hover {
+    background-color: var(--primary-color, #0066cc);
+    color: var(--white, #ffffff);
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+    .universal-product-display.column-layout {
+        max-width: 100%;
+    }
+    
+    .universal-product-display.sticky-display {
+        position: static;
+        max-height: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .upd-header {
+        padding: 12px 15px;
+    }
+    
+    .upd-product-title {
+        font-size: 1.25em;
+    }
+    
+    .upd-selected-color {
+        font-size: 0.8em;
+        padding: 5px 10px;
+    }
+    
+    .upd-selected-color .mini-color-swatch {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .upd-info-box {
+        padding: 12px;
+        font-size: 0.9em;
+    }
+    
+    .upd-color-swatches .color-swatches-container {
+        padding: 12px;
+    }
+    
+    .upd-color-swatches .section-title {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .upd-navigation {
+        margin-bottom: 8px;
+    }
+    
+    .upd-back-button {
+        font-size: 0.85em;
+    }
+    
+    .upd-product-title {
+        font-size: 1.1em;
+        margin-bottom: 8px;
+    }
+    
+    .upd-selected-color {
+        font-size: 0.75em;
+        padding: 4px 8px;
+        gap: 6px;
+    }
+    
+    .upd-selected-color .mini-color-swatch {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .upd-product-meta {
+        font-size: 0.85em;
+    }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+    .upd-navigation,
+    .show-more-colors,
+    .image-zoom-overlay {
+        display: none !important;
+    }
+    
+    .universal-product-display {
+        max-width: 100% !important;
+    }
+}

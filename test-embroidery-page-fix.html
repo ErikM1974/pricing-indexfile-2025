@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Embroidery Page Fix</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Embroidery Page Component Test</h1>
+    
+    <div id="test-results"></div>
+    
+    <h2>Component Status:</h2>
+    <div id="component-status"></div>
+    
+    <h2>Data Status:</h2>
+    <div id="data-status"></div>
+    
+    <script>
+        const results = document.getElementById('test-results');
+        const componentStatus = document.getElementById('component-status');
+        const dataStatus = document.getElementById('data-status');
+        
+        function addStatus(message, type = 'info', container = results) {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+        }
+        
+        // Check for required elements
+        function checkElements() {
+            addStatus('=== Checking Required Elements ===', 'info', componentStatus);
+            
+            const elementsToCheck = [
+                { id: 'product-display', name: 'Product Display Container' },
+                { id: 'quick-quote-container', name: 'Quick Quote Container' },
+                { id: 'pricing-grid-container', name: 'Pricing Grid Container' },
+                { id: 'custom-pricing-grid', name: 'Legacy Pricing Grid (hidden)' },
+                { id: 'product-title-context', name: 'Product Title Context' },
+                { id: 'color-swatches', name: 'Color Swatches' }
+            ];
+            
+            elementsToCheck.forEach(elem => {
+                const el = document.getElementById(elem.id);
+                if (el) {
+                    addStatus(`✓ ${elem.name} found`, 'success', componentStatus);
+                } else {
+                    addStatus(`✗ ${elem.name} NOT found`, 'error', componentStatus);
+                }
+            });
+        }
+        
+        // Check for required scripts
+        function checkScripts() {
+            addStatus('=== Checking Required Scripts ===', 'info', componentStatus);
+            
+            const scriptsToCheck = [
+                { obj: 'UniversalProductDisplay', name: 'Universal Product Display' },
+                { obj: 'UniversalQuickQuoteCalculator', name: 'Universal Quick Quote' },
+                { obj: 'UniversalPricingGrid', name: 'Universal Pricing Grid' },
+                { obj: 'UniversalImageGallery', name: 'Universal Image Gallery' },
+                { obj: 'PricingPageUI', name: 'Pricing Pages UI' },
+                { obj: 'DP5Helper', name: 'DP5 Helper' }
+            ];
+            
+            scriptsToCheck.forEach(script => {
+                if (window[script.obj]) {
+                    addStatus(`✓ ${script.name} loaded`, 'success', componentStatus);
+                } else {
+                    addStatus(`✗ ${script.name} NOT loaded`, 'error', componentStatus);
+                }
+            });
+        }
+        
+        // Check data availability
+        function checkData() {
+            addStatus('=== Checking Data Availability ===', 'info', dataStatus);
+            
+            const dataToCheck = [
+                { prop: 'productTitle', name: 'Product Title' },
+                { prop: 'selectedStyleNumber', name: 'Style Number' },
+                { prop: 'selectedColorName', name: 'Selected Color' },
+                { prop: 'selectedColorData', name: 'Color Data' },
+                { prop: 'nwcaPricingData', name: 'Pricing Data' }
+            ];
+            
+            dataToCheck.forEach(data => {
+                if (window[data.prop]) {
+                    addStatus(`✓ ${data.name}: ${JSON.stringify(window[data.prop]).substring(0, 100)}...`, 'success', dataStatus);
+                } else {
+                    addStatus(`✗ ${data.name} NOT available`, 'error', dataStatus);
+                }
+            });
+        }
+        
+        // Listen for events
+        window.addEventListener('pricingDataLoaded', (event) => {
+            addStatus('✓ pricingDataLoaded event received', 'success');
+            console.log('Pricing data:', event.detail);
+        });
+        
+        window.addEventListener('productColorsReady', (event) => {
+            addStatus('✓ productColorsReady event received', 'success');
+            console.log('Product colors:', event.detail);
+        });
+        
+        window.addEventListener('colorChanged', (event) => {
+            addStatus('✓ colorChanged event received', 'success');
+            console.log('Color changed:', event.detail);
+        });
+        
+        // Run checks after page loads
+        setTimeout(() => {
+            checkElements();
+            checkScripts();
+            checkData();
+        }, 2000);
+        
+        // Add link to embroidery page
+        const link = document.createElement('a');
+        link.href = '/embroidery-pricing.html?StyleNumber=054X&COLOR=Ash';
+        link.textContent = 'Go to Embroidery Page';
+        link.style.display = 'block';
+        link.style.marginTop = '20px';
+        link.style.fontSize = '18px';
+        document.body.appendChild(link);
+    </script>
+</body>
+</html>
