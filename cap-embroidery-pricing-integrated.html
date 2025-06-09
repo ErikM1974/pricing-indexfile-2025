@@ -1061,8 +1061,9 @@
             // Update product info
             updateProductInfo();
             
-            // Initial pricing calculation (with fallback values)
-            updatePricing();
+            // Don't calculate pricing with fallback values immediately
+            // Wait for real data from Caspio
+            console.log('[Beta Page] Waiting for Caspio data before calculating initial pricing...');
             
             // Populate initial pricing table
             populateInitialPricingTable();
@@ -1075,11 +1076,26 @@
                 console.log('[Beta Page] Checking for existing pricing table data');
                 extractPricingFromTable();
                 if (state.pricingTiers.length > 0) {
+                    console.log('[Beta Page] Extracted pricing tiers, updating all displays');
                     updatePricing();
                     updatePricingDisplay();
                     updateBreakdown();
                 }
             }, 1000);
+            
+            // Also check again after a longer delay in case Caspio loads slowly
+            setTimeout(() => {
+                if (state.pricingTiers.length === 0) {
+                    console.log('[Beta Page] Re-checking for pricing data...');
+                    extractPricingFromTable();
+                    if (state.pricingTiers.length > 0) {
+                        console.log('[Beta Page] Found pricing data on second check');
+                        updatePricing();
+                        updatePricingDisplay();
+                        updateBreakdown();
+                    }
+                }
+            }, 2500);
             
             // Add client-stitch-count-select ID for compatibility
             const stitchSelect = document.getElementById('stitch-count');
@@ -1121,10 +1137,19 @@
                 
                 // Update pricing with real data
                 updatePricing();
+                updatePricingDisplay();
+                updateBreakdown();
                 
                 // Check if we need to add the 24-47 tier
                 setTimeout(function() {
                     fixPricingTable();
+                    // Extract pricing again after fixing table
+                    extractPricingFromTable();
+                    if (state.pricingTiers.length > 0) {
+                        updatePricing();
+                        updatePricingDisplay();
+                        updateBreakdown();
+                    }
                 }, 500);
             });
             
@@ -1554,9 +1579,15 @@
             // If we have Caspio data, use it
             if (state.pricingTiers.length > 0) {
                 tier = state.pricingTiers.find(t => state.quantity >= t.min && state.quantity <= t.max);
-                if (!tier && state.quantity >= 72) {
-                    // Use last tier for 72+
-                    tier = state.pricingTiers[state.pricingTiers.length - 1];
+                if (!tier) {
+                    // For quantities below the first tier, use the first tier's price
+                    if (state.quantity < state.pricingTiers[0].min) {
+                        tier = state.pricingTiers[0];
+                        console.log('[Beta Page] Using first tier price for small quantity');
+                    } else if (state.quantity >= 72) {
+                        // Use last tier for 72+
+                        tier = state.pricingTiers[state.pricingTiers.length - 1];
+                    }
                 }
                 console.log('[Beta Page] Found tier for quantity', state.quantity, ':', tier);
             }
