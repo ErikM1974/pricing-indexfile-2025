@@ -6,6 +6,7 @@
     <title>DTG Pricing | NWCA</title>
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/dtg-brand-override.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
@@ -784,8 +785,9 @@
     </style>
 </head>
 <body>
+    <div id="universal-header-container" data-page-type="dtg"></div>
     <div class="container">
-        <h1>DTG Pricing</h1>
+        <h1 style="display: none;">DTG Pricing</h1>
         
         <!-- Hidden search input for script compatibility -->
         <input type="text" id="style-search-input" style="display: none;" />
@@ -803,7 +805,7 @@
                             <span class="meta-item">Style: <strong id="product-style-context">Style Number</strong></span>
                         </div>
                     </div>
-                    <div class="navigation-area">
+                    <div class="navigation-area" style="display: none;">
                         <a id="back-to-product" href="/product.html" class="back-to-product">
                             <span class="back-icon">←</span> Back to Product
                         </a>
@@ -1090,6 +1092,7 @@
     <script src="/shared_components/js/dtg-adapter.js"></script>
     <script src="/shared_components/js/pricing-fallback-adapter.js"></script>
     <script src="/shared_components/js/dtg-quote-system.js"></script>
+    <script src="/shared_components/js/universal-header-component.js"></script>
     
 </body>
 </html>

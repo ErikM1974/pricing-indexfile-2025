@@ -212,7 +212,10 @@ const UniversalHeaderComponent = {
                     <nav class="header-breadcrumb-nav">
                         <a href="/" class="breadcrumb-link">Home</a>
                         <span class="breadcrumb-separator">›</span>
-                        <span>Products</span>
+                        ${config.styleNumber ? 
+                            `<a href="/product?StyleNumber=${config.styleNumber}${config.color ? '&COLOR=' + encodeURIComponent(config.color) : ''}" class="breadcrumb-link">Products</a>` : 
+                            `<span>Products</span>`
+                        }
         `;
         
         // Add product link if we have a style number

@@ -54,12 +54,12 @@
     border-color: var(--primary-color) !important;
 }
 
-/* Links */
-a {
+/* Links - exclude header links */
+a:not(.breadcrumb-link):not(.back-to-product) {
     color: var(--primary-color) !important;
 }
 
-a:hover {
+a:not(.breadcrumb-link):not(.back-to-product):hover {
     color: var(--primary-dark) !important;
 }
 
@@ -169,14 +169,8 @@ select:focus {
     color: var(--primary-color) !important;
 }
 
-/* Back to product link */
-.back-to-product {
-    color: var(--primary-color) !important;
-}
-
-.back-to-product:hover {
-    color: var(--primary-dark) !important;
-}
+/* Back to product link - removed to use header default styling */
+/* Header back button should use universal-header.css styles */
 
 /* Pricing header */
 .pricing-header {

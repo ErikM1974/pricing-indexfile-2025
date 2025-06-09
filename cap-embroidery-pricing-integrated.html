@@ -725,54 +725,8 @@
     </style>
 </head>
 <body>
-    <!-- Universal Navigation Header -->
-    <header class="universal-header">
-        <div class="header-top-bar">
-            <div class="header-top-bar-content">
-                <div class="contact-info">
-                    <span>📞 253-922-5793</span>
-                    <span>✉️ sales@nwcustomapparel.com</span>
-                    <span>🕒 9AM-5PM</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="header-main">
-            <div class="header-main-content">
-                <div class="header-brand">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" alt="NW Custom Apparel Logo" class="header-logo-img">
-                </div>
-                
-                <div class="header-nav-hub">
-                    <a id="back-to-product" href="#" class="back-to-product">
-                        <span class="back-icon">←</span> 
-                        <span>Back to Product</span>
-                    </a>
-                    
-                    <div class="page-context">
-                        <div class="page-context-title">Cap Embroidery Pricing</div>
-                        <div class="page-context-subtitle" id="current-product-context">Select a product to get started</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="header-breadcrumb">
-            <div class="header-breadcrumb-content">
-                <nav class="header-breadcrumb-nav">
-                    <a href="/" class="breadcrumb-link">Home</a>
-                    <span class="breadcrumb-separator">›</span>
-                    <span>Products</span>
-                    <span class="breadcrumb-separator">›</span>
-                    <a id="breadcrumb-product-link" href="#" class="breadcrumb-link">
-                        <span id="breadcrumb-product">Product</span>
-                    </a>
-                    <span class="breadcrumb-separator">›</span>
-                    <span class="breadcrumb-current">Cap Embroidery Pricing</span>
-                </nav>
-            </div>
-        </div>
-    </header>
+    <!-- Universal Header -->
+    <div id="universal-header-container" data-page-type="cap-embroidery"></div>
     
     <!-- Hidden Caspio Matrix - Keep this for data source -->
     <div id="pricing-calculator" class="pricing-calculator hidden-calculator">
@@ -1010,6 +964,9 @@
     <script src="/shared_components/js/cap-embroidery-controller-v2.js"></script>
     <!-- Removed clean-color-adapter.js - dp5-helper already handles color swatches -->
     <!-- IMPORTANT: NOT including cap-embroidery-ltm-fix.js as it has the $18 bug -->
+    
+    <!-- Universal Header Component -->
+    <script src="/shared_components/js/universal-header-component.js"></script>
     
     <!-- Beta Analytics and Feedback -->
     <script src="/beta-analytics-tracker.js" defer></script>
