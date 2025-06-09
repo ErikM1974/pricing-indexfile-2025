@@ -186,6 +186,7 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     border-radius: var(--radius-sm, 4px);
     overflow: hidden;
+    table-layout: fixed; /* Ensure columns maintain consistent width */
 }
 
 .pricing-grid th {
@@ -206,12 +207,15 @@
     text-align: center;
     border-bottom: 1px solid var(--border-color, #dee2e6);
     transition: background-color 0.3s ease;
+    vertical-align: middle;
 }
 
 .pricing-grid td:first-child {
     text-align: left;
     padding-left: 15px;
     font-weight: 500;
+    white-space: nowrap; /* Prevent text from wrapping */
+    min-width: 140px; /* Ensure adequate space */
 }
 
 .pricing-grid tbody tr:nth-child(even) {
@@ -236,6 +240,8 @@
 .price-cell {
     position: relative;
     font-weight: 500;
+    white-space: nowrap;
+    min-width: 80px; /* Ensure minimum width for price cells */
 }
 
 .price-cell.best-price {
@@ -251,6 +257,8 @@
     font-size: 0.75em;
     border-radius: 12px;
     font-weight: 500;
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
 .tier-badge.popular {

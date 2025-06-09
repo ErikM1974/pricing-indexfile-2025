@@ -147,18 +147,30 @@
         // Look for both the old custom-pricing-grid ID and the new universal pricing grid table
         let pricingGrid = document.getElementById('custom-pricing-grid');
         if (!pricingGrid) {
-            // Try to find universal pricing grid table
-            const universalGrid = document.querySelector('[id$="-table"].pricing-grid');
-            if (universalGrid) {
-                pricingGrid = universalGrid;
-                console.log("[DP5-HELPER] Using universal pricing grid table:", universalGrid.id);
+            // Try to find universal pricing grid table - it should be 'pricing-grid-container-table'
+            pricingGrid = document.getElementById('pricing-grid-container-table');
+            if (!pricingGrid) {
+                // Also try selector approach
+                pricingGrid = document.querySelector('[id$="-table"].pricing-grid');
+            }
+            
+            if (pricingGrid) {
+                console.log("[DP5-HELPER] Using universal pricing grid table:", pricingGrid.id);
             } else {
                 console.warn("[DP5-HELPER] No pricing grid element found (neither custom-pricing-grid nor universal grid).");
                 return;
             }
         }
         
-        const headerRow = document.getElementById('pricing-header-row') || pricingGrid.querySelector('thead tr');
+        // Try to find header row - universal grid uses containerId-header-row pattern
+        let headerRow = document.getElementById('pricing-header-row');
+        if (!headerRow) {
+            headerRow = document.getElementById('pricing-grid-container-header-row');
+        }
+        if (!headerRow && pricingGrid) {
+            headerRow = pricingGrid.querySelector('thead tr');
+        }
+        
         if (headerRow) {
             while (headerRow.children.length > 1) {
                 headerRow.removeChild(headerRow.lastChild);

@@ -216,15 +216,18 @@ class UniversalPricingGrid {
         }
 
         // Initialize color from global state if available
-        if (window.selectedColorName && this.config.showColorIndicator) {
-            console.log('[UniversalPricingGrid] Initializing color from global state:', window.selectedColorName);
-            const colorData = {
-                COLOR_NAME: window.selectedColorName,
-                HEX_CODE: window.selectedColorHex || null,
-                COLOR_SQUARE_IMAGE: window.selectedColorImage || null
-            };
-            this.updateSelectedColor(window.selectedColorName, colorData);
-        }
+        // Delay this slightly to ensure elements are ready
+        setTimeout(() => {
+            if (window.selectedColorName && this.config.showColorIndicator) {
+                console.log('[UniversalPricingGrid] Initializing color from global state:', window.selectedColorName);
+                const colorData = {
+                    COLOR_NAME: window.selectedColorName,
+                    HEX_CODE: window.selectedColorHex || null,
+                    COLOR_SQUARE_IMAGE: window.selectedColorImage || window.selectedColorSquareImage || null
+                };
+                this.updateSelectedColor(window.selectedColorName, colorData);
+            }
+        }, 100);
     }
 
     showLoading() {
@@ -581,20 +584,31 @@ class UniversalPricingGrid {
             this.elements.colorName.textContent = colorName;
         }
 
-        if (this.elements.colorSwatch && colorData) {
-            // Update mini swatch appearance
+        if (this.elements.colorSwatch) {
+            // Reset styles first
             this.elements.colorSwatch.style.backgroundImage = '';
             this.elements.colorSwatch.style.backgroundColor = '#ccc';
             
-            if (colorData.COLOR_SQUARE_IMAGE || colorData.COLOR_SWATCH_IMAGE_URL) {
-                const swatchUrl = colorData.COLOR_SQUARE_IMAGE || colorData.COLOR_SWATCH_IMAGE_URL;
-                this.elements.colorSwatch.style.backgroundImage = `url('${swatchUrl}')`;
-            } else if (colorData.HEX_CODE) {
-                this.elements.colorSwatch.style.backgroundColor = colorData.HEX_CODE;
+            // If we have color data, use it
+            if (colorData) {
+                if (colorData.COLOR_SQUARE_IMAGE || colorData.COLOR_SWATCH_IMAGE_URL) {
+                    const swatchUrl = colorData.COLOR_SQUARE_IMAGE || colorData.COLOR_SWATCH_IMAGE_URL;
+                    this.elements.colorSwatch.style.backgroundImage = `url('${swatchUrl}')`;
+                    this.elements.colorSwatch.style.backgroundSize = 'cover';
+                    this.elements.colorSwatch.style.backgroundPosition = 'center';
+                } else if (colorData.HEX_CODE) {
+                    this.elements.colorSwatch.style.backgroundColor = colorData.HEX_CODE;
+                } else {
+                    // Fallback color based on name
+                    this.elements.colorSwatch.style.backgroundColor = this.getColorFallback(colorName);
+                }
             } else {
-                // Fallback color based on name
+                // If no color data, just use fallback based on name
                 this.elements.colorSwatch.style.backgroundColor = this.getColorFallback(colorName);
             }
+            
+            // Make sure the swatch is visible
+            this.elements.colorSwatch.style.display = 'inline-block';
         }
     }
 
@@ -621,7 +635,8 @@ class UniversalPricingGrid {
             'brown': '#8B4513', 'maroon': '#800000', 'forest': '#228B22', 'royal': '#4169E1',
             'cardinal': '#C41E3A', 'kelly': '#4CBB17', 'hunter': '#355E3B', 'burgundy': '#800020',
             'charcoal': '#36454F', 'heather': '#B0C4DE', 'stone': '#928E85', 'sand': '#C2B280',
-            'khaki': '#F0E68C'
+            'khaki': '#F0E68C', 'teal': '#008080', 'shark': '#7A8288', 'cyber': '#00D7FF',
+            'scarlet': '#FF2400', 'gold': '#FFD700', 'silver': '#C0C0C0', 'jade': '#00A86B'
         };
         
         const normalizedName = colorName.toLowerCase();
