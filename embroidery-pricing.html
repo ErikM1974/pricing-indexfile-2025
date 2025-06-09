@@ -927,18 +927,15 @@
                 window.initializeProductFromURL();
             }
             
-            // Initialize Universal Product Display with a slight delay to ensure data is ready
-            let productDisplay;
-            setTimeout(() => {
-                productDisplay = new UniversalProductDisplay({
-                    containerId: 'product-display',
-                    pageType: 'embroidery',
-                    showBackButton: true,
-                    showInfoBox: true,
-                    showSelectedColor: true,
-                    sticky: false
-                });
-            }, 100);
+            // Initialize Universal Product Display immediately
+            let productDisplay = new UniversalProductDisplay({
+                containerId: 'product-display',
+                pageType: 'embroidery',
+                showBackButton: true,
+                showInfoBox: true,
+                showSelectedColor: true,
+                sticky: false
+            });
             
             // Initialize Quick Quote Calculator
             const quickQuote = new UniversalQuickQuoteCalculator({

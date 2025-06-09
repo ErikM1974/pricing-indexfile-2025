@@ -782,19 +782,16 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[DTF] Page initialized with quote system');
             
-            // Initialize Universal Product Display with a slight delay to ensure data is ready
-            let productDisplay;
-            setTimeout(() => {
-                productDisplay = new UniversalProductDisplay({
-                    containerId: 'product-display',
-                    pageType: 'dtf',
-                    showBackButton: true,
-                    showInfoBox: true,
-                    showSelectedColor: true,
-                    sticky: false,
-                    infoBoxContent: 'DTF Transfer Printing: Vibrant, full-color designs with excellent durability and stretch. Perfect for both light and dark garments.'
-                });
-            }, 100);
+            // Initialize Universal Product Display immediately
+            let productDisplay = new UniversalProductDisplay({
+                containerId: 'product-display',
+                pageType: 'dtf',
+                showBackButton: true,
+                showInfoBox: true,
+                showSelectedColor: true,
+                sticky: false,
+                infoBoxContent: 'DTF Transfer Printing: Vibrant, full-color designs with excellent durability and stretch. Perfect for both light and dark garments.'
+            });
             
             // Dispatch event to signal DTF page is ready
             window.dispatchEvent(new CustomEvent('dtfPageReady', {

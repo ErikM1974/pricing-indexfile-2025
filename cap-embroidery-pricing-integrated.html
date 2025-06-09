@@ -991,19 +991,16 @@
                 window.PricingPageUI.init();
             }
             
-            // Initialize Universal Product Display with a slight delay to ensure data is ready
-            let productDisplay;
-            setTimeout(() => {
-                productDisplay = new UniversalProductDisplay({
-                    containerId: 'product-display',
-                    pageType: 'cap-embroidery',
-                    showBackButton: true,
-                    showInfoBox: true,
-                    showSelectedColor: true,
-                    sticky: false,
-                    infoBoxContent: 'Pricing includes an 8,000 stitch embroidered logo on front.'
-                });
-            }, 100);
+            // Initialize Universal Product Display immediately
+            let productDisplay = new UniversalProductDisplay({
+                containerId: 'product-display',
+                pageType: 'cap-embroidery',
+                showBackButton: true,
+                showInfoBox: true,
+                showSelectedColor: true,
+                sticky: false,
+                infoBoxContent: 'Pricing includes an 8,000 stitch embroidered logo on front.'
+            });
             
             // Update product info
             updateProductInfo();
