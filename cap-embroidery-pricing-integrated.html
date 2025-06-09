@@ -775,7 +775,7 @@
                             <!-- Quantity Input -->
                             <div class="quantity-input-group">
                                 <button class="quantity-btn" id="decrease-btn" onclick="updateQuantity(-1)">−</button>
-                                <input type="number" class="quantity-input" id="quantity-input" value="31" min="1" max="10000" onchange="handleQuantityChange()">
+                                <input type="number" class="quantity-input" id="quantity-input" value="24" min="1" max="10000" onchange="handleQuantityChange()">
                                 <button class="quantity-btn" id="increase-btn" onclick="updateQuantity(1)">+</button>
                                 <span class="quantity-label">caps</span>
                             </div>
@@ -960,7 +960,7 @@
         
         // Cap Embroidery Pricing Logic
         const state = {
-            quantity: 31,
+            quantity: 24,
             basePrice: 0,
             unitPrice: 0,
             totalPrice: 0,
@@ -1033,14 +1033,15 @@
                         '72-99+': '21.00'
                     }
                 },
-                tierData: [
-                    { range: '24-47', prices: { 'OSFA': '24.00' } },
-                    { range: '48-71', prices: { 'OSFA': '23.00' } },
-                    { range: '72-99+', prices: { 'OSFA': '21.00' } }
-                ],
+                tierData: {
+                    '24-47': { MinQuantity: 24, MaxQuantity: 47 },
+                    '48-71': { MinQuantity: 48, MaxQuantity: 71 },
+                    '72-99+': { MinQuantity: 72 }
+                },
                 styleNumber: state.styleNumber,
                 color: state.selectedColor,
-                embellishmentType: 'cap-embroidery'
+                embellishmentType: 'cap-embroidery',
+                stitchCount: state.frontLogoStitches
             };
             
             // Add alias for compatibility
@@ -1535,12 +1536,13 @@
                     styleNumber: state.styleNumber,
                     color: state.selectedColor,
                     embellishmentType: 'cap-embroidery',
+                    stitchCount: state.frontLogoStitches, // Pass the current stitch count
                     _dp5Processed: true, // Mark as processed to prevent dp5-helper from re-processing
                     _fromStitchCountUpdate: true // Additional flag to identify source
                 };
                 
                 // Convert pricing tiers to the expected format
-                const tierData = [];
+                const tierData = {};
                 state.pricingTiers.forEach(tier => {
                     let rangeKey;
                     if (tier.min === 72 && tier.max === 99999) {
@@ -1550,11 +1552,11 @@
                     }
                     gridData.prices.OSFA[rangeKey] = tier.price.toFixed(2);
                     
-                    // Add tier data in array format as expected by UniversalPricingGrid
-                    tierData.push({
-                        range: rangeKey,
-                        prices: { 'OSFA': tier.price.toFixed(2) }
-                    });
+                    // Add tier data in object format as expected by UniversalPricingGrid
+                    tierData[rangeKey] = {
+                        MinQuantity: tier.min,
+                        MaxQuantity: tier.max === 99999 ? undefined : tier.max
+                    };
                 });
                 
                 // Add tierData and tiers (alias) to the event detail

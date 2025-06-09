@@ -323,8 +323,11 @@ class UniversalPricingGrid {
         }
 
         // Update pricing note if embellishment type is embroidery
-        if (this.elements.pricingNote && data.embellishmentType === 'embroidery') {
-            this.elements.pricingNote.textContent = 'Prices shown are per item and include an 8,000 stitch embroidered logo.';
+        if (this.elements.pricingNote) {
+            if (data.embellishmentType === 'embroidery' || data.embellishmentType === 'cap-embroidery') {
+                const stitchCount = data.stitchCount || 8000;
+                this.elements.pricingNote.textContent = `Prices shown are per item and include a ${stitchCount.toLocaleString()} stitch embroidered logo.`;
+            }
         }
 
         // Hide loading and show table
