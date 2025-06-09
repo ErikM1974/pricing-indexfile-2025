@@ -11,6 +11,9 @@
     
     <!-- Essential styles for image gallery and color swatches -->
     <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
     <!-- Removed clean-color-swatches.css - using default dp5-helper styles -->
     <link rel="stylesheet" href="/shared_components/css/enhanced-loading-animations.css">
     
@@ -750,38 +753,8 @@
                 <div class="product-header">
                     <!-- Left Column - Product Info -->
                     <div>
-                        <!-- Product Image Gallery Structure matching original page -->
-                        <div id="product-image-gallery" class="image-gallery-enhanced product-image-gallery">
-                            <div id="main-image-container" class="image-container-enhanced main-image-container">
-                                <img id="product-image-main" src="" alt="Product Image" class="product-main-image" 
-                                     onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y4ZjlmYSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIwMCIgeT0iMjAwIiBmaWxsPSIjNmM3NTdkIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiPkltYWdlIE5vdCBBdmFpbGFibGU8L3RleHQ+PC9zdmc+'; this.alt='Image not available';">
-                                <div class="image-loading-spinner"></div>
-                                <div class="image-zoom-overlay zoom-overlay-enhanced">🔍</div>
-                            </div>
-                            <div id="image-thumbnails" class="image-thumbnails-enhanced image-thumbnails">
-                                <!-- Thumbnails will be dynamically added here -->
-                            </div>
-                        </div>
-                        
-                        <div class="product-info">
-                            <h1 class="product-title" id="product-title">Product Title</h1>
-                            <p class="product-style">Style: <strong id="product-style-context"></strong></p>
-                            <div class="product-description">
-                                <h3>What's Included</h3>
-                                <p>Pricing includes an 8,000 stitch embroidered logo on one location.</p>
-                            </div>
-                            
-                            <!-- Color Swatches styled like embroidery page -->
-                            <div class="color-swatches-left-column" style="margin-top:15px;">
-                                <div class="color-swatches-container compact">
-                                    <h3 class="section-title">Available Colors</h3>
-                                    <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 5px; max-height: 300px;">
-                                        <!-- Color swatches will be dynamically added here by dp5-helper -->
-                                    </div>
-                                    <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Universal Product Display Component will render here -->
+                        <div id="product-display"></div>
                     </div>
                     
                     <!-- Right Column - Quick Quote -->
@@ -968,6 +941,9 @@
     <!-- Universal Header Component -->
     <script src="/shared_components/js/universal-header-component.js"></script>
     
+    <!-- Universal Product Display Component -->
+    <script src="/shared_components/js/universal-product-display.js"></script>
+    
     <!-- Beta Analytics and Feedback -->
     <script src="/beta-analytics-tracker.js" defer></script>
     <script src="/beta-feedback-widget.js" defer></script>
@@ -1014,6 +990,20 @@
             if (window.PricingPageUI && typeof window.PricingPageUI.init === 'function') {
                 window.PricingPageUI.init();
             }
+            
+            // Initialize Universal Product Display with a slight delay to ensure data is ready
+            let productDisplay;
+            setTimeout(() => {
+                productDisplay = new UniversalProductDisplay({
+                    containerId: 'product-display',
+                    pageType: 'cap-embroidery',
+                    showBackButton: true,
+                    showInfoBox: true,
+                    showSelectedColor: true,
+                    sticky: false,
+                    infoBoxContent: 'Pricing includes an 8,000 stitch embroidered logo on front.'
+                });
+            }, 100);
             
             // Update product info
             updateProductInfo();

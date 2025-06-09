@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/dtg-brand-override.css">
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
@@ -798,49 +800,8 @@
 
             <!-- Left Column: Product Context -->
             <div class="product-context-column">
-                <div class="product-header">
-                    <div class="product-title-area">
-                        <h2 id="product-title-context">Product Title</h2>
-                        <div class="product-meta" style="padding-top: 8px; margin-bottom: 5px;">
-                            <span class="meta-item">Style: <strong id="product-style-context">Style Number</strong></span>
-                        </div>
-                    </div>
-                    <div class="navigation-area" style="display: none;">
-                        <a id="back-to-product" href="/product.html" class="back-to-product">
-                            <span class="back-icon">←</span> Back to Product
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Enhanced Product Image Gallery -->
-                <div class="product-image-gallery" id="product-image-gallery">
-                    <div class="main-image-container" id="main-image-container">
-                        <img id="product-image-main" src="" alt="Product Image" class="product-image">
-                        <div class="image-loading-spinner"></div>
-                        <div class="image-zoom-overlay">
-                            <span class="zoom-icon">🔍</span>
-                        </div>
-                    </div>
-                    <div class="image-thumbnails" id="image-thumbnails">
-                        <!-- Thumbnails will be dynamically added here -->
-                    </div>
-                </div>
-                
-                <div class="static-product-info" style="padding:15px; background-color: var(--background-light); border-radius: var(--radius-sm); margin-top:15px;">
-                    <p>Pricing includes a full-color DTG print on one location.</p>
-                </div>
-                
-                
-                <!-- Color Swatches in left column -->
-                <div class="color-swatches-left-column" style="margin-top:15px;">
-                    <div class="color-swatches-container compact">
-                        <h3 class="section-title">Available Colors</h3>
-                        <div class="color-swatches collapsed" id="color-swatches" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 5px; max-height: 300px;">
-                            <!-- Color swatches will be dynamically added here by pricing-pages.js -->
-                        </div>
-                        <button class="show-more-colors" id="show-more-colors" style="display: none;">Show More Colors</button>
-                    </div>
-                </div>
+                <!-- Universal Product Display Component will render here -->
+                <div id="product-display"></div>
             </div>
 
             <!-- Right Column: Interactive Elements -->
@@ -1045,6 +1006,20 @@
                     window.initializeProductFromURL();
                 }
             }, 100);
+            
+            // Initialize Universal Product Display with a slight delay to ensure data is ready
+            let productDisplay;
+            setTimeout(() => {
+                productDisplay = new UniversalProductDisplay({
+                    containerId: 'product-display',
+                    pageType: 'dtg',
+                    showBackButton: true,
+                    showInfoBox: true,
+                    showSelectedColor: true,
+                    sticky: false,
+                    infoBoxContent: 'Pricing includes a full-color DTG print on one location.'
+                });
+            }, 100);
         });
     </script>
     <!-- Image modal setup -->
@@ -1093,6 +1068,8 @@
     <script src="/shared_components/js/pricing-fallback-adapter.js"></script>
     <script src="/shared_components/js/dtg-quote-system.js"></script>
     <script src="/shared_components/js/universal-header-component.js"></script>
+    <script src="/shared_components/js/universal-product-display.js"></script>
+    <script src="/shared_components/js/universal-image-gallery.js"></script>
     
 </body>
 </html>
