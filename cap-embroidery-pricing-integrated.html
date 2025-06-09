@@ -744,6 +744,14 @@
         <img id="product-image-context" src="" alt="">
         <div id="product-color-context"></div>
         <div id="selected-color-swatch-context"></div>
+        <div id="custom-pricing-grid">
+            <table>
+                <thead>
+                    <tr id="pricing-header-row"></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <div id="app">
@@ -866,18 +874,9 @@
                     <h2>Pricing by Quantity</h2>
                     <p style="color: var(--gray-600); margin-bottom: 20px;">Volume discounts automatically applied • <span id="pricing-stitch-count-display">8,000 stitch pricing shown</span></p>
                     
-                    <div class="pricing-table-container">
-                        <table id="custom-pricing-grid" class="pricing-table">
-                            <thead>
-                                <tr id="pricing-header-row" class="pricing-table-header">
-                                    <th>Quantity Range</th>
-                                    <th>Price per Cap</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Pricing data will be dynamically added here -->
-                            </tbody>
-                        </table>
+                    <!-- Universal Pricing Grid Component -->
+                    <div id="pricing-grid-container">
+                        <!-- Universal pricing grid will be initialized here -->
                     </div>
                     
                     <p style="margin-top: 20px; font-size: 14px; color: var(--gray-600);">
@@ -944,6 +943,9 @@
     <!-- Universal Product Display Component -->
     <script src="/shared_components/js/universal-product-display.js"></script>
     
+    <!-- Universal Pricing Grid Component -->
+    <script src="/shared_components/js/universal-pricing-grid.js"></script>
+    
     <!-- Beta Analytics and Feedback -->
     <script src="/beta-analytics-tracker.js" defer></script>
     <script src="/beta-feedback-widget.js" defer></script>
@@ -1001,6 +1003,18 @@
                 sticky: false,
                 infoBoxContent: 'Pricing includes an 8,000 stitch embroidered logo on front.'
             });
+            
+            // Initialize Universal Pricing Grid
+            let pricingGrid = new UniversalPricingGrid({
+                containerId: 'pricing-grid-container',
+                showInventory: false, // Cap embroidery doesn't show inventory
+                loadingAnimation: true,
+                showColorIndicator: true,
+                showSizes: false // Cap embroidery uses OSFA
+            });
+            
+            // Make it globally accessible
+            window.pricingGrid = pricingGrid;
             
             // Update product info
             updateProductInfo();
@@ -1067,6 +1081,11 @@
                     state.selectedColor = event.detail.COLOR_NAME;
                     console.log('[Beta Page] Color changed to:', state.selectedColor);
                     // Pricing recalculation will be triggered by other scripts
+                    
+                    // Update the pricing grid with the new color
+                    if (pricingGrid) {
+                        pricingGrid.updateSelectedColor(event.detail.COLOR_NAME, event.detail);
+                    }
                 }
             });
             
@@ -1516,6 +1535,11 @@
         function updatePricing() {
             console.log('[Beta Page] updatePricing called with quantity:', state.quantity);
             console.log('[Beta Page] Current pricing tiers:', state.pricingTiers);
+            
+            // Update the pricing grid tier highlighting
+            if (window.pricingGrid) {
+                window.pricingGrid.highlightActiveTier(state.quantity);
+            }
             
             // Get base price from tier
             let tier = null;
