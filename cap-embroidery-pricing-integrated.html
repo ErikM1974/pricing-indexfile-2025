@@ -624,6 +624,8 @@
             z-index: 2;
             cursor: pointer;
             margin: 0;
+            transform: scaleX(1) !important;
+            direction: ltr !important;
         }
         
         .back-slider-track {
@@ -1177,7 +1179,7 @@
                                         <span class="bubble-value">5,000</span>
                                         <span class="bubble-unit">stitches</span>
                                     </div>
-                                    <div class="slider-track-container" style="position: relative;">
+                                    <div class="slider-track-container" style="position: relative; direction: ltr;">
                                         <input type="range" 
                                                class="back-logo-slider" 
                                                id="back-logo-slider"
@@ -1185,6 +1187,7 @@
                                                max="15000" 
                                                step="1000"
                                                value="5000"
+                                               style="direction: ltr;"
                                                oninput="updateBackLogoFromSlider(this.value)">
                                         <div class="back-slider-track">
                                             <div class="back-slider-fill" id="back-slider-fill"></div>
@@ -1192,7 +1195,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="stitch-milestones">
+                                <div class="stitch-milestones" style="direction: ltr;">
                                     <div class="milestone">5K</div>
                                     <div class="milestone">8K</div>
                                     <div class="milestone">10K</div>
