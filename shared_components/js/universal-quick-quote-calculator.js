@@ -99,7 +99,7 @@ class UniversalQuickQuoteCalculator {
                 <!-- Pricing Display -->
                 <div class="pricing-display">
                     <div class="unit-price" id="unit-price">$0.00</div>
-                    <div class="unit-label" id="unit-label">per ${this.config.unitLabel.slice(0, -1)} (starting price)</div>
+                    <div class="unit-label" id="unit-label">per ${this.config.unitLabel.slice(0, -1)}</div>
                     <div class="total-price" id="total-price">Total: $0.00</div>
                 </div>
                 
