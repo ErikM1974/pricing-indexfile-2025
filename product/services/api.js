@@ -6,6 +6,7 @@
 export class API {
     constructor() {
         this.baseUrl = '/api'; // Use local server proxy
+        this.caspioUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api'; // Direct Caspio URL for new endpoints
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }
@@ -101,6 +102,38 @@ export class API {
             return data;
         } catch (error) {
             console.error('Inventory API error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get base item costs for a specific style
+     */
+    async getBaseItemCosts(styleNumber) {
+        const cacheKey = `base_costs_${styleNumber}`;
+        
+        // Check cache first
+        const cached = this.getFromCache(cacheKey);
+        if (cached) {
+            return cached;
+        }
+
+        try {
+            // Use direct Caspio URL for base-item-costs
+            const response = await fetch(`${this.caspioUrl}/base-item-costs?styleNumber=${encodeURIComponent(styleNumber)}`);
+            
+            if (!response.ok) {
+                throw new Error(`Failed to load base costs: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            
+            // Cache the result
+            this.setCache(cacheKey, data);
+            
+            return data;
+        } catch (error) {
+            console.error('Base costs API error:', error);
             throw error;
         }
     }

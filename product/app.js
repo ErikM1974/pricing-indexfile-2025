@@ -57,7 +57,8 @@ class ProductPageApp {
 
         // Initialize product info component
         this.components.info = new ProductInfo(
-            document.getElementById('product-info')
+            document.getElementById('product-info'),
+            this.api
         );
 
         // Initialize color swatches component

@@ -570,6 +570,22 @@ app.get('/api/sizes-by-style-color', async (req, res) => {
   }
 });
 
+// Base Item Costs API
+app.get('/api/base-item-costs', async (req, res) => {
+  try {
+    const { styleNumber } = req.query;
+    
+    if (!styleNumber) {
+      return res.status(400).json({ error: 'styleNumber parameter is required' });
+    }
+    
+    const data = await makeApiRequest(`/base-item-costs?styleNumber=${encodeURIComponent(styleNumber)}`);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch base item costs' });
+  }
+});
+
 // Inventory API
 app.get('/api/inventory', async (req, res) => {
   try {
