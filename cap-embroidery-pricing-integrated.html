@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     
+    <!-- Modern enhancements for consistent design -->
+    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
+    
     <!-- Essential styles for image gallery and color swatches -->
     <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
     <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
@@ -120,12 +123,10 @@
         /* Remove conflicting gallery styles - let the CSS files handle it */
         /* Removed gallery-placeholder styles to avoid conflicts */
         
-        /* Quick Quote Calculator */
+        /* Quick Quote Calculator - Extends cart-summary from shared CSS */
         .quick-quote {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            /* Inherits styles from .cart-summary in modern-enhancements.css */
+            /* Additional specific styles only */
         }
         
         .quick-quote h2 {
@@ -139,7 +140,7 @@
             margin: 0 0 30px 0;
         }
         
-        /* Quantity Controls */
+        /* Quantity Controls - Use shared styles from modern-enhancements.css */
         .quantity-input-group {
             display: flex;
             align-items: center;
@@ -147,38 +148,24 @@
             margin-bottom: 20px;
         }
         
+        /* Override specific properties for this page's design */
         .quantity-btn {
+            /* Inherits from modern-enhancements.css */
             width: 40px;
             height: 40px;
+            font-size: 20px;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 20px;
-            transition: background-color 0.2s;
-        }
-        
-        .quantity-btn:hover:not(:disabled) {
-            background: var(--primary-dark);
-        }
-        
-        .quantity-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
         
         .quantity-input {
+            /* Inherits from modern-enhancements.css */
             width: 80px;
             text-align: center;
             font-size: 20px;
-            font-weight: 600;
             padding: 8px;
-            border: 2px solid var(--gray-300);
-            border-radius: 4px;
         }
         
         .quantity-label {
@@ -341,18 +328,8 @@
             cursor: pointer;
         }
         
-        /* Back Logo Details */
-        .back-logo-details {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background: var(--gray-100);
-            border-radius: 4px;
-        }
-        
-        .back-logo-details.active {
-            display: block;
-        }
+        /* Back Logo Details - Use shared styles from modern-enhancements.css */
+        /* Removed custom styles - using .back-logo-pricing-info from shared CSS */
         
         /* Stitch Counter */
         .stitch-counter {
@@ -391,28 +368,45 @@
             font-size: 14px;
         }
         
-        /* Pricing Table */
+        /* Pricing Table - Use shared pricing-grid styles */
         .pricing-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
         }
         
         .pricing-table th,
         .pricing-table td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid var(--gray-200);
         }
         
         .pricing-table th {
-            background: var(--gray-100);
-            font-weight: 600;
-            color: var(--gray-800);
+            background: var(--primary-gradient);
+            color: white;
+            font-weight: var(--font-semibold);
+            padding: var(--space-md);
+            text-transform: uppercase;
+            font-size: var(--text-sm);
+            letter-spacing: 0.05em;
         }
         
-        .pricing-table tr:hover {
-            background: var(--gray-50);
+        .pricing-table td {
+            background: white;
+            border-bottom: 1px solid var(--neutral-100);
+            transition: all var(--transition-base);
+        }
+        
+        .pricing-table tr:hover td {
+            background: var(--primary-light);
+            transform: scale(1.02);
+        }
+        
+        .pricing-table tr:last-child td {
+            border-bottom: none;
         }
         
         /* CTA Section */
@@ -768,7 +762,7 @@
                     
                     <!-- Right Column - Quick Quote -->
                     <div>
-                        <div class="quick-quote">
+                        <div class="quick-quote cart-summary">
                             <h2>Quick Quote Calculator</h2>
                             <p class="quick-quote-subtitle">Enter quantity for instant pricing</p>
                             
@@ -850,21 +844,26 @@
                     </div>
                     
                     <div class="option-group">
-                        <label class="checkbox-label">
+                        <div class="back-logo-option">
                             <input type="checkbox" id="back-logo-checkbox" onchange="toggleBackLogo()">
-                            Add embroidered back logo (+$5.00 per cap)
-                        </label>
+                            <label for="back-logo-checkbox">Add embroidered back logo (+$5.00 per cap)</label>
+                        </div>
                         
-                        <div class="back-logo-details" id="back-logo-details">
-                            <label>Back Logo Stitch Count:</label>
-                            <div class="stitch-counter">
-                                <button class="stitch-counter-btn" onclick="updateBackLogoStitches(-1000)">−</button>
-                                <span class="stitch-counter-display" id="back-logo-stitches">5,000</span>
-                                <button class="stitch-counter-btn" onclick="updateBackLogoStitches(1000)">+</button>
-                                <span class="stitch-counter-range">(5K-15K)</span>
+                        <div class="back-logo-pricing-info" id="back-logo-details" style="display: none;">
+                            <div>
+                                <strong>Back Logo Stitch Count:</strong>
                             </div>
-                            <div id="back-logo-price-display" style="margin-top: 10px; font-weight: 500;">
-                                Additional Cost: $5.00 per cap
+                            <div class="back-logo-stitch-selector">
+                                <label>Stitches:</label>
+                                <div class="stitch-counter">
+                                    <button class="quantity-btn" style="width: 32px; height: 32px; padding: 0;" onclick="updateBackLogoStitches(-1000)">−</button>
+                                    <span class="stitch-counter-display" id="back-logo-stitches" style="min-width: 60px; text-align: center; font-weight: 600;">5,000</span>
+                                    <button class="quantity-btn" style="width: 32px; height: 32px; padding: 0;" onclick="updateBackLogoStitches(1000)">+</button>
+                                    <span class="stitch-counter-range" style="color: var(--neutral-600); font-size: 14px;">(5K-15K)</span>
+                                </div>
+                            </div>
+                            <div id="back-logo-price-display" style="margin-top: 10px;">
+                                <strong>Additional Cost:</strong> $5.00 per cap
                             </div>
                         </div>
                     </div>
@@ -875,8 +874,8 @@
                     <h2>Pricing by Quantity</h2>
                     <p style="color: var(--gray-600); margin-bottom: 20px;">Volume discounts automatically applied • <span id="pricing-stitch-count-display">8,000 stitch pricing shown</span></p>
                     
-                    <!-- Universal Pricing Grid Component -->
-                    <div id="pricing-grid-container">
+                    <!-- Universal Pricing Grid Component with shared styles -->
+                    <div id="pricing-grid-container" class="pricing-grid-wrapper">
                         <!-- Universal pricing grid will be initialized here -->
                     </div>
                     
@@ -1861,10 +1860,11 @@
             
             state.backLogoEnabled = checkbox.checked;
             
+            // Use display style instead of active class for modern-enhancements.css
             if (checkbox.checked) {
-                details.classList.add('active');
+                details.style.display = 'block';
             } else {
-                details.classList.remove('active');
+                details.style.display = 'none';
             }
             
             updatePricing();
