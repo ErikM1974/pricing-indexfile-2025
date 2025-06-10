@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
     <!-- Removed clean-color-swatches.css - using default dp5-helper styles -->
     <link rel="stylesheet" href="/shared_components/css/enhanced-loading-animations.css">
+    <!-- Cool customization styles -->
+    <link rel="stylesheet" href="/shared_components/css/embroidery-customization-cool.css">
     
     <!-- Simple, clean styles without design system -->
     <style>
@@ -480,6 +482,233 @@
             color: var(--gray-700);
         }
         
+        /* Visual Toggle Styles for Front Logo */
+        .stitch-toggle-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .stitch-toggle-option {
+            flex: 1;
+            max-width: 150px;
+            padding: 20px;
+            border: 2px solid var(--neutral-200);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stitch-toggle-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stitch-toggle-option.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-color: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 102, 204, 0.3);
+        }
+        
+        .stitch-toggle-option.active .stitch-count-display {
+            color: white;
+        }
+        
+        .stitch-toggle-option.active .stitch-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .stitch-toggle-option.active .density-dot {
+            background: white;
+        }
+        
+        .stitch-count-display {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+        
+        .stitch-label {
+            font-size: 14px;
+            color: var(--neutral-600);
+            margin-bottom: 12px;
+        }
+        
+        .density-preview {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+        
+        .density-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .density-dot.empty {
+            background: var(--neutral-200);
+        }
+        
+        /* Milestones for back logo slider */
+        .back-logo-slider-container .stitch-milestones {
+            display: flex;
+            position: relative;
+            margin-top: 10px;
+            padding: 0 12px;
+            height: 40px;
+        }
+        
+        .back-logo-slider-container .milestone {
+            position: absolute;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: var(--neutral-600);
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        /* Position milestones evenly from 5K to 15K */
+        .back-logo-slider-container .milestone:nth-child(1) { left: 0%; }     /* 5K */
+        .back-logo-slider-container .milestone:nth-child(2) { left: 30%; }    /* 8K */
+        .back-logo-slider-container .milestone:nth-child(3) { left: 50%; }    /* 10K */
+        .back-logo-slider-container .milestone:nth-child(4) { left: 70%; }    /* 12K */
+        .back-logo-slider-container .milestone:nth-child(5) { left: 100%; }   /* 15K */
+        
+        /* Back Logo Slider Styles */
+        .back-logo-slider-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 12px;
+        }
+        
+        .back-logo-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            outline: none;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+        }
+        
+        .back-slider-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: var(--neutral-200);
+            border-radius: 4px;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        
+        .back-slider-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, var(--info-color) 0%, var(--secondary-color) 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .back-logo-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 3px solid var(--info-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .back-logo-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .back-logo-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 3px solid var(--info-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .back-value-bubble {
+            position: absolute;
+            top: -45px;
+            transform: translateX(-50%);
+            background: var(--info-color);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            pointer-events: none;
+            transition: left 0.3s ease;
+        }
+        
+        .back-value-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid var(--info-color);
+        }
+        
+        /* Price info badge */
+        .price-info-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .price-info-badge .info-text {
+            color: var(--success-color);
+            background: rgba(40, 167, 69, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+        
+        /* Additional color variables */
+        :root {
+            --neutral-200: #e5e7eb;
+            --neutral-600: #4b5563;
+            --secondary-color: #764ba2;
+            --info-color: #17a2b8;
+            --success-color: #28a745;
+        }
+        
         /* Savings Tip */
         .savings-tip {
             display: none;
@@ -832,38 +1061,114 @@
             <div class="container">
                 <!-- Customization Options -->
                 <div class="content-section">
-                    <h2>Customization Options</h2>
+                    <h2>✨ Customization Options</h2>
                     
-                    <div class="option-group">
-                        <label for="stitch-count">Front Logo Stitch Count</label>
-                        <select id="stitch-count" class="option-select" onchange="handleStitchCountChange()">
+                    <!-- Front Logo Stitch Count - Visual Toggle -->
+                    <div class="option-card glassmorphism">
+                        <div class="option-header">
+                            <div class="option-title">
+                                <span class="stitch-icon-animated">🪡</span>
+                                <h3>Front Logo Stitch Count</h3>
+                            </div>
+                            <div class="price-info-badge">
+                                <span class="info-text">Included in pricing</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stitch-toggle-container">
+                            <div class="stitch-toggle-option" data-value="5000" onclick="setFrontStitchCount(5000)">
+                                <div class="stitch-count-display">5K</div>
+                                <div class="stitch-label">Basic</div>
+                                <div class="density-preview">
+                                    <span class="density-dot"></span>
+                                    <span class="density-dot"></span>
+                                    <span class="density-dot empty"></span>
+                                    <span class="density-dot empty"></span>
+                                    <span class="density-dot empty"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="stitch-toggle-option active" data-value="8000" onclick="setFrontStitchCount(8000)">
+                                <div class="stitch-count-display">8K</div>
+                                <div class="stitch-label">Standard</div>
+                                <div class="density-preview">
+                                    <span class="density-dot"></span>
+                                    <span class="density-dot"></span>
+                                    <span class="density-dot"></span>
+                                    <span class="density-dot empty"></span>
+                                    <span class="density-dot empty"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="stitch-toggle-option" data-value="10000" onclick="setFrontStitchCount(10000)">
+                                <div class="stitch-count-display">10K</div>
+                                <div class="stitch-label">Detailed</div>
+                                <div class="density-preview">
+                                    <span class="density-dot"></span>
+                                    <span class="density-dot"></span>
+                                    <span class="density-dot"></span>
+                                    <span class="density-dot"></span>
+                                    <span class="density-dot empty"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden select to maintain compatibility -->
+                        <select id="stitch-count" style="display: none;" onchange="handleStitchCountChange()">
                             <option value="5000">5,000 stitches</option>
                             <option value="8000" selected>8,000 stitches (Standard)</option>
                             <option value="10000">10,000 stitches</option>
                         </select>
                     </div>
                     
-                    <div class="option-group">
+                    <!-- Back Logo - Cool Version -->
+                    <div class="option-card glassmorphism">
+                        <div class="option-header">
+                            <div class="option-title">
+                                <span class="logo-icon">🎯</span>
+                                <h3>Back Logo</h3>
+                            </div>
+                            <div class="price-badge" id="back-logo-price-badge">
+                                <span class="extra-cost">+$5.00</span>
+                            </div>
+                        </div>
+                        
                         <div class="back-logo-option">
                             <input type="checkbox" id="back-logo-checkbox" onchange="toggleBackLogo()">
-                            <label for="back-logo-checkbox">Add embroidered back logo (+$5.00 per cap)</label>
+                            <label for="back-logo-checkbox" class="checkbox-label">Add embroidered back logo</label>
                         </div>
                         
                         <div class="back-logo-pricing-info" id="back-logo-details" style="display: none;">
-                            <div>
-                                <strong>Back Logo Stitch Count:</strong>
-                            </div>
-                            <div class="back-logo-stitch-selector">
-                                <label>Stitches:</label>
-                                <div class="stitch-counter">
-                                    <button class="quantity-btn" style="width: 32px; height: 32px; padding: 0;" onclick="updateBackLogoStitches(-1000)">−</button>
-                                    <span class="stitch-counter-display" id="back-logo-stitches" style="min-width: 60px; text-align: center; font-weight: 600;">5,000</span>
-                                    <button class="quantity-btn" style="width: 32px; height: 32px; padding: 0;" onclick="updateBackLogoStitches(1000)">+</button>
-                                    <span class="stitch-counter-range" style="color: var(--neutral-600); font-size: 14px;">(5K-15K)</span>
+                            <div class="back-logo-slider-container">
+                                <div style="position: relative; padding: 20px 0;">
+                                    <input type="range" 
+                                           class="back-logo-slider" 
+                                           id="back-logo-slider"
+                                           min="5000" 
+                                           max="15000" 
+                                           step="1000"
+                                           value="5000"
+                                           oninput="updateBackLogoFromSlider(this.value)">
+                                    <div class="back-slider-track">
+                                        <div class="back-slider-fill" id="back-slider-fill"></div>
+                                    </div>
+                                    <div class="back-value-bubble" id="back-value-bubble">
+                                        <span class="bubble-value">5,000</span>
+                                        <span class="bubble-unit">stitches</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="stitch-milestones">
+                                    <span class="milestone">5K</span>
+                                    <span class="milestone">8K</span>
+                                    <span class="milestone">10K</span>
+                                    <span class="milestone">12K</span>
+                                    <span class="milestone">15K</span>
                                 </div>
                             </div>
-                            <div id="back-logo-price-display" style="margin-top: 10px;">
-                                <strong>Additional Cost:</strong> $5.00 per cap
+                            
+                            <div id="back-logo-price-display" style="margin-top: 20px; text-align: center; font-weight: 600;">
+                                Additional Cost: $5.00 per cap
                             </div>
                         </div>
                     </div>
@@ -1021,6 +1326,15 @@
             
             // Make it globally accessible
             window.pricingGrid = pricingGrid;
+            
+            // Initialize visual toggle buttons  
+            initializeVisualToggles();
+            
+            // Initialize back logo slider
+            const backSlider = document.getElementById('back-logo-slider');
+            if (backSlider) {
+                updateBackLogoSliderVisuals();
+            }
             
             // Initialize with default pricing data immediately
             const initialPricingData = {
@@ -1402,6 +1716,27 @@
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
+        }
+        
+        // Function to update front stitch count from visual toggles
+        window.setFrontStitchCount = function(value) {
+            // Update hidden select
+            const select = document.getElementById('stitch-count');
+            if (select) {
+                select.value = value;
+                
+                // Update visual toggles
+                document.querySelectorAll('.stitch-toggle-option').forEach(option => {
+                    if (parseInt(option.dataset.value) === value) {
+                        option.classList.add('active');
+                    } else {
+                        option.classList.remove('active');
+                    }
+                });
+                
+                // Trigger the existing handler
+                handleStitchCountChange();
+            }
         }
         
         // Handle stitch count change (make it global)
@@ -1870,25 +2205,70 @@
             updatePricing();
         }
         
+        // Update back logo from slider
+        window.updateBackLogoFromSlider = function(value) {
+            state.backLogoStitches = parseInt(value);
+            
+            // Update bubble
+            const bubble = document.getElementById('back-value-bubble');
+            if (bubble) {
+                bubble.querySelector('.bubble-value').textContent = value.toLocaleString();
+            }
+            
+            // Update slider visuals
+            updateBackLogoSliderVisuals();
+            
+            // Update price display
+            const price = Math.ceil(state.backLogoStitches / 1000);
+            document.getElementById('back-logo-price-display').innerHTML = 
+                `Additional Cost: <span style="color: var(--info-color);">$${price.toFixed(2)}</span> per cap`;
+            
+            // Update pricing if back logo is enabled
+            if (state.backLogoEnabled) {
+                updatePricing();
+            }
+        }
+        
+        function updateBackLogoSliderVisuals() {
+            const slider = document.getElementById('back-logo-slider');
+            const fill = document.getElementById('back-slider-fill');
+            const bubble = document.getElementById('back-value-bubble');
+            
+            if (slider && fill && bubble) {
+                const percent = (slider.value - slider.min) / (slider.max - slider.min);
+                fill.style.width = `${percent * 100}%`;
+                bubble.style.left = `${percent * 100}%`;
+            }
+        }
+        
         function updateBackLogoStitches(delta) {
             const newValue = state.backLogoStitches + delta;
             
             if (newValue >= 5000 && newValue <= 15000) {
                 state.backLogoStitches = newValue;
-                document.getElementById('back-logo-stitches').textContent = newValue.toLocaleString();
                 
-                // Update price display
-                const price = Math.ceil(newValue / 1000);
-                document.getElementById('back-logo-price-display').textContent = 
-                    `Additional Cost: $${price.toFixed(2)} per cap`;
-                
-                // Update pricing if back logo is enabled
-                if (state.backLogoEnabled) {
-                    updatePricing();
+                // Update slider
+                const slider = document.getElementById('back-logo-slider');
+                if (slider) {
+                    slider.value = newValue;
+                    updateBackLogoFromSlider(newValue);
                 }
             }
         }
         
+        
+        // Initialize visual toggle buttons
+        function initializeVisualToggles() {
+            // Set the default active toggle (8000 stitches)
+            const defaultValue = 8000;
+            document.querySelectorAll('.stitch-toggle-option').forEach(option => {
+                if (parseInt(option.dataset.value) === defaultValue) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+        }
         
         // Populate initial pricing table with fallback data
         function populateInitialPricingTable() {
