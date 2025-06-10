@@ -633,6 +633,7 @@
             border-radius: 4px;
             transform: translateY(-50%);
             z-index: 1;
+            pointer-events: none;
         }
         
         .back-slider-fill {
@@ -1168,21 +1169,23 @@
                         
                         <div class="back-logo-pricing-info" id="back-logo-details" style="display: none;">
                             <div class="back-logo-slider-container">
-                                <div style="position: relative; padding: 30px 0 10px;">
-                                    <input type="range" 
-                                           class="back-logo-slider" 
-                                           id="back-logo-slider"
-                                           min="5000" 
-                                           max="15000" 
-                                           step="1000"
-                                           value="5000"
-                                           oninput="updateBackLogoFromSlider(this.value)">
-                                    <div class="back-slider-track">
-                                        <div class="back-slider-fill" id="back-slider-fill"></div>
-                                    </div>
+                                <div class="slider-wrapper" style="position: relative; padding: 30px 0 10px;">
                                     <div class="back-value-bubble" id="back-value-bubble">
                                         <span class="bubble-value">5,000</span>
                                         <span class="bubble-unit">stitches</span>
+                                    </div>
+                                    <div class="slider-track-container" style="position: relative;">
+                                        <input type="range" 
+                                               class="back-logo-slider" 
+                                               id="back-logo-slider"
+                                               min="5000" 
+                                               max="15000" 
+                                               step="1000"
+                                               value="5000"
+                                               oninput="updateBackLogoFromSlider(this.value)">
+                                        <div class="back-slider-track">
+                                            <div class="back-slider-fill" id="back-slider-fill"></div>
+                                        </div>
                                     </div>
                                 </div>
                                 
