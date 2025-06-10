@@ -51,39 +51,87 @@ class EmbroideryCustomizationOptions {
     
     generateHTML() {
         return `
-            <div class="customization-section">
-                <h2>Customization Options</h2>
+            <div class="customization-section content-section">
+                <h2>✨ Customization Options</h2>
                 
-                <!-- Primary Logo Stitch Count -->
-                <div class="option-group">
-                    <label>Front Logo Stitch Count</label>
-                    <div class="stitch-counter">
-                        <button class="stitch-counter-btn" id="primary-decrease">−</button>
-                        <span class="stitch-counter-display" id="primary-stitches">${this.state.primaryStitches.toLocaleString()}</span>
-                        <button class="stitch-counter-btn" id="primary-increase">+</button>
-                        <span class="stitch-counter-range">(5K-25K)</span>
+                <!-- Primary Logo Stitch Count - Cool Version -->
+                <div class="option-card glassmorphism">
+                    <div class="option-header">
+                        <div class="option-title">
+                            <span class="stitch-icon-animated">🪡</span>
+                            <h3>Front Logo Stitch Count</h3>
+                        </div>
+                        <div class="price-badge" id="primary-price-badge">
+                            ${this.state.primaryStitches <= this.config.includedStitches ? 
+                                '<span class="included">✓ Included</span>' : 
+                                `<span class="extra-cost">+$${((this.state.primaryStitches - this.config.includedStitches) / 1000).toFixed(2)}</span>`
+                            }
+                        </div>
                     </div>
-                    <div id="primary-stitch-note" style="margin-top: 5px; font-size: 14px; color: var(--gray-600);">
-                        ${this.state.primaryStitches <= this.config.includedStitches ? 
-                            'Included in base price' : 
-                            `+$${((this.state.primaryStitches - this.config.includedStitches) / 1000).toFixed(2)} per item`
-                        }
+                    
+                    <div class="stitch-slider-container">
+                        <input type="range" 
+                               class="stitch-slider" 
+                               id="primary-stitch-slider"
+                               min="${this.config.minPrimaryStitches}" 
+                               max="${this.config.maxPrimaryStitches}" 
+                               step="${this.config.stitchIncrement}"
+                               value="${this.state.primaryStitches}">
+                        <div class="slider-track">
+                            <div class="slider-fill" id="primary-slider-fill"></div>
+                        </div>
+                        <div class="stitch-value-bubble" id="primary-bubble">
+                            <span class="bubble-value">${this.state.primaryStitches.toLocaleString()}</span>
+                            <span class="bubble-unit">stitches</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stitch-milestones">
+                        <span class="milestone" data-value="5000">5K</span>
+                        <span class="milestone" data-value="8000">8K<br><small>Standard</small></span>
+                        <span class="milestone" data-value="10000">10K</span>
+                        <span class="milestone" data-value="15000">15K</span>
+                        <span class="milestone" data-value="20000">20K</span>
+                        <span class="milestone" data-value="25000">25K</span>
+                    </div>
+                    
+                    <div class="stitch-density-visual">
+                        <div class="density-bars" id="density-bars">
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                        </div>
+                        <span class="density-label" id="density-label">Medium Detail</span>
                     </div>
                 </div>
                 
-                <!-- Additional Logos -->
-                <div class="option-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="additional-logos-checkbox">
-                        Add additional embroidered logo
-                    </label>
+                <!-- Additional Logos - Cool Version -->
+                <div class="option-card glassmorphism">
+                    <div class="option-header">
+                        <div class="option-title">
+                            <span class="logo-icon">🎨</span>
+                            <h3>Additional Logo Locations</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="logo-position-selector">
+                        <label class="position-checkbox">
+                            <input type="checkbox" id="additional-logos-checkbox">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Add more embroidered logos</span>
+                        </label>
+                    </div>
                     
                     <div class="additional-logo-details" id="additional-logo-details">
-                        <div id="additional-logos-list">
+                        <div id="additional-logos-list" class="logos-grid">
                             <!-- Logos will be dynamically added here -->
                         </div>
-                        <button class="add-logo-btn" id="add-another-logo">
-                            + Add Another Logo
+                        <button class="add-logo-btn-cool" id="add-another-logo">
+                            <span class="btn-icon">✨</span>
+                            <span class="btn-text">Add Another Logo</span>
+                            <span class="btn-pulse"></span>
                         </button>
                     </div>
                 </div>
@@ -92,14 +140,16 @@ class EmbroideryCustomizationOptions {
     }
     
     setupEventListeners() {
-        // Primary logo stitch controls
-        document.getElementById('primary-decrease').addEventListener('click', () => {
-            this.updatePrimaryStitches(-this.config.stitchIncrement);
-        });
-        
-        document.getElementById('primary-increase').addEventListener('click', () => {
-            this.updatePrimaryStitches(this.config.stitchIncrement);
-        });
+        // Primary logo stitch slider
+        const slider = document.getElementById('primary-stitch-slider');
+        if (slider) {
+            slider.addEventListener('input', (e) => {
+                this.updatePrimaryStitchesFromSlider(parseInt(e.target.value));
+            });
+            
+            // Initialize slider position
+            this.updateSliderVisuals();
+        }
         
         // Additional logos checkbox
         document.getElementById('additional-logos-checkbox').addEventListener('change', (e) => {
@@ -112,26 +162,83 @@ class EmbroideryCustomizationOptions {
         });
     }
     
-    updatePrimaryStitches(delta) {
-        const newValue = this.state.primaryStitches + delta;
+    updatePrimaryStitchesFromSlider(newValue) {
+        this.state.primaryStitches = newValue;
         
-        if (newValue >= this.config.minPrimaryStitches && newValue <= this.config.maxPrimaryStitches) {
-            this.state.primaryStitches = newValue;
-            
-            // Update display
-            document.getElementById('primary-stitches').textContent = newValue.toLocaleString();
-            
-            // Update note
-            const note = document.getElementById('primary-stitch-note');
+        // Update bubble value
+        const bubble = document.getElementById('primary-bubble');
+        if (bubble) {
+            bubble.querySelector('.bubble-value').textContent = newValue.toLocaleString();
+        }
+        
+        // Update price badge with animation
+        const badge = document.getElementById('primary-price-badge');
+        if (badge) {
+            badge.classList.add('updating');
             if (newValue <= this.config.includedStitches) {
-                note.textContent = 'Included in base price';
+                badge.innerHTML = '<span class="included">✓ Included</span>';
             } else {
                 const extraCost = ((newValue - this.config.includedStitches) / 1000) * this.config.pricePerThousand;
-                note.textContent = `+$${extraCost.toFixed(2)} per item`;
+                badge.innerHTML = `<span class="extra-cost">+$${extraCost.toFixed(2)}</span>`;
             }
-            
-            // Update calculator
-            this.calculator.setPrimaryStitches(newValue);
+            setTimeout(() => badge.classList.remove('updating'), 300);
+        }
+        
+        // Update slider visuals
+        this.updateSliderVisuals();
+        
+        // Update density indicator
+        this.updateDensityIndicator(newValue);
+        
+        // Update calculator
+        this.calculator.setPrimaryStitches(newValue);
+    }
+    
+    updateSliderVisuals() {
+        const slider = document.getElementById('primary-stitch-slider');
+        const fill = document.getElementById('primary-slider-fill');
+        const bubble = document.getElementById('primary-bubble');
+        
+        if (slider && fill && bubble) {
+            const percent = (slider.value - slider.min) / (slider.max - slider.min);
+            fill.style.width = `${percent * 100}%`;
+            bubble.style.left = `${percent * 100}%`;
+        }
+    }
+    
+    updateDensityIndicator(stitches) {
+        const bars = document.querySelectorAll('#density-bars .bar');
+        const label = document.getElementById('density-label');
+        
+        // Clear all active bars
+        bars.forEach(bar => bar.classList.remove('active'));
+        
+        let activeCount = 1;
+        let densityText = 'Light Detail';
+        
+        if (stitches >= 20000) {
+            activeCount = 5;
+            densityText = 'Ultra High Detail';
+        } else if (stitches >= 15000) {
+            activeCount = 4;
+            densityText = 'High Detail';
+        } else if (stitches >= 10000) {
+            activeCount = 3;
+            densityText = 'Medium Detail';
+        } else if (stitches >= 7000) {
+            activeCount = 2;
+            densityText = 'Standard Detail';
+        }
+        
+        // Activate bars with animation
+        for (let i = 0; i < activeCount && i < bars.length; i++) {
+            setTimeout(() => {
+                bars[i].classList.add('active');
+            }, i * 50);
+        }
+        
+        if (label) {
+            label.textContent = densityText;
         }
     }
     
@@ -171,60 +278,77 @@ class EmbroideryCustomizationOptions {
         const container = document.getElementById('additional-logos-list');
         
         container.innerHTML = this.state.additionalLogos.map((logo, index) => `
-            <div class="additional-logo-item" data-logo-id="${logo.id}">
-                <div>
-                    <strong>Additional Logo ${index + 1}:</strong>
-                    <div style="font-size: 14px; color: var(--gray-600); margin-top: 5px;">
-                        Additional Cost: $${(logo.stitches / 1000 * this.config.pricePerThousand).toFixed(2)} per item
-                    </div>
+            <div class="additional-logo-card" data-logo-id="${logo.id}">
+                <div class="logo-card-header">
+                    <h4>🎯 Logo ${index + 1}</h4>
+                    <button class="remove-logo-btn" data-logo-id="${logo.id}">
+                        <span>×</span>
+                    </button>
                 </div>
-                <div class="additional-logo-controls">
-                    <div class="stitch-counter">
-                        <button class="stitch-counter-btn logo-decrease" data-logo-id="${logo.id}">−</button>
-                        <span class="stitch-counter-display">${logo.stitches.toLocaleString()}</span>
-                        <button class="stitch-counter-btn logo-increase" data-logo-id="${logo.id}">+</button>
-                        <span class="stitch-counter-range">(5K-20K)</span>
+                
+                <div class="logo-stitch-controls">
+                    <div class="mini-slider-container">
+                        <input type="range" 
+                               class="mini-stitch-slider" 
+                               data-logo-id="${logo.id}"
+                               min="${this.config.minAdditionalStitches}" 
+                               max="${this.config.maxAdditionalStitches}" 
+                               step="${this.config.stitchIncrement}"
+                               value="${logo.stitches}">
+                        <div class="mini-slider-value">${logo.stitches.toLocaleString()} stitches</div>
                     </div>
-                    <button class="remove-logo-btn" data-logo-id="${logo.id}">✕</button>
+                    
+                    <div class="logo-price-display">
+                        <span class="price-label">Cost:</span>
+                        <span class="price-value">+$${(logo.stitches / 1000 * this.config.pricePerThousand).toFixed(2)}</span>
+                        <span class="price-unit">per item</span>
+                    </div>
                 </div>
             </div>
         `).join('');
         
-        // Add event listeners for logo controls
-        container.querySelectorAll('.logo-decrease').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+        // Add event listeners for mini sliders
+        container.querySelectorAll('.mini-stitch-slider').forEach(slider => {
+            slider.addEventListener('input', (e) => {
                 const logoId = parseInt(e.target.dataset.logoId);
-                this.updateAdditionalLogoStitches(logoId, -this.config.stitchIncrement);
-            });
-        });
-        
-        container.querySelectorAll('.logo-increase').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const logoId = parseInt(e.target.dataset.logoId);
-                this.updateAdditionalLogoStitches(logoId, this.config.stitchIncrement);
+                const newValue = parseInt(e.target.value);
+                this.updateAdditionalLogoStitchesFromSlider(logoId, newValue);
             });
         });
         
         container.querySelectorAll('.remove-logo-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const logoId = parseInt(e.target.dataset.logoId);
-                this.removeAdditionalLogo(logoId);
+                const logoId = parseInt(e.currentTarget.dataset.logoId);
+                // Add fade out animation
+                const card = e.currentTarget.closest('.additional-logo-card');
+                card.classList.add('removing');
+                setTimeout(() => {
+                    this.removeAdditionalLogo(logoId);
+                }, 300);
             });
         });
     }
     
-    updateAdditionalLogoStitches(logoId, delta) {
+    updateAdditionalLogoStitchesFromSlider(logoId, newValue) {
         const logo = this.state.additionalLogos.find(l => l.id === logoId);
         if (!logo) return;
         
-        const newValue = logo.stitches + delta;
+        logo.stitches = newValue;
+        this.calculator.updateAdditionalLogo(logoId, newValue);
         
-        if (newValue >= this.config.minAdditionalStitches && newValue <= this.config.maxAdditionalStitches) {
-            logo.stitches = newValue;
-            this.calculator.updateAdditionalLogo(logoId, newValue);
-            this.renderAdditionalLogos();
+        // Update the display values
+        const card = document.querySelector(`[data-logo-id="${logoId}"]`);
+        if (card) {
+            card.querySelector('.mini-slider-value').textContent = `${newValue.toLocaleString()} stitches`;
+            const priceValue = card.querySelector('.price-value');
+            if (priceValue) {
+                priceValue.classList.add('updating');
+                priceValue.textContent = `+$${(newValue / 1000 * this.config.pricePerThousand).toFixed(2)}`;
+                setTimeout(() => priceValue.classList.remove('updating'), 300);
+            }
         }
     }
+    
     
     removeAdditionalLogo(logoId) {
         this.state.additionalLogos = this.state.additionalLogos.filter(l => l.id !== logoId);
