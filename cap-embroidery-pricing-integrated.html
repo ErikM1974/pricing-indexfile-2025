@@ -588,12 +588,15 @@
         }
         .back-logo-slider-container .milestone:nth-child(2) { 
             left: 30%; 
+            transform: translateX(-50%);
         }
         .back-logo-slider-container .milestone:nth-child(3) { 
             left: 50%; 
+            transform: translateX(-50%);
         }
         .back-logo-slider-container .milestone:nth-child(4) { 
             left: 70%; 
+            transform: translateX(-50%);
         }
         .back-logo-slider-container .milestone:nth-child(5) { 
             left: 100%; 
@@ -621,6 +624,7 @@
             z-index: 2;
             cursor: pointer;
             margin: 0;
+            direction: ltr;
         }
         
         .back-slider-track {
@@ -2275,7 +2279,13 @@
             const bubble = document.getElementById('back-value-bubble');
             
             if (slider && fill && bubble) {
-                const percent = (slider.value - slider.min) / (slider.max - slider.min);
+                // Parse values as integers to ensure proper calculation
+                const value = parseInt(slider.value);
+                const min = parseInt(slider.min);
+                const max = parseInt(slider.max);
+                const percent = (value - min) / (max - min);
+                
+                console.log('[Back Logo Slider] Value:', value, 'Min:', min, 'Max:', max, 'Percent:', percent);
                 fill.style.width = `${percent * 100}%`;
                 bubble.style.left = `${percent * 100}%`;
             }
