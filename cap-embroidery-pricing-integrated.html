@@ -563,32 +563,38 @@
         
         /* Milestones for back logo slider */
         .back-logo-slider-container .stitch-milestones {
-            display: flex;
             position: relative;
-            margin-top: 10px;
-            padding: 0 12px;
+            margin-top: 20px;
             height: 40px;
+            width: 100%;
         }
         
-        /* Position milestones at exact slider value positions */
-        /* Range is 5000-15000 (10000 total) */
+        /* Position milestones */
         .back-logo-slider-container .milestone {
             position: absolute;
+            top: 0;
             transform: translateX(-50%);
-            font-size: 12px;
+            font-size: 13px;
             color: var(--neutral-600);
             text-align: center;
-            line-height: 1.2;
+            font-weight: 500;
+            white-space: nowrap;
         }
         
-        /* Adjust first and last milestones to not get cut off */
+        /* Spread milestones evenly with better spacing */
         .back-logo-slider-container .milestone:nth-child(1) { 
             left: 0%; 
             transform: translateX(0);
         }
-        .back-logo-slider-container .milestone:nth-child(2) { left: 30%; }     /* 8K:  (8000-5000)/10000 = 30% */
-        .back-logo-slider-container .milestone:nth-child(3) { left: 50%; }     /* 10K: (10000-5000)/10000 = 50% */
-        .back-logo-slider-container .milestone:nth-child(4) { left: 70%; }     /* 12K: (12000-5000)/10000 = 70% */
+        .back-logo-slider-container .milestone:nth-child(2) { 
+            left: 30%; 
+        }
+        .back-logo-slider-container .milestone:nth-child(3) { 
+            left: 50%; 
+        }
+        .back-logo-slider-container .milestone:nth-child(4) { 
+            left: 70%; 
+        }
         .back-logo-slider-container .milestone:nth-child(5) { 
             left: 100%; 
             transform: translateX(-100%);
@@ -597,12 +603,11 @@
         /* Back Logo Slider Styles */
         .back-logo-slider-container {
             margin-top: 20px;
-            padding: 30px 40px;
+            padding: 30px 60px;
             background: rgba(0, 0, 0, 0.02);
             border-radius: 12px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .back-logo-slider {
@@ -943,6 +948,17 @@
             display: block;
         }
         
+        /* Responsive adjustments for slider */
+        @media (max-width: 768px) {
+            .back-logo-slider-container {
+                padding: 20px 30px;
+            }
+            
+            .back-logo-slider-container .milestone {
+                font-size: 11px;
+            }
+        }
+        
         /* Responsive adjustments for swatches */
         @media (max-width: 768px) {
             .color-swatches-container.compact .color-swatches {
@@ -1152,7 +1168,7 @@
                         
                         <div class="back-logo-pricing-info" id="back-logo-details" style="display: none;">
                             <div class="back-logo-slider-container">
-                                <div style="position: relative; padding: 30px 0 20px;">
+                                <div style="position: relative; padding: 30px 0 10px;">
                                     <input type="range" 
                                            class="back-logo-slider" 
                                            id="back-logo-slider"
@@ -1171,11 +1187,11 @@
                                 </div>
                                 
                                 <div class="stitch-milestones">
-                                    <span class="milestone">5K</span>
-                                    <span class="milestone">8K</span>
-                                    <span class="milestone">10K</span>
-                                    <span class="milestone">12K</span>
-                                    <span class="milestone">15K</span>
+                                    <div class="milestone">5K</div>
+                                    <div class="milestone">8K</div>
+                                    <div class="milestone">10K</div>
+                                    <div class="milestone">12K</div>
+                                    <div class="milestone">15K</div>
                                 </div>
                             </div>
                             
