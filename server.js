@@ -110,10 +110,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Serve product-updated.html for the /product route (product details page)
+// Serve product.html for the /product route (product details page)
 app.get('/product', (req, res) => {
-  console.log('Serving product page from:', path.join(__dirname, 'product-updated.html'));
-  res.sendFile(path.join(__dirname, 'product-updated.html'));
+  console.log('Serving product page from:', path.join(__dirname, 'product.html'));
+  res.sendFile(path.join(__dirname, 'product.html'));
 });
 
 // Serve cart.html for the /cart route (shopping cart page)

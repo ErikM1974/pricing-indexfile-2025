@@ -85,15 +85,12 @@ hr { display: none; }
 .style-search-container {
     position: relative;
     margin-bottom: var(--spacing-md);
-    /* max-width: 450px; Consider removing or adjusting if it needs to be wider for cart button, or set to a larger value like 600px or 100% if it should span more. */
-    display: flex;
-    /* justify-content: space-between; Removed to use margin-left: auto on cart button */
-    align-items: center;
-    gap: var(--spacing-md); /* Retained for overall spacing between search controls and cart button if not pushed by auto margin */
+    max-width: 600px;
     background-color: var(--background-color);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);
+    min-height: 60px; /* Fixed minimum height to prevent jumping */
 }
 
 .style-search-container label {
@@ -169,57 +166,10 @@ hr { display: none; }
 .search-controls {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm); /* e.g., 8px */
-    /* flex-grow: 1; Removed to allow it to take only needed space */
+    gap: var(--spacing-sm);
+    width: 100%;
 }
 
-/* Styles for the "View Cart" button in the header */
-.view-cart-btn-header {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px; /* Space between icon, text, and badge */
-    padding: var(--spacing-sm) var(--spacing-md); /* e.g., 8px 16px */
-    background-color: var(--primary-color);
-    color: white; /* Assuming --button-text-color is white or not defined */
-    text-decoration: none;
-    border-radius: var(--radius-md); /* Updated for modern look, e.g. 8px */
-    font-weight: 600; /* Slightly bolder */
-    border: none;
-    cursor: pointer;
-    transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
-    margin-left: auto; /* Pushes button to the far right */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
-}
-
-.view-cart-btn-header:hover {
-    background-color: var(--primary-dark); /* Or var(--primary-hover-color) if defined */
-    color: white;
-    box-shadow: 0 3px 7px rgba(0,0,0,0.15); /* Enhanced shadow on hover */
-}
-
-.view-cart-btn-header svg {
-    /* margin-right: var(--spacing-xs); Gap property on parent handles this now */
-    width: 1em; /* Adjust size as needed, relative to font */
-    height: 1em; /* Adjust size as needed, relative to font */
-    fill: currentColor; /* SVG inherits text color */
-    vertical-align: middle; /* Better alignment with text in a flex container */
-}
-
-#cart-item-count-header {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #ffffff; /* White background for the badge */
-    color: var(--primary-color); /* Text color same as button's base, or a contrasting dark */
-    border-radius: 50%; /* Circular badge */
-    min-width: 22px;
-    height: 22px;
-    font-size: 0.75rem; /* 12px */
-    font-weight: bold;
-    padding: 0 4px; /* Horizontal padding for numbers > 9 */
-    line-height: 1; /* Helps center text vertically */
-    /* margin-left: 4px; Replaced by gap on parent .view-cart-btn-header */
-}
 
 #style-suggestions-list div:hover { background-color: var(--primary-light); /* Use themed light */ }
 
@@ -564,236 +514,35 @@ hr { display: none; }
     font-size: 0.75em;
 }
 
-/* --- Tab Styles --- */
-.tabs-container {
-    margin-top: var(--spacing-lg);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
+/* Tab styles removed - no longer using tabs */
+
+/* Hide any Caspio script content that appears as text */
+pre[style*="background-color: rgb(0, 0, 0)"],
+pre[style*="word-wrap: break-word"],
+body > pre:not(.code-block),
+.container ~ pre,
+pre:last-of-type {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* --- Inventory Container --- */
+.inventory-container {
     background-color: var(--background-color);
-}
-
-.tab-nav {
-    display: flex;
-    flex-wrap: wrap;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    background-color: var(--primary-light); /* Use light primary for tab nav bg */
-    position: relative;
-}
-
-.tab-link {
-    padding: 15px 20px;
-    cursor: pointer;
-    background-color: transparent;
-    color: var(--text-color);
-    text-decoration: none;
-    font-size: 1em;
-    text-align: center;
-    flex-grow: 1;
-    transition: all var(--transition-fast);
-    position: relative;
-    font-weight: 500;
-    border-bottom: 3px solid transparent;
-}
-
-.tab-link:hover {
-    background-color: var(--primary-light); /* Use themed light on hover */
-    color: var(--primary-dark); /* Use themed dark text on hover */
-}
-
-.tab-link.active {
-    color: var(--primary-color); /* Use themed primary */
-    font-weight: bold;
-    border-bottom: 3px solid var(--primary-color); /* Use themed primary */
-    background-color: var(--background-color); /* White background for active tab */
-}
-
-.tab-content-panel {
     padding: var(--spacing-lg);
-    border-top: none;
-    visibility: hidden;
-    height: 0;
-    overflow: hidden;
-    opacity: 0;
-    position: absolute;
-    z-index: -1;
-    transition: opacity var(--transition-normal);
+    border-radius: var(--radius-md);
+    margin-top: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
 }
 
-.tab-content-panel.active {
-    visibility: visible;
-    height: auto;
-    overflow: visible;
-    opacity: 1;
-    position: static;
-    z-index: 1;
-}
-
-/* Special style to hide raw JavaScript code in embroidery panel */
-#embroidery-panel pre,
-#embroidery-panel code,
-#embroidery-panel > *:not(iframe):not(.loading-message):not(#dp5-wrapper) {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    width: 0 !important;
-    overflow: hidden !important;
-    position: absolute !important;
-    left: -9999px !important;
-}
-
-/* Ensure iframe is visible */
-#embroidery-panel iframe {
-    display: block !important;
-    visibility: visible !important;
-    height: 600px !important;
-    width: 100% !important;
-    border: none !important;
-}
-
-/* Hide script tags and code blocks in tab content */
-.tab-content-panel script,
-.tab-content-panel pre,
-.tab-content-panel code,
-pre:contains("new function"),
-pre:contains("this.appKey"),
-pre:contains("function requestDataPage"),
-/* More aggressive selectors to hide script content */
-.tab-content-panel > div:not(.loading-message):not(.iframe-container):not([id$="-wrapper"]):not(.error-message),
-.tab-content-panel > div > div:not(.loading-message):not(.iframe-container):not([id$="-wrapper"]):not(.error-message),
-.tab-content-panel:has(pre:contains("new function")),
-.tab-content-panel:has(pre:contains("this.appKey")),
-.tab-content-panel:has(pre:contains("function requestDataPage")),
-.tab-content-panel:has(pre:contains("subdomain")),
-.tab-content-panel:has(pre:contains("appKey")),
-.tab-content-panel:has(pre:contains("userQuery")),
-/* Hide any text that looks like JavaScript code */
-.tab-content-panel > :not(iframe):contains("new function"),
-.tab-content-panel > :not(iframe):contains("this.appKey"),
-.tab-content-panel > :not(iframe):contains("function requestDataPage"),
-.tab-content-panel > :not(iframe):contains("subdomain"),
-.tab-content-panel > :not(iframe):contains("appKey"),
-.tab-content-panel > :not(iframe):contains("userQuery"),
-/* Extremely aggressive selectors to hide specific JavaScript code */
-.tab-content-panel > *:not(#dp5-wrapper):not(#dp6-wrapper):not(#dp7-wrapper):not(#dp8-wrapper),
-#embroidery-panel > *:not(#dp5-wrapper),
-#cap-emb-panel > *:not(#dp7-wrapper),
-#dtg-panel > *:not(#dp6-wrapper),
-#screenprint-panel > *:not(#dp8-wrapper),
-/* Target the specific JavaScript code that's being displayed */
-.tab-content-panel pre[style*="background-color: rgb(0, 0, 0)"],
-.tab-content-panel div[style*="background-color: rgb(0, 0, 0)"],
-.tab-content-panel pre:contains("new function"),
-.tab-content-panel div:contains("new function"),
-.tab-content-panel pre:contains("this.appKey"),
-.tab-content-panel div:contains("this.appKey"),
-.tab-content-panel pre:contains("function requestDataPage"),
-.tab-content-panel div:contains("function requestDataPage"),
-.tab-content-panel pre:contains("subdomain"),
-.tab-content-panel div:contains("subdomain"),
-.tab-content-panel pre:contains("appKey"),
-.tab-content-panel div:contains("appKey"),
-.tab-content-panel pre:contains("userQuery"),
-.tab-content-panel div:contains("userQuery"),
-.tab-content-panel pre:contains("isDotNet"),
-.tab-content-panel div:contains("isDotNet"),
-.tab-content-panel pre:contains("targetScript"),
-.tab-content-panel div:contains("targetScript"),
-.tab-content-panel pre:contains("document.getElementsByTagName"),
-.tab-content-panel div:contains("document.getElementsByTagName"),
-.tab-content-panel pre:contains("document.createElement"),
-.tab-content-panel div:contains("document.createElement") {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    width: 0 !important;
-    overflow: hidden !important;
-    position: absolute !important;
-    left: -9999px !important;
-}
-
-/* Add a style to ensure iframes are visible */
-.tab-content-panel iframe {
-    display: block !important;
-    visibility: visible !important;
-    height: 600px !important;
-    width: 100% !important;
-    border: none !important;
-    margin-top: 15px !important;
-}
-
-/* Style for iframe containers */
-.iframe-container {
-    width: 100%;
-    min-height: 600px;
-    border: none;
-    margin-top: 15px;
-}
-
-/* Special styles for embroidery panels to hide script content */
-#embroidery-panel, #cap-emb-panel, #dtg-panel, #screenprint-panel {
-    position: relative;
-}
-
-#embroidery-panel > *:not(#dp5-wrapper),
-#cap-emb-panel > *:not(#dp7-wrapper),
-#dtg-panel > *:not(#dp6-wrapper),
-#screenprint-panel > *:not(#dp8-wrapper) {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    width: 0 !important;
-    overflow: hidden !important;
-    position: absolute !important;
-    left: -9999px !important;
-}
-
-/* Extremely aggressive styles for embroidery panel */
-#embroidery-panel {
-    position: relative;
-    overflow: hidden;
-}
-
-#embroidery-panel::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: white;
-    z-index: 1;
-}
-
-#embroidery-panel #dp5-wrapper {
-    position: relative;
-    z-index: 2;
-}
-
-#embroidery-panel #dp5-wrapper .loading-message,
-#embroidery-panel #dp5-wrapper .iframe-container,
-#embroidery-panel #dp5-wrapper iframe {
-    position: relative;
-    z-index: 3;
-    display: block !important;
-    visibility: visible !important;
-}
-
-/* Hide all direct text nodes in the panel */
-#embroidery-panel > :not(#dp5-wrapper) {
-    font-size: 0 !important;
-    color: transparent !important;
-    background: transparent !important;
-}
-
-/* Ensure wrapper divs are visible */
-#dp5-wrapper, #dp6-wrapper, #dp7-wrapper, #dp8-wrapper {
-    display: block !important;
-    visibility: visible !important;
-    width: 100% !important;
-    min-height: 600px !important;
+.inventory-container h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: var(--spacing-md);
 }
 
 /* --- Custom Inventory Table Styles --- */
@@ -867,29 +616,54 @@ pre:contains("function requestDataPage"),
 }
 
 /* --- Pricing Options Section --- */
+.pricing-options {
+    background-color: var(--background-light);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.pricing-options h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+    text-align: center;
+}
+
+.pricing-options p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: var(--spacing-lg);
+}
+
 .pricing-links {
-    display: flex; /* Changed from grid */
-    flex-wrap: nowrap; /* Prevent wrapping */
-    gap: 10px; /* Adjusted gap */
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--spacing-md); /* Better spacing between cards */
     margin-top: var(--spacing-md);
-    justify-content: space-between; /* Distribute space evenly */
+    justify-content: center; /* Center the cards */
 }
 
 .pricing-option-card {
-    display: block; /* Make the link a block element */
-    padding: var(--spacing-sm); /* Reduced padding to 8px */
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md); /* e.g., 8px */
-    background-color: var(--background-light); /* var(--card-bg-color) or light neutral */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md) var(--spacing-sm); /* Better vertical padding */
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--background-color);
     color: var(--text-color);
     text-decoration: none;
     transition: all var(--transition-fast);
     text-align: center;
-    flex-basis: calc(20% - 8px); /* For 5 cards with 10px gap (4 gaps * 10px = 40px; 40px / 5 = 8px) */
-    flex-grow: 0;   /* Prevent growing */
-    flex-shrink: 0; /* Prevent shrinking */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    box-shadow: var(--shadow-sm); /* e.g., 0 1px 3px rgba(0,0,0,0.05); */
+    flex-basis: 180px; /* Fixed width for consistency */
+    min-height: 140px; /* Minimum height for consistency */
+    flex-grow: 0;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    box-shadow: var(--shadow-sm);
 }
 
 .pricing-option-card:hover,
@@ -901,33 +675,54 @@ pre:contains("function requestDataPage"),
     box-shadow: var(--shadow-md); /* Slightly stronger shadow on hover for better effect */
 }
 
-.pricing-option-card h4 { /* Style heading within the card */
-    margin-top: 0;
-    margin-bottom: var(--spacing-sm);
+.pricing-option-card h4 {
+    margin: var(--spacing-xs) 0 0 0;
     color: var(--primary-dark);
-    font-size: 0.8rem; /* Further reduced font size */
-    line-height: 1.2; /* Added line-height */
-    text-align: center; /* Ensure text is centered */
-    overflow-wrap: break-word; /* Helps with text overflow */
-    word-break: break-word; /* Prevent overflow for long names */
+    font-size: 1rem; /* Larger, more readable font */
+    line-height: 1.3;
+    text-align: center;
+    font-weight: 600;
 }
 
-.pricing-option-card p { /* Style paragraph within the card */
+.pricing-option-card p {
     font-size: 0.9em;
     color: var(--text-light);
     margin-bottom: 0;
 }
+
 .pricing-icon {
-    font-size: 1.5em; /* Reduced icon size */
-    margin-bottom: var(--spacing-xs); /* Adjusted margin to 4px */
-    /* Add any other necessary base styles for the icon container if needed */
+    font-size: 2.5em; /* Larger icon for better visibility */
+    margin-bottom: var(--spacing-sm);
+    display: block;
+    line-height: 1;
 }
 
+/* Responsive pricing cards */
+@media (max-width: 1024px) {
+    .pricing-links {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .pricing-option-card {
+        flex-basis: calc(33.333% - var(--spacing-md));
+        min-width: 150px;
+    }
+}
 
-/* --- Embedded DP Styles --- */
- #inventory-panel > #inventory-area { padding: 0; margin-top: 0; }
- .tab-content-panel > div[id$="-wrapper"] { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;}
- .tab-content-panel > div[id$="-wrapper"]:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+@media (max-width: 768px) {
+    .pricing-option-card {
+        flex-basis: calc(50% - var(--spacing-md));
+    }
+}
+
+@media (max-width: 480px) {
+    .pricing-option-card {
+        flex-basis: 100%;
+        max-width: 300px;
+    }
+}
+
 
 /* Gallery item styling from index.html */
 a.gallery-item-link {
@@ -1042,36 +837,3 @@ a.gallery-item-link img {
     cursor: zoom-in;
 }
 
-/* --- Beta Button Styles --- */
-.pricing-option-card.beta {
-    position: relative;
-    background-color: #e8f5e9;
-    border-color: #4caf50;
-}
-
-.pricing-option-card.beta:hover {
-    background-color: #c8e6c9;
-    border-color: #388e3c;
-}
-
-.beta-badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #ff6b6b;
-    color: white;
-    font-size: 0.7rem;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    z-index: 1;
-}
-
-.beta-info {
-    font-size: 0.7rem;
-    color: #666;
-    margin-top: 4px;
-    font-style: italic;
-}

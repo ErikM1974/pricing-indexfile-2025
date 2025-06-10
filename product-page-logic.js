@@ -667,27 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       window.history.replaceState({}, '', url);
                       console.log("URL updated with parameters:", url.search);
         
-                      // Call each pricing calculator's init function
-                      if (typeof initDp5ApiFetch === 'function') {
-                          console.log("Calling initDp5ApiFetch with styleNumber:", styleNumber);
-                          initDp5ApiFetch(styleNumber);
-                      }
-                      if (typeof initDp6ApiFetch === 'function') {
-                          console.log("Calling initDp6ApiFetch with styleNumber:", styleNumber);
-                          initDp6ApiFetch(styleNumber);
-                      }
-                      if (typeof initDp7ApiFetch === 'function') {
-                          console.log("Calling initDp7ApiFetch with styleNumber:", styleNumber);
-                          initDp7ApiFetch(styleNumber);
-                      }
-                      if (typeof initDp8ApiFetch === 'function') {
-                          console.log("Calling initDp8ApiFetch with styleNumber:", styleNumber);
-                          initDp8ApiFetch(styleNumber);
-                      }
-                      if (typeof initDtfApiFetch === 'function') {
-                          console.log("Calling initDtfApiFetch with styleNumber:", styleNumber);
-                          initDtfApiFetch(styleNumber);
-                      }
+                      // Tab initializer functions removed - no longer using tabs
                  }
                  
                  // --- Update Pricing Links Function ---

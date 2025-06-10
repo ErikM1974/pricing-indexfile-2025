@@ -3,215 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NWCA Pricing Tool - Product Details</title>
-    <script src="tab-initializers.js"></script>
-    <link rel="stylesheet" href="product-styles.css">
+    <title>Product Details - Northwest Custom Apparel</title>
+    <link rel="stylesheet" href="product/styles/product.css">
 </head>
 <body>
-
-<div class="container">
-    <h1>Product Search and Details</h1>
-
-    <div class="back-button-container">
-        <a href="/index.html" class="back-to-gallery-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px; vertical-align: text-bottom;">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
-            Back to Gallery
-        </a>
-    </div>
-
-    <div class="style-search-container">
-        <div class="search-controls">
-            <label for="style-search-input">Search Style:</label>
-            <input type="text" id="style-search-input" placeholder="Enter Style (e.g., PC61)" autocomplete="off">
-            <button id="search-button">Search</button>
+    <!-- Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Product Details</h1>
+            <a href="/" class="back-link">← Back to Gallery</a>
         </div>
-        <a href="cart.html" class="view-cart-btn-header">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px; vertical-align: text-bottom;">
-                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-            </svg>
-            View Cart (<span id="cart-item-count-header" class="cart-count-display">0</span>)
-        </a>
-        <div id="style-suggestions-list" class="suggestions-hidden"></div>
-    </div>
+    </header>
 
-    <div class="section-divider"></div> <!-- Replaced hr with styled div -->
-
-    <!-- Pricing Options -->
-    <div class="pricing-options" style="padding: var(--spacing-lg); margin-top: var(--spacing-lg); border-top: 1px solid var(--border-color);"> <!-- Removed inline styles, used variables -->
-        <h3>Embellishment Options</h3> <!-- Removed inline styles, rely on global h3 style -->
-        <p>Click on any option below to view detailed pricing information:</p> <!-- Removed inline style -->
-        
-        <div class="pricing-links"> <!-- Removed inline styles, rely on CSS class -->
-            <a href="/pricing/embroidery?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card"> <!-- Removed inline styles, added class -->
-                <div class="pricing-icon">🧵</div>
-                <h4>Embroidery Pricing</h4> <!-- Changed to h4 for better semantics -->
-            </a>
-            <a href="/pricing/cap-embroidery?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card"> <!-- Removed inline styles, added class -->
-                <div class="pricing-icon">🧢</div>
-                <h4>Cap Embroidery Pricing</h4> <!-- Changed to h4 -->
-            </a>
-            <!-- New Beta Option for Cap Embroidery -->
-            <a href="/cap-embroidery-pricing-integrated.html?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card beta" id="cap-embroidery-beta">
-                <span class="beta-badge">BETA</span>
-                <div class="pricing-icon">🧢</div>
-                <h4>Cap Embroidery<br>New System</h4>
-                <div class="beta-info">Try our updated version!</div>
-            </a>
-            <a href="/pricing/dtg?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card"> <!-- Removed inline styles, added class -->
-                <div class="pricing-icon">👕</div>
-                <h4>DTG Pricing</h4> <!-- Changed to h4 -->
-            </a>
-            <a href="/pricing/screen-print?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card"> <!-- Removed inline styles, added class -->
-                <div class="pricing-icon">🖨️</div>
-                <h4>Screen Print Pricing</h4> <!-- Changed to h4 -->
-            </a>
-            <a href="/pricing/dtf?StyleNumber={styleNumber}&COLOR={colorCode}" class="pricing-option-card"> <!-- Removed inline styles, added class -->
-                <div class="pricing-icon">🎨</div>
-                <h4>DTF Pricing</h4> <!-- Changed to h4 -->
-            </a>
-        </div>
-    </div>
-
-    <div id="product-info-area"></div>
-    <div id="swatch-area" style="display: none;"></div> <!-- Hidden but kept for backward compatibility -->
-    <!-- Swatch area moved into product-info-area via JavaScript -->
-
-    <div class="section-divider"></div> <!-- Replaced hr with styled div -->
-
-    <div class="tabs-container">
-        <div class="tab-nav">
-            <a href="#" class="tab-link active" data-tab-target="#inventory-panel">Inventory</a>
-        </div>
-        
-        <div class="tab-content">
-            <div id="inventory-panel" class="tab-content-panel active">
-                <div id="inventory-area">
-                    <p><i>Select a style to load inventory...</i></p>
-                </div>
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Product Search Section -->
+        <section id="product-search" class="search-section">
+            <div class="search-container">
+                <label for="style-search">Search Products:</label>
+                <input 
+                    type="text" 
+                    id="style-search" 
+                    placeholder="Enter style number (e.g., PC61)" 
+                    autocomplete="off"
+                >
+                <div id="search-results" class="search-results hidden"></div>
             </div>
-        
+        </section>
 
-            <div id="embroidery-panel" class="tab-content-panel">
-                <div id="dp5-wrapper">
-                    <div class="loading-message">Select a product to view embroidery pricing...</div>
+        <!-- Product Display Section -->
+        <section id="product-display" class="product-section hidden">
+            <!-- Product Info and Gallery -->
+            <div class="product-content">
+                <div id="product-gallery" class="product-gallery">
+                    <!-- Gallery will be populated by JavaScript -->
                 </div>
-                <style>
-                    /* Ensure iframe is properly displayed */
-                    #embroidery-panel iframe {
-                        display: block !important;
-                        visibility: visible !important;
-                        height: 600px !important;
-                        width: 100% !important;
-                        border: none !important;
-                        overflow: auto;
-                    }
-                    
-                    /* Style for loading message */
-                    #embroidery-panel .loading-message {
-                        padding: 20px;
-                        text-align: center;
-                        color: #555;
-                    }
-                    
-                    /* Style for error messages */
-                    #embroidery-panel .error-message {
-                        padding: 15px;
-                        background-color: #fff0f0;
-                        border-left: 4px solid #c00;
-                        margin: 15px 0;
-                        color: #c00;
-                    }
-                </style>
-            </div>
-
-            
-
-            <div id="cap-emb-panel" class="tab-content-panel">
-                <div id="dp7-wrapper">
-                    <!-- Content will be loaded dynamically by initDp7ApiFetch -->
-                    <div class="loading-message">Select a product to view cap embroidery pricing...</div>
-                    <div class="iframe-container"></div>
-                </div>
-            </div>
-
-            <div id="dtg-panel" class="tab-content-panel">
-                <div id="dp6-wrapper">
-                    <!-- Content will be loaded dynamically by initDp6ApiFetch -->
-                    <div class="loading-message">Select a product to view DTG pricing...</div>
-                    <div class="iframe-container"></div>
-                </div>
-            </div>
-
-            <div id="screenprint-panel" class="tab-content-panel">
-                <div id="dp8-wrapper">
-                    <!-- Content will be loaded dynamically by initDp8ApiFetch -->
-                    <div class="loading-message">Select a product to view screen print pricing...</div>
-                    <div class="iframe-container"></div>
-                </div>
-            </div>
-
-            <div id="dtf-panel" class="tab-content-panel">
-                <div id="dtf-wrapper">
-                    <!-- Content will be loaded dynamically by initDtfApiFetch -->
-                    <div class="loading-message">Select a product to view DTF pricing...</div>
-                    <div class="iframe-container"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-<!-- Image Modal/Lightbox -->
-<div id="image-modal" class="image-modal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <img id="modal-image" src="" alt="Enlarged product image">
-    </div>
-</div>
-
-<script src="cart.js" defer></script>
-    <script src="product-page-logic.js" defer></script>
-    <!-- <script src="product-page-cleanup.js" defer></script> -->
-    
-    <!-- Beta Analytics -->
-    <script src="beta-analytics-tracker.js" defer></script>
-    
-    <!-- Beta button handler -->
-    <script>
-    // Extend the updatePricingLinks function to handle the beta button
-    document.addEventListener('DOMContentLoaded', function() {
-        // Store reference to original function after it's loaded
-        setTimeout(function() {
-            const originalUpdatePricingLinks = window.updatePricingLinks;
-            
-            window.updatePricingLinks = function(styleNumber, colorCode) {
-                // Call the original function
-                if (originalUpdatePricingLinks) {
-                    originalUpdatePricingLinks.call(this, styleNumber, colorCode);
-                }
                 
-                // Also update the beta button
-                const betaButton = document.getElementById('cap-embroidery-beta');
-                if (betaButton) {
-                    const catalogColorToUse = window.selectedCatalogColor;
-                    
-                    if (styleNumber && catalogColorToUse && !String(catalogColorToUse).includes('{')) {
-                        const newHref = `/cap-embroidery-pricing-integrated.html?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(catalogColorToUse)}`;
-                        betaButton.setAttribute('href', newHref);
-                        betaButton.classList.remove('pricing-link-disabled');
-                        
-                        // Add click tracking
-                        betaButton.onclick = function() {
-                            console.log('Beta cap embroidery clicked:', styleNumber, catalogColorToUse);
-                            // Could add analytics tracking here
-                        };
-                    } else {
-                        betaButton.classList.add('pricing-link-disabled');
-                    }
-                }
-            };
-        }, 100); // Small delay to ensure original function is loaded
-    });
-    </script>
+                <div id="product-info" class="product-info">
+                    <!-- Product details will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Color Swatches -->
+            <div id="color-swatches" class="color-swatches">
+                <!-- Swatches will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Pricing Options Section -->
+        <section id="pricing-options" class="pricing-section hidden">
+            <h2>Select Embellishment Type</h2>
+            <div class="pricing-cards">
+                <!-- Pricing cards will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Inventory Section -->
+        <section id="inventory-display" class="inventory-section hidden">
+            <h2>Inventory Levels</h2>
+            <div id="inventory-table" class="inventory-container">
+                <!-- Inventory table will be populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="error-message hidden">
+        <p id="error-text"></p>
+        <button onclick="location.reload()">Reload Page</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="product/app.js" type="module"></script>
 </body>
 </html>
