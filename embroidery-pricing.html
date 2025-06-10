@@ -6,21 +6,20 @@
     <title>Embroidery Pricing | NWCA</title>
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    
+    <!-- Modern enhancements for consistent design -->
+    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
+    
     <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
     <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
     <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
     <style>
-        /* CSS Variables for consistency */
+        /* CSS Variables for consistency - Most are now in modern-enhancements.css */
         :root {
+            /* Override primary color if needed, otherwise inherit from modern-enhancements.css */
             --primary: #0066cc;
             --primary-dark: #0052a3;
-            --gray-100: #f8f9fa;
-            --gray-300: #dee2e6;
-            --gray-600: #6c757d;
-            --gray-700: #495057;
-            --gray-900: #212529;
-            --white: #ffffff;
         }
         
         /* New layout styles for embroidery pricing page */
@@ -35,22 +34,23 @@
             overflow: hidden;
         }
         
-        /* Improved header styling */
-        .product-header { /* Applies to both left and right column headers if not overridden */
+        /* Product header - Enhanced with shared styles */
+        .product-header {
+            /* Inherits enhanced styles from modern-enhancements.css */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px; /* Adjusted padding */
-            background-color: var(--white); /* Changed background */
-            border: 1px solid var(--border-color); /* Added full border */
-            border-radius: var(--radius-md); /* Apply to all corners */
-            /* box-shadow: var(--shadow-sm); /* Optional: add a light shadow */
-            margin-bottom: 15px; /* Add some space below this header */
+            padding: var(--space-md) var(--space-lg);
+            background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-md);
+            transition: box-shadow var(--transition-base);
         }
-        /* Specific override for the left column's product header if needed, but general might be fine */
-        .product-context-column .product-header {
-             background-color: var(--background-light, #f8f9fa); /* Or a very light grey */
-             /* border-bottom: 1px solid var(--border-color); */ /* Keep only bottom border or full */
+        
+        .product-header:hover {
+            box-shadow: var(--shadow-md);
         }
         
         .product-title-area {
@@ -94,7 +94,7 @@
         
         /* This is a duplicate rule - the main one is defined below */
         
-        /* Enhanced Product Image Gallery Styles */
+        /* Product Image Gallery - Enhanced with shared styles */
         .product-image-gallery {
             position: relative;
             width: 100%;
@@ -103,13 +103,20 @@
         }
         
         .main-image-container {
+            /* Inherits enhanced styles from modern-enhancements.css */
             position: relative;
             width: 100%;
-            background-color: #f8f9fa;
-            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+            border-radius: var(--radius-lg);
             overflow: hidden;
             box-shadow: var(--shadow-md);
-            margin-bottom: 15px;
+            margin-bottom: var(--space-md);
+            transition: all var(--transition-base);
+        }
+        
+        .main-image-container:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
         }
         
         .main-image-container img {
@@ -168,26 +175,27 @@
         }
         
         .thumbnail-item {
+            /* Enhanced with shared styles */
             flex: 0 0 80px;
             height: 80px;
-            border: 2px solid transparent;
-            border-radius: var(--radius-sm);
+            background: white;
+            border: 2px solid var(--neutral-200);
+            border-radius: var(--radius-md);
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background-color: white;
+            transition: all var(--transition-base);
             position: relative;
         }
         
         .thumbnail-item:hover {
             border-color: var(--primary-light);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
         }
         
         .thumbnail-item.active {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.1);
         }
         
         .thumbnail-item img {
@@ -310,23 +318,29 @@
         }
 
         .color-swatch {
+            /* Enhanced with shared styles from modern-enhancements.css */
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            border: 2px solid var(--border-color);
+            border: 3px solid var(--neutral-200);
             margin-bottom: 4px;
             background-size: cover;
             background-position: center;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
         }
 
         .color-swatch:hover {
             border-color: var(--primary-color);
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
         }
 
         .color-swatch.active {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(47, 102, 30, 0.2);
+            transform: scale(1.05);
         }
 
         .color-name {
@@ -507,30 +521,19 @@
             padding: 0;
         }
         
-        /* Quantity input styling */
+        /* Quantity input styling - Inherits from modern-enhancements.css */
         .quantity-input {
+            /* Inherits base styles from shared CSS */
             width: 40px;
-            text-align: center;
             padding: 4px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
         }
         
         .quantity-btn {
+            /* Inherits base styles from shared CSS */
             width: 24px;
             height: 24px;
             padding: 0;
-            background-color: var(--primary-light);
-            border: 1px solid var(--primary-color);
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        
-        .quantity-btn:hover {
-            background-color: var(--primary-color);
-            color: white;
+            font-size: 14px;
         }
         
         .quantity-input-container {
@@ -540,13 +543,9 @@
             gap: 4px;
         }
         
-        /* Pricing tier info */
+        /* Pricing tier info - Now inherits from modern-enhancements.css */
         .pricing-tier-info {
-            background-color: var(--primary-light);
-            border-radius: var(--radius-sm);
-            padding: var(--spacing-md);
-            margin-bottom: var(--spacing-md);
-            border-left: 3px solid var(--primary-color);
+            /* Inherits styles from shared CSS - info box styles */
         }
         
         .tier-explanation h4,
@@ -682,32 +681,39 @@
             display: none;
         }
         
-        /* Main Content Sections */
+        /* Main Content Sections - Enhanced */
         .main-content {
-            padding: 40px 0;
+            padding: var(--space-2xl) 0;
         }
         
         .content-section {
             background: white;
-            border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow-md);
+            transition: box-shadow var(--transition-base);
+        }
+        
+        .content-section:hover {
+            box-shadow: var(--shadow-lg);
         }
         
         .content-section h2 {
-            font-size: 22px;
-            font-weight: 600;
-            margin: 0 0 20px 0;
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            margin: 0 0 var(--space-lg) 0;
+            color: var(--primary-dark);
         }
         
-        /* CTA Section */
+        /* CTA Section - Enhanced with gradient background */
         .cta-section {
-            background: var(--gray-100);
-            border-radius: 8px;
+            background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+            border-radius: var(--radius-lg);
             padding: 40px;
             text-align: center;
             margin-top: 40px;
+            box-shadow: var(--shadow-sm);
         }
         
         .cta-section h2 {
@@ -728,37 +734,17 @@
             flex-wrap: wrap;
         }
         
+        /* Buttons - Now inherit from modern-enhancements.css */
         .btn {
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: 500;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            /* Base styles inherited from shared CSS */
         }
         
         .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: var(--primary-dark);
+            /* Uses add-to-cart-button styles from shared CSS */
         }
         
         .btn-secondary {
-            background: white;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--gray-100);
+            /* Inherits from shared CSS */
         }
         
         /* Features */
@@ -870,11 +856,11 @@
                     <p>Contact us with your quantity and customization details for a personalized quote.</p>
                     
                     <div class="cta-buttons">
-                        <button class="btn btn-primary" onclick="window.location.href='tel:253-922-5793'">
+                        <button class="btn btn-primary add-to-cart-button" onclick="window.location.href='tel:253-922-5793'">
                             📞 Call for Quote: 253-922-5793
                         </button>
                         
-                        <button class="btn btn-secondary" onclick="window.location.href='mailto:sales@nwcustomapparel.com?subject=Embroidery Quote Request'">
+                        <button class="btn btn-secondary" style="background: white; color: var(--primary-color); border: 2px solid var(--primary-color);" onclick="window.location.href='mailto:sales@nwcustomapparel.com?subject=Embroidery Quote Request'">
                             ✉️ Email Quote Request
                         </button>
                     </div>
