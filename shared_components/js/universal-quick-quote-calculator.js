@@ -18,7 +18,7 @@ class UniversalQuickQuoteCalculator {
             ltmFee: config.ltmFee || 50,
             showAdditionalLogos: config.showAdditionalLogos !== false,
             showPrimaryStitchCount: config.showPrimaryStitchCount !== false,
-            pricePerThousandStitches: config.pricePerThousandStitches || 1.00,
+            pricePerThousandStitches: config.pricePerThousandStitches || 1.25,
             ...config
         };
 

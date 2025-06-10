@@ -15,7 +15,7 @@ class EmbroideryCustomizationOptions {
             maxAdditionalStitches: 20000,
             defaultAdditionalStitches: 8000,
             stitchIncrement: 1000,
-            pricePerThousand: 1.00
+            pricePerThousand: 1.25
         };
         
         this.state = {
@@ -294,7 +294,17 @@ class EmbroideryCustomizationOptions {
                                max="${this.config.maxAdditionalStitches}" 
                                step="${this.config.stitchIncrement}"
                                value="${logo.stitches}">
+                        <div class="mini-slider-track">
+                            <div class="mini-slider-fill" data-logo-id="${logo.id}"></div>
+                        </div>
                         <div class="mini-slider-value">${logo.stitches.toLocaleString()} stitches</div>
+                        <div class="mini-milestones">
+                            <span class="mini-milestone" data-value="5000">5K</span>
+                            <span class="mini-milestone" data-value="8000">8K</span>
+                            <span class="mini-milestone" data-value="10000">10K</span>
+                            <span class="mini-milestone" data-value="15000">15K</span>
+                            <span class="mini-milestone" data-value="20000">20K</span>
+                        </div>
                     </div>
                     
                     <div class="logo-price-display">
@@ -312,7 +322,24 @@ class EmbroideryCustomizationOptions {
                 const logoId = parseInt(e.target.dataset.logoId);
                 const newValue = parseInt(e.target.value);
                 this.updateAdditionalLogoStitchesFromSlider(logoId, newValue);
+                
+                // Update slider fill
+                const fill = document.querySelector(`.mini-slider-fill[data-logo-id="${logoId}"]`);
+                if (fill) {
+                    const percent = (newValue - this.config.minAdditionalStitches) / 
+                                  (this.config.maxAdditionalStitches - this.config.minAdditionalStitches);
+                    fill.style.width = `${percent * 100}%`;
+                }
             });
+            
+            // Initialize slider fill
+            const logoId = parseInt(slider.dataset.logoId);
+            const fill = document.querySelector(`.mini-slider-fill[data-logo-id="${logoId}"]`);
+            if (fill) {
+                const percent = (slider.value - this.config.minAdditionalStitches) / 
+                              (this.config.maxAdditionalStitches - this.config.minAdditionalStitches);
+                fill.style.width = `${percent * 100}%`;
+            }
         });
         
         container.querySelectorAll('.remove-logo-btn').forEach(btn => {
