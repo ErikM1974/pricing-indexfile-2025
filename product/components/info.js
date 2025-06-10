@@ -15,10 +15,11 @@ export class ProductInfo {
         }
 
         const selectedColor = product.colors[0];
+        const colorName = selectedColor.COLOR_NAME || selectedColor.colorName || selectedColor.color_name || 'N/A';
         const priceEstimate = this.calculatePriceEstimate(product.styleNumber);
 
         this.container.innerHTML = `
-            <h2 class="product-title">${this.escapeHtml(product.title)}</h2>
+            <h2 class="product-title">${this.escapeHtml(product.title || product.productTitle || product.PRODUCT_TITLE || product.styleNumber)}</h2>
             <div class="product-style">Style: ${this.escapeHtml(product.styleNumber)}</div>
             
             ${priceEstimate ? `
@@ -31,12 +32,12 @@ export class ProductInfo {
             
             <div class="selected-color">
                 <strong>Selected Color:</strong> 
-                <span id="selected-color-name">${this.escapeHtml(selectedColor.colorName)}</span>
+                <span id="selected-color-name">${this.escapeHtml(colorName)}</span>
             </div>
             
             <div class="product-description">
                 <h3>Description</h3>
-                <p>${this.formatDescription(product.description)}</p>
+                <p>${this.formatDescription(product.description || product.PRODUCT_DESCRIPTION || '')}</p>
             </div>
             
             <div class="product-actions">
@@ -83,19 +84,25 @@ export class ProductInfo {
     }
 
     copyProductInfo(product) {
-        const selectedColor = product.colors.find(c => 
-            c.colorName === document.getElementById('selected-color-name')?.textContent
-        ) || product.colors[0];
+        const selectedColorName = document.getElementById('selected-color-name')?.textContent;
+        const selectedColor = product.colors.find(c => {
+            const colorName = c.COLOR_NAME || c.colorName || c.color_name;
+            return colorName === selectedColorName;
+        }) || product.colors[0];
+        
+        const colorName = selectedColor.COLOR_NAME || selectedColor.colorName || selectedColor.color_name || 'N/A';
+        const title = product.title || product.productTitle || product.PRODUCT_TITLE || product.styleNumber;
+        const description = product.description || product.PRODUCT_DESCRIPTION || 'No description available';
 
         const info = `
-Product: ${product.title}
+Product: ${title}
 Style: ${product.styleNumber}
-Color: ${selectedColor.colorName}
+Color: ${colorName}
 ${this.calculatePriceEstimate(product.styleNumber) ? 
     `Estimated Price: ${this.calculatePriceEstimate(product.styleNumber)} (24pc with embroidery)` : ''}
 
 Description:
-${product.description}
+${description}
         `.trim();
 
         // Copy to clipboard

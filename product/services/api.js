@@ -5,7 +5,7 @@
 
 export class API {
     constructor() {
-        this.baseUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+        this.baseUrl = '/api'; // Use local server proxy
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }

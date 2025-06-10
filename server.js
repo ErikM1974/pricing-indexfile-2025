@@ -42,6 +42,17 @@ app.use((req, res, next) => {
 // Compress all responses
 app.use(compression());
 
+// Serve product folder static files
+app.use('/product', express.static(path.join(__dirname, 'product'), {
+  maxAge: '0', // Don't cache static assets
+  setHeaders: (res, path) => {
+    // Set no-cache for all files to ensure changes are immediately visible
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+}));
+
 // Set proper cache headers for static assets
 app.use(express.static(__dirname, {
   maxAge: '0', // Don't cache static assets
@@ -112,7 +123,7 @@ app.get('/', (req, res) => {
 
 // Serve product.html for the /product route (product details page)
 app.get('/product', (req, res) => {
-  console.log('Serving product page from:', path.join(__dirname, 'product.html'));
+  console.log('Serving product.html page');
   res.sendFile(path.join(__dirname, 'product.html'));
 });
 
@@ -508,6 +519,54 @@ app.put('/api/orders/:id', async (req, res) => {
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update order' });
+  }
+});
+
+// Style Search API
+app.get('/api/stylesearch', async (req, res) => {
+  try {
+    const { term } = req.query;
+    
+    if (!term) {
+      return res.status(400).json({ error: 'term parameter is required' });
+    }
+    
+    const data = await makeApiRequest(`/stylesearch?term=${encodeURIComponent(term)}`);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to search styles' });
+  }
+});
+
+// Product Colors API
+app.get('/api/product-colors', async (req, res) => {
+  try {
+    const { styleNumber } = req.query;
+    
+    if (!styleNumber) {
+      return res.status(400).json({ error: 'styleNumber parameter is required' });
+    }
+    
+    const data = await makeApiRequest(`/product-colors?styleNumber=${encodeURIComponent(styleNumber)}`);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch product colors' });
+  }
+});
+
+// Sizes by Style and Color API
+app.get('/api/sizes-by-style-color', async (req, res) => {
+  try {
+    const { styleNumber, color } = req.query;
+    
+    if (!styleNumber || !color) {
+      return res.status(400).json({ error: 'styleNumber and color parameters are required' });
+    }
+    
+    const data = await makeApiRequest(`/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color)}`);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch sizes' });
   }
 });
 

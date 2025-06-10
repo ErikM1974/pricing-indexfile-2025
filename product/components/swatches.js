@@ -39,23 +39,33 @@ export class ColorSwatches {
     }
 
     createSwatchHtml(color, index) {
+        const catalogColor = color.CATALOG_COLOR || color.catalogColor || color.catalog_color;
+        const colorName = color.COLOR_NAME || color.colorName || color.color_name;
+        const swatchImage = color.COLOR_SQUARE_IMAGE || color.colorSwatchImage || color.color_swatch_image;
+        
         const isSelected = this.selectedColor && 
-                          this.selectedColor.catalogColor === color.catalogColor;
+                          (this.selectedColor.CATALOG_COLOR === catalogColor || 
+                           this.selectedColor.catalogColor === catalogColor);
         
         return `
             <div class="color-swatch ${isSelected ? 'selected' : ''}" 
-                 data-color="${color.catalogColor}"
-                 title="${color.colorName}">
+                 data-color="${catalogColor}"
+                 title="${colorName}">
                 <div class="swatch-image" 
-                     style="background-image: url('${color.colorSwatchImage || ''}')">
-                    ${!color.colorSwatchImage ? this.createColorFallback(color.colorName) : ''}
+                     style="background-image: url('${swatchImage || ''}')">
+                    ${!swatchImage ? this.createColorFallback(colorName) : ''}
                 </div>
-                <div class="swatch-name">${color.colorName}</div>
+                <div class="swatch-name">${colorName}</div>
             </div>
         `;
     }
 
     createColorFallback(colorName) {
+        // Handle undefined or empty color names
+        if (!colorName) {
+            return '<div class="fallback-color" style="background-color: #CCCCCC"></div>';
+        }
+        
         // Generate a color based on the color name for fallback
         const colorMap = {
             'black': '#000000',
@@ -91,16 +101,19 @@ export class ColorSwatches {
     selectColor(color) {
         this.selectedColor = color;
         
+        const catalogColor = color.CATALOG_COLOR || color.catalogColor || color.catalog_color;
+        const colorName = color.COLOR_NAME || color.colorName || color.color_name;
+        
         // Update visual selection
         this.container.querySelectorAll('.color-swatch').forEach(swatch => {
-            const isSelected = swatch.dataset.color === color.catalogColor;
+            const isSelected = swatch.dataset.color === catalogColor;
             swatch.classList.toggle('selected', isSelected);
         });
 
         // Update product info display
         const colorNameEl = document.getElementById('selected-color-name');
         if (colorNameEl) {
-            colorNameEl.textContent = color.colorName;
+            colorNameEl.textContent = colorName;
         }
 
         // Trigger callback

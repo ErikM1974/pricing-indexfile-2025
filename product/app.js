@@ -120,17 +120,29 @@ class ProductPageApp {
             
             // Fetch product data
             const productData = await this.api.getProduct(styleNumber);
+            console.log('Product data received:', productData);
             
             if (!productData || !productData.colors || productData.colors.length === 0) {
-                throw new Error('Product not found');
+                throw new Error('Product not found or has no colors');
             }
 
             // Update state
             this.state.set('product', productData);
-            this.state.set('selectedColor', productData.colors[0]);
             
-            // Update URL
-            this.updateUrl(styleNumber, productData.colors[0].catalogColor);
+            // Check if we have colors and select the first one
+            if (productData.colors && productData.colors.length > 0) {
+                const firstColor = productData.colors[0];
+                console.log('First color data:', firstColor);
+                
+                // Check which property name is used for catalog color
+                const catalogColor = firstColor.CATALOG_COLOR || firstColor.catalogColor || firstColor.catalog_color || 'NA';
+                console.log('Catalog color:', catalogColor);
+                
+                this.state.set('selectedColor', firstColor);
+                
+                // Update URL
+                this.updateUrl(styleNumber, catalogColor);
+            }
             
         } catch (error) {
             console.error('Failed to load product:', error);
@@ -147,10 +159,15 @@ class ProductPageApp {
         document.getElementById('inventory-display').classList.remove('hidden');
 
         // Update components
-        this.components.gallery.update(product.colors[0]);
+        const firstColor = product.colors[0];
+        const catalogColor = firstColor.CATALOG_COLOR || firstColor.catalogColor || firstColor.catalog_color || 'NA';
+        
+        console.log('Updating product display with first color:', catalogColor);
+        
+        this.components.gallery.update(firstColor);
         this.components.info.update(product);
         this.components.swatches.update(product.colors);
-        this.components.pricing.update(product.styleNumber, product.colors[0].catalogColor);
+        this.components.pricing.update(product.styleNumber, catalogColor);
     }
 
     async handleColorSelect(color) {
@@ -158,19 +175,26 @@ class ProductPageApp {
     }
 
     async updateColorSelection(color) {
+        if (!color) {
+            console.error('No color selected');
+            return;
+        }
+        
         const product = this.state.get('product');
+        const catalogColor = color.CATALOG_COLOR || color.catalogColor || color.catalog_color || 'NA';
+        console.log('Updating color selection:', catalogColor);
         
         // Update gallery
         this.components.gallery.update(color);
         
         // Update pricing links
-        this.components.pricing.update(product.styleNumber, color.catalogColor);
+        this.components.pricing.update(product.styleNumber, catalogColor);
         
         // Load inventory
-        await this.loadInventory(product.styleNumber, color.catalogColor);
+        await this.loadInventory(product.styleNumber, catalogColor);
         
         // Update URL
-        this.updateUrl(product.styleNumber, color.catalogColor);
+        this.updateUrl(product.styleNumber, catalogColor);
     }
 
     async loadInventory(styleNumber, colorCode) {

@@ -82,23 +82,60 @@ export class ProductGallery {
 
     extractImages(colorData) {
         const images = [];
+        const colorName = colorData.COLOR_NAME || colorData.colorName || colorData.color_name || 'Product';
         
-        // Add color swatch as first image
-        if (colorData.colorSwatchImage) {
+        // Primary product image
+        const mainImage = colorData.MAIN_IMAGE_URL || colorData.mainImageUrl || colorData.main_image_url;
+        if (mainImage && mainImage.trim()) {
             images.push({
-                url: colorData.colorSwatchImage,
-                alt: `${colorData.colorName} swatch`,
-                type: 'swatch'
+                url: mainImage,
+                alt: `${colorName} - Main View`,
+                type: 'main'
             });
         }
         
-        // Add product images
+        // Model images
+        const modelImages = [
+            { url: colorData.FRONT_MODEL || colorData.frontModel, alt: 'Front Model' },
+            { url: colorData.BACK_MODEL || colorData.backModel, alt: 'Back Model' },
+            { url: colorData.SIDE_MODEL || colorData.sideModel, alt: 'Side Model' }
+        ];
+        
+        modelImages.forEach(img => {
+            if (img.url && img.url.trim()) {
+                images.push({
+                    url: img.url,
+                    alt: `${colorName} - ${img.alt}`,
+                    type: 'model'
+                });
+            }
+        });
+        
+        // Flat images
+        const flatImages = [
+            { url: colorData.FRONT_FLAT || colorData.frontFlat, alt: 'Front Flat' },
+            { url: colorData.BACK_FLAT || colorData.backFlat, alt: 'Back Flat' }
+        ];
+        
+        flatImages.forEach(img => {
+            if (img.url && img.url.trim()) {
+                images.push({
+                    url: img.url,
+                    alt: `${colorName} - ${img.alt}`,
+                    type: 'flat'
+                });
+            }
+        });
+        
+        // Additional product images (if any)
         for (let i = 1; i <= 6; i++) {
-            const imageUrl = colorData[`colorProductImage${i}`];
-            if (imageUrl && imageUrl.trim()) {
+            const imageUrl = colorData[`COLOR_PRODUCT_IMAGE_${i}`] || 
+                           colorData[`colorProductImage${i}`] || 
+                           colorData[`color_product_image_${i}`];
+            if (imageUrl && imageUrl.trim() && !images.find(img => img.url === imageUrl)) {
                 images.push({
                     url: imageUrl,
-                    alt: `${colorData.colorName} - View ${i}`,
+                    alt: `${colorName} - View ${i}`,
                     type: 'product'
                 });
             }
