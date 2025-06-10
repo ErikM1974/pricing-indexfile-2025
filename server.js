@@ -126,7 +126,7 @@ app.get('/pricing/embroidery', (req, res) => {
 });
 
 app.get('/pricing/cap-embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'cap-embroidery-pricing.html'));
+  res.sendFile(path.join(__dirname, 'cap-embroidery-pricing-integrated.html'));
 });
 
 app.get('/pricing/dtg', (req, res) => {
