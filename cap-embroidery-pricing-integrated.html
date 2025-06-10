@@ -581,18 +581,28 @@
             line-height: 1.2;
         }
         
-        .back-logo-slider-container .milestone:nth-child(1) { left: 0%; }      /* 5K:  (5000-5000)/10000 = 0% */
+        /* Adjust first and last milestones to not get cut off */
+        .back-logo-slider-container .milestone:nth-child(1) { 
+            left: 0%; 
+            transform: translateX(0);
+        }
         .back-logo-slider-container .milestone:nth-child(2) { left: 30%; }     /* 8K:  (8000-5000)/10000 = 30% */
         .back-logo-slider-container .milestone:nth-child(3) { left: 50%; }     /* 10K: (10000-5000)/10000 = 50% */
         .back-logo-slider-container .milestone:nth-child(4) { left: 70%; }     /* 12K: (12000-5000)/10000 = 70% */
-        .back-logo-slider-container .milestone:nth-child(5) { left: 100%; }    /* 15K: (15000-5000)/10000 = 100% */
+        .back-logo-slider-container .milestone:nth-child(5) { 
+            left: 100%; 
+            transform: translateX(-100%);
+        }
         
         /* Back Logo Slider Styles */
         .back-logo-slider-container {
             margin-top: 20px;
-            padding: 20px 30px;
+            padding: 30px 40px;
             background: rgba(0, 0, 0, 0.02);
             border-radius: 12px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .back-logo-slider {
@@ -605,6 +615,7 @@
             position: relative;
             z-index: 2;
             cursor: pointer;
+            margin: 0;
         }
         
         .back-slider-track {
@@ -1141,7 +1152,7 @@
                         
                         <div class="back-logo-pricing-info" id="back-logo-details" style="display: none;">
                             <div class="back-logo-slider-container">
-                                <div style="position: relative; padding: 20px 0;">
+                                <div style="position: relative; padding: 30px 0 20px;">
                                     <input type="range" 
                                            class="back-logo-slider" 
                                            id="back-logo-slider"
@@ -1392,6 +1403,15 @@
                     updateBreakdown();
                 }
             }, 1000);
+            
+            // Add hidden increment arrow buttons for cap-embroidery-controller-v2.js compatibility
+            const hiddenArrows = document.createElement('div');
+            hiddenArrows.style.display = 'none';
+            hiddenArrows.innerHTML = `
+                <button id="stitch-increment-arrow" style="display: none;"></button>
+                <button id="stitch-decrement-arrow" style="display: none;"></button>
+            `;
+            document.body.appendChild(hiddenArrows);
             
             // Also check again after a longer delay in case Caspio loads slowly
             setTimeout(() => {
