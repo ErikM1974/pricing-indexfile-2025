@@ -1,0 +1,7 @@
+Server is running on port 3000
+Using existing Caspio API for quote functionality:
+  Quote Sessions: /api/quote_sessions
+  Quote Items: /api/quote_items
+  Quote Analytics: /api/quote_analytics
+Serving product page from: /mnt/c/Users/erik/OneDrive - Northwest Custom Apparel/2025/Pricing Index File 2025/product-updated.html
+Serving product page from: /mnt/c/Users/erik/OneDrive - Northwest Custom Apparel/2025/Pricing Index File 2025/product-updated.html
