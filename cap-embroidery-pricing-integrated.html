@@ -565,31 +565,26 @@
         .back-logo-slider-container .stitch-milestones {
             display: flex;
             position: relative;
-            margin-top: 10px;
+            margin-top: 15px;
             padding: 0 12px;
             height: 40px;
+            justify-content: space-between;
         }
         
         .back-logo-slider-container .milestone {
-            position: absolute;
-            transform: translateX(-50%);
+            position: relative;
+            transform: none;
             font-size: 12px;
             color: var(--neutral-600);
             text-align: center;
             line-height: 1.2;
+            flex-shrink: 0;
         }
-        
-        /* Position milestones evenly from 5K to 15K */
-        .back-logo-slider-container .milestone:nth-child(1) { left: 0%; }     /* 5K */
-        .back-logo-slider-container .milestone:nth-child(2) { left: 30%; }    /* 8K */
-        .back-logo-slider-container .milestone:nth-child(3) { left: 50%; }    /* 10K */
-        .back-logo-slider-container .milestone:nth-child(4) { left: 70%; }    /* 12K */
-        .back-logo-slider-container .milestone:nth-child(5) { left: 100%; }   /* 15K */
         
         /* Back Logo Slider Styles */
         .back-logo-slider-container {
             margin-top: 20px;
-            padding: 20px;
+            padding: 20px 30px;
             background: rgba(0, 0, 0, 0.02);
             border-radius: 12px;
         }
@@ -1159,11 +1154,11 @@
                                 </div>
                                 
                                 <div class="stitch-milestones">
-                                    <span class="milestone">5K</span>
-                                    <span class="milestone">8K</span>
-                                    <span class="milestone">10K</span>
-                                    <span class="milestone">12K</span>
-                                    <span class="milestone">15K</span>
+                                    <span class="milestone" style="position: absolute; left: 0; transform: translateX(0);">5K</span>
+                                    <span class="milestone" style="position: absolute; left: 30%; transform: translateX(-50%);">8K</span>
+                                    <span class="milestone" style="position: absolute; left: 50%; transform: translateX(-50%);">10K</span>
+                                    <span class="milestone" style="position: absolute; left: 70%; transform: translateX(-50%);">12K</span>
+                                    <span class="milestone" style="position: absolute; left: 100%; transform: translateX(-100%);">15K</span>
                                 </div>
                             </div>
                             
