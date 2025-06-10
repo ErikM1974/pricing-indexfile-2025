@@ -87,8 +87,7 @@ class EmbroideryCustomizationOptions {
                     </div>
                     
                     <div class="stitch-milestones">
-                        <span class="milestone" data-value="5000">5K</span>
-                        <span class="milestone" data-value="8000">8K<br><small>Standard</small></span>
+                        <span class="milestone" data-value="8000">8K<br><small>Included</small></span>
                         <span class="milestone" data-value="10000">10K</span>
                         <span class="milestone" data-value="15000">15K</span>
                         <span class="milestone" data-value="20000">20K</span>
