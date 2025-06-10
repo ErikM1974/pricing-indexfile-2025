@@ -321,31 +321,51 @@
     margin-bottom: 20px;
 }
 
-/* Logo Cards */
-.additional-logo-card {
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
-    padding: 16px;
-    transition: all 0.3s ease;
+/* Additional Logo Full Cards */
+.additional-logo-full {
+    margin-bottom: 16px;
+    animation: slideInFromBottom 0.5s ease-out;
 }
 
-.additional-logo-card.removing {
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.additional-logo-full.removing {
+    animation: slideOutToLeft 0.3s ease-out;
     opacity: 0;
     transform: translateX(-20px);
 }
 
-.logo-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+@keyframes slideOutToLeft {
+    to {
+        opacity: 0;
+        transform: translateX(-100px);
+    }
 }
 
-.logo-card-header h4 {
-    margin: 0;
-    font-size: 16px;
-    color: var(--primary-dark);
+/* Logo Actions */
+.logo-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-position-icon {
+    font-size: 24px;
+    animation: rotate 4s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .remove-logo-btn {
@@ -369,97 +389,30 @@
     transform: rotate(90deg);
 }
 
-/* Mini Slider */
-.mini-slider-container {
-    position: relative;
-    margin-bottom: 20px;
-    padding-top: 10px;
+
+/* Additional Logo Specific Styles */
+.additional-logo-slider {
+    /* Inherits from .stitch-slider */
 }
 
-.mini-stitch-slider {
-    width: 100%;
-    height: 6px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: transparent;
-    outline: none;
-    cursor: pointer;
-    position: relative;
-    z-index: 2;
-}
-
-.mini-slider-track {
-    position: absolute;
-    top: 10px;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: var(--neutral-200);
-    border-radius: 3px;
-    z-index: 1;
-}
-
-.mini-slider-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
+.additional-fill {
     background: linear-gradient(90deg, var(--info-color) 0%, var(--secondary-color) 100%);
-    border-radius: 3px;
-    transition: width 0.3s ease;
 }
 
-.mini-stitch-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    background: white;
-    border: 2px solid var(--info-color);
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.additional-bubble {
+    background: var(--info-color);
 }
 
-.mini-stitch-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    background: white;
-    border: 2px solid var(--info-color);
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.additional-bubble::after {
+    border-top-color: var(--info-color);
 }
 
-.mini-slider-value {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--info-color);
-    margin-top: 8px;
-    text-align: center;
-}
-
-/* Mini Milestones */
-.mini-milestones {
-    display: flex;
-    position: relative;
-    margin-top: 6px;
-    height: 20px;
-}
-
-.mini-milestone {
-    position: absolute;
-    font-size: 10px;
-    color: var(--neutral-500);
-    transform: translateX(-50%);
-}
-
-/* Position mini milestones - range is 5000-20000 (15000 total) */
-.mini-milestone:nth-child(1) { left: 0%; }      /* 5K at 0% */
-.mini-milestone:nth-child(2) { left: 20%; }     /* 8K at 20% (3000/15000) */
-.mini-milestone:nth-child(3) { left: 33.33%; }  /* 10K at 33.33% (5000/15000) */
-.mini-milestone:nth-child(4) { left: 66.67%; }  /* 15K at 66.67% (10000/15000) */
-.mini-milestone:nth-child(5) { left: 100%; }    /* 20K at 100% */
+/* Additional milestones positioning - range is 5000-20000 (15000 total) */
+.additional-logo-full .milestone:nth-child(1) { left: 0%; }      /* 5K at 0% */
+.additional-logo-full .milestone:nth-child(2) { left: 20%; }     /* 8K at 20% */
+.additional-logo-full .milestone:nth-child(3) { left: 33.33%; }  /* 10K at 33.33% */
+.additional-logo-full .milestone:nth-child(4) { left: 66.67%; }  /* 15K at 66.67% */
+.additional-logo-full .milestone:nth-child(5) { left: 100%; }    /* 20K at 100% */
 
 .logo-price-display {
     display: flex;
