@@ -748,7 +748,7 @@
                 const styleField = document.querySelector('[id^="Value1_1_"]');
                 const categoryField = document.querySelector('[id^="Value2_1_"]');
                 const subcategoryField = document.querySelector('[id^="Value3_1_"]');
-                const brandField = document.querySelector('[id^="Value4_1_"]');
+                const brandField = document.querySelector('[id^="Value4_1_"]') || document.querySelector('select[name="Value4_1"]');
                 const topSellerRadios = document.querySelectorAll('[name^="Value5_1_"]');
                 
                 if (searchBtn && styleField) {
@@ -939,10 +939,17 @@
         }
         
         function setupBrandDropdown() {
-            const brandField = document.querySelector(CASPIO_SELECTORS.brandField);
             const brandSelect = document.getElementById('brandSelect');
+            if (!brandSelect) return;
             
-            if (!brandField || !brandSelect) return;
+            // Only proceed if we have a brand field
+            if (!CASPIO_SELECTORS.brandField) {
+                console.log('[Sales Tool] No brand field found in Caspio form');
+                return;
+            }
+            
+            const brandField = document.querySelector(CASPIO_SELECTORS.brandField);
+            if (!brandField) return;
             
             // Clear existing options
             brandSelect.innerHTML = '<option value="">All Brands</option>';
@@ -1135,6 +1142,9 @@
         }
         
         function setTopSellerFilter() {
+            // Only set top seller filter if we have the field
+            if (!CASPIO_SELECTORS.topSellerField) return;
+            
             const isTopSellerOnly = document.getElementById('topSellerCheck').checked;
             const topSellerRadios = document.querySelectorAll(CASPIO_SELECTORS.topSellerField);
             
@@ -1148,6 +1158,9 @@
         }
         
         function setBrandFilter() {
+            // Only set brand filter if we have a brand field
+            if (!CASPIO_SELECTORS.brandField) return;
+            
             const selectedBrand = document.getElementById('brandSelect').value;
             const brandField = document.querySelector(CASPIO_SELECTORS.brandField);
             
