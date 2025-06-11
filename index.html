@@ -389,14 +389,27 @@
         
         /* Hide Caspio */
         .cbFormSection,
+        [id*="cbOuterAjaxCtnr"],
+        [id*="caspioform"],
+        [data-cb-name="cbTable"],
         #cbOuterAjaxCtnr_3d724d7b64e687,
         #cbOuterAjaxCtnr_1d2e38bf703c02 {
+            display: none !important;
+            visibility: hidden !important;
             position: absolute !important;
             left: -9999px !important;
             top: -9999px !important;
             width: 1px !important;
             height: 1px !important;
             overflow: hidden !important;
+        }
+        
+        /* Ensure our content stays visible */
+        body > .header,
+        body > .main-container {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
     </style>
 </head>
@@ -505,8 +518,10 @@
         </main>
     </div>
     
-    <!-- Caspio embed -->
-    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb"></script>
+    <!-- Hidden container for Caspio -->
+    <div id="caspioContainer" style="position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; overflow: hidden;">
+        <!-- Caspio will load here -->
+    </div>
     
     <script>
         // Configuration
@@ -528,6 +543,30 @@
         let currentCategory = '';
         let currentSubcategory = '';
         
+        // Prevent Caspio from overriding our page
+        (function() {
+            // Store original document.write
+            const originalWrite = document.write;
+            const originalWriteln = document.writeln;
+            
+            // Override document.write to capture Caspio content
+            document.write = function(content) {
+                if (content && content.includes('caspio')) {
+                    console.log('[Sales Tool] Intercepted Caspio write');
+                    const container = document.getElementById('caspioContainer');
+                    if (container) {
+                        container.insertAdjacentHTML('beforeend', content);
+                    }
+                } else {
+                    originalWrite.call(document, content);
+                }
+            };
+            
+            document.writeln = function(content) {
+                document.write(content + '\n');
+            };
+        })();
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[Sales Tool] Initializing...');
@@ -538,9 +577,48 @@
             // Setup search
             setupSearch();
             
-            // Wait for Caspio to load
-            waitForCaspio();
+            // Load Caspio dynamically
+            loadCaspio();
         });
+        
+        function loadCaspio() {
+            console.log('[Sales Tool] Loading Caspio form...');
+            
+            // Create script element
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb';
+            script.async = true;
+            
+            // Add to hidden container
+            const container = document.getElementById('caspioContainer');
+            if (container) {
+                container.appendChild(script);
+            }
+            
+            // Monitor for Caspio elements appearing outside container
+            const bodyObserver = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1 && node.id && 
+                            (node.id.includes('caspioform') || 
+                             node.id.includes('cbOuterAjaxCtnr') ||
+                             (node.className && node.className.includes && node.className.includes('cbFormSection')))) {
+                            console.log('[Sales Tool] Moving Caspio element to container:', node.id || node.className);
+                            const container = document.getElementById('caspioContainer');
+                            if (container && !container.contains(node)) {
+                                container.appendChild(node);
+                            }
+                        }
+                    });
+                });
+            });
+            
+            bodyObserver.observe(document.body, { childList: true, subtree: true });
+            
+            // Start waiting for Caspio
+            waitForCaspio();
+        }
         
         function waitForCaspio() {
             let attempts = 0;
