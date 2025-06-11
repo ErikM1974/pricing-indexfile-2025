@@ -18,6 +18,10 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #f5f5f5;
             color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
         
         /* Header */
@@ -26,11 +30,10 @@
             color: white;
             padding: 1rem 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
         
         .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -45,54 +48,130 @@
             font-weight: 600;
         }
         
-        /* Container */
-        .container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
         
-        /* Stats Bar */
-        .stats-bar {
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
             background: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
-            display: flex;
-            gap: 3rem;
-            align-items: center;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            flex-shrink: 0;
         }
         
-        .stat {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid #e9ecef;
         }
         
-        .stat-label {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .stat-value {
+        .sidebar-title {
+            font-size: 1.125rem;
             font-weight: 600;
             color: #1a472a;
+        }
+        
+        .category-list {
+            list-style: none;
+        }
+        
+        .category-item {
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .category-link {
+            display: block;
+            padding: 1rem;
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        .category-link:hover {
+            background: #f8f9fa;
+        }
+        
+        .category-link.active {
+            background: #e8f5e9;
+            color: #1a472a;
+            font-weight: 500;
+        }
+        
+        .category-link.has-subcategories::after {
+            content: '▶';
+            position: absolute;
+            right: 1rem;
+            font-size: 0.75rem;
+            transition: transform 0.2s;
+        }
+        
+        .category-link.expanded::after {
+            transform: rotate(90deg);
+        }
+        
+        .subcategory-list {
+            list-style: none;
+            background: #f8f9fa;
+            display: none;
+        }
+        
+        .subcategory-list.show {
+            display: block;
+        }
+        
+        .subcategory-item {
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .subcategory-link {
+            display: block;
+            padding: 0.75rem 1rem 0.75rem 2rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .subcategory-link:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .subcategory-link.active {
+            background: #e8f5e9;
+            color: #1a472a;
+            font-weight: 500;
+        }
+        
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
         }
         
         /* Search Section */
         .search-section {
             background: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             margin-bottom: 2rem;
-        }
-        
-        .search-title {
-            font-size: 1.5rem;
-            color: #1a472a;
-            margin-bottom: 1.5rem;
         }
         
         .search-box {
@@ -132,7 +211,6 @@
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
-            margin-bottom: 1.5rem;
         }
         
         .quick-btn {
@@ -152,7 +230,7 @@
         /* Results */
         .results-section {
             background: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
@@ -176,23 +254,37 @@
             font-size: 0.875rem;
         }
         
+        /* Product Grid */
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 1.5rem;
         }
         
         .product-card {
-            background: #f8f9fa;
+            background: white;
+            border: 1px solid #e9ecef;
             border-radius: 8px;
             overflow: hidden;
-            transition: transform 0.2s;
-            border: 1px solid #e9ecef;
+            transition: all 0.2s;
+            cursor: pointer;
         }
         
         .product-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .product-sale {
+            background: #dc3545;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            border-radius: 4px;
         }
         
         .product-link {
@@ -203,11 +295,12 @@
         
         .product-image {
             aspect-ratio: 1;
-            background: white;
+            background: #f8f9fa;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            position: relative;
         }
         
         .product-image img {
@@ -219,31 +312,79 @@
         
         .product-info {
             padding: 1rem;
+            text-align: center;
+        }
+        
+        .product-style {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1a472a;
+            margin-bottom: 0.25rem;
         }
         
         .product-title {
             font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
-        }
-        
-        .product-meta {
-            font-size: 0.75rem;
             color: #666;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+            height: 2.4em;
+            overflow: hidden;
         }
         
         .product-price {
+            font-size: 1.125rem;
             font-weight: 600;
             color: #1a472a;
-            font-size: 1.125rem;
         }
         
         .loading {
             text-align: center;
             padding: 3rem;
             color: #666;
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .sidebar {
+                position: fixed;
+                left: -250px;
+                top: 0;
+                height: 100%;
+                z-index: 1000;
+                transition: left 0.3s;
+            }
+            
+            .sidebar.show {
+                left: 0;
+            }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            
+            .sidebar-overlay.show {
+                display: block;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+            
+            .results-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
+            }
         }
         
         /* Hide Caspio */
@@ -262,84 +403,285 @@
 <body>
     <header class="header">
         <div class="header-content">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
             <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Logo%20White.png" alt="NWCA" class="logo">
-            <h1 class="header-title">Sales Tool - Product Search & Pricing</h1>
+            <h1 class="header-title">Sales Tool</h1>
         </div>
     </header>
     
-    <div class="container">
-        <div class="stats-bar">
-            <div class="stat">
-                <span class="stat-label">Products:</span>
-                <span class="stat-value">10,000+</span>
+    <div class="main-container">
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Categories</h2>
             </div>
-            <div class="stat">
-                <span class="stat-label">Brands:</span>
-                <span class="stat-value">50+</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">Price Formula:</span>
-                <span class="stat-value">(Base / 0.60) + $15</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">Cache:</span>
-                <span class="stat-value">2 Hours</span>
-            </div>
-        </div>
+            <ul class="category-list">
+                <li class="category-item">
+                    <a class="category-link" data-category="T-Shirts">T-Shirts</a>
+                    <ul class="subcategory-list" id="subcat-T-Shirts"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Polos/Knits">Polos/Knits</a>
+                    <ul class="subcategory-list" id="subcat-Polos/Knits"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Sweatshirts/Fleece">Sweatshirts/Fleece</a>
+                    <ul class="subcategory-list" id="subcat-Sweatshirts/Fleece"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Caps">Caps</a>
+                    <ul class="subcategory-list" id="subcat-Caps"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Activewear">Activewear</a>
+                    <ul class="subcategory-list" id="subcat-Activewear"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Outerwear">Outerwear</a>
+                    <ul class="subcategory-list" id="subcat-Outerwear"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Bottoms">Bottoms</a>
+                    <ul class="subcategory-list" id="subcat-Bottoms"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Bags">Bags</a>
+                    <ul class="subcategory-list" id="subcat-Bags"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Accessories">Accessories</a>
+                    <ul class="subcategory-list" id="subcat-Accessories"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Workwear">Workwear</a>
+                    <ul class="subcategory-list" id="subcat-Workwear"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Ladies">Ladies</a>
+                    <ul class="subcategory-list" id="subcat-Ladies"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Youth">Youth</a>
+                    <ul class="subcategory-list" id="subcat-Youth"></ul>
+                </li>
+                <li class="category-item">
+                    <a class="category-link" data-category="Infant & Toddler">Infant & Toddler</a>
+                    <ul class="subcategory-list" id="subcat-Infant & Toddler"></ul>
+                </li>
+            </ul>
+        </nav>
         
-        <div class="search-section">
-            <h2 class="search-title">Quick Product Search</h2>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <main class="content">
+            <div class="search-section">
+                <div class="search-box">
+                    <input type="text" 
+                           id="searchInput" 
+                           class="search-input" 
+                           placeholder="Enter style number (e.g., PC54, G500)..."
+                           autocomplete="off">
+                    <button id="searchBtn" class="search-btn">Search</button>
+                </div>
+                
+                <div class="quick-buttons">
+                    <button class="quick-btn" data-style="PC54">PC54</button>
+                    <button class="quick-btn" data-style="G500">G500</button>
+                    <button class="quick-btn" data-style="DT6000">DT6000</button>
+                    <button class="quick-btn" data-style="ST350">ST350</button>
+                    <button class="quick-btn" data-style="054X">054X</button>
+                    <button class="quick-btn" data-style="CP90">CP90</button>
+                </div>
+            </div>
             
-            <div class="search-box">
-                <input type="text" 
-                       id="searchInput" 
-                       class="search-input" 
-                       placeholder="Enter style number (e.g., PC54, G500)..."
-                       autocomplete="off">
-                <button id="searchBtn" class="search-btn">Search</button>
+            <div class="results-section">
+                <div class="results-header">
+                    <h3 class="results-title">Products</h3>
+                    <span class="results-count" id="resultsCount">Click a category to browse</span>
+                </div>
+                <div class="results-grid" id="resultsGrid">
+                    <div class="loading">Select a category from the left to view products</div>
+                </div>
             </div>
-            
-            <div class="quick-buttons">
-                <button class="quick-btn" data-style="PC54">PC54</button>
-                <button class="quick-btn" data-style="G500">G500</button>
-                <button class="quick-btn" data-style="DT6000">DT6000</button>
-                <button class="quick-btn" data-style="ST350">ST350</button>
-                <button class="quick-btn" data-style="054X">054X</button>
-                <button class="quick-btn" data-style="CP90">CP90</button>
-                <button class="quick-btn" data-style="Nike">Nike</button>
-                <button class="quick-btn" data-style="Carhartt">Carhartt</button>
-            </div>
-        </div>
-        
-        <div class="results-section">
-            <div class="results-header">
-                <h3 class="results-title">Products</h3>
-                <span class="results-count" id="resultsCount">Ready to search</span>
-            </div>
-            <div class="results-grid" id="resultsGrid">
-                <div class="loading">Enter a style number above to search for products</div>
-            </div>
-        </div>
-        
-        <!-- Caspio embed -->
-        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb"></script>
+        </main>
     </div>
+    
+    <!-- Caspio embed -->
+    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb"></script>
     
     <script>
         // Configuration
         const API_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/base-item-costs';
         const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
         
+        // Caspio selectors
+        const CASPIO_SELECTORS = {
+            styleField: '#Value1_1_3d724d7b64e687',
+            categoryField: '#Value2_1_3d724d7b64e687',
+            subcategoryField: '#Value3_1_3d724d7b64e687',
+            brandField: '#Value4_1',
+            searchButton: '#searchID_3d724d7b64e687'
+        };
+        
         // State
         let isSearching = false;
         let observer = null;
+        let currentCategory = '';
+        let currentSubcategory = '';
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[Sales Tool] Initializing...');
             
-            // Setup event listeners
+            // Setup mobile menu
+            setupMobileMenu();
+            
+            // Setup category navigation
+            setupCategoryNavigation();
+            
+            // Setup search
+            setupSearch();
+            
+            // Setup result observer
+            setupResultObserver();
+            
+            // Initialize with all products after delay
+            setTimeout(() => {
+                const caspioSearchBtn = document.querySelector(CASPIO_SELECTORS.searchButton);
+                if (caspioSearchBtn) {
+                    console.log('[Sales Tool] Loading initial products');
+                    caspioSearchBtn.click();
+                }
+            }, 2000);
+        });
+        
+        function setupMobileMenu() {
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            });
+            
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            });
+        }
+        
+        function setupCategoryNavigation() {
+            const categoryLinks = document.querySelectorAll('.category-link');
+            
+            categoryLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const category = link.dataset.category;
+                    
+                    // Toggle subcategory display
+                    const subcatList = document.getElementById(`subcat-${category}`);
+                    const isExpanded = link.classList.contains('expanded');
+                    
+                    // If clicking same category, just toggle subcategories
+                    if (currentCategory === category && isExpanded) {
+                        link.classList.remove('expanded');
+                        subcatList.classList.remove('show');
+                        return;
+                    }
+                    
+                    // Remove active states
+                    document.querySelectorAll('.category-link').forEach(l => {
+                        l.classList.remove('active', 'expanded');
+                    });
+                    document.querySelectorAll('.subcategory-list').forEach(l => {
+                        l.classList.remove('show');
+                    });
+                    
+                    // Set active category
+                    link.classList.add('active');
+                    currentCategory = category;
+                    currentSubcategory = '';
+                    
+                    // Load subcategories from Caspio
+                    loadSubcategories(category);
+                    
+                    // Perform search with category
+                    performCategorySearch(category, '');
+                });
+            });
+        }
+        
+        function loadSubcategories(category) {
+            const categoryField = document.querySelector(CASPIO_SELECTORS.categoryField);
+            const subcategoryField = document.querySelector(CASPIO_SELECTORS.subcategoryField);
+            
+            if (!categoryField || !subcategoryField) return;
+            
+            // Update Caspio category
+            categoryField.value = category;
+            categoryField.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            // Get category link
+            const categoryLink = document.querySelector(`[data-category="${category}"]`);
+            const subcatList = document.getElementById(`subcat-${category}`);
+            
+            // Clear existing subcategories
+            subcatList.innerHTML = '<li class="loading" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Loading...</li>';
+            
+            // Wait for Caspio to update subcategories
+            const observer = new MutationObserver((mutations, obs) => {
+                if (subcategoryField.options.length > 1) {
+                    // Clear loading message
+                    subcatList.innerHTML = '';
+                    
+                    // Add subcategories
+                    let hasSubcategories = false;
+                    Array.from(subcategoryField.options).forEach(option => {
+                        if (option.value && !option.text.includes('NO Subcategory')) {
+                            hasSubcategories = true;
+                            const li = document.createElement('li');
+                            li.className = 'subcategory-item';
+                            li.innerHTML = `<a class="subcategory-link" data-subcategory="${option.value}">${option.text}</a>`;
+                            subcatList.appendChild(li);
+                        }
+                    });
+                    
+                    if (hasSubcategories) {
+                        categoryLink.classList.add('has-subcategories', 'expanded');
+                        subcatList.classList.add('show');
+                        
+                        // Setup subcategory clicks
+                        subcatList.querySelectorAll('.subcategory-link').forEach(subLink => {
+                            subLink.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                
+                                // Remove active from all subcategories
+                                document.querySelectorAll('.subcategory-link').forEach(sl => {
+                                    sl.classList.remove('active');
+                                });
+                                
+                                // Set active
+                                subLink.classList.add('active');
+                                currentSubcategory = subLink.dataset.subcategory;
+                                
+                                // Search with subcategory
+                                performCategorySearch(currentCategory, currentSubcategory);
+                            });
+                        });
+                    }
+                    
+                    obs.disconnect();
+                }
+            });
+            
+            observer.observe(subcategoryField, { childList: true });
+        }
+        
+        function setupSearch() {
+            // Search button
             document.getElementById('searchBtn').addEventListener('click', performSearch);
+            
+            // Enter key
             document.getElementById('searchInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') performSearch();
             });
@@ -351,19 +693,7 @@
                     performSearch();
                 });
             });
-            
-            // Setup result observer
-            setupResultObserver();
-            
-            // Trigger initial search after a delay
-            setTimeout(() => {
-                const caspioSearchBtn = document.querySelector('#searchID_3d724d7b64e687');
-                if (caspioSearchBtn) {
-                    console.log('[Sales Tool] Triggering initial search');
-                    caspioSearchBtn.click();
-                }
-            }, 2000);
-        });
+        }
         
         function performSearch() {
             if (isSearching) return;
@@ -374,20 +704,57 @@
                 return;
             }
             
+            // Clear category selection
+            document.querySelectorAll('.category-link, .subcategory-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            currentCategory = '';
+            currentSubcategory = '';
+            
             isSearching = true;
             document.getElementById('resultsGrid').innerHTML = '<div class="loading">Searching...</div>';
             document.getElementById('resultsCount').textContent = 'Searching...';
             
             // Update Caspio form
-            const styleField = document.querySelector('#Value1_1_3d724d7b64e687');
-            const searchBtn = document.querySelector('#searchID_3d724d7b64e687');
+            const styleField = document.querySelector(CASPIO_SELECTORS.styleField);
+            const categoryField = document.querySelector(CASPIO_SELECTORS.categoryField);
+            const subcategoryField = document.querySelector(CASPIO_SELECTORS.subcategoryField);
+            const searchBtn = document.querySelector(CASPIO_SELECTORS.searchButton);
             
-            if (styleField && searchBtn) {
-                styleField.value = searchTerm;
+            if (styleField) styleField.value = searchTerm;
+            if (categoryField) categoryField.value = '';
+            if (subcategoryField) subcategoryField.value = '';
+            
+            if (searchBtn) {
                 searchBtn.click();
             } else {
                 console.error('[Sales Tool] Caspio form not found');
                 document.getElementById('resultsGrid').innerHTML = '<div class="loading">Error: Search form not found. Please refresh the page.</div>';
+                isSearching = false;
+            }
+        }
+        
+        function performCategorySearch(category, subcategory) {
+            if (isSearching) return;
+            
+            isSearching = true;
+            document.getElementById('resultsGrid').innerHTML = '<div class="loading">Loading products...</div>';
+            document.getElementById('resultsCount').textContent = 'Loading...';
+            
+            // Update Caspio form
+            const styleField = document.querySelector(CASPIO_SELECTORS.styleField);
+            const categoryField = document.querySelector(CASPIO_SELECTORS.categoryField);
+            const subcategoryField = document.querySelector(CASPIO_SELECTORS.subcategoryField);
+            const searchBtn = document.querySelector(CASPIO_SELECTORS.searchButton);
+            
+            if (styleField) styleField.value = '';
+            if (categoryField) categoryField.value = category;
+            if (subcategoryField) subcategoryField.value = subcategory;
+            
+            if (searchBtn) {
+                searchBtn.click();
+            } else {
+                console.error('[Sales Tool] Caspio form not found');
                 isSearching = false;
             }
         }
@@ -453,16 +820,14 @@
                 <div class="product-card">
                     <a href="${product.url}" class="product-link">
                         <div class="product-image">
+                            ${product.isTopSeller ? '<div class="product-sale">Sale</div>' : ''}
                             <img src="${product.image}" alt="${product.title}">
                         </div>
                         <div class="product-info">
-                            <h4 class="product-title">${product.title}</h4>
-                            <div class="product-meta">
-                                Style: ${product.styleNumber} | ${product.brand}<br>
-                                ${product.sizes}
-                            </div>
+                            <div class="product-style">${product.styleNumber}</div>
+                            <div class="product-title">${product.title}</div>
                             <div class="product-price" data-style="${product.styleNumber}">
-                                Loading price...
+                                Loading...
                             </div>
                         </div>
                     </a>
@@ -484,7 +849,7 @@
             // Check cache
             const cached = getCachedPrice(styleNumber);
             if (cached !== null) {
-                element.textContent = `From $${cached.toFixed(2)}`;
+                element.textContent = `$${cached.toFixed(2)}+`;
                 return;
             }
             
@@ -513,11 +878,11 @@
                 
                 // Cache and display
                 setCachedPrice(styleNumber, finalPrice);
-                element.textContent = `From $${finalPrice.toFixed(2)}`;
+                element.textContent = `$${finalPrice.toFixed(2)}+`;
                 
             } catch (error) {
                 console.error(`[Sales Tool] Price error for ${styleNumber}:`, error);
-                element.textContent = 'Price unavailable';
+                element.textContent = 'Price N/A';
             }
         }
         
