@@ -70,7 +70,9 @@
             background: white;
             box-shadow: 2px 0 4px rgba(0,0,0,0.05);
             overflow-y: auto;
+            overflow-x: visible;
             flex-shrink: 0;
+            position: relative;
         }
         
         .sidebar-header {
@@ -122,6 +124,66 @@
         
         .category-link.expanded::after {
             transform: rotate(90deg);
+        }
+        
+        .category-item {
+            position: relative;
+        }
+        
+        /* Mega Menu */
+        .mega-menu {
+            position: fixed;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 1.5rem;
+            min-width: 400px;
+            max-width: 600px;
+            display: none;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .mega-menu.show {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .mega-menu-header {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1a472a;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .mega-menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .mega-menu-item {
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            font-size: 0.875rem;
+        }
+        
+        .mega-menu-item:hover {
+            background: #e8f5e9;
+            color: #1a472a;
+            transform: translateX(4px);
         }
         
         .subcategory-list {
@@ -340,11 +402,112 @@
             font-size: 0.875rem;
         }
         
+        /* Hero Section */
+        .hero-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            position: relative;
+            height: 400px;
+            transition: all 0.3s ease;
+        }
+        
+        .hero-section.hidden {
+            display: none;
+        }
+        
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&w=1200&q=80') center center;
+            background-size: cover;
+            position: relative;
+        }
+        
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(26, 71, 42, 0.9) 0%, rgba(26, 71, 42, 0.7) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hero-content {
+            text-align: center;
+            color: white;
+            max-width: 600px;
+            padding: 2rem;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+        
+        .hero-cta {
+            background: white;
+            color: #1a472a;
+            padding: 1rem 2.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
         /* Product Grid */
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 1.5rem;
+        }
+        
+        /* Enhanced top seller cards in regular grid */
+        .product-card.top-seller {
+            border: 2px solid #e8f5e9;
+            background: linear-gradient(to bottom, #f8fef9, white);
+        }
+        
+        .product-card.top-seller .product-image {
+            position: relative;
+        }
+        
+        .top-seller-indicator {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #ff6b6b;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
         }
         
         .product-card {
@@ -465,6 +628,23 @@
             
             .content {
                 padding: 1rem;
+            }
+            
+            .hero-section {
+                height: 300px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .hero-cta {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
             }
             
             .results-grid {
@@ -622,13 +802,29 @@
                 </div>
             </div>
             
+            <div class="hero-section">
+                <div class="hero-image">
+                    <div class="hero-overlay">
+                        <div class="hero-content">
+                            <h1 class="hero-title">Bigger Selection.<br>Best Value.<br>Fast Delivery.</h1>
+                            <p class="hero-subtitle">Premium custom apparel with industry-leading pricing</p>
+                            <button class="hero-cta" onclick="document.querySelector('[data-category=\"T-Shirts\"]').click()">Shop Essential Tees</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="results-section">
                 <div class="results-header">
                     <h3 class="results-title">Products</h3>
                     <span class="results-count" id="resultsCount">Click a category to browse</span>
                 </div>
                 <div class="results-grid" id="resultsGrid">
-                    <div class="loading">Select a category from the left to view products</div>
+                    <div class="loading" style="text-align: center; padding: 4rem; color: #666;" data-empty="true">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+                        <div style="font-size: 1.25rem; font-weight: 500; margin-bottom: 0.5rem;">Ready to Browse?</div>
+                        <div>Select a category from the left sidebar or use the search box above</div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -802,29 +998,97 @@
         
         function setupCategoryNavigation() {
             const categoryLinks = document.querySelectorAll('.category-link');
+            let currentMegaMenu = null;
+            let hoverTimer = null;
             
             categoryLinks.forEach(link => {
+                const categoryItem = link.closest('.category-item');
+                let megaMenu = null;
+                
+                // Create mega menu for this category
+                function createMegaMenu() {
+                    const menu = document.createElement('div');
+                    menu.className = 'mega-menu';
+                    menu.innerHTML = `
+                        <div class="mega-menu-header">${link.dataset.category} Categories</div>
+                        <div class="mega-menu-grid">
+                            <div class="loading" style="padding: 1rem; color: #666;">Loading subcategories...</div>
+                        </div>
+                    `;
+                    document.body.appendChild(menu);
+                    
+                    // Add hover listeners to mega menu itself
+                    menu.addEventListener('mouseenter', () => {
+                        clearTimeout(hoverTimer);
+                    });
+                    
+                    menu.addEventListener('mouseleave', () => {
+                        hoverTimer = setTimeout(() => {
+                            menu.classList.remove('show');
+                            if (currentMegaMenu === menu) {
+                                currentMegaMenu = null;
+                            }
+                        }, 300);
+                    });
+                    
+                    return menu;
+                }
+                
+                // Position mega menu
+                function positionMegaMenu() {
+                    if (!megaMenu) return;
+                    
+                    const rect = categoryItem.getBoundingClientRect();
+                    const sidebarRect = document.querySelector('.sidebar').getBoundingClientRect();
+                    
+                    megaMenu.style.left = (sidebarRect.right + 10) + 'px';
+                    megaMenu.style.top = rect.top + 'px';
+                }
+                
+                // Mouse enter - show mega menu
+                categoryItem.addEventListener('mouseenter', () => {
+                    clearTimeout(hoverTimer);
+                    
+                    // Hide any other open mega menu
+                    if (currentMegaMenu && currentMegaMenu !== megaMenu) {
+                        currentMegaMenu.classList.remove('show');
+                    }
+                    
+                    if (!megaMenu) {
+                        megaMenu = createMegaMenu();
+                        loadSubcategoriesForMegaMenu(link.dataset.category, megaMenu);
+                    }
+                    
+                    positionMegaMenu();
+                    
+                    // Show with animation
+                    setTimeout(() => {
+                        megaMenu.classList.add('show');
+                        currentMegaMenu = megaMenu;
+                    }, 10);
+                });
+                
+                // Mouse leave - hide mega menu after delay
+                categoryItem.addEventListener('mouseleave', () => {
+                    hoverTimer = setTimeout(() => {
+                        if (megaMenu) {
+                            megaMenu.classList.remove('show');
+                            if (currentMegaMenu === megaMenu) {
+                                currentMegaMenu = null;
+                            }
+                        }
+                    }, 300);
+                });
+                
+                
+                // Click handler for main category
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     const category = link.dataset.category;
                     
-                    // Toggle subcategory display
-                    const subcatList = document.getElementById(`subcat-${category}`);
-                    const isExpanded = link.classList.contains('expanded');
-                    
-                    // If clicking same category, just toggle subcategories
-                    if (currentCategory === category && isExpanded) {
-                        link.classList.remove('expanded');
-                        subcatList.classList.remove('show');
-                        return;
-                    }
-                    
                     // Remove active states
                     document.querySelectorAll('.category-link').forEach(l => {
-                        l.classList.remove('active', 'expanded');
-                    });
-                    document.querySelectorAll('.subcategory-list').forEach(l => {
-                        l.classList.remove('show');
+                        l.classList.remove('active');
                     });
                     
                     // Set active category
@@ -832,13 +1096,104 @@
                     currentCategory = category;
                     currentSubcategory = '';
                     
-                    // Load subcategories from Caspio
-                    loadSubcategories(category);
+                    // Hide mega menu
+                    if (megaMenu) {
+                        megaMenu.classList.remove('show');
+                    }
                     
                     // Perform search with category
                     performCategorySearch(category, '');
                 });
             });
+            
+            // Hide subcategory lists since we're using mega menu
+            document.querySelectorAll('.subcategory-list').forEach(list => {
+                list.style.display = 'none';
+            });
+        }
+        
+        
+        function loadSubcategoriesForMegaMenu(category, megaMenu) {
+            const categoryField = document.querySelector(CASPIO_SELECTORS.categoryField);
+            const subcategoryField = document.querySelector(CASPIO_SELECTORS.subcategoryField);
+            
+            if (!categoryField || !subcategoryField) return;
+            
+            // Update Caspio category
+            categoryField.value = category;
+            categoryField.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            const megaGrid = megaMenu.querySelector('.mega-menu-grid');
+            
+            // Wait for Caspio to update subcategories
+            const observer = new MutationObserver((mutations, obs) => {
+                if (subcategoryField.options.length > 1) {
+                    // Clear loading message
+                    megaGrid.innerHTML = '';
+                    
+                    // Add subcategories
+                    let hasSubcategories = false;
+                    Array.from(subcategoryField.options).forEach(option => {
+                        if (option.value && !option.text.includes('NO Subcategory')) {
+                            hasSubcategories = true;
+                            const link = document.createElement('a');
+                            link.className = 'mega-menu-item';
+                            link.href = '#';
+                            link.textContent = option.text;
+                            
+                            link.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log(`[Sales Tool] Subcategory clicked: ${option.text} (${option.value})`);
+                                
+                                // Immediately disable further clicks
+                                if (link.dataset.clicked === 'true') {
+                                    console.log('[Sales Tool] Ignoring duplicate click');
+                                    return;
+                                }
+                                link.dataset.clicked = 'true';
+                                
+                                // Set active states
+                                document.querySelectorAll('.category-link').forEach(l => {
+                                    l.classList.remove('active');
+                                });
+                                document.querySelector(`[data-category="${category}"]`).classList.add('active');
+                                
+                                currentCategory = category;
+                                currentSubcategory = option.value;
+                                
+                                // Hide mega menu immediately
+                                megaMenu.classList.remove('show');
+                                
+                                // Hide all mega menus
+                                document.querySelectorAll('.mega-menu').forEach(menu => {
+                                    menu.classList.remove('show');
+                                });
+                                
+                                // Perform search
+                                console.log(`[Sales Tool] Performing search for category: ${category}, subcategory: ${option.value}`);
+                                performCategorySearch(category, option.value);
+                                
+                                // Re-enable clicks after a delay
+                                setTimeout(() => {
+                                    link.dataset.clicked = 'false';
+                                }, 1000);
+                            });
+                            
+                            
+                            megaGrid.appendChild(link);
+                        }
+                    });
+                    
+                    if (!hasSubcategories) {
+                        megaGrid.innerHTML = '<div style="padding: 1rem; color: #666;">No subcategories available</div>';
+                    }
+                    
+                    obs.disconnect();
+                }
+            });
+            
+            observer.observe(subcategoryField, { childList: true });
         }
         
         function loadSubcategories(category) {
@@ -1170,7 +1525,13 @@
         }
         
         function performCategorySearch(category, subcategory) {
-            if (isSearching) return;
+            console.log(`[Sales Tool] performCategorySearch called - Category: ${category}, Subcategory: ${subcategory}, isSearching: ${isSearching}`);
+            
+            if (isSearching) {
+                console.log('[Sales Tool] Search already in progress, canceling previous search');
+                // Force cancel the previous search
+                isSearching = false;
+            }
             
             isSearching = true;
             document.getElementById('resultsGrid').innerHTML = '<div class="loading">Loading products...</div>';
@@ -1182,15 +1543,21 @@
             const subcategoryField = document.querySelector(CASPIO_SELECTORS.subcategoryField);
             const searchBtn = document.querySelector(CASPIO_SELECTORS.searchButton);
             
+            console.log('[Sales Tool] Setting form fields:', {
+                category: category,
+                subcategory: subcategory || '(empty)'
+            });
+            
             if (styleField) styleField.value = '';
             if (categoryField) categoryField.value = category;
-            if (subcategoryField) subcategoryField.value = subcategory;
+            if (subcategoryField) subcategoryField.value = subcategory || '';
             
             // Apply filters
             setBrandFilter();
             setTopSellerFilter();
             
             if (searchBtn) {
+                console.log('[Sales Tool] Clicking search button');
                 searchBtn.click();
             } else {
                 console.error('[Sales Tool] Caspio form not found');
@@ -1214,6 +1581,7 @@
                         console.log(`[Sales Tool] Found ${resultItems.length} results`);
                         processResults(resultItems);
                         isSearching = false;
+                        console.log('[Sales Tool] Search completed, isSearching set to false');
                     } else {
                         // Check for no results
                         const noResults = document.querySelector('.cbResultSetInfoMessage');
@@ -1222,6 +1590,7 @@
                             document.getElementById('resultsGrid').innerHTML = '<div class="loading">No products found</div>';
                             document.getElementById('resultsCount').textContent = '0 items found';
                             isSearching = false;
+                            console.log('[Sales Tool] Search completed (no results), isSearching set to false');
                         }
                     }
                 }, 500); // Wait 500ms for results to stabilize
@@ -1267,23 +1636,34 @@
                 window.updateStyleCache(styleNumbers);
             }
             
+            // Hide hero section when we have results
+            const heroSection = document.querySelector('.hero-section');
+            if (heroSection && products.length > 0) {
+                heroSection.classList.add('hidden');
+            }
+            
             displayProducts(products);
             document.getElementById('resultsCount').textContent = `${products.length} items found`;
         }
         
         function displayProducts(products) {
             const grid = document.getElementById('resultsGrid');
+            const heroSection = document.querySelector('.hero-section');
             
             if (products.length === 0) {
-                grid.innerHTML = '<div class="loading">No products found</div>';
+                grid.innerHTML = '<div class="loading" data-empty="true">No products found</div>';
+                // Show hero section when no products
+                if (heroSection) {
+                    heroSection.classList.remove('hidden');
+                }
                 return;
             }
             
             grid.innerHTML = products.map(product => `
-                <div class="product-card">
+                <div class="product-card ${product.isTopSeller ? 'top-seller' : ''}">
                     <a href="${product.url}" class="product-link">
                         <div class="product-image">
-                            ${product.isTopSeller ? '<div class="product-sale">Sale</div>' : ''}
+                            ${product.isTopSeller ? '<div class="top-seller-indicator">🔥 TOP SELLER</div>' : ''}
                             <img src="${product.image}" alt="${product.title}">
                         </div>
                         <div class="product-info">
