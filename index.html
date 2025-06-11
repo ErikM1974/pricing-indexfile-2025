@@ -3,17 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NW Custom Apparel Online Catalog 2025</title>
+    <title>NWCA Sales Tool - Product Search & Pricing</title>
 
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link rel="shortcut icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link rel="apple-touch-icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
 
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="modern-search-interface.css">
+    <link rel="stylesheet" href="enhanced-gallery-system-v2.css">
     
     <style>
-        /* Promotional banner styles */
+        /* Clean internal sales tool styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+            color: #2c3e50;
+        }
+        
+        .sales-header {
+            background: #1a472a;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-logo {
+            height: 40px;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .header-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        /* Quick stats bar */
+        .stats-bar {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #1a472a;
+        }
+        
+        /* Hide unnecessary elements */
         .promo-banner {
             background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
             color: white;
@@ -64,139 +143,80 @@
             font-size: 1.5em;
         }
         
-        .promo-banner .deal-highlight {
-            color: #ffc107;
-            font-weight: bold;
-            margin: 0 5px;
+        /* Hide original Caspio elements */
+        .cbFormSection,
+        .cbResultSetListViewTable {
+            position: absolute !important;
+            left: -9999px !important;
         }
     </style>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            function setupAccordions() {
-                const stepContainers = document.querySelectorAll('.catalog-instructions .step-container');
-                if (stepContainers.length > 0) {
-                    stepContainers.forEach(function(container, index) {
-                        const heading = container.querySelector('h4');
-                        if (!heading || container.classList.contains('accordion-section')) return; // Skip if no heading or already processed
-
-                        const content = document.createElement('div');
-                        content.className = 'accordion-content';
-                        let nextElement = heading.nextElementSibling;
-                        while (nextElement) {
-                            const temp = nextElement.nextElementSibling;
-                            content.appendChild(nextElement);
-                            nextElement = temp;
-                        }
-
-                        const header = document.createElement('div');
-                        header.className = 'accordion-header';
-                        const icon = document.createElement('span');
-                        icon.className = 'accordion-icon';
-                        icon.innerHTML = '▼';
-
-                        const title = document.createElement('span');
-                        title.className = 'accordion-title';
-                        while(heading.firstChild) {
-                            title.appendChild(heading.firstChild);
-                        }
-
-                        header.appendChild(title);
-                        header.appendChild(icon);
-
-                        container.removeChild(heading);
-                        container.insertBefore(header, container.firstChild);
-                        container.appendChild(content);
-                        container.classList.add('accordion-section');
-
-                        // All steps closed by default (first step open code is commented out)
-                        // if (index === 0) { container.classList.add('active'); }
-
-                        header.addEventListener('click', function() {
-                            container.classList.toggle('active');
-                        });
-                    });
-                }
-            }
-            setTimeout(setupAccordions, 0);
-        });
-    </script>
 </head>
 <body>
-    <header class="site-header">
-        <div class="header-container">
-            <h1>NW Custom Apparel Online Catalog 2025</h1>
+    <!-- Simple header for internal sales team -->
+    <header class="sales-header">
+        <div class="header-content">
+            <div class="header-brand">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Logo%20White.png" alt="NWCA" class="header-logo">
+                <div>
+                    <h1 class="header-title">Sales Tool</h1>
+                    <div class="header-subtitle">Product Search & Instant Pricing</div>
+                </div>
+            </div>
+            <div class="header-info">
+                <span id="currentTime"></span>
+            </div>
         </div>
     </header>
     
-    <!-- BOGO Cap Special Promotional Banner -->
-    <div class="promo-banner">
-        <a href="c112-bogo-promo.html">
-            <span class="cap-icon">🧢</span>
-            EMBROIDERED TRUCKER CAP SPECIAL: Buy One, Get One <span class="deal-highlight">25% OFF!</span> - Click for Details
-        </a>
-    </div>
-
-    <section id="hero-section">
-        <div class="hero-container">
-            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/GREEN%20TEAM%20NWCA%20HERO%20Image.png?ver=1" alt="NW Custom Apparel Team - Green Theme" class="hero-image">
+    <div class="main-container">
+        <!-- Quick stats -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">Products:</span>
+                <span class="stat-value">10,000+</span>
             </div>
-    </section>
-
-    <div id="gallery-container">
-        <!-- Modern search interface will be inserted here by JavaScript -->
+            <div class="stat-item">
+                <span class="stat-label">Brands:</span>
+                <span class="stat-value">50+</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Price Formula:</span>
+                <span class="stat-value">(Base / 0.60) + $15</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Cache:</span>
+                <span class="stat-value">2 Hours</span>
+            </div>
+        </div>
+        
+        <!-- Caspio embed - will be intercepted by our enhanced gallery system -->
         <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb"></script>
     </div>
 
-    <section id="catalog-instructions-section">
-        <div class="catalog-instructions">
-            <h3>Your Custom Look Starts Here: Find Apparel & See Decorated Pricing</h3>
-            <p class="intro-text">Welcome! Browse thousands of apparel items ready for your custom logo or design. Finding your gear and seeing decoration pricing is easy:</p>
-
-            <div class="step-container">
-                <h4><span class="step-icon">1</span> Find Your Perfect Product:</h4>
-                <ul>
-                    <li>Use the <strong>Search Filters Above</strong> - Enter a specific <strong>STYLE#</strong> or use the <strong>CATEGORY</strong>, <strong>SUBCATEGORY</strong>, and <strong>BRAND</strong> dropdowns to explore options.</li>
-                    <li>Hit the <strong>Search</strong> button to see results.</li>
-                </ul>
-            </div>
-            <div class="step-container">
-                <h4><span class="step-icon">2</span> See Your Price – Decoration Included:</h4>
-                <ul>
-                    <li><strong>Click any item</strong> from the search results.</li>
-                    <li>On the item's page, select from the <strong>decoration tabs</strong> (Embroidery, Screen Print, DTG, DTF).</li>
-                    <li>The price grid will show the <strong>price per item</strong>, including standard decoration, based on quantity.</li>
-                </ul>
-            </div>
-            <div class="step-container">
-                <h4><span class="step-icon">3</span> Ready to Order or Have Questions?</h4>
-                <p><strong>Note:</strong> Full online ordering is coming soon! Until then, we're here to help you place your order personally.</p>
-                <p>Once you've found your items (note the Style #, color, quantity, and decoration method), contact us:</p>
-                <div class="contact-info">
-                    <div class="contact-method">
-                        <span class="contact-method-title">Email Us:</span>
-                        <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
-                    </div>
-                    <div class="contact-method">
-                        <span class="contact-method-title">Account Executives:</span>
-                        <strong>Taylar:</strong> <a href="mailto:taylar@nwcustomapparel.com">taylar@nwcustomapparel.com</a><br>
-                        <strong>Nika:</strong> <a href="mailto:nika@nwcustomapparel.com">nika@nwcustomapparel.com</a>
-                    </div>
-                    <div class="contact-method">
-                        <span class="contact-method-title">Call Us:</span>
-                        <strong>253-922-5793</strong><br>
-                        Monday - Friday, 9:00 AM - 5:00 PM Pacific
-                    </div>
-                    <div class="contact-method">
-                        <span class="contact-method-title">Visit Our Showroom:</span>
-                        Come to Milton, WA to see and feel the quality firsthand.
-                    </div>
-                </div>
-            </div>
-            <p class="final-note">We look forward to working with you to create your custom apparel!</p>
-        </div>
-    </section>
-
-    <script src="modern-search-interface-v3.js"></script>
+    
+    <!-- Include enhanced gallery system V2 -->
+    <script src="enhanced-gallery-system-v2.js"></script>
+    
+    <script>
+        // Show current time
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const dateStr = now.toLocaleDateString('en-US', { 
+                weekday: 'short',
+                month: 'short', 
+                day: 'numeric' 
+            });
+            document.getElementById('currentTime').textContent = `${dateStr} ${timeStr}`;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 60000); // Update every minute
+    </script>
     </body>
 </html>

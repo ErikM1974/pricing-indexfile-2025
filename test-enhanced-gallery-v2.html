@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Enhanced Gallery V2 - NWCA Sales Tool</title>
+    
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="enhanced-gallery-system-v2.css">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+        
+        .test-header {
+            background: #1a472a;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .test-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        /* Debug Panel */
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #1a472a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+        }
+        
+        .debug-panel h3 {
+            margin: 0 0 1rem 0;
+            color: #1a472a;
+            font-size: 1.125rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .debug-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .debug-section {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .debug-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .debug-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .debug-value {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin: 0.25rem 0;
+        }
+        
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-dot.ready { background: #28a745; }
+        .status-dot.loading { background: #ffc107; }
+        .status-dot.error { background: #dc3545; }
+        
+        .debug-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .debug-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .debug-btn:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+        }
+        
+        .log-entry {
+            font-size: 0.75rem;
+            padding: 0.25rem 0;
+            color: #6c757d;
+            font-family: monospace;
+        }
+        
+        .log-entry.error {
+            color: #dc3545;
+        }
+        
+        .log-entry.success {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <header class="test-header">
+        <h1>Enhanced Gallery V2 Test Page</h1>
+    </header>
+    
+    <div class="test-container">
+        <!-- Caspio embed - will be intercepted -->
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb"></script>
+    </div>
+    
+    <!-- Debug Panel -->
+    <div class="debug-panel" id="debugPanel">
+        <h3>
+            Debug Info
+            <button class="debug-close" onclick="document.getElementById('debugPanel').style.display='none'">×</button>
+        </h3>
+        
+        <div class="debug-section">
+            <div class="debug-label">System Status</div>
+            <div class="debug-value">
+                <span class="status-dot ready" id="statusDot"></span>
+                <span id="systemStatus">Initializing...</span>
+            </div>
+        </div>
+        
+        <div class="debug-section">
+            <div class="debug-label">Caspio Form</div>
+            <div class="debug-value" id="caspioStatus">Searching...</div>
+        </div>
+        
+        <div class="debug-section">
+            <div class="debug-label">Gallery Status</div>
+            <div class="debug-value" id="galleryStatus">Not created</div>
+        </div>
+        
+        <div class="debug-section">
+            <div class="debug-label">API Stats</div>
+            <div class="debug-value">
+                Calls: <span id="apiCalls">0</span> | 
+                Cached: <span id="cachedPrices">0</span>
+            </div>
+        </div>
+        
+        <div class="debug-section">
+            <div class="debug-label">Activity Log</div>
+            <div id="activityLog" style="max-height: 150px; overflow-y: auto;">
+                <!-- Log entries will appear here -->
+            </div>
+        </div>
+        
+        <div class="debug-actions">
+            <button class="debug-btn" onclick="clearCache()">Clear Cache</button>
+            <button class="debug-btn" onclick="reloadPrices()">Reload Prices</button>
+            <button class="debug-btn" onclick="simulateSearch()">Test Search</button>
+        </div>
+    </div>
+    
+    <!-- Include enhanced gallery system V2 -->
+    <script src="enhanced-gallery-system-v2.js"></script>
+    
+    <script>
+        // Debug monitoring
+        let apiCallCount = 0;
+        const activityLog = [];
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            activityLog.unshift({time: timestamp, message, type});
+            if (activityLog.length > 20) activityLog.pop();
+            
+            updateLogDisplay();
+        }
+        
+        function updateLogDisplay() {
+            const logDiv = document.getElementById('activityLog');
+            logDiv.innerHTML = activityLog.map(entry => 
+                `<div class="log-entry ${entry.type}">${entry.time}: ${entry.message}</div>`
+            ).join('');
+        }
+        
+        // Monitor console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args[0];
+            if (typeof message === 'string' && message.includes('[Enhanced Gallery')) {
+                addLog(message.replace(/\[Enhanced Gallery V?\d?\]/, '').trim());
+                
+                // Update status based on log
+                if (message.includes('Loading...')) {
+                    updateStatus('loading', 'Loading enhanced gallery...');
+                } else if (message.includes('Initializing...')) {
+                    updateStatus('loading', 'Initializing system...');
+                } else if (message.includes('Caspio ready')) {
+                    document.getElementById('caspioStatus').textContent = 'Found ✓';
+                    updateStatus('ready', 'System ready');
+                } else if (message.includes('Interface created')) {
+                    document.getElementById('galleryStatus').textContent = 'Created ✓';
+                }
+            }
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            const message = args[0];
+            if (typeof message === 'string' && message.includes('[Enhanced Gallery')) {
+                addLog(message.replace(/\[Enhanced Gallery V?\d?\]/, '').trim(), 'error');
+                updateStatus('error', 'Error occurred');
+            }
+        };
+        
+        // Monitor fetch for API calls
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            const url = args[0];
+            if (url.includes('caspio-pricing-proxy')) {
+                apiCallCount++;
+                document.getElementById('apiCalls').textContent = apiCallCount;
+                addLog(`API call: ${url.split('?')[1]}`);
+                
+                return originalFetch.apply(this, args)
+                    .then(response => {
+                        if (response.ok) {
+                            addLog('API response: Success', 'success');
+                        } else {
+                            addLog(`API response: ${response.status}`, 'error');
+                        }
+                        updateCacheCount();
+                        return response;
+                    })
+                    .catch(error => {
+                        addLog(`API error: ${error.message}`, 'error');
+                        throw error;
+                    });
+            }
+            return originalFetch.apply(this, args);
+        };
+        
+        function updateStatus(status, message) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('systemStatus');
+            
+            dot.className = 'status-dot ' + status;
+            text.textContent = message;
+        }
+        
+        function updateCacheCount() {
+            let count = 0;
+            for (let key in localStorage) {
+                if (key.startsWith('egPrice_')) {
+                    count++;
+                }
+            }
+            document.getElementById('cachedPrices').textContent = count;
+        }
+        
+        // Debug functions
+        function clearCache() {
+            if (window.egDebug && window.egDebug.clearCache) {
+                window.egDebug.clearCache();
+                updateCacheCount();
+                addLog('Cache cleared', 'success');
+            }
+        }
+        
+        function reloadPrices() {
+            if (window.egDebug && window.egDebug.reloadPrices) {
+                window.egDebug.reloadPrices();
+                addLog('Reloading prices...');
+            }
+        }
+        
+        function simulateSearch() {
+            const input = document.getElementById('egSearchInput');
+            const btn = document.getElementById('egSearchBtn');
+            if (input && btn) {
+                input.value = 'PC54';
+                btn.click();
+                addLog('Simulated search: PC54');
+            } else {
+                addLog('Search interface not ready', 'error');
+            }
+        }
+        
+        // Initial setup
+        addLog('Test page loaded');
+        updateCacheCount();
+        
+        // Check for gallery after a delay
+        setTimeout(() => {
+            if (!document.querySelector('.eg-container')) {
+                updateStatus('error', 'Gallery not created');
+                document.getElementById('galleryStatus').textContent = 'Failed ✗';
+                document.getElementById('caspioStatus').textContent = 'Not found ✗';
+                addLog('Gallery initialization failed', 'error');
+            }
+        }, 5000);
+        
+        // Simulate Caspio form if not present (for testing)
+        setTimeout(() => {
+            if (!document.querySelector('.cbFormSection') && !document.querySelector('[id*="cbForm"]')) {
+                addLog('Creating test Caspio form...');
+                const testForm = document.createElement('div');
+                testForm.className = 'cbFormSection';
+                testForm.innerHTML = `
+                    <form>
+                        <input type="text" name="Value1_1" placeholder="Style">
+                        <select name="Value2_1"><option value="">All Categories</option></select>
+                        <select name="Value4_1"><option value="">All Brands</option></select>
+                        <input type="radio" name="Value5_1" value="A" checked>
+                        <input type="radio" name="Value5_1" value="Y">
+                        <button type="button" class="cbSearchButton">Search</button>
+                    </form>
+                `;
+                document.body.appendChild(testForm);
+                addLog('Test form created');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+/* Enhanced Gallery System V2 CSS */
+/* Optimized for internal sales tool - clean, efficient design */
+
+/* Reset for our components */
+.eg-container * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main container */
+.eg-container {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #2c3e50;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Search Panel */
+.eg-search-panel {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+}
+
+.eg-search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.eg-search-header h2 {
+    font-size: 1.25rem;
+    color: #1a472a;
+    font-weight: 600;
+}
+
+.eg-clear-btn {
+    background: none;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    color: #6c757d;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.eg-clear-btn:hover {
+    border-color: #adb5bd;
+    background: #f8f9fa;
+}
+
+/* Search Row */
+.eg-search-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.eg-search-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.eg-search-input:focus {
+    outline: none;
+    border-color: #1a472a;
+    box-shadow: 0 0 0 3px rgba(26, 71, 42, 0.1);
+}
+
+.eg-search-btn {
+    background: #1a472a;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.eg-search-btn:hover {
+    background: #0f2818;
+    transform: translateY(-1px);
+}
+
+/* Quick Filters */
+.eg-quick-filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.eg-quick-btn {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.eg-quick-btn:hover {
+    background: #1a472a;
+    color: white;
+    border-color: #1a472a;
+}
+
+/* Advanced Filters */
+.eg-advanced-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.eg-select {
+    padding: 0.625rem 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.875rem;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 160px;
+}
+
+.eg-select:focus {
+    outline: none;
+    border-color: #1a472a;
+}
+
+.eg-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #495057;
+}
+
+.eg-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Results Panel */
+.eg-results-panel {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.eg-results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.eg-results-header h3 {
+    font-size: 1.125rem;
+    color: #1a472a;
+    font-weight: 600;
+}
+
+.eg-count {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+/* Results Grid */
+.eg-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Product Card */
+.eg-product-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.2s;
+    border: 1px solid #e9ecef;
+}
+
+.eg-product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #dee2e6;
+}
+
+.eg-product-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.eg-product-image {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.eg-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 1rem;
+}
+
+.eg-product-info {
+    padding: 1rem;
+}
+
+.eg-product-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.eg-product-style {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.eg-product-brand {
+    font-size: 0.8125rem;
+    color: #495057;
+    margin-bottom: 0.75rem;
+}
+
+/* Price Display */
+.eg-product-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    font-weight: 600;
+}
+
+.eg-price-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.eg-price-value {
+    font-size: 1.125rem;
+    color: #1a472a;
+}
+
+.eg-price-loading {
+    font-size: 0.8125rem;
+    color: #adb5bd;
+    font-style: italic;
+}
+
+.eg-price-error {
+    font-size: 0.8125rem;
+    color: #dc3545;
+}
+
+/* Loading State */
+.eg-loading {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+/* Message */
+.eg-message {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+.eg-message p {
+    margin: 0.5rem 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .eg-search-row {
+        flex-direction: column;
+    }
+    
+    .eg-advanced-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .eg-select {
+        width: 100%;
+    }
+    
+    .eg-results-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1rem;
+    }
+}
+
+/* Hide original Caspio elements */
+.cbFormSection,
+.cbResultSetListViewTable,
+.cbResultSetListViewTableOddCell,
+.cbResultSetListViewTableEvenCell,
+[id*="cbForm"] {
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    height: 1px !important;
+    width: 1px !important;
+    overflow: hidden !important;
+}
+
+/* Utility classes */
+.eg-hidden {
+    display: none !important;
+}
+
+.eg-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
