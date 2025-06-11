@@ -706,59 +706,8 @@
             <div class="sidebar-header">
                 <h2 class="sidebar-title">Categories</h2>
             </div>
-            <ul class="category-list">
-                <li class="category-item">
-                    <a class="category-link" data-category="T-Shirts">T-Shirts</a>
-                    <ul class="subcategory-list" id="subcat-T-Shirts"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Polos/Knits">Polos/Knits</a>
-                    <ul class="subcategory-list" id="subcat-Polos/Knits"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Sweatshirts/Fleece">Sweatshirts/Fleece</a>
-                    <ul class="subcategory-list" id="subcat-Sweatshirts/Fleece"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Caps">Caps</a>
-                    <ul class="subcategory-list" id="subcat-Caps"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Activewear">Activewear</a>
-                    <ul class="subcategory-list" id="subcat-Activewear"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Outerwear">Outerwear</a>
-                    <ul class="subcategory-list" id="subcat-Outerwear"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Bottoms">Bottoms</a>
-                    <ul class="subcategory-list" id="subcat-Bottoms"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Bags">Bags</a>
-                    <ul class="subcategory-list" id="subcat-Bags"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Accessories">Accessories</a>
-                    <ul class="subcategory-list" id="subcat-Accessories"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Workwear">Workwear</a>
-                    <ul class="subcategory-list" id="subcat-Workwear"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Ladies">Ladies</a>
-                    <ul class="subcategory-list" id="subcat-Ladies"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Youth">Youth</a>
-                    <ul class="subcategory-list" id="subcat-Youth"></ul>
-                </li>
-                <li class="category-item">
-                    <a class="category-link" data-category="Infant & Toddler">Infant & Toddler</a>
-                    <ul class="subcategory-list" id="subcat-Infant & Toddler"></ul>
-                </li>
+            <ul class="category-list" id="categoryList">
+                <!-- Categories will be dynamically generated from CATEGORY_DATA -->
             </ul>
         </nav>
         
@@ -816,7 +765,10 @@
             
             <div class="results-section">
                 <div class="results-header">
-                    <h3 class="results-title">Products</h3>
+                    <h3 class="results-title">
+                        <span id="resultsTitle">Products</span>
+                        <span id="categoryBreadcrumb" style="font-size: 0.875rem; font-weight: normal; color: #666; margin-left: 0.5rem;"></span>
+                    </h3>
                     <span class="results-count" id="resultsCount">Click a category to browse</span>
                 </div>
                 <div class="results-grid" id="resultsGrid">
@@ -839,6 +791,26 @@
         // Configuration
         const API_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/base-item-costs';
         const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
+        
+        // Hardcoded category structure from database - ordered for display
+        const CATEGORY_DATA = {
+            "T-Shirts": ["Ring Spun", "100% Cotton", "6-6.1 100% Cotton", "Long Sleeve", "Fashion", "5-5.6 100% Cotton", "Performance", "Ladies", "Youth", "Tanks", "Specialty", "Tall", "50/50 Blend", "Eco-Friendly", "Workwear", "Juniors & Young Men"],
+            "Polos/Knits": ["Ladies", "Performance", "Easy Care", "Fashion", "Tall", "Cotton", "Youth", "Workwear", "Sweaters", "Mock & Turtlenecks", "Silk Touch™", "Basic Knits"],
+            "Sweatshirts/Fleece": ["Ladies", "Performance", "Crewnecks", "Hoodie", "Youth", "Fleece", "Heavyweight", "1/2 & 1/4 Zip", "Full Zip", "Tall", "Sweatpants", "Juniors & Young Men"],
+            "Caps": ["Performance/ Athletic", "Visors", "Stretch-to-Fit", "Youth", "Fashion", "Fleece/Beanies", "Twill", "Full Brim", "Pigment/Garment Dyed", "Flexfit", "Mesh Back", "Camouflage", "Safety", "Recycled", "Scarves/Gloves", "Canvas", "Racing", "Fitted"],
+            "Activewear": ["Ladies", "Youth", "Performance", "Basketball", "Pants & Shorts", "Jerseys", "Tanks", "Athletic/Warm-Ups", "Baseball"],
+            "Outerwear": ["Ladies", "Athletic/Warm-Ups", "Corporate Jackets", "Tall", "Insulated Jackets", "Youth", "Polyester Fleece", "Golf Outerwear", "Rainwear", "Work Jackets", "Soft Shells", "Vests", "3-in-1", "Parkas/ Shells/ Systems", "Camouflage"],
+            "Bags": ["Golf Bags", "Travel Bags", "Rolling Bags", "Backpacks", "Totes", "Briefcases/ Messengers", "Specialty Bags", "Coolers & Lunch Bags", "Duffels", "Cinch Packs", "Grocery Totes", "Eco-Friendly"],
+            "Accessories": ["Other", "Aprons", "Blankets", "Scarves/Gloves", "Robes/Towels", "Golf Towels"],
+            "Workwear": ["Medical/Scrubs", "Stain/Soil Resistant", "Aprons", "T-Shirts", "Industrial Work Shirts", "Polos", "Safety", "Industrial Work Pants/Shorts", "Work Jackets"],
+            "Woven Shirts": ["Ladies", "Premium Wovens", "Workwear", "Denim", "Cotton", "Easy Care", "Cotton/Poly Blend", "Oxfords", "Camp Shirts", "100% Cotton", "Fishing", "Tall"],
+            "Ladies": ["Polos/Knits", "Outerwear", "Activewear", "Fashion", "T-Shirts", "Sweatshirts/Fleece", "Bottoms", "Woven Shirts", "Dresses", "Caps"],
+            "Youth": ["Sweatshirts/Fleece", "T-Shirts", "Bottoms", "Activewear", "Outerwear", "Caps", "Polos/Knits"],
+            "Infant & Toddler": ["Tops & Bottoms", "Accessories & Caps"],
+            "Tall": ["Sweatshirts/Fleece", "Outerwear", "Woven Shirts", "Polos/Knits", "T-Shirts"],
+            "Juniors & Young Men": ["T-Shirts", "Pants & Shorts", "Lounge", "Sweatshirts", "Caps"],
+            "Personal Protection": ["Medical/Scrubs", "Face Coverings"]
+        };
         
         // Caspio selectors - dynamically find them
         const CASPIO_SELECTORS = {
@@ -884,6 +856,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[Sales Tool] Initializing...');
             
+            // Build category menu from hardcoded data
+            buildCategoryMenu();
+            
             // Setup mobile menu
             setupMobileMenu();
             
@@ -893,6 +868,30 @@
             // Load Caspio dynamically
             loadCaspio();
         });
+        
+        function buildCategoryMenu() {
+            const categoryList = document.getElementById('categoryList');
+            
+            // Build menu from CATEGORY_DATA
+            Object.keys(CATEGORY_DATA).forEach(categoryName => {
+                const li = document.createElement('li');
+                li.className = 'category-item';
+                
+                const link = document.createElement('a');
+                link.className = 'category-link';
+                link.href = '#';
+                link.dataset.category = categoryName;
+                link.textContent = categoryName;
+                
+                // Add arrow indicator if has subcategories
+                if (CATEGORY_DATA[categoryName].length > 0) {
+                    link.classList.add('has-subcategories');
+                }
+                
+                li.appendChild(link);
+                categoryList.appendChild(li);
+            });
+        }
         
         function loadCaspio() {
             console.log('[Sales Tool] Loading Caspio form...');
@@ -1003,19 +1002,58 @@
             
             categoryLinks.forEach(link => {
                 const categoryItem = link.closest('.category-item');
+                const categoryName = link.dataset.category;
                 let megaMenu = null;
                 
                 // Create mega menu for this category
                 function createMegaMenu() {
                     const menu = document.createElement('div');
                     menu.className = 'mega-menu';
+                    
+                    const subcategories = CATEGORY_DATA[categoryName] || [];
+                    
                     menu.innerHTML = `
-                        <div class="mega-menu-header">${link.dataset.category} Categories</div>
+                        <div class="mega-menu-header">${categoryName} Categories</div>
                         <div class="mega-menu-grid">
-                            <div class="loading" style="padding: 1rem; color: #666;">Loading subcategories...</div>
+                            ${subcategories.length > 0 ? 
+                                subcategories.map(subcat => `
+                                    <a class="mega-menu-item" href="#" data-category="${categoryName}" data-subcategory="${subcat}">
+                                        ${subcat}
+                                    </a>
+                                `).join('') 
+                                : '<div style="padding: 1rem; color: #666;">No subcategories available</div>'
+                            }
                         </div>
                     `;
                     document.body.appendChild(menu);
+                    
+                    // Add click handlers to subcategory links
+                    menu.querySelectorAll('.mega-menu-item').forEach(item => {
+                        item.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const subcategory = item.dataset.subcategory;
+                            console.log(`[Sales Tool] Subcategory clicked: ${subcategory}`);
+                            
+                            // Set active states
+                            document.querySelectorAll('.category-link').forEach(l => {
+                                l.classList.remove('active');
+                            });
+                            link.classList.add('active');
+                            
+                            currentCategory = categoryName;
+                            currentSubcategory = subcategory;
+                            
+                            // Hide all mega menus
+                            document.querySelectorAll('.mega-menu').forEach(m => {
+                                m.classList.remove('show');
+                            });
+                            
+                            // Perform search
+                            performCategorySearch(categoryName, subcategory);
+                        });
+                    });
                     
                     // Add hover listeners to mega menu itself
                     menu.addEventListener('mouseenter', () => {
@@ -1056,7 +1094,6 @@
                     
                     if (!megaMenu) {
                         megaMenu = createMegaMenu();
-                        loadSubcategoriesForMegaMenu(link.dataset.category, megaMenu);
                     }
                     
                     positionMegaMenu();
@@ -1080,11 +1117,12 @@
                     }, 300);
                 });
                 
-                
                 // Click handler for main category
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     const category = link.dataset.category;
+                    
+                    console.log(`[Sales Tool] Main category clicked: ${category}`);
                     
                     // Remove active states
                     document.querySelectorAll('.category-link').forEach(l => {
@@ -1096,170 +1134,15 @@
                     currentCategory = category;
                     currentSubcategory = '';
                     
-                    // Hide mega menu
-                    if (megaMenu) {
-                        megaMenu.classList.remove('show');
-                    }
+                    // Hide all mega menus
+                    document.querySelectorAll('.mega-menu').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
                     
-                    // Perform search with category
+                    // Perform search with category only (no subcategory)
                     performCategorySearch(category, '');
                 });
             });
-            
-            // Hide subcategory lists since we're using mega menu
-            document.querySelectorAll('.subcategory-list').forEach(list => {
-                list.style.display = 'none';
-            });
-        }
-        
-        
-        function loadSubcategoriesForMegaMenu(category, megaMenu) {
-            const categoryField = document.querySelector(CASPIO_SELECTORS.categoryField);
-            const subcategoryField = document.querySelector(CASPIO_SELECTORS.subcategoryField);
-            
-            if (!categoryField || !subcategoryField) return;
-            
-            // Update Caspio category
-            categoryField.value = category;
-            categoryField.dispatchEvent(new Event('change', { bubbles: true }));
-            
-            const megaGrid = megaMenu.querySelector('.mega-menu-grid');
-            
-            // Wait for Caspio to update subcategories
-            const observer = new MutationObserver((mutations, obs) => {
-                if (subcategoryField.options.length > 1) {
-                    // Clear loading message
-                    megaGrid.innerHTML = '';
-                    
-                    // Add subcategories
-                    let hasSubcategories = false;
-                    Array.from(subcategoryField.options).forEach(option => {
-                        if (option.value && !option.text.includes('NO Subcategory')) {
-                            hasSubcategories = true;
-                            const link = document.createElement('a');
-                            link.className = 'mega-menu-item';
-                            link.href = '#';
-                            link.textContent = option.text;
-                            
-                            link.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                console.log(`[Sales Tool] Subcategory clicked: ${option.text} (${option.value})`);
-                                
-                                // Immediately disable further clicks
-                                if (link.dataset.clicked === 'true') {
-                                    console.log('[Sales Tool] Ignoring duplicate click');
-                                    return;
-                                }
-                                link.dataset.clicked = 'true';
-                                
-                                // Set active states
-                                document.querySelectorAll('.category-link').forEach(l => {
-                                    l.classList.remove('active');
-                                });
-                                document.querySelector(`[data-category="${category}"]`).classList.add('active');
-                                
-                                currentCategory = category;
-                                currentSubcategory = option.value;
-                                
-                                // Hide mega menu immediately
-                                megaMenu.classList.remove('show');
-                                
-                                // Hide all mega menus
-                                document.querySelectorAll('.mega-menu').forEach(menu => {
-                                    menu.classList.remove('show');
-                                });
-                                
-                                // Perform search
-                                console.log(`[Sales Tool] Performing search for category: ${category}, subcategory: ${option.value}`);
-                                performCategorySearch(category, option.value);
-                                
-                                // Re-enable clicks after a delay
-                                setTimeout(() => {
-                                    link.dataset.clicked = 'false';
-                                }, 1000);
-                            });
-                            
-                            
-                            megaGrid.appendChild(link);
-                        }
-                    });
-                    
-                    if (!hasSubcategories) {
-                        megaGrid.innerHTML = '<div style="padding: 1rem; color: #666;">No subcategories available</div>';
-                    }
-                    
-                    obs.disconnect();
-                }
-            });
-            
-            observer.observe(subcategoryField, { childList: true });
-        }
-        
-        function loadSubcategories(category) {
-            const categoryField = document.querySelector(CASPIO_SELECTORS.categoryField);
-            const subcategoryField = document.querySelector(CASPIO_SELECTORS.subcategoryField);
-            
-            if (!categoryField || !subcategoryField) return;
-            
-            // Update Caspio category
-            categoryField.value = category;
-            categoryField.dispatchEvent(new Event('change', { bubbles: true }));
-            
-            // Get category link
-            const categoryLink = document.querySelector(`[data-category="${category}"]`);
-            const subcatList = document.getElementById(`subcat-${category}`);
-            
-            // Clear existing subcategories
-            subcatList.innerHTML = '<li class="loading" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Loading...</li>';
-            
-            // Wait for Caspio to update subcategories
-            const observer = new MutationObserver((mutations, obs) => {
-                if (subcategoryField.options.length > 1) {
-                    // Clear loading message
-                    subcatList.innerHTML = '';
-                    
-                    // Add subcategories
-                    let hasSubcategories = false;
-                    Array.from(subcategoryField.options).forEach(option => {
-                        if (option.value && !option.text.includes('NO Subcategory')) {
-                            hasSubcategories = true;
-                            const li = document.createElement('li');
-                            li.className = 'subcategory-item';
-                            li.innerHTML = `<a class="subcategory-link" data-subcategory="${option.value}">${option.text}</a>`;
-                            subcatList.appendChild(li);
-                        }
-                    });
-                    
-                    if (hasSubcategories) {
-                        categoryLink.classList.add('has-subcategories', 'expanded');
-                        subcatList.classList.add('show');
-                        
-                        // Setup subcategory clicks
-                        subcatList.querySelectorAll('.subcategory-link').forEach(subLink => {
-                            subLink.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                
-                                // Remove active from all subcategories
-                                document.querySelectorAll('.subcategory-link').forEach(sl => {
-                                    sl.classList.remove('active');
-                                });
-                                
-                                // Set active
-                                subLink.classList.add('active');
-                                currentSubcategory = subLink.dataset.subcategory;
-                                
-                                // Search with subcategory
-                                performCategorySearch(currentCategory, currentSubcategory);
-                            });
-                        });
-                    }
-                    
-                    obs.disconnect();
-                }
-            });
-            
-            observer.observe(subcategoryField, { childList: true });
         }
         
         function setupSearch() {
@@ -1457,6 +1340,12 @@
             currentCategory = '';
             currentSubcategory = '';
             
+            // Clear breadcrumb
+            const breadcrumb = document.getElementById('categoryBreadcrumb');
+            if (breadcrumb) {
+                breadcrumb.textContent = '';
+            }
+            
             isSearching = true;
             document.getElementById('resultsGrid').innerHTML = '<div class="loading">Searching...</div>';
             document.getElementById('resultsCount').textContent = 'Searching...';
@@ -1537,32 +1426,68 @@
             document.getElementById('resultsGrid').innerHTML = '<div class="loading">Loading products...</div>';
             document.getElementById('resultsCount').textContent = 'Loading...';
             
+            // Update breadcrumb
+            const breadcrumb = document.getElementById('categoryBreadcrumb');
+            if (breadcrumb) {
+                if (subcategory) {
+                    breadcrumb.textContent = `> ${category} > ${subcategory}`;
+                } else {
+                    breadcrumb.textContent = `> ${category}`;
+                }
+            }
+            
             // Update Caspio form
             const styleField = document.querySelector(CASPIO_SELECTORS.styleField);
             const categoryField = document.querySelector(CASPIO_SELECTORS.categoryField);
             const subcategoryField = document.querySelector(CASPIO_SELECTORS.subcategoryField);
             const searchBtn = document.querySelector(CASPIO_SELECTORS.searchButton);
             
-            console.log('[Sales Tool] Setting form fields:', {
-                category: category,
-                subcategory: subcategory || '(empty)'
+            console.log('[Sales Tool] Current form values BEFORE update:', {
+                style: styleField?.value,
+                category: categoryField?.value,
+                subcategory: subcategoryField?.value
             });
             
-            if (styleField) styleField.value = '';
-            if (categoryField) categoryField.value = category;
-            if (subcategoryField) subcategoryField.value = subcategory || '';
-            
-            // Apply filters
-            setBrandFilter();
-            setTopSellerFilter();
-            
-            if (searchBtn) {
-                console.log('[Sales Tool] Clicking search button');
-                searchBtn.click();
-            } else {
-                console.error('[Sales Tool] Caspio form not found');
-                isSearching = false;
+            // Clear style field first and force update
+            if (styleField) {
+                styleField.value = '';
+                styleField.dispatchEvent(new Event('change', { bubbles: true }));
             }
+            
+            // Set category
+            if (categoryField) {
+                categoryField.value = category;
+                categoryField.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            
+            // Wait a bit for category to update subcategory options, then set subcategory
+            setTimeout(() => {
+                if (subcategoryField) {
+                    subcategoryField.value = subcategory || '';
+                    subcategoryField.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                
+                console.log('[Sales Tool] Form values AFTER update:', {
+                    style: styleField?.value,
+                    category: categoryField?.value,
+                    subcategory: subcategoryField?.value
+                });
+                
+                // Apply filters
+                setBrandFilter();
+                setTopSellerFilter();
+                
+                // Small delay before clicking search to ensure all fields are updated
+                setTimeout(() => {
+                    if (searchBtn) {
+                        console.log('[Sales Tool] Clicking search button');
+                        searchBtn.click();
+                    } else {
+                        console.error('[Sales Tool] Caspio form not found');
+                        isSearching = false;
+                    }
+                }, 100);
+            }, 200);
         }
         
         function setupResultObserver() {
@@ -1579,6 +1504,19 @@
                     const resultItems = document.querySelectorAll('[data-cb-name="data-row"]');
                     if (resultItems.length > 0 && isSearching) {
                         console.log(`[Sales Tool] Found ${resultItems.length} results`);
+                        
+                        // Debug: Log first few results to see what we're getting
+                        const debugResults = Array.from(resultItems).slice(0, 3).map(item => {
+                            const link = item.querySelector('a.gallery-item-link');
+                            return {
+                                href: link?.href,
+                                title: link?.querySelector('.gallery-item-title')?.textContent?.trim(),
+                                category: item.querySelector('[data-cb-name="cbFormData1"]')?.textContent?.trim(),
+                                subcategory: item.querySelector('[data-cb-name="cbFormData2"]')?.textContent?.trim()
+                            };
+                        });
+                        console.log('[Sales Tool] Sample results:', debugResults);
+                        
                         processResults(resultItems);
                         isSearching = false;
                         console.log('[Sales Tool] Search completed, isSearching set to false');
@@ -1718,8 +1656,9 @@
                 }
                 
                 if (lowestPrice === Infinity || lowestPrice <= 0) {
-                    console.error(`[Sales Tool] No valid price found for ${styleNumber}`);
-                    throw new Error('No valid price found');
+                    // No price found - this is expected for some products
+                    element.textContent = 'QUOTE';
+                    return;
                 }
                 
                 // Apply formula: (price / 0.60) + 15
@@ -1730,8 +1669,8 @@
                 element.textContent = `$${finalPrice.toFixed(2)}+`;
                 
             } catch (error) {
-                console.error(`[Sales Tool] Price error for ${styleNumber}:`, error);
-                element.textContent = 'Price N/A';
+                // API error or no pricing - show QUOTE
+                element.textContent = 'QUOTE';
             }
         }
         
