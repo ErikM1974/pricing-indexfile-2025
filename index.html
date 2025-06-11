@@ -513,13 +513,13 @@
         const API_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/base-item-costs';
         const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
         
-        // Caspio selectors
+        // Caspio selectors - dynamically find them
         const CASPIO_SELECTORS = {
-            styleField: '#Value1_1_3d724d7b64e687',
-            categoryField: '#Value2_1_3d724d7b64e687',
-            subcategoryField: '#Value3_1_3d724d7b64e687',
-            brandField: '#Value4_1',
-            searchButton: '#searchID_3d724d7b64e687'
+            styleField: '',
+            categoryField: '',
+            subcategoryField: '',
+            brandField: '',
+            searchButton: ''
         };
         
         // State
@@ -535,24 +535,49 @@
             // Setup mobile menu
             setupMobileMenu();
             
-            // Setup category navigation
-            setupCategoryNavigation();
-            
             // Setup search
             setupSearch();
             
-            // Setup result observer
-            setupResultObserver();
-            
-            // Initialize with all products after delay
-            setTimeout(() => {
-                const caspioSearchBtn = document.querySelector(CASPIO_SELECTORS.searchButton);
-                if (caspioSearchBtn) {
-                    console.log('[Sales Tool] Loading initial products');
-                    caspioSearchBtn.click();
-                }
-            }, 2000);
+            // Wait for Caspio to load
+            waitForCaspio();
         });
+        
+        function waitForCaspio() {
+            let attempts = 0;
+            const checkInterval = setInterval(() => {
+                attempts++;
+                console.log(`[Sales Tool] Looking for Caspio form... (attempt ${attempts})`);
+                
+                // Find selectors dynamically
+                const searchBtn = document.querySelector('[id^="searchID_"]');
+                const styleField = document.querySelector('[id^="Value1_1_"]');
+                const categoryField = document.querySelector('[id^="Value2_1_"]');
+                const subcategoryField = document.querySelector('[id^="Value3_1_"]');
+                
+                if (searchBtn && styleField) {
+                    // Update selectors
+                    CASPIO_SELECTORS.searchButton = '#' + searchBtn.id;
+                    CASPIO_SELECTORS.styleField = '#' + styleField.id;
+                    CASPIO_SELECTORS.categoryField = '#' + categoryField.id;
+                    CASPIO_SELECTORS.subcategoryField = '#' + subcategoryField.id;
+                    
+                    console.log('[Sales Tool] Caspio form found!', CASPIO_SELECTORS);
+                    clearInterval(checkInterval);
+                    
+                    // Setup category navigation after Caspio is ready
+                    setupCategoryNavigation();
+                    
+                    // Setup result observer
+                    setupResultObserver();
+                }
+                
+                if (attempts > 20) {
+                    clearInterval(checkInterval);
+                    console.error('[Sales Tool] Caspio form not found');
+                    alert('Failed to load search form. Please refresh the page.');
+                }
+            }, 500);
+        }
         
         function setupMobileMenu() {
             const menuBtn = document.getElementById('mobileMenuBtn');
@@ -861,15 +886,24 @@
                 
                 // Find lowest price
                 let lowestPrice = Infinity;
-                if (data.prices) {
+                
+                // Check different possible price structures
+                if (data.prices && typeof data.prices === 'object') {
                     Object.values(data.prices).forEach(price => {
                         if (price > 0 && price < lowestPrice) {
                             lowestPrice = price;
                         }
                     });
+                } else if (data.price && data.price > 0) {
+                    lowestPrice = data.price;
+                } else if (data.basePrice && data.basePrice > 0) {
+                    lowestPrice = data.basePrice;
+                } else if (Array.isArray(data) && data.length > 0 && data[0].price) {
+                    lowestPrice = data[0].price;
                 }
                 
                 if (lowestPrice === Infinity) {
+                    console.log(`[Sales Tool] No price found for ${styleNumber}, data:`, data);
                     throw new Error('No prices found');
                 }
                 
