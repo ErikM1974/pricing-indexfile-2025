@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Homepage Search - NW Custom Apparel</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2f661e;
+            text-align: center;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .instructions {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .check-item {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .check-item::before {
+            content: "□ ";
+            margin-left: -20px;
+            font-weight: bold;
+        }
+        
+        .screenshot-note {
+            background: #f0f8ff;
+            padding: 10px;
+            border-radius: 4px;
+            font-style: italic;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Homepage Search Interface Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Instructions</h2>
+        <div class="instructions">
+            <p><strong>What we're testing:</strong> The modern search interface should hide the Caspio dropdowns and replace them with a beautiful visual interface.</p>
+            
+            <h3>Expected Behavior:</h3>
+            <div class="check-item">The old Caspio dropdown search should be hidden</div>
+            <div class="check-item">A modern search bar should appear at the top</div>
+            <div class="check-item">Category tiles should be displayed in a grid</div>
+            <div class="check-item">Brand filter buttons should be visible</div>
+            <div class="check-item">The "Top Sellers Only" toggle should work</div>
+            
+            <h3>Test These Actions:</h3>
+            <div class="check-item">Click on a category tile (e.g., "T-Shirts") - it should search</div>
+            <div class="check-item">Type a style number in the search bar (e.g., "PC54") and click Search</div>
+            <div class="check-item">Click on a brand filter button (e.g., "Nike")</div>
+            <div class="check-item">Toggle "Top Sellers Only" on/off</div>
+            <div class="check-item">Results should appear in the gallery below</div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Live Homepage Preview</h2>
+        <div class="status warning">
+            <strong>Note:</strong> The iframe below shows your actual homepage. If the modern search doesn't appear, check the browser console for errors.
+        </div>
+        <iframe src="index.html" title="Homepage Preview"></iframe>
+    </div>
+    
+    <div class="test-section">
+        <h2>Troubleshooting</h2>
+        <div class="screenshot-note">
+            💡 <strong>Take a screenshot!</strong> If something doesn't look right, take a screenshot and describe what you see vs. what you expected.
+        </div>
+        
+        <h3>Common Issues:</h3>
+        <ul>
+            <li><strong>Old search still visible:</strong> The CSS might not be loading properly</li>
+            <li><strong>No modern interface:</strong> JavaScript might have errors - check console</li>
+            <li><strong>Clicks don't work:</strong> The form field IDs might have changed</li>
+            <li><strong>No results:</strong> The search button click might not be triggering</li>
+        </ul>
+        
+        <h3>Quick Fixes to Try:</h3>
+        <ol>
+            <li>Hard refresh the page (Ctrl+Shift+R or Cmd+Shift+R)</li>
+            <li>Clear browser cache</li>
+            <li>Check browser console (F12) for any red errors</li>
+            <li>Try in an incognito/private window</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>Next Steps</h2>
+        <div class="status success">
+            <strong>If everything works:</strong> Great! The modern search is ready. We can move on to enhancing the gallery display.
+        </div>
+        <div class="status error">
+            <strong>If there are issues:</strong> Note what's not working and we'll fix it before proceeding.
+        </div>
+    </div>
+</body>
+</html>

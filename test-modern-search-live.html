@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modern Search Interface LIVE - NW Custom Apparel</title>
+    
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="modern-search-interface.css">
+    
+    <style>
+        /* Test page specific styles */
+        .test-info {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1200px;
+            text-align: center;
+        }
+        
+        .test-info h2 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .test-controls {
+            margin: 20px auto;
+            text-align: center;
+            max-width: 1200px;
+        }
+        
+        .test-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .test-btn:hover {
+            background: #1976d2;
+        }
+        
+        .debug-panel {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 1200px;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: left;
+        }
+        
+        .debug-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: white;
+            border-radius: 3px;
+        }
+        
+        .found {
+            color: green;
+        }
+        
+        .not-found {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <h1>Modern Search Interface - LIVE Test</h1>
+        </div>
+    </header>
+    
+    <div class="test-info">
+        <h2>🧪 Testing Modern Search with LIVE Caspio Form</h2>
+        <p>This page tests the modern search interface with your actual Caspio form.</p>
+        <p><strong>What to test:</strong></p>
+        <ul style="text-align: left; display: inline-block;">
+            <li>The Caspio form should be hidden but functional</li>
+            <li>Click category tiles to search by category</li>
+            <li>Use the search bar to search by style number</li>
+            <li>Try brand filter buttons</li>
+            <li>Toggle "Top Sellers Only"</li>
+            <li>Results should appear in the Caspio gallery below</li>
+        </ul>
+    </div>
+    
+    <div class="test-controls">
+        <button class="test-btn" onclick="showHiddenForm()">Show Hidden Form (Debug)</button>
+        <button class="test-btn" onclick="hideForm()">Hide Form Again</button>
+        <button class="test-btn" onclick="checkFormElements()">Check Form Elements</button>
+        <button class="test-btn" onclick="testCategorySearch()">Test Category Search</button>
+    </div>
+    
+    <div class="debug-panel" id="debugPanel" style="display: none;">
+        <h3>Debug Information:</h3>
+        <div id="debugInfo"></div>
+    </div>
+
+    <div id="gallery-container">
+        <p style="text-align: center; max-width: 1100px; margin: 0 auto var(--spacing-md) auto; font-size: 1.1rem;">
+            Use the filters below to find your perfect product. Need help?
+            <a href="#catalog-instructions-section" style="color: var(--primary-color); text-decoration: underline;">See our step-by-step guide.</a>
+        </p>
+        <h2>Search Catalog</h2>
+        <!-- Modern search interface will be inserted here by JavaScript -->
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb"></script>
+    </div>
+
+    <script src="modern-search-interface-v2.js"></script>
+    
+    <script>
+        // Debug functions for testing
+        function showHiddenForm() {
+            const forms = document.querySelectorAll('[id^="cbTable_"]');
+            forms.forEach(form => {
+                form.style.position = 'static';
+                form.style.left = 'auto';
+                form.style.top = 'auto';
+                form.style.width = 'auto';
+                form.style.height = 'auto';
+                form.style.visibility = 'visible';
+            });
+            alert('Form is now visible below the modern interface');
+        }
+        
+        function hideForm() {
+            const forms = document.querySelectorAll('[id^="cbTable_"]');
+            forms.forEach(form => {
+                form.style.position = 'absolute';
+                form.style.left = '-9999px';
+                form.style.top = '-9999px';
+                form.style.visibility = 'hidden';
+            });
+            alert('Form is hidden again');
+        }
+        
+        function checkFormElements() {
+            const debugPanel = document.getElementById('debugPanel');
+            const debugInfo = document.getElementById('debugInfo');
+            debugPanel.style.display = 'block';
+            
+            debugInfo.innerHTML = '';
+            
+            // Check for form elements
+            const elements = [
+                { name: 'Style Input', selector: '[id^="Value1_1_"]' },
+                { name: 'Category Dropdown', selector: '[id^="Value2_1_"]' },
+                { name: 'Subcategory Dropdown', selector: '[id^="Value3_1_"]' },
+                { name: 'Brand Dropdown', selector: '#Value4_1' },
+                { name: 'Top Seller Radio', selector: '[name^="Value5_1"]' },
+                { name: 'Search Button', selector: '[id^="searchID_"]' },
+                { name: 'Caspio Form Table', selector: '[id^="cbTable_"]' },
+                { name: 'Modern Search Container', selector: '.modern-search-container' }
+            ];
+            
+            elements.forEach(el => {
+                const found = document.querySelector(el.selector);
+                const status = found ? 
+                    `<span class="found">✓ Found: ${found.id || found.name || 'element'}</span>` : 
+                    `<span class="not-found">✗ Not Found</span>`;
+                
+                debugInfo.innerHTML += `<div class="debug-item">${el.name}: ${status}</div>`;
+            });
+        }
+        
+        function testCategorySearch() {
+            // Simulate clicking on T-Shirts category
+            const categoryDropdown = document.querySelector('[id^="Value2_1_"]');
+            if (categoryDropdown) {
+                categoryDropdown.value = 'T-Shirts';
+                categoryDropdown.dispatchEvent(new Event('change', { bubbles: true }));
+                
+                setTimeout(() => {
+                    const searchButton = document.querySelector('[id^="searchID_"]');
+                    if (searchButton) {
+                        searchButton.click();
+                        alert('Searching for T-Shirts category...');
+                    }
+                }, 100);
+            } else {
+                alert('Category dropdown not found!');
+            }
+        }
+        
+        // Auto-check elements after page loads
+        setTimeout(checkFormElements, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Modern Search - NW Custom Apparel</title>
+    
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="modern-search-interface.css">
+    
+    <style>
+        .debug-info {
+            background: #f0f8ff;
+            border: 2px solid #0066cc;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1200px;
+            font-family: monospace;
+        }
+        
+        .debug-btn {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        .debug-btn:hover {
+            background: #0052a3;
+        }
+        
+        #debugOutput {
+            background: #333;
+            color: #0f0;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <h1>Debug Modern Search Interface</h1>
+        </div>
+    </header>
+    
+    <div class="debug-info">
+        <h2>🔍 Debug Controls</h2>
+        <button class="debug-btn" onclick="checkCaspioForm()">Check Caspio Form</button>
+        <button class="debug-btn" onclick="listFormElements()">List Form Elements</button>
+        <button class="debug-btn" onclick="testHideForm()">Test Hide Form</button>
+        <button class="debug-btn" onclick="testShowForm()">Test Show Form</button>
+        <button class="debug-btn" onclick="manualInit()">Manual Initialize</button>
+        <button class="debug-btn" onclick="clearDebug()">Clear Output</button>
+        
+        <div id="debugOutput"></div>
+    </div>
+
+    <div id="gallery-container">
+        <p style="text-align: center; max-width: 1100px; margin: 0 auto var(--spacing-md) auto; font-size: 1.1rem;">
+            Use the filters below to find your perfect product. Need help?
+            <a href="#catalog-instructions-section" style="color: var(--primary-color); text-decoration: underline;">See our step-by-step guide.</a>
+        </p>
+        <h2>Search Catalog</h2>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb"></script>
+    </div>
+
+    <script src="modern-search-interface.js"></script>
+    
+    <script>
+        function log(message) {
+            const output = document.getElementById('debugOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function checkCaspioForm() {
+            log('=== Checking for Caspio Form ===');
+            
+            const form1 = document.querySelector('section[data-cb-name="cbTable"]');
+            log(`section[data-cb-name="cbTable"]: ${form1 ? 'FOUND' : 'NOT FOUND'}`);
+            
+            const form2 = document.querySelector('.cbSearchSpa');
+            log(`.cbSearchSpa: ${form2 ? 'FOUND' : 'NOT FOUND'}`);
+            
+            const form3 = document.querySelector('[id^="cbTable_"]');
+            log(`[id^="cbTable_"]: ${form3 ? 'FOUND' : 'NOT FOUND'}`);
+            
+            const searchBtn = document.querySelector('.cbSearchButton');
+            log(`Search button: ${searchBtn ? 'FOUND' : 'NOT FOUND'}`);
+            
+            if (form1) {
+                log(`Form classes: ${form1.className}`);
+                log(`Form ID: ${form1.id}`);
+            }
+        }
+        
+        function listFormElements() {
+            log('=== Listing Form Elements ===');
+            
+            const inputs = document.querySelectorAll('input[name^="Value"]');
+            log(`Found ${inputs.length} input fields:`);
+            
+            inputs.forEach(input => {
+                log(`  - ${input.name} (${input.type}): ID=${input.id}`);
+            });
+            
+            const selects = document.querySelectorAll('select[name^="Value"]');
+            log(`Found ${selects.length} select fields:`);
+            
+            selects.forEach(select => {
+                log(`  - ${select.name}: ID=${select.id}, Options=${select.options.length}`);
+            });
+        }
+        
+        function testHideForm() {
+            log('=== Testing Hide Form ===');
+            const form = document.querySelector('section[data-cb-name="cbTable"]');
+            if (form) {
+                form.style.position = 'absolute';
+                form.style.left = '-9999px';
+                form.style.top = '-9999px';
+                log('Form hidden successfully');
+            } else {
+                log('ERROR: Form not found');
+            }
+        }
+        
+        function testShowForm() {
+            log('=== Testing Show Form ===');
+            const form = document.querySelector('section[data-cb-name="cbTable"]');
+            if (form) {
+                form.style.position = 'static';
+                form.style.left = 'auto';
+                form.style.top = 'auto';
+                log('Form shown successfully');
+            } else {
+                log('ERROR: Form not found');
+            }
+        }
+        
+        function manualInit() {
+            log('=== Manual Initialize ===');
+            if (typeof initializeModernSearch === 'function') {
+                log('Calling initializeModernSearch()...');
+                initializeModernSearch();
+                log('Done!');
+            } else {
+                log('ERROR: initializeModernSearch function not found');
+                log('Trying window scope...');
+                if (window.initializeModernSearch) {
+                    window.initializeModernSearch();
+                    log('Done!');
+                } else {
+                    log('ERROR: Function not available in window scope either');
+                }
+            }
+        }
+        
+        function clearDebug() {
+            document.getElementById('debugOutput').innerHTML = '';
+        }
+        
+        // Auto-check after page loads
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                log('=== Page Load Complete ===');
+                checkCaspioForm();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
