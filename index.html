@@ -1199,18 +1199,35 @@
         }
         
         function setupResultObserver() {
-            const targetNode = document.querySelector('#cbOuterAjaxCtnr_1d2e38bf703c02') || document.body;
+            let debounceTimer = null;
             
             observer = new MutationObserver((mutations) => {
-                const resultItems = document.querySelectorAll('[data-cb-name="data-row"]');
-                if (resultItems.length > 0 && isSearching) {
-                    console.log(`[Sales Tool] Found ${resultItems.length} results`);
-                    processResults(resultItems);
-                    isSearching = false;
-                }
+                if (!isSearching) return;
+                
+                // Clear any existing timer
+                if (debounceTimer) clearTimeout(debounceTimer);
+                
+                // Debounce to avoid processing multiple times
+                debounceTimer = setTimeout(() => {
+                    const resultItems = document.querySelectorAll('[data-cb-name="data-row"]');
+                    if (resultItems.length > 0 && isSearching) {
+                        console.log(`[Sales Tool] Found ${resultItems.length} results`);
+                        processResults(resultItems);
+                        isSearching = false;
+                    } else {
+                        // Check for no results
+                        const noResults = document.querySelector('.cbResultSetInfoMessage');
+                        if (noResults && noResults.textContent.includes('No records')) {
+                            console.log('[Sales Tool] No results found');
+                            document.getElementById('resultsGrid').innerHTML = '<div class="loading">No products found</div>';
+                            document.getElementById('resultsCount').textContent = '0 items found';
+                            isSearching = false;
+                        }
+                    }
+                }, 500); // Wait 500ms for results to stabilize
             });
             
-            observer.observe(targetNode, {
+            observer.observe(document.body, {
                 childList: true,
                 subtree: true
             });
@@ -1308,49 +1325,21 @@
                 // Find lowest price
                 let lowestPrice = Infinity;
                 
-                // Check different possible price structures
+                // The API returns prices per size, so we need to find the lowest
                 if (data.prices && typeof data.prices === 'object') {
-                    Object.values(data.prices).forEach(price => {
-                        if (price > 0 && price < lowestPrice) {
-                            lowestPrice = price;
+                    const allPrices = Object.values(data.prices);
+                    if (allPrices.length > 0) {
+                        // Filter out any non-numeric values and find the minimum
+                        const validPrices = allPrices.filter(price => typeof price === 'number' && price > 0);
+                        if (validPrices.length > 0) {
+                            lowestPrice = Math.min(...validPrices);
                         }
-                    });
-                } else if (data.price && data.price > 0) {
-                    lowestPrice = data.price;
-                } else if (data.basePrice && data.basePrice > 0) {
-                    lowestPrice = data.basePrice;
-                } else if (Array.isArray(data) && data.length > 0 && data[0].price) {
-                    lowestPrice = data[0].price;
+                    }
                 }
                 
-                if (lowestPrice === Infinity) {
-                    // Debug: Show the full data structure
-                    console.log(`[Sales Tool] Price data for ${styleNumber}:`, JSON.stringify(data, null, 2));
-                    
-                    // Try to find any numeric value in prices object
-                    if (data.prices) {
-                        const priceEntries = Object.entries(data.prices);
-                        console.log(`[Sales Tool] Price entries:`, priceEntries);
-                        
-                        // Look for any numeric values, even if nested
-                        for (const [key, value] of priceEntries) {
-                            if (typeof value === 'number' && value > 0) {
-                                lowestPrice = value;
-                                break;
-                            } else if (typeof value === 'object' && value !== null) {
-                                // Check nested objects
-                                const nestedPrices = Object.values(value).filter(v => typeof v === 'number' && v > 0);
-                                if (nestedPrices.length > 0) {
-                                    lowestPrice = Math.min(...nestedPrices);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    
-                    if (lowestPrice === Infinity) {
-                        throw new Error('No valid price found');
-                    }
+                if (lowestPrice === Infinity || lowestPrice <= 0) {
+                    console.error(`[Sales Tool] No valid price found for ${styleNumber}`);
+                    throw new Error('No valid price found');
                 }
                 
                 // Apply formula: (price / 0.60) + 15
