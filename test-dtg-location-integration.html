@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test DTG Location Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2e5827;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #2e5827;
+        }
+        .test-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #2e5827;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        .test-button:hover {
+            background: #1b4118;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .checklist li:before {
+            content: "☐ ";
+            color: #666;
+            font-weight: bold;
+        }
+        .before-after {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .comparison-box {
+            padding: 20px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+        .comparison-box h3 {
+            margin-top: 0;
+        }
+        .before {
+            background: #fee;
+            border-color: #fcc;
+        }
+        .after {
+            background: #efe;
+            border-color: #cfc;
+        }
+        .code-snippet {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>DTG Print Location Integration Test</h1>
+        
+        <!-- Overview -->
+        <div class="test-section">
+            <h2>🎯 Test Overview</h2>
+            <p>This page tests the new DTG page with integrated location selector in the Quick Quote Calculator.</p>
+            
+            <div class="before-after">
+                <div class="comparison-box before">
+                    <h3>❌ Before (Problems)</h3>
+                    <ul>
+                        <li>Location selector buried in middle of page</li>
+                        <li>Shows embroidery terms ("8,000 stitches")</li>
+                        <li>Complex quote builder system</li>
+                        <li>Disconnected pricing flow</li>
+                    </ul>
+                </div>
+                <div class="comparison-box after">
+                    <h3>✅ After (Solutions)</h3>
+                    <ul>
+                        <li>Location selector at top of Quick Quote</li>
+                        <li>DTG-specific language</li>
+                        <li>Simple call-to-action buttons</li>
+                        <li>Integrated pricing flow</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Links -->
+        <div class="test-section">
+            <h2>🔗 Test Links</h2>
+            <p>Click these links to test different scenarios:</p>
+            
+            <a href="/dtg-pricing.html?style=PC54&color=Navy" class="test-button">
+                Test PC54 Navy
+            </a>
+            <a href="/dtg-pricing.html?style=G500&color=Black" class="test-button">
+                Test G500 Black
+            </a>
+            <a href="/dtg-pricing.html?style=4830&color=Pacific%20Blue" class="test-button">
+                Test 4830 Pacific Blue
+            </a>
+        </div>
+        
+        <!-- Test Checklist -->
+        <div class="test-section">
+            <h2>✓ Test Checklist</h2>
+            <p>Verify each of these items on the DTG page:</p>
+            
+            <ul class="checklist">
+                <li><strong>Location Selector Position:</strong> Should be inside Quick Quote at the top as "Step 1"</li>
+                <li><strong>Quantity Input:</strong> Should be labeled as "Step 2" when location selector is present</li>
+                <li><strong>No Embroidery Terms:</strong> Should NOT see "stitches" anywhere</li>
+                <li><strong>Location Options:</strong> All 8 locations should be in dropdown with upcharge indicators</li>
+                <li><strong>Price Updates:</strong> Selecting different locations should update pricing instantly</li>
+                <li><strong>Breakdown Display:</strong> Should show "Left Chest printing (4" x 4")" not "Front logo (8,000 stitches)"</li>
+                <li><strong>No Quote Builder:</strong> The complex quote builder section should be removed</li>
+                <li><strong>Simple CTA:</strong> Just "Call" and "Email" buttons at bottom</li>
+                <li><strong>Pricing Grid:</strong> Should update when location changes</li>
+                <li><strong>Mobile Responsive:</strong> Test on mobile view - location selector should be full width</li>
+            </ul>
+        </div>
+        
+        <!-- Code Changes -->
+        <div class="test-section">
+            <h2>💻 Key Changes Made</h2>
+            
+            <h3>1. DTG Config Updated</h3>
+            <div class="code-snippet">
+quickQuote: {
+    showLocationSelector: true,  // Now integrated
+    defaultLocation: 'LC',       // Default to Left Chest
+}</div>
+            
+            <h3>2. Quick Quote Calculator Enhanced</h3>
+            <div class="code-snippet">
+// Added location selector HTML generation
+// Added handleLocationChange method
+// Modified updateBreakdown for DTG-specific display
+// Added location upcharge to pricing calculations</div>
+            
+            <h3>3. DTG Integration Updated</h3>
+            <div class="code-snippet">
+// Added getDTGPricingBreakdown method
+// Connected location changes to pricing updates
+// Removed standalone location selector initialization</div>
+            
+            <h3>4. Simplified HTML</h3>
+            <div class="code-snippet">
+// Removed standalone location selector
+// Removed complex quote builder section
+// Added simple CTA section with contact buttons</div>
+        </div>
+        
+        <!-- Common Issues -->
+        <div class="test-section">
+            <h2>⚠️ Potential Issues to Check</h2>
+            <ul>
+                <li><strong>Default Location:</strong> Should default to "Left Chest Only" on page load</li>
+                <li><strong>Empty Location:</strong> Pricing should still work if no location selected</li>
+                <li><strong>Price Sync:</strong> Quick Quote and Pricing Grid should show same prices</li>
+                <li><strong>Loading States:</strong> Should handle loading gracefully when switching locations</li>
+                <li><strong>Browser Compatibility:</strong> Test in Chrome, Firefox, Safari, Edge</li>
+            </ul>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="test-section">
+            <h2>🚀 Quick Actions</h2>
+            
+            <a href="/dtg-pricing.html" class="test-button">
+                Open DTG Page (No Params)
+            </a>
+            
+            <a href="javascript:void(0)" onclick="window.open('/dtg-pricing.html?style=G500&color=Black', 'dtg', 'width=375,height=812')" class="test-button">
+                Test Mobile View
+            </a>
+            
+            <a href="javascript:void(0)" onclick="comparePages()" class="test-button">
+                Compare Before/After
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        function comparePages() {
+            const width = window.screen.width;
+            const height = window.screen.height;
+            const halfWidth = width / 2;
+            
+            // Open backup (before) on left
+            window.open('/dtg-pricing-backup.html?style=G500&color=Black', 
+                'before', 
+                `width=${halfWidth},height=${height},left=0,top=0`);
+            
+            // Open current (after) on right
+            window.open('/dtg-pricing.html?style=G500&color=Black', 
+                'after', 
+                `width=${halfWidth},height=${height},left=${halfWidth},top=0`);
+        }
+        
+        // Add click handlers to checklist items
+        document.querySelectorAll('.checklist li').forEach(item => {
+            item.style.cursor = 'pointer';
+            item.addEventListener('click', function() {
+                if (this.textContent.startsWith('☐')) {
+                    this.textContent = '✓' + this.textContent.substring(1);
+                    this.style.background = '#e8f5e9';
+                    this.style.borderColor = '#4caf50';
+                } else if (this.textContent.startsWith('✓')) {
+                    this.textContent = '☐' + this.textContent.substring(1);
+                    this.style.background = 'white';
+                    this.style.borderColor = '#ddd';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

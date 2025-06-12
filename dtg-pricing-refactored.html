@@ -42,22 +42,60 @@
             
             <!-- Right Column: Interactive Elements -->
             <div class="product-interactive-column">
-                <!-- Quick Quote Calculator with integrated location selector -->
+                <!-- Quick Quote Calculator -->
                 <div id="quick-quote-container"></div>
+                
+                <!-- Location Selector -->
+                <div class="location-selector-container">
+                    <label for="parent-dtg-location-select" class="location-selector-label">
+                        Select Print Location
+                    </label>
+                    <select id="parent-dtg-location-select">
+                        <option value="">-- Choose Location --</option>
+                    </select>
+                    <div class="location-helper-text" id="location-helper" style="display: none;"></div>
+                </div>
                 
                 <!-- Pricing Grid Container -->
                 <div id="pricing-grid-container"></div>
                 
-                <!-- Call to Action -->
-                <div class="dtg-cta-section">
-                    <h3>Ready to Order?</h3>
-                    <p>Contact us for a custom quote with your exact specifications.</p>
+                <!-- DTG Quote System -->
+                <div class="dtg-quote-section">
+                    <div class="dtg-quote-header">
+                        <h3 class="dtg-quote-title">Build Your Quote</h3>
+                        <div class="dtg-quote-actions">
+                            <button class="dtg-action-btn secondary" id="save-quote-btn">
+                                💾 Save
+                            </button>
+                            <button class="dtg-action-btn secondary" id="export-pdf-btn">
+                                📄 PDF
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Size Distribution Grid -->
+                    <div id="size-quantity-grid-container">
+                        <h4 style="margin-top: 0; color: var(--primary-color);">Enter Quantities by Size</h4>
+                        <div id="size-quantity-grid" class="dtg-size-grid">
+                            <!-- Will be populated by DTG quote system -->
+                        </div>
+                    </div>
+                    
+                    <!-- Quote Summary -->
+                    <div id="quote-container" class="quote-section" style="margin-top: 20px;">
+                        <div id="quote-items-list"></div>
+                        <div id="quote-subtotal"></div>
+                        <div id="quote-ltm" class="ltm-row" style="display: none;"></div>
+                        <div id="quote-total"></div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
                     <div class="dtg-quick-actions">
-                        <button class="dtg-action-btn primary" onclick="window.location.href='tel:253-922-5793'">
-                            📞 Call: 253-922-5793
+                        <button class="dtg-action-btn primary" id="add-to-quote-btn">
+                            ➕ Add to Quote
                         </button>
-                        <button class="dtg-action-btn secondary" onclick="window.location.href='mailto:sales@nwcustomapparel.com?subject=DTG Quote Request'">
-                            ✉️ Email Quote
+                        <button class="dtg-action-btn secondary" id="clear-quote-btn">
+                            🗑️ Clear Quote
                         </button>
                     </div>
                 </div>
@@ -68,10 +106,6 @@
         <div id="pricing-calculator" style="display:none !important; position: absolute; left: -9999px;">
             <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150002eb9491a50104c1d99d7/emb"></script>
         </div>
-        
-        <!-- Hidden elements for quote system compatibility -->
-        <div id="size-quantity-grid-container" style="display: none;"></div>
-        <div id="quote-container" style="display: none;"></div>
     </div>
     
     <!-- Core JavaScript -->
@@ -87,6 +121,7 @@
     <script src="/shared_components/js/dtg-page-setup.js"></script>
     <script src="/shared_components/js/dtg-adapter.js"></script>
     <script src="/shared_components/js/pricing-fallback-adapter.js"></script>
+    <script src="/shared_components/js/dtg-quote-system.js"></script>
     
     <!-- Universal Components -->
     <script src="/shared_components/js/universal-header-component.js"></script>

@@ -32,7 +32,8 @@ class UniversalQuickQuoteCalculator {
             unitPrice: 0,
             totalPrice: 0,
             sizeGroups: [],
-            currentTier: null
+            currentTier: null,
+            selectedLocation: this.config.defaultLocation || ''
         };
 
         // Initialize
@@ -75,6 +76,12 @@ class UniversalQuickQuoteCalculator {
 
         // Setup event listeners
         this.setupEventListeners();
+        
+        // Set default location if provided
+        if (this.elements.locationSelect && this.config.defaultLocation) {
+            this.elements.locationSelect.value = this.config.defaultLocation;
+            this.state.selectedLocation = this.config.defaultLocation;
+        }
 
         // Initial update
         this.updatePricing();
@@ -82,14 +89,31 @@ class UniversalQuickQuoteCalculator {
 
     generateHTML() {
         const isCapEmbroidery = this.config.pageType === 'cap-embroidery';
+        const isDTG = this.config.pageType === 'dtg';
         
         return `
             <div class="quick-quote">
                 <h2>Quick Quote Calculator</h2>
-                <p class="quick-quote-subtitle">Enter quantity for instant pricing</p>
+                <p class="quick-quote-subtitle">${isDTG && this.config.showLocationSelector ? 'Select location and quantity for instant pricing' : 'Enter quantity for instant pricing'}</p>
+                
+                ${this.config.showLocationSelector && this.config.locations ? `
+                <!-- Location Selector for DTG -->
+                <div class="location-selector-group">
+                    <label for="dtg-location-select" class="location-label">Step 1: Select Print Location</label>
+                    <select id="dtg-location-select" class="location-select">
+                        <option value="">-- Choose Print Location --</option>
+                        ${Object.entries(this.config.locations).map(([code, location]) => `
+                            <option value="${code}" data-upcharge="${location.upcharge || 0}">
+                                ${location.name}${location.upcharge ? ` (+$${location.upcharge.toFixed(2)})` : ''}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+                ` : ''}
                 
                 <!-- Quantity Input -->
                 <div class="quantity-input-group">
+                    ${isDTG && this.config.showLocationSelector ? '<label class="quantity-label-text">Step 2: Enter Quantity</label>' : ''}
                     <button class="quantity-btn" id="decrease-btn">−</button>
                     <input type="number" class="quantity-input" id="quantity-input" value="${this.state.quantity}" min="1" max="10000">
                     <button class="quantity-btn" id="increase-btn">+</button>
@@ -124,12 +148,21 @@ class UniversalQuickQuoteCalculator {
                 <div class="quick-select">
                     <span class="quick-select-label">Quick select:</span>
                     <div class="quick-select-grid">
+                        ${isDTG ? `
+                        <button class="quick-select-btn" data-quantity="12">1 Dozen</button>
+                        <button class="quick-select-btn" data-quantity="24">2 Dozen</button>
+                        <button class="quick-select-btn" data-quantity="36">3 Dozen</button>
+                        <button class="quick-select-btn" data-quantity="48">4 Dozen</button>
+                        <button class="quick-select-btn" data-quantity="72">6 Dozen</button>
+                        <button class="quick-select-btn" data-quantity="144">12 Dozen</button>
+                        ` : `
                         <button class="quick-select-btn" data-quantity="24">2 Dozen</button>
                         <button class="quick-select-btn" data-quantity="36">3 Dozen</button>
                         <button class="quick-select-btn" data-quantity="48">4 Dozen</button>
                         <button class="quick-select-btn" data-quantity="72">6 Dozen</button>
                         <button class="quick-select-btn" data-quantity="144">12 Dozen</button>
                         <button class="quick-select-btn" data-quantity="288">24 Dozen</button>
+                        `}
                     </div>
                 </div>
             </div>
@@ -149,7 +182,8 @@ class UniversalQuickQuoteCalculator {
             savingsTipText: document.getElementById('savings-tip-text'),
             ltmWarning: document.getElementById('ltm-warning'),
             ltmWarningText: document.getElementById('ltm-warning-text'),
-            quickSelectBtns: document.querySelectorAll('.quick-select-btn')
+            quickSelectBtns: document.querySelectorAll('.quick-select-btn'),
+            locationSelect: document.getElementById('dtg-location-select')
         };
     }
 
@@ -163,6 +197,24 @@ class UniversalQuickQuoteCalculator {
         this.elements.quickSelectBtns.forEach(btn => {
             btn.addEventListener('click', (e) => this.setQuantity(parseInt(e.target.dataset.quantity)));
         });
+        
+        // Location selector (for DTG)
+        if (this.elements.locationSelect) {
+            this.elements.locationSelect.addEventListener('change', (e) => this.handleLocationChange(e.target.value));
+        }
+    }
+    
+    handleLocationChange(locationCode) {
+        console.log('[QuickQuote] Location changed to:', locationCode);
+        this.state.selectedLocation = locationCode;
+        
+        // Call the onLocationChange callback if provided
+        if (this.config.onLocationChange) {
+            this.config.onLocationChange(locationCode);
+        }
+        
+        // Update pricing with new location
+        this.updatePricing();
     }
 
     updateQuantity(delta) {
@@ -385,17 +437,28 @@ class UniversalQuickQuoteCalculator {
         // Calculate additional costs
         let additionalCosts = 0;
 
-        // Primary logo overage (if over included stitches)
-        if (this.state.primaryStitches > this.config.includedStitches) {
+        // DTG location upcharge
+        if (this.config.pageType === 'dtg' && this.state.selectedLocation && this.config.locations) {
+            const location = this.config.locations[this.state.selectedLocation];
+            if (location && location.upcharge) {
+                additionalCosts += location.upcharge;
+            }
+        }
+
+        // Primary logo overage (if over included stitches) - only for embroidery
+        if ((this.config.pageType === 'embroidery' || this.config.pageType === 'cap-embroidery') && 
+            this.state.primaryStitches > this.config.includedStitches) {
             const extraThousands = (this.state.primaryStitches - this.config.includedStitches) / 1000;
             additionalCosts += extraThousands * this.config.pricePerThousandStitches;
         }
 
-        // Additional logos
-        const additionalLogoCost = this.state.additionalLogos.reduce((sum, logo) => {
-            return sum + (logo.stitches / 1000 * this.config.pricePerThousandStitches);
-        }, 0);
-        additionalCosts += additionalLogoCost;
+        // Additional logos - only for embroidery
+        if (this.config.pageType === 'embroidery' || this.config.pageType === 'cap-embroidery') {
+            const additionalLogoCost = this.state.additionalLogos.reduce((sum, logo) => {
+                return sum + (logo.stitches / 1000 * this.config.pricePerThousandStitches);
+            }, 0);
+            additionalCosts += additionalLogoCost;
+        }
 
         // LTM fee if applicable
         let ltmFeePerUnit = 0;
@@ -449,76 +512,112 @@ class UniversalQuickQuoteCalculator {
     updateBreakdown() {
         let html = '';
 
-        // Base price
-        html += `
-            <div class="breakdown-item">
-                <span class="breakdown-label">Base ${this.config.unitLabel.slice(0, -1)} price:</span>
-                <span class="breakdown-value">$${this.state.basePrice.toFixed(2)}</span>
-            </div>
-        `;
-
-        // Size inclusions
-        const baseSizes = this.state.sizeGroups.find(g => g.upcharge === 0);
-        if (baseSizes) {
-            html += `
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Includes sizes:</span>
-                    <span class="breakdown-value">${baseSizes.sizes}</span>
-                </div>
-            `;
-        }
-
-        // Size upcharges
-        const upcharges = this.state.sizeGroups.filter(g => g.upcharge > 0);
-        if (upcharges.length > 0) {
-            html += `
-                <div class="breakdown-item" style="margin-top: 8px;">
-                    <span class="breakdown-label">Size upcharges:</span>
-                </div>
-            `;
+        // Use custom breakdown for DTG if provided
+        if (this.config.customPricingBreakdown && this.config.pageType === 'dtg') {
+            const breakdownItems = this.config.customPricingBreakdown(this.state.quantity, this.state.selectedLocation);
             
-            upcharges.forEach(group => {
+            breakdownItems.forEach(item => {
                 html += `
-                    <div class="breakdown-item" style="padding-left: 20px;">
-                        <span class="breakdown-label">• ${group.sizes}:</span>
-                        <span class="breakdown-value">add $${group.upcharge.toFixed(2)}</span>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">${item.label}:</span>
+                        <span class="breakdown-value">${item.formatted}</span>
                     </div>
                 `;
             });
-        }
-
-        // Front logo
-        if (this.config.showPrimaryStitchCount) {
-            const primaryCost = this.state.primaryStitches > this.config.includedStitches ? 
-                `+$${((this.state.primaryStitches - this.config.includedStitches) / 1000 * this.config.pricePerThousandStitches).toFixed(2)}` : 
-                'included';
             
-            html += `
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Front logo (${this.state.primaryStitches.toLocaleString()} stitches):</span>
-                    <span class="breakdown-value">${primaryCost}</span>
-                </div>
-            `;
+            // Size upcharges (if any)
+            const upcharges = this.state.sizeGroups.filter(g => g.upcharge > 0);
+            if (upcharges.length > 0) {
+                html += `
+                    <div class="breakdown-item" style="margin-top: 8px;">
+                        <span class="breakdown-label">Size upcharges:</span>
+                    </div>
+                `;
+                
+                upcharges.forEach(group => {
+                    html += `
+                        <div class="breakdown-item" style="padding-left: 20px;">
+                            <span class="breakdown-label">• ${group.sizes}:</span>
+                            <span class="breakdown-value">add $${group.upcharge.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+            }
         } else {
+            // Default breakdown for non-DTG pages
+            // Base price
             html += `
                 <div class="breakdown-item">
-                    <span class="breakdown-label">Front logo (${this.config.includedStitches.toLocaleString()} stitches):</span>
-                    <span class="breakdown-value">included</span>
+                    <span class="breakdown-label">Base ${this.config.unitLabel.slice(0, -1)} price:</span>
+                    <span class="breakdown-value">$${this.state.basePrice.toFixed(2)}</span>
                 </div>
             `;
+
+            // Size inclusions
+            const baseSizes = this.state.sizeGroups.find(g => g.upcharge === 0);
+            if (baseSizes) {
+                html += `
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Includes sizes:</span>
+                        <span class="breakdown-value">${baseSizes.sizes}</span>
+                    </div>
+                `;
+            }
+
+            // Size upcharges
+            const upcharges = this.state.sizeGroups.filter(g => g.upcharge > 0);
+            if (upcharges.length > 0) {
+                html += `
+                    <div class="breakdown-item" style="margin-top: 8px;">
+                        <span class="breakdown-label">Size upcharges:</span>
+                    </div>
+                `;
+                
+                upcharges.forEach(group => {
+                    html += `
+                        <div class="breakdown-item" style="padding-left: 20px;">
+                            <span class="breakdown-label">• ${group.sizes}:</span>
+                            <span class="breakdown-value">add $${group.upcharge.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            // Front logo (only for embroidery pages)
+            if (this.config.pageType === 'embroidery' || this.config.pageType === 'cap-embroidery') {
+                if (this.config.showPrimaryStitchCount) {
+                    const primaryCost = this.state.primaryStitches > this.config.includedStitches ? 
+                        `+$${((this.state.primaryStitches - this.config.includedStitches) / 1000 * this.config.pricePerThousandStitches).toFixed(2)}` : 
+                        'included';
+                    
+                    html += `
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Front logo (${this.state.primaryStitches.toLocaleString()} stitches):</span>
+                            <span class="breakdown-value">${primaryCost}</span>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Front logo (${this.config.includedStitches.toLocaleString()} stitches):</span>
+                            <span class="breakdown-value">included</span>
+                        </div>
+                    `;
+                }
+
+                // Additional logos
+                this.state.additionalLogos.forEach((logo, index) => {
+                    html += `
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Additional logo ${index + 1} (${logo.stitches.toLocaleString()} stitches):</span>
+                            <span class="breakdown-value">+$${(logo.stitches / 1000 * this.config.pricePerThousandStitches).toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+            }
         }
 
-        // Additional logos
-        this.state.additionalLogos.forEach((logo, index) => {
-            html += `
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Additional logo ${index + 1} (${logo.stitches.toLocaleString()} stitches):</span>
-                    <span class="breakdown-value">+$${(logo.stitches / 1000 * this.config.pricePerThousandStitches).toFixed(2)}</span>
-                </div>
-            `;
-        });
-
-        // LTM fee
+        // LTM fee (applies to all page types)
         if (this.state.quantity < this.config.ltmThreshold) {
             html += `
                 <div class="breakdown-item">
