@@ -378,11 +378,13 @@
             margin-top: 5px;
         }
     </style>
-    <!-- Quote System Styles -->
-    <link rel="stylesheet" href="/shared_components/css/quote-system.css">
-    <!-- jsPDF Libraries for PDF Generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <!-- Screen Print Specific Styles -->
+    <style>
+        /* Hide legacy controls that are replaced by new interface */
+        #color-select, #additional-logo-checkbox {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div id="universal-header-container" data-page-type="screenprint"></div>
@@ -418,24 +420,18 @@
                         <p>Pricing information is currently unavailable. Please try again later or contact support.</p>
                     </div>
 
-                    <!-- Screen Print Specific Controls -->
-                    <div class="embellishment-controls-container" style="margin-bottom: 20px; padding: 15px; background-color: var(--background-light, #f8f9fa); border-radius: var(--radius-sm); display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
-                        <div>
-                            <label for="color-select" style="margin-right: 8px; font-weight: bold; font-size: 1em;">Number of Print Colors:</label>
-                            <select id="color-select" name="color-select" style="padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 0.9em; min-width: 150px;">
-                                <option value="">-- Select --</option>
-                                <option value="1">1 Color</option>
-                                <option value="2">2 Colors</option>
-                                <option value="3">3 Colors</option>
-                                <option value="4">4 Colors</option>
-                                <option value="5">5 Colors</option>
-                                <option value="6">6 Colors</option>
-                            </select>
-                        </div>
-                        <div>
-                            <input type="checkbox" id="additional-logo-checkbox" name="additional-logo-checkbox" style="margin-right: 5px;">
-                            <label for="additional-logo-checkbox" style="font-weight: bold; font-size: 1em;">Add Second Location Print?</label>
-                        </div>
+                    <!-- Legacy controls - hidden but kept for compatibility -->
+                    <div style="display: none;">
+                        <select id="color-select" name="color-select">
+                            <option value="">-- Select --</option>
+                            <option value="1">1 Color</option>
+                            <option value="2">2 Colors</option>
+                            <option value="3">3 Colors</option>
+                            <option value="4">4 Colors</option>
+                            <option value="5">5 Colors</option>
+                            <option value="6">6 Colors</option>
+                        </select>
+                        <input type="checkbox" id="additional-logo-checkbox" name="additional-logo-checkbox">
                     </div>
                     
                     <div class="pricing-section">
@@ -560,9 +556,9 @@
                         </div>
                     </div>
                     
-                    <!-- Screen Print Quote System Integration -->
+                    <!-- Screen Print Pricing Interface -->
                     <div id="add-to-cart-section">
-                        <!-- Quote system will be initialized by screenprint-quote-adapter.js -->
+                        <!-- Interface will be initialized by screenprint-integration.js -->
                     </div>
                 </div>
             </div>
@@ -661,12 +657,14 @@
     <script src="/shared_components/js/pricing-pages.js"></script>
     <script src="/shared_components/js/pricing-matrix-capture.js"></script>
     <script src="/shared_components/js/pricing-matrix-api.js"></script>
-    <script src="/shared_components/js/screenprint-adapter.js"></script>
     <script src="/shared_components/js/product-pricing-ui.js"></script>
     <script src="/shared_components/js/pricing-calculator.js"></script>
-    <script src="/shared_components/js/order-form-pdf.js"></script>
-    <script src="/shared_components/js/quote-adapter-base.js"></script>
-    <script src="/shared_components/js/screenprint-quote-adapter.js"></script>
+    
+    <!-- Screen Print Modular Components -->
+    <script src="/shared_components/js/screenprint-config.js"></script>
+    <script src="/shared_components/js/screenprint-calculator.js"></script>
+    <script src="/shared_components/js/screenprint-adapter.js"></script>
+    <script src="/shared_components/js/screenprint-integration.js"></script>
     
     <!-- Enhanced Loading Experience -->
     <script src="/shared_components/js/screenprint-enhanced-loading.js"></script>
