@@ -421,6 +421,16 @@ class UniversalProductDisplay {
             }, 100);
         }
     }
+    
+    // Update info box content dynamically
+    updateInfoBox(content) {
+        const infoBox = this.container.querySelector('.upd-info-box p');
+        if (infoBox) {
+            infoBox.textContent = content;
+        } else {
+            console.warn('[UniversalProductDisplay] Info box element not found');
+        }
+    }
 }
 
 // Export for use

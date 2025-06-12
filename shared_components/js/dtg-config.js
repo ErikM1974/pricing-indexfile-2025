@@ -22,45 +22,61 @@ const DTGConfig = {
         'FF': {
             name: 'Full Front Only',
             displayName: 'Full Front',
-            description: 'Large front print area (12" x 12" max)',
-            maxSize: '12" x 12"'
+            description: 'Large front print area (12" x 16" max)',
+            maxSize: '12" x 16"'
         },
         'FB': {
             name: 'Full Back Only',
             displayName: 'Full Back',
-            description: 'Large back print area (12" x 12" max)',
-            maxSize: '12" x 12"'
+            description: 'Large back print area (12" x 16" max)',
+            maxSize: '12" x 16"'
         },
         'JF': {
             name: 'Jumbo Front Only',
             displayName: 'Jumbo Front',
-            description: 'Extra large front print (14" x 16" max)',
-            maxSize: '14" x 16"'
+            description: 'Extra large front print (16" x 20" max)',
+            maxSize: '16" x 20"'
         },
         'JB': {
             name: 'Jumbo Back Only',
             displayName: 'Jumbo Back',
-            description: 'Extra large back print (14" x 16" max)',
-            maxSize: '14" x 16"'
+            description: 'Extra large back print (16" x 20" max)',
+            maxSize: '16" x 20"'
         },
         'LC_FB': {
             name: 'Left Chest + Full Back',
             displayName: 'Left Chest + Full Back',
             description: 'Combination front and back prints',
-            combo: true
+            combo: true,
+            maxSize: 'LC: 4" x 4", FB: 12" x 16"'
         },
         'FF_FB': {
             name: 'Full Front + Full Back',
             displayName: 'Full Front + Full Back',
             description: 'Large prints on both sides',
-            combo: true
+            combo: true,
+            maxSize: 'FF: 12" x 16", FB: 12" x 16"'
         },
         'JF_JB': {
             name: 'Jumbo Front + Jumbo Back',
             displayName: 'Jumbo Front + Jumbo Back',
             description: 'Maximum coverage both sides',
-            combo: true
+            combo: true,
+            maxSize: 'JF: 16" x 20", JB: 16" x 20"'
         }
+    },
+    
+    // Print size reference (for dynamic locations from Caspio)
+    printSizes: {
+        'LC': '4" x 4"',
+        'FF': '12" x 16"',
+        'FB': '12" x 16"',
+        'JF': '16" x 20"',
+        'JB': '16" x 20"',
+        'LC_FB': 'LC: 4" x 4", FB: 12" x 16"',
+        'LC_JB': 'LC: 4" x 4", JB: 16" x 20"',
+        'FF_FB': 'FF: 12" x 16", FB: 12" x 16"',
+        'JF_JB': 'JF: 16" x 20", JB: 16" x 20"'
     },
     
     // Pricing configurations

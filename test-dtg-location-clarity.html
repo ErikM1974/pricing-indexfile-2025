@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Location Clarity Test</title>
+    <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
+    <link rel="stylesheet" href="/shared_components/css/dtg-specific.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #2e5827;
+        }
+        
+        .feature-list {
+            background: #e8f5e9;
+            border-left: 4px solid #2e5827;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .feature-list ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .feature-list li {
+            margin: 8px 0;
+        }
+        
+        .arrow {
+            color: #2e5827;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+        
+        .mockup-container {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .before-after {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison-box {
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .comparison-box.before {
+            background: #fff3e0;
+        }
+        
+        .comparison-box.after {
+            background: #e8f5e9;
+        }
+        
+        @media (max-width: 768px) {
+            .before-after {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="dtg-pricing-page">
+    <h1>DTG Location Clarity Improvements</h1>
+    
+    <div class="demo-section">
+        <h2>What's New: 4 Ways to See Selected Location</h2>
+        
+        <div class="feature-list">
+            <h3>✨ Visual Improvements</h3>
+            <ul>
+                <li><strong>Selected Location Badge</strong> - Shows below dropdown with icon 📍</li>
+                <li><strong>Quick Quote Title Update</strong> - "Quick Quote: Left Chest + Jumbo Back"</li>
+                <li><strong>Enhanced Info Box</strong> - Prominent display with location icon</li>
+                <li><strong>Styled Dropdown</strong> - Better visual feedback when selecting</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>Live Demo</h2>
+        
+        <div class="mockup-container">
+            <!-- Quick Quote Section -->
+            <div class="quick-quote" style="max-width: 600px; margin: 0 auto;">
+                <h2 id="quick-quote-title">Quick Quote Calculator</h2>
+                <p class="quick-quote-subtitle" id="quick-quote-subtitle">Select location and quantity for instant pricing</p>
+                
+                <!-- Location Selector -->
+                <div class="location-selector-group">
+                    <label for="demo-location" class="location-label">Step 1: Select Print Location</label>
+                    <select id="demo-location" class="location-select" onchange="updateLocationDisplay(this.value)">
+                        <option value="">-- Choose Print Location --</option>
+                        <option value="LC">Left Chest Only</option>
+                        <option value="FF">Full Front Only</option>
+                        <option value="FB">Full Back Only</option>
+                        <option value="JB">Jumbo Back Only</option>
+                        <option value="LC_JB">Left Chest + Jumbo Back</option>
+                    </select>
+                    <div class="selected-location-display" id="selected-location-display" style="display: none;">
+                        <span class="location-icon">📍</span>
+                        <span class="location-text" id="selected-location-text"></span>
+                        <span class="location-size" id="selected-location-size"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Box Demo -->
+        <div class="upd-info-box" id="demo-info-box" style="display: none;">
+            <p id="info-box-text">Select a location to see info</p>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>Before vs After</h2>
+        
+        <div class="before-after">
+            <div class="comparison-box before">
+                <h4>❌ Before</h4>
+                <ul>
+                    <li>Just a dropdown selection</li>
+                    <li>No visual confirmation</li>
+                    <li>Easy to miss what's selected</li>
+                    <li>Info box was plain text</li>
+                </ul>
+            </div>
+            
+            <div class="comparison-box after">
+                <h4>✅ After</h4>
+                <ul>
+                    <li>Location badge with icon</li>
+                    <li>Title shows selected location</li>
+                    <li>Enhanced info box styling</li>
+                    <li>Animation on selection</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>Visual Flow</h2>
+        <p>User selects "Left Chest + Jumbo Back":</p>
+        <ol>
+            <li>Dropdown shows selection</li>
+            <li class="arrow">→</li>
+            <li>Badge appears: 📍 Left Chest + Jumbo Back (LC: 4" x 4", JB: 16" x 20")</li>
+            <li class="arrow">→</li>
+            <li>Title updates: "Quick Quote: <span style="background: #e8f5e9; padding: 2px 8px; border-radius: 4px; color: #2e5827; font-weight: bold;">Left Chest + Jumbo Back</span>"</li>
+            <li class="arrow">→</li>
+            <li>Info box shows: "Left Chest + Jumbo Back printing (LC: 4" x 4", JB: 16" x 20")"</li>
+        </ol>
+    </div>
+    
+    <script>
+        const sizes = {
+            'LC': '4" x 4"',
+            'FF': '12" x 16"',
+            'FB': '12" x 16"',
+            'JB': '16" x 20"',
+            'LC_JB': 'LC: 4" x 4", JB: 16" x 20"'
+        };
+        
+        function updateLocationDisplay(value) {
+            const dropdown = document.getElementById('demo-location');
+            const selectedOption = dropdown.options[dropdown.selectedIndex];
+            
+            if (value) {
+                // Update badge
+                const displayEl = document.getElementById('selected-location-display');
+                const textEl = document.getElementById('selected-location-text');
+                const sizeEl = document.getElementById('selected-location-size');
+                
+                displayEl.style.display = 'flex';
+                textEl.textContent = selectedOption.text;
+                sizeEl.textContent = sizes[value] ? `(${sizes[value]})` : '';
+                
+                // Animate
+                displayEl.classList.remove('location-updated');
+                void displayEl.offsetWidth;
+                displayEl.classList.add('location-updated');
+                
+                // Update title
+                const titleEl = document.getElementById('quick-quote-title');
+                titleEl.innerHTML = `Quick Quote: <span class="location-highlight">${selectedOption.text}</span>`;
+                
+                // Update subtitle
+                const subtitleEl = document.getElementById('quick-quote-subtitle');
+                subtitleEl.textContent = 'Enter quantity for instant pricing';
+                
+                // Update info box
+                const infoBox = document.getElementById('demo-info-box');
+                const infoText = document.getElementById('info-box-text');
+                infoBox.style.display = 'block';
+                infoText.textContent = `${selectedOption.text} printing${sizes[value] ? ` (${sizes[value]})` : ''}`;
+            }
+        }
+    </script>
+</body>
+</html>

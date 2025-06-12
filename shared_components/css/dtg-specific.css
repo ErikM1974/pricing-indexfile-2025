@@ -477,3 +477,213 @@
     margin-top: 8px;
     border-top: 2px solid var(--dtg-primary-light);
 }
+
+/* Selected Location Display */
+.selected-location-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border: 2px solid var(--dtg-primary);
+    border-radius: 8px;
+    font-weight: 600;
+    color: var(--dtg-primary-dark);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.selected-location-display.location-updated {
+    animation: pulse 0.5s ease-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.location-icon {
+    font-size: 20px;
+}
+
+.location-text {
+    font-size: 16px;
+    color: var(--dtg-primary-dark);
+}
+
+.location-size {
+    font-size: 14px;
+    color: #666;
+    font-weight: normal;
+}
+
+/* Quick Quote Title with Location */
+.location-highlight {
+    color: var(--dtg-primary);
+    background: var(--dtg-primary-light);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+
+/* Enhanced Location Dropdown */
+.dtg-pricing-page .location-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%232e5827' d='M10 12l-5-5h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+}
+
+.dtg-pricing-page .location-select:focus {
+    background-color: #f0f8f0;
+}
+
+/* Info Box Enhancement for DTG */
+.dtg-pricing-page .upd-info-box {
+    background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e9 100%);
+    border-left: 4px solid var(--dtg-primary);
+    padding: 16px 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--dtg-primary-dark);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.dtg-pricing-page .upd-info-box::before {
+    content: "📍";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    opacity: 0.3;
+}
+
+.dtg-pricing-page .upd-info-box p {
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Print Size Guide */
+.print-size-guide {
+    margin: 15px 0;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.size-guide-toggle {
+    width: 100%;
+    padding: 12px 15px;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--dtg-primary);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+}
+
+.size-guide-toggle:hover {
+    background: #f0f0f0;
+}
+
+.toggle-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 12px;
+}
+
+.print-size-guide.expanded .toggle-icon {
+    transform: rotate(90deg);
+}
+
+.size-guide-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.print-size-guide.expanded .size-guide-content {
+    max-height: 400px;
+}
+
+.size-guide-grid {
+    padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.size-guide-item {
+    padding: 10px 15px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.size-guide-item strong {
+    color: var(--dtg-primary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+    .size-guide-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        padding: 12px;
+    }
+    
+    .size-guide-item {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+    
+    /* Mobile adjustments for selected location */
+    .selected-location-display {
+        flex-wrap: wrap;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .location-text {
+        font-size: 14px;
+    }
+    
+    .location-size {
+        font-size: 12px;
+    }
+    
+    .location-highlight {
+        display: block;
+        margin-top: 4px;
+    }
+}

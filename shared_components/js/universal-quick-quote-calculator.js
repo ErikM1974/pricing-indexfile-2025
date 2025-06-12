@@ -93,8 +93,8 @@ class UniversalQuickQuoteCalculator {
         
         return `
             <div class="quick-quote">
-                <h2>Quick Quote Calculator</h2>
-                <p class="quick-quote-subtitle">${isDTG && this.config.showLocationSelector ? 'Select location and quantity for instant pricing' : 'Enter quantity for instant pricing'}</p>
+                <h2 id="quick-quote-title">Quick Quote Calculator</h2>
+                <p class="quick-quote-subtitle" id="quick-quote-subtitle">${isDTG && this.config.showLocationSelector ? 'Select location and quantity for instant pricing' : 'Enter quantity for instant pricing'}</p>
                 
                 ${this.config.showLocationSelector && this.config.locations ? `
                 <!-- Location Selector for DTG -->
@@ -108,6 +108,33 @@ class UniversalQuickQuoteCalculator {
                             </option>
                         `).join('')}
                     </select>
+                    <div class="selected-location-display" id="selected-location-display" style="display: none;">
+                        <span class="location-icon">📍</span>
+                        <span class="location-text" id="selected-location-text"></span>
+                        <span class="location-size" id="selected-location-size"></span>
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${this.config.showLocationSelector && this.config.pageType === 'dtg' ? `
+                <!-- Print Size Guide -->
+                <div class="print-size-guide">
+                    <button type="button" class="size-guide-toggle" onclick="this.parentElement.classList.toggle('expanded')">
+                        <span class="toggle-icon">▶</span> View Print Size Guide
+                    </button>
+                    <div class="size-guide-content">
+                        <div class="size-guide-grid">
+                            <div class="size-guide-item">
+                                <strong>Left Chest:</strong> 4" x 4"
+                            </div>
+                            <div class="size-guide-item">
+                                <strong>Full:</strong> 12" x 16"
+                            </div>
+                            <div class="size-guide-item">
+                                <strong>Jumbo:</strong> 16" x 20"
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 ` : ''}
                 
@@ -208,6 +235,11 @@ class UniversalQuickQuoteCalculator {
         console.log('[QuickQuote] Location changed to:', locationCode);
         this.state.selectedLocation = locationCode;
         
+        // Update visual displays for DTG
+        if (this.config.pageType === 'dtg' && locationCode) {
+            this.updateLocationDisplay(locationCode);
+        }
+        
         // Call the onLocationChange callback if provided
         if (this.config.onLocationChange) {
             this.config.onLocationChange(locationCode);
@@ -215,6 +247,52 @@ class UniversalQuickQuoteCalculator {
         
         // Update pricing with new location
         this.updatePricing();
+    }
+    
+    updateLocationDisplay(locationCode) {
+        // Update selected location display
+        const displayEl = document.getElementById('selected-location-display');
+        const textEl = document.getElementById('selected-location-text');
+        const sizeEl = document.getElementById('selected-location-size');
+        
+        if (displayEl && textEl && sizeEl) {
+            // Get location name from dropdown or config
+            const dropdown = document.getElementById('dtg-location-select');
+            let locationName = '';
+            if (dropdown) {
+                const selectedOption = dropdown.options[dropdown.selectedIndex];
+                locationName = selectedOption ? selectedOption.text : '';
+            }
+            
+            // Get size from config or master bundle
+            let size = '';
+            if (window.DTGConfig && window.DTGConfig.printSizes && window.DTGConfig.printSizes[locationCode]) {
+                size = window.DTGConfig.printSizes[locationCode];
+            }
+            
+            textEl.textContent = locationName;
+            sizeEl.textContent = size ? `(${size})` : '';
+            displayEl.style.display = 'flex';
+            
+            // Add animation
+            displayEl.classList.remove('location-updated');
+            void displayEl.offsetWidth; // Force reflow
+            displayEl.classList.add('location-updated');
+        }
+        
+        // Update Quick Quote title
+        const titleEl = document.getElementById('quick-quote-title');
+        const subtitleEl = document.getElementById('quick-quote-subtitle');
+        const dropdown = document.getElementById('dtg-location-select');
+        if (titleEl && dropdown) {
+            const selectedOption = dropdown.options[dropdown.selectedIndex];
+            if (selectedOption && selectedOption.value) {
+                titleEl.innerHTML = `Quick Quote: <span class="location-highlight">${selectedOption.text}</span>`;
+                if (subtitleEl) {
+                    subtitleEl.textContent = 'Enter quantity for instant pricing';
+                }
+            }
+        }
     }
 
     updateQuantity(delta) {
@@ -267,21 +345,8 @@ class UniversalQuickQuoteCalculator {
         // Convert the pricing data format to match our expected structure
         const pricingTiers = [];
         
-        // Extract unique sizes from headers, handling slash-separated sizes
-        const uniqueSizes = [];
-        data.headers.forEach(header => {
-            if (header.includes('/')) {
-                // Split S/M into S and M
-                const sizes = header.split('/');
-                sizes.forEach(size => {
-                    if (size && !uniqueSizes.includes(size)) {
-                        uniqueSizes.push(size);
-                    }
-                });
-            } else if (!header.includes('-') && !uniqueSizes.includes(header)) {
-                uniqueSizes.push(header);
-            }
-        });
+        // For DTG, use headers as-is (they're already grouped like S-XL, 2XL, 3XL, 4XL+)
+        const headers = data.headers || [];
         
         // Process each tier
         Object.keys(data.tierData).forEach(tierKey => {
@@ -294,9 +359,12 @@ class UniversalQuickQuoteCalculator {
             };
             
             // Get prices for each size group
-            data.headers.forEach(sizeGroup => {
+            headers.forEach(sizeGroup => {
                 if (data.prices[sizeGroup] && data.prices[sizeGroup][tierKey] !== undefined) {
-                    tier.prices[sizeGroup] = data.prices[sizeGroup][tierKey];
+                    const price = parseFloat(data.prices[sizeGroup][tierKey]);
+                    if (!isNaN(price)) {
+                        tier.prices[sizeGroup] = price;
+                    }
                 }
             });
             
@@ -308,11 +376,16 @@ class UniversalQuickQuoteCalculator {
         
         this.state.pricingData = { 
             tiers: pricingTiers, 
-            headers: data.headers,
-            uniqueSizes: uniqueSizes
+            headers: headers
         };
         
-        console.log('[QuickQuote] Processed pricing data:', this.state.pricingData);
+        console.log('[QuickQuote] Processed pricing data:', {
+            tiers: pricingTiers.length,
+            headers: headers,
+            firstTier: pricingTiers[0]
+        });
+        
+        // Trigger pricing update
         this.updatePricing();
     }
 

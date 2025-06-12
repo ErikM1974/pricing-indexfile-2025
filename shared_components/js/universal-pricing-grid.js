@@ -72,7 +72,7 @@ class UniversalPricingGrid {
                 
                 <div class="pricing-grid-container">
                     <!-- Initial loading state -->
-                    <div id="${this.config.containerId}-initial-state" class="enhanced-loading-container" style="display: ${this.config.loadingAnimation ? 'block' : 'none'};">
+                    <div id="${this.config.containerId}-initial-state" class="enhanced-loading-container" style="display: none;">
                         <div class="loading-content">
                             <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#2e5827" stroke-width="2" style="margin-bottom: 20px;">
                                 <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
@@ -134,7 +134,12 @@ class UniversalPricingGrid {
     generateColorIndicatorHTML() {
         return `
             <div class="pricing-header" style="margin-bottom: 20px;">
-                <h3 class="section-title" style="font-size: 1.3em; margin: 0;">Detailed Pricing Tiers</h3>
+                <h3 class="section-title" style="font-size: 1.3em; margin: 0;">
+                    Detailed Pricing Tiers
+                    <span class="location-indicator" id="${this.config.containerId}-location-indicator" style="display: none;">
+                        for <span class="location-name" style="color: var(--primary-color); font-weight: 700;"></span>
+                    </span>
+                </h3>
                 <div class="selected-color-indicator">
                     <span>Selected Color:</span>
                     <div class="mini-color-swatch clickable" id="${this.config.containerId}-color-swatch" title="Click to view this color"></div>

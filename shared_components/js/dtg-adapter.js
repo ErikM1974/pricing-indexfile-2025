@@ -43,6 +43,39 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         const fallbackDiv = document.getElementById(FALLBACK_UI_DIV_ID);
         if (fallbackDiv) fallbackDiv.style.display = 'none';
     }
+    
+    // Updates the location dropdown with data from Caspio master bundle
+    function updateLocationDropdownFromBundle(masterBundle) {
+        const dropdown = document.getElementById('dtg-location-select');
+        if (!dropdown || !masterBundle.printLocationMeta || !Array.isArray(masterBundle.printLocationMeta)) {
+            console.warn('[ADAPTER:DTG] Cannot update dropdown - missing dropdown element or location metadata');
+            return;
+        }
+        
+        console.log('[ADAPTER:DTG] Updating location dropdown with', masterBundle.printLocationMeta.length, 'locations from Caspio');
+        
+        // Save current selection
+        const currentValue = dropdown.value;
+        
+        // Clear existing options
+        dropdown.innerHTML = '<option value="">-- Choose Print Location --</option>';
+        
+        // Add all locations from Caspio
+        masterBundle.printLocationMeta.forEach(location => {
+            const option = document.createElement('option');
+            option.value = location.code || '';
+            option.textContent = location.name || location.code || 'Unknown Location';
+            dropdown.appendChild(option);
+        });
+        
+        // Restore previous selection if it still exists
+        if (currentValue && Array.from(dropdown.options).some(opt => opt.value === currentValue)) {
+            dropdown.value = currentValue;
+        }
+        
+        console.log('[ADAPTER:DTG] Dropdown updated with locations:', 
+            masterBundle.printLocationMeta.map(loc => `${loc.code}: ${loc.name}`).join(', '));
+    }
 
     // Processes the Master Bundle received from Caspio
     async function processMasterBundle(masterBundle) {
@@ -77,6 +110,9 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         }
 
         console.log('[ADAPTER:DTG] Master bundle processed successfully.');
+        
+        // Update the location dropdown with data from Caspio
+        updateLocationDropdownFromBundle(masterBundle);
 
         const parentDropdown = document.getElementById('parent-dtg-location-select');
         let initialLocationCode = parentDropdown ? parentDropdown.value : null;
@@ -172,8 +208,9 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
             console.log('[ADAPTER:DTG] Added missing tiers to ensure complete tier structure');
         }
         
-        // Group sizes as requested: S-XL, 2XL, 3XL, 4XL
-        const groupedHeaders = [];
+        // Group sizes as requested: S-XL, 2XL, 3XL, 4XL+
+        const standardDTGGroups = ['S-XL', '2XL', '3XL', '4XL+'];
+        const groupedHeaders = [...standardDTGGroups]; // Always include all standard groups
         const groupedPrices = {};
         const sizeMapping = {
             'S': 'S-XL',
@@ -182,20 +219,13 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
             'XL': 'S-XL',
             '2XL': '2XL',
             '3XL': '3XL',
-            '4XL': '4XL',
-            '5XL': '5XL',
-            '6XL': '6XL'
+            '4XL': '4XL+',
+            '5XL': '4XL+',
+            '6XL': '4XL+'
         };
         
-        // Create grouped headers
-        const addedGroups = new Set();
-        (masterBundle.uniqueSizes || []).forEach(size => {
-            const group = sizeMapping[size] || size;
-            if (!addedGroups.has(group)) {
-                addedGroups.add(group);
-                groupedHeaders.push(group);
-            }
-        });
+        // Log the standard groups being used
+        console.log('[ADAPTER:DTG] Using standard DTG size groups:', groupedHeaders);
         
         // Group prices - use the highest price within each group
         groupedHeaders.forEach(group => {
@@ -215,8 +245,19 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
                             }
                         }
                     });
+                } else if (group === '4XL+') {
+                    // For 4XL+ group, check 4XL, 5XL, 6XL
+                    ['4XL', '5XL', '6XL'].forEach(size => {
+                        if (locationPriceProfile[size] && locationPriceProfile[size][tierKey] !== undefined) {
+                            const price = parseFloat(locationPriceProfile[size][tierKey]);
+                            if (!isNaN(price) && price > maxPrice) {
+                                maxPrice = price;
+                                foundPrice = true;
+                            }
+                        }
+                    });
                 } else {
-                    // For individual sizes (2XL, 3XL, 4XL, etc.)
+                    // For individual sizes (2XL, 3XL)
                     if (locationPriceProfile[group] && locationPriceProfile[group][tierKey] !== undefined) {
                         const price = parseFloat(locationPriceProfile[group][tierKey]);
                         if (!isNaN(price)) {
@@ -273,21 +314,9 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
             console.warn('[ADAPTER:DTG] DP5Helper.testListenerReach not found or not a function!');
         }
         
-        // Hide loading spinner and initial state, show table with animation
-        const initState = document.getElementById('pricing-initial-state');
-        const spinner = document.getElementById('pricing-table-loading');
-        const grid = document.getElementById('custom-pricing-grid');
-        
-        if (initState) initState.style.display = 'none';
-        if (spinner) spinner.style.display = 'none';
-        if (grid) {
-            grid.style.display = 'table';
-            // Trigger animation
-            setTimeout(() => {
-                grid.style.opacity = '1';
-                grid.style.transform = 'translateY(0)';
-            }, 50);
-        }
+        // The universal pricing grid handles its own display, so we don't need to manipulate the old grid
+        // Just make sure the data is dispatched and let the universal components handle display
+        console.log('[ADAPTER:DTG] Pricing data dispatched, universal components will handle display');
         
         // Trigger price grouping after displaying pricing (only once per location change)
         if (!window.dtgPriceGroupingScheduled) {

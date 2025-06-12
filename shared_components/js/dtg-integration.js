@@ -152,11 +152,46 @@ class DTGIntegration {
         }
         
         this.state.currentLocation = locationCode;
-        const locationInfo = this.config.helpers.getLocationInfo(locationCode);
         
-        // Update info box with location details
+        // Try to get location info from Caspio data first, then fall back to config
+        let locationInfo = null;
+        if (window.dtgMasterPriceBundle && window.dtgMasterPriceBundle.printLocationMeta) {
+            const caspioLocation = window.dtgMasterPriceBundle.printLocationMeta.find(
+                loc => loc.code === locationCode
+            );
+            if (caspioLocation) {
+                locationInfo = {
+                    name: caspioLocation.name,
+                    displayName: caspioLocation.name,
+                    code: caspioLocation.code,
+                    // Get size from config if not provided by Caspio
+                    maxSize: caspioLocation.maxSize || this.config.printSizes[locationCode]
+                };
+            }
+        }
+        
+        // Fall back to config if not found in Caspio data
+        if (!locationInfo) {
+            locationInfo = this.config.helpers.getLocationInfo(locationCode);
+        }
+        
+        // If still no location info, create a basic one
+        if (!locationInfo) {
+            locationInfo = {
+                name: 'Custom Location',
+                displayName: 'Custom Location',
+                code: locationCode
+            };
+        }
+        
+        // Ensure we have size info from printSizes if not in locationInfo
+        if (!locationInfo.maxSize && this.config.printSizes && this.config.printSizes[locationCode]) {
+            locationInfo.maxSize = this.config.printSizes[locationCode];
+        }
+        
+        // Update info box with location details and size
         if (this.components.productDisplay && locationInfo) {
-            const infoText = `${locationInfo.displayName} printing${locationInfo.maxSize ? ` (up to ${locationInfo.maxSize})` : ''}`;
+            const infoText = `${locationInfo.displayName || locationInfo.name} printing${locationInfo.maxSize ? ` (${locationInfo.maxSize})` : ''}`;
             this.components.productDisplay.updateInfoBox(infoText);
         }
         
@@ -168,7 +203,7 @@ class DTGIntegration {
         // Update pricing note
         const pricingNote = document.getElementById('pricing-grid-container-pricing-note');
         if (pricingNote && locationInfo) {
-            pricingNote.textContent = `Prices shown are per item and include ${locationInfo.displayName} printing.`;
+            pricingNote.textContent = `Prices shown are per item and include ${locationInfo.displayName || locationInfo.name} printing.`;
         }
         
         // Update Quick Quote if it exists
@@ -177,18 +212,21 @@ class DTGIntegration {
         }
         
         // Trigger DTG adapter to load pricing for this location
-        if (window.displayPricingForSelectedLocation) {
-            window.displayPricingForSelectedLocation(locationCode);
+        if (window.DTGAdapter && window.DTGAdapter.displayPricingForSelectedLocation) {
+            window.DTGAdapter.displayPricingForSelectedLocation(locationCode);
+        } else {
+            console.error('[DTGIntegration] DTGAdapter.displayPricingForSelectedLocation not found');
         }
     }
     
     handlePricingDataLoaded(data) {
-        console.log('[DTGIntegration] Processing pricing data');
+        console.log('[DTGIntegration] Processing pricing data:', data);
         
         this.state.currentPricingData = data;
         
-        // Update Quick Quote with new pricing
-        if (this.components.quickQuote && data.pricingData) {
+        // Update Quick Quote with new pricing - pass the full data structure
+        if (this.components.quickQuote && data) {
+            console.log('[DTGIntegration] Updating Quick Quote with headers:', data.headers);
             this.components.quickQuote.updatePricingData(data);
         }
         
@@ -196,6 +234,7 @@ class DTGIntegration {
         if (this.components.pricingGrid) {
             // Transform DTG data format to universal format if needed
             const transformedData = this.transformPricingData(data);
+            console.log('[DTGIntegration] Updating Pricing Grid with headers:', transformedData.headers);
             this.components.pricingGrid.updatePricingData(transformedData);
         }
         
