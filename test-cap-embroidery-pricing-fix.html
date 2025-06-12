@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cap Embroidery Pricing Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .test-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .test-link:hover {
+            background: #0056b3;
+        }
+        .issue-description {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .fix-description {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .test-iframe {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .console-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 5px;
+        }
+        .log-entry.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .log-entry.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .log-entry.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .log-entry.success {
+            background: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cap Embroidery Pricing Fix Test</h1>
+    
+    <div class="issue-description">
+        <h3>🐛 Issue Description</h3>
+        <p><strong>Problem:</strong> When selecting different stitch counts (5,000, 8,000, or 10,000) for the front logo, the pricing in the quick quote calculator doesn't update. Similarly, the back logo pricing doesn't update when adjusted.</p>
+        <p><strong>Expected Behavior:</strong> The quick quote should immediately reflect price changes when stitch counts are modified.</p>
+    </div>
+    
+    <div class="fix-description">
+        <h3>✅ Fix Applied</h3>
+        <p><strong>Solution:</strong> Created <code>cap-embroidery-pricing-fix.js</code> that:</p>
+        <ul>
+            <li>Ensures pricing data exists for all stitch count options (5,000, 8,000, 10,000)</li>
+            <li>Fixes the event handlers for stitch count changes</li>
+            <li>Ensures back logo pricing updates trigger quick quote recalculation</li>
+            <li>Provides fallback pricing data if Caspio data is missing</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Links</h2>
+        <div class="test-links">
+            <a href="/cap-embroidery-pricing-integrated.html?StyleNumber=NE1000&COLOR=Black" class="test-link" target="_blank">
+                Test NE1000 Black
+            </a>
+            <a href="/cap-embroidery-pricing-integrated.html?StyleNumber=C112&COLOR=Black" class="test-link" target="_blank">
+                Test C112 Black
+            </a>
+            <a href="/cap-embroidery-pricing-integrated.html?StyleNumber=PC800&COLOR=Navy" class="test-link" target="_blank">
+                Test PC800 Navy
+            </a>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Live Test</h2>
+        <p>Test the fix by:</p>
+        <ol>
+            <li>Changing the front logo stitch count between 5,000, 8,000, and 10,000</li>
+            <li>Verify the quick quote price updates immediately</li>
+            <li>Enable the back logo and adjust the stitch count slider</li>
+            <li>Verify the quick quote reflects the back logo pricing</li>
+        </ol>
+        <iframe src="/cap-embroidery-pricing-integrated.html?StyleNumber=C112&COLOR=Black" class="test-iframe" id="test-frame"></iframe>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div class="console-output" id="console-output">
+            <div class="log-entry info">Waiting for page to load...</div>
+        </div>
+    </div>
+    
+    <script>
+        // Capture console logs from the iframe
+        const consoleOutput = document.getElementById('console-output');
+        const testFrame = document.getElementById('test-frame');
+        
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleOutput.appendChild(entry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        testFrame.addEventListener('load', function() {
+            addLog('Page loaded, monitoring for pricing updates...', 'success');
+            
+            try {
+                // Try to access the iframe's window
+                const iframeWindow = testFrame.contentWindow;
+                
+                // Override console methods in the iframe
+                const originalLog = iframeWindow.console.log;
+                const originalError = iframeWindow.console.error;
+                const originalWarn = iframeWindow.console.warn;
+                
+                iframeWindow.console.log = function(...args) {
+                    originalLog.apply(this, args);
+                    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+                    if (message.includes('[Cap Embroidery Fix]')) {
+                        addLog(message, 'success');
+                    } else if (message.includes('[Cap Embroidery]')) {
+                        addLog(message, 'info');
+                    }
+                };
+                
+                iframeWindow.console.error = function(...args) {
+                    originalError.apply(this, args);
+                    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+                    addLog(message, 'error');
+                };
+                
+                iframeWindow.console.warn = function(...args) {
+                    originalWarn.apply(this, args);
+                    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+                    addLog(message, 'warning');
+                };
+                
+                // Listen for custom events
+                iframeWindow.addEventListener('capEmbroideryPricingUpdated', function(event) {
+                    addLog(`Pricing updated for ${event.detail.stitchCount} stitches`, 'success');
+                });
+                
+            } catch (e) {
+                addLog('Cannot access iframe content (cross-origin restriction)', 'warning');
+            }
+        });
+        
+        // Test instructions
+        addLog('Test Instructions:', 'info');
+        addLog('1. Change front logo stitch count and verify quick quote updates', 'info');
+        addLog('2. Enable back logo and adjust slider, verify pricing updates', 'info');
+        addLog('3. Check console for [Cap Embroidery Fix] messages', 'info');
+    </script>
+</body>
+</html>
