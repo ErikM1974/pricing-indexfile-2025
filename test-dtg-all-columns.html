@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG All Columns Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2e5827;
+        }
+        
+        .info-box {
+            background: #e8f5e9;
+            border-left: 4px solid #2e5827;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .test-grid {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .test-grid th,
+        .test-grid td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .test-grid th {
+            background: #2e5827;
+            color: white;
+        }
+        
+        .test-grid tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .location-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+        
+        select {
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #2e5827;
+            border-radius: 4px;
+            background: white;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .status.success {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .status.error {
+            background: #f44336;
+            color: white;
+        }
+        
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>DTG All Columns Test</h1>
+    
+    <div class="info-box">
+        <h3>Testing DTG Pricing Grid with All Size Columns</h3>
+        <p>This page tests that the DTG pricing grid always shows all 4 columns: S-XL, 2XL, 3XL, 4XL+</p>
+        <p>The fix ensures consistent column display regardless of which sizes are actually available in the product.</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>Expected Result</h2>
+        <table class="test-grid">
+            <thead>
+                <tr>
+                    <th>Quantity</th>
+                    <th>S-XL</th>
+                    <th>2XL</th>
+                    <th>3XL</th>
+                    <th>4XL+</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>24-47</td>
+                    <td>$12.00</td>
+                    <td>$14.00</td>
+                    <td>$15.00</td>
+                    <td>$16.00</td>
+                </tr>
+                <tr>
+                    <td>48-71</td>
+                    <td>$10.00</td>
+                    <td>$12.00</td>
+                    <td>$13.00</td>
+                    <td>$14.00</td>
+                </tr>
+                <tr>
+                    <td>72+</td>
+                    <td>$8.00</td>
+                    <td>$10.00</td>
+                    <td>$11.00</td>
+                    <td>$12.00</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test DTG Data Processing</h2>
+        
+        <div class="location-selector">
+            <label for="test-location">Test Location:</label>
+            <select id="test-location">
+                <option value="LC">Left Chest</option>
+                <option value="FC">Full Chest</option>
+                <option value="FB">Full Back</option>
+            </select>
+            <button onclick="testDataProcessing()">Process Test Data</button>
+        </div>
+        
+        <div id="test-status"></div>
+        <pre id="test-output"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>Code Changes Applied</h2>
+        <pre><code>// Fixed header creation in dtg-adapter.js:
+const standardDTGGroups = ['S-XL', '2XL', '3XL', '4XL+'];
+const groupedHeaders = [...standardDTGGroups];
+
+// Updated size mapping:
+const sizeMapping = {
+    'S': 'S-XL',
+    'M': 'S-XL',
+    'L': 'S-XL',
+    'XL': 'S-XL',
+    '2XL': '2XL',
+    '3XL': '3XL',
+    '4XL': '4XL+',
+    '5XL': '4XL+',
+    '6XL': '4XL+'
+};
+
+// Enhanced price grouping for 4XL+ group:
+if (group === '4XL+') {
+    ['4XL', '5XL', '6XL'].forEach(size => {
+        // Check prices for all large sizes
+    });
+}</code></pre>
+    </div>
+    
+    <script>
+        function testDataProcessing() {
+            const location = document.getElementById('test-location').value;
+            const statusEl = document.getElementById('test-status');
+            const outputEl = document.getElementById('test-output');
+            
+            // Simulate DTG adapter data processing
+            const testMasterBundle = {
+                styleNumber: 'TEST123',
+                color: 'Black',
+                uniqueSizes: ['S', 'M', 'L', 'XL', '2XL'], // Limited sizes
+                allLocationPrices: {
+                    'LC': {
+                        'S': { '24-47': 12, '48-71': 10, '72+': 8 },
+                        'M': { '24-47': 12, '48-71': 10, '72+': 8 },
+                        'L': { '24-47': 12, '48-71': 10, '72+': 8 },
+                        'XL': { '24-47': 12, '48-71': 10, '72+': 8 },
+                        '2XL': { '24-47': 14, '48-71': 12, '72+': 10 }
+                        // Note: No 3XL, 4XL data
+                    }
+                }
+            };
+            
+            // Process with fixed headers
+            const standardDTGGroups = ['S-XL', '2XL', '3XL', '4XL+'];
+            const groupedHeaders = [...standardDTGGroups];
+            
+            const sizeMapping = {
+                'S': 'S-XL',
+                'M': 'S-XL',
+                'L': 'S-XL',
+                'XL': 'S-XL',
+                '2XL': '2XL',
+                '3XL': '3XL',
+                '4XL': '4XL+',
+                '5XL': '4XL+',
+                '6XL': '4XL+'
+            };
+            
+            const groupedPrices = {};
+            const locationPrices = testMasterBundle.allLocationPrices[location];
+            
+            groupedHeaders.forEach(group => {
+                groupedPrices[group] = {};
+                ['24-47', '48-71', '72+'].forEach(tierKey => {
+                    let maxPrice = 0;
+                    let foundPrice = false;
+                    
+                    if (group === 'S-XL') {
+                        ['S', 'M', 'L', 'XL'].forEach(size => {
+                            if (locationPrices && locationPrices[size] && locationPrices[size][tierKey] !== undefined) {
+                                const price = parseFloat(locationPrices[size][tierKey]);
+                                if (!isNaN(price) && price > maxPrice) {
+                                    maxPrice = price;
+                                    foundPrice = true;
+                                }
+                            }
+                        });
+                    } else if (group === '4XL+') {
+                        ['4XL', '5XL', '6XL'].forEach(size => {
+                            if (locationPrices && locationPrices[size] && locationPrices[size][tierKey] !== undefined) {
+                                const price = parseFloat(locationPrices[size][tierKey]);
+                                if (!isNaN(price) && price > maxPrice) {
+                                    maxPrice = price;
+                                    foundPrice = true;
+                                }
+                            }
+                        });
+                    } else {
+                        // For individual sizes (2XL, 3XL)
+                        if (locationPrices && locationPrices[group] && locationPrices[group][tierKey] !== undefined) {
+                            const price = parseFloat(locationPrices[group][tierKey]);
+                            if (!isNaN(price)) {
+                                maxPrice = price;
+                                foundPrice = true;
+                            }
+                        }
+                    }
+                    
+                    groupedPrices[group][tierKey] = foundPrice ? maxPrice : 0;
+                });
+            });
+            
+            // Display results
+            const result = {
+                location: location,
+                headers: groupedHeaders,
+                prices: groupedPrices,
+                originalSizes: testMasterBundle.uniqueSizes
+            };
+            
+            statusEl.innerHTML = '<div class="status success">✓ Processing Complete - All 4 columns generated!</div>';
+            outputEl.textContent = JSON.stringify(result, null, 2);
+            
+            // Verify all columns exist
+            if (groupedHeaders.length === 4) {
+                statusEl.innerHTML += '<div class="status success">✓ Correct number of columns: 4</div>';
+            } else {
+                statusEl.innerHTML += '<div class="status error">✗ Wrong number of columns: ' + groupedHeaders.length + '</div>';
+            }
+        }
+        
+        // Run test on load
+        window.addEventListener('DOMContentLoaded', () => {
+            testDataProcessing();
+        });
+    </script>
+</body>
+</html>

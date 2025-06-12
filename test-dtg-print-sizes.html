@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test DTG Print Sizes</title>
+    <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
+    <link rel="stylesheet" href="/shared_components/css/dtg-specific.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .feature-box {
+            background: #e8f5e9;
+            border-left: 4px solid #2e5827;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-display {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        h2 {
+            color: #2e5827;
+        }
+        
+        .example-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .example-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .example-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .size-info {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>DTG Print Size Display Test</h1>
+    
+    <div class="demo-section">
+        <h2>Feature 1: Info Box Updates with Size</h2>
+        <div class="feature-box">
+            <p>When you select a location, the info box now shows the print size:</p>
+        </div>
+        
+        <div class="info-display" id="demo-info-box">
+            Left Chest printing (4" x 4")
+        </div>
+        
+        <p>Examples:</p>
+        <ul class="example-list">
+            <li>Left Chest Only → <span class="size-info">"Left Chest printing (4" x 4")"</span></li>
+            <li>Full Front Only → <span class="size-info">"Full Front printing (12" x 16")"</span></li>
+            <li>Jumbo Back Only → <span class="size-info">"Jumbo Back printing (16" x 20")"</span></li>
+            <li>Left Chest + Jumbo Back → <span class="size-info">"Left Chest + Jumbo Back printing (LC: 4" x 4", JB: 16" x 20")"</span></li>
+        </ul>
+    </div>
+    
+    <div class="demo-section">
+        <h2>Feature 2: Print Size Guide</h2>
+        <div class="feature-box">
+            <p>A collapsible guide shows all print sizes below the location dropdown:</p>
+        </div>
+        
+        <!-- Demo Quick Quote Section -->
+        <div class="quick-quote" style="max-width: 600px; margin: 0 auto;">
+            <h3>Quick Quote Calculator</h3>
+            
+            <!-- Location Selector -->
+            <div class="location-selector-group">
+                <label for="demo-location" class="location-label">Step 1: Select Print Location</label>
+                <select id="demo-location" class="location-select">
+                    <option value="">-- Choose Print Location --</option>
+                    <option value="LC">Left Chest Only</option>
+                    <option value="FF">Full Front Only</option>
+                    <option value="FB">Full Back Only</option>
+                    <option value="JF">Jumbo Front Only</option>
+                    <option value="JB">Jumbo Back Only</option>
+                    <option value="LC_FB">Left Chest + Full Back</option>
+                    <option value="LC_JB">Left Chest + Jumbo Back</option>
+                    <option value="FF_FB">Full Front + Full Back</option>
+                    <option value="JF_JB">Jumbo Front + Jumbo Back</option>
+                </select>
+            </div>
+            
+            <!-- Print Size Guide -->
+            <div class="print-size-guide">
+                <button type="button" class="size-guide-toggle" onclick="this.parentElement.classList.toggle('expanded')">
+                    <span class="toggle-icon">▶</span> View Print Size Guide
+                </button>
+                <div class="size-guide-content">
+                    <div class="size-guide-grid">
+                        <div class="size-guide-item">
+                            <strong>Left Chest:</strong> 4" x 4"
+                        </div>
+                        <div class="size-guide-item">
+                            <strong>Full Front:</strong> 12" x 16"
+                        </div>
+                        <div class="size-guide-item">
+                            <strong>Full Back:</strong> 12" x 16"
+                        </div>
+                        <div class="size-guide-item">
+                            <strong>Jumbo Front:</strong> 16" x 20"
+                        </div>
+                        <div class="size-guide-item">
+                            <strong>Jumbo Back:</strong> 16" x 20"
+                        </div>
+                        <div class="size-guide-item combo">
+                            <strong>Left Chest + Full Back:</strong> LC: 4" x 4", FB: 12" x 16"
+                        </div>
+                        <div class="size-guide-item combo">
+                            <strong>Left Chest + Jumbo Back:</strong> LC: 4" x 4", JB: 16" x 20"
+                        </div>
+                        <div class="size-guide-item combo">
+                            <strong>Full Front + Full Back:</strong> FF: 12" x 16", FB: 12" x 16"
+                        </div>
+                        <div class="size-guide-item combo">
+                            <strong>Jumbo Front + Jumbo Back:</strong> JF: 16" x 20", JB: 16" x 20"
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>Implementation Summary</h2>
+        <ol>
+            <li><strong>DTG Config Updated</strong> - Added `printSizes` reference object</li>
+            <li><strong>Info Box Shows Size</strong> - Updates dynamically when location changes</li>
+            <li><strong>Print Size Guide Added</strong> - Collapsible reference under dropdown</li>
+            <li><strong>Works with Dynamic Locations</strong> - Falls back to config sizes for Caspio locations</li>
+        </ol>
+        
+        <div class="feature-box">
+            <h3>✅ User Benefits</h3>
+            <ul>
+                <li>Always see the print size for selected location</li>
+                <li>Quick reference guide available at any time</li>
+                <li>Clear understanding of what each location offers</li>
+                <li>Works with all locations (hardcoded and Caspio)</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Demo functionality
+        const dropdown = document.getElementById('demo-location');
+        const infoBox = document.getElementById('demo-info-box');
+        
+        const sizes = {
+            'LC': '4" x 4"',
+            'FF': '12" x 16"',
+            'FB': '12" x 16"',
+            'JF': '16" x 20"',
+            'JB': '16" x 20"',
+            'LC_FB': 'LC: 4" x 4", FB: 12" x 16"',
+            'LC_JB': 'LC: 4" x 4", JB: 16" x 20"',
+            'FF_FB': 'FF: 12" x 16", FB: 12" x 16"',
+            'JF_JB': 'JF: 16" x 20", JB: 16" x 20"'
+        };
+        
+        dropdown.addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            if (this.value && sizes[this.value]) {
+                infoBox.textContent = `${selected.text} printing (${sizes[this.value]})`;
+            } else {
+                infoBox.textContent = 'Select a location to see print size';
+            }
+        });
+    </script>
+</body>
+</html>

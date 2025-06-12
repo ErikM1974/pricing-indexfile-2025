@@ -156,9 +156,8 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         if (!window.dtgMasterPriceBundle || !window.dtgMasterPriceBundle.allLocationPrices) {
             console.error('[ADAPTER:DTG] Master bundle not available to display pricing.');
             displayError('Pricing data is not loaded. Please refresh.');
-            if (initialState) initialState.style.display = 'none';
-            if (loadingSpinner) loadingSpinner.style.display = 'none';
-            if (pricingGrid) pricingGrid.style.display = 'table';
+            // Remove references to undefined variables - these elements no longer exist
+            // The universal components handle their own display states
             return;
         }
 
@@ -450,7 +449,8 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
     }
 
     function setupParentLocationSelector() {
-        const parentLocationDropdown = document.getElementById('parent-dtg-location-select');
+        // Look for the dropdown in the Quick Quote component
+        const parentLocationDropdown = document.getElementById('dtg-location-select');
         if (parentLocationDropdown) {
             // Style the dropdown to make it more prominent
             parentLocationDropdown.style.border = '2px solid #2e5827';
@@ -501,12 +501,12 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         // Update the pricing header to show selected location
         const pricingHeader = document.querySelector('.pricing-header .section-title');
         if (pricingHeader && locationValue) {
-            const locationText = document.querySelector(`#parent-dtg-location-select option[value="${locationValue}"]`)?.textContent || locationValue;
+            const locationText = document.querySelector(`#dtg-location-select option[value="${locationValue}"]`)?.textContent || locationValue;
             pricingHeader.innerHTML = `Detailed Pricing per Quantity Tier <span style="color: #2e5827; font-size: 0.9em;">(${locationText})</span>`;
         }
         
         // Update dropdown visual state
-        const dropdown = document.getElementById('parent-dtg-location-select');
+        const dropdown = document.getElementById('dtg-location-select');
         if (dropdown) {
             dropdown.style.borderColor = '#2e5827';
             dropdown.style.boxShadow = '0 0 5px rgba(46, 88, 39, 0.3)';

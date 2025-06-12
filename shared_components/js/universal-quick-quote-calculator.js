@@ -33,7 +33,9 @@ class UniversalQuickQuoteCalculator {
             totalPrice: 0,
             sizeGroups: [],
             currentTier: null,
-            selectedLocation: this.config.defaultLocation || ''
+            selectedLocation: this.config.defaultLocation || '',
+            hasInitialPricing: false,
+            waitingForPricing: true
         };
 
         // Initialize
@@ -50,9 +52,20 @@ class UniversalQuickQuoteCalculator {
             this.render();
         }
 
-        // Listen for pricing data updates
+        // Listen for pricing data updates with deduplication
         window.addEventListener('pricingDataLoaded', (event) => {
+            // Skip if already processed by Quick Quote
+            if (event.detail && event.detail._quickQuoteProcessed) {
+                return;
+            }
+            
             console.log('[QuickQuote] Pricing data loaded', event.detail);
+            
+            // Mark as processed
+            if (event.detail) {
+                event.detail._quickQuoteProcessed = true;
+            }
+            
             this.updatePricingData(event.detail);
         });
 
@@ -502,6 +515,33 @@ class UniversalQuickQuoteCalculator {
     }
 
     updatePricing() {
+        // Check if we have pricing data
+        if (!this.state.pricingData || !this.state.pricingData.tiers || this.state.pricingData.tiers.length === 0) {
+            // Only update to 0 if we haven't received initial pricing yet
+            if (!this.state.hasInitialPricing) {
+                this.state.unitPrice = 0.00;
+                this.state.totalPrice = 0.00;
+                this.state.basePrice = 0.00;
+                this.updatePricingDisplay();
+                
+                // Show loading indicator if waiting
+                if (this.state.waitingForPricing && this.elements.unitPrice) {
+                    this.elements.unitPrice.textContent = 'Loading...';
+                    this.elements.unitPrice.classList.add('loading');
+                }
+            }
+            return;
+        }
+        
+        // Mark that we have received initial pricing
+        this.state.hasInitialPricing = true;
+        this.state.waitingForPricing = false;
+        
+        // Remove loading class
+        if (this.elements.unitPrice) {
+            this.elements.unitPrice.classList.remove('loading');
+        }
+        
         // Calculate base pricing
         const { basePrice, sizeGroups } = this.calculateDynamicPricing();
         this.state.basePrice = basePrice;

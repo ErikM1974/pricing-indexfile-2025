@@ -44,6 +44,15 @@ class UniversalPricingGrid {
 
         // Listen for events
         this.setupEventListeners();
+        
+        // Show initial loading state
+        if (this.config.loadingAnimation && this.config.containerId.includes('pricing-grid-container')) {
+            setTimeout(() => {
+                if (!this.state.pricingData) {
+                    this.showLoading();
+                }
+            }, 500);
+        }
     }
 
     render() {
@@ -199,9 +208,20 @@ class UniversalPricingGrid {
     }
 
     setupEventListeners() {
-        // Listen for pricing data updates
+        // Listen for pricing data updates with deduplication
         window.addEventListener('pricingDataLoaded', (event) => {
+            // Skip if already processed by pricing grid
+            if (event.detail && event.detail._pricingGridProcessed) {
+                return;
+            }
+            
             console.log('[UniversalPricingGrid] Pricing data loaded event received');
+            
+            // Mark as processed
+            if (event.detail) {
+                event.detail._pricingGridProcessed = true;
+            }
+            
             this.updatePricingData(event.detail);
         });
 

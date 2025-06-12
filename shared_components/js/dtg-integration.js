@@ -10,7 +10,9 @@ class DTGIntegration {
         this.state = {
             currentLocation: null,
             currentPricingData: null,
-            isInitialized: false
+            isInitialized: false,
+            lastPricingUpdate: 0,
+            isLoadingPricing: false
         };
         
         // Wait for DOM before initializing
@@ -89,9 +91,32 @@ class DTGIntegration {
     }
     
     setupEventListeners() {
-        // Listen for pricing data from DTG adapter
+        // Listen for pricing data from DTG adapter with deduplication
         window.addEventListener('pricingDataLoaded', (event) => {
+            // Prevent duplicate processing
+            const now = Date.now();
+            const timeSinceLastUpdate = now - this.state.lastPricingUpdate;
+            
+            // Skip if we just processed an update (within 100ms)
+            if (timeSinceLastUpdate < 100) {
+                console.log('[DTGIntegration] Skipping duplicate pricing event');
+                return;
+            }
+            
+            // Check if this is the same data we already have
+            if (event.detail && event.detail._dtgProcessed) {
+                console.log('[DTGIntegration] Pricing data already processed, skipping');
+                return;
+            }
+            
             console.log('[DTGIntegration] Pricing data received:', event.detail);
+            this.state.lastPricingUpdate = now;
+            
+            // Mark the data as processed
+            if (event.detail) {
+                event.detail._dtgProcessed = true;
+            }
+            
             this.handlePricingDataLoaded(event.detail);
         });
         
@@ -151,7 +176,16 @@ class DTGIntegration {
             return;
         }
         
+        // Prevent rapid-fire location changes
+        if (this.state.isLoadingPricing) {
+            console.log('[DTGIntegration] Still loading previous location, queuing:', locationCode);
+            // Queue this location change for after current load
+            this.state.queuedLocation = locationCode;
+            return;
+        }
+        
         this.state.currentLocation = locationCode;
+        this.state.isLoadingPricing = true;
         
         // Try to get location info from Caspio data first, then fall back to config
         let locationInfo = null;
@@ -223,6 +257,15 @@ class DTGIntegration {
         console.log('[DTGIntegration] Processing pricing data:', data);
         
         this.state.currentPricingData = data;
+        this.state.isLoadingPricing = false;
+        
+        // Check if we have a queued location change
+        if (this.state.queuedLocation) {
+            const queuedLocation = this.state.queuedLocation;
+            this.state.queuedLocation = null;
+            console.log('[DTGIntegration] Processing queued location:', queuedLocation);
+            setTimeout(() => this.handleLocationChange(queuedLocation), 100);
+        }
         
         // Update Quick Quote with new pricing - pass the full data structure
         if (this.components.quickQuote && data) {
