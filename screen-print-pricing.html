@@ -384,6 +384,47 @@
         #color-select, #additional-logo-checkbox {
             display: none;
         }
+        
+        /* Collapsible sections styling */
+        .collapsible-section {
+            background: white;
+            border-radius: var(--radius-md, 8px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .collapsible-trigger {
+            width: 100%;
+            padding: 20px;
+            background: white;
+            border: none;
+            text-align: left;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--primary-color, #2e5827);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .collapsible-trigger:hover {
+            background-color: var(--primary-light, #f8f9fa);
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.2em;
+        }
+        
+        .collapsible-trigger.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        .collapsible-content {
+            padding: 0 20px 20px;
+        }
     </style>
 </head>
 <body>
@@ -434,131 +475,76 @@
                         <input type="checkbox" id="additional-logo-checkbox" name="additional-logo-checkbox">
                     </div>
                     
-                    <div class="pricing-section">
-                        <div class="pricing-header" style="margin-bottom: 20px;">
-                             <h3 class="section-title" style="font-size: 1.3em; margin: 0;">Detailed Pricing per Quantity Tier</h3>
-                             <div class="selected-color-indicator">
-                                <span>Selected Garment Color:</span>
-                                <div class="mini-color-swatch clickable" id="pricing-color-swatch" title="Click to view this color in the swatches"></div>
-                                <strong id="pricing-color-name">Color Name</strong>
+                    <!-- Screen Print Calculator at TOP (like DTG) -->
+                    <div id="add-to-cart-section">
+                        <!-- Calculator will be initialized by screenprint-integration.js -->
+                    </div>
+                    
+                    <!-- Pricing Tables at BOTTOM (collapsed by default) -->
+                    <div class="pricing-tables-section" style="margin-top: 40px;">
+                        <!-- Collapsible Pricing Tiers -->
+                        <div class="collapsible-section">
+                            <button type="button" class="collapsible-trigger" id="toggle-pricing-tiers">
+                                <span class="toggle-icon">▼</span>
+                                <span class="toggle-text">View Detailed Pricing Tiers</span>
+                            </button>
+                            <div class="collapsible-content" id="pricing-tiers-content" style="display: none;">
+                                <div class="pricing-section">
+                                    <div class="pricing-grid-container">
+                                        <table class="pricing-grid" id="custom-pricing-grid" style="display: none;">
+                                            <thead>
+                                                <tr id="pricing-header-row">
+                                                    <th>Quantity</th>
+                                                    <!-- Tier headers will be dynamically populated -->
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Pricing data will be dynamically added here -->
+                                            </tbody>
+                                        </table>
+                                        <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                                            <p><strong>Note:</strong> Prices shown are per item. Setup fees apply per color.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="pricing-grid-container">
-                            <!-- Beautiful initial state -->
-                            <div id="pricing-initial-state" class="enhanced-loading-container" style="display: block;">
-                                <div class="loading-content">
-                                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#2e5827" stroke-width="2" style="margin-bottom: 20px;">
-                                        <circle cx="12" cy="12" r="3"/>
-                                        <path d="M12 1v6m0 6v6"/>
-                                        <path d="m12 1 4 4m-8 0 4-4"/>
-                                        <path d="m12 23-4-4m8 0-4 4"/>
-                                    </svg>
-                                    <h3 style="color: #2e5827; font-size: 1.5em; margin: 0 0 10px 0; font-weight: 600;">Screen Print Pricing</h3>
-                                    <p style="color: #666; margin: 0; font-size: 1.1em;">Select the number of print colors to view pricing</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Enhanced loading state -->
-                            <div id="pricing-table-loading" style="display: none;">
-                                <div class="enhanced-loading-container">
-                                    <div class="loading-content">
-                                        <div class="loading-spinner-dual">
-                                            <div class="loading-spinner-outer"></div>
-                                            <div class="loading-spinner-inner"></div>
-                                        </div>
-                                        <div class="loading-status" id="loading-status">Loading your custom pricing...</div>
-                                        <div class="loading-step" id="loading-step">Connecting to pricing database...</div>
-                                        <div class="loading-progress">
-                                            <div class="loading-progress-bar" id="loading-progress-bar" style="width: 0%;"></div>
-                                        </div>
+                        <!-- Collapsible Additional Location Pricing -->
+                        <div class="collapsible-section" style="margin-top: 20px;">
+                            <button type="button" class="collapsible-trigger" id="toggle-additional-pricing">
+                                <span class="toggle-icon">▼</span>
+                                <span class="toggle-text">View Additional Location Pricing</span>
+                            </button>
+                            <div class="collapsible-content" id="additional-pricing-content" style="display: none;">
+                                <div class="pricing-section additional-logo-pricing-section">
+                                    <div id="additional-pricing-loading" style="padding: 15px; text-align: center; background-color: #f8f9fa; border: 1px solid #eee; border-radius: var(--radius-sm);">
+                                        Loading additional location pricing...
+                                    </div>
+                                    <div class="pricing-grid-container additional-logo-grid-container">
+                                        <table class="pricing-grid" id="additional-logo-pricing-grid" style="display: none;">
+                                            <thead>
+                                                <tr id="additional-logo-header-row">
+                                                    <!-- Headers will be populated -->
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Pricing data will be populated -->
+                                            </tbody>
+                                            <tfoot>
+                                                <!-- Notes will be populated -->
+                                            </tfoot>
+                                        </table>
                                     </div>
                                 </div>
-                                
-                                <!-- Skeleton table preview -->
-                                <div style="margin-top: 20px;">
-                                    <div class="skeleton-table">
-                                        <div class="skeleton-row skeleton-header">
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                        </div>
-                                        <div class="skeleton-row">
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                        </div>
-                                        <div class="skeleton-row">
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                        </div>
-                                        <div class="skeleton-row">
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                            <div class="skeleton-cell"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <table class="pricing-grid" id="custom-pricing-grid" style="display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease;">
-                                <thead>
-                                    <tr id="pricing-header-row">
-                                        <th>Quantity</th>
-                                        <!-- Tier headers will be dynamically populated -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Pricing data will be dynamically added here -->
-                                </tbody>
-                            </table>
-                            <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                                <p><strong>Note:</strong> Prices shown are per item. Setup fees and potential flash charges apply per color. Dark garments may require a white base (counts as an extra color).</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Additional Logo Pricing Section -->
-                    <div class="pricing-section additional-logo-pricing-section" style="margin-top: 30px;">
-                        <div class="pricing-header" style="margin-bottom: 15px;">
-                             <h3 class="section-title" style="font-size: 1.3em; margin: 0;">Additional Location Print Pricing</h3>
-                             <p style="font-size: 0.9em; color: #555; margin-top: 5px;">Prices below are per item for an additional print location, based on the number of colors in that additional print.</p>
-                        </div>
-                        <div id="additional-pricing-loading" style="padding: 15px; text-align: center; background-color: #f8f9fa; border: 1px solid #eee; border-radius: var(--radius-sm);">
-                            Loading additional location pricing...
-                        </div>
-                        <div class="pricing-grid-container additional-logo-grid-container">
-                            <table class="pricing-grid" id="additional-logo-pricing-grid" style="display: none;">
-                                <thead>
-                                    <tr id="additional-logo-header-row">
-                                        <!-- Headers: Qty Range | 1 Color | 2 Colors | ... | 6 Colors -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Pricing data will be dynamically added here by product-pricing-ui.js -->
-                                </tbody>
-                                <tfoot>
-                                    <!-- Optional: notes about additional setup fees for second location if applicable -->
-                                </tfoot>
-                            </table>
-                             <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                                <p><strong>Note:</strong> A separate setup fee may apply for each additional location and color count.</p>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Screen Print Pricing Interface -->
-                    <div id="add-to-cart-section">
-                        <!-- Interface will be initialized by screenprint-integration.js -->
+                    <!-- Hidden loading states for compatibility -->
+                    <div style="display: none;">
+                        <div id="pricing-initial-state"></div>
+                        <div id="pricing-table-loading"></div>
                     </div>
                 </div>
             </div>
