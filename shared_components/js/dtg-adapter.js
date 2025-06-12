@@ -450,8 +450,20 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
 
     function setupParentLocationSelector() {
         // Look for the dropdown in the Quick Quote component
-        const parentLocationDropdown = document.getElementById('dtg-location-select');
-        if (parentLocationDropdown) {
+        // Try multiple times since Quick Quote might initialize after adapter
+        let retryCount = 0;
+        const maxRetries = 20;
+        
+        const tryFindDropdown = () => {
+            const parentLocationDropdown = document.getElementById('dtg-location-select');
+            
+            if (!parentLocationDropdown && retryCount < maxRetries) {
+                retryCount++;
+                setTimeout(tryFindDropdown, 500); // Try again in 500ms
+                return;
+            }
+            
+            if (parentLocationDropdown) {
             // Style the dropdown to make it more prominent
             parentLocationDropdown.style.border = '2px solid #2e5827';
             parentLocationDropdown.style.fontWeight = 'bold';
@@ -491,10 +503,14 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
                     }
                 }
             });
-            console.log('[ADAPTER:DTG] Event listener added to parent-dtg-location-select.');
-        } else {
-            console.warn('[ADAPTER:DTG] parent-dtg-location-select dropdown not found.');
-        }
+                console.log('[ADAPTER:DTG] Event listener added to dtg-location-select.');
+            } else {
+                console.warn('[ADAPTER:DTG] dtg-location-select dropdown not found after ' + retryCount + ' attempts.');
+            }
+        };
+        
+        // Start trying to find the dropdown
+        tryFindDropdown();
     }
     
     function updateLocationIndicator(locationValue) {
