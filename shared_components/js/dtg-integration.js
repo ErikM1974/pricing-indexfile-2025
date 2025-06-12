@@ -117,27 +117,9 @@ class DTGIntegration {
     }
     
     getDTGPricingBreakdown(quantity, location) {
-        const locationInfo = this.config.helpers.getLocationInfo(location || this.state.currentLocation);
-        const basePrice = this.getBasePrice(quantity);
-        const locationUpcharge = locationInfo ? (locationInfo.upcharge || 0) : 0;
-        
-        const breakdown = [
-            {
-                label: 'Base shirt price',
-                value: basePrice,
-                formatted: this.config.helpers.formatPrice(basePrice)
-            }
-        ];
-        
-        if (locationInfo) {
-            breakdown.push({
-                label: `${locationInfo.displayName} printing${locationInfo.maxSize ? ` (${locationInfo.maxSize})` : ''}`,
-                value: locationUpcharge,
-                formatted: locationUpcharge > 0 ? `+${this.config.helpers.formatPrice(locationUpcharge)}` : 'included'
-            });
-        }
-        
-        return breakdown;
+        // For DTG, we don't need a complex breakdown since prices are all-inclusive
+        // This method is here for compatibility but returns null to use the default breakdown
+        return null;
     }
     
     getBasePrice(quantity) {

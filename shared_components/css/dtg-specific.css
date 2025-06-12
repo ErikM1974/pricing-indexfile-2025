@@ -449,3 +449,31 @@
 .dtg-pricing-page #pricing-grid-container-initial-state {
     display: none !important; /* Hide the "Select Print Location" message since it's in Quick Quote now */
 }
+
+/* Clean pricing breakdown for DTG */
+.dtg-pricing-page .pricing-breakdown {
+    background: var(--neutral-50);
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    margin-top: 15px;
+}
+
+.dtg-pricing-page .breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--neutral-200);
+}
+
+.dtg-pricing-page .breakdown-item:last-child {
+    border-bottom: none;
+}
+
+.dtg-pricing-page .breakdown-total {
+    font-weight: 600;
+    font-size: 1.1em;
+    color: var(--dtg-primary-dark);
+    padding-top: 12px;
+    margin-top: 8px;
+    border-top: 2px solid var(--dtg-primary-light);
+}

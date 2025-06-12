@@ -17,57 +17,49 @@ const DTGConfig = {
             name: 'Left Chest Only',
             displayName: 'Left Chest',
             description: 'Standard left chest placement (4" x 4" max)',
-            maxSize: '4" x 4"',
-            basePrice: true
+            maxSize: '4" x 4"'
         },
         'FF': {
             name: 'Full Front Only',
             displayName: 'Full Front',
             description: 'Large front print area (12" x 12" max)',
-            maxSize: '12" x 12"',
-            upcharge: 2.00
+            maxSize: '12" x 12"'
         },
         'FB': {
             name: 'Full Back Only',
             displayName: 'Full Back',
             description: 'Large back print area (12" x 12" max)',
-            maxSize: '12" x 12"',
-            upcharge: 2.00
+            maxSize: '12" x 12"'
         },
         'JF': {
             name: 'Jumbo Front Only',
             displayName: 'Jumbo Front',
             description: 'Extra large front print (14" x 16" max)',
-            maxSize: '14" x 16"',
-            upcharge: 4.00
+            maxSize: '14" x 16"'
         },
         'JB': {
             name: 'Jumbo Back Only',
             displayName: 'Jumbo Back',
             description: 'Extra large back print (14" x 16" max)',
-            maxSize: '14" x 16"',
-            upcharge: 4.00
+            maxSize: '14" x 16"'
         },
         'LC_FB': {
             name: 'Left Chest + Full Back',
             displayName: 'Left Chest + Full Back',
             description: 'Combination front and back prints',
-            combo: true,
-            upcharge: 4.00
+            combo: true
         },
         'FF_FB': {
             name: 'Full Front + Full Back',
             displayName: 'Full Front + Full Back',
             description: 'Large prints on both sides',
-            combo: true,
-            upcharge: 6.00
+            combo: true
         },
         'JF_JB': {
             name: 'Jumbo Front + Jumbo Back',
             displayName: 'Jumbo Front + Jumbo Back',
             description: 'Maximum coverage both sides',
-            combo: true,
-            upcharge: 10.00
+            combo: true
         }
     },
     
@@ -166,11 +158,11 @@ const DTGConfig = {
         },
         
         /**
-         * Calculate total upcharge for a location
+         * Get location description
          */
-        getLocationUpcharge(locationCode) {
+        getLocationDescription(locationCode) {
             const location = DTGConfig.locations[locationCode];
-            return location ? (location.upcharge || 0) : 0;
+            return location ? location.description : '';
         },
         
         /**

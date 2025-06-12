@@ -103,8 +103,8 @@ class UniversalQuickQuoteCalculator {
                     <select id="dtg-location-select" class="location-select">
                         <option value="">-- Choose Print Location --</option>
                         ${Object.entries(this.config.locations).map(([code, location]) => `
-                            <option value="${code}" data-upcharge="${location.upcharge || 0}">
-                                ${location.name}${location.upcharge ? ` (+$${location.upcharge.toFixed(2)})` : ''}
+                            <option value="${code}">
+                                ${location.name}
                             </option>
                         `).join('')}
                     </select>
@@ -437,13 +437,7 @@ class UniversalQuickQuoteCalculator {
         // Calculate additional costs
         let additionalCosts = 0;
 
-        // DTG location upcharge
-        if (this.config.pageType === 'dtg' && this.state.selectedLocation && this.config.locations) {
-            const location = this.config.locations[this.state.selectedLocation];
-            if (location && location.upcharge) {
-                additionalCosts += location.upcharge;
-            }
-        }
+        // No location upcharge for DTG - prices from Caspio are complete
 
         // Primary logo overage (if over included stitches) - only for embroidery
         if ((this.config.pageType === 'embroidery' || this.config.pageType === 'cap-embroidery') && 
@@ -514,16 +508,26 @@ class UniversalQuickQuoteCalculator {
 
         // Use custom breakdown for DTG if provided
         if (this.config.customPricingBreakdown && this.config.pageType === 'dtg') {
-            const breakdownItems = this.config.customPricingBreakdown(this.state.quantity, this.state.selectedLocation);
+            // For DTG, just show the complete price and size upcharges
+            html += `
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Price per shirt:</span>
+                    <span class="breakdown-value">$${this.state.basePrice.toFixed(2)}</span>
+                </div>
+            `;
             
-            breakdownItems.forEach(item => {
-                html += `
-                    <div class="breakdown-item">
-                        <span class="breakdown-label">${item.label}:</span>
-                        <span class="breakdown-value">${item.formatted}</span>
-                    </div>
-                `;
-            });
+            // Show selected location
+            if (this.state.selectedLocation && this.config.locations) {
+                const location = this.config.locations[this.state.selectedLocation];
+                if (location) {
+                    html += `
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">${location.displayName} printing:</span>
+                            <span class="breakdown-value">included</span>
+                        </div>
+                    `;
+                }
+            }
             
             // Size upcharges (if any)
             const upcharges = this.state.sizeGroups.filter(g => g.upcharge > 0);
@@ -627,18 +631,20 @@ class UniversalQuickQuoteCalculator {
             `;
         }
 
-        // Total
-        const hasUpcharges = this.state.sizeGroups.some(g => g.upcharge > 0);
-        const priceRange = hasUpcharges ? 
-            `$${this.state.unitPrice.toFixed(2)}-$${(this.state.unitPrice + Math.max(...this.state.sizeGroups.map(g => g.upcharge))).toFixed(2)}` :
-            `$${this.state.unitPrice.toFixed(2)}`;
-            
-        html += `
-            <div class="breakdown-item breakdown-total">
-                <span class="breakdown-label">Your price:</span>
-                <span class="breakdown-value">${priceRange} /${this.config.unitLabel.slice(0, -1)}</span>
-            </div>
-        `;
+        // Total - only show for non-DTG or if DTG doesn't have custom breakdown
+        if (this.config.pageType !== 'dtg' || !this.config.customPricingBreakdown) {
+            const hasUpcharges = this.state.sizeGroups.some(g => g.upcharge > 0);
+            const priceRange = hasUpcharges ? 
+                `$${this.state.unitPrice.toFixed(2)}-$${(this.state.unitPrice + Math.max(...this.state.sizeGroups.map(g => g.upcharge))).toFixed(2)}` :
+                `$${this.state.unitPrice.toFixed(2)}`;
+                
+            html += `
+                <div class="breakdown-item breakdown-total">
+                    <span class="breakdown-label">Your price:</span>
+                    <span class="breakdown-value">${priceRange} /${this.config.unitLabel.slice(0, -1)}</span>
+                </div>
+            `;
+        }
 
         this.elements.breakdown.innerHTML = html;
     }
