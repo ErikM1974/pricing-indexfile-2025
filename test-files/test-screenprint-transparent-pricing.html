@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Screen Print Transparent Pricing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2e5827;
+            margin-top: 0;
+        }
+        .mock-container {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            background: #fafafa;
+        }
+        #add-to-cart-section {
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Screen Print Transparent Pricing Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Scenario</h2>
+        <p>Testing the new transparent pricing display that shows base price prominently with setup fees separated.</p>
+        <ul>
+            <li>Base shirt price should be large and prominent</li>
+            <li>All-in price (with setup) should be secondary</li>
+            <li>Setup fees should be clearly broken down</li>
+            <li>Impact examples should show how quantity affects setup cost per shirt</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>Mock Interface</h2>
+        <div class="mock-container">
+            <div id="add-to-cart-section">
+                <!-- Integration will populate this -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <pre id="console-output" style="background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; max-height: 300px;">Console messages will appear here...</pre>
+    </div>
+    
+    <!-- Mock pricing grid for breakdown -->
+    <table id="custom-pricing-grid" style="display: none;">
+        <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>S</th>
+                <th>M</th>
+                <th>L</th>
+                <th>XL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1-23</td>
+                <td>$16.50</td>
+                <td>$16.50</td>
+                <td>$16.50</td>
+                <td>$16.50</td>
+            </tr>
+            <tr>
+                <td>24-47</td>
+                <td>$13.50</td>
+                <td>$13.50</td>
+                <td>$13.50</td>
+                <td>$13.50</td>
+            </tr>
+            <tr>
+                <td>48-71</td>
+                <td>$12.00</td>
+                <td>$12.00</td>
+                <td>$12.00</td>
+                <td>$12.00</td>
+            </tr>
+            <tr>
+                <td>72+</td>
+                <td>$10.50</td>
+                <td>$10.50</td>
+                <td>$10.50</td>
+                <td>$10.50</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <script>
+        // Console capture
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function logToOutput(type, args) {
+            const timestamp = new Date().toLocaleTimeString();
+            consoleOutput.textContent += `[${timestamp}] [${type}] ${args.join(' ')}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToOutput('LOG', args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logToOutput('ERROR', args);
+        };
+    </script>
+    
+    <!-- Define config for CSS variables -->
+    <style>
+        :root {
+            --primary-color: #2e5827;
+            --primary-light: #e8f5e9;
+            --background-light: #f8f9fa;
+            --border-color: #ddd;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+        }
+    </style>
+    
+    <!-- Load modules -->
+    <script src="/shared_components/js/screenprint-config.js"></script>
+    <script src="/shared_components/js/screenprint-calculator.js"></script>
+    <script src="/shared_components/js/screenprint-adapter.js"></script>
+    <script src="/shared_components/js/screenprint-integration.js"></script>
+    
+    <script>
+        // Simulate pricing data after page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, simulating pricing data...');
+            
+            // Simulate Caspio message after a delay
+            setTimeout(() => {
+                console.log('Simulating Caspio pricing data...');
+                
+                // Simulate the adapter receiving pricing data
+                const mockPricingData = {
+                    embellishmentType: 'screen-print',
+                    styleNumber: 'PC54',
+                    color: 'Navy',
+                    productTitle: 'Port & Company Core Cotton Tee',
+                    uniqueSizes: ['S', 'M', 'L', 'XL'],
+                    tiers: [
+                        {
+                            label: '1-23',
+                            minQty: 1,
+                            maxQty: 23,
+                            prices: { S: 16.50, M: 16.50, L: 16.50, XL: 16.50 },
+                            ltmFee: 50
+                        },
+                        {
+                            label: '24-47',
+                            minQty: 24,
+                            maxQty: 47,
+                            prices: { S: 13.50, M: 13.50, L: 13.50, XL: 13.50 },
+                            ltmFee: 50
+                        },
+                        {
+                            label: '48-71',
+                            minQty: 48,
+                            maxQty: 71,
+                            prices: { S: 12.00, M: 12.00, L: 12.00, XL: 12.00 },
+                            ltmFee: 0
+                        },
+                        {
+                            label: '72+',
+                            minQty: 72,
+                            maxQty: null,
+                            prices: { S: 10.50, M: 10.50, L: 10.50, XL: 10.50 },
+                            ltmFee: 0
+                        }
+                    ],
+                    fees: {
+                        setup: 90, // 3 colors × $30
+                        flash: 0
+                    }
+                };
+                
+                // Dispatch pricing data loaded event
+                document.dispatchEvent(new CustomEvent('pricingDataLoaded', { 
+                    detail: mockPricingData 
+                }));
+                
+                // Simulate initial color selection
+                setTimeout(() => {
+                    const frontColors = document.getElementById('sp-front-colors');
+                    if (frontColors) {
+                        frontColors.value = '3';
+                        frontColors.dispatchEvent(new Event('change'));
+                    }
+                    
+                    // Test dark garment
+                    const darkCheckbox = document.getElementById('dark-garment-checkbox');
+                    if (darkCheckbox) {
+                        darkCheckbox.checked = true;
+                        darkCheckbox.dispatchEvent(new Event('change'));
+                    }
+                    
+                    console.log('Initial setup complete: 3 front colors, dark garment');
+                }, 500);
+                
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

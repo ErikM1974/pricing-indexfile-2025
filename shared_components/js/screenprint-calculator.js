@@ -12,8 +12,6 @@ window.ScreenPrintCalculator = (function() {
         frontColors: 0,
         backColors: 0,
         isDarkGarment: false,
-        includeSetupInPrice: false,
-        setupDivisionQuantity: 48,
         currentGarmentColor: '',
         basePrice: 0,
         pricingData: null
@@ -78,7 +76,6 @@ window.ScreenPrintCalculator = (function() {
         }
         
         state.quantity = quantity;
-        state.setupDivisionQuantity = quantity; // Default to same
         recalculatePricing();
         return true;
     }
@@ -102,17 +99,9 @@ window.ScreenPrintCalculator = (function() {
         recalculatePricing();
     }
     
-    // Toggle setup fee inclusion
-    function toggleSetupInPrice(include) {
-        state.includeSetupInPrice = include;
-        updatePricingDisplay();
-    }
-    
-    // Update setup division quantity
-    function updateSetupDivisionQuantity(qty) {
-        const quantity = parseInt(qty) || 1;
-        state.setupDivisionQuantity = Math.max(1, quantity);
-        updatePricingDisplay();
+    // Get state for external use
+    function getState() {
+        return { ...state };
     }
     
     // Calculate total colors including white base
@@ -194,73 +183,95 @@ window.ScreenPrintCalculator = (function() {
             pricing = calculatePricing();
         }
         
-        // Update all pricing elements
+        // Update hero price display
+        const basePriceLarge = document.getElementById('sp-base-price-large');
+        if (basePriceLarge) {
+            basePriceLarge.textContent = pricing.basePrice.toFixed(2);
+        }
+        
+        // Update all-in price
+        const allInPrice = document.getElementById('sp-all-in-price');
+        if (allInPrice) {
+            const allInValue = pricing.basePrice + pricing.setupPerShirt + (pricing.ltmFee / pricing.quantity);
+            allInPrice.textContent = config.formatCurrency(allInValue);
+        }
+        
+        // Update grand total
+        const grandTotal = document.getElementById('sp-grand-total');
+        if (grandTotal) {
+            grandTotal.textContent = config.formatCurrency(pricing.grandTotal);
+        }
+        
+        // Update setup fee
+        const setupFee = document.getElementById('sp-setup-fee');
+        if (setupFee) {
+            setupFee.textContent = config.formatCurrency(pricing.setupFee);
+        }
+        
+        // Update setup breakdown
+        const setupBreakdown = document.getElementById('sp-setup-breakdown');
+        if (setupBreakdown) {
+            let breakdown = '';
+            if (pricing.colors.front > 0) {
+                breakdown += `Front (${pricing.colors.front} color${pricing.colors.front > 1 ? 's' : ''} × $30): ${config.formatCurrency(pricing.colors.front * config.setupFeePerColor)}`;
+            }
+            if (pricing.colors.back > 0) {
+                if (breakdown) breakdown += '<br>';
+                breakdown += `Back (${pricing.colors.back} color${pricing.colors.back > 1 ? 's' : ''} × $30): ${config.formatCurrency(pricing.colors.back * config.setupFeePerColor)}`;
+            }
+            setupBreakdown.innerHTML = breakdown;
+        }
+        
+        // Update impact examples
+        const impactExamples = document.getElementById('sp-impact-examples');
+        if (impactExamples) {
+            const examples = [
+                { qty: 48, impact: pricing.setupFee / 48 },
+                { qty: 96, impact: pricing.setupFee / 96 },
+                { qty: 144, impact: pricing.setupFee / 144 }
+            ];
+            
+            let examplesHTML = '';
+            examples.forEach(ex => {
+                const isCurrentQty = ex.qty === pricing.quantity;
+                examplesHTML += `• ${ex.qty} shirts: +${config.formatCurrency(ex.impact)} per shirt`;
+                if (isCurrentQty) examplesHTML += ' ← Your quantity';
+                examplesHTML += '<br>';
+            });
+            impactExamples.innerHTML = examplesHTML;
+        }
+        
+        // Update LTM notice
+        const ltmNotice = document.getElementById('sp-ltm-notice');
+        if (ltmNotice) {
+            ltmNotice.style.display = pricing.ltmFee > 0 ? 'flex' : 'none';
+        }
+        const ltmFee = document.getElementById('sp-ltm-fee');
+        if (ltmFee) {
+            ltmFee.textContent = config.formatCurrency(pricing.ltmFee);
+        }
+        
+        // Update LTM warning
+        const ltmWarning = document.getElementById('sp-ltm-warning');
+        if (ltmWarning) {
+            ltmWarning.style.display = pricing.ltmFee > 0 ? 'inline' : 'none';
+        }
+        
+        // Update hidden compatibility elements
         const elements = {
             quantity: document.getElementById('sp-quantity-display'),
             basePrice: document.getElementById('sp-base-price'),
-            subtotal: document.getElementById('sp-subtotal'),
-            setupFee: document.getElementById('sp-setup-fee'),
-            setupBreakdown: document.getElementById('sp-setup-breakdown'),
-            ltmFee: document.getElementById('sp-ltm-fee'),
-            ltmWarning: document.getElementById('sp-ltm-warning'),
-            grandTotal: document.getElementById('sp-grand-total'),
-            perShirtPrice: document.getElementById('sp-per-shirt-price'),
-            setupPerShirt: document.getElementById('sp-setup-per-shirt'),
-            setupDivisionQty: document.getElementById('sp-setup-division-qty')
+            subtotal: document.getElementById('sp-subtotal')
         };
         
-        // Update quantity
         if (elements.quantity) {
             elements.quantity.textContent = pricing.quantity;
         }
-        
-        // Update base price and subtotal
         if (elements.basePrice) {
             elements.basePrice.textContent = config.formatCurrency(pricing.basePrice);
         }
         if (elements.subtotal) {
             elements.subtotal.textContent = config.formatCurrency(pricing.subtotal);
-        }
-        
-        // Update setup fee with breakdown
-        if (elements.setupFee) {
-            elements.setupFee.textContent = config.formatCurrency(pricing.setupFee);
-        }
-        if (elements.setupBreakdown) {
-            let breakdown = '';
-            if (pricing.colors.front > 0) {
-                breakdown += `Front (${pricing.colors.front} color${pricing.colors.front > 1 ? 's' : ''}): ${config.formatCurrency(pricing.colors.front * config.setupFeePerColor)}`;
-            }
-            if (pricing.colors.back > 0) {
-                if (breakdown) breakdown += '<br>';
-                breakdown += `Back (${pricing.colors.back} color${pricing.colors.back > 1 ? 's' : ''}): ${config.formatCurrency(pricing.colors.back * config.setupFeePerColor)}`;
-            }
-            elements.setupBreakdown.innerHTML = breakdown;
-        }
-        
-        // Update LTM fee
-        if (elements.ltmFee) {
-            elements.ltmFee.textContent = config.formatCurrency(pricing.ltmFee);
-            elements.ltmFee.parentElement.style.display = pricing.ltmFee > 0 ? 'flex' : 'none';
-        }
-        if (elements.ltmWarning) {
-            elements.ltmWarning.style.display = pricing.ltmFee > 0 ? 'block' : 'none';
-        }
-        
-        // Update grand total
-        if (elements.grandTotal) {
-            elements.grandTotal.textContent = config.formatCurrency(pricing.grandTotal);
-        }
-        
-        // Update per shirt pricing
-        if (elements.perShirtPrice) {
-            elements.perShirtPrice.textContent = config.formatCurrency(pricing.totalPerShirt);
-        }
-        if (elements.setupPerShirt) {
-            elements.setupPerShirt.textContent = config.formatCurrency(pricing.setupPerShirt);
-        }
-        if (elements.setupDivisionQty) {
-            elements.setupDivisionQty.value = state.setupDivisionQuantity;
         }
     }
     
@@ -289,10 +300,9 @@ window.ScreenPrintCalculator = (function() {
         updateQuantity,
         updateColors,
         toggleDarkGarment,
-        toggleSetupInPrice,
-        updateSetupDivisionQuantity,
         getCurrentPricing,
-        recalculatePricing
+        recalculatePricing,
+        getState
     };
 })();
 

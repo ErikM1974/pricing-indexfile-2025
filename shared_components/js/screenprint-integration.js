@@ -101,56 +101,72 @@ window.ScreenPrintIntegration = (function() {
                 <div class="sp-pricing-display">
                     <h3 class="section-title">Your Pricing</h3>
                     
-                    <div class="sp-pricing-summary">
-                        <div class="pricing-line">
-                            <span>Quantity:</span>
-                            <span id="sp-quantity-display">${config.standardMinimum}</span>
+                    <!-- Main Price Display -->
+                    <div class="sp-hero-price-box">
+                        <div class="sp-base-price-display">
+                            <span class="sp-currency-symbol">$</span>
+                            <span id="sp-base-price-large">0.00</span>
+                            <span class="sp-price-label">per shirt</span>
+                        </div>
+                        <div class="sp-price-subtitle">shirt + printing included</div>
+                        
+                        <div class="sp-all-in-price">
+                            <span class="sp-all-in-label">with setup:</span>
+                            <span id="sp-all-in-price">$0.00</span>
+                            <span class="sp-all-in-suffix">/shirt</span>
                         </div>
                         
-                        <div class="pricing-line">
-                            <span>Base Price:</span>
-                            <span><span id="sp-base-price">$0.00</span>/shirt × <span class="sp-qty-ref">${config.standardMinimum}</span> = <span id="sp-subtotal">$0.00</span></span>
-                        </div>
-                        
-                        <div class="pricing-line setup-fee-line">
-                            <span>Setup Fees:</span>
-                            <span id="sp-setup-fee">$0.00</span>
-                        </div>
-                        
-                        <div class="setup-breakdown" id="sp-setup-breakdown"></div>
-                        
-                        <div class="pricing-line ltm-fee-line" style="display: none;">
-                            <span>Small Order Fee:</span>
-                            <span id="sp-ltm-fee">$50.00</span>
-                        </div>
-                        
-                        <div class="pricing-divider"></div>
-                        
-                        <div class="pricing-line pricing-total">
-                            <span>TOTAL PRICE:</span>
+                        <div class="sp-total-order">
+                            <span>Total order:</span>
                             <span id="sp-grand-total">$0.00</span>
                         </div>
                     </div>
                     
-                    <!-- Setup Fee Calculator -->
-                    <div class="sp-setup-calculator">
-                        <label>
-                            <input type="checkbox" id="sp-include-setup-toggle">
-                            Spread setup cost across shirts
-                        </label>
+                    <!-- Setup Fee Details -->
+                    <div class="sp-setup-details">
+                        <div class="sp-setup-header">
+                            <span class="sp-setup-title">One-time Setup Investment:</span>
+                            <span id="sp-setup-fee" class="sp-setup-amount">$0.00</span>
+                        </div>
+                        <div class="setup-breakdown" id="sp-setup-breakdown"></div>
                         
-                        <div id="sp-setup-spread-details" style="display: none;">
-                            <div class="setup-calc-line">
-                                Setup per shirt: $<span id="sp-setup-fee-total">0</span> ÷ 
-                                <input type="number" 
-                                       id="sp-setup-division-qty" 
-                                       min="1" 
-                                       value="${config.standardMinimum}" 
-                                       style="width: 80px;"> 
-                                shirts = <strong>$<span id="sp-setup-per-shirt">0.00</span></strong>
+                        <div class="sp-setup-impact">
+                            <div class="sp-impact-icon">ℹ️</div>
+                            <div class="sp-impact-message">
+                                <div id="sp-setup-impact-text">Setup cost impact decreases with quantity:</div>
+                                <div class="sp-impact-examples" id="sp-impact-examples">
+                                    <!-- Dynamic examples will be inserted here -->
+                                </div>
                             </div>
-                            <div class="setup-calc-line">
-                                Total per shirt: <strong>$<span id="sp-per-shirt-price">0.00</span></strong>
+                        </div>
+                    </div>
+                    
+                    <!-- Small Order Fee (if applicable) -->
+                    <div class="sp-ltm-notice" id="sp-ltm-notice" style="display: none;">
+                        <span class="sp-ltm-icon">⚠️</span>
+                        <span>Small order fee applies:</span>
+                        <span id="sp-ltm-fee">$50.00</span>
+                    </div>
+                    
+                    <!-- Hidden elements for compatibility -->
+                    <div style="display: none;">
+                        <span id="sp-quantity-display">${config.standardMinimum}</span>
+                        <span id="sp-base-price">$0.00</span>
+                        <span id="sp-subtotal">$0.00</span>
+                    </div>
+                </div>
+                    
+                    <!-- Quantity Savings Calculator -->
+                    <div class="sp-savings-calculator">
+                        <button type="button" id="sp-toggle-savings" class="sp-savings-toggle">
+                            💡 See how quantity affects your price
+                        </button>
+                        <div id="sp-savings-details" style="display: none;">
+                            <div class="sp-savings-content">
+                                <div class="sp-savings-header">Order more, save more:</div>
+                                <div id="sp-quantity-savings">
+                                    <!-- Dynamic savings calculations will be shown here -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -262,69 +278,226 @@ window.ScreenPrintIntegration = (function() {
                 font-size: 0.9em;
             }
             
-            .sp-pricing-summary {
+            /* Hero Price Display */
+            .sp-hero-price-box {
                 background: white;
-                border-radius: var(--radius-sm, 4px);
-                padding: 20px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                border-radius: var(--radius-md, 8px);
+                padding: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                text-align: center;
+                margin-bottom: 20px;
+                border: 2px solid var(--primary-color, #2e5827);
             }
             
-            .pricing-line {
+            .sp-base-price-display {
+                display: flex;
+                align-items: baseline;
+                justify-content: center;
+                margin-bottom: 5px;
+            }
+            
+            .sp-currency-symbol {
+                font-size: 28px;
+                font-weight: 600;
+                color: var(--primary-color, #2e5827);
+                margin-right: 2px;
+            }
+            
+            #sp-base-price-large {
+                font-size: 48px;
+                font-weight: bold;
+                color: var(--primary-color, #2e5827);
+                line-height: 1;
+            }
+            
+            .sp-price-label {
+                font-size: 20px;
+                font-weight: 500;
+                margin-left: 8px;
+                color: #333;
+            }
+            
+            .sp-price-subtitle {
+                font-size: 14px;
+                color: #666;
+                margin-bottom: 20px;
+                font-style: italic;
+            }
+            
+            .sp-all-in-price {
+                font-size: 18px;
+                color: #555;
+                margin-bottom: 10px;
+                padding: 10px;
+                background: #f8f9fa;
+                border-radius: var(--radius-sm, 4px);
+                display: inline-block;
+            }
+            
+            .sp-all-in-label {
+                font-weight: 500;
+                margin-right: 5px;
+            }
+            
+            #sp-all-in-price {
+                font-weight: bold;
+                color: #333;
+            }
+            
+            .sp-total-order {
+                font-size: 16px;
+                color: #666;
+            }
+            
+            #sp-grand-total {
+                font-weight: 600;
+                color: #333;
+            }
+            
+            /* Setup Details */
+            .sp-setup-details {
+                background: #f8f9fa;
+                border-radius: var(--radius-sm, 4px);
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .sp-setup-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 8px 0;
+                margin-bottom: 10px;
+                font-weight: 600;
             }
             
-            .pricing-line span:first-child {
-                font-weight: 500;
+            .sp-setup-title {
+                color: #333;
+            }
+            
+            .sp-setup-amount {
+                font-size: 20px;
+                color: var(--primary-color, #2e5827);
             }
             
             .setup-breakdown {
                 padding-left: 20px;
                 font-size: 0.9em;
                 color: #666;
-                margin-bottom: 10px;
+                margin-bottom: 15px;
+                line-height: 1.6;
             }
             
-            .pricing-divider {
-                border-top: 2px solid var(--border-color, #ddd);
-                margin: 15px 0;
-            }
-            
-            .pricing-total {
-                font-size: 1.3em;
-                font-weight: bold;
-                color: var(--primary-color, #2e5827);
-            }
-            
-            .sp-setup-calculator {
-                margin-top: 20px;
-                padding: 15px;
-                background: var(--primary-light, #e8f5e9);
-                border-radius: var(--radius-sm, 4px);
-            }
-            
-            .sp-setup-calculator label {
+            .sp-setup-impact {
                 display: flex;
-                align-items: center;
-                gap: 8px;
-                font-weight: 500;
-                cursor: pointer;
-            }
-            
-            #sp-setup-spread-details {
-                margin-top: 15px;
-                padding: 10px;
+                gap: 10px;
+                padding: 15px;
                 background: white;
                 border-radius: var(--radius-sm, 4px);
+                border: 1px solid #e0e0e0;
             }
             
-            .setup-calc-line {
-                padding: 5px 0;
+            .sp-impact-icon {
+                font-size: 20px;
+                flex-shrink: 0;
+            }
+            
+            .sp-impact-message {
+                flex: 1;
+            }
+            
+            #sp-setup-impact-text {
+                font-weight: 500;
+                margin-bottom: 8px;
+                color: #333;
+            }
+            
+            .sp-impact-examples {
+                font-size: 0.9em;
+                color: #666;
+                line-height: 1.5;
+            }
+            
+            /* LTM Notice */
+            .sp-ltm-notice {
                 display: flex;
                 align-items: center;
-                gap: 5px;
+                gap: 10px;
+                padding: 12px;
+                background: #fff3cd;
+                border: 1px solid #ffeeba;
+                border-radius: var(--radius-sm, 4px);
+                color: #856404;
+                margin-bottom: 20px;
+            }
+            
+            .sp-ltm-icon {
+                font-size: 18px;
+            }
+            
+            /* Savings Calculator */
+            .sp-savings-calculator {
+                text-align: center;
+                margin-top: 20px;
+            }
+            
+            .sp-savings-toggle {
+                background: var(--primary-light, #e8f5e9);
+                border: 1px solid var(--primary-color, #2e5827);
+                color: var(--primary-color, #2e5827);
+                padding: 10px 20px;
+                border-radius: var(--radius-sm, 4px);
+                cursor: pointer;
+                font-size: 1em;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+            
+            .sp-savings-toggle:hover {
+                background: var(--primary-color, #2e5827);
+                color: white;
+            }
+            
+            .sp-savings-content {
+                margin-top: 15px;
+                padding: 20px;
+                background: white;
+                border-radius: var(--radius-sm, 4px);
+                border: 1px solid #e0e0e0;
+            }
+            
+            .sp-savings-header {
+                font-weight: 600;
+                margin-bottom: 15px;
+                color: #333;
+            }
+            
+            #sp-quantity-savings {
+                text-align: left;
+            }
+            
+            .sp-savings-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            
+            .sp-savings-row:last-child {
+                border-bottom: none;
+            }
+            
+            .sp-savings-qty {
+                font-weight: 500;
+            }
+            
+            .sp-savings-price {
+                color: var(--primary-color, #2e5827);
+                font-weight: 600;
+            }
+            
+            .sp-savings-note {
+                font-size: 0.85em;
+                color: #666;
             }
             
             .sp-detailed-breakdown {
@@ -413,19 +586,10 @@ window.ScreenPrintIntegration = (function() {
             }
         });
         
-        // Setup inclusion toggle
-        document.addEventListener('change', (e) => {
-            if (e.target.id === 'sp-include-setup-toggle') {
-                const details = document.getElementById('sp-setup-spread-details');
-                details.style.display = e.target.checked ? 'block' : 'none';
-                calculator.toggleSetupInPrice(e.target.checked);
-            }
-        });
-        
-        // Setup division quantity
-        document.addEventListener('input', (e) => {
-            if (e.target.id === 'sp-setup-division-qty') {
-                calculator.updateSetupDivisionQuantity(e.target.value);
+        // Savings calculator toggle
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'sp-toggle-savings') {
+                toggleSavingsCalculator();
             }
         });
         
@@ -492,6 +656,64 @@ window.ScreenPrintIntegration = (function() {
             content.style.display = 'none';
             button.textContent = '▼ View Detailed Pricing Breakdown';
         }
+    }
+    
+    // Toggle savings calculator
+    function toggleSavingsCalculator() {
+        const button = document.getElementById('sp-toggle-savings');
+        const details = document.getElementById('sp-savings-details');
+        
+        if (details.style.display === 'none') {
+            // Calculate and show savings
+            showQuantitySavings();
+            details.style.display = 'block';
+            button.textContent = '🔼 Hide quantity savings';
+        } else {
+            // Hide savings
+            details.style.display = 'none';
+            button.textContent = '💡 See how quantity affects your price';
+        }
+    }
+    
+    // Show quantity savings
+    function showQuantitySavings() {
+        const savingsDiv = document.getElementById('sp-quantity-savings');
+        if (!savingsDiv) return;
+        
+        const currentPricing = calculator.getCurrentPricing();
+        const quantities = [48, 72, 96, 144, 200, 300];
+        let savingsHTML = '';
+        
+        quantities.forEach(qty => {
+            // Calculate pricing for this quantity
+            const oldQty = currentPricing.quantity;
+            calculator.updateQuantity(qty);
+            const qtyPricing = calculator.getCurrentPricing();
+            
+            const allInPrice = qtyPricing.basePrice + (qtyPricing.setupFee / qty) + (qtyPricing.ltmFee / qty);
+            const totalPrice = qtyPricing.grandTotal;
+            
+            savingsHTML += '<div class="sp-savings-row">';
+            savingsHTML += `<span class="sp-savings-qty">${qty} shirts:</span>`;
+            savingsHTML += `<span class="sp-savings-price">${config.formatCurrency(allInPrice)}/shirt</span>`;
+            
+            if (qty === currentPricing.quantity) {
+                savingsHTML += '<span class="sp-savings-note"> (current)</span>';
+            } else if (qty > currentPricing.quantity) {
+                const currentAllIn = currentPricing.basePrice + (currentPricing.setupFee / currentPricing.quantity) + (currentPricing.ltmFee / currentPricing.quantity);
+                const savings = currentAllIn - allInPrice;
+                if (savings > 0) {
+                    savingsHTML += `<span class="sp-savings-note"> Save ${config.formatCurrency(savings)}/shirt</span>`;
+                }
+            }
+            
+            savingsHTML += '</div>';
+            
+            // Restore original quantity
+            calculator.updateQuantity(oldQty);
+        });
+        
+        savingsDiv.innerHTML = savingsHTML;
     }
     
     // Public API
