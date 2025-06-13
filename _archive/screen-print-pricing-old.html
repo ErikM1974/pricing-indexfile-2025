@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Print Pricing | NWCA</title>
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
+    <style>
+        /* Color swatch styles */
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .swatch-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 70px;
+        }
+        
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .color-swatch.active {
+            border: 3px solid #0056b3;
+            box-shadow: 0 0 8px rgba(0,86,179,0.5);
+        }
+        
+        .color-name {
+            font-size: 0.8em;
+            margin-top: 5px;
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Loading indicator */
+        #pricing-loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #666;
+        }
+        
+        /* Enhanced Product Image Gallery Styles */
+        .product-image-gallery {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .main-image-container {
+            position: relative;
+            width: 100%;
+            background-color: #f8f9fa;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 15px;
+        }
+        
+        .main-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            min-height: 400px;
+            object-fit: contain;
+            background-color: white;
+        }
+        
+        .image-loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .main-image-container.loading .image-loading-spinner {
+            display: block;
+        }
+        
+        .image-thumbnails {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--primary-light);
+        }
+        
+        .image-thumbnails::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .image-thumbnails::-webkit-scrollbar-track {
+            background: var(--primary-light);
+            border-radius: 3px;
+        }
+        
+        .image-thumbnails::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        .thumbnail-item {
+            flex: 0 0 80px;
+            height: 80px;
+            border: 2px solid transparent;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+            position: relative;
+        }
+        
+        .thumbnail-item:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .thumbnail-item.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .thumbnail-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .thumbnail-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 0.7em;
+            padding: 2px 4px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .image-zoom-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .main-image-container:hover .image-zoom-overlay {
+            opacity: 1;
+        }
+        
+        .zoom-icon {
+            font-size: 20px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .swatch-wrapper {
+                width: 60px;
+            }
+            
+            .color-swatch {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .main-image-container img {
+                min-height: 300px;
+            }
+            
+            .thumbnail-item {
+                flex: 0 0 60px;
+                height: 60px;
+            }
+        }
+        
+        /* Enhanced Loading Animations - DTG Style */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: calc(200px + 100%) 0; }
+        }
+        
+        @keyframes progressPulse {
+            0%, 100% { transform: scaleX(1); }
+            50% { transform: scaleX(1.05); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Loading skeleton styles */
+        .skeleton-table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .skeleton-row {
+            display: flex;
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200px 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        .skeleton-cell {
+            flex: 1;
+            height: 20px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            margin: 0 4px;
+        }
+        
+        .skeleton-header {
+            background-color: #2e5827;
+            color: white;
+            animation: none;
+        }
+        
+        .skeleton-header .skeleton-cell {
+            background-color: rgba(255,255,255,0.2);
+            height: 16px;
+        }
+        
+        /* Progress bar styles */
+        .loading-progress {
+            width: 100%;
+            height: 8px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #4caf50 25%, #66bb6a 25%, #66bb6a 50%, #4caf50 50%, #4caf50 75%, #66bb6a 75%);
+            background-size: 20px 20px;
+            border-radius: 4px;
+            animation: progressPulse 2s ease-in-out infinite;
+            transition: width 0.3s ease;
+        }
+        
+        /* Enhanced loading container */
+        .enhanced-loading-container {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-loading-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        .loading-content {
+            background: white;
+            display: inline-block;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .loading-spinner-dual {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .loading-spinner-outer {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #e8f5e9;
+            border-top: 3px solid #2e5827;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-spinner-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border: 2px solid #c8e6c9;
+            border-top: 2px solid #4caf50;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite reverse;
+        }
+        
+        .loading-status {
+            color: #2e5827;
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .loading-step {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
+    <!-- Screen Print Specific Styles -->
+    <style>
+        /* Hide legacy controls that are replaced by new interface */
+        #color-select, #additional-logo-checkbox {
+            display: none;
+        }
+        
+        /* Collapsible sections styling */
+        .collapsible-section {
+            background: white;
+            border-radius: var(--radius-md, 8px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .collapsible-trigger {
+            width: 100%;
+            padding: 20px;
+            background: white;
+            border: none;
+            text-align: left;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--primary-color, #2e5827);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .collapsible-trigger:hover {
+            background-color: var(--primary-light, #f8f9fa);
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.2em;
+        }
+        
+        .collapsible-trigger.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        .collapsible-content {
+            padding: 0 20px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="universal-header-container" data-page-type="screenprint"></div>
+    <div class="container">
+        <h1 style="display: none;">Screen Printing Pricing</h1>
+        
+        <!-- Hidden elements for compatibility with legacy scripts -->
+        <div style="display: none;">
+            <h2 id="product-title-context">Product Title</h2>
+            <img id="product-image-main-hidden" src="" alt="">
+        </div>
+
+        <!-- New Two-Column Layout Container -->
+        <div class="product-page-columns-container">
+
+            <!-- Left Column: Product Context -->
+            <div class="product-context-column">
+                <!-- Universal Product Display Component will render here -->
+                <div id="product-display"></div>
+            </div>
+
+            <!-- Right Column: Interactive Elements -->
+            <div class="product-interactive-column">
+                <div class="pricing-content-interactive">
+                    <!-- Hidden Caspio Iframe Container -->
+                    <div id="caspio-iframe-container" style="display: none;">
+                        <!-- Caspio iframe will be loaded here by JS -->
+                    </div>
+                    <div id="pricing-calculator">
+                        <!-- Pricing calculator content will be loaded here by JS -->
+                    </div>
+                    <div id="pricing-fallback" style="display: none;">
+                        <p>Pricing information is currently unavailable. Please try again later or contact support.</p>
+                    </div>
+
+                    <!-- Legacy controls - hidden but kept for compatibility -->
+                    <div style="display: none;">
+                        <select id="color-select" name="color-select">
+                            <option value="">-- Select --</option>
+                            <option value="1">1 Color</option>
+                            <option value="2">2 Colors</option>
+                            <option value="3">3 Colors</option>
+                            <option value="4">4 Colors</option>
+                            <option value="5">5 Colors</option>
+                            <option value="6">6 Colors</option>
+                        </select>
+                        <input type="checkbox" id="additional-logo-checkbox" name="additional-logo-checkbox">
+                    </div>
+                    
+                    <!-- Screen Print Calculator at TOP (like DTG) -->
+                    <div id="add-to-cart-section">
+                        <!-- Calculator will be initialized by screenprint-integration.js -->
+                    </div>
+                    
+                    <!-- Pricing Tables at BOTTOM (collapsed by default) -->
+                    <div class="pricing-tables-section" style="margin-top: 40px;">
+                        <!-- Collapsible Pricing Tiers -->
+                        <div class="collapsible-section">
+                            <button type="button" class="collapsible-trigger" id="toggle-pricing-tiers">
+                                <span class="toggle-icon">▼</span>
+                                <span class="toggle-text">View Detailed Pricing Tiers</span>
+                            </button>
+                            <div class="collapsible-content" id="pricing-tiers-content" style="display: none;">
+                                <div class="pricing-section">
+                                    <div class="pricing-grid-container">
+                                        <table class="pricing-grid" id="custom-pricing-grid" style="display: none;">
+                                            <thead>
+                                                <tr id="pricing-header-row">
+                                                    <th>Quantity</th>
+                                                    <!-- Tier headers will be dynamically populated -->
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Pricing data will be dynamically added here -->
+                                            </tbody>
+                                        </table>
+                                        <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                                            <p><strong>Note:</strong> Prices shown are per item. Setup fees apply per color.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Collapsible Additional Location Pricing -->
+                        <div class="collapsible-section" style="margin-top: 20px;">
+                            <button type="button" class="collapsible-trigger" id="toggle-additional-pricing">
+                                <span class="toggle-icon">▼</span>
+                                <span class="toggle-text">View Additional Location Pricing</span>
+                            </button>
+                            <div class="collapsible-content" id="additional-pricing-content" style="display: none;">
+                                <div class="pricing-section additional-logo-pricing-section">
+                                    <div id="additional-pricing-loading" style="padding: 15px; text-align: center; background-color: #f8f9fa; border: 1px solid #eee; border-radius: var(--radius-sm);">
+                                        Loading additional location pricing...
+                                    </div>
+                                    <div class="pricing-grid-container additional-logo-grid-container">
+                                        <table class="pricing-grid" id="additional-logo-pricing-grid" style="display: none;">
+                                            <thead>
+                                                <tr id="additional-logo-header-row">
+                                                    <!-- Headers will be populated -->
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Pricing data will be populated -->
+                                            </tbody>
+                                            <tfoot>
+                                                <!-- Notes will be populated -->
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden loading states for compatibility -->
+                    <div style="display: none;">
+                        <div id="pricing-initial-state"></div>
+                        <div id="pricing-table-loading"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- JavaScript Files -->
+    <script src="/shared_components/js/utils.js"></script>
+    <script>
+        // Helper function to populate color swatches
+        function populateColorSwatches(colors) {
+            const swatchesContainer = document.getElementById('color-swatches');
+            const loadingElement = document.getElementById('color-swatches-loading');
+            
+            if (!swatchesContainer) return;
+            
+            // Clear existing swatches
+            swatchesContainer.innerHTML = '';
+            
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+            
+            if (!colors || !Array.isArray(colors) || colors.length === 0) {
+                console.warn("No color data available to populate swatches");
+                return;
+            }
+            
+            colors.forEach(color => {
+                const swatchWrapper = document.createElement('div');
+                swatchWrapper.className = 'swatch-wrapper';
+                
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.dataset.colorName = color.COLOR_NAME;
+                swatch.dataset.catalogColor = color.CATALOG_COLOR;
+                swatch.title = color.COLOR_NAME;
+                
+                if (color.COLOR_SQUARE_IMAGE) {
+                    swatch.style.backgroundImage = `url('${color.COLOR_SQUARE_IMAGE}')`;
+                } else {
+                    swatch.style.backgroundColor = color.COLOR_NAME.toLowerCase().replace(/\s+/g, '');
+                }
+                
+                // Check if this is the currently selected color
+                if ((window.selectedCatalogColor && color.CATALOG_COLOR === window.selectedCatalogColor) ||
+                    (!window.selectedCatalogColor && window.selectedColorName && color.COLOR_NAME === window.selectedColorName)) {
+                    swatch.classList.add('active');
+                }
+                
+                // Add click handler to change color
+                swatch.addEventListener('click', () => {
+                    // Update URL with new color
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('COLOR', color.CATALOG_COLOR);
+                    window.location.href = currentUrl.toString();
+                });
+                
+                const name = document.createElement('span');
+                name.className = 'color-name';
+                name.textContent = color.COLOR_NAME;
+                
+                swatchWrapper.appendChild(swatch);
+                swatchWrapper.appendChild(name);
+                swatchesContainer.appendChild(swatchWrapper);
+            });
+            
+            // Show the swatches container
+            swatchesContainer.style.display = 'flex';
+        }
+        
+        // Listen for product colors data
+        window.addEventListener('productColorsReady', function(event) {
+            if (event.detail && event.detail.colors) {
+                populateColorSwatches(event.detail.colors);
+            }
+        });
+        
+        // Initialize Universal Product Display when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[Screen Print] Initializing Universal Product Display');
+            
+            // Initialize Universal Product Display immediately
+            let productDisplay = new UniversalProductDisplay({
+                containerId: 'product-display',
+                pageType: 'screenprint',
+                showBackButton: true,
+                showInfoBox: true,
+                showSelectedColor: true,
+                sticky: false,
+                infoBoxContent: 'Pricing includes screen printing for the selected number of colors on one location. Additional charges may apply for setup, flash curing, and specialty inks.'
+            });
+        });
+    </script>
+    <script src="/shared_components/js/pricing-pages.js"></script>
+    <!-- Disabled: pricing-matrix-capture.js - Using master bundle approach instead -->
+    <!-- <script src="/shared_components/js/pricing-matrix-capture.js"></script> -->
+    <script src="/shared_components/js/pricing-matrix-api.js"></script>
+    <script src="/shared_components/js/product-pricing-ui.js"></script>
+    <script src="/shared_components/js/pricing-calculator.js"></script>
+    
+    <!-- Screen Print Modular Components -->
+    <script src="/shared_components/js/screenprint-config.js"></script>
+    <script src="/shared_components/js/screenprint-calculator.js"></script>
+    <script src="/shared_components/js/screenprint-adapter.js"></script>
+    <script src="/shared_components/js/screenprint-integration.js"></script>
+    
+    <!-- Enhanced Loading Experience -->
+    <script src="/shared_components/js/screenprint-enhanced-loading.js"></script>
+    <script src="/shared_components/js/universal-header-component.js"></script>
+    <script src="/shared_components/js/universal-product-display.js"></script>
+    <script src="/shared_components/js/universal-image-gallery.js"></script>
+    
+    <!-- Caspio Integration -->
+    <script src="/screenprint-caspio-loader.js"></script>
+    
+    <!-- Disabled: Fallback extractor - Getting master bundle from Caspio now -->
+    <!-- <script src="/screenprint-fallback-extractor.js"></script> -->
+    
+</body>
+</html>
