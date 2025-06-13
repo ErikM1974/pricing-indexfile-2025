@@ -75,25 +75,25 @@ window.ScreenPrintAdapter = (function() {
         
         // Get current configuration from calculator
         const frontColorSelect = document.getElementById('sp-front-colors');
-        const backColorSelect = document.getElementById('sp-back-colors');
         const frontColors = frontColorSelect ? frontColorSelect.value : '0';
-        const backColors = backColorSelect ? backColorSelect.value : '0';
         
-        // Use front colors for primary pricing (back just adds to setup)
+        // For screen print, we always use front colors for the primary location pricing
+        // Additional locations have their own pricing structure
         const colorCount = frontColors || '1';
         
         if (!colorCount || colorCount === '0') {
-            console.log('[ScreenPrintAdapter] No color count selected');
+            console.log('[ScreenPrintAdapter] No front color count selected');
             return;
         }
+        
+        console.log('[ScreenPrintAdapter] Processing pricing for front colors:', colorCount);
         
         // Extract pricing for selected color count
         const pricingData = extractPricingForColorCount(colorCount);
         
         if (pricingData) {
-            // Add back color info for setup fee calculation
+            // Add front color info
             pricingData.frontColors = parseInt(frontColors) || 0;
-            pricingData.backColors = parseInt(backColors) || 0;
             
             // Dispatch pricing data
             document.dispatchEvent(new CustomEvent('pricingDataLoaded', { 
@@ -213,7 +213,10 @@ window.ScreenPrintAdapter = (function() {
     function setupEventListeners() {
         // Listen for color selection changes from integration
         document.addEventListener('change', (e) => {
-            if (e.target.id === 'sp-front-colors' || e.target.id === 'sp-back-colors') {
+            if (e.target.id === 'sp-front-colors' || 
+                e.target.classList.contains('location-select') || 
+                e.target.classList.contains('location-colors-select')) {
+                console.log('[ScreenPrintAdapter] Detected change in colors/locations, reprocessing pricing');
                 setTimeout(() => processPricingData(), 100);
             }
         });

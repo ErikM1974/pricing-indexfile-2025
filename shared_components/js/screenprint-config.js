@@ -22,6 +22,19 @@ window.ScreenPrintConfig = {
         { value: '6', label: '6 Colors' }
     ],
     
+    // Location options for additional prints
+    locationOptions: [
+        { value: 'back', label: 'Back' },
+        { value: 'left-chest', label: 'Left Chest' },
+        { value: 'right-chest', label: 'Right Chest' },
+        { value: 'left-sleeve', label: 'Left Sleeve' },
+        { value: 'right-sleeve', label: 'Right Sleeve' },
+        { value: 'custom', label: 'Other Location' }
+    ],
+    
+    // Maximum additional locations
+    maxAdditionalLocations: 3,
+    
     // Dark garment colors that typically need white underbase
     darkGarmentColors: [
         'Black', 'Navy', 'Navy Blue', 'Dark Grey', 'Charcoal', 'Forest Green', 
@@ -54,9 +67,8 @@ window.ScreenPrintConfig = {
         );
     },
     
-    calculateSetupFee(frontColors, backColors = 0) {
-        const totalColors = parseInt(frontColors) + parseInt(backColors);
-        return totalColors * this.setupFeePerColor;
+    calculateSetupFee(totalColors) {
+        return parseInt(totalColors) * this.setupFeePerColor;
     },
     
     formatCurrency(amount) {
@@ -72,6 +84,7 @@ window.ScreenPrintConfig = {
 // Freeze config to prevent accidental modifications
 Object.freeze(ScreenPrintConfig);
 Object.freeze(ScreenPrintConfig.colorOptions);
+Object.freeze(ScreenPrintConfig.locationOptions);
 Object.freeze(ScreenPrintConfig.darkGarmentColors);
 Object.freeze(ScreenPrintConfig.ui);
 Object.freeze(ScreenPrintConfig.messages);

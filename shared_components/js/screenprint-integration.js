@@ -61,23 +61,16 @@ window.ScreenPrintIntegration = (function() {
                             </select>
                         </div>
                         
-                        <!-- Add Back Print -->
-                        <div class="control-group checkbox-group">
-                            <label>
-                                <input type="checkbox" id="sp-add-back-print">
-                                <span>Add Back/Second Location Print</span>
-                            </label>
-                        </div>
-                        
-                        <!-- Back Colors (hidden by default) -->
-                        <div class="control-group" id="sp-back-colors-group" style="display: none;">
-                            <label for="sp-back-colors">Back Design Colors:</label>
-                            <select id="sp-back-colors" class="control-select">
-                                <option value="0">No Back Print</option>
-                                ${config.colorOptions.map(opt => 
-                                    `<option value="${opt.value}">${opt.label}</option>`
-                                ).join('')}
-                            </select>
+                        <!-- Additional Locations -->
+                        <div class="control-group">
+                            <label>Additional Print Locations:</label>
+                            <div id="sp-additional-locations-container">
+                                <!-- Dynamic location controls will be added here -->
+                            </div>
+                            <button type="button" id="sp-add-location-btn" class="add-location-btn">
+                                <span class="btn-icon">+</span> Add Print Location
+                            </button>
+                            <div class="help-text">Up to ${config.maxAdditionalLocations} additional locations</div>
                         </div>
                         
                         <!-- Quantity -->
@@ -157,6 +150,28 @@ window.ScreenPrintIntegration = (function() {
                 
                 <!-- Error Messages -->
                 <div id="sp-error-message" class="error-message" style="display: none;"></div>
+            </div>
+            
+            <!-- Detailed Order Summary -->
+            <div class="order-summary-section" id="sp-order-summary" style="display: none;">
+                <h4 class="summary-title">Detailed Order Summary</h4>
+                <div class="summary-content">
+                    <div class="summary-items" id="sp-summary-items">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Pricing Tiers Accordion -->
+            <div class="pricing-tiers-section">
+                <button type="button" class="collapsible-trigger" id="toggle-pricing-tiers">
+                    <span class="trigger-icon">▶</span> View All Pricing Tiers
+                </button>
+                <div class="collapsible-content" style="display: none;">
+                    <div id="sp-pricing-tiers-content">
+                        <!-- Dynamic pricing tiers will be inserted here -->
+                    </div>
+                </div>
             </div>
         `;
         
@@ -249,6 +264,81 @@ window.ScreenPrintIntegration = (function() {
                 color: #ff6b6b;
                 display: block;
                 margin-top: 5px;
+            }
+            
+            /* Additional Locations */
+            #sp-additional-locations-container {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .location-control {
+                animation: slideIn 0.3s ease;
+            }
+            
+            .location-row {
+                display: grid;
+                grid-template-columns: 1fr 120px 40px;
+                gap: 8px;
+                align-items: center;
+            }
+            
+            .add-location-btn {
+                background: var(--primary-color, #2e5827);
+                color: white;
+                border: none;
+                padding: 10px 16px;
+                border-radius: var(--radius-sm, 4px);
+                cursor: pointer;
+                font-size: 0.95em;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                transition: background-color 0.3s ease;
+            }
+            
+            .add-location-btn:hover {
+                background: #234520;
+            }
+            
+            .add-location-btn .btn-icon {
+                font-size: 1.2em;
+                font-weight: bold;
+            }
+            
+            .remove-location-btn {
+                background: #dc3545;
+                color: white;
+                border: none;
+                padding: 8px;
+                border-radius: var(--radius-sm, 4px);
+                cursor: pointer;
+                font-size: 1.2em;
+                line-height: 1;
+                transition: background-color 0.3s ease;
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .remove-location-btn:hover {
+                background: #c82333;
+            }
+            
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
             
             /* Results Side */
@@ -403,6 +493,183 @@ window.ScreenPrintIntegration = (function() {
                 text-align: center;
             }
             
+            /* Order Summary Section */
+            .order-summary-section {
+                background: white;
+                border: 1px solid var(--border-color, #ddd);
+                border-radius: var(--radius-md, 8px);
+                padding: 20px;
+                margin: 20px 0;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            }
+            
+            .summary-title {
+                color: var(--primary-color, #2e5827);
+                font-size: 1.2em;
+                margin: 0 0 15px 0;
+                font-weight: 600;
+            }
+            
+            .summary-table {
+                font-size: 0.95em;
+            }
+            
+            .summary-row {
+                display: grid;
+                grid-template-columns: 1fr auto auto;
+                gap: 15px;
+                padding: 8px 0;
+                align-items: center;
+            }
+            
+            .summary-row.indent {
+                padding-left: 20px;
+            }
+            
+            .summary-label {
+                font-weight: 500;
+            }
+            
+            .summary-value {
+                text-align: right;
+                color: #666;
+            }
+            
+            .summary-total {
+                text-align: right;
+                font-weight: 600;
+                min-width: 80px;
+            }
+            
+            .summary-section-divider {
+                border-top: 1px solid #eee;
+                margin: 10px 0;
+            }
+            
+            .summary-section-title {
+                font-weight: 600;
+                color: #555;
+                margin: 10px 0 5px 0;
+                font-size: 0.9em;
+            }
+            
+            .subtotal-row {
+                border-top: 1px solid #eee;
+                padding-top: 12px;
+                margin-top: 8px;
+            }
+            
+            .grand-total-row {
+                border-top: 2px solid var(--primary-color, #2e5827);
+                padding-top: 12px;
+                margin-top: 12px;
+                font-size: 1.1em;
+            }
+            
+            .grand-total-row .summary-total {
+                color: var(--primary-color, #2e5827);
+                font-size: 1.2em;
+            }
+            
+            .per-item-row {
+                background: #f8f9fa;
+                padding: 10px 8px;
+                margin: 10px -8px -8px;
+                border-radius: 4px;
+            }
+            
+            /* Pricing Tiers Section */
+            .pricing-tiers-section {
+                margin: 20px 0;
+            }
+            
+            .collapsible-trigger {
+                background: var(--background-light, #f8f9fa);
+                border: 1px solid var(--border-color, #ddd);
+                border-radius: var(--radius-sm, 4px);
+                padding: 12px 16px;
+                cursor: pointer;
+                width: 100%;
+                text-align: left;
+                font-size: 1em;
+                font-weight: 600;
+                color: var(--primary-color, #2e5827);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background-color 0.3s ease;
+            }
+            
+            .collapsible-trigger:hover {
+                background: #e9ecef;
+            }
+            
+            .collapsible-trigger.active .trigger-icon {
+                transform: rotate(90deg);
+            }
+            
+            .trigger-icon {
+                transition: transform 0.3s ease;
+            }
+            
+            .collapsible-content {
+                margin-top: 10px;
+                animation: slideDown 0.3s ease;
+            }
+            
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    max-height: 0;
+                }
+                to {
+                    opacity: 1;
+                    max-height: 1000px;
+                }
+            }
+            
+            .tiers-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            
+            .tiers-table th,
+            .tiers-table td {
+                padding: 10px;
+                text-align: center;
+                border: 1px solid #ddd;
+            }
+            
+            .tiers-table th {
+                background: var(--background-light, #f8f9fa);
+                font-weight: 600;
+                color: #333;
+            }
+            
+            .tiers-table tr.current-tier {
+                background: #e7f5e7;
+                font-weight: 600;
+            }
+            
+            .tier-range {
+                text-align: left !important;
+                font-weight: 600;
+            }
+            
+            .savings {
+                color: var(--primary-color, #2e5827);
+                font-weight: 600;
+            }
+            
+            .tiers-note {
+                font-size: 0.85em;
+                color: #666;
+                text-align: center;
+                margin-top: 10px;
+                font-style: italic;
+            }
+            
             /* Responsive */
             @media (max-width: 768px) {
                 .calculator-content {
@@ -435,24 +702,27 @@ window.ScreenPrintIntegration = (function() {
         document.addEventListener('change', (e) => {
             if (e.target.id === 'sp-front-colors') {
                 calculator.updateColors('front', e.target.value);
-            } else if (e.target.id === 'sp-back-colors') {
-                calculator.updateColors('back', e.target.value);
             }
         });
         
-        // Back print toggle
+        // Add location button
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'sp-add-location-btn' || e.target.closest('#sp-add-location-btn')) {
+                addLocationControl();
+            }
+            
+            // Remove location button
+            if (e.target.classList.contains('remove-location-btn') || e.target.closest('.remove-location-btn')) {
+                const btn = e.target.closest('.remove-location-btn');
+                const index = parseInt(btn.dataset.index);
+                removeLocationControl(index);
+            }
+        });
+        
+        // Location and color changes
         document.addEventListener('change', (e) => {
-            if (e.target.id === 'sp-add-back-print') {
-                const backGroup = document.getElementById('sp-back-colors-group');
-                const backColors = document.getElementById('sp-back-colors');
-                
-                if (e.target.checked) {
-                    backGroup.style.display = 'flex';
-                } else {
-                    backGroup.style.display = 'none';
-                    backColors.value = '0';
-                    calculator.updateColors('back', 0);
-                }
+            if (e.target.classList.contains('location-select') || e.target.classList.contains('location-colors-select')) {
+                updateLocationFromUI();
             }
         });
         
@@ -503,6 +773,104 @@ window.ScreenPrintIntegration = (function() {
         });
     }
     
+    // Add location control
+    function addLocationControl() {
+        const container = document.getElementById('sp-additional-locations-container');
+        const currentCount = container.querySelectorAll('.location-control').length;
+        
+        if (currentCount >= config.maxAdditionalLocations) {
+            return;
+        }
+        
+        const index = currentCount;
+        const locationControl = document.createElement('div');
+        locationControl.className = 'location-control';
+        locationControl.dataset.index = index;
+        
+        locationControl.innerHTML = `
+            <div class="location-row">
+                <select class="location-select control-select" data-index="${index}">
+                    ${config.locationOptions.map(opt => 
+                        `<option value="${opt.value}" ${opt.value === 'back' ? 'selected' : ''}>${opt.label}</option>`
+                    ).join('')}
+                </select>
+                <select class="location-colors-select control-select" data-index="${index}">
+                    ${config.colorOptions.map(opt => 
+                        `<option value="${opt.value}" ${opt.value === '1' ? 'selected' : ''}>${opt.label}</option>`
+                    ).join('')}
+                </select>
+                <button type="button" class="remove-location-btn" data-index="${index}">
+                    <span class="btn-icon">×</span>
+                </button>
+            </div>
+        `;
+        
+        container.appendChild(locationControl);
+        
+        // Add to calculator state with default values
+        calculator.addAdditionalLocation('back', 1);
+        
+        // Update button visibility
+        updateAddLocationButton();
+    }
+    
+    // Remove location control
+    function removeLocationControl(index) {
+        const container = document.getElementById('sp-additional-locations-container');
+        const control = container.querySelector(`[data-index="${index}"]`);
+        
+        if (control) {
+            control.remove();
+            calculator.removeAdditionalLocation(index);
+            
+            // Re-index remaining controls
+            const controls = container.querySelectorAll('.location-control');
+            controls.forEach((ctrl, i) => {
+                ctrl.dataset.index = i;
+                ctrl.querySelector('.location-select').dataset.index = i;
+                ctrl.querySelector('.location-colors-select').dataset.index = i;
+                ctrl.querySelector('.remove-location-btn').dataset.index = i;
+            });
+            
+            updateAddLocationButton();
+        }
+    }
+    
+    // Update location from UI
+    function updateLocationFromUI() {
+        const container = document.getElementById('sp-additional-locations-container');
+        const controls = container.querySelectorAll('.location-control');
+        
+        console.log('[ScreenPrintIntegration] Updating locations from UI, found', controls.length, 'controls');
+        
+        controls.forEach((control, index) => {
+            const locationSelect = control.querySelector('.location-select');
+            const colorsSelect = control.querySelector('.location-colors-select');
+            
+            if (locationSelect && locationSelect.value) {
+                console.log(`[ScreenPrintIntegration] Updating location ${index}: ${locationSelect.value} with ${colorsSelect.value} colors`);
+                calculator.updateAdditionalLocation(
+                    index,
+                    locationSelect.value,
+                    colorsSelect.value
+                );
+            }
+        });
+    }
+    
+    // Update add location button visibility
+    function updateAddLocationButton() {
+        const btn = document.getElementById('sp-add-location-btn');
+        const container = document.getElementById('sp-additional-locations-container');
+        const currentCount = container.querySelectorAll('.location-control').length;
+        
+        if (currentCount >= config.maxAdditionalLocations) {
+            btn.style.display = 'none';
+        } else {
+            btn.style.display = 'block';
+        }
+    }
+    
     // Update pricing display
     function updatePricingDisplay(pricing) {
         // Update base price
@@ -514,8 +882,9 @@ window.ScreenPrintIntegration = (function() {
         // Update price subtitle
         const priceSubtitle = document.getElementById('sp-price-subtitle');
         if (priceSubtitle) {
-            if (pricing.hasBackPrint && pricing.additionalLocationCost > 0) {
-                priceSubtitle.textContent = 'shirt + printing (2 locations)';
+            if (pricing.hasAdditionalLocations && pricing.additionalLocationCost > 0) {
+                const totalLocations = 1 + pricing.additionalLocationBreakdown.length;
+                priceSubtitle.textContent = `shirt + printing (${totalLocations} locations)`;
             } else {
                 priceSubtitle.textContent = 'shirt + printing included';
             }
@@ -550,15 +919,29 @@ window.ScreenPrintIntegration = (function() {
         const setupBreakdown = document.getElementById('sp-setup-breakdown');
         if (setupBreakdown) {
             let breakdown = '';
+            
+            // Front location
             if (pricing.colors.front > 0) {
                 breakdown += `• Front (${pricing.colors.front} color${pricing.colors.front > 1 ? 's' : ''} × $30): ${config.formatCurrency(pricing.colors.front * config.setupFeePerColor)}<br>`;
             }
-            if (pricing.colors.back > 0) {
-                breakdown += `• Back (${pricing.colors.back} color${pricing.colors.back > 1 ? 's' : ''} × $30): ${config.formatCurrency(pricing.colors.back * config.setupFeePerColor)}`;
-                if (pricing.additionalLocationCost > 0) {
-                    breakdown += `<br><small style="color: #666;">+ ${config.formatCurrency(pricing.additionalLocationCost)}/shirt for 2nd location</small>`;
-                }
+            
+            // Additional locations
+            if (pricing.additionalLocationBreakdown && pricing.additionalLocationBreakdown.length > 0) {
+                pricing.additionalLocationBreakdown.forEach(loc => {
+                    const locationLabel = config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
+                    breakdown += `• ${locationLabel} (${loc.totalColors} color${loc.totalColors > 1 ? 's' : ''} × $30): ${config.formatCurrency(loc.setupCost)}<br>`;
+                });
+                
+                // Show per-piece costs for additional locations
+                breakdown += '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd;">';
+                breakdown += '<small style="color: #666;"><strong>Additional Location Costs:</strong><br>';
+                pricing.additionalLocationBreakdown.forEach(loc => {
+                    const locationLabel = config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
+                    breakdown += `• ${locationLabel}: +${config.formatCurrency(loc.costPerPiece)}/shirt<br>`;
+                });
+                breakdown += '</small></div>';
             }
+            
             setupBreakdown.innerHTML = breakdown;
         }
         
@@ -577,6 +960,183 @@ window.ScreenPrintIntegration = (function() {
         if (ltmWarning) {
             ltmWarning.style.display = pricing.ltmFee > 0 ? 'inline' : 'none';
         }
+        
+        // Update detailed order summary
+        updateOrderSummary(pricing);
+        
+        // Update pricing tiers
+        updatePricingTiers(pricing);
+    }
+    
+    // Update order summary
+    function updateOrderSummary(pricing) {
+        const summarySection = document.getElementById('sp-order-summary');
+        const summaryItems = document.getElementById('sp-summary-items');
+        
+        if (!summaryItems || !pricing.quantity || pricing.quantity === 0) {
+            if (summarySection) summarySection.style.display = 'none';
+            return;
+        }
+        
+        // Get current state from calculator
+        const calcState = calculator.getState();
+        
+        // Show summary section
+        summarySection.style.display = 'block';
+        
+        let summaryHTML = `
+            <div class="summary-table">
+                <div class="summary-row">
+                    <div class="summary-label">${pricing.quantity} × ${calcState.pricingData?.styleNumber || 'Shirts'}</div>
+                    <div class="summary-value">@ ${config.formatCurrency(pricing.basePrice)} ea</div>
+                    <div class="summary-total">${config.formatCurrency(pricing.basePrice * pricing.quantity)}</div>
+                </div>
+        `;
+        
+        // Add additional locations
+        if (pricing.additionalLocationBreakdown && pricing.additionalLocationBreakdown.length > 0) {
+            summaryHTML += '<div class="summary-section-divider"></div>';
+            summaryHTML += '<div class="summary-section-title">Additional Print Locations:</div>';
+            
+            pricing.additionalLocationBreakdown.forEach(loc => {
+                const locationLabel = config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
+                summaryHTML += `
+                    <div class="summary-row indent">
+                        <div class="summary-label">${locationLabel} (${loc.colors} color${loc.colors > 1 ? 's' : ''})</div>
+                        <div class="summary-value">@ ${config.formatCurrency(loc.costPerPiece)} ea</div>
+                        <div class="summary-total">${config.formatCurrency(loc.costPerPiece * pricing.quantity)}</div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Subtotal
+        summaryHTML += `
+            <div class="summary-row subtotal-row">
+                <div class="summary-label">Subtotal:</div>
+                <div class="summary-value"></div>
+                <div class="summary-total">${config.formatCurrency(pricing.subtotal)}</div>
+            </div>
+        `;
+        
+        // Setup fees
+        summaryHTML += '<div class="summary-section-divider"></div>';
+        summaryHTML += '<div class="summary-section-title">One-Time Setup Fees:</div>';
+        
+        if (pricing.colors.front > 0) {
+            summaryHTML += `
+                <div class="summary-row indent">
+                    <div class="summary-label">Front: ${pricing.colors.front} color${pricing.colors.front > 1 ? 's' : ''} × $30</div>
+                    <div class="summary-value"></div>
+                    <div class="summary-total">${config.formatCurrency(pricing.colors.front * config.setupFeePerColor)}</div>
+                </div>
+            `;
+        }
+        
+        if (pricing.additionalLocationBreakdown) {
+            pricing.additionalLocationBreakdown.forEach(loc => {
+                const locationLabel = config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
+                summaryHTML += `
+                    <div class="summary-row indent">
+                        <div class="summary-label">${locationLabel}: ${loc.totalColors} color${loc.totalColors > 1 ? 's' : ''} × $30</div>
+                        <div class="summary-value"></div>
+                        <div class="summary-total">${config.formatCurrency(loc.setupCost)}</div>
+                    </div>
+                `;
+            });
+        }
+        
+        summaryHTML += `
+            <div class="summary-row">
+                <div class="summary-label">Total Setup:</div>
+                <div class="summary-value"></div>
+                <div class="summary-total">${config.formatCurrency(pricing.setupFee)}</div>
+            </div>
+        `;
+        
+        // LTM fee if applicable
+        if (pricing.ltmFee > 0) {
+            summaryHTML += `
+                <div class="summary-row">
+                    <div class="summary-label">Small Order Fee:</div>
+                    <div class="summary-value"></div>
+                    <div class="summary-total">${config.formatCurrency(pricing.ltmFee)}</div>
+                </div>
+            `;
+        }
+        
+        // Grand total
+        summaryHTML += `
+            <div class="summary-row grand-total-row">
+                <div class="summary-label">TOTAL:</div>
+                <div class="summary-value"></div>
+                <div class="summary-total">${config.formatCurrency(pricing.grandTotal)}</div>
+            </div>
+            <div class="summary-row per-item-row">
+                <div class="summary-label">Per Shirt Cost:</div>
+                <div class="summary-value"></div>
+                <div class="summary-total">${config.formatCurrency(pricing.totalPerShirt)}</div>
+            </div>
+        `;
+        
+        summaryHTML += '</div>';
+        summaryItems.innerHTML = summaryHTML;
+    }
+    
+    // Update pricing tiers
+    function updatePricingTiers(pricing) {
+        const tiersContent = document.getElementById('sp-pricing-tiers-content');
+        const calcState = calculator.getState();
+        
+        if (!tiersContent || !pricing.tierInfo || !calcState.pricingData) return;
+        
+        let tiersHTML = '<div class="pricing-tiers-table">';
+        
+        // Header
+        tiersHTML += '<table class="tiers-table"><thead><tr><th>Quantity</th>';
+        
+        // Add size headers
+        const sizes = calcState.pricingData.uniqueSizes || [];
+        sizes.forEach(size => {
+            tiersHTML += `<th>${size}</th>`;
+        });
+        
+        tiersHTML += '<th>Your Savings</th></tr></thead><tbody>';
+        
+        // Add tier rows
+        let baseTierPrice = null;
+        calcState.pricingData.tiers.forEach((tier, index) => {
+            const isCurrentTier = pricing.quantity >= tier.minQty && 
+                                  (tier.maxQty === null || pricing.quantity <= tier.maxQty);
+            
+            tiersHTML += `<tr class="${isCurrentTier ? 'current-tier' : ''}">`;
+            tiersHTML += `<td class="tier-range">${tier.minQty}-${tier.maxQty || '576+'}</td>`;
+            
+            // Add prices for each size
+            sizes.forEach(size => {
+                const price = tier.prices[size];
+                tiersHTML += `<td>${price ? config.formatCurrency(price) : '-'}</td>`;
+            });
+            
+            // Calculate savings
+            if (index === 0) {
+                baseTierPrice = tier.prices[sizes[0]] || 0;
+                tiersHTML += '<td>-</td>';
+            } else {
+                const currentPrice = tier.prices[sizes[0]] || 0;
+                const savings = baseTierPrice - currentPrice;
+                const savingsPercent = baseTierPrice > 0 ? (savings / baseTierPrice * 100).toFixed(0) : 0;
+                tiersHTML += `<td class="savings">${savingsPercent}% off</td>`;
+            }
+            
+            tiersHTML += '</tr>';
+        });
+        
+        tiersHTML += '</tbody></table>';
+        tiersHTML += '<div class="tiers-note">Prices shown are per shirt and include 1 color print on front location.</div>';
+        tiersHTML += '</div>';
+        
+        tiersContent.innerHTML = tiersHTML;
     }
     
     // Setup initial state
@@ -617,7 +1177,10 @@ window.ScreenPrintIntegration = (function() {
     
     // Public API
     return {
-        init
+        init,
+        addLocationControl,
+        removeLocationControl,
+        updateLocationFromUI
     };
 })();
 

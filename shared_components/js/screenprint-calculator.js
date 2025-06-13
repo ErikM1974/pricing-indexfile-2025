@@ -10,7 +10,7 @@ window.ScreenPrintCalculator = (function() {
     let state = {
         quantity: 48,
         frontColors: 0,
-        backColors: 0,
+        additionalLocations: [], // Array of {location: 'back', colors: 2}
         isDarkGarment: false,
         currentGarmentColor: '',
         basePrice: 0,
@@ -86,11 +86,43 @@ window.ScreenPrintCalculator = (function() {
         
         if (location === 'front') {
             state.frontColors = colorCount;
-        } else if (location === 'back') {
-            state.backColors = colorCount;
+            recalculatePricing();
+        }
+    }
+    
+    // Add additional location
+    function addAdditionalLocation(location, colors) {
+        if (state.additionalLocations.length >= config.maxAdditionalLocations) {
+            showError(`Maximum ${config.maxAdditionalLocations} additional locations allowed`);
+            return false;
         }
         
+        state.additionalLocations.push({
+            location: location,
+            colors: parseInt(colors) || 1
+        });
+        
         recalculatePricing();
+        return true;
+    }
+    
+    // Update additional location
+    function updateAdditionalLocation(index, location, colors) {
+        if (index >= 0 && index < state.additionalLocations.length) {
+            state.additionalLocations[index] = {
+                location: location,
+                colors: parseInt(colors) || 1
+            };
+            recalculatePricing();
+        }
+    }
+    
+    // Remove additional location
+    function removeAdditionalLocation(index) {
+        if (index >= 0 && index < state.additionalLocations.length) {
+            state.additionalLocations.splice(index, 1);
+            recalculatePricing();
+        }
     }
     
     // Toggle dark garment
@@ -107,25 +139,50 @@ window.ScreenPrintCalculator = (function() {
     // Calculate total colors including white base
     function calculateTotalColors() {
         let frontTotal = state.frontColors;
-        let backTotal = state.backColors;
+        let additionalTotal = 0;
+        let locationDetails = [];
         
-        if (state.isDarkGarment && (frontTotal > 0 || backTotal > 0)) {
-            if (frontTotal > 0) frontTotal += 1; // Add white base
-            if (backTotal > 0) backTotal += 1; // Add white base
+        // Add white base for front if dark garment
+        if (state.isDarkGarment && frontTotal > 0) {
+            frontTotal += 1;
         }
         
-        return { front: frontTotal, back: backTotal, total: frontTotal + backTotal };
+        // Process additional locations
+        state.additionalLocations.forEach(loc => {
+            let locationColors = loc.colors;
+            if (state.isDarkGarment && locationColors > 0) {
+                locationColors += 1; // Add white base
+            }
+            additionalTotal += locationColors;
+            locationDetails.push({
+                ...loc,
+                totalColors: locationColors
+            });
+        });
+        
+        return { 
+            front: frontTotal, 
+            additionalTotal: additionalTotal,
+            total: frontTotal + additionalTotal,
+            locationDetails: locationDetails
+        };
     }
     
     // Calculate pricing
     function calculatePricing() {
         const colors = calculateTotalColors();
-        const setupFee = config.calculateSetupFee(colors.front, colors.back);
+        
+        // Calculate setup fees
+        let setupFee = colors.front * config.setupFeePerColor;
+        colors.locationDetails.forEach(loc => {
+            setupFee += loc.totalColors * config.setupFeePerColor;
+        });
         
         // Get base price from pricing data
         let basePrice = 0;
         let tierInfo = null;
-        let additionalLocationCost = 0;
+        let totalAdditionalLocationCost = 0;
+        let additionalLocationBreakdown = [];
         
         if (state.pricingData && state.pricingData.tiers) {
             // Find appropriate tier based on quantity
@@ -165,31 +222,43 @@ window.ScreenPrintCalculator = (function() {
                 console.warn('[ScreenPrintCalculator] No tier found for quantity', state.quantity);
             }
             
-            // Get additional location pricing if back print is selected
-            if (state.backColors > 0 && state.pricingData.additionalLocationPricing) {
-                const backColorCount = colors.back.toString();
-                const additionalPricing = state.pricingData.additionalLocationPricing;
-                
-                console.log('[ScreenPrintCalculator] Looking for additional location pricing for', backColorCount, 'colors');
-                console.log('[ScreenPrintCalculator] Available additional pricing:', additionalPricing);
-                
-                if (additionalPricing && additionalPricing.tiers) {
-                    // Find the matching tier for additional location
-                    const additionalTier = additionalPricing.tiers.find(tier => {
-                        return state.quantity >= tier.minQty && 
-                               (tier.maxQty === null || tier.maxQty === undefined || state.quantity <= tier.maxQty);
-                    });
+            // Get additional location pricing for each location
+            if (state.additionalLocations.length > 0 && state.pricingData.additionalLocationPricing) {
+                state.additionalLocations.forEach((loc, index) => {
+                    const locationColors = colors.locationDetails[index].totalColors;
+                    const colorCountStr = locationColors.toString();
+                    const additionalPricing = state.pricingData.additionalLocationPricing;
                     
-                    if (additionalTier && additionalTier.pricePerPiece !== null) {
-                        additionalLocationCost = parseFloat(additionalTier.pricePerPiece) || 0;
-                        console.log('[ScreenPrintCalculator] Additional location cost per piece:', additionalLocationCost);
+                    console.log(`[ScreenPrintCalculator] Looking for additional location pricing for ${loc.location} with ${colorCountStr} colors`);
+                    
+                    if (additionalPricing && additionalPricing.tiers) {
+                        // Find the matching tier for additional location
+                        const additionalTier = additionalPricing.tiers.find(tier => {
+                            return state.quantity >= tier.minQty && 
+                                   (tier.maxQty === null || tier.maxQty === undefined || state.quantity <= tier.maxQty);
+                        });
+                        
+                        if (additionalTier && additionalTier.pricePerPiece !== null) {
+                            const locationCost = parseFloat(additionalTier.pricePerPiece) || 0;
+                            totalAdditionalLocationCost += locationCost;
+                            
+                            additionalLocationBreakdown.push({
+                                location: loc.location,
+                                colors: loc.colors,
+                                totalColors: locationColors,
+                                costPerPiece: locationCost,
+                                setupCost: locationColors * config.setupFeePerColor
+                            });
+                            
+                            console.log(`[ScreenPrintCalculator] ${loc.location} cost per piece: $${locationCost}`);
+                        }
                     }
-                }
+                });
             }
         }
         
-        // Calculate totals including additional location
-        const basePriceWithAdditional = basePrice + additionalLocationCost;
+        // Calculate totals including additional locations
+        const basePriceWithAdditional = basePrice + totalAdditionalLocationCost;
         const subtotal = basePriceWithAdditional * state.quantity;
         const ltmFee = (state.quantity < config.ltmThreshold) ? config.ltmFee : 0;
         const totalSetup = setupFee;
@@ -203,8 +272,9 @@ window.ScreenPrintCalculator = (function() {
             quantity: state.quantity,
             colors: colors,
             basePrice: basePrice,
-            additionalLocationCost: additionalLocationCost,
+            additionalLocationCost: totalAdditionalLocationCost,
             basePriceWithAdditional: basePriceWithAdditional,
+            additionalLocationBreakdown: additionalLocationBreakdown,
             subtotal: subtotal,
             setupFee: totalSetup,
             setupPerShirt: setupPerShirt,
@@ -212,7 +282,7 @@ window.ScreenPrintCalculator = (function() {
             grandTotal: grandTotal,
             totalPerShirt: totalPerShirt,
             tierInfo: tierInfo,
-            hasBackPrint: state.backColors > 0
+            hasAdditionalLocations: state.additionalLocations.length > 0
         };
     }
     
@@ -349,6 +419,9 @@ window.ScreenPrintCalculator = (function() {
         init,
         updateQuantity,
         updateColors,
+        addAdditionalLocation,
+        updateAdditionalLocation,
+        removeAdditionalLocation,
         toggleDarkGarment,
         getCurrentPricing,
         recalculatePricing,

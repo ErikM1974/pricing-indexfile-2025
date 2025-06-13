@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Screen Print V2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-controls {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-btn {
+            background: #2e5827;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-btn:hover {
+            background: #234520;
+        }
+        .console-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Screen Print V2 Test Page</h1>
+    
+    <div class="test-controls">
+        <h3>Test Controls</h3>
+        <button class="test-btn" onclick="simulateCaspioData()">Simulate Caspio Data</button>
+        <button class="test-btn" onclick="testAddLocation()">Add Location</button>
+        <button class="test-btn" onclick="testUpdateQuantity()">Update Quantity (144)</button>
+        <button class="test-btn" onclick="testDarkGarment()">Toggle Dark Garment</button>
+        <button class="test-btn" onclick="showState()">Show Current State</button>
+        <button class="test-btn" onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <!-- Calculator Container -->
+    <div id="screenprint-calculator-v2"></div>
+
+    <!-- Console Output -->
+    <div class="console-output" id="console-output">
+        Console output will appear here...
+    </div>
+
+    <!-- Include the V2 scripts -->
+    <script src="/shared_components/js/screenprint-caspio-adapter-v2.js"></script>
+    <script src="/shared_components/js/screenprint-pricing-v2.js"></script>
+
+    <script>
+        // Override console.log to show in our output
+        const outputDiv = document.getElementById('console-output');
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            outputDiv.innerHTML += args.join(' ') + '<br>';
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        };
+
+        function clearConsole() {
+            outputDiv.innerHTML = 'Console cleared.<br>';
+        }
+
+        function simulateCaspioData() {
+            console.log('Simulating Caspio master bundle...');
+            
+            const mockBundle = {
+                styleNumber: 'TEST123',
+                productTitle: 'Test T-Shirt',
+                colorName: 'Black',
+                uniqueSizes: ['S', 'M', 'L', 'XL', '2XL'],
+                primaryLocationPricing: {
+                    '1': {
+                        setupFee: 30,
+                        tiers: [
+                            {
+                                label: 'Tier 1',
+                                minQty: 24,
+                                maxQty: 47,
+                                prices: { 'S': 12.50, 'M': 12.50, 'L': 12.50, 'XL': 12.50, '2XL': 14.50 }
+                            },
+                            {
+                                label: 'Tier 2',
+                                minQty: 48,
+                                maxQty: 95,
+                                prices: { 'S': 10.50, 'M': 10.50, 'L': 10.50, 'XL': 10.50, '2XL': 12.50 }
+                            },
+                            {
+                                label: 'Tier 3',
+                                minQty: 96,
+                                maxQty: 143,
+                                prices: { 'S': 9.50, 'M': 9.50, 'L': 9.50, 'XL': 9.50, '2XL': 11.50 }
+                            }
+                        ]
+                    },
+                    '2': {
+                        setupFee: 60,
+                        tiers: [
+                            {
+                                label: 'Tier 1',
+                                minQty: 24,
+                                maxQty: 47,
+                                prices: { 'S': 13.50, 'M': 13.50, 'L': 13.50, 'XL': 13.50, '2XL': 15.50 }
+                            },
+                            {
+                                label: 'Tier 2',
+                                minQty: 48,
+                                maxQty: 95,
+                                prices: { 'S': 11.50, 'M': 11.50, 'L': 11.50, 'XL': 11.50, '2XL': 13.50 }
+                            }
+                        ]
+                    }
+                },
+                additionalLocationPricing: {
+                    tiers: [
+                        {
+                            minQty: 24,
+                            maxQty: 47,
+                            pricePerPiece: 3.00
+                        },
+                        {
+                            minQty: 48,
+                            maxQty: 95,
+                            pricePerPiece: 2.50
+                        },
+                        {
+                            minQty: 96,
+                            maxQty: null,
+                            pricePerPiece: 2.00
+                        }
+                    ]
+                }
+            };
+
+            // Simulate Caspio message
+            window.postMessage({
+                type: 'caspioScreenPrintMasterBundleReady',
+                data: mockBundle
+            }, '*');
+        }
+
+        function testAddLocation() {
+            console.log('Adding location...');
+            window.ScreenPrintPricingV2.addLocation();
+        }
+
+        function testUpdateQuantity() {
+            console.log('Updating quantity to 144...');
+            window.ScreenPrintPricingV2.updateQuantity(144);
+            document.getElementById('sp-quantity').value = 144;
+        }
+
+        function testDarkGarment() {
+            const checkbox = document.getElementById('sp-dark-garment');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                window.ScreenPrintPricingV2.updateDarkGarment(checkbox.checked);
+                console.log('Dark garment:', checkbox.checked);
+            }
+        }
+
+        function showState() {
+            console.log('Current state:', JSON.stringify(window.ScreenPrintPricingV2.state, null, 2));
+        }
+
+        // Auto-load test data after page loads
+        setTimeout(() => {
+            console.log('Page loaded. Click "Simulate Caspio Data" to begin testing.');
+        }, 500);
+    </script>
+</body>
+</html>
