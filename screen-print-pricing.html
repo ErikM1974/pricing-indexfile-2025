@@ -435,6 +435,77 @@
             font-style: italic;
         }
 
+        /* Size Upcharge Info Box */
+        .sp-size-upcharge-info {
+            background: linear-gradient(135deg, #f0f7f0 0%, #e8f5e8 100%);
+            border: 1px solid #d4e8d4;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .sp-size-upcharge-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d4e8d4;
+        }
+
+        .sp-size-icon {
+            font-size: 24px;
+        }
+
+        .sp-size-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2e5827;
+        }
+
+        .sp-size-upcharge-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .sp-size-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .sp-size-item:hover {
+            border-color: #2e5827;
+            box-shadow: 0 2px 6px rgba(46, 88, 39, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .sp-size-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .sp-size-price {
+            display: block;
+            color: #2e5827;
+            font-weight: 500;
+            font-size: 1.05em;
+        }
+
+        .sp-size-item:first-child .sp-size-price {
+            color: #666;
+            font-style: italic;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .sp-layout {
@@ -462,6 +533,16 @@
             .sp-btn-remove {
                 width: 100%;
                 margin-top: 5px;
+            }
+
+            .sp-size-upcharge-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sp-size-upcharge-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>

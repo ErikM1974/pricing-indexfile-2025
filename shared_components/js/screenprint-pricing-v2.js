@@ -200,6 +200,32 @@ class ScreenPrintPricing {
                         </div>
                     </div>
                 </div>
+                
+                <!-- Size Upcharge Info Box (moved to bottom) -->
+                <div class="sp-size-upcharge-info">
+                    <div class="sp-size-upcharge-header">
+                        <span class="sp-size-icon">👕</span>
+                        <span class="sp-size-title">Size Upcharges</span>
+                    </div>
+                    <div class="sp-size-upcharge-grid">
+                        <div class="sp-size-item">
+                            <span class="sp-size-label">S-XL</span>
+                            <span class="sp-size-price">Standard</span>
+                        </div>
+                        <div class="sp-size-item">
+                            <span class="sp-size-label">2XL</span>
+                            <span class="sp-size-price">+$2.00</span>
+                        </div>
+                        <div class="sp-size-item">
+                            <span class="sp-size-label">3XL</span>
+                            <span class="sp-size-price">+$3.00</span>
+                        </div>
+                        <div class="sp-size-item">
+                            <span class="sp-size-label">4XL+</span>
+                            <span class="sp-size-price">+$4.00</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
         // Re-cache elements that are created inside container.innerHTML
