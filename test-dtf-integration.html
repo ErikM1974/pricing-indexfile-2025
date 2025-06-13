@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTF Integration Test Links</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-links {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .info {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .link-group {
+            margin-bottom: 30px;
+        }
+        .link-group h3 {
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+        a {
+            display: block;
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        a:hover {
+            background: #0056b3;
+        }
+        .code {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-top: 20px;
+            border: 1px solid #dee2e6;
+        }
+        .formula {
+            background: #e9f7ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border: 1px solid #b8e0ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-links">
+        <h1>DTF Integration Test Links</h1>
+        <p class="info">Click these links to test the DTF calculator with different URL parameters</p>
+
+        <div class="link-group">
+            <h3>Basic Tests</h3>
+            <a href="/dtf-pricing.html?price=5&quantity=24&productName=Gildan%205000%20T-Shirt&sku=G5000-BLK">
+                Basic T-Shirt ($5, 24 qty)
+            </a>
+            <a href="/dtf-pricing.html?garmentCost=10&qty=50&name=Premium%20Hoodie&sku=CHM-S700">
+                Premium Hoodie ($10, 50 qty)
+            </a>
+            <a href="/dtf-pricing.html?cost=15&quantity=100&productName=Performance%20Shirt">
+                Performance Shirt ($15, 100 qty)
+            </a>
+        </div>
+
+        <div class="link-group">
+            <h3>Edge Cases</h3>
+            <a href="/dtf-pricing.html?price=8&quantity=10&productName=Small%20Order%20Test">
+                Minimum Order (10 qty) - Should show $50 LTM
+            </a>
+            <a href="/dtf-pricing.html?price=5&quantity=23&productName=LTM%20Threshold%20Test">
+                LTM Threshold (23 qty) - Should show $50 LTM
+            </a>
+            <a href="/dtf-pricing.html?price=5&quantity=24&productName=No%20LTM%20Test">
+                No LTM (24 qty) - Should NOT show LTM
+            </a>
+        </div>
+
+        <div class="link-group">
+            <h3>Direct Calculator Access</h3>
+            <a href="/dtf-pricing-v2.html">DTF Calculator V2 (Clean)</a>
+            <a href="/test-dtf-v2.html">DTF Calculator Test Page (with controls)</a>
+        </div>
+
+        <div class="formula">
+            <h4>Current Pricing Formula:</h4>
+            <p><strong>Per Shirt Price =</strong><br>
+            (Garment ÷ 0.6) + Transfers + ($2 × Locations) + (Freight × Locations) + (LTM ÷ Quantity)</p>
+            
+            <h4>Pricing Tiers:</h4>
+            <ul>
+                <li>10-23: $6.00 / $9.50 / $14.50 (+$50 LTM)</li>
+                <li>24-47: $5.25 / $8.25 / $12.50</li>
+                <li>48-71: $4.00 / $6.50 / $10.00</li>
+                <li>72+: $3.25 / $5.00 / $8.00</li>
+            </ul>
+        </div>
+
+        <div class="code">
+            <h4>JavaScript Integration Example:</h4>
+            <pre>// Send data to calculator
+window.DTFAdapter.updateData({
+    garmentCost: 10.00,
+    quantity: 50,
+    productInfo: {
+        name: 'Premium T-Shirt',
+        sku: 'PRM-001'
+    }
+});</pre>
+            
+            <h4>Simulate Pricing Event:</h4>
+            <button onclick="simulatePricingEvent()" style="background: #28a745; margin-top: 10px;">
+                Simulate DTG-style Pricing Event
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        function simulatePricingEvent() {
+            // Simulate a DTG-style pricing event
+            const mockEvent = new CustomEvent('pricingDataLoaded', {
+                detail: {
+                    styleNumber: "G5000",
+                    color: "Black",
+                    embellishmentType: "dtf",
+                    headers: ["S-XL", "2XL", "3XL", "4XL+"],
+                    prices: {
+                        "S-XL": {
+                            "24-47": 8.50,
+                            "48-71": 7.75,
+                            "72+": 7.00
+                        },
+                        "2XL": {
+                            "24-47": 10.50,
+                            "48-71": 9.75,
+                            "72+": 9.00
+                        }
+                    },
+                    tierData: {
+                        "24-47": { MinQuantity: 24, MaxQuantity: 47 },
+                        "48-71": { MinQuantity: 48, MaxQuantity: 71 },
+                        "72+": { MinQuantity: 72, MaxQuantity: 99999 }
+                    },
+                    productTitle: "Gildan 5000 - Heavy Cotton T-Shirt",
+                    capturedAt: new Date().toISOString(),
+                    hasError: false
+                }
+            });
+            
+            window.dispatchEvent(mockEvent);
+            alert('Pricing event dispatched! Check the DTF pricing page to see if garment cost updated to $8.50');
+            
+            // Also open the DTF page in a new tab
+            window.open('/dtf-pricing.html', '_blank');
+        }
+    </script>
+</body>
+</html>
