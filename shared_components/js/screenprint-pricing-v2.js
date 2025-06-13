@@ -82,7 +82,8 @@ class ScreenPrintPricing {
             setupFee: null,
             // Accordions
             tiersAccordion: null,
-            tiersContent: null
+            tiersContent: null,
+            additionalLocationGuideContent: null // Added for the new accordion
         };
     }
 
@@ -228,6 +229,7 @@ class ScreenPrintPricing {
         this.elements.orderSummary = document.getElementById('sp-order-summary');
         this.elements.summaryContent = document.getElementById('sp-summary-content');
         this.elements.tiersContent = document.getElementById('sp-tiers-content');
+        this.elements.additionalLocationGuideContent = document.getElementById('sp-location-guide'); // Cache this
     }
 
     bindEvents() {
@@ -378,6 +380,7 @@ class ScreenPrintPricing {
     }
 
     updateLocations() {
+        console.log('[ScreenPrintV2_Debug] updateLocations() called.'); // Removed event.target as event is not in this scope
         // Rebuild locations array from UI
         const locationRows = this.elements.locationsContainer.querySelectorAll('.sp-location-row');
         this.state.additionalLocations = Array.from(locationRows).map(row => {
@@ -411,106 +414,154 @@ class ScreenPrintPricing {
 
     // Pricing calculations
     calculatePricing() {
+        const { quantity, frontColors, additionalLocations, isDarkGarment, pricingData } = this.state;
+
         const pricing = {
-            quantity: this.state.quantity,
-            frontColors: this.state.frontColors,
-            additionalLocations: this.state.additionalLocations,
-            isDarkGarment: this.state.isDarkGarment,
-            basePrice: 0,
-            additionalCost: 0,
+            quantity: quantity,
+            frontColors: frontColors, // Design colors for front
+            additionalLocations: additionalLocations, // Array of {location, colors (design)}
+            isDarkGarment: isDarkGarment,
+            basePrice: 0,           // Garment + front print (including underbase if applicable)
+            additionalCost: 0,      // Sum of per-piece costs for all additional locations (including underbase)
             setupFee: 0,
             ltmFee: 0,
             subtotal: 0,
             grandTotal: 0,
             perShirtTotal: 0,
             setupPerShirt: 0,
-            colorBreakdown: {
-                front: 0,
-                locations: []
+            colorBreakdown: {       // For display in setup details
+                front: 0,           // Effective print colors for front
+                locations: []       // Array of {location, colors (design), totalColors (effective), setupCost, costPerPiece}
             }
         };
 
-        // Calculate actual colors (including white base if needed)
-        pricing.colorBreakdown.front = this.state.frontColors;
-        if (this.state.isDarkGarment && this.state.frontColors > 0) {
-            pricing.colorBreakdown.front += 1;
+        if (!pricingData) return pricing; // Not ready if master bundle isn't loaded
+
+        // 1. Calculate effective front print colors and determine basePrice
+        let effectiveFrontPrintColors = frontColors;
+        if (isDarkGarment && frontColors > 0) {
+            effectiveFrontPrintColors += 1;
         }
+        pricing.colorBreakdown.front = effectiveFrontPrintColors;
 
-        // Calculate setup for front
-        pricing.setupFee = pricing.colorBreakdown.front * this.config.setupFeePerColor;
-
-        // Calculate additional locations
-        this.state.additionalLocations.forEach(loc => {
-            let locationColors = loc.colors;
-            if (this.state.isDarkGarment && locationColors > 0) {
-                locationColors += 1;
+        if (frontColors > 0) { // Only if there is a front print
+            const frontPricingTiers = pricingData.primaryLocationPricing?.[effectiveFrontPrintColors.toString()]?.tiers;
+            if (frontPricingTiers) {
+                const tier = frontPricingTiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
+                if (tier?.prices) {
+                    const sizes = Object.keys(tier.prices); // Assuming prices object contains garment+print for that size
+                    if (sizes.length > 0) {
+                        pricing.basePrice = parseFloat(tier.prices[sizes[0]]) || 0; // Use first available size's price
+                    }
+                }
             }
-            
-            pricing.colorBreakdown.locations.push({
-                ...loc,
-                totalColors: locationColors,
-                setupCost: locationColors * this.config.setupFeePerColor
-            });
+        }
+        // If frontColors is 0, pricing.basePrice remains 0 (assuming it's print cost, garment cost is part of primaryLocationPricing)
+        // If pricingData.primaryLocationPricing was garment-only for key "0", that could be handled here.
 
-            pricing.setupFee += locationColors * this.config.setupFeePerColor;
-        });
+        // 2. Calculate costs and setup for additional locations
+        let totalSetupForAdditionalLocations = 0;
+        if (pricingData.additionalLocationPricing) {
+            const additionalPricingDataTiers = pricingData.additionalLocationPricing;
+            console.log('[ScreenPrintV2_Debug] Calculating additional locations. Count:', additionalLocations.length, 'Data:', JSON.stringify(additionalLocations));
 
-        // Get base price from pricing data
-        if (this.state.pricingData) {
-            const tier = this.findPricingTier(this.state.quantity);
-            if (tier) {
-                // Get base price for front colors
-                const frontPricing = this.state.pricingData.primaryLocationPricing?.[this.state.frontColors];
-                if (frontPricing?.tiers) {
-                    const frontTier = frontPricing.tiers.find(t => 
-                        this.state.quantity >= t.minQty && 
-                        (!t.maxQty || this.state.quantity <= t.maxQty)
-                    );
-                    if (frontTier?.prices) {
-                        // Use first available size price
-                        const sizes = Object.keys(frontTier.prices);
-                        if (sizes.length > 0) {
-                            pricing.basePrice = parseFloat(frontTier.prices[sizes[0]]) || 0;
+            additionalLocations.forEach((loc, index) => {
+                console.log(`[ScreenPrintV2_Debug] Add.Loc #${index + 1}: Design Colors: ${loc.colors}, Location: ${loc.location}`);
+                let costPerPieceForThisLoc = 0;
+                let effectiveColorsForSetupThisLoc = loc.colors; // Design colors for this specific location
+
+                if (loc.colors > 0) { // Only if this location has a print
+                    // Cost for design colors
+                    const designColorTierInfo = additionalPricingDataTiers[loc.colors.toString()]?.tiers;
+                    console.log(`[ScreenPrintV2_Debug] Add.Loc #${index + 1}: Looking for design color tier info for ${loc.colors} colors.`);
+                    if (designColorTierInfo) {
+                        const tier = designColorTierInfo.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
+                        if (tier?.pricePerPiece) {
+                            const designColorCost = parseFloat(tier.pricePerPiece);
+                            costPerPieceForThisLoc += designColorCost;
+                            console.log(`[ScreenPrintV2_Debug] Add.Loc #${index + 1}: Found design color cost: ${designColorCost} for ${loc.colors} colors.`);
+                        } else {
+                            console.warn(`[ScreenPrintV2_Debug] Add.Loc #${index + 1}: No pricePerPiece in tier for ${loc.colors} colors. Tier:`, tier);
+                        }
+                    } else {
+                        console.warn(`[ScreenPrintV2_Debug] Add.Loc #${index + 1}: No designColorTierInfo found for ${loc.colors} colors.`);
+                    }
+
+                    // Cost and setup adjustment for underbase on this additional location
+                    if (isDarkGarment) {
+                        effectiveColorsForSetupThisLoc += 1;
+                        const underbaseTierInfo = additionalPricingDataTiers["1"]?.tiers; // Assuming underbase costs same as 1-color print
+                        console.log(`[ScreenPrintV2_Debug] Add.Loc #${index + 1}: Dark garment, checking underbase cost.`);
+                        if (underbaseTierInfo) {
+                            const tier = underbaseTierInfo.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
+                            if (tier?.pricePerPiece) {
+                                const underbaseCost = parseFloat(tier.pricePerPiece);
+                                costPerPieceForThisLoc += underbaseCost;
+                                console.log(`[ScreenPrintV2_Debug] Add.Loc #${index + 1}: Added underbase cost: ${underbaseCost}.`);
+                            } else {
+                                console.warn(`[ScreenPrintV2_Debug] Add.Loc #${index + 1}: No pricePerPiece in tier for underbase (1 color). Tier:`, tier);
+                            }
+                        } else {
+                             console.warn(`[ScreenPrintV2_Debug] Add.Loc #${index + 1}: No underbaseTierInfo (1 color) found for dark garment.`);
                         }
                     }
                 }
+                console.log(`[ScreenPrintV2_Debug] Add.Loc #${index + 1}: Calculated costPerPieceForThisLoc: ${costPerPieceForThisLoc}`);
+                pricing.additionalCost += costPerPieceForThisLoc;
+                const setupForThisLoc = effectiveColorsForSetupThisLoc * this.config.setupFeePerColor;
+                totalSetupForAdditionalLocations += setupForThisLoc;
 
-                // Calculate additional location costs
-                if (this.state.pricingData.additionalLocationPricing) {
-                    pricing.colorBreakdown.locations.forEach((loc, index) => {
-                        const addlPricing = this.state.pricingData.additionalLocationPricing;
-                        if (addlPricing?.tiers) {
-                            const addlTier = addlPricing.tiers.find(t => 
-                                this.state.quantity >= t.minQty && 
-                                (!t.maxQty || this.state.quantity <= t.maxQty)
-                            );
-                            if (addlTier?.pricePerPiece) {
-                                loc.costPerPiece = parseFloat(addlTier.pricePerPiece) || 0;
-                                pricing.additionalCost += loc.costPerPiece;
-                            }
-                        }
-                    });
+                pricing.colorBreakdown.locations.push({
+                    ...loc, // original location and design colors (loc.colors)
+                    totalColors: effectiveColorsForSetupThisLoc, // for setup display
+                    setupCost: setupForThisLoc,
+                    costPerPiece: costPerPieceForThisLoc // for order summary display
+                });
+            });
+        }
+
+        // 3. Calculate total setup fee
+        const setupForFront = (frontColors > 0 ? pricing.colorBreakdown.front : 0) * this.config.setupFeePerColor;
+        pricing.setupFee = setupForFront + totalSetupForAdditionalLocations;
+
+        // 4. LTM Fee
+        // Check if LTM fee should be sourced from tierData in masterBundle or config
+        // For now, using simple config.ltmThreshold and config.ltmFee
+        if (quantity < this.config.ltmThreshold && quantity > 0) { // Only apply if quantity > 0
+             // Attempt to get LTM from the primary location's tier if possible
+            let tierBasedLtmFee = null;
+            if (frontColors > 0 && pricingData.primaryLocationPricing?.[effectiveFrontPrintColors.toString()]?.tiers) {
+                const tier = pricingData.primaryLocationPricing[effectiveFrontPrintColors.toString()].tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
+                if (tier && tier.ltmFee !== undefined && tier.ltmFee > 0) {
+                    tierBasedLtmFee = parseFloat(tier.ltmFee);
+                }
+            } else if (pricingData.tierData) { // Fallback to general tierData if no front print
+                 const generalTierKey = Object.keys(pricingData.tierData).find(key => {
+                    const tier = pricingData.tierData[key];
+                    return quantity >= tier.MinQuantity && (!tier.MaxQuantity || quantity <= tier.MaxQuantity);
+                });
+                if (generalTierKey && pricingData.tierData[generalTierKey].LTM_Fee > 0) {
+                    tierBasedLtmFee = parseFloat(pricingData.tierData[generalTierKey].LTM_Fee);
                 }
             }
+            
+            pricing.ltmFee = tierBasedLtmFee !== null ? tierBasedLtmFee : (quantity > 0 ? this.config.ltmFee : 0) ;
+
         }
 
-        // Calculate totals
-        const pricePerShirt = pricing.basePrice + pricing.additionalCost;
-        pricing.subtotal = pricePerShirt * this.state.quantity;
-        
-        // LTM fee
-        if (this.state.quantity < this.config.ltmThreshold) {
-            pricing.ltmFee = this.config.ltmFee;
-        }
 
-        // Final calculations
+        // 5. Final calculations
+        const totalPerShirtPrintCost = pricing.basePrice + pricing.additionalCost;
+        pricing.subtotal = totalPerShirtPrintCost * quantity;
         pricing.grandTotal = pricing.subtotal + pricing.setupFee + pricing.ltmFee;
-        pricing.setupPerShirt = pricing.setupFee / this.state.quantity;
-        pricing.perShirtTotal = pricePerShirt + pricing.setupPerShirt + (pricing.ltmFee / this.state.quantity);
-
+        pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
+        pricing.perShirtTotal = quantity > 0 ? totalPerShirtPrintCost + pricing.setupPerShirt + (pricing.ltmFee / quantity) : 0;
+        
         return pricing;
     }
 
+    // findPricingTier is not directly used by the revised calculatePricing in the same way,
+    // tier finding logic is now embedded. Can be removed or kept for other purposes if any.
     findPricingTier(quantity) {
         if (!this.state.pricingData?.primaryLocationPricing) return null;
         
@@ -527,7 +578,7 @@ class ScreenPrintPricing {
         const pricing = this.calculatePricing();
         
         // Update main price display
-        this.elements.basePrice.textContent = (pricing.basePrice + pricing.additionalCost).toFixed(2);
+        this.elements.basePrice.textContent = pricing.basePrice.toFixed(2); // Display only garment + front print cost here
         this.elements.setupImpact.textContent = `+$${pricing.setupPerShirt.toFixed(2)}`;
         this.elements.allInPrice.textContent = `$${pricing.perShirtTotal.toFixed(2)}`;
         this.elements.grandTotal.textContent = `$${pricing.grandTotal.toFixed(2)}`;
@@ -712,11 +763,72 @@ class ScreenPrintPricing {
             if (targetId === 'pricing-tiers' && !this.tiersLoaded) {
                 this.updatePricingTiers();
                 this.tiersLoaded = true;
+            } else if (targetId === 'location-pricing' && !this.locationGuideLoaded) {
+                this.updateAdditionalLocationPricingGuide();
+                this.locationGuideLoaded = true;
             }
         } else {
             content.style.display = 'none';
             icon.style.transform = 'rotate(0deg)';
         }
+    }
+
+    updateAdditionalLocationPricingGuide() {
+        const guideContainer = this.elements.additionalLocationGuideContent;
+        if (!guideContainer) {
+            console.error("[ScreenPrintV2] Additional location guide container not found.");
+            return;
+        }
+
+        if (!this.state.masterBundle || !this.state.masterBundle.additionalLocationPricing || !this.state.masterBundle.tierData) {
+            guideContainer.innerHTML = '<p>Additional location pricing data not yet available. Please ensure product data is loaded.</p>';
+            return;
+        }
+
+        const additionalPricing = this.state.masterBundle.additionalLocationPricing;
+        const tierLabels = Object.keys(this.state.masterBundle.tierData).sort((a, b) =>
+            this.state.masterBundle.tierData[a].MinQuantity - this.state.masterBundle.tierData[b].MinQuantity
+        );
+
+        let html = `
+            <p>The table below shows the <strong>per-piece cost</strong> for adding a print to an additional location. Setup fees also apply per color, per location.</p>
+            <table class="sp-tiers-table">
+                <thead>
+                    <tr>
+                        <th>Quantity Tier</th>
+                        <th>1 Color</th>
+                        <th>2 Colors</th>
+                        <th>3 Colors</th>
+                        <th>4 Colors</th>
+                        <th>5 Colors</th>
+                        <th>6 Colors</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        tierLabels.forEach(tierLabel => {
+            html += `<tr><td class="sp-tier-range">${tierLabel}</td>`;
+            for (let i = 1; i <= 6; i++) {
+                let pricePerPiece = '-';
+                const colorData = additionalPricing[i.toString()]; // Pricing is keyed by color count as string
+                if (colorData && colorData.tiers) {
+                    const tierInfo = colorData.tiers.find(t => t.label === tierLabel);
+                    if (tierInfo && tierInfo.pricePerPiece !== null && tierInfo.pricePerPiece !== undefined) {
+                        pricePerPiece = `$${parseFloat(tierInfo.pricePerPiece).toFixed(2)}`;
+                    }
+                }
+                html += `<td>${pricePerPiece}</td>`;
+            }
+            html += `</tr>`;
+        });
+
+        html += `
+                </tbody>
+            </table>
+            <p class="sp-tiers-note">Setup fee per color, per additional location: $${this.config.setupFeePerColor.toFixed(2)}.</p>
+        `;
+        guideContainer.innerHTML = html;
     }
 
     showError(message) {
@@ -739,8 +851,12 @@ class ScreenPrintPricing {
         
         // Update tiers if accordion is open
         const tiersContent = document.getElementById('pricing-tiers');
-        if (tiersContent && tiersContent.style.display !== 'none') {
+        if (tiersContent && tiersContent.style.display !== 'none' && this.tiersLoaded) { // only update if already loaded once
             this.updatePricingTiers();
+        }
+        const locationGuideContent = document.getElementById('location-pricing');
+        if (locationGuideContent && locationGuideContent.style.display !== 'none' && this.locationGuideLoaded) { // only update if already loaded once
+            this.updateAdditionalLocationPricingGuide();
         }
     }
 }
