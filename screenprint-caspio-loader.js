@@ -7,7 +7,7 @@
     console.log('[ScreenPrintCaspioLoader] Initializing');
     
     // Configuration
-    const CASPIO_APP_KEY = 'a0e150002eb94f9e91e34e2c9990'; // Screen print app key
+    const CASPIO_APP_KEY = 'a0e1500026349f420e494800b43e'; // Screen print app key - Updated to confirmed correct AppKey
     const CASPIO_DOMAIN = 'https://c3eku948.caspio.com';
     
     // Create and inject the Caspio iframe
@@ -22,9 +22,10 @@
         const urlParams = new URLSearchParams(window.location.search);
         const styleNumber = urlParams.get('StyleNumber') || '';
         const color = urlParams.get('COLOR') || '';
+        console.log(`[ScreenPrintCaspioLoader] URL Params: StyleNumber='${styleNumber}', COLOR='${color}'`);
         
         if (!styleNumber || !color) {
-            console.warn('[ScreenPrintCaspioLoader] Missing StyleNumber or COLOR parameters');
+            console.warn('[ScreenPrintCaspioLoader] CRITICAL: Missing StyleNumber or COLOR parameters. Iframe will not be created.');
             return;
         }
         
@@ -49,7 +50,7 @@
             // Build Caspio URL
             const caspioUrl = `${CASPIO_DOMAIN}/dp/${CASPIO_APP_KEY}?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(color)}`;
             iframe.src = caspioUrl;
-            console.log('[ScreenPrintCaspioLoader] Loading Caspio iframe:', caspioUrl);
+            console.log('[ScreenPrintCaspioLoader] Attempting to load REAL Caspio iframe. SRC:', caspioUrl);
         }
         
         // Set iframe attributes
