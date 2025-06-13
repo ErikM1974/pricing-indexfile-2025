@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Screen Print Pricing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .price-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2e5827;
+            margin: 10px 0;
+        }
+        
+        .calculation {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        
+        .tier-info {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        button {
+            background: #2e5827;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #1e3817;
+        }
+        
+        .error {
+            color: #f44336;
+            background: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Screen Print Pricing Verification</h1>
+    
+    <div class="result-box">
+        <h2>Master Bundle Data (from console)</h2>
+        <div class="tier-info">
+            <h3>PC54 - Navy Pricing Tiers:</h3>
+            <table>
+                <tr>
+                    <th>Tier</th>
+                    <th>Quantity Range</th>
+                    <th>S-XL Price</th>
+                    <th>2XL Price</th>
+                </tr>
+                <tr>
+                    <td>24-47</td>
+                    <td>24-47 shirts</td>
+                    <td>$8.50</td>
+                    <td>$10.50</td>
+                </tr>
+                <tr>
+                    <td>48-71</td>
+                    <td>48-71 shirts</td>
+                    <td>$7.00</td>
+                    <td>$9.00</td>
+                </tr>
+                <tr>
+                    <td>72+</td>
+                    <td>72+ shirts</td>
+                    <td>$5.50</td>
+                    <td>$7.50</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div class="result-box">
+        <h2>Test Calculations</h2>
+        
+        <button onclick="testPricing(48, 3, false)">Test: 48 qty, 3 colors</button>
+        <button onclick="testPricing(72, 4, false)">Test: 72 qty, 4 colors</button>
+        <button onclick="testPricing(24, 2, false)">Test: 24 qty, 2 colors</button>
+        <button onclick="testPricing(48, 3, true)">Test: 48 qty, 3 colors (dark)</button>
+        
+        <div id="test-result"></div>
+    </div>
+    
+    <div class="result-box">
+        <h2>What Should Display in Calculator</h2>
+        <div id="expected-display"></div>
+    </div>
+    
+    <script>
+        // Test data matching console output
+        const tierData = {
+            '24-47': {
+                MinQuantity: 24,
+                MaxQuantity: 47,
+                S: 8.5,
+                M: 8.5,
+                L: 8.5,
+                XL: 8.5,
+                '2XL': 10.5,
+                '3XL': 12.5,
+                '4XL': 14.5
+            },
+            '48-71': {
+                MinQuantity: 48,
+                MaxQuantity: 71,
+                S: 7,
+                M: 7,
+                L: 7,
+                XL: 7,
+                '2XL': 9,
+                '3XL': 11,
+                '4XL': 13
+            },
+            '72+': {
+                MinQuantity: 72,
+                MaxQuantity: null,
+                S: 5.5,
+                M: 5.5,
+                L: 5.5,
+                XL: 5.5,
+                '2XL': 7.5,
+                '3XL': 9.5,
+                '4XL': 11.5
+            }
+        };
+        
+        function testPricing(qty, colors, isDark) {
+            // Find tier
+            let selectedTier = null;
+            let tierKey = '';
+            
+            for (const [key, tier] of Object.entries(tierData)) {
+                if (qty >= tier.MinQuantity && (tier.MaxQuantity === null || qty <= tier.MaxQuantity)) {
+                    selectedTier = tier;
+                    tierKey = key;
+                    break;
+                }
+            }
+            
+            if (!selectedTier) {
+                document.getElementById('test-result').innerHTML = '<div class="error">No tier found for quantity ' + qty + '</div>';
+                return;
+            }
+            
+            // Calculate
+            const basePrice = selectedTier.S;
+            const totalColors = isDark ? colors + 1 : colors; // Add white base for dark
+            const setupFee = totalColors * 30;
+            const ltmFee = qty < 48 ? 50 : 0;
+            const subtotal = basePrice * qty;
+            const grandTotal = subtotal + setupFee + ltmFee;
+            const setupPerShirt = setupFee / qty;
+            const allInPrice = basePrice + setupPerShirt + (ltmFee / qty);
+            
+            // Display results
+            const resultHTML = `
+                <h3>Test: ${qty} shirts, ${colors} colors${isDark ? ' (dark garment)' : ''}</h3>
+                
+                <div class="tier-info">
+                    <strong>Selected Tier:</strong> ${tierKey}<br>
+                    <strong>Base Price:</strong> $${basePrice.toFixed(2)} per shirt
+                </div>
+                
+                <div class="calculation">
+                    <strong>Calculation Breakdown:</strong><br>
+                    Base: ${qty} × $${basePrice.toFixed(2)} = $${subtotal.toFixed(2)}<br>
+                    Setup: ${totalColors} colors × $30 = $${setupFee.toFixed(2)}<br>
+                    ${ltmFee > 0 ? `LTM Fee: $${ltmFee.toFixed(2)}<br>` : ''}
+                    <strong>Grand Total: $${grandTotal.toFixed(2)}</strong>
+                </div>
+                
+                <div class="calculation">
+                    <strong>Per Shirt Breakdown:</strong><br>
+                    Base Price: $${basePrice.toFixed(2)}<br>
+                    Setup Impact: +$${setupPerShirt.toFixed(2)}<br>
+                    ${ltmFee > 0 ? `LTM Impact: +$${(ltmFee/qty).toFixed(2)}<br>` : ''}
+                    <strong>All-in Price: $${allInPrice.toFixed(2)}</strong>
+                </div>
+            `;
+            
+            document.getElementById('test-result').innerHTML = resultHTML;
+            
+            // Show what should display
+            const displayHTML = `
+                <h3>Calculator Should Show:</h3>
+                <div class="price-display">$${basePrice.toFixed(2)} per shirt</div>
+                <p>shirt + printing included</p>
+                <hr>
+                <p>Setup impact: +$${setupPerShirt.toFixed(2)}</p>
+                <p><strong>All-in price: $${allInPrice.toFixed(2)}</strong></p>
+                <p>Total order: $${grandTotal.toFixed(2)}</p>
+                
+                <div style="background: #f0f0f0; padding: 10px; margin-top: 10px;">
+                    <strong>One-time Setup: $${setupFee.toFixed(2)}</strong><br>
+                    • Front (${colors} color${colors > 1 ? 's' : ''} × $30): $${(colors * 30).toFixed(2)}<br>
+                    ${isDark ? `• White base included in color count<br>` : ''}
+                </div>
+                
+                ${ltmFee > 0 ? `
+                <div style="background: #fff3cd; padding: 10px; margin-top: 10px;">
+                    ⚠️ Small order fee applies: <strong>$${ltmFee.toFixed(2)}</strong>
+                </div>` : ''}
+            `;
+            
+            document.getElementById('expected-display').innerHTML = displayHTML;
+        }
+        
+        // Run initial test
+        testPricing(48, 3, false);
+    </script>
+</body>
+</html>

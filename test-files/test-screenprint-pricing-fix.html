@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Screen Print Pricing Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .status {
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .success { background: #e8f5e9; color: #2e5827; }
+        .error { background: #ffebee; color: #c62828; }
+        .info { background: #e3f2fd; color: #1565c0; }
+        
+        h1 { color: #2e5827; }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Screen Print Pricing Fix Test</h1>
+    
+    <div id="status-message" class="status info">
+        Initializing test...
+    </div>
+    
+    <div class="test-section">
+        <h2>Quick Quote Calculator</h2>
+        <div id="add-to-cart-section">
+            <!-- Calculator will be rendered here -->
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <pre id="console-output"></pre>
+    </div>
+    
+    <!-- Hidden pricing grid -->
+    <table id="custom-pricing-grid" style="display: none;">
+        <thead><tr><th>Quantity</th></tr></thead>
+        <tbody></tbody>
+    </table>
+    
+    <!-- Load modules -->
+    <script src="/shared_components/js/screenprint-config.js"></script>
+    <script src="/shared_components/js/screenprint-calculator.js"></script>
+    <script src="/shared_components/js/screenprint-adapter.js"></script>
+    <script src="/shared_components/js/screenprint-integration.js"></script>
+    
+    <script>
+        // Capture console output
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        let logs = [];
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
+            ).join(' ');
+            logs.push(message);
+            consoleOutput.textContent = logs.join('\n');
+        };
+        
+        // Update status
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status-message');
+            status.className = `status ${type}`;
+            status.textContent = message;
+        }
+        
+        // Listen for events
+        document.addEventListener('screenPrintAdapterReady', () => {
+            updateStatus('Screen Print Adapter Ready - Sending test data...', 'success');
+            sendTestData();
+        });
+        
+        document.addEventListener('pricingDataLoaded', (event) => {
+            updateStatus('Pricing data loaded successfully!', 'success');
+            console.log('Pricing data received:', event.detail);
+            
+            // Check if we got tiers with prices
+            if (event.detail && event.detail.tiers && event.detail.tiers.length > 0) {
+                const firstTier = event.detail.tiers[0];
+                if (firstTier.prices && Object.keys(firstTier.prices).length > 0) {
+                    updateStatus('✅ Pricing extraction successful! Prices found in tiers.', 'success');
+                } else {
+                    updateStatus('❌ Pricing extraction failed - no prices in tiers', 'error');
+                }
+            }
+        });
+        
+        document.addEventListener('pricingDataError', (event) => {
+            updateStatus('Pricing data error: ' + event.detail.message, 'error');
+        });
+        
+        // Send test data
+        function sendTestData() {
+            const testData = {
+                type: 'caspioScreenPrintMasterBundleReady',
+                data: {
+                    sN: 'PC54',
+                    cN: 'Navy',
+                    pT: 'Port & Company Core Cotton Tee - Navy',
+                    uniqueSizes: ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'],
+                    tierData: {
+                        '24-47': {
+                            MinQuantity: 24,
+                            MaxQuantity: 47,
+                            S: 8.50,
+                            M: 8.50,
+                            L: 8.50,
+                            XL: 8.50,
+                            '2XL': 10.50,
+                            '3XL': 12.50,
+                            '4XL': 14.50
+                        },
+                        '48-71': {
+                            MinQuantity: 48,
+                            MaxQuantity: 71,
+                            S: 7.00,
+                            M: 7.00,
+                            L: 7.00,
+                            XL: 7.00,
+                            '2XL': 9.00,
+                            '3XL': 11.00,
+                            '4XL': 13.00
+                        },
+                        '72+': {
+                            MinQuantity: 72,
+                            MaxQuantity: null,
+                            S: 5.50,
+                            M: 5.50,
+                            L: 5.50,
+                            XL: 5.50,
+                            '2XL': 7.50,
+                            '3XL': 9.50,
+                            '4XL': 11.50
+                        }
+                    }
+                }
+            };
+            
+            console.log('Sending test data via postMessage...');
+            window.postMessage(testData, '*');
+        }
+        
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            updateStatus('Test page loaded - waiting for adapter...', 'info');
+            
+            // Set URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.has('StyleNumber')) {
+                urlParams.set('StyleNumber', 'PC54');
+                urlParams.set('COLOR', 'Navy');
+                urlParams.set('mock', 'true');
+                const newUrl = window.location.pathname + '?' + urlParams.toString();
+                window.history.replaceState({}, '', newUrl);
+            }
+            
+            // Send test data after a delay if adapter doesn't initialize
+            setTimeout(() => {
+                if (document.getElementById('status-message').textContent.includes('waiting')) {
+                    sendTestData();
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

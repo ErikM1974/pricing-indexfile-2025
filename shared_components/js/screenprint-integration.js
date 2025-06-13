@@ -114,7 +114,7 @@ window.ScreenPrintIntegration = (function() {
                                 <span id="sp-base-price-large">0.00</span>
                                 <span class="price-suffix">per shirt</span>
                             </div>
-                            <div class="price-subtitle">shirt + printing included</div>
+                            <div class="price-subtitle" id="sp-price-subtitle">shirt + printing included</div>
                             
                             <!-- Divider -->
                             <div class="price-divider"></div>
@@ -467,6 +467,16 @@ window.ScreenPrintIntegration = (function() {
         document.addEventListener('screenPrintPricingCalculated', (e) => {
             updatePricingDisplay(e.detail);
         });
+        
+        // Listen for adapter ready
+        document.addEventListener('screenPrintAdapterReady', (e) => {
+            console.log('[ScreenPrintIntegration] Adapter ready, triggering initial calculation');
+            // Trigger recalculation with current values
+            const frontColors = document.getElementById('sp-front-colors');
+            if (frontColors && frontColors.value !== '0') {
+                calculator.updateColors('front', frontColors.value);
+            }
+        });
     }
     
     // Setup collapsible sections for pricing tables
@@ -498,7 +508,17 @@ window.ScreenPrintIntegration = (function() {
         // Update base price
         const basePriceLarge = document.getElementById('sp-base-price-large');
         if (basePriceLarge) {
-            basePriceLarge.textContent = pricing.basePrice.toFixed(2);
+            basePriceLarge.textContent = pricing.basePriceWithAdditional.toFixed(2);
+        }
+        
+        // Update price subtitle
+        const priceSubtitle = document.getElementById('sp-price-subtitle');
+        if (priceSubtitle) {
+            if (pricing.hasBackPrint && pricing.additionalLocationCost > 0) {
+                priceSubtitle.textContent = 'shirt + printing (2 locations)';
+            } else {
+                priceSubtitle.textContent = 'shirt + printing included';
+            }
         }
         
         // Update setup impact
@@ -510,7 +530,7 @@ window.ScreenPrintIntegration = (function() {
         // Update all-in price
         const allInPrice = document.getElementById('sp-all-in-price');
         if (allInPrice) {
-            const allInValue = pricing.basePrice + pricing.setupPerShirt + (pricing.ltmFee / pricing.quantity);
+            const allInValue = pricing.basePriceWithAdditional + pricing.setupPerShirt + (pricing.ltmFee / pricing.quantity);
             allInPrice.textContent = config.formatCurrency(allInValue);
         }
         
@@ -535,6 +555,9 @@ window.ScreenPrintIntegration = (function() {
             }
             if (pricing.colors.back > 0) {
                 breakdown += `• Back (${pricing.colors.back} color${pricing.colors.back > 1 ? 's' : ''} × $30): ${config.formatCurrency(pricing.colors.back * config.setupFeePerColor)}`;
+                if (pricing.additionalLocationCost > 0) {
+                    breakdown += `<br><small style="color: #666;">+ ${config.formatCurrency(pricing.additionalLocationCost)}/shirt for 2nd location</small>`;
+                }
             }
             setupBreakdown.innerHTML = breakdown;
         }
@@ -560,6 +583,13 @@ window.ScreenPrintIntegration = (function() {
     function setupInitialState() {
         // Set initial quantity
         calculator.updateQuantity(config.standardMinimum);
+        
+        // Set default front colors to 1 if not set
+        const frontColors = document.getElementById('sp-front-colors');
+        if (frontColors && frontColors.value === '0') {
+            frontColors.value = '1';
+            calculator.updateColors('front', 1);
+        }
         
         // Check for dark garment
         const urlParams = new URLSearchParams(window.location.search);

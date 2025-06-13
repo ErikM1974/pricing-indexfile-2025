@@ -18,17 +18,52 @@ window.ScreenPrintAdapter = (function() {
     
     // Store master bundle from Caspio
     function storeMasterBundle(data) {
+        console.log('[ScreenPrintAdapter] === STORING MASTER BUNDLE ===');
+        console.log('[ScreenPrintAdapter] Raw data received:', data);
+        
+        // Only store if we have primaryLocationPricing (full bundle from Caspio)
+        // This prevents the fallback extractor from overwriting good data
+        if (!data.primaryLocationPricing && masterBundle && masterBundle.primaryLocationPricing) {
+            console.log('[ScreenPrintAdapter] Ignoring incomplete bundle - keeping existing full bundle');
+            return;
+        }
+        
         masterBundle = data;
         isReady = true;
-        console.log('[ScreenPrintAdapter] Master bundle stored:', masterBundle);
         
-        // Process and dispatch initial data
-        processPricingData();
+        // Log the structure for debugging
+        console.log('[ScreenPrintAdapter] Master bundle structure analysis:');
+        console.log('- Type:', typeof masterBundle);
+        console.log('- Is Array:', Array.isArray(masterBundle));
+        console.log('- Keys:', Object.keys(masterBundle));
         
-        // Notify other components
+        // Check if we're getting the shortened field names from Caspio
+        if (masterBundle.sN && !masterBundle.styleNumber) {
+            console.log('[ScreenPrintAdapter] Converting shortened field names');
+            masterBundle.styleNumber = masterBundle.sN;
+            masterBundle.colorName = masterBundle.cN;
+            masterBundle.productTitle = masterBundle.pT;
+        }
+        
+        // Log specific fields we're looking for
+        console.log('[ScreenPrintAdapter] Field check:');
+        console.log('- styleNumber:', masterBundle.styleNumber);
+        console.log('- colorName:', masterBundle.colorName);
+        console.log('- productTitle:', masterBundle.productTitle);
+        console.log('- tierData:', !!masterBundle.tierData);
+        console.log('- primaryLocationPricing:', !!masterBundle.primaryLocationPricing);
+        console.log('- uniqueSizes:', masterBundle.uniqueSizes);
+        
+        // Notify other components that adapter is ready
         document.dispatchEvent(new CustomEvent('screenPrintAdapterReady', { 
             detail: { success: true } 
         }));
+        
+        // Wait for UI to initialize and set default values, then process
+        setTimeout(() => {
+            console.log('[ScreenPrintAdapter] Processing pricing data after UI initialization');
+            processPricingData();
+        }, 100);
     }
     
     // Process pricing data based on current selections
@@ -39,8 +74,13 @@ window.ScreenPrintAdapter = (function() {
         }
         
         // Get current configuration from calculator
-        const colorSelect = document.getElementById('sp-front-colors');
-        const colorCount = colorSelect ? colorSelect.value : '1';
+        const frontColorSelect = document.getElementById('sp-front-colors');
+        const backColorSelect = document.getElementById('sp-back-colors');
+        const frontColors = frontColorSelect ? frontColorSelect.value : '0';
+        const backColors = backColorSelect ? backColorSelect.value : '0';
+        
+        // Use front colors for primary pricing (back just adds to setup)
+        const colorCount = frontColors || '1';
         
         if (!colorCount || colorCount === '0') {
             console.log('[ScreenPrintAdapter] No color count selected');
@@ -51,6 +91,10 @@ window.ScreenPrintAdapter = (function() {
         const pricingData = extractPricingForColorCount(colorCount);
         
         if (pricingData) {
+            // Add back color info for setup fee calculation
+            pricingData.frontColors = parseInt(frontColors) || 0;
+            pricingData.backColors = parseInt(backColors) || 0;
+            
             // Dispatch pricing data
             document.dispatchEvent(new CustomEvent('pricingDataLoaded', { 
                 detail: pricingData 
@@ -65,61 +109,88 @@ window.ScreenPrintAdapter = (function() {
     function extractPricingForColorCount(colorCount) {
         if (!masterBundle) return null;
         
-        // Try to find pricing data in various possible locations
-        const possibleKeys = [
-            'primaryLocationPricing',
-            'primary_location_pricing',
-            'screenPrintPricing',
-            'pricing'
-        ];
+        console.log('[ScreenPrintAdapter] === EXTRACTING PRICING ===');
+        console.log('[ScreenPrintAdapter] Color count:', colorCount);
+        console.log('[ScreenPrintAdapter] Master bundle structure:', {
+            hasStyleNumber: !!masterBundle.styleNumber,
+            hasColorName: !!masterBundle.colorName,
+            hasProductTitle: !!masterBundle.productTitle,
+            hasTierData: !!masterBundle.tierData,
+            hasPrimaryLocationPricing: !!masterBundle.primaryLocationPricing,
+            hasUniqueSizes: !!masterBundle.uniqueSizes,
+            keys: Object.keys(masterBundle)
+        });
         
-        let pricingData = null;
+        // Extract basic info from master bundle
+        const styleNumber = masterBundle.styleNumber || '';
+        const color = masterBundle.colorName || '';
+        const productTitle = masterBundle.productTitle || '';
         
-        for (const key of possibleKeys) {
-            if (masterBundle[key] && masterBundle[key][colorCount]) {
-                pricingData = masterBundle[key][colorCount];
-                break;
-            }
-        }
-        
-        // If master bundle has direct tiers, use those
-        if (!pricingData && masterBundle.tiers) {
-            pricingData = masterBundle;
-        }
-        
-        if (!pricingData) {
-            console.error('[ScreenPrintAdapter] No pricing data found for', colorCount, 'colors');
+        if (!styleNumber && !productTitle) {
+            console.error('[ScreenPrintAdapter] Master bundle missing style/product info');
             return null;
         }
         
+        // Get pricing data for the selected color count from primaryLocationPricing
+        const colorCountStr = colorCount.toString();
+        const pricingProfile = masterBundle.primaryLocationPricing && masterBundle.primaryLocationPricing[colorCountStr];
+        
+        if (!pricingProfile) {
+            console.error(`[ScreenPrintAdapter] No pricing found for ${colorCount} colors`);
+            return null;
+        }
+        
+        console.log(`[ScreenPrintAdapter] Found pricing profile for ${colorCount} colors:`, pricingProfile);
+        
+        // Extract tiers from the pricing profile
+        let tiers = [];
+        
+        if (pricingProfile.tiers && Array.isArray(pricingProfile.tiers)) {
+            pricingProfile.tiers.forEach(tier => {
+                console.log(`[ScreenPrintAdapter] Processing tier ${tier.label}:`, tier);
+                
+                tiers.push({
+                    label: tier.label,
+                    minQty: tier.minQty || 0,
+                    maxQty: tier.maxQty || 999999,
+                    prices: tier.prices || {},
+                    ltmFee: tier.ltmFee || 0,
+                    TierLabel: tier.label
+                });
+            });
+        }
+        
+        // Sort tiers by minQty
+        tiers.sort((a, b) => a.minQty - b.minQty);
+        
+        console.log('[ScreenPrintAdapter] Final tiers:', tiers);
+        
+        // Get additional location pricing for the color count
+        const additionalPricing = masterBundle.additionalLocationPricing && 
+                                  masterBundle.additionalLocationPricing[colorCountStr];
+        
         // Format data for components
-        return {
+        const result = {
             embellishmentType: 'screen-print',
-            styleNumber: masterBundle.sN || masterBundle.styleNumber || '',
-            color: masterBundle.cN || masterBundle.color || '',
-            productTitle: masterBundle.pT || masterBundle.productTitle || '',
+            styleNumber: styleNumber,
+            color: color,
+            productTitle: productTitle,
             uniqueSizes: masterBundle.uniqueSizes || [],
-            tiers: formatTiers(pricingData.tiers || []),
+            tiers: tiers,
             fees: {
-                setup: parseInt(colorCount) * config.setupFeePerColor,
-                flash: 0 // Included in color count for dark garments
+                setup: pricingProfile.setupFee || (parseInt(colorCount) * config.setupFeePerColor),
+                flash: pricingProfile.flashChargeTotal || 0
             },
-            additionalLocationPricing: masterBundle.additionalLocationPricing || {},
+            additionalLocationPricing: additionalPricing || {},
+            pricingRules: masterBundle.pricingRules || {},
             colorCount: colorCount
         };
+        
+        console.log('[ScreenPrintAdapter] Returning formatted data:', result);
+        return result;
     }
     
-    // Format tier data
-    function formatTiers(tiers) {
-        return tiers.map(tier => ({
-            label: tier.TierLabel || `${tier.minQty}${tier.maxQty ? '-' + tier.maxQty : '+'}`,
-            minQty: tier.minQty || 0,
-            maxQty: tier.maxQty || null,
-            prices: tier.prices || {},
-            ltmFee: tier.LTM_Fee || 0,
-            TierLabel: tier.TierLabel // Keep for compatibility
-        }));
-    }
+    
     
     // Update pricing table
     function updatePricingTable(pricingData) {
@@ -153,21 +224,25 @@ window.ScreenPrintAdapter = (function() {
     
     // Handle Caspio messages
     function handleCaspioMessage(event) {
-        console.log('[ScreenPrintAdapter] Message received:', event.data?.type);
-        
-        if (event.data && event.data.type === 'caspioScreenPrintMasterBundleReady') {
-            if (!event.data.data) {
-                console.error('[ScreenPrintAdapter] Empty data in Caspio message');
+        // Only log messages with actual data
+        if (event.data && event.data.type) {
+            console.log('[ScreenPrintAdapter] Message received:', event.data.type);
+            
+            if (event.data.type === 'caspioScreenPrintMasterBundleReady') {
+                if (!event.data.data) {
+                    console.error('[ScreenPrintAdapter] Empty data in Caspio message');
+                    showPricingError();
+                    return;
+                }
+                
+                storeMasterBundle(event.data.data);
+                
+            } else if (event.data.type === 'caspioPricingError') {
+                console.error('[ScreenPrintAdapter] Caspio error:', event.data.error);
                 showPricingError();
-                return;
             }
-            
-            storeMasterBundle(event.data.data);
-            
-        } else if (event.data && event.data.type === 'caspioPricingError') {
-            console.error('[ScreenPrintAdapter] Caspio error:', event.data.error);
-            showPricingError();
         }
+        // Ignore messages without type (reduces console spam)
     }
     
     // Show pricing error

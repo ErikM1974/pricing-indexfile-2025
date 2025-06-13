@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Print Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2e5827;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        
+        .console {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .timestamp {
+            color: #666;
+            font-size: 11px;
+        }
+        
+        .log-type {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .log-type.info { color: #2196F3; }
+        .log-type.warn { color: #FF9800; }
+        .log-type.error { color: #F44336; }
+        .log-type.success { color: #4CAF50; }
+        
+        .data-viewer {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 600px;
+            overflow: auto;
+        }
+        
+        .controls {
+            margin-bottom: 15px;
+        }
+        
+        button {
+            background: #2e5827;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #1e3817;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .status.ready { background: #4CAF50; color: white; }
+        .status.waiting { background: #FF9800; color: white; }
+        .status.error { background: #F44336; color: white; }
+        
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        
+        #pricing-display {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Screen Print Pricing Debug Tool</h1>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>Controls & Status</h2>
+            
+            <div class="controls">
+                <button onclick="clearLogs()">Clear Logs</button>
+                <button onclick="sendMockData()">Send Mock Data</button>
+                <button onclick="reloadPage()">Reload Page</button>
+                <span id="adapter-status" class="status waiting">Adapter: Waiting</span>
+            </div>
+            
+            <h3>Event Log</h3>
+            <div id="event-log" class="console">
+                <div class="log-entry">
+                    <span class="timestamp">[00:00:00]</span>
+                    <span class="log-type info">INFO:</span>
+                    Debug tool initialized
+                </div>
+            </div>
+            
+            <h3>Quick Quote Calculator</h3>
+            <div id="add-to-cart-section">
+                <!-- Calculator will be rendered here -->
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>Data Inspector</h2>
+            
+            <h3>Master Bundle Data</h3>
+            <div id="master-bundle-viewer" class="data-viewer">
+                <pre>No data received yet...</pre>
+            </div>
+            
+            <h3>Extracted Pricing Data</h3>
+            <div id="pricing-data-viewer" class="data-viewer">
+                <pre>No pricing data extracted yet...</pre>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden pricing grid for testing -->
+    <table id="custom-pricing-grid" style="display: none;">
+        <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>S-XL</th>
+                <th>2XL</th>
+                <th>3XL</th>
+                <th>4XL+</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    
+    <!-- Hidden iframe container -->
+    <div id="caspio-iframe-container" style="display: none;"></div>
+    
+    <!-- Load modules -->
+    <script src="/shared_components/js/screenprint-config.js"></script>
+    <script src="/shared_components/js/screenprint-calculator.js"></script>
+    <script src="/shared_components/js/screenprint-adapter.js"></script>
+    <script src="/shared_components/js/screenprint-integration.js"></script>
+    
+    <script>
+        // Debug logging system
+        const logs = [];
+        
+        function log(type, message, data = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = { timestamp, type, message, data };
+            logs.push(entry);
+            
+            const logContainer = document.getElementById('event-log');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            
+            let html = `
+                <span class="timestamp">[${timestamp}]</span>
+                <span class="log-type ${type}">${type.toUpperCase()}:</span>
+                ${message}
+            `;
+            
+            if (data) {
+                html += `<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            }
+            
+            logEntry.innerHTML = html;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('event-log').innerHTML = '';
+            log('info', 'Logs cleared');
+        }
+        
+        function reloadPage() {
+            window.location.reload();
+        }
+        
+        // Intercept console logs
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg) : arg
+            ).join(' ');
+            
+            if (message.includes('[ScreenPrintAdapter]')) {
+                log('info', message);
+            }
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            const message = args.join(' ');
+            if (message.includes('[ScreenPrintAdapter]')) {
+                log('warn', message);
+            }
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            const message = args.join(' ');
+            if (message.includes('[ScreenPrintAdapter]')) {
+                log('error', message);
+            }
+        };
+        
+        // Listen for adapter events
+        document.addEventListener('screenPrintAdapterReady', (event) => {
+            log('success', 'Screen Print Adapter Ready', event.detail);
+            document.getElementById('adapter-status').className = 'status ready';
+            document.getElementById('adapter-status').textContent = 'Adapter: Ready';
+        });
+        
+        document.addEventListener('pricingDataLoaded', (event) => {
+            log('success', 'Pricing Data Loaded', event.detail);
+            document.getElementById('pricing-data-viewer').innerHTML = 
+                `<pre>${JSON.stringify(event.detail, null, 2)}</pre>`;
+        });
+        
+        document.addEventListener('pricingDataError', (event) => {
+            log('error', 'Pricing Data Error', event.detail);
+            document.getElementById('adapter-status').className = 'status error';
+            document.getElementById('adapter-status').textContent = 'Adapter: Error';
+        });
+        
+        document.addEventListener('screenPrintPricingCalculated', (event) => {
+            log('info', 'Pricing Calculated', event.detail);
+        });
+        
+        // Listen for postMessage events
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type) {
+                log('info', `PostMessage received: ${event.data.type}`);
+                
+                if (event.data.type === 'caspioScreenPrintMasterBundleReady') {
+                    document.getElementById('master-bundle-viewer').innerHTML = 
+                        `<pre>${JSON.stringify(event.data.data, null, 2)}</pre>`;
+                }
+            }
+        });
+        
+        // Send mock data function
+        function sendMockData() {
+            log('info', 'Sending mock data...');
+            
+            const mockData = {
+                type: 'caspioScreenPrintMasterBundleReady',
+                data: {
+                    sN: 'PC54',
+                    cN: 'Navy',
+                    pT: 'Port & Company Core Cotton Tee - Navy',
+                    uniqueSizes: ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'],
+                    tierData: {
+                        '24-47': {
+                            minQuantity: 24,
+                            maxQuantity: 47,
+                            S: 8.50,
+                            M: 8.50,
+                            L: 8.50,
+                            XL: 8.50,
+                            '2XL': 10.50,
+                            '3XL': 12.50,
+                            '4XL': 14.50
+                        },
+                        '48-71': {
+                            minQuantity: 48,
+                            maxQuantity: 71,
+                            S: 7.00,
+                            M: 7.00,
+                            L: 7.00,
+                            XL: 7.00,
+                            '2XL': 9.00,
+                            '3XL': 11.00,
+                            '4XL': 13.00
+                        },
+                        '72+': {
+                            minQuantity: 72,
+                            maxQuantity: null,
+                            S: 5.50,
+                            M: 5.50,
+                            L: 5.50,
+                            XL: 5.50,
+                            '2XL': 7.50,
+                            '3XL': 9.50,
+                            '4XL': 11.50
+                        }
+                    },
+                    prices: {
+                        S: { '24-47': 8.50, '48-71': 7.00, '72+': 5.50 },
+                        M: { '24-47': 8.50, '48-71': 7.00, '72+': 5.50 },
+                        L: { '24-47': 8.50, '48-71': 7.00, '72+': 5.50 },
+                        XL: { '24-47': 8.50, '48-71': 7.00, '72+': 5.50 },
+                        '2XL': { '24-47': 10.50, '48-71': 9.00, '72+': 7.50 },
+                        '3XL': { '24-47': 12.50, '48-71': 11.00, '72+': 9.50 },
+                        '4XL': { '24-47': 14.50, '48-71': 13.00, '72+': 11.50 }
+                    }
+                }
+            };
+            
+            window.postMessage(mockData, '*');
+        }
+        
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            log('info', 'Debug tool loaded');
+            log('info', 'Waiting for Screen Print Adapter to initialize...');
+            
+            // Add some URL params if missing
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.has('StyleNumber')) {
+                urlParams.set('StyleNumber', 'PC54');
+                urlParams.set('COLOR', 'Navy');
+                const newUrl = window.location.pathname + '?' + urlParams.toString();
+                log('warn', 'Added missing URL parameters', { StyleNumber: 'PC54', COLOR: 'Navy' });
+                window.history.replaceState({}, '', newUrl);
+            }
+            
+            // Send mock data after a delay to simulate Caspio
+            setTimeout(() => {
+                if (document.getElementById('adapter-status').className.includes('waiting')) {
+                    log('warn', 'Adapter still waiting, sending mock data automatically...');
+                    sendMockData();
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

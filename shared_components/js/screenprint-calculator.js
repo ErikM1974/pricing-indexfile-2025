@@ -125,36 +125,86 @@ window.ScreenPrintCalculator = (function() {
         // Get base price from pricing data
         let basePrice = 0;
         let tierInfo = null;
+        let additionalLocationCost = 0;
         
         if (state.pricingData && state.pricingData.tiers) {
             // Find appropriate tier based on quantity
             tierInfo = state.pricingData.tiers.find(tier => {
                 return state.quantity >= tier.minQty && 
-                       (tier.maxQty === null || state.quantity <= tier.maxQty);
+                       (tier.maxQty === null || tier.maxQty === undefined || state.quantity <= tier.maxQty);
             });
+            
+            console.log('[ScreenPrintCalculator] Found tier for quantity', state.quantity, ':', tierInfo);
             
             if (tierInfo && tierInfo.prices) {
                 // Get price for the selected size or use first available
                 const sizes = Object.keys(tierInfo.prices);
-                basePrice = tierInfo.prices[sizes[0]] || 0;
+                if (sizes.length > 0) {
+                    // Try to find a standard size (S, M, L, XL) first
+                    const standardSizes = ['XL', 'L', 'M', 'S'];
+                    let priceFound = false;
+                    
+                    for (const size of standardSizes) {
+                        if (tierInfo.prices[size] !== undefined && tierInfo.prices[size] !== null) {
+                            basePrice = parseFloat(tierInfo.prices[size]) || 0;
+                            priceFound = true;
+                            console.log('[ScreenPrintCalculator] Using price for size', size, ':', basePrice);
+                            break;
+                        }
+                    }
+                    
+                    // If no standard size found, use first available
+                    if (!priceFound && sizes[0]) {
+                        basePrice = parseFloat(tierInfo.prices[sizes[0]]) || 0;
+                        console.log('[ScreenPrintCalculator] Using price for first available size', sizes[0], ':', basePrice);
+                    }
+                } else {
+                    console.warn('[ScreenPrintCalculator] No prices found in tier');
+                }
+            } else {
+                console.warn('[ScreenPrintCalculator] No tier found for quantity', state.quantity);
+            }
+            
+            // Get additional location pricing if back print is selected
+            if (state.backColors > 0 && state.pricingData.additionalLocationPricing) {
+                const backColorCount = colors.back.toString();
+                const additionalPricing = state.pricingData.additionalLocationPricing;
+                
+                console.log('[ScreenPrintCalculator] Looking for additional location pricing for', backColorCount, 'colors');
+                console.log('[ScreenPrintCalculator] Available additional pricing:', additionalPricing);
+                
+                if (additionalPricing && additionalPricing.tiers) {
+                    // Find the matching tier for additional location
+                    const additionalTier = additionalPricing.tiers.find(tier => {
+                        return state.quantity >= tier.minQty && 
+                               (tier.maxQty === null || tier.maxQty === undefined || state.quantity <= tier.maxQty);
+                    });
+                    
+                    if (additionalTier && additionalTier.pricePerPiece !== null) {
+                        additionalLocationCost = parseFloat(additionalTier.pricePerPiece) || 0;
+                        console.log('[ScreenPrintCalculator] Additional location cost per piece:', additionalLocationCost);
+                    }
+                }
             }
         }
         
-        // Calculate totals
-        const subtotal = basePrice * state.quantity;
+        // Calculate totals including additional location
+        const basePriceWithAdditional = basePrice + additionalLocationCost;
+        const subtotal = basePriceWithAdditional * state.quantity;
         const ltmFee = (state.quantity < config.ltmThreshold) ? config.ltmFee : 0;
         const totalSetup = setupFee;
         const grandTotal = subtotal + totalSetup + ltmFee;
         
-        // Per shirt calculations
-        const setupPerShirt = totalSetup / state.setupDivisionQuantity;
-        const totalPerShirt = state.includeSetupInPrice ? 
-            (basePrice + setupPerShirt) : basePrice;
+        // Per shirt calculations  
+        const setupPerShirt = totalSetup / state.quantity;
+        const totalPerShirt = basePriceWithAdditional + setupPerShirt + (ltmFee / state.quantity);
         
         return {
             quantity: state.quantity,
             colors: colors,
             basePrice: basePrice,
+            additionalLocationCost: additionalLocationCost,
+            basePriceWithAdditional: basePriceWithAdditional,
             subtotal: subtotal,
             setupFee: totalSetup,
             setupPerShirt: setupPerShirt,
@@ -186,13 +236,13 @@ window.ScreenPrintCalculator = (function() {
         // Update hero price display
         const basePriceLarge = document.getElementById('sp-base-price-large');
         if (basePriceLarge) {
-            basePriceLarge.textContent = pricing.basePrice.toFixed(2);
+            basePriceLarge.textContent = pricing.basePriceWithAdditional.toFixed(2);
         }
         
         // Update all-in price
         const allInPrice = document.getElementById('sp-all-in-price');
         if (allInPrice) {
-            const allInValue = pricing.basePrice + pricing.setupPerShirt + (pricing.ltmFee / pricing.quantity);
+            const allInValue = pricing.basePriceWithAdditional + pricing.setupPerShirt + (pricing.ltmFee / pricing.quantity);
             allInPrice.textContent = config.formatCurrency(allInValue);
         }
         
