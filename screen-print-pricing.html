@@ -488,26 +488,38 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Core Scripts (must load first) -->
     <script src="/shared_components/js/utils.js"></script>
-    <script src="/shared_components/js/universal-header-component.js"></script>
-    <script src="/shared_components/js/universal-product-display.js"></script>
     
-    <!-- Initialize Universal Product Display -->
+    <!-- Initialize product display when ready -->
     <script>
+        // Initialize Universal Product Display when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('[ScreenPrintV2] Initializing Universal Product Display');
+            console.log('[ScreenPrintV2] DOM Ready - Initializing Universal Product Display');
             
-            new UniversalProductDisplay({
+            // Initialize Universal Product Display
+            let productDisplay = new UniversalProductDisplay({
                 containerId: 'product-display',
                 pageType: 'screenprint',
                 showBackButton: true,
                 showInfoBox: true,
                 showSelectedColor: true,
+                sticky: false,
                 infoBoxContent: 'Screen printing pricing includes the shirt and printing. Setup fees apply per color per location.'
             });
         });
     </script>
+    
+    <!-- Shared Pricing Scripts (handles product data fetching) -->
+    <script src="/shared_components/js/pricing-pages.js"></script>
+    <script src="/shared_components/js/pricing-matrix-api.js"></script>
+    <script src="/shared_components/js/product-pricing-ui.js"></script>
+    <script src="/shared_components/js/pricing-calculator.js"></script>
+    
+    <!-- Universal Components -->
+    <script src="/shared_components/js/universal-header-component.js"></script>
+    <script src="/shared_components/js/universal-product-display.js"></script>
+    <script src="/shared_components/js/universal-image-gallery.js"></script>
 
     <!-- Screen Print V2 Scripts -->
     <script src="/shared_components/js/screenprint-caspio-adapter-v2.js"></script>
