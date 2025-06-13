@@ -1047,7 +1047,16 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         try {
             await loadScript('/cart.js');
             await loadScript('/cart-integration.js');
-            await loadScript('/pricing-matrix-capture.js');
+            
+            // Skip pricing-matrix-capture for screen print pages (they use master bundle)
+            const currentPage = window.location.pathname.toLowerCase();
+            const isScreenPrint = currentPage.includes('screen-print');
+            if (!isScreenPrint) {
+                await loadScript('/pricing-matrix-capture.js');
+            } else {
+                console.log("PricingPages: Skipping pricing-matrix-capture.js for screen print page");
+            }
+            
             await loadScript('/pricing-calculator.js');
             await loadScript('/product-quantity-ui.js');
             await loadScript('/add-to-cart.js');
