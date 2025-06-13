@@ -800,3 +800,20 @@ select,
         width: 100%;
     }
 }
+/* Screen Print Pricing V2 - Subtitle Enhancements */
+.sp-price-subtitle { /* Existing class for the dynamic subtitle container */
+    font-size: 0.85em !important; /* Increased from 0.8em in JS, or default 14px in HTML */
+    line-height: 1.4 !important;   /* Increased for better readability of multi-line */
+    /* color: #555; */ /* Slightly darker than default #666 if needed, but let's test default first */
+}
+
+.sp-dark-garment-indicator { /* Existing class for the dark garment text */
+    font-size: 0.85em !important; /* Further increased for prominence */
+    font-weight: bold;
+    color: #555 !important; /* Slightly darker grey for better visibility */
+}
+
+.sp-print-only-total { /* New class for the print-only sum */
+    font-weight: bold;
+    color: #00695C; /* A distinct, readable teal/green color */
+}
