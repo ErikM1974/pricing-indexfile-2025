@@ -1,0 +1,172 @@
+/*
+ * Force Green Theme CSS
+ * This file FORCES the green theme to override any JavaScript-injected styles
+ * Load this LAST in your CSS stack
+ */
+
+/* Force CSS variables */
+:root {
+    --primary-color: #3a7c52 !important;
+    --primary: #3a7c52 !important;
+    --primary-dark: #2d5f3f !important;
+    --primary-light: #4a9c62 !important;
+    --nwca-primary: #3a7c52 !important;
+    --nwca-primary-dark: #2d5f3f !important;
+    --nwca-primary-light: #4a9c62 !important;
+}
+
+/* Force header backgrounds */
+#universal-header-container,
+#universal-header-container > div,
+#universal-header-container .header-main,
+#universal-header-container .header-container,
+.universal-header,
+.universal-pricing-header,
+.pricing-header,
+.header-main,
+.header-container,
+.page-header {
+    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%) !important;
+    background-color: #3a7c52 !important;
+}
+
+/* Remove any blue gradients */
+.page-header {
+    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%) !important;
+}
+
+/* Force button colors */
+.btn-primary,
+.action-btn,
+.dtf-btn,
+.sp-btn-add,
+.quick-quote-btn,
+button[type="submit"],
+.add-location-btn,
+.calculate-btn {
+    background: #3a7c52 !important;
+    background-color: #3a7c52 !important;
+    border-color: #3a7c52 !important;
+    color: white !important;
+}
+
+.btn-primary:hover,
+.action-btn:hover,
+.dtf-btn:hover,
+.sp-btn-add:hover,
+.quick-quote-btn:hover,
+button[type="submit"]:hover,
+.add-location-btn:hover,
+.calculate-btn:hover {
+    background: #2d5f3f !important;
+    background-color: #2d5f3f !important;
+    border-color: #2d5f3f !important;
+}
+
+/* Force link colors */
+a:not(.universal-header-contact-item):not(.universal-header-nav-link):not(.universal-header-btn) {
+    color: #3a7c52 !important;
+}
+
+a:not(.universal-header-contact-item):not(.universal-header-nav-link):not(.universal-header-btn):hover {
+    color: #2d5f3f !important;
+}
+
+/* DTF specific overrides */
+.dtf-calculator-header,
+.dtf-header,
+.dtf-title {
+    background: #3a7c52 !important;
+    color: white !important;
+}
+
+.dtf-price-display,
+.dtf-price,
+.dtf-total {
+    color: #3a7c52 !important;
+    border-color: #3a7c52 !important;
+}
+
+/* Screenprint specific overrides */
+.sp-title,
+.sp-currency,
+.sp-price-value,
+.sp-savings,
+.sp-accordion-trigger {
+    color: #3a7c52 !important;
+}
+
+.sp-price-box {
+    border: 2px solid #3a7c52 !important;
+}
+
+.sp-input:focus,
+.sp-select:focus {
+    border-color: #3a7c52 !important;
+    box-shadow: 0 0 0 0.2rem rgba(58, 124, 82, 0.25) !important;
+}
+
+.sp-total span:last-child,
+.sp-summary-grand-total .sp-summary-total {
+    color: #3a7c52 !important;
+}
+
+.sp-summary-grand-total td {
+    border-top-color: #3a7c52 !important;
+}
+
+/* Form control focus states */
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.quantity-input:focus {
+    border-color: #3a7c52 !important;
+    box-shadow: 0 0 0 0.2rem rgba(58, 124, 82, 0.25) !important;
+}
+
+/* Progress bars and active states */
+.progress-bar,
+.active,
+.selected {
+    background-color: #3a7c52 !important;
+}
+
+/* Tabs and nav items */
+.nav-link.active,
+.nav-tabs .nav-link.active {
+    color: #3a7c52 !important;
+    border-bottom-color: #3a7c52 !important;
+}
+
+/* Cards and panels */
+.card-header {
+    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%) !important;
+    color: white !important;
+}
+
+/* Pricing display elements */
+.price-display,
+.total-price,
+.unit-price {
+    color: #3a7c52 !important;
+}
+
+/* Override Bootstrap primary color */
+.bg-primary {
+    background-color: #3a7c52 !important;
+}
+
+.text-primary {
+    color: #3a7c52 !important;
+}
+
+.border-primary {
+    border-color: #3a7c52 !important;
+}
+
+/* Make sure this overrides everything */
+* {
+    --bs-primary: #3a7c52 !important;
+    --bs-primary-rgb: 58, 124, 82 !important;
+}

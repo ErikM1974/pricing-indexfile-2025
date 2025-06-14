@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS Diagnostic</title>
+    <meta charset="UTF-8">
+    
+    <!-- Test different path formats -->
+    <link rel="stylesheet" href="shared_components/css/universal-pricing-header.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-box {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            background: #f5f5f5;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSS Loading Diagnostic</h1>
+    
+    <div class="test-box">
+        <h2>Test 1: CSS Variable Check</h2>
+        <p>If CSS is loaded, this box should have a green background:</p>
+        <div style="background: var(--nwca-primary, #ff0000); color: white; padding: 10px;">
+            Background should be green (#3a7c52), not red
+        </div>
+    </div>
+    
+    <div class="test-box">
+        <h2>Test 2: Header Class Check</h2>
+        <div class="universal-pricing-header" style="padding: 20px;">
+            This should have green gradient background if CSS loaded
+        </div>
+    </div>
+    
+    <div class="test-box">
+        <h2>Test 3: JavaScript Path Check</h2>
+        <p>Current page location: <span id="location"></span></p>
+        <p>CSS file should be at: <span id="css-path"></span></p>
+    </div>
+    
+    <script>
+        // Show current location
+        document.getElementById('location').textContent = window.location.href;
+        
+        // Calculate expected CSS path
+        const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+        document.getElementById('css-path').textContent = baseUrl + '/shared_components/css/universal-pricing-header.css';
+        
+        // Check if CSS loaded
+        window.onload = function() {
+            const testDiv = document.createElement('div');
+            testDiv.className = 'universal-pricing-header';
+            document.body.appendChild(testDiv);
+            const styles = window.getComputedStyle(testDiv);
+            
+            if (styles.background.includes('linear-gradient')) {
+                console.log('SUCCESS: CSS is loaded!');
+            } else {
+                console.log('FAIL: CSS not loaded');
+                console.log('Background value:', styles.background);
+            }
+            
+            document.body.removeChild(testDiv);
+        };
+    </script>
+</body>
+</html>

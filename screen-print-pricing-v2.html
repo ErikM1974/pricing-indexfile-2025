@@ -3,12 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Screen Print Pricing | NWCA</title>
+    <title>Screen Print Pricing | Northwest Custom Apparel</title>
     
-    <!-- Shared styles -->
-    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Universal Pricing CSS -->
+    <link rel="stylesheet" href="shared_components/css/universal-pricing-header.css">
+    <link rel="stylesheet" href="shared_components/css/universal-pricing-layout.css">
+    <link rel="stylesheet" href="shared_components/css/universal-calculator-theme.css">
+    <link rel="stylesheet" href="shared_components/css/universal-pricing-components.css">
+    
+    <!-- Legacy styles for compatibility -->
+    <link rel="stylesheet" href="shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="shared_components/css/universal-product-display.css">
     
     <!-- Screen Print V2 Styles -->
     <style>
@@ -22,7 +31,7 @@
         }
 
         .sp-title {
-            color: #2e5827;
+            color: #3a7c52 !important;
             font-size: 1.5em;
             margin: 0 0 20px 0;
             font-weight: 600;
@@ -63,7 +72,7 @@
 
         .sp-input:focus, .sp-select:focus {
             outline: none;
-            border-color: #2e5827;
+            border-color: #3a7c52 !important;
         }
 
         .sp-help-text {
@@ -98,12 +107,12 @@
         }
 
         .sp-btn-add {
-            background: #2e5827;
+            background: #3a7c52 !important;
             color: white;
         }
 
         .sp-btn-add:hover {
-            background: #234520;
+            background: #2d5f3f !important;
         }
 
         .sp-btn-remove {
@@ -149,7 +158,7 @@
 
         .sp-price-box {
             background: white;
-            border: 2px solid #2e5827;
+            border: 2px solid #3a7c52 !important;
             border-radius: 8px;
             padding: 25px;
             text-align: center;
@@ -167,13 +176,13 @@
         .sp-currency {
             font-size: 28px;
             font-weight: 600;
-            color: #2e5827;
+            color: #3a7c52 !important;
         }
 
         .sp-price-value {
             font-size: 42px;
             font-weight: bold;
-            color: #2e5827;
+            color: #3a7c52 !important;
             line-height: 1;
         }
 
@@ -226,7 +235,7 @@
         }
 
         .sp-total span:last-child {
-            color: #2e5827;
+            color: #3a7c52 !important;
         }
 
         .sp-order-total {
@@ -329,13 +338,13 @@
 
         .sp-summary-grand-total td {
             padding-top: 10px;
-            border-top: 2px solid #2e5827;
+            border-top: 2px solid #3a7c52 !important;
             font-size: 1.1em;
             font-weight: 600;
         }
 
         .sp-summary-grand-total .sp-summary-total {
-            color: #2e5827;
+            color: #3a7c52 !important;
         }
 
         .sp-summary-per-item {
@@ -362,7 +371,7 @@
             cursor: pointer;
             font-size: 1em;
             font-weight: 600;
-            color: #2e5827;
+            color: #3a7c52 !important;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -418,7 +427,7 @@
         }
 
         .sp-savings {
-            color: #2e5827;
+            color: #3a7c52 !important;
             font-weight: 600;
         }
 
@@ -459,11 +468,202 @@
                 margin-top: 5px;
             }
         }
+        
+        /* Inline critical header styles */
+        .universal-pricing-header {
+            background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .universal-header-contact-bar {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        
+        .universal-header-main {
+            padding: 20px 0;
+        }
+        
+        .universal-header-main-content,
+        .universal-header-contact-content,
+        .universal-page-title-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .universal-header-contact-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .universal-header-contact-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .universal-header-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .universal-header-main-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .universal-header-company-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .universal-header-tagline {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .universal-header-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .universal-header-nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .universal-header-nav-link.active {
+            border-bottom-color: white;
+        }
+        
+        .universal-header-cta-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .universal-header-btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .universal-header-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .universal-header-btn-primary {
+            background: white;
+            color: #3a7c52;
+            border: 1px solid white;
+        }
+        
+        .universal-pricing-page-title {
+            background: #f8f9fa;
+            padding: 30px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .universal-page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        
+        .universal-page-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin: 0;
+        }
     </style>
 </head>
-<body>
+<body class="universal-theme">
     <!-- Universal Header -->
-    <div id="universal-header-container" data-page-type="screenprint"></div>
+    <header class="universal-pricing-header">
+        <!-- Contact Bar -->
+        <div class="universal-header-contact-bar">
+            <div class="universal-header-contact-content">
+                <div class="universal-header-contact-left">
+                    <a href="tel:253-922-5793" class="universal-header-contact-item">
+                        <i class="fas fa-phone universal-header-contact-icon"></i>
+                        253-922-5793
+                    </a>
+                    <a href="mailto:sales@nwcustomapparel.com" class="universal-header-contact-item">
+                        <i class="fas fa-envelope universal-header-contact-icon"></i>
+                        sales@nwcustomapparel.com
+                    </a>
+                    <span class="universal-header-contact-item">
+                        <i class="fas fa-clock universal-header-contact-icon"></i>
+                        9AM-5PM
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Header -->
+        <div class="universal-header-main">
+            <div class="universal-header-main-content">
+                <!-- Logo -->
+                <a href="/" class="universal-header-logo">
+                    <div class="universal-header-logo-text">
+                        <h1 class="universal-header-company-name">NW NORTHWEST</h1>
+                        <p class="universal-header-tagline">CUSTOM APPAREL</p>
+                    </div>
+                </a>
+                
+                <!-- Navigation -->
+                <nav class="universal-header-nav">
+                    <a href="/" class="universal-header-nav-link">Home</a>
+                    <a href="/products" class="universal-header-nav-link">Products</a>
+                    <a href="#" class="universal-header-nav-link active">PC61</a>
+                    <a href="/screenprint-pricing" class="universal-header-nav-link">Screen Print Pricing</a>
+                </nav>
+                
+                <!-- CTA Buttons -->
+                <div class="universal-header-cta-group">
+                    <a href="#" class="universal-header-btn universal-header-btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Product
+                    </a>
+                    <a href="#" class="universal-header-btn universal-header-btn-primary">
+                        Screen Print Style PC61
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Page Title -->
+    <div class="universal-pricing-page-title">
+        <div class="universal-page-title-content">
+            <h1 class="universal-page-title">Screen Print Pricing Calculator</h1>
+            <p class="universal-page-subtitle">Get instant pricing for custom screen printed apparel</p>
+        </div>
+    </div>
 
     <!-- Main Container -->
     <div class="container">
@@ -489,9 +689,9 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/shared_components/js/utils.js"></script>
-    <script src="/shared_components/js/universal-header-component.js"></script>
-    <script src="/shared_components/js/universal-product-display.js"></script>
+    <script src="shared_components/js/utils.js"></script>
+    <script src="shared_components/js/universal-header-component.js"></script>
+    <script src="shared_components/js/universal-product-display.js"></script>
     
     <!-- Initialize Universal Product Display -->
     <script>
@@ -510,10 +710,10 @@
     </script>
 
     <!-- Screen Print V2 Scripts -->
-    <script src="/shared_components/js/screenprint-caspio-adapter-v2.js"></script>
-    <script src="/shared_components/js/screenprint-pricing-v2.js"></script>
+    <script src="shared_components/js/screenprint-caspio-adapter-v2.js"></script>
+    <script src="shared_components/js/screenprint-pricing-v2.js"></script>
     
     <!-- Caspio Loader -->
-    <script src="/screenprint-caspio-loader.js"></script>
+    <script src="screenprint-caspio-loader.js"></script>
 </body>
 </html>

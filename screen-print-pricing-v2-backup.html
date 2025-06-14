@@ -5,40 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Screen Print Pricing | NWCA</title>
     
-    <!-- Universal Pricing CSS - Load FIRST for proper theming -->
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-layout.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
-    
-    <!-- Shared CSS -->
+    <!-- Shared styles -->
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
-    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
-    <link rel="stylesheet" href="/shared_components/css/image-modal.css">
-    
-    <!-- FORCE GREEN THEME - Load LAST to override everything -->
-    <link rel="stylesheet" href="/shared_components/css/force-green-theme.css">
     
     <!-- Screen Print V2 Styles -->
     <style>
-        /* CRITICAL: Force green theme colors */
-        :root {
-            --primary-color: #3a7c52 !important;
-            --primary: #3a7c52 !important;
-            --primary-dark: #2d5f3f !important;
-        }
-        
-        /* Override header colors */
-        #universal-header-container .header-main,
-        .universal-header {
-            background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%) !important;
-        }
-        
         /* Screen Print Calculator V2 Styles */
         .sp-calculator {
             background: #f8f9fa;
@@ -49,7 +22,7 @@
         }
 
         .sp-title {
-            color: #3a7c52 !important;
+            color: #2e5827;
             font-size: 1.5em;
             margin: 0 0 20px 0;
             font-weight: 600;
@@ -90,7 +63,7 @@
 
         .sp-input:focus, .sp-select:focus {
             outline: none;
-            border-color: #3a7c52 !important;
+            border-color: #2e5827;
         }
 
         .sp-help-text {
@@ -125,12 +98,12 @@
         }
 
         .sp-btn-add {
-            background: #3a7c52 !important;
+            background: #2e5827;
             color: white;
         }
 
         .sp-btn-add:hover {
-            background: #2d5f3f !important;
+            background: #234520;
         }
 
         .sp-btn-remove {
@@ -176,7 +149,7 @@
 
         .sp-price-box {
             background: white;
-            border: 2px solid #3a7c52 !important;
+            border: 2px solid #2e5827;
             border-radius: 8px;
             padding: 25px;
             text-align: center;
@@ -194,13 +167,13 @@
         .sp-currency {
             font-size: 28px;
             font-weight: 600;
-            color: #3a7c52 !important;
+            color: #2e5827;
         }
 
         .sp-price-value {
             font-size: 42px;
             font-weight: bold;
-            color: #3a7c52 !important;
+            color: #2e5827;
             line-height: 1;
         }
 
@@ -253,7 +226,7 @@
         }
 
         .sp-total span:last-child {
-            color: #3a7c52 !important;
+            color: #2e5827;
         }
 
         .sp-order-total {
@@ -315,7 +288,7 @@
         }
 
         .sp-order-summary h4 {
-            color: #3a7c52 !important;
+            color: #2e5827;
             margin: 0 0 15px 0;
             font-size: 1.2em;
         }
@@ -356,13 +329,13 @@
 
         .sp-summary-grand-total td {
             padding-top: 10px;
-            border-top: 2px solid #3a7c52 !important;
+            border-top: 2px solid #2e5827;
             font-size: 1.1em;
             font-weight: 600;
         }
 
         .sp-summary-grand-total .sp-summary-total {
-            color: #3a7c52 !important;
+            color: #2e5827;
         }
 
         .sp-summary-per-item {
@@ -389,7 +362,7 @@
             cursor: pointer;
             font-size: 1em;
             font-weight: 600;
-            color: #3a7c52 !important;
+            color: #2e5827;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -445,7 +418,7 @@
         }
 
         .sp-savings {
-            color: #3a7c52 !important;
+            color: #2e5827;
             font-weight: 600;
         }
 
@@ -454,77 +427,6 @@
             color: #666;
             text-align: center;
             margin-top: 10px;
-            font-style: italic;
-        }
-
-        /* Size Upcharge Info Box */
-        .sp-size-upcharge-info {
-            background: linear-gradient(135deg, #f0f7f0 0%, #e8f5e8 100%);
-            border: 1px solid #d4e8d4;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .sp-size-upcharge-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #d4e8d4;
-        }
-
-        .sp-size-icon {
-            font-size: 24px;
-        }
-
-        .sp-size-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #3a7c52 !important;
-        }
-
-        .sp-size-upcharge-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-
-        .sp-size-item {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 10px;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-
-        .sp-size-item:hover {
-            border-color: #3a7c52 !important;
-            box-shadow: 0 2px 6px rgba(46, 88, 39, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .sp-size-label {
-            display: block;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-            font-size: 0.95em;
-        }
-
-        .sp-size-price {
-            display: block;
-            color: #3a7c52 !important;
-            font-weight: 500;
-            font-size: 1.05em;
-        }
-
-        .sp-size-item:first-child .sp-size-price {
-            color: #666;
             font-style: italic;
         }
 
@@ -556,20 +458,10 @@
                 width: 100%;
                 margin-top: 5px;
             }
-
-            .sp-size-upcharge-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .sp-size-upcharge-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
-<body class="universal-theme">
+<body>
     <!-- Universal Header -->
     <div id="universal-header-container" data-page-type="screenprint"></div>
 
@@ -596,39 +488,26 @@
         </div>
     </div>
 
-    <!-- Core Scripts (must load first) -->
+    <!-- Scripts -->
     <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/universal-header-component.js"></script>
+    <script src="/shared_components/js/universal-product-display.js"></script>
     
-    <!-- Initialize product display when ready -->
+    <!-- Initialize Universal Product Display -->
     <script>
-        // Initialize Universal Product Display when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('[ScreenPrintV2] DOM Ready - Initializing Universal Product Display');
+            console.log('[ScreenPrintV2] Initializing Universal Product Display');
             
-            // Initialize Universal Product Display
-            let productDisplay = new UniversalProductDisplay({
+            new UniversalProductDisplay({
                 containerId: 'product-display',
                 pageType: 'screenprint',
                 showBackButton: true,
                 showInfoBox: true,
                 showSelectedColor: true,
-                sticky: false,
                 infoBoxContent: 'Screen printing pricing includes the shirt and printing. Setup fees apply per color per location.'
             });
         });
     </script>
-    
-    <!-- Shared Pricing Scripts (handles product data fetching) -->
-    <script src="/shared_components/js/pricing-pages.js"></script>
-    <script src="/shared_components/js/pricing-matrix-api.js"></script>
-    <script src="/shared_components/js/product-pricing-ui.js"></script>
-    <script src="/shared_components/js/pricing-calculator.js"></script>
-    <script src="/shared_components/js/dtg-page-setup.js"></script>
-    
-    <!-- Universal Components -->
-    <script src="/shared_components/js/universal-header-component.js"></script>
-    <script src="/shared_components/js/universal-product-display.js"></script>
-    <script src="/shared_components/js/universal-image-gallery.js"></script>
 
     <!-- Screen Print V2 Scripts -->
     <script src="/shared_components/js/screenprint-caspio-adapter-v2.js"></script>

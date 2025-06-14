@@ -1,6 +1,60 @@
 /* Universal Pricing Page Layout Styles */
 /* Used across multiple pricing pages for consistent layout */
+/* Updated to match mockup design with green theme #3a7c52 */
 
+:root {
+    /* Universal brand colors */
+    --nwca-primary: #3a7c52;
+    --nwca-primary-dark: #2d5f3f;
+    --nwca-primary-light: #4a9c62;
+    --nwca-primary-lighter: #e8f5e9;
+    
+    /* Keep existing vars for backward compatibility */
+    --primary-color: var(--nwca-primary);
+    --primary: var(--nwca-primary);
+}
+
+/* Main Container - New Universal Structure */
+.universal-pricing-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Two Column Layout - Matching Mockup */
+.universal-pricing-columns {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+/* Left Column - Product Display */
+.universal-product-column {
+    position: sticky;
+    top: 20px;
+}
+
+.universal-product-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+/* Right Column - Calculator */
+.universal-calculator-column {
+    min-height: 600px;
+}
+
+.universal-calculator-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+}
+
+/* LEGACY STYLES - Keep for backward compatibility */
 /* Improved layout styles */
 .improved-layout {
     display: flex;

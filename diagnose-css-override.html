@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS Override Diagnostic</title>
+    <style>
+        body { padding: 20px; font-family: Arial, sans-serif; }
+        .diagnostic { margin: 20px 0; padding: 20px; border: 2px solid #ddd; }
+        .success { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+        .code { background: #f5f5f5; padding: 10px; font-family: monospace; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>CSS Override Diagnostic Tool</h1>
+    
+    <div class="diagnostic">
+        <h2>Instructions:</h2>
+        <ol>
+            <li>Open your DTF or Screenprint pricing page</li>
+            <li>Open browser Developer Tools (F12)</li>
+            <li>Go to Console tab</li>
+            <li>Paste and run this code:</li>
+        </ol>
+        
+        <div class="code">
+// Check what's overriding the header
+const header = document.querySelector('#universal-header-container, .universal-header, .page-header, .header-main');
+if (header) {
+    const styles = window.getComputedStyle(header);
+    console.log('Header element:', header);
+    console.log('Background:', styles.background);
+    console.log('Background-color:', styles.backgroundColor);
+    
+    // Check CSS variable values
+    const root = document.documentElement;
+    const rootStyles = window.getComputedStyle(root);
+    console.log('--primary-color:', rootStyles.getPropertyValue('--primary-color'));
+    console.log('--primary:', rootStyles.getPropertyValue('--primary'));
+    
+    // Find all stylesheets
+    console.log('\nLoaded stylesheets:');
+    Array.from(document.styleSheets).forEach((sheet, i) => {
+        console.log(`${i}: ${sheet.href || 'Inline styles'}`);
+    });
+    
+    // Check for blue color in styles
+    const blueFound = Array.from(document.styleSheets).some(sheet => {
+        try {
+            return Array.from(sheet.cssRules || []).some(rule => 
+                rule.cssText && rule.cssText.includes('#007bff')
+            );
+        } catch(e) { return false; }
+    });
+    console.log('\nBlue color (#007bff) found in styles:', blueFound);
+} else {
+    console.log('No header element found!');
+}
+
+// Force green theme immediately
+document.documentElement.style.setProperty('--primary-color', '#3a7c52', 'important');
+document.documentElement.style.setProperty('--primary', '#3a7c52', 'important');
+        </div>
+    </div>
+    
+    <div class="diagnostic">
+        <h2>Quick Fix - Add to Console:</h2>
+        <div class="code">
+// Force green theme on all elements
+document.querySelectorAll('.page-header, #universal-header-container, .header-main').forEach(el => {
+    el.style.background = 'linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%)';
+});
+
+document.querySelectorAll('.btn-primary, .sp-btn-add, .dtf-btn').forEach(el => {
+    el.style.backgroundColor = '#3a7c52';
+    el.style.borderColor = '#3a7c52';
+});
+
+document.querySelectorAll('.sp-title, .sp-currency, .sp-price-value, .dtf-price').forEach(el => {
+    el.style.color = '#3a7c52';
+});
+        </div>
+    </div>
+    
+    <div class="diagnostic">
+        <h2>Expected Results:</h2>
+        <ul>
+            <li>Header should show green gradient background</li>
+            <li>Primary color variables should be #3a7c52</li>
+            <li>force-green-theme.css should be in the stylesheet list</li>
+            <li>No blue colors (#007bff) should be found</li>
+        </ul>
+    </div>
+</body>
+</html>

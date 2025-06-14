@@ -1,0 +1,345 @@
+/*
+ * Universal Calculator Theme CSS
+ * Consistent styling for all pricing calculators
+ * Maintains functionality while adding visual consistency
+ */
+
+/* Calculator Title Section */
+.universal-calculator-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 10px 0;
+    text-align: center;
+}
+
+.universal-calculator-subtitle {
+    font-size: 16px;
+    color: #666;
+    text-align: center;
+    margin: 0 0 30px 0;
+}
+
+/* Step-based Calculator Flow */
+.universal-calculator-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.universal-calculator-step {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.universal-step-number {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: #3a7c52;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.universal-step-content {
+    flex: 1;
+}
+
+.universal-step-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 10px 0;
+}
+
+/* Form Controls - Additive styles that don't break functionality */
+.universal-theme input[type="text"],
+.universal-theme input[type="number"],
+.universal-theme select,
+.universal-theme .quantity-input,
+.universal-theme .sp-input,
+.universal-theme .sp-select {
+    border: 2px solid #ddd !important;
+    border-radius: 4px !important;
+    padding: 10px !important;
+    font-size: 16px !important;
+    transition: border-color 0.3s !important;
+}
+
+.universal-theme input[type="text"]:focus,
+.universal-theme input[type="number"]:focus,
+.universal-theme select:focus,
+.universal-theme .quantity-input:focus,
+.universal-theme .sp-input:focus,
+.universal-theme .sp-select:focus {
+    outline: none !important;
+    border-color: #3a7c52 !important;
+    box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1) !important;
+}
+
+/* Buttons - Universal green theme */
+.universal-theme button,
+.universal-theme .btn,
+.universal-theme .sp-btn,
+.universal-theme .dtf-btn,
+.universal-theme .action-btn {
+    background: #3a7c52 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 10px 20px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s !important;
+}
+
+.universal-theme button:hover,
+.universal-theme .btn:hover,
+.universal-theme .sp-btn:hover,
+.universal-theme .dtf-btn:hover,
+.universal-theme .action-btn:hover {
+    background: #2d5f3f !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Secondary buttons */
+.universal-theme .btn-secondary,
+.universal-theme .sp-btn-remove,
+.universal-theme .remove-btn {
+    background: #dc3545 !important;
+}
+
+.universal-theme .btn-secondary:hover,
+.universal-theme .sp-btn-remove:hover,
+.universal-theme .remove-btn:hover {
+    background: #c82333 !important;
+}
+
+/* Quick Select Buttons */
+.universal-quantity-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.universal-quantity-btn {
+    padding: 8px 16px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 4px;
+    color: #333;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.universal-quantity-btn:hover {
+    border-color: #3a7c52;
+    color: #3a7c52;
+    background: #e8f5e9;
+}
+
+.universal-quantity-btn.active {
+    background: #3a7c52;
+    color: white;
+    border-color: #3a7c52;
+}
+
+/* Pricing Display Box - Matching mockup */
+.universal-price-display {
+    background: white;
+    border: 2px solid #3a7c52;
+    border-radius: 8px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}
+
+.universal-price-main {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 2px;
+    margin-bottom: 5px;
+}
+
+.universal-price-currency {
+    font-size: 28px;
+    font-weight: 600;
+    color: #3a7c52;
+}
+
+.universal-price-value {
+    font-size: 42px;
+    font-weight: bold;
+    color: #3a7c52;
+    line-height: 1;
+}
+
+.universal-price-label {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin-left: 5px;
+}
+
+.universal-price-subtitle {
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+/* Order Summary Section */
+.universal-order-summary {
+    background: #f8f9fa;
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.universal-summary-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 15px 0;
+}
+
+.universal-summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 15px;
+}
+
+.universal-summary-label {
+    color: #666;
+}
+
+.universal-summary-value {
+    font-weight: 600;
+    color: #333;
+}
+
+.universal-summary-divider {
+    height: 1px;
+    background: #e9ecef;
+    margin: 15px 0;
+}
+
+.universal-summary-total {
+    border-top: 2px solid #3a7c52;
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.universal-summary-total .universal-summary-row {
+    font-size: 18px;
+}
+
+.universal-summary-total .universal-summary-value {
+    color: #3a7c52;
+}
+
+/* Action Buttons */
+.universal-action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.universal-action-btn {
+    flex: 1;
+    padding: 15px 25px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.universal-action-primary {
+    background: #3a7c52;
+    color: white;
+    border: 2px solid #3a7c52;
+}
+
+.universal-action-primary:hover {
+    background: #2d5f3f;
+    border-color: #2d5f3f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.universal-action-secondary {
+    background: white;
+    color: #3a7c52;
+    border: 2px solid #3a7c52;
+}
+
+.universal-action-secondary:hover {
+    background: #e8f5e9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading States */
+.universal-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #666;
+    gap: 10px;
+}
+
+.universal-loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3a7c52;
+    border-radius: 50%;
+    animation: universal-spin 1s linear infinite;
+}
+
+@keyframes universal-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 576px) {
+    .universal-calculator-card {
+        padding: 20px;
+    }
+    
+    .universal-price-currency {
+        font-size: 24px;
+    }
+    
+    .universal-price-value {
+        font-size: 36px;
+    }
+    
+    .universal-action-buttons {
+        flex-direction: column;
+    }
+    
+    .universal-quantity-buttons {
+        flex-wrap: wrap;
+    }
+}

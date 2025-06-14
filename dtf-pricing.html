@@ -11,6 +11,12 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
+    <!-- Universal Pricing CSS - Load FIRST for proper theming -->
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-layout.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
+    
     <!-- Existing styles -->
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
@@ -22,11 +28,61 @@
     <!-- DTF Calculator CSS -->
     <link rel="stylesheet" href="/shared_components/css/dtf-calculator.css">
     
+    <!-- FORCE GREEN THEME - Load LAST to override everything -->
+    <link rel="stylesheet" href="/shared_components/css/force-green-theme.css">
+    
     <!-- jsPDF Libraries for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
     <style>
+        /* CRITICAL: Override blue theme with green - MUST be inline to override JS */
+        :root {
+            --primary-color: #3a7c52 !important;
+            --primary: #3a7c52 !important;
+            --primary-dark: #2d5f3f !important;
+            --nwca-primary: #3a7c52 !important;
+        }
+        
+        /* Force green header styling */
+        #universal-header-container .header-main,
+        .universal-header,
+        .pricing-header,
+        .header-container {
+            background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%) !important;
+        }
+        
+        /* Override any blue colors in buttons and links */
+        .btn-primary,
+        .action-btn,
+        .dtf-btn,
+        button[type="submit"] {
+            background-color: #3a7c52 !important;
+            border-color: #3a7c52 !important;
+        }
+        
+        .btn-primary:hover,
+        .action-btn:hover,
+        .dtf-btn:hover,
+        button[type="submit"]:hover {
+            background-color: #2d5f3f !important;
+            border-color: #2d5f3f !important;
+        }
+        
+        a {
+            color: #3a7c52 !important;
+        }
+        
+        /* DTF Calculator specific overrides */
+        .dtf-calculator-header {
+            background: #3a7c52 !important;
+        }
+        
+        .dtf-price-display {
+            color: #3a7c52 !important;
+            border-color: #3a7c52 !important;
+        }
+        
         /* Critical internal-only hiding styles - must be inline for immediate effect */
         .internal-only {
             display: none !important;
@@ -100,7 +156,7 @@
         }
     </style>
 </head>
-<body>
+<body class="universal-theme">
     <!-- Universal Header -->
     <universal-header></universal-header>
     

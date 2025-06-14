@@ -3,33 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DTF Transfer Pricing Calculator</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>DTF Transfer Pricing | Northwest Custom Apparel</title>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Universal CSS (for consistent styling with other calculators) -->
-    <link rel="stylesheet" href="/shared_components/css/universal.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-swatch.css">
+    <!-- Universal Pricing CSS -->
+    <link rel="stylesheet" href="shared_components/css/universal-pricing-header.css">
+    <link rel="stylesheet" href="shared_components/css/universal-pricing-layout.css">
+    <link rel="stylesheet" href="shared_components/css/universal-calculator-theme.css">
+    <link rel="stylesheet" href="shared_components/css/universal-pricing-components.css">
     
-    <!-- DTF Calculator Specific CSS -->
-    <link rel="stylesheet" href="/shared_components/css/dtf-calculator.css">
+    <!-- DTF Calculator Specific CSS (for functionality) -->
+    <link rel="stylesheet" href="shared_components/css/dtf-calculator.css">
     
     <style>
+        /* Page-specific overrides */
         body {
             background-color: #f5f5f5;
-            font-family: 'Arial', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
         }
         
+        /* Hide old blue header styles */
         .page-header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            display: none !important;
+        }
+        
+        /* Inline critical styles in case external CSS doesn't load */
+        .universal-pricing-header {
+            background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
             color: white;
-            padding: 40px 0;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .universal-header-contact-bar {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        
+        .universal-header-main {
+            padding: 20px 0;
+        }
+        
+        .universal-header-main-content,
+        .universal-header-contact-content,
+        .universal-page-title-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .universal-header-contact-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .universal-header-contact-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .universal-header-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .universal-header-main-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .universal-header-company-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .universal-header-tagline {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .universal-header-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .universal-header-nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .universal-header-nav-link.active {
+            border-bottom-color: white;
+        }
+        
+        .universal-header-cta-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .universal-header-btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .universal-header-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .universal-header-btn-primary {
+            background: white;
+            color: #3a7c52;
+            border: 1px solid white;
+        }
+        
+        .universal-pricing-page-title {
+            background: #f8f9fa;
+            padding: 30px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .universal-page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        
+        .universal-page-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin: 0;
         }
         
         .page-header h1 {
@@ -87,12 +216,67 @@
         }
     </style>
 </head>
-<body>
-    <!-- Page Header -->
-    <div class="page-header">
-        <div class="container">
-            <h1>DTF Transfer Pricing Calculator</h1>
-            <p>Calculate pricing for Direct-to-Film transfers with multiple locations</p>
+<body class="universal-theme">
+    <!-- Universal Header -->
+    <header class="universal-pricing-header">
+        <!-- Contact Bar -->
+        <div class="universal-header-contact-bar">
+            <div class="universal-header-contact-content">
+                <div class="universal-header-contact-left">
+                    <a href="tel:253-922-5793" class="universal-header-contact-item">
+                        <i class="fas fa-phone universal-header-contact-icon"></i>
+                        253-922-5793
+                    </a>
+                    <a href="mailto:sales@nwcustomapparel.com" class="universal-header-contact-item">
+                        <i class="fas fa-envelope universal-header-contact-icon"></i>
+                        sales@nwcustomapparel.com
+                    </a>
+                    <span class="universal-header-contact-item">
+                        <i class="fas fa-clock universal-header-contact-icon"></i>
+                        9AM-5PM
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Header -->
+        <div class="universal-header-main">
+            <div class="universal-header-main-content">
+                <!-- Logo -->
+                <a href="/" class="universal-header-logo">
+                    <div class="universal-header-logo-text">
+                        <h1 class="universal-header-company-name">NW NORTHWEST</h1>
+                        <p class="universal-header-tagline">CUSTOM APPAREL</p>
+                    </div>
+                </a>
+                
+                <!-- Navigation -->
+                <nav class="universal-header-nav">
+                    <a href="/" class="universal-header-nav-link">Home</a>
+                    <a href="/products" class="universal-header-nav-link">Products</a>
+                    <a href="#" class="universal-header-nav-link active">PC61</a>
+                    <a href="/dtf-pricing" class="universal-header-nav-link">DTF Transfer Pricing</a>
+                </nav>
+                
+                <!-- CTA Buttons -->
+                <div class="universal-header-cta-group">
+                    <a href="#" class="universal-header-btn universal-header-btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Product
+                    </a>
+                    <a href="#" class="universal-header-btn universal-header-btn-primary">
+                        DTF Pricing Style PC61
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Page Title -->
+    <div class="universal-pricing-page-title">
+        <div class="universal-page-title-content">
+            <h1 class="universal-page-title">DTF Transfer Pricing Calculator</h1>
+            <p class="universal-page-subtitle">Calculate pricing for Direct-to-Film transfers with multiple locations</p>
         </div>
     </div>
 
@@ -127,10 +311,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- DTF Calculator Scripts -->
-    <script src="/shared_components/js/dtf-config.js"></script>
-    <script src="/shared_components/js/dtf-pricing-calculator.js"></script>
-    <script src="/shared_components/js/dtf-adapter.js"></script>
-    <script src="/shared_components/js/dtf-integration.js"></script>
+    <script src="shared_components/js/dtf-config.js"></script>
+    <script src="shared_components/js/dtf-pricing-calculator.js"></script>
+    <script src="shared_components/js/dtf-adapter.js"></script>
+    <script src="shared_components/js/dtf-integration.js"></script>
     
     <script>
         // Initialize page and handle product info display
