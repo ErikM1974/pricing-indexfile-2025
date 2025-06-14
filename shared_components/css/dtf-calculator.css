@@ -2,6 +2,115 @@
  * DTF Pricing Calculator Styles
  */
 
+/* Pricing error and placeholder states */
+.pricing-error-container {
+    padding: 20px;
+    text-align: center;
+}
+
+.pricing-error-container .alert {
+    border-radius: 8px;
+    padding: 30px;
+    background-color: #fff3cd;
+    border: 2px solid #ffc107;
+}
+
+.pricing-error-container .alert i {
+    font-size: 3rem;
+    color: #ff6b6b;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.pricing-error-container h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.pricing-error-container p {
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.pricing-placeholder {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pricing-placeholder i {
+    color: #ddd;
+    animation: bounce 2s infinite;
+}
+
+.pricing-placeholder h5 {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.pricing-placeholder p {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Staff View Toggle */
+.staff-view-toggle {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.staff-view-toggle a {
+    font-size: 0.875rem;
+    text-decoration: none;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.staff-view-toggle a:hover {
+    color: #666;
+}
+
+/* Internal View Visibility */
+.internal-only {
+    display: none !important;
+}
+
+/* Specific rule for accordion items to ensure they hide */
+.accordion-item.internal-only {
+    display: none !important;
+}
+
+/* Show internal elements when authenticated */
+body.show-internal .internal-only {
+    display: block !important;
+}
+
+body.show-internal .accordion-item.internal-only {
+    display: block !important;
+}
+
+body.show-internal .summary-section.internal-only {
+    display: block !important;
+}
+
+/* Visual indicator when in staff view */
+body.show-internal .staff-view-toggle a {
+    color: #28a745;
+    font-weight: 500;
+}
+
+body.show-internal .staff-view-toggle a::after {
+    content: " ✓";
+}
+
 /* Main Layout */
 .dtf-calculator-wrapper {
     display: grid;

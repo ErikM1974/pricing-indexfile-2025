@@ -82,6 +82,17 @@
                 return null;
             } catch (error) {
                 console.error('DTF Adapter: Error fetching base garment costs:', error);
+                
+                // Dispatch API failure event
+                window.dispatchEvent(new CustomEvent('dtfApiError', {
+                    detail: {
+                        error: error.message,
+                        styleNumber: styleNumber,
+                        timestamp: new Date().toISOString()
+                    },
+                    bubbles: true
+                }));
+                
                 return null;
             }
         }

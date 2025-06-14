@@ -27,6 +27,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
     <style>
+        /* Critical internal-only hiding styles - must be inline for immediate effect */
+        .internal-only {
+            display: none !important;
+        }
+        
+        .accordion-item.internal-only {
+            display: none !important;
+        }
+        
+        body.show-internal .internal-only,
+        body.show-internal .accordion-item.internal-only {
+            display: block !important;
+        }
+        
         /* Page layout styles */
         .product-page-columns-container {
             display: flex;
@@ -355,6 +369,35 @@
                 console.log('[DTF] Sending initial URL data:', initialData);
                 window.DTFAdapter.updateData(initialData);
             }
+            
+            // Listen for API errors
+            window.addEventListener('dtfApiError', function(event) {
+                console.error('[DTF] API Error detected:', event.detail);
+                
+                // Show user-friendly error message
+                const container = document.getElementById('dtf-calculator-container');
+                if (container) {
+                    const errorHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            <h4 class="alert-heading">
+                                <i class="fas fa-exclamation-circle"></i> Connection Error
+                            </h4>
+                            <p>We're unable to retrieve pricing information at this time.</p>
+                            <hr>
+                            <p class="mb-0">
+                                <strong>Please call for a quote: (360) 763-7850</strong><br>
+                                <small>Error: ${event.detail.error || 'Network connection failed'}</small>
+                            </p>
+                        </div>
+                    `;
+                    
+                    // Insert error at the top of the calculator
+                    const existingError = container.querySelector('.alert-danger');
+                    if (!existingError) {
+                        container.insertAdjacentHTML('afterbegin', errorHTML);
+                    }
+                }
+            });
             
             // Dispatch event to signal DTF page is ready
             window.dispatchEvent(new CustomEvent('dtfPageReady', {

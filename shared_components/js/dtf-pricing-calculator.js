@@ -19,6 +19,7 @@ class DTFPricingCalculator {
     init() {
         this.render();
         this.attachEventListeners();
+        this.checkStaffViewStatus();
         this.addTransferLocation(); // Start with one location
     }
 
@@ -74,7 +75,7 @@ class DTFPricingCalculator {
                                 </div>
                             </div>
 
-                            <div class="accordion-item">
+                            <div class="accordion-item internal-only">
                                 <h2 class="accordion-header" id="headingTwo">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -89,7 +90,7 @@ class DTFPricingCalculator {
                                 </div>
                             </div>
 
-                            <div class="accordion-item">
+                            <div class="accordion-item internal-only">
                                 <h2 class="accordion-header" id="headingThree">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
@@ -114,10 +115,10 @@ class DTFPricingCalculator {
                                             <h6 class="mt-3">Freight Tiers:</h6>
                                             <table class="table table-sm">
                                                 <tbody>
-                                                    <tr><td>10-49 qty:</td><td>$1.00 per transfer</td></tr>
-                                                    <tr><td>50-99 qty:</td><td>$0.75 per transfer</td></tr>
-                                                    <tr><td>100-199 qty:</td><td>$0.50 per transfer</td></tr>
-                                                    <tr><td>200+ qty:</td><td>$0.35 per transfer</td></tr>
+                                                    <tr><td>10-49 qty:</td><td>$0.50 per transfer</td></tr>
+                                                    <tr><td>50-99 qty:</td><td>$0.35 per transfer</td></tr>
+                                                    <tr><td>100-199 qty:</td><td>$0.25 per transfer</td></tr>
+                                                    <tr><td>200+ qty:</td><td>$0.15 per transfer</td></tr>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -132,6 +133,11 @@ class DTFPricingCalculator {
                     <h3>Order Summary</h3>
                     <div id="order-summary-content">
                         <!-- Summary will be populated here -->
+                    </div>
+                    <div class="staff-view-toggle">
+                        <a href="#" id="staff-view-link" class="text-muted">
+                            <i class="fas fa-chart-bar"></i> Internal View
+                        </a>
                     </div>
                 </div>
             </div>
@@ -349,6 +355,38 @@ class DTFPricingCalculator {
         const pricing = this.calculatePricing();
         const summaryContainer = document.getElementById('order-summary-content');
 
+        // Check if garment cost is missing or zero
+        if (!this.currentData.garmentCost || this.currentData.garmentCost === 0) {
+            summaryContainer.innerHTML = `
+                <div class="pricing-error-container">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Pricing Unavailable</h4>
+                        <p>Unable to retrieve garment pricing at this time.</p>
+                        <p><strong>Please call for a quote: (360) 763-7850</strong></p>
+                        <button class="btn btn-primary mt-2" onclick="window.location.href='tel:+13607637850'">
+                            <i class="fas fa-phone"></i> Call Now
+                        </button>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // Check if no transfers are selected
+        if (pricing.transferDetails.length === 0) {
+            summaryContainer.innerHTML = `
+                <div class="pricing-placeholder">
+                    <div class="text-center text-muted p-4">
+                        <i class="fas fa-hand-point-up fa-3x mb-3"></i>
+                        <h5>Select Transfer Locations</h5>
+                        <p>Add at least one transfer location to see pricing</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
         let transfersHTML = '';
         if (pricing.transferDetails.length > 0) {
             transfersHTML = pricing.transferDetails.map(detail => `
@@ -369,7 +407,7 @@ class DTFPricingCalculator {
                 </div>
             </div>
 
-            <div class="summary-section">
+            <div class="summary-section internal-only">
                 <h5>Garment Cost</h5>
                 <div class="summary-line-item">
                     <span>Base Garment (with 40% margin)</span>
@@ -377,7 +415,7 @@ class DTFPricingCalculator {
                 </div>
             </div>
 
-            <div class="summary-section">
+            <div class="summary-section internal-only">
                 <h5>Transfer Costs</h5>
                 ${transfersHTML}
                 ${pricing.transferDetails.length > 0 ? `
@@ -388,7 +426,7 @@ class DTFPricingCalculator {
                 ` : ''}
             </div>
 
-            <div class="summary-section">
+            <div class="summary-section internal-only">
                 <h5>Labor Cost</h5>
                 <div class="summary-line-item">
                     <span>Pressing (${pricing.locationCount} location${pricing.locationCount !== 1 ? 's' : ''} × $2)</span>
@@ -397,7 +435,7 @@ class DTFPricingCalculator {
             </div>
 
             ${DTFConfig.settings.showFreight || DTFConfig.settings.showLTMFee ? `
-                <div class="summary-section">
+                <div class="summary-section internal-only">
                     <h5>Additional Fees</h5>
                     ${DTFConfig.settings.showFreight && DTFConfig.settings.includeFreightInTransfers && pricing.locationCount > 0 ? `
                         <div class="summary-line-item">
@@ -419,9 +457,20 @@ class DTFPricingCalculator {
                             <span>$${pricing.ltmFee.toFixed(2)}</span>
                         </div>
                         <div class="summary-note">
-                            <i class="fas fa-info-circle"></i> $${pricing.ltmFeePerShirt.toFixed(2)} per shirt
+                            <i class="fas fa-info-circle"></i> $${pricing.ltmFee.toFixed(2)} ÷ ${pricing.quantity} shirts = $${pricing.ltmFeePerShirt.toFixed(2)} per shirt
                         </div>
                     ` : ''}
+                </div>
+            ` : ''}
+
+            ${pricing.ltmFee > 0 ? `
+                <div class="summary-section">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Minimum Order Information</strong><br>
+                        Orders under ${DTFConfig.settings.ltmFeeThreshold} pieces include a $${pricing.ltmFee.toFixed(2)} setup fee<br>
+                        <small>This adds $${pricing.ltmFeePerShirt.toFixed(2)} per shirt to your order</small>
+                    </div>
                 </div>
             ` : ''}
 
@@ -448,10 +497,11 @@ class DTFPricingCalculator {
         // Quantity input
         this.container.addEventListener('input', (e) => {
             if (e.target.id === 'dtf-quantity') {
-                const value = parseInt(e.target.value) || DTFConfig.settings.minQuantity;
-                this.currentData.quantity = Math.max(value, DTFConfig.settings.minQuantity);
-                e.target.value = this.currentData.quantity;
-                this.updateSummary();
+                const value = parseInt(e.target.value);
+                if (!isNaN(value) && value > 0) {
+                    this.currentData.quantity = value;
+                    this.updateSummary();
+                }
             }
         });
 
@@ -476,6 +526,12 @@ class DTFPricingCalculator {
             if (e.target.closest('.btn-remove-transfer')) {
                 const transferId = parseInt(e.target.closest('.btn-remove-transfer').dataset.transferId);
                 this.removeTransferLocation(transferId);
+            }
+            
+            // Staff view toggle
+            if (e.target.closest('#staff-view-link')) {
+                e.preventDefault();
+                this.handleStaffViewToggle();
             }
         });
 
@@ -513,6 +569,35 @@ class DTFPricingCalculator {
         this.currentData.quantity = Math.max(parseInt(qty) || DTFConfig.settings.minQuantity, DTFConfig.settings.minQuantity);
         document.getElementById('dtf-quantity').value = this.currentData.quantity;
         this.updateSummary();
+    }
+    
+    handleStaffViewToggle() {
+        // Check if already in staff view
+        if (document.body.classList.contains('show-internal')) {
+            // Toggle off
+            document.body.classList.remove('show-internal');
+            sessionStorage.removeItem('dtfStaffView');
+            return;
+        }
+        
+        // Prompt for password
+        const password = prompt('Enter password for internal view:');
+        
+        if (password === '1977') {
+            // Enable staff view
+            document.body.classList.add('show-internal');
+            sessionStorage.setItem('dtfStaffView', 'true');
+        } else if (password !== null) {
+            // Wrong password (but not cancelled)
+            alert('Incorrect password');
+        }
+    }
+    
+    checkStaffViewStatus() {
+        // Check if staff view was previously enabled in this session
+        if (sessionStorage.getItem('dtfStaffView') === 'true') {
+            document.body.classList.add('show-internal');
+        }
     }
 }
 

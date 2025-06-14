@@ -66,14 +66,14 @@ const DTFConfig = {
     // Freight costs (tiered structure based on quantity)
     freightCost: {
         tiers: [
-            { minQty: 10, maxQty: 49, costPerTransfer: 1.00 },
-            { minQty: 50, maxQty: 99, costPerTransfer: 0.75 },
-            { minQty: 100, maxQty: 199, costPerTransfer: 0.50 },
-            { minQty: 200, maxQty: 999999, costPerTransfer: 0.35 }
+            { minQty: 10, maxQty: 49, costPerTransfer: 0.50 },
+            { minQty: 50, maxQty: 99, costPerTransfer: 0.35 },
+            { minQty: 100, maxQty: 199, costPerTransfer: 0.25 },
+            { minQty: 200, maxQty: 999999, costPerTransfer: 0.15 }
         ],
         getFreightPerTransfer: function(quantity) {
             const tier = this.tiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
-            return tier ? tier.costPerTransfer : 0.35; // Default to lowest tier
+            return tier ? tier.costPerTransfer : 0.15; // Default to lowest tier
         },
         getTotalFreight: function(quantity, locationCount) {
             return this.getFreightPerTransfer(quantity) * locationCount;
