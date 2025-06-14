@@ -341,7 +341,31 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
     // Fallback data initialization (called if capture fails after max attempts)
     function initializeFallbackPricingData(embType) {
         if (window.nwcaPricingData || captureCompleted) return; // Don't overwrite if data was captured
-        console.warn(`[PRICING-MATRIX] Initializing FALLBACK pricing data for ${embType}.`);
+        console.warn(`[PRICING-MATRIX] No pricing table found for ${embType}. Triggering fallback mode.`);
+        
+        // For DTF pages, we'll fetch real data via API instead of using hardcoded fallback
+        if (embType === 'dtf') {
+            // Just dispatch a minimal event with isFallback flag to trigger API fetch
+            const fallbackData = {
+                styleNumber: window.selectedStyleNumber || NWCAUtils.getUrlParameter('StyleNumber'),
+                color: window.selectedColorName || NWCAUtils.getUrlParameter('COLOR'),
+                embellishmentType: embType,
+                headers: [],
+                prices: {},
+                tierData: {},
+                uniqueSizes: [],
+                capturedAt: new Date().toISOString(),
+                isFallback: true
+            };
+            
+            window.nwcaPricingData = fallbackData;
+            console.log("[PRICING-MATRIX] Dispatching fallback event for DTF - will trigger API fetch");
+            window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: fallbackData }));
+            captureCompleted = true;
+            return;
+        }
+        
+        // Original fallback logic for other embellishment types
         let headers = ['S-XL', '2XL', '3XL']; let prices = { 'S-XL': { 'Tier1': 20.00, 'Tier2': 19.00, 'Tier3': 18.00, 'Tier4': 17.00 }, '2XL': { 'Tier1': 22.00, 'Tier2': 21.00, 'Tier3': 20.00, 'Tier4': 19.00 }, '3XL': { 'Tier1': 23.00, 'Tier2': 22.00, 'Tier3': 21.00, 'Tier4': 20.00 }, }; let tiers = { 'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11, LTM_Fee: 50 }, 'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23, LTM_Fee: 25 }, 'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 }, 'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 71 }, 'Tier5': { 'MinQuantity': 72, 'MaxQuantity': 10000 }, }; let uniqueSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL']; if (embType === 'cap-embroidery') { headers = ['One Size']; prices = { 'One Size': { 'Tier1': 22.99, 'Tier2': 21.99, 'Tier3': 20.99, 'Tier4': 19.99, 'Tier5': 18.99 } }; uniqueSizes = ['OS']; }
         window.nwcaPricingData = { styleNumber: window.selectedStyleNumber || 'FALLBACK', color: window.selectedColorName || 'FALLBACK', embellishmentType: embType, headers: headers, prices: prices, tierData: tiers, uniqueSizes: uniqueSizes, capturedAt: new Date().toISOString(), isFallback: true };
         window.availableSizesFromTable = headers;

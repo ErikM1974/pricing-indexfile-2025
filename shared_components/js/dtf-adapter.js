@@ -57,20 +57,58 @@
             });
         }
 
-        checkForInitialData() {
+        async fetchBaseGarmentCost(styleNumber) {
+            try {
+                const apiUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/base-item-costs?styleNumber=${encodeURIComponent(styleNumber)}`;
+                this.log('DTF Adapter: Fetching base garment costs from:', apiUrl);
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                this.log('DTF Adapter: Received base costs data:', data);
+                
+                if (data && data.prices) {
+                    // Find the lowest price
+                    const prices = Object.values(data.prices);
+                    const lowestPrice = Math.min(...prices);
+                    
+                    this.log('DTF Adapter: Found lowest base cost:', lowestPrice);
+                    return lowestPrice;
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('DTF Adapter: Error fetching base garment costs:', error);
+                return null;
+            }
+        }
+
+        async checkForInitialData() {
             // Check URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             
+            const styleNumber = urlParams.get('StyleNumber') || urlParams.get('styleNumber') || urlParams.get('sku');
             const garmentCost = urlParams.get('garmentCost') || urlParams.get('cost');
             const quantity = urlParams.get('quantity') || urlParams.get('qty');
             const productName = urlParams.get('productName') || urlParams.get('name');
-            const productSku = urlParams.get('sku');
+            const productSku = urlParams.get('sku') || styleNumber;
             const productImage = urlParams.get('image');
 
             let hasData = false;
             const data = {};
 
-            if (garmentCost) {
+            // If we have a style number but no garment cost, fetch it from API
+            if (styleNumber && !garmentCost) {
+                const apiCost = await this.fetchBaseGarmentCost(styleNumber);
+                if (apiCost !== null) {
+                    data.garmentCost = apiCost;
+                    hasData = true;
+                    this.log('DTF Adapter: Using API garment cost:', apiCost);
+                }
+            } else if (garmentCost) {
                 data.garmentCost = parseFloat(garmentCost);
                 hasData = true;
             }
@@ -284,6 +322,15 @@
         }
 
         // Public API methods
+        async fetchAndSetGarmentCost(styleNumber) {
+            const cost = await this.fetchBaseGarmentCost(styleNumber);
+            if (cost !== null) {
+                this.setGarmentCost(cost);
+                return cost;
+            }
+            return null;
+        }
+
         setGarmentCost(cost) {
             this.updatePricingData({ garmentCost: parseFloat(cost) });
         }

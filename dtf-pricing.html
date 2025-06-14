@@ -204,8 +204,23 @@
             });
             
             // Listen for pricing data loaded event (from DTG/pricing system)
-            window.addEventListener('pricingDataLoaded', function(event) {
+            window.addEventListener('pricingDataLoaded', async function(event) {
                 console.log('[DTF] Pricing data loaded:', event.detail);
+                
+                // Check if this is fallback pricing data
+                if (event.detail && event.detail.isFallback) {
+                    console.log('[DTF] Detected fallback pricing - fetching real garment costs from API');
+                    
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const styleNumber = event.detail.styleNumber || urlParams.get('StyleNumber');
+                    if (styleNumber && window.DTFAdapter) {
+                        const realCost = await window.DTFAdapter.fetchAndSetGarmentCost(styleNumber);
+                        if (realCost !== null) {
+                            console.log('[DTF] Successfully fetched real garment cost:', realCost);
+                            return; // Exit early, we've set the real cost
+                        }
+                    }
+                }
                 
                 if (event.detail && event.detail.prices) {
                     // Extract base garment price from first tier, first size group
@@ -235,6 +250,57 @@
                     
                     if (window.DTFAdapter) {
                         window.DTFAdapter.updateData(pricingData);
+                    }
+                }
+            });
+            
+            // Listen for pricing matrix API events
+            window.addEventListener('pricingMatrixDataAvailable', function(event) {
+                console.log('[DTF] Pricing matrix data available:', event.detail);
+                
+                // Try to get garment price from the pricing matrix
+                if (event.detail && event.detail.data) {
+                    // Look for the base garment price (usually first row or "0" colors)
+                    let garmentPrice = 0;
+                    
+                    // Check if data has a structure like DTG or screen print
+                    if (event.detail.data.primaryLocationPricing && event.detail.data.primaryLocationPricing["0"]) {
+                        // Screen print style data structure
+                        const zeroColorPricing = event.detail.data.primaryLocationPricing["0"];
+                        if (zeroColorPricing.tiers && zeroColorPricing.tiers.length > 0) {
+                            const firstTier = zeroColorPricing.tiers[0];
+                            const sizes = Object.keys(firstTier.prices || {});
+                            if (sizes.length > 0) {
+                                garmentPrice = firstTier.prices[sizes[0]];
+                            }
+                        }
+                    } else if (event.detail.data.rows) {
+                        // Table-based structure
+                        const rows = event.detail.data.rows;
+                        if (rows.length > 0 && rows[0].cells && rows[0].cells.length > 1) {
+                            // Try to parse the first price cell
+                            const priceText = rows[0].cells[1];
+                            const price = parseFloat(priceText.replace(/[$,]/g, ''));
+                            if (!isNaN(price)) {
+                                garmentPrice = price;
+                            }
+                        }
+                    }
+                    
+                    if (garmentPrice > 0) {
+                        const pricingData = {
+                            garmentCost: garmentPrice,
+                            quantity: 24,
+                            productInfo: {
+                                name: event.detail.productTitle || window.selectedColorName,
+                                sku: event.detail.styleNumber || urlParams.get('StyleNumber')
+                            }
+                        };
+                        
+                        console.log('[DTF] Sending garment price from matrix:', pricingData);
+                        if (window.DTFAdapter) {
+                            window.DTFAdapter.updateData(pricingData);
+                        }
                     }
                 }
             });
@@ -298,6 +364,36 @@
                     useQuoteSystem: false
                 }
             }));
+            
+            // Try to fetch pricing data if not received after a delay
+            setTimeout(function() {
+                if (!window.DTFAdapter || !window.DTFAdapter.getData || window.DTFAdapter.getData().garmentCost === 0) {
+                    console.log('[DTF] No pricing data received, attempting to fetch...');
+                    
+                    // Try to trigger pricing data load
+                    if (window.PricingMatrixAPI && window.PricingMatrixAPI.fetchPricingData) {
+                        const styleNumber = urlParams.get('StyleNumber');
+                        const color = urlParams.get('COLOR') || urlParams.get('color');
+                        
+                        if (styleNumber) {
+                            console.log('[DTF] Requesting pricing data for:', styleNumber, color);
+                            window.PricingMatrixAPI.fetchPricingData(styleNumber, 'dtf', color);
+                        }
+                    }
+                    
+                    // Also try to get data from the pricing matrix if it exists
+                    if (window.PricingMatrix && window.PricingMatrix.data) {
+                        console.log('[DTF] Found existing pricing matrix data:', window.PricingMatrix.data);
+                        // Dispatch event with the data
+                        window.dispatchEvent(new CustomEvent('pricingMatrixDataAvailable', {
+                            detail: {
+                                data: window.PricingMatrix.data,
+                                styleNumber: urlParams.get('StyleNumber')
+                            }
+                        }));
+                    }
+                }
+            }, 2000); // Wait 2 seconds for normal data flow
         });
         
         // Handle messages from parent window (iframe scenarios)
