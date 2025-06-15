@@ -88,6 +88,7 @@
         let processedStyleNumbers = new Set();
         let lastProcessedCount = 0;
         let topSellers = []; // Store top seller products
+        let isStyleSearch = false; // Flag for style searches
 
         // Prevent Caspio from overriding our page
         (function() {
@@ -122,6 +123,7 @@
             
             // Build top navigation categories
             buildTopNavCategories();
+            enhanceDropdownInteraction();
 
             // Setup mobile menu
             setupMobileMenu();
@@ -129,13 +131,14 @@
             // Setup search - now using advanced autocomplete
             setupAdvancedSearch();
 
-            // Setup category navigation (mega menus)
+            // Setup category navigation (flyout menus)
             setupCategoryNavigation();
 
             // Setup result observer
             setupResultObserver();
 
-            // Load Caspio dynamically - initial load to get all products including top sellers
+            // Load Caspio to get all products for top sellers and autocomplete
+            // but don't show results section
             loadCaspio();
             
             // Show loading message for top sellers
@@ -148,7 +151,7 @@
                 if (container) {
                     const results = container.querySelectorAll('.gallery-item-link, a[href*="StyleNumber="]');
                     console.log(`[Sales Tool] Manual check found ${results.length} results`);
-                    if (results.length > 0 && topSellers.length === 0) {
+                    if (results.length > 0) {
                         console.log('[Sales Tool] Processing results from manual check');
                         processResults(results);
                     }
@@ -167,11 +170,11 @@
                     <div class="nav-category-item">
                         <h4 class="nav-category-title">${categoryName}</h4>
                         <ul class="nav-subcategory-list">
-                            ${CATEGORY_DATA[categoryName].slice(0, 5).map(subcat => 
+                            ${CATEGORY_DATA[categoryName].slice(0, 4).map(subcat => 
                                 `<li><a href="#" data-category="${categoryName}" data-subcategory="${subcat}" class="nav-subcategory-link">${subcat}</a></li>`
                             ).join('')}
-                            ${CATEGORY_DATA[categoryName].length > 5 ? 
-                                `<li><a href="#" data-category="${categoryName}" class="nav-view-all">View all ${CATEGORY_DATA[categoryName].length} subcategories →</a></li>` : ''}
+                            ${CATEGORY_DATA[categoryName].length > 4 ? 
+                                `<li><a href="#" data-category="${categoryName}" class="nav-view-all">View all ${CATEGORY_DATA[categoryName].length} subcategories</a></li>` : ''}
                         </ul>
                     </div>
                 `;
@@ -179,23 +182,127 @@
             
             navCategories.innerHTML = html;
             
-            // Add click handlers
+            // Add click handlers with proper event handling
             navCategories.querySelectorAll('.nav-subcategory-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
+                    
                     const category = link.dataset.category;
                     const subcategory = link.dataset.subcategory;
-                    performCategorySearch(category, subcategory);
+                    
+                    // Close dropdown smoothly
+                    const dropdown = link.closest('.nav-dropdown');
+                    const navLink = document.querySelector('.nav-products');
+                    if (dropdown && navLink) {
+                        navLink.setAttribute('aria-expanded', 'false');
+                        dropdown.style.opacity = '0';
+                        dropdown.style.visibility = 'hidden';
+                        dropdown.style.transform = 'translateY(-10px)';
+                        dropdown.style.pointerEvents = 'none';
+                    }
+                    
+                    // Perform search after a short delay to ensure smooth transition
+                    setTimeout(() => {
+                        performCategorySearch(category, subcategory);
+                    }, 300);
                 });
             });
             
             navCategories.querySelectorAll('.nav-view-all').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
+                    
                     const category = link.dataset.category;
-                    // Click the sidebar category to show all subcategories
-                    document.querySelector(`[data-category="${category}"]`).click();
+                    
+                    // Close dropdown smoothly
+                    const dropdown = link.closest('.nav-dropdown');
+                    const navLink = document.querySelector('.nav-products');
+                    if (dropdown && navLink) {
+                        navLink.setAttribute('aria-expanded', 'false');
+                        dropdown.style.opacity = '0';
+                        dropdown.style.visibility = 'hidden';
+                        dropdown.style.transform = 'translateY(-10px)';
+                        dropdown.style.pointerEvents = 'none';
+                    }
+                    
+                    // Click the sidebar category after a short delay
+                    setTimeout(() => {
+                        const sidebarCategory = document.querySelector(`[data-category="${category}"]`);
+                        if (sidebarCategory) {
+                            sidebarCategory.click();
+                        }
+                    }, 300);
                 });
+            });
+        }
+
+        function enhanceDropdownInteraction() {
+            const productsNavItem = document.querySelector('.nav-products').parentElement;
+            const dropdown = productsNavItem.querySelector('.nav-dropdown');
+            let closeTimeout;
+            let isDropdownOpen = false;
+
+            // Prevent dropdown from closing when hovering between trigger and dropdown
+            productsNavItem.addEventListener('mouseenter', () => {
+                clearTimeout(closeTimeout);
+                dropdown.style.pointerEvents = 'auto';
+                isDropdownOpen = true;
+            });
+
+            productsNavItem.addEventListener('mouseleave', () => {
+                closeTimeout = setTimeout(() => {
+                    if (!isDropdownOpen) {
+                        dropdown.style.pointerEvents = 'none';
+                    }
+                }, 200);
+            });
+
+            dropdown.addEventListener('mouseenter', () => {
+                clearTimeout(closeTimeout);
+                isDropdownOpen = true;
+            });
+
+            dropdown.addEventListener('mouseleave', () => {
+                closeTimeout = setTimeout(() => {
+                    dropdown.style.pointerEvents = 'none';
+                    isDropdownOpen = false;
+                }, 200);
+            });
+
+            // Add keyboard navigation support
+            const navLink = productsNavItem.querySelector('.nav-link');
+            navLink.setAttribute('aria-haspopup', 'true');
+            navLink.setAttribute('aria-expanded', 'false');
+
+            navLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const isExpanded = navLink.getAttribute('aria-expanded') === 'true';
+                navLink.setAttribute('aria-expanded', !isExpanded);
+                
+                if (!isExpanded) {
+                    dropdown.style.opacity = '1';
+                    dropdown.style.visibility = 'visible';
+                    dropdown.style.transform = 'translateY(0)';
+                    dropdown.style.pointerEvents = 'auto';
+                } else {
+                    dropdown.style.opacity = '0';
+                    dropdown.style.visibility = 'hidden';
+                    dropdown.style.transform = 'translateY(-10px)';
+                    dropdown.style.pointerEvents = 'none';
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!productsNavItem.contains(e.target)) {
+                    navLink.setAttribute('aria-expanded', 'false');
+                    dropdown.style.opacity = '0';
+                    dropdown.style.visibility = 'hidden';
+                    dropdown.style.transform = 'translateY(-10px)';
+                    dropdown.style.pointerEvents = 'none';
+                }
             });
         }
 
@@ -236,10 +343,22 @@
         function performStyleSearch(styleNumber) {
             console.log(`[Sales Tool] Style search: ${styleNumber}`);
             
-            // Reset processing state
+            // Reset state
+            currentCategory = '';
+            currentSubcategory = '';
             isProcessingResults = false;
             processedStyleNumbers.clear();
             lastProcessedCount = 0;
+            isStyleSearch = true; // Set style search flag
+            
+            // Show results section
+            const resultsSection = document.querySelector('.results-section');
+            const homepageSections = document.querySelector('.homepage-sections');
+            const heroSection = document.querySelector('.hero-section');
+            
+            if (heroSection) heroSection.classList.add('hidden');
+            if (homepageSections) homepageSections.style.display = 'none';
+            if (resultsSection) resultsSection.style.display = 'block';
             
             // Clear breadcrumb
             const breadcrumb = document.getElementById('categoryBreadcrumb');
@@ -435,128 +554,57 @@
         }
 
         function setupCategoryNavigation() {
+            // Create flyout menu container
+            const flyoutMenu = document.createElement('div');
+            flyoutMenu.className = 'category-flyout';
+            flyoutMenu.id = 'categoryFlyout';
+            document.body.appendChild(flyoutMenu);
+
             const categoryLinks = document.querySelectorAll('.category-link');
-            let currentMegaMenu = null;
             let hoverTimer = null;
+            let activeLink = null;
 
             categoryLinks.forEach(link => {
                 const categoryItem = link.closest('.category-item');
                 const categoryName = link.dataset.category;
-                let megaMenu = null;
 
-                // Create mega menu for this category
-                function createMegaMenu() {
-                    const menu = document.createElement('div');
-                    menu.className = 'mega-menu';
-
-                    const subcategories = CATEGORY_DATA[categoryName] || [];
-
-                    menu.innerHTML = `
-                        <div class="mega-menu-header">${categoryName} Categories</div>
-                        <div class="mega-menu-grid">
-                            ${subcategories.length > 0 ? 
-                                subcategories.map(subcat => `
-                                    <a class="mega-menu-item" href="#" data-category="${categoryName}" data-subcategory="${subcat}">
-                                        ${subcat}
-                                    </a>
-                                `).join('') 
-                                : '<div style="padding: 1rem; color: #666;">No subcategories available</div>'
-                            }
-                        </div>
-                    `;
-                    document.body.appendChild(menu);
-
-                    // Add click handlers to subcategory links
-                    menu.querySelectorAll('.mega-menu-item').forEach(item => {
-                        item.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-
-                            const subcategory = item.dataset.subcategory;
-                            const category = item.dataset.category;
-                            console.log(`[Sales Tool] Subcategory clicked: ${subcategory}`);
-                            console.log(`[Sales Tool] Parent category: ${category}`);
-
-                            // Set active states
-                            document.querySelectorAll('.category-link').forEach(l => {
-                                l.classList.remove('active');
-                            });
-                            link.classList.add('active');
-
-                            currentCategory = categoryName;
-                            currentSubcategory = subcategory;
-
-                            // Hide all mega menus
-                            document.querySelectorAll('.mega-menu').forEach(m => {
-                                m.classList.remove('show');
-                            });
-
-                            // Perform search
-                            console.log(`[Sales Tool] About to call performCategorySearch with: ${categoryName}, ${subcategory}`);
-                            performCategorySearch(categoryName, subcategory);
-                        });
-                    });
-
-                    // Add hover listeners to mega menu itself
-                    menu.addEventListener('mouseenter', () => {
-                        clearTimeout(hoverTimer);
-                    });
-
-                    menu.addEventListener('mouseleave', () => {
-                        hoverTimer = setTimeout(() => {
-                            menu.classList.remove('show');
-                            if (currentMegaMenu === menu) {
-                                currentMegaMenu = null;
-                            }
-                        }, 300);
-                    });
-
-                    return menu;
-                }
-
-                // Position mega menu
-                function positionMegaMenu() {
-                    if (!megaMenu) return;
-
-                    const rect = categoryItem.getBoundingClientRect();
-                    const sidebarRect = document.querySelector('.sidebar').getBoundingClientRect();
-
-                    megaMenu.style.left = (sidebarRect.right + 10) + 'px';
-                    megaMenu.style.top = rect.top + 'px';
-                }
-
-                // Mouse enter - show mega menu
+                // Hover to show flyout menu
                 categoryItem.addEventListener('mouseenter', () => {
                     clearTimeout(hoverTimer);
-
-                    // Hide any other open mega menu
-                    if (currentMegaMenu && currentMegaMenu !== megaMenu) {
-                        currentMegaMenu.classList.remove('show');
+                    
+                    const subcategories = CATEGORY_DATA[categoryName];
+                    
+                    // Update active link
+                    if (activeLink) {
+                        activeLink.classList.remove('hovering');
                     }
-
-                    if (!megaMenu) {
-                        megaMenu = createMegaMenu();
+                    activeLink = link;
+                    link.classList.add('hovering');
+                    
+                    if (subcategories && subcategories.length > 0) {
+                        // Update flyout content
+                        updateFlyoutMenu(categoryName, subcategories);
+                        
+                        // Position flyout next to the category
+                        const rect = categoryItem.getBoundingClientRect();
+                        const sidebar = document.querySelector('.sidebar');
+                        const sidebarRect = sidebar.getBoundingClientRect();
+                        
+                        flyoutMenu.style.top = rect.top + 'px';
+                        flyoutMenu.style.left = sidebarRect.right + 'px';
+                        flyoutMenu.classList.add('show');
                     }
-
-                    positionMegaMenu();
-
-                    // Show with animation
-                    setTimeout(() => {
-                        megaMenu.classList.add('show');
-                        currentMegaMenu = megaMenu;
-                    }, 10);
                 });
 
-                // Mouse leave - hide mega menu after delay
+                // Mouse leave - hide flyout after delay
                 categoryItem.addEventListener('mouseleave', () => {
                     hoverTimer = setTimeout(() => {
-                        if (megaMenu) {
-                            megaMenu.classList.remove('show');
-                            if (currentMegaMenu === megaMenu) {
-                                currentMegaMenu = null;
-                            }
+                        flyoutMenu.classList.remove('show');
+                        link.classList.remove('hovering');
+                        if (activeLink === link) {
+                            activeLink = null;
                         }
-                    }, 300);
+                    }, 200);
                 });
 
                 // Click handler for main category
@@ -576,13 +624,72 @@
                     currentCategory = category;
                     currentSubcategory = '';
 
-                    // Hide all mega menus
-                    document.querySelectorAll('.mega-menu').forEach(menu => {
-                        menu.classList.remove('show');
-                    });
+                    // Hide flyout
+                    flyoutMenu.classList.remove('show');
 
                     // Perform search with category only (no subcategory)
                     performCategorySearch(category, '');
+                });
+            });
+            
+            // Handle flyout menu hover
+            flyoutMenu.addEventListener('mouseenter', () => {
+                clearTimeout(hoverTimer);
+            });
+            
+            flyoutMenu.addEventListener('mouseleave', () => {
+                hoverTimer = setTimeout(() => {
+                    flyoutMenu.classList.remove('show');
+                    if (activeLink) {
+                        activeLink.classList.remove('hovering');
+                        activeLink = null;
+                    }
+                }, 200);
+            });
+        }
+        
+        function updateFlyoutMenu(category, subcategories) {
+            const flyout = document.getElementById('categoryFlyout');
+            
+            let html = `
+                <div class="flyout-header">${category}</div>
+                <div class="flyout-content">
+            `;
+            
+            subcategories.forEach(subcat => {
+                html += `<a href="#" class="flyout-item" data-category="${category}" data-subcategory="${subcat}">${subcat}</a>`;
+            });
+            
+            html += '</div>';
+            flyout.innerHTML = html;
+            
+            // Add click handlers to subcategory items
+            flyout.querySelectorAll('.flyout-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const category = this.dataset.category;
+                    const subcategory = this.dataset.subcategory;
+                    
+                    console.log(`[Sales Tool] Subcategory clicked: ${subcategory}`);
+                    console.log(`[Sales Tool] Parent category: ${category}`);
+                    
+                    // Set active states
+                    document.querySelectorAll('.category-link').forEach(l => {
+                        l.classList.remove('active');
+                    });
+                    const categoryLink = document.querySelector(`[data-category="${category}"]`);
+                    if (categoryLink) {
+                        categoryLink.classList.add('active');
+                    }
+                    
+                    currentCategory = category;
+                    currentSubcategory = subcategory;
+                    
+                    // Hide flyout
+                    flyout.classList.remove('show');
+                    
+                    // Perform search
+                    performCategorySearch(category, subcategory);
                 });
             });
         }
@@ -627,15 +734,29 @@
         function performCategorySearch(category, subcategory) {
             console.log(`[Sales Tool] Category search - Category: ${category}, Subcategory: ${subcategory}`);
 
+            // Set current category and subcategory for filtering
+            currentCategory = category;
+            currentSubcategory = subcategory || '';
+
             // Reset processing state
             isProcessingResults = false;
             processedStyleNumbers.clear();
             lastProcessedCount = 0;
+            isStyleSearch = false; // Clear style search flag
 
             // Update UI
             document.getElementById('resultsGrid').innerHTML = '<div class="loading">Loading products...</div>';
             document.getElementById('resultsCount').textContent = 'Loading...';
 
+            // Show results section
+            const resultsSection = document.querySelector('.results-section');
+            const homepageSections = document.querySelector('.homepage-sections');
+            const heroSection = document.querySelector('.hero-section');
+            
+            if (heroSection) heroSection.classList.add('hidden');
+            if (homepageSections) homepageSections.style.display = 'none';
+            if (resultsSection) resultsSection.style.display = 'block';
+            
             // Update breadcrumb
             const breadcrumb = document.getElementById('categoryBreadcrumb');
             if (breadcrumb) {
@@ -858,19 +979,29 @@
                 window.updateStyleCache(styleNumbers);
             }
 
-            // Hide hero section when we have results
-            const heroSection = document.querySelector('.hero-section');
-            if (heroSection && products.length > 0) {
-                heroSection.classList.add('hidden');
+            // Show results if a category is selected OR if this is a style search
+            if (currentCategory || currentSubcategory || isStyleSearch) {
+                // Show/hide sections based on whether we're viewing products
+                const heroSection = document.querySelector('.hero-section');
+                const resultsSection = document.querySelector('.results-section');
+                const homepageSections = document.querySelector('.homepage-sections');
+                
+                // Show results, hide homepage content
+                if (heroSection) heroSection.classList.add('hidden');
+                if (homepageSections) homepageSections.style.display = 'none';
+                if (resultsSection) resultsSection.style.display = 'block';
+                
+                // Clear and display products
+                displayProducts(products);
+                document.getElementById('resultsCount').textContent = `${products.length} items found`;
             }
-
-            // Clear and display products
-            displayProducts(products);
-            document.getElementById('resultsCount').textContent = `${products.length} items found`;
+            // If no category selected, this is just the initial load for caching/top sellers
+            // Don't show any products, keep homepage visible
 
             // Reset processing flag after a delay
             setTimeout(() => {
                 isProcessingResults = false;
+                isStyleSearch = false; // Reset style search flag
             }, 500);
         }
 

@@ -34,7 +34,8 @@
       "Bash(npm install:*)",
       "Bash(npm test:*)",
       "Bash(chmod:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }
