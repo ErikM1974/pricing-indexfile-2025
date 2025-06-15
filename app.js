@@ -1,6 +1,34 @@
 // Configuration
         const API_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/base-item-costs';
         const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
+        
+        /* TOP SELLERS LIST (hardcoded as Caspio IsTopSeller field is not populated)
+         * Full list for reference:
+         * 18500    Gildan - Heavy Blend Hooded Sweatshirt. 18500
+         * 5186     Hanes Beefy-T - 100% Cotton Long Sleeve T-Shirt. 5186
+         * 8000     Gildan DryBlend 50 Cotton/50 Poly T-Shirt. 8000
+         * 996M     Jerzees NuBlend Pullover Hooded Sweatshirt. 996M
+         * C114     Port Authority Digi Camo Snapback Trucker Cap C114
+         * C112     Port Authority Snapback Trucker Cap. C112
+         * CP90     Port & Company Knit Cap. CP90
+         * CSF300   CornerStone A107 Class 3 Heavy-Duty Fleece Full-Zip Hoodie CSF300
+         * CTK121   Carhartt Midweight Hooded Sweatshirt. CTK121
+         * NKDC1963 Nike Dri-FIT Micro Pique 2.0 Polo NKDC1963
+         * CT104670 Carhartt Storm Defender Shoreline Jacket CT104670
+         * PC450    Port & Company Fan Favorite Tee. PC450
+         * CT105534 Carhartt Super Dux Soft Shell Jacket CT105534
+         * CT102286 Carhartt Gilliam Vest CT102286
+         * P170     Hanes EcoSmart - Pullover Hooded Sweatshirt. P170
+         * CT100617 Carhartt Rain Defender Paxton Heavyweight Hooded Zip Mock Sweatshirt. CT100617
+         * CTK87    Carhartt Workwear Pocket Short Sleeve T-Shirt. CTK87
+         * CT103828 Carhartt Duck Detroit Jacket CT103828
+         * CT104050 Carhartt Washed Duck Active Jac. CT104050
+         * PC54LS   Port & Company - Long Sleeve Core Cotton Tee. PC54LS
+         * PC54     Port & Company - Core Cotton Tee. PC54
+         * PC61LS   Port & Company Long Sleeve Essential Tee. PC61LS
+         * PC78H    Port & Company - Core Fleece Pullover Hooded Sweatshirt. PC78H
+         * PC61     Port & Company - Essential Tee. PC61
+         */
 
         /* IMPORTANT: Caspio Search Configuration
          * Caspio is configured with this logic structure:
@@ -107,8 +135,25 @@
             // Setup result observer
             setupResultObserver();
 
-            // Load Caspio dynamically
+            // Load Caspio dynamically - initial load to get all products including top sellers
             loadCaspio();
+            
+            // Show loading message for top sellers
+            updateTopSellersDisplay();
+            
+            // Also check for results after a delay in case observer misses them
+            setTimeout(() => {
+                console.log('[Sales Tool] Checking for results after 5 seconds...');
+                const container = document.getElementById('caspioContainer');
+                if (container) {
+                    const results = container.querySelectorAll('.gallery-item-link, a[href*="StyleNumber="]');
+                    console.log(`[Sales Tool] Manual check found ${results.length} results`);
+                    if (results.length > 0 && topSellers.length === 0) {
+                        console.log('[Sales Tool] Processing results from manual check');
+                        processResults(results);
+                    }
+                }
+            }, 5000);
         });
 
         function buildTopNavCategories() {
@@ -185,13 +230,7 @@
                 });
             }
             
-            // Setup quick buttons
-            document.querySelectorAll('.quick-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const style = this.dataset.style.split(' ')[0]; // Get just the style number
-                    performStyleSearch(style);
-                });
-            });
+            // Quick buttons will be populated dynamically with top sellers
         }
         
         function performStyleSearch(styleNumber) {
@@ -246,7 +285,7 @@
         }
 
         function loadCaspio(params = {}) {
-            console.log('[Sales Tool] Loading Caspio...', params);
+            console.log('[Sales Tool] Loading Caspio with params:', JSON.stringify(params));
 
             // Clear existing Caspio content
             const container = document.getElementById('caspioContainer');
@@ -650,13 +689,19 @@
                 debounceTimer = setTimeout(() => {
                     // Only look in the Caspio container
                     const caspioContainer = document.getElementById('caspioContainer');
-                    if (!caspioContainer) return;
+                    if (!caspioContainer) {
+                        console.log('[Sales Tool] Caspio container not found');
+                        return;
+                    }
 
-                    // Check for Caspio results
-                    const resultItems = caspioContainer.querySelectorAll('[data-cb-name="data-row"], .cbResultSetDataRow, a[href*="StyleNumber="]');
+                    // Check for Caspio results - also look for gallery items
+                    const resultItems = caspioContainer.querySelectorAll('[data-cb-name="data-row"], .cbResultSetDataRow, a[href*="StyleNumber="], .gallery-item-link');
+                    
+                    console.log(`[Sales Tool] Mutation detected, checking for results...`);
+                    console.log(`[Sales Tool] Found ${resultItems.length} potential result items`);
 
                     if (resultItems.length > 0 && resultItems.length !== lastProcessedCount) {
-                        console.log(`[Sales Tool] Found ${resultItems.length} new results`);
+                        console.log(`[Sales Tool] Processing ${resultItems.length} new results`);
                         lastProcessedCount = resultItems.length;
                         processResults(resultItems);
 
@@ -678,9 +723,11 @@
                             document.getElementById('resultsGrid').innerHTML = '<div class="loading">No products found</div>';
                             document.getElementById('resultsCount').textContent = '0 items found';
                             lastProcessedCount = 0;
+                        } else {
+                            console.log('[Sales Tool] No items found yet, waiting...');
                         }
                     }
-                }, 750); // Wait 0.75 seconds to ensure all results are loaded
+                }, 1500); // Wait 1.5 seconds to ensure all results are loaded
             });
 
             observer.observe(document.body, {
@@ -698,12 +745,13 @@
 
             isProcessingResults = true;
             console.log(`[Sales Tool] Processing ${resultItems.length} result items...`);
+            console.log(`[Sales Tool] Current category: "${currentCategory}", subcategory: "${currentSubcategory}"`);
 
             const products = [];
             const styleNumbers = [];
             const currentProcessedStyles = new Set();
 
-            resultItems.forEach(item => {
+            resultItems.forEach((item, index) => {
                 // Hide original
                 item.style.display = 'none';
 
@@ -713,6 +761,26 @@
                     link = item;
                 }
                 if (!link) return;
+                
+                // Debug first few items to see structure
+                if (index < 3) {
+                    console.log(`[Sales Tool] ===== Item ${index} Debug =====`);
+                    console.log(`[Sales Tool] Tag name:`, item.tagName);
+                    console.log(`[Sales Tool] Item classes:`, item.className);
+                    console.log(`[Sales Tool] Link classes:`, link.className);
+                    
+                    // Check the full HTML to see all classes
+                    if (link.outerHTML.length < 500) {
+                        console.log(`[Sales Tool] Link HTML:`, link.outerHTML.substring(0, 200) + '...');
+                    }
+                    
+                    // Check if IsTopSeller-Yes is in the class list
+                    if (link.className.includes('IsTopSeller-Yes')) {
+                        console.log(`[Sales Tool] *** FOUND IsTopSeller-Yes class! ***`);
+                    }
+                    
+                    console.log(`[Sales Tool] ===================`);
+                }
 
                 const styleMatch = link.href.match(/StyleNumber=([^&]+)/);
                 const styleNumber = styleMatch ? styleMatch[1] : '';
@@ -725,6 +793,21 @@
 
                 currentProcessedStyles.add(styleNumber);
 
+                // Only check for the specific class
+                let isTopSeller = false;
+                
+                // Check link classes
+                if (link.classList.contains('IsTopSeller-Yes')) {
+                    isTopSeller = true;
+                    console.log(`[Sales Tool] TopSeller class found on link for: ${styleNumber}`);
+                }
+                
+                // Check item classes  
+                if (item.classList.contains('IsTopSeller-Yes')) {
+                    isTopSeller = true;
+                    console.log(`[Sales Tool] TopSeller class found on item for: ${styleNumber}`);
+                }
+                
                 const product = {
                     url: link.href,
                     styleNumber: styleNumber,
@@ -732,14 +815,43 @@
                     sizes: link.querySelector('.gallery-item-sizes')?.textContent?.replace('Sizes: ', '').trim() || '',
                     brand: link.querySelector('.gallery-item-brand')?.textContent?.trim() || '',
                     image: link.querySelector('.gallery-product-image')?.src || '',
-                    isTopSeller: link.classList.contains('IsTopSeller-Yes')
+                    isTopSeller: isTopSeller
                 };
+                
+                // Debug top seller detection
+                if (isTopSeller) {
+                    console.log(`[Sales Tool] *** FOUND TOP SELLER: ${styleNumber} - ${product.title}`);
+                }
 
                 products.push(product);
                 styleNumbers.push(styleNumber);
             });
 
             console.log(`[Sales Tool] Found ${products.length} unique products`);
+            
+            // Cache all products for autocomplete
+            if (!currentCategory && !currentSubcategory) {
+                window.allProductsCache = products;
+                console.log(`[Sales Tool] Cached ${products.length} products for autocomplete`);
+            }
+
+            // Collect top sellers if this is the initial load
+            if (!currentCategory && !currentSubcategory) {
+                console.log(`[Sales Tool] Initial load detected - looking for top sellers`);
+                const allTopSellers = products.filter(p => p.isTopSeller);
+                console.log(`[Sales Tool] Total products: ${products.length}`);
+                console.log(`[Sales Tool] Products with isTopSeller=true: ${allTopSellers.length}`);
+                
+                if (allTopSellers.length > 0) {
+                    topSellers = allTopSellers.slice(0, 6);
+                    console.log(`[Sales Tool] Top sellers to display:`, topSellers);
+                } else {
+                    console.log(`[Sales Tool] No top sellers found in initial load`);
+                }
+                updateTopSellersDisplay();
+            } else {
+                console.log(`[Sales Tool] Not initial load - category: ${currentCategory}, subcategory: ${currentSubcategory}`);
+            }
 
             // Update autocomplete cache
             if (window.updateStyleCache) {
@@ -885,6 +997,61 @@
             });
 
             bodyObserver.observe(document.body, { childList: true, subtree: true });
+        }
+
+        function updateTopSellersDisplay() {
+            const quickButtons = document.querySelector('.quick-buttons');
+            if (!quickButtons) return;
+            
+            // Clear existing content
+            quickButtons.innerHTML = '';
+            
+            if (topSellers.length === 0) {
+                // No top sellers found - show hardcoded popular products
+                console.log('[Sales Tool] No top sellers found - showing popular products');
+                
+                // Hardcoded top sellers from actual sales data
+                const popularProducts = [
+                    { style: 'PC54', title: 'Port & Company - Core Cotton Tee' },
+                    { style: 'PC450', title: 'Port & Company Fan Favorite Tee' },
+                    { style: 'C112', title: 'Port Authority Snapback Trucker Cap' },
+                    { style: 'CP90', title: 'Port & Company Knit Cap' },
+                    { style: 'PC90H', title: 'Port & Company Essential Fleece Pullover Hooded Sweatshirt' },
+                    { style: 'PC78H', title: 'Port & Company - Core Fleece Pullover Hooded Sweatshirt' }
+                ];
+                
+                popularProducts.forEach(product => {
+                    const button = document.createElement('button');
+                    button.className = 'quick-btn top-seller-btn';
+                    button.dataset.style = product.style;
+                    button.innerHTML = `
+                        <span class="btn-style">${product.style}</span>
+                        <span class="btn-title">${product.title}</span>
+                    `;
+                    button.addEventListener('click', function() {
+                        performStyleSearch(product.style);
+                    });
+                    quickButtons.appendChild(button);
+                });
+            } else {
+                // Add top seller buttons
+                console.log(`[Sales Tool] Displaying ${topSellers.length} top sellers`);
+                topSellers.forEach(product => {
+                    const button = document.createElement('button');
+                    button.className = 'quick-btn top-seller-btn';
+                    // Note: Using product.style or product.styleNumber depending on what's available
+                    const styleNum = product.styleNumber || product.style;
+                    button.dataset.style = styleNum;
+                    button.innerHTML = `
+                        <span class="btn-style">${styleNum}</span>
+                        <span class="btn-title">${product.title || 'Top Seller'}</span>
+                    `;
+                    button.addEventListener('click', function() {
+                        performStyleSearch(styleNum);
+                    });
+                    quickButtons.appendChild(button);
+                });
+            }
         }
 
         function getCachedPrice(styleNumber) {

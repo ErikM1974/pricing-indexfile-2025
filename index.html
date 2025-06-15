@@ -7,7 +7,7 @@
     
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     
-    <link rel="stylesheet" href="main-redesign.css">
+    <link rel="stylesheet" href="main-redesign.css?v=2">
 </head>
 <body>
     <header class="header">
@@ -45,7 +45,7 @@
                 <input type="text" 
                        id="navSearchInput" 
                        class="nav-search-input" 
-                       placeholder="Search products..."
+                       placeholder="Search by style number or product name..."
                        autocomplete="off">
                 <div id="navAutocompleteList" class="nav-autocomplete-list"></div>
                 <button id="navSearchBtn" class="nav-search-btn">
@@ -101,42 +101,13 @@
             </div>
             
             <div class="quick-access-section">
-                <h2 class="section-title">Popular Searches</h2>
+                <h2 class="section-title">Top Sellers</h2>
                 <div class="quick-buttons">
-                    <button class="quick-btn" data-style="PC54">PC54 - Essential Tee</button>
-                    <button class="quick-btn" data-style="G500">G500 - Heavy Cotton</button>
-                    <button class="quick-btn" data-style="DT6000">DT6000 - District Tee</button>
-                    <button class="quick-btn" data-style="ST350">ST350 - Sport-Tek</button>
-                    <button class="quick-btn" data-style="054X">054X - Tri-Blend</button>
-                    <button class="quick-btn" data-style="CP90">CP90 - Flexfit Cap</button>
+                    <!-- Top sellers will be dynamically loaded here -->
+                    <div class="loading-message">Loading...</div>
                 </div>
             </div>
             
-            <div class="featured-section">
-                <h2 class="section-title">Featured Categories</h2>
-                <div class="featured-grid">
-                    <div class="featured-card" onclick='document.querySelector("[data-category=\"T-Shirts\"]").click()'>
-                        <div class="featured-icon">👕</div>
-                        <h3>T-Shirts</h3>
-                        <p>Essential tees for every occasion</p>
-                    </div>
-                    <div class="featured-card" onclick='document.querySelector("[data-category=\"Polos/Knits\"]").click()'>
-                        <div class="featured-icon">🎽</div>
-                        <h3>Polos & Knits</h3>
-                        <p>Professional and comfortable</p>
-                    </div>
-                    <div class="featured-card" onclick='document.querySelector("[data-category=\"Caps\"]").click()'>
-                        <div class="featured-icon">🧢</div>
-                        <h3>Caps & Hats</h3>
-                        <p>Complete your branded look</p>
-                    </div>
-                    <div class="featured-card" onclick='document.querySelector("[data-category=\"Outerwear\"]").click()'>
-                        <div class="featured-icon">🧥</div>
-                        <h3>Outerwear</h3>
-                        <p>Jackets, vests, and more</p>
-                    </div>
-                </div>
-            </div>
             
             <div class="results-section">
                 <div class="results-header">
@@ -162,7 +133,7 @@
         <!-- Caspio will load here -->
     </div>
     
-    <script src="autocomplete.js?v=2"></script>
-    <script src="app.js?v=2" defer></script>
+    <script src="autocomplete.js?v=14"></script>
+    <script src="app.js?v=14" defer></script>
 </body>
 </html>

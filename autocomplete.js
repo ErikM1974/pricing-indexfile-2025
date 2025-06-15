@@ -16,7 +16,7 @@ class AdvancedAutocomplete {
         this.recentSearches = this.loadRecentSearches();
         
         // API endpoint
-        this.API_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/search';
+        this.API_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/stylesearch';
         
         // Initialize
         this.init();
@@ -98,10 +98,15 @@ class AdvancedAutocomplete {
             // Show loading state
             this.showLoading();
             
-            // For now, use a simple pattern-based search since we don't have the exact API endpoint
-            // In production, this would call the actual search API
-            const results = this.mockSearch(term);
-            this.results = results;
+            // Call the API endpoint
+            const response = await fetch(`${this.API_URL}?term=${encodeURIComponent(term)}`);
+            
+            if (!response.ok) {
+                throw new Error(`Search failed: ${response.statusText}`);
+            }
+            
+            const results = await response.json();
+            this.results = results || [];
             
             if (results.length > 0) {
                 this.showResults(results);
@@ -114,26 +119,10 @@ class AdvancedAutocomplete {
         }
     }
     
-    mockSearch(term) {
-        // Common style patterns based on the data
-        const commonStyles = [
-            { value: 'PC54', label: 'Port & Company Core Cotton Tee' },
-            { value: 'PC55', label: 'Port & Company Core Blend Tee' },
-            { value: 'G500', label: 'Gildan Heavy Cotton T-Shirt' },
-            { value: 'G640', label: 'Gildan Softstyle T-Shirt' },
-            { value: 'DT6000', label: 'District Very Important Tee' },
-            { value: 'ST350', label: 'Sport-Tek PosiCharge Competitor Tee' },
-            { value: '054X', label: 'Port Authority Tri-Blend Tee' },
-            { value: 'CP90', label: 'Port & Company Flexfit Cap' },
-            { value: 'AA1070', label: 'Alternative Apparel Go-To Tee' },
-            { value: 'NK354', label: 'Nike Dri-FIT Micro Pique 2.0 Polo' }
-        ];
-        
-        // Filter based on search term
-        return commonStyles.filter(style => 
-            style.value.toLowerCase().includes(term.toLowerCase()) ||
-            style.label.toLowerCase().includes(term.toLowerCase())
-        );
+    // Keep this method for potential future use, but it's not needed with the API
+    searchLoadedProducts(term) {
+        // This method is no longer used since we're using the API
+        return [];
     }
     
     showResults(results) {
@@ -141,12 +130,19 @@ class AdvancedAutocomplete {
         
         results.forEach((result, index) => {
             const isSelected = index === this.selectedIndex;
+            // Extract style and description from label
+            const parts = result.label.split(' - ');
+            const styleNumber = result.value;
+            const description = parts.length > 1 ? parts.slice(1).join(' - ') : result.label;
+            
             html += `
                 <div class="autocomplete-result-item ${isSelected ? 'selected' : ''}" 
                      data-index="${index}"
-                     data-style="${result.value}">
-                    <div class="result-style">${result.value}</div>
-                    <div class="result-name">${result.label}</div>
+                     data-style="${styleNumber}">
+                    <div class="result-content">
+                        <div class="result-style">${styleNumber}</div>
+                        <div class="result-name">${description}</div>
+                    </div>
                 </div>
             `;
         });
@@ -204,7 +200,7 @@ class AdvancedAutocomplete {
     showLoading() {
         this.resultsList.innerHTML = `
             <div class="autocomplete-loading">
-                <span>Searching...</span>
+                Searching products...
             </div>
         `;
         this.resultsList.classList.add('show');
@@ -213,7 +209,9 @@ class AdvancedAutocomplete {
     showNoResults() {
         this.resultsList.innerHTML = `
             <div class="autocomplete-no-results">
-                No products found
+                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔍</div>
+                <div>No products found</div>
+                <div style="font-size: 0.8rem; color: #999; margin-top: 0.25rem;">Try a different search term</div>
             </div>
         `;
         this.resultsList.classList.add('show');
