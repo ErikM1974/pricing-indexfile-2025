@@ -976,6 +976,13 @@
             font-size: 0.875rem;
         }
 
+        .breadcrumb-text {
+            font-size: 0.875rem;
+            font-weight: normal;
+            color: #666;
+            margin-left: 0.5rem;
+        }
+
         /* Hero Section - SanMar Style */
         .hero-section {
             width: 100%;

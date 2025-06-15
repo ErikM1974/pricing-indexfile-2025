@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Northwest Custom Apparel - Your headquarters for custom embroidery, screen printing, DTG, and DTF on quality apparel. Browse our 2025 catalog.">
     <title>Custom Apparel Catalog 2025 - Northwest Custom Apparel</title>
+    
+    <!-- Preconnect to CDN for faster resource loading -->
+    <link rel="preconnect" href="https://cdn.caspio.com">
+    <link rel="dns-prefetch" href="https://cdn.caspio.com">
     
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     
-    <link rel="stylesheet" href="main-redesign.css?v=9">
+    <link rel="stylesheet" href="main-redesign.css?v=10">
 </head>
 <body>
     <header class="header">
         <div class="header-content">
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle mobile menu" type="button">☰</button>
             <a href="/" class="logo-link" title="Return to Home">
                 <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" alt="Northwest Custom Apparel" class="logo">
             </a>
@@ -27,7 +32,7 @@
         <div class="nav-container">
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="#" class="nav-link nav-products">Products <span class="nav-arrow">▼</span></a>
+                    <a href="#" class="nav-link nav-products" aria-haspopup="true" aria-expanded="false">Products <span class="nav-arrow">▼</span></a>
                     <div class="nav-dropdown mega-dropdown">
                         <div class="dropdown-content">
                             <div class="dropdown-categories" id="navCategories">
@@ -46,14 +51,15 @@
                     <a href="/sale.html" class="nav-link">Sale</a>
                 </li>
             </ul>
-            <div class="nav-search">
+            <div class="nav-search" role="search">
                 <input type="text" 
                        id="navSearchInput" 
                        class="nav-search-input" 
                        placeholder="Search by style number or product name..."
-                       autocomplete="off">
+                       autocomplete="off"
+                       aria-label="Search products">
                 <div id="navAutocompleteList" class="nav-autocomplete-list"></div>
-                <button id="navSearchBtn" class="nav-search-btn">
+                <button id="navSearchBtn" class="nav-search-btn" type="button" aria-label="Search">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
@@ -81,7 +87,12 @@
                 <div class="hero-background">
                     <!-- Hero image showing custom embroidered caps -->
                     <div class="hero-image-placeholder">
-                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/website%20team%20nwca%20hero%20image.png?ver=1" alt="Patriotic red, white and blue baseball caps with Tajima embroidery machine - Custom Apparel by Northwest Custom Apparel" class="hero-bg-img">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/website%20team%20nwca%20hero%20image.png?ver=1" 
+                             alt="Custom embroidered patriotic caps with embroidery machine" 
+                             class="hero-bg-img"
+                             loading="lazy"
+                             width="1920"
+                             height="800">
                     </div>
                     <div class="hero-overlay">
                         <div class="hero-content">
@@ -110,7 +121,7 @@
                 <div class="results-header">
                     <h3 class="results-title">
                         <span id="resultsTitle">Products</span>
-                        <span id="categoryBreadcrumb" style="font-size: 0.875rem; font-weight: normal; color: #666; margin-left: 0.5rem;"></span>
+                        <span id="categoryBreadcrumb" class="breadcrumb-text"></span>
                     </h3>
                     <span class="results-count" id="resultsCount">0 products</span>
                 </div>
@@ -127,6 +138,6 @@
     </div>
     
     <script src="autocomplete.js?v=22"></script>
-    <script src="app.js?v=29" defer></script>
+    <script src="app.js?v=30" defer></script>
 </body>
 </html>

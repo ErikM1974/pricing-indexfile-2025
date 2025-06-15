@@ -1,6 +1,14 @@
 // Configuration
         const API_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/base-item-costs';
         const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
+        const DEBUG_MODE = false; // Set to true to enable console logging
+        
+        // Debug logging wrapper
+        const debugLog = (...args) => {
+            if (DEBUG_MODE) {
+                console.log(...args);
+            }
+        };
         
         /* TOP SELLERS LIST (hardcoded as Caspio IsTopSeller field is not populated)
          * Full list for reference:
