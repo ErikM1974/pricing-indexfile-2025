@@ -1,3 +1,29 @@
+/**
+ * Northwest Custom Apparel - Homepage Product Catalog
+ * 
+ * This application integrates with Caspio DataPages to display product catalogs.
+ * 
+ * CASPIO INTEGRATION NOTES:
+ * - Caspio loads via script tags and tries to replace the entire page content
+ * - We intercept document.write to capture Caspio's HTML output
+ * - MutationObservers watch for when Caspio adds/modifies DOM elements
+ * - Products are hidden in a 1px container and extracted to our custom display
+ * 
+ * API DOCUMENTATION:
+ * - Caspio DataPage: Embedded via script tag with URL parameters
+ * - Pricing API: GET https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/base-item-costs
+ * 
+ * REFACTORING NOTES (v2.0):
+ * - Consolidated global variables into appState object
+ * - Broke down large processResults function into smaller functions
+ * - Added comprehensive documentation for Caspio integration
+ * - Added DEBUG_MODE flag to control console logging
+ * - Improved code organization and maintainability
+ * 
+ * @author Northwest Custom Apparel
+ * @version 2.0
+ */
+
 // Configuration
         const API_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/base-item-costs';
         const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
@@ -82,24 +108,77 @@
             topSellerField: ''
         };
 
-        // State
-        let isSearching = false;
-        let observer = null;
-        let bodyObserver = null;
-        let currentCategory = '';
-        let currentSubcategory = '';
-        let expectedSearchCategory = '';
-        let expectedSearchSubcategory = '';
-        let searchRetryCount = 0;
+        /**
+         * Application State Management
+         * Consolidates all state variables into a single object for better organization
+         */
+        const appState = {
+            // Search state
+            search: {
+                isSearching: false,
+                isStyleSearch: false,
+                currentCategory: '',
+                currentSubcategory: '',
+                expectedSearchCategory: '',
+                expectedSearchSubcategory: '',
+                searchRetryCount: 0
+            },
+            
+            // Processing state
+            processing: {
+                isProcessingResults: false,
+                processedStyleNumbers: new Set(),
+                lastProcessedCount: 0,
+                lastDisplayedProducts: ''
+            },
+            
+            // UI state
+            ui: {
+                topSellers: [],
+                observer: null,
+                bodyObserver: null
+            }
+        };
+        
+        // Constants
         const MAX_SEARCH_RETRIES = 3;
-        let isProcessingResults = false;
-        let processedStyleNumbers = new Set();
-        let lastProcessedCount = 0;
-        let topSellers = []; // Store top seller products
-        let isStyleSearch = false; // Flag for style searches
-        let lastDisplayedProducts = ''; // Track last displayed products JSON to prevent flashing
 
-        // Prevent Caspio from overriding our page
+        /**
+         * State helper functions
+         */
+        const resetSearchState = () => {
+            appState.search.isSearching = false;
+            appState.search.isStyleSearch = false;
+            appState.search.currentCategory = '';
+            appState.search.currentSubcategory = '';
+            appState.search.searchRetryCount = 0;
+            appState.processing.processedStyleNumbers.clear();
+            appState.processing.lastProcessedCount = 0;
+            appState.processing.lastDisplayedProducts = '';
+        };
+
+        const setSearchCategory = (category, subcategory = '') => {
+            appState.search.currentCategory = category;
+            appState.search.currentSubcategory = subcategory;
+            appState.search.expectedSearchCategory = category;
+            appState.search.expectedSearchSubcategory = subcategory;
+        };
+
+        /**
+         * CASPIO INTEGRATION EXPLANATION:
+         * 
+         * Caspio DataPages are designed to be standalone pages. When embedded,
+         * they try to replace the entire page content using document.write.
+         * 
+         * Our solution:
+         * 1. Override document.write to capture Caspio's output
+         * 2. Place Caspio content in a hidden container
+         * 3. Use MutationObservers to watch for when Caspio adds products
+         * 4. Extract product data and display in our custom UI
+         * 
+         * This allows us to use Caspio's search/filter functionality
+         * while maintaining our custom design.
+         */
         (function() {
             // Store original document.write
             const originalWrite = document.write;
@@ -108,7 +187,7 @@
             // Override document.write to capture Caspio content
             document.write = function(content) {
                 if (content && content.includes('caspio')) {
-                    console.log('[Sales Tool] Intercepted Caspio write');
+                    debugLog('[Sales Tool] Intercepted Caspio write');
                     const container = document.getElementById('caspioContainer');
                     if (container) {
                         container.insertAdjacentHTML('beforeend', content);
@@ -125,7 +204,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('[Sales Tool] Initializing...');
+            debugLog('[Sales Tool] Initializing...');
 
             // Build category menu from hardcoded data
             buildCategoryMenu();
@@ -155,13 +234,13 @@
             
             // Also check for results after a delay in case observer misses them
             setTimeout(() => {
-                console.log('[Sales Tool] Checking for results after 5 seconds...');
+                debugLog('[Sales Tool] Checking for results after 5 seconds...');
                 const container = document.getElementById('caspioContainer');
                 if (container) {
                     const results = container.querySelectorAll('.gallery-item-link, a[href*="StyleNumber="]');
-                    console.log(`[Sales Tool] Manual check found ${results.length} results`);
+                    debugLog(`[Sales Tool] Manual check found ${results.length} results`);
                     if (results.length > 0) {
-                        console.log('[Sales Tool] Processing results from manual check');
+                        debugLog('[Sales Tool] Processing results from manual check');
                         processResults(results);
                     }
                 }
@@ -326,8 +405,8 @@
                         document.querySelectorAll('.category-link').forEach(link => {
                             link.classList.remove('active');
                         });
-                        currentCategory = '';
-                        currentSubcategory = '';
+                        appState.search.currentCategory = '';
+                        appState.search.currentSubcategory = '';
                         
                         // Perform search
                         performStyleSearch(styleNumber);
@@ -350,16 +429,16 @@
         }
         
         function performStyleSearch(styleNumber) {
-            console.log(`[Sales Tool] Style search: ${styleNumber}`);
+            debugLog(`[Sales Tool] Style search: ${styleNumber}`);
             
             // Reset state
-            currentCategory = '';
-            currentSubcategory = '';
-            isProcessingResults = false;
-            processedStyleNumbers.clear();
-            lastProcessedCount = 0;
-            isStyleSearch = true; // Set style search flag
-            lastDisplayedProducts = ''; // Reset to allow fresh display
+            appState.search.currentCategory = '';
+            appState.search.currentSubcategory = '';
+            appState.processing.isProcessingResults = false;
+            appState.processing.processedStyleNumbers.clear();
+            appState.processing.lastProcessedCount = 0;
+            appState.search.isStyleSearch = true; // Set style search flag
+            appState.processing.lastDisplayedProducts = ''; // Reset to allow fresh display
             
             // Show results section
             const resultsSection = document.querySelector('.results-section');
@@ -414,7 +493,7 @@
         }
 
         function loadCaspio(params = {}) {
-            console.log('[Sales Tool] Loading Caspio with params:', JSON.stringify(params));
+            debugLog('[Sales Tool] Loading Caspio with params:', JSON.stringify(params));
 
             // Clear existing Caspio content
             const container = document.getElementById('caspioContainer');
@@ -445,7 +524,7 @@
 
             deployScript += `"><\/script>`;
 
-            console.log('[Sales Tool] Loading with params:', params);
+            debugLog('[Sales Tool] Loading with params:', params);
 
             // Use a different approach - create a temporary div and use innerHTML
             if (container) {
@@ -464,12 +543,12 @@
 
                     // Add load event listener
                     newScript.onload = function() {
-                        console.log('[Sales Tool] Caspio script loaded successfully');
+                        debugLog('[Sales Tool] Caspio script loaded successfully');
                         // Wait a bit for Caspio to initialize
                         setTimeout(() => {
                             // Re-setup observer for new results
-                            if (observer) {
-                                observer.disconnect();
+                            if (appState.ui.observer) {
+                                appState.ui.observer.disconnect();
                             }
                             setupResultObserver();
 
@@ -483,7 +562,7 @@
                     };
 
                     newScript.onerror = function() {
-                        console.error('[Sales Tool] Failed to load Caspio script');
+                        if (DEBUG_MODE) console.error('[Sales Tool] Failed to load Caspio script');
                     };
 
                     // Append to container
@@ -492,15 +571,15 @@
             }
 
             // Monitor for Caspio elements appearing outside container
-            if (!bodyObserver) {
-                bodyObserver = new MutationObserver(function(mutations) {
+            if (!appState.ui.bodyObserver) {
+                appState.ui.bodyObserver = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     mutation.addedNodes.forEach(function(node) {
                         if (node.nodeType === 1) {
                             // Check for Caspio elements
                             if ((node.id && (node.id.includes('caspioform') || node.id.includes('cbOuterAjaxCtnr'))) ||
                                 (node.className && node.className.includes && node.className.includes('cbFormSection'))) {
-                                console.log('[Sales Tool] Moving Caspio element to container:', node.id || node.className);
+                                debugLog('[Sales Tool] Moving Caspio element to container:', node.id || node.className);
                                 const container = document.getElementById('caspioContainer');
                                 if (container && !container.contains(node)) {
                                     container.appendChild(node);
@@ -509,16 +588,16 @@
 
                             // Check for iframes that might contain Caspio
                             if (node.tagName === 'IFRAME' && node.src && node.src.includes('caspio')) {
-                                console.log('[Sales Tool] Found Caspio iframe:', node.src);
+                                debugLog('[Sales Tool] Found Caspio iframe:', node.src);
                                 // Try to access iframe content if same-origin
                                 node.onload = function() {
                                     try {
                                         const iframeDoc = node.contentDocument || node.contentWindow.document;
-                                        console.log('[Sales Tool] Iframe loaded, checking for results...');
+                                        debugLog('[Sales Tool] Iframe loaded, checking for results...');
                                         // Set up observer for iframe content
                                         setupIframeObserver(iframeDoc);
                                     } catch (e) {
-                                        console.log('[Sales Tool] Cannot access iframe content (cross-origin)');
+                                        debugLog('[Sales Tool] Cannot access iframe content (cross-origin)');
                                     }
                                 };
                             }
@@ -527,16 +606,16 @@
                 });
                 });
 
-                bodyObserver.observe(document.body, { childList: true, subtree: true });
+                appState.ui.bodyObserver.observe(document.body, { childList: true, subtree: true });
             }
         }
 
         function setupIframeObserver(iframeDoc) {
             const iframeObserver = new MutationObserver((mutations) => {
-                console.log('[Sales Tool] Iframe content changed, checking for results...');
+                debugLog('[Sales Tool] Iframe content changed, checking for results...');
                 const resultItems = iframeDoc.querySelectorAll('.gallery-item-link, [data-cb-name="data-row"], a[href*="StyleNumber="]');
                 if (resultItems.length > 0) {
-                    console.log(`[Sales Tool] Found ${resultItems.length} results in iframe`);
+                    debugLog(`[Sales Tool] Found ${resultItems.length} results in iframe`);
                     processResults(resultItems);
                 }
             });
@@ -622,7 +701,7 @@
                     e.preventDefault();
                     const category = link.dataset.category;
 
-                    console.log(`[Sales Tool] Main category clicked: ${category}`);
+                    debugLog(`[Sales Tool] Main category clicked: ${category}`);
 
                     // Remove active states
                     document.querySelectorAll('.category-link').forEach(l => {
@@ -631,8 +710,8 @@
 
                     // Set active category
                     link.classList.add('active');
-                    currentCategory = category;
-                    currentSubcategory = '';
+                    appState.search.currentCategory = category;
+                    appState.search.currentSubcategory = '';
 
                     // Hide flyout
                     flyoutMenu.classList.remove('show');
@@ -680,8 +759,8 @@
                     const category = this.dataset.category;
                     const subcategory = this.dataset.subcategory;
                     
-                    console.log(`[Sales Tool] Subcategory clicked: ${subcategory}`);
-                    console.log(`[Sales Tool] Parent category: ${category}`);
+                    debugLog(`[Sales Tool] Subcategory clicked: ${subcategory}`);
+                    debugLog(`[Sales Tool] Parent category: ${category}`);
                     
                     // Set active states
                     document.querySelectorAll('.category-link').forEach(l => {
@@ -692,8 +771,8 @@
                         categoryLink.classList.add('active');
                     }
                     
-                    currentCategory = category;
-                    currentSubcategory = subcategory;
+                    appState.search.currentCategory = category;
+                    appState.search.currentSubcategory = subcategory;
                     
                     // Hide flyout
                     flyout.classList.remove('show');
@@ -742,18 +821,18 @@
 
 
         function performCategorySearch(category, subcategory) {
-            console.log(`[Sales Tool] Category search - Category: ${category}, Subcategory: ${subcategory}`);
+            debugLog(`[Sales Tool] Category search - Category: ${category}, Subcategory: ${subcategory}`);
 
             // Set current category and subcategory for filtering
-            currentCategory = category;
-            currentSubcategory = subcategory || '';
+            appState.search.currentCategory = category;
+            appState.search.currentSubcategory = subcategory || '';
 
             // Reset processing state
-            isProcessingResults = false;
-            processedStyleNumbers.clear();
-            lastProcessedCount = 0;
-            isStyleSearch = false; // Clear style search flag when doing category search
-            lastDisplayedProducts = ''; // Reset to allow fresh display
+            appState.processing.isProcessingResults = false;
+            appState.processing.processedStyleNumbers.clear();
+            appState.processing.lastProcessedCount = 0;
+            appState.search.isStyleSearch = false; // Clear style search flag when doing category search
+            appState.processing.lastDisplayedProducts = ''; // Reset to allow fresh display
 
             // Update UI
             document.getElementById('resultsGrid').innerHTML = '<div class="loading">Loading products...</div>';
@@ -792,13 +871,27 @@
             loadCaspio(params);
         }
 
+        /**
+         * MUTATION OBSERVER EXPLANATION:
+         * 
+         * We use MutationObservers to detect when Caspio adds products to the DOM.
+         * This is necessary because:
+         * 1. Caspio loads asynchronously after page load
+         * 2. Caspio updates the DOM when filters/searches are applied
+         * 3. We need to extract the data before our custom display
+         * 
+         * The observer watches for:
+         * - New product elements being added
+         * - Changes to the Caspio container
+         * - "No results" messages
+         */
         function setupResultObserver() {
             let debounceTimer = null;
-            console.log('[Sales Tool] Setting up result observer...');
+            debugLog('[Sales Tool] Setting up result observer...');
 
-            observer = new MutationObserver((mutations) => {
+            appState.ui.observer = new MutationObserver((mutations) => {
                 // Check if we should skip processing
-                if (isProcessingResults) {
+                if (appState.processing.isProcessingResults) {
                     return;
                 }
 
@@ -822,27 +915,27 @@
                     // Only look in the Caspio container
                     const caspioContainer = document.getElementById('caspioContainer');
                     if (!caspioContainer) {
-                        console.log('[Sales Tool] Caspio container not found');
+                        debugLog('[Sales Tool] Caspio container not found');
                         return;
                     }
 
                     // Check for Caspio results - also look for gallery items
                     const resultItems = caspioContainer.querySelectorAll('[data-cb-name="data-row"], .cbResultSetDataRow, a[href*="StyleNumber="], .gallery-item-link');
                     
-                    console.log(`[Sales Tool] Mutation detected, checking for results...`);
-                    console.log(`[Sales Tool] Found ${resultItems.length} potential result items`);
+                    debugLog(`[Sales Tool] Mutation detected, checking for results...`);
+                    debugLog(`[Sales Tool] Found ${resultItems.length} potential result items`);
 
-                    if (resultItems.length > 0 && resultItems.length !== lastProcessedCount) {
-                        console.log(`[Sales Tool] Processing ${resultItems.length} new results`);
-                        lastProcessedCount = resultItems.length;
+                    if (resultItems.length > 0 && resultItems.length !== appState.processing.lastProcessedCount) {
+                        debugLog(`[Sales Tool] Processing ${resultItems.length} new results`);
+                        appState.processing.lastProcessedCount = resultItems.length;
                         processResults(resultItems);
 
                         // Disconnect observer after processing to prevent loops
-                        observer.disconnect();
+                        appState.ui.observer.disconnect();
 
                         // Reconnect after a delay
                         setTimeout(() => {
-                            observer.observe(document.body, {
+                            appState.ui.observer.observe(document.body, {
                                 childList: true,
                                 subtree: true
                             });
@@ -851,138 +944,150 @@
                         // Check for no results message
                         const noResults = caspioContainer.querySelector('.cbResultSetInfoMessage');
                         if (noResults && noResults.textContent.includes('No records')) {
-                            console.log('[Sales Tool] No results found message detected');
+                            debugLog('[Sales Tool] No results found message detected');
                             document.getElementById('resultsGrid').innerHTML = '<div class="loading">No products found</div>';
                             document.getElementById('resultsCount').textContent = '0 items found';
-                            lastProcessedCount = 0;
+                            appState.processing.lastProcessedCount = 0;
                         } else {
-                            console.log('[Sales Tool] No items found yet, waiting...');
+                            debugLog('[Sales Tool] No items found yet, waiting...');
                         }
                     }
                 }, 1500); // Wait 1.5 seconds to ensure all results are loaded
             });
 
-            observer.observe(document.body, {
+            appState.ui.observer.observe(document.body, {
                 childList: true,
                 subtree: true
             });
         }
 
+        /**
+         * Extract product data from a Caspio result item
+         * @param {HTMLElement} item - The DOM element containing product data
+         * @param {number} index - Index for debugging
+         * @returns {Object|null} Product data or null if extraction fails
+         */
+        function extractProductData(item, index) {
+            // Try multiple selectors to find the product link
+            let link = item.querySelector('a.gallery-item-link');
+            if (!link && item.tagName === 'A' && item.href && item.href.includes('StyleNumber=')) {
+                link = item;
+            }
+            if (!link) return null;
+
+            // Debug first few items
+            if (index < 3 && DEBUG_MODE) {
+                debugLog(`[Sales Tool] ===== Item ${index} Debug =====`);
+                debugLog(`[Sales Tool] Tag name:`, item.tagName);
+                debugLog(`[Sales Tool] Item classes:`, item.className);
+                debugLog(`[Sales Tool] Link classes:`, link.className);
+            }
+
+            // Extract URL and parse parameters
+            const url = new URL(link.href);
+            const styleNumber = url.searchParams.get('StyleNumber');
+            if (!styleNumber) return null;
+
+            // Extract product details
+            const img = link.querySelector('img') || item.querySelector('img');
+            const titleElement = link.querySelector('.gallery-item-title') || 
+                               item.querySelector('.gallery-item-title') ||
+                               link.querySelector('[data-cb-name="StyleName"]') ||
+                               item.querySelector('[data-cb-name="StyleName"]');
+
+            // Check if it's a top seller
+            const linkClasses = link.className || '';
+            const itemClasses = item.className || '';
+            const isTopSeller = linkClasses.includes('IsTopSeller-Yes') || 
+                               itemClasses.includes('IsTopSeller-Yes');
+
+            return {
+                styleNumber,
+                title: titleElement ? titleElement.textContent.trim() : styleNumber,
+                image: img ? img.src : '/placeholder.jpg',
+                url: link.href,
+                isTopSeller
+            };
+        }
+
+        /**
+         * Display "no results" message
+         */
+        function displayNoResults() {
+            document.getElementById('resultsGrid').innerHTML = '<div class="loading">No products found</div>';
+            document.getElementById('resultsCount').textContent = '0 items found';
+            appState.processing.lastProcessedCount = 0;
+        }
+
+        /**
+         * Main function to process Caspio results
+         * Extracts product data and updates the display
+         */
         function processResults(resultItems) {
             // Prevent multiple simultaneous processing
-            if (isProcessingResults) {
-                console.log('[Sales Tool] Already processing results, skipping...');
+            if (appState.processing.isProcessingResults) {
+                debugLog('[Sales Tool] Already processing results, skipping...');
                 return;
             }
 
-            isProcessingResults = true;
-            console.log(`[Sales Tool] Processing ${resultItems.length} result items...`);
-            console.log(`[Sales Tool] Current category: "${currentCategory}", subcategory: "${currentSubcategory}"`);
+            appState.processing.isProcessingResults = true;
+            debugLog(`[Sales Tool] Processing ${resultItems.length} result items...`);
+            debugLog(`[Sales Tool] Current category: "${appState.search.currentCategory}", subcategory: "${appState.search.currentSubcategory}"`);
 
             const products = [];
             const styleNumbers = [];
             const currentProcessedStyles = new Set();
 
+            // Process each result item
             resultItems.forEach((item, index) => {
-                // Hide original
+                // Hide original Caspio element
                 item.style.display = 'none';
 
-                // Extract data - try multiple selectors
-                let link = item.querySelector('a.gallery-item-link');
-                if (!link && item.tagName === 'A' && item.href && item.href.includes('StyleNumber=')) {
-                    link = item;
-                }
-                if (!link) return;
-                
-                // Debug first few items to see structure
-                if (index < 3) {
-                    console.log(`[Sales Tool] ===== Item ${index} Debug =====`);
-                    console.log(`[Sales Tool] Tag name:`, item.tagName);
-                    console.log(`[Sales Tool] Item classes:`, item.className);
-                    console.log(`[Sales Tool] Link classes:`, link.className);
-                    
-                    // Check the full HTML to see all classes
-                    if (link.outerHTML.length < 500) {
-                        console.log(`[Sales Tool] Link HTML:`, link.outerHTML.substring(0, 200) + '...');
-                    }
-                    
-                    // Check if IsTopSeller-Yes is in the class list
-                    if (link.className.includes('IsTopSeller-Yes')) {
-                        console.log(`[Sales Tool] *** FOUND IsTopSeller-Yes class! ***`);
-                    }
-                    
-                    console.log(`[Sales Tool] ===================`);
-                }
-
-                const styleMatch = link.href.match(/StyleNumber=([^&]+)/);
-                const styleNumber = styleMatch ? styleMatch[1] : '';
+                // Extract product data
+                const productData = extractProductData(item, index);
+                if (!productData) return;
 
                 // Skip if we've already processed this style in this batch
-                if (!styleNumber || currentProcessedStyles.has(styleNumber)) {
-                    console.log(`[Sales Tool] Skipping duplicate style: ${styleNumber}`);
+                if (currentProcessedStyles.has(productData.styleNumber)) {
+                    debugLog(`[Sales Tool] Skipping duplicate style: ${productData.styleNumber}`);
                     return;
                 }
 
-                currentProcessedStyles.add(styleNumber);
+                currentProcessedStyles.add(productData.styleNumber);
 
-                // Only check for the specific class
-                let isTopSeller = false;
-                
-                // Check link classes
-                if (link.classList.contains('IsTopSeller-Yes')) {
-                    isTopSeller = true;
-                    console.log(`[Sales Tool] TopSeller class found on link for: ${styleNumber}`);
-                }
-                
-                // Check item classes  
-                if (item.classList.contains('IsTopSeller-Yes')) {
-                    isTopSeller = true;
-                    console.log(`[Sales Tool] TopSeller class found on item for: ${styleNumber}`);
-                }
-                
-                const product = {
-                    url: link.href,
-                    styleNumber: styleNumber,
-                    title: link.querySelector('.gallery-item-title')?.textContent?.trim() || '',
-                    sizes: link.querySelector('.gallery-item-sizes')?.textContent?.replace('Sizes: ', '').trim() || '',
-                    brand: link.querySelector('.gallery-item-brand')?.textContent?.trim() || '',
-                    image: link.querySelector('.gallery-product-image')?.src || '',
-                    isTopSeller: isTopSeller
-                };
-                
                 // Debug top seller detection
-                if (isTopSeller) {
-                    console.log(`[Sales Tool] *** FOUND TOP SELLER: ${styleNumber} - ${product.title}`);
+                if (productData.isTopSeller) {
+                    debugLog(`[Sales Tool] *** FOUND TOP SELLER: ${productData.styleNumber} - ${productData.title}`);
                 }
 
-                products.push(product);
-                styleNumbers.push(styleNumber);
+                products.push(productData);
+                styleNumbers.push(productData.styleNumber);
             });
 
-            console.log(`[Sales Tool] Found ${products.length} unique products`);
+            debugLog(`[Sales Tool] Found ${products.length} unique products`);
             
             // Cache all products for autocomplete (only on initial load, not style searches)
-            if (!currentCategory && !currentSubcategory && !isStyleSearch) {
+            if (!appState.search.currentCategory && !appState.search.currentSubcategory && !appState.search.isStyleSearch) {
                 window.allProductsCache = products;
-                console.log(`[Sales Tool] Cached ${products.length} products for autocomplete`);
+                debugLog(`[Sales Tool] Cached ${products.length} products for autocomplete`);
             }
 
             // Collect top sellers if this is the initial load (not a style search)
-            if (!currentCategory && !currentSubcategory && !isStyleSearch) {
+            if (!appState.search.currentCategory && !appState.search.currentSubcategory && !appState.search.isStyleSearch) {
                 console.log(`[Sales Tool] Initial load detected - looking for top sellers`);
                 const allTopSellers = products.filter(p => p.isTopSeller);
                 console.log(`[Sales Tool] Total products: ${products.length}`);
                 console.log(`[Sales Tool] Products with isTopSeller=true: ${allTopSellers.length}`);
                 
                 if (allTopSellers.length > 0) {
-                    topSellers = allTopSellers.slice(0, 6);
-                    console.log(`[Sales Tool] Top sellers to display:`, topSellers);
+                    appState.ui.topSellers = allTopSellers.slice(0, 6);
+                    console.log(`[Sales Tool] Top sellers to display:`, appState.ui.topSellers);
                 } else {
                     console.log(`[Sales Tool] No top sellers found in initial load`);
                 }
                 updateTopSellersDisplay();
             } else {
-                console.log(`[Sales Tool] Not initial load - category: ${currentCategory}, subcategory: ${currentSubcategory}, isStyleSearch: ${isStyleSearch}`);
+                console.log(`[Sales Tool] Not initial load - category: ${appState.search.currentCategory}, subcategory: ${appState.search.currentSubcategory}, isStyleSearch: ${appState.search.isStyleSearch}`);
             }
 
             // Update autocomplete cache
@@ -991,12 +1096,12 @@
             }
 
             // Show results if a category is selected OR if this is a style search
-            if (currentCategory || currentSubcategory || isStyleSearch) {
+            if (appState.search.currentCategory || appState.search.currentSubcategory || appState.search.isStyleSearch) {
                 // Create a simple string representation of products for comparison
                 const productsKey = products.map(p => p.styleNumber).join(',');
                 
                 // Only update display if products have changed
-                if (productsKey !== lastDisplayedProducts) {
+                if (productsKey !== appState.processing.lastDisplayedProducts) {
                     // Show/hide sections based on whether we're viewing products
                     const heroSection = document.querySelector('.hero-section');
                     const resultsSection = document.querySelector('.results-section');
@@ -1012,7 +1117,7 @@
                     document.getElementById('resultsCount').textContent = `${products.length} items found`;
                     
                     // Update last displayed products
-                    lastDisplayedProducts = productsKey;
+                    appState.processing.lastDisplayedProducts = productsKey;
                 }
             }
             // If no category selected, this is just the initial load for caching/top sellers
@@ -1020,7 +1125,7 @@
 
             // Reset processing flag after a delay
             setTimeout(() => {
-                isProcessingResults = false;
+                appState.processing.isProcessingResults = false;
                 // Don't reset isStyleSearch here - it should only be reset when starting a new search
             }, 500);
         }
@@ -1117,13 +1222,13 @@
 
 
         function setupBodyObserver() {
-            bodyObserver = new MutationObserver(function(mutations) {
+            appState.ui.bodyObserver = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     mutation.addedNodes.forEach(function(node) {
                         if (node.nodeType === 1) {
                             if ((node.id && (node.id.includes('caspioform') || node.id.includes('cbOuterAjaxCtnr'))) ||
                                 (node.className && node.className.includes && node.className.includes('cbFormSection'))) {
-                                console.log('[Sales Tool] Moving Caspio element to container:', node.id || node.className);
+                                debugLog('[Sales Tool] Moving Caspio element to container:', node.id || node.className);
                                 const container = document.getElementById('caspioContainer');
                                 if (container && !container.contains(node)) {
                                     container.appendChild(node);
@@ -1131,14 +1236,14 @@
                             }
 
                             if (node.tagName === 'IFRAME' && node.src && node.src.includes('caspio')) {
-                                console.log('[Sales Tool] Found Caspio iframe:', node.src);
+                                debugLog('[Sales Tool] Found Caspio iframe:', node.src);
                                 node.onload = function() {
                                     try {
                                         const iframeDoc = node.contentDocument || node.contentWindow.document;
-                                        console.log('[Sales Tool] Iframe loaded, checking for results...');
+                                        debugLog('[Sales Tool] Iframe loaded, checking for results...');
                                         setupIframeObserver(iframeDoc);
                                     } catch (e) {
-                                        console.log('[Sales Tool] Cannot access iframe content (cross-origin)');
+                                        debugLog('[Sales Tool] Cannot access iframe content (cross-origin)');
                                     }
                                 };
                             }
@@ -1147,7 +1252,7 @@
                 });
             });
 
-            bodyObserver.observe(document.body, { childList: true, subtree: true });
+            appState.ui.bodyObserver.observe(document.body, { childList: true, subtree: true });
         }
 
         function updateTopSellersDisplay() {
@@ -1157,7 +1262,7 @@
             // Clear existing content
             quickButtons.innerHTML = '';
             
-            if (topSellers.length === 0) {
+            if (appState.ui.topSellers.length === 0) {
                 // No top sellers found - show hardcoded popular products
                 console.log('[Sales Tool] No top sellers found - showing popular products');
                 
@@ -1186,8 +1291,8 @@
                 });
             } else {
                 // Add top seller buttons
-                console.log(`[Sales Tool] Displaying ${topSellers.length} top sellers`);
-                topSellers.forEach(product => {
+                console.log(`[Sales Tool] Displaying ${appState.ui.topSellers.length} top sellers`);
+                appState.ui.topSellers.forEach(product => {
                     const button = document.createElement('button');
                     button.className = 'quick-btn top-seller-btn';
                     // Note: Using product.style or product.styleNumber depending on what's available
@@ -1217,7 +1322,7 @@
 
                 localStorage.removeItem(`price_${styleNumber}`);
             } catch (e) {
-                console.error('[Sales Tool] Cache error:', e);
+                if (DEBUG_MODE) console.error('[Sales Tool] Cache error:', e);
             }
             return null;
         }
@@ -1229,6 +1334,6 @@
                     timestamp: Date.now()
                 }));
             } catch (e) {
-                console.error('[Sales Tool] Cache set error:', e);
+                if (DEBUG_MODE) console.error('[Sales Tool] Cache set error:', e);
             }
         }
