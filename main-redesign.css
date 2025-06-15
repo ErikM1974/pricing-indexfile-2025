@@ -29,9 +29,21 @@
             gap: 2rem;
         }
 
+        .logo-link {
+            display: inline-block;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
         .logo {
             height: 40px;
-            flex-shrink: 0;
+            display: block;
+            transition: opacity 0.2s ease;
+            cursor: pointer;
+        }
+
+        .logo-link:hover .logo {
+            opacity: 0.8;
         }
 
         .header-info {
