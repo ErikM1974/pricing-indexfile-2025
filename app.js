@@ -89,6 +89,7 @@
         let lastProcessedCount = 0;
         let topSellers = []; // Store top seller products
         let isStyleSearch = false; // Flag for style searches
+        let lastDisplayedProducts = ''; // Track last displayed products JSON to prevent flashing
 
         // Prevent Caspio from overriding our page
         (function() {
@@ -350,6 +351,7 @@
             processedStyleNumbers.clear();
             lastProcessedCount = 0;
             isStyleSearch = true; // Set style search flag
+            lastDisplayedProducts = ''; // Reset to allow fresh display
             
             // Show results section
             const resultsSection = document.querySelector('.results-section');
@@ -742,7 +744,8 @@
             isProcessingResults = false;
             processedStyleNumbers.clear();
             lastProcessedCount = 0;
-            isStyleSearch = false; // Clear style search flag
+            isStyleSearch = false; // Clear style search flag when doing category search
+            lastDisplayedProducts = ''; // Reset to allow fresh display
 
             // Update UI
             document.getElementById('resultsGrid').innerHTML = '<div class="loading">Loading products...</div>';
@@ -950,14 +953,14 @@
 
             console.log(`[Sales Tool] Found ${products.length} unique products`);
             
-            // Cache all products for autocomplete
-            if (!currentCategory && !currentSubcategory) {
+            // Cache all products for autocomplete (only on initial load, not style searches)
+            if (!currentCategory && !currentSubcategory && !isStyleSearch) {
                 window.allProductsCache = products;
                 console.log(`[Sales Tool] Cached ${products.length} products for autocomplete`);
             }
 
-            // Collect top sellers if this is the initial load
-            if (!currentCategory && !currentSubcategory) {
+            // Collect top sellers if this is the initial load (not a style search)
+            if (!currentCategory && !currentSubcategory && !isStyleSearch) {
                 console.log(`[Sales Tool] Initial load detected - looking for top sellers`);
                 const allTopSellers = products.filter(p => p.isTopSeller);
                 console.log(`[Sales Tool] Total products: ${products.length}`);
@@ -971,7 +974,7 @@
                 }
                 updateTopSellersDisplay();
             } else {
-                console.log(`[Sales Tool] Not initial load - category: ${currentCategory}, subcategory: ${currentSubcategory}`);
+                console.log(`[Sales Tool] Not initial load - category: ${currentCategory}, subcategory: ${currentSubcategory}, isStyleSearch: ${isStyleSearch}`);
             }
 
             // Update autocomplete cache
@@ -981,19 +984,28 @@
 
             // Show results if a category is selected OR if this is a style search
             if (currentCategory || currentSubcategory || isStyleSearch) {
-                // Show/hide sections based on whether we're viewing products
-                const heroSection = document.querySelector('.hero-section');
-                const resultsSection = document.querySelector('.results-section');
-                const homepageSections = document.querySelector('.homepage-sections');
+                // Create a simple string representation of products for comparison
+                const productsKey = products.map(p => p.styleNumber).join(',');
                 
-                // Show results, hide homepage content
-                if (heroSection) heroSection.classList.add('hidden');
-                if (homepageSections) homepageSections.style.display = 'none';
-                if (resultsSection) resultsSection.style.display = 'block';
-                
-                // Clear and display products
-                displayProducts(products);
-                document.getElementById('resultsCount').textContent = `${products.length} items found`;
+                // Only update display if products have changed
+                if (productsKey !== lastDisplayedProducts) {
+                    // Show/hide sections based on whether we're viewing products
+                    const heroSection = document.querySelector('.hero-section');
+                    const resultsSection = document.querySelector('.results-section');
+                    const homepageSections = document.querySelector('.homepage-sections');
+                    
+                    // Show results, hide homepage content
+                    if (heroSection) heroSection.classList.add('hidden');
+                    if (homepageSections) homepageSections.style.display = 'none';
+                    if (resultsSection) resultsSection.style.display = 'block';
+                    
+                    // Clear and display products
+                    displayProducts(products);
+                    document.getElementById('resultsCount').textContent = `${products.length} items found`;
+                    
+                    // Update last displayed products
+                    lastDisplayedProducts = productsKey;
+                }
             }
             // If no category selected, this is just the initial load for caching/top sellers
             // Don't show any products, keep homepage visible
@@ -1001,7 +1013,7 @@
             // Reset processing flag after a delay
             setTimeout(() => {
                 isProcessingResults = false;
-                isStyleSearch = false; // Reset style search flag
+                // Don't reset isStyleSearch here - it should only be reset when starting a new search
             }, 500);
         }
 
