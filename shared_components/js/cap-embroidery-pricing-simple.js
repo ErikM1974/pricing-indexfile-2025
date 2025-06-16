@@ -166,6 +166,18 @@
         
         // Attach event listeners
         attachEventListeners();
+        
+        // Trigger initial state
+        if (elements.frontSlider) {
+            elements.frontSlider.dispatchEvent(new Event('input'));
+        }
+        if (elements.backCheckbox) {
+            elements.backCheckbox.checked = false;
+            elements.backCheckbox.dispatchEvent(new Event('change'));
+        }
+        if (elements.quantityInput) {
+            elements.quantityInput.dispatchEvent(new Event('input'));
+        }
     }
 
     // Attach all event listeners
@@ -393,46 +405,118 @@
         }
     }
 
-    // Embed Caspio data engine
-    function embedCaspioEngine() {
-        // Add hidden container if it doesn't exist
-        let container = document.getElementById('caspio-dp-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'caspio-dp-container';
-            container.style.display = 'none';
-            document.body.appendChild(container);
+    // Embed Caspio data engine or use direct API
+    async function embedCaspioEngine() {
+        console.log('[CAP-PRICING-SIMPLE] Starting pricing data fetch...');
+        
+        // Instead of loading Caspio, directly fetch the pricing data
+        const API_BASE_URL = window.API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const STITCH_COUNT = "8000";
+        const urlParams = new URLSearchParams(window.location.search);
+        const styleNumber = urlParams.get('StyleNumber');
+        
+        if (!styleNumber) {
+            console.log('[CAP-PRICING-SIMPLE] No StyleNumber, skipping pricing fetch');
+            return;
         }
-
-        // This is the official Caspio embed library script
-        const caspioLibrary = document.createElement('script');
-        caspioLibrary.src = 'https://c3eku948.caspio.com/scripts/embed.js';
-        caspioLibrary.type = 'text/javascript';
         
-        // This function runs AFTER the library has loaded
-        caspioLibrary.onload = () => {
-            try {
-                // Get style number from the main page's URL
-                const urlParams = new URLSearchParams(window.location.search);
-                const styleNumber = urlParams.get('StyleNumber');
-
-                // Use the CaspioDeployment object to deploy the datapage
-                // This object is created by the embed.js library
-                new CaspioDeployment({
-                    "authType": "Public", 
-                    "appKey": "a0e150004ecd0739f853449c8d7f", 
-                    "id": "caspio-dp-container", 
-                    "endpoint": "emb",
-                    "passParameters": true // This ensures our URL params get passed to the iFrame
-                }).deploy();
-
-            } catch (e) {
-                console.error('[CAP-PRICING-SIMPLE] Caspio embed failed:', e);
+        try {
+            // Fetch all pricing components in parallel (same as Caspio script would do)
+            const tierApiUrl = `${API_BASE_URL}/api/pricing-tiers?method=EmbroideryCaps`;
+            const ruleApiUrl = `${API_BASE_URL}/api/pricing-rules?method=EmbroideryCaps`;
+            const sizeDataApiUrl = `${API_BASE_URL}/api/max-prices-by-style?styleNumber=${encodeURIComponent(styleNumber)}`;
+            const costApiUrl = `${API_BASE_URL}/api/embroidery-costs?itemType=Cap&stitchCount=${STITCH_COUNT}`;
+            
+            const [tierRes, ruleRes, sizeDataRes, costRes] = await Promise.all([
+                fetch(tierApiUrl),
+                fetch(ruleApiUrl),
+                fetch(sizeDataApiUrl),
+                fetch(costApiUrl)
+            ]);
+            
+            if (!tierRes.ok || !ruleRes.ok || !sizeDataRes.ok || !costRes.ok) {
+                throw new Error(`API fetch failed: Tiers: ${tierRes.status}, Rules: ${ruleRes.status}, SizeData: ${sizeDataRes.status}, Costs: ${costRes.status}`);
             }
-        };
-        
-        document.body.appendChild(caspioLibrary);
-        console.log('[CAP-PRICING-SIMPLE] Caspio engine embedding...');
+            
+            const tiersResult = await tierRes.json();
+            const rulesResult = await ruleRes.json();
+            const sizeDataResult = await sizeDataRes.json();
+            const costsResult = await costRes.json();
+            
+            // Process and calculate prices (same logic as Caspio script)
+            const tierDefinitions = {};
+            tiersResult.forEach(tier => {
+                tierDefinitions[tier.TierLabel] = tier;
+            });
+            
+            let priceProfile = {};
+            const baseItemCosts = {};
+            sizeDataResult.sizes.forEach(item => {
+                if (item && item.size && baseItemCosts[item.size] === undefined && !isNaN(parseFloat(item.price))) {
+                    baseItemCosts[item.size] = parseFloat(item.price);
+                }
+            });
+            
+            const uniqueSizes = [...new Set(sizeDataResult.sizes.map(s => s.size).filter(Boolean))];
+            uniqueSizes.forEach(size => {
+                const maxCasePrice = baseItemCosts[size];
+                if (maxCasePrice !== undefined) {
+                    priceProfile[size] = {};
+                    for (const tierLabel in tierDefinitions) {
+                        const tierInfo = tierDefinitions[tierLabel];
+                        const embCost = costsResult[tierLabel];
+                        if (embCost !== undefined && tierInfo.MarginDenominator) {
+                            const itemPortion = maxCasePrice / parseFloat(tierInfo.MarginDenominator);
+                            const unroundedFinalPrice = itemPortion + parseFloat(embCost);
+                            priceProfile[size][tierLabel] = applyDynamicRounding(unroundedFinalPrice, rulesResult.RoundingMethod);
+                        } else {
+                            priceProfile[size][tierLabel] = null;
+                        }
+                    }
+                }
+            });
+            
+            // Prepare the final data bundle
+            const masterBundle = {
+                success: true,
+                allPriceProfiles: { [STITCH_COUNT]: priceProfile },
+                groupedHeaders: uniqueSizes,
+                tierDefinitions: tierDefinitions,
+                pricingRules: rulesResult,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Dispatch event as if it came from Caspio
+            console.log('[CAP-PRICING-SIMPLE] Dispatching pricing data:', masterBundle);
+            document.dispatchEvent(new CustomEvent('caspioCapPricingCalculated', {
+                detail: masterBundle
+            }));
+            
+        } catch (error) {
+            console.error('[CAP-PRICING-SIMPLE] Failed to fetch pricing data:', error);
+            document.dispatchEvent(new CustomEvent('caspioCapPricingCalculated', {
+                detail: { success: false, message: error.message }
+            }));
+        }
+    }
+    
+    // Helper function for rounding
+    function applyDynamicRounding(amount, ruleName) {
+        if (isNaN(amount) || amount === null || typeof amount !== 'number') {
+            return 0;
+        }
+        switch (ruleName) {
+            case 'CeilDollar':
+                return Math.ceil(amount);
+            case 'HalfDollarUp_Final':
+                return Math.ceil(amount * 2) / 2;
+            case 'RoundToNearestHalfDollar':
+                return Math.round(amount * 2) / 2;
+            case 'RoundToNearestDollar':
+                return Math.round(amount);
+            default:
+                return parseFloat(amount.toFixed(2));
+        }
     }
 
     // Display error message
@@ -474,6 +558,7 @@
             // Set globals for compatibility with existing components
             window.productTitle = data.productTitle || `Style ${styleNumber}`;
             window.selectedStyleNumber = styleNumber;
+            window.productColors = data.colors || [];
             
             // Find and set selected color
             if (data.colors && data.colors.length > 0) {

@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
     
+    <!-- Cap Embroidery specific styles -->
+    <link rel="stylesheet" href="/shared_components/css/cap-embroidery-styles.css">
+    
     <!-- Legacy styles for compatibility -->
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
@@ -31,37 +34,172 @@
             --primary-dark: #2d5f3f !important;
             --primary-color: #3a7c52 !important;
             --primary-light: #e8f5e9 !important;
+            --secondary: #f5f5f5;
+            --border-color: #e0e0e0;
         }
         
         /* Page-specific overrides */
         body {
-            background-color: #f5f5f5;
+            background-color: #f9f9f9;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding-top: 80px;
+        }
+        
+        /* Hide duplicate header */
+        .universal-pricing-header {
+            display: none;
+        }
+        
+        /* Container styling */
+        .universal-pricing-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .universal-pricing-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        /* Card styling */
+        .universal-product-card,
+        .universal-calculator-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Product display fixes */
+        #product-display {
+            padding: 0;
+        }
+        
+        .universal-product-display {
+            padding: 20px;
+        }
+        
+        /* Color swatches styling */
+        .upd-color-swatches {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-swatch.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(58, 124, 82, 0.2);
+        }
+        
+        /* Calculator card styling */
+        .universal-calculator-card {
+            padding: 0;
+        }
+        
+        .universal-calculator-card > div {
+            margin-bottom: 0;
+        }
+        
+        /* Quick quote styling */
+        .universal-quick-quote {
+            padding: 25px;
+            border-bottom: 1px solid var(--border-color);
             margin: 0;
         }
         
-        /* Cap-specific styles */
-        .cap-preview-container {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
+        .quote-title {
+            font-size: 18px;
+            font-weight: 600;
             margin-bottom: 20px;
+            color: #333;
         }
         
-        .cap-preview-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
+        /* Pricing grid styling */
+        .universal-pricing-grid {
+            padding: 25px;
+            margin: 0;
+            border-bottom: 1px solid var(--border-color);
         }
         
-        /* Keep existing functional classes */
-        .hero-section,
-        .product-header,
-        .product-info,
-        .pricing-section,
-        .cap-pricing-container {
-            /* Preserve existing functionality */
+        .grid-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .pricing-table th {
+            background-color: #f8f8f8;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .pricing-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .tier-label {
+            font-weight: 600;
+            text-align: left;
+            background-color: #fafafa;
+        }
+        
+        .price-cell {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        /* Embroidery customization styling */
+        .embroidery-customization-section {
+            padding: 25px;
+            background: white;
+        }
+        
+        .customization-section {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            border-radius: 0;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
         }
         
         /* Stitch slider styles */
@@ -137,20 +275,46 @@
             margin-top: 10px;
         }
         
-        /* Quick quote styles */
-        .universal-quick-quote {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        /* Action buttons */
+        .universal-action-buttons {
+            padding: 25px;
+            background: #f8f8f8;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
         }
         
-        .quote-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #333;
+        .universal-action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .universal-action-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .universal-action-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .universal-action-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .universal-action-secondary:hover {
+            background: var(--primary-light);
         }
         
         .quote-form {
@@ -198,129 +362,17 @@
             border-top: 2px solid #333;
         }
         
-        /* Pricing table styles */
-        .universal-pricing-grid {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .grid-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #333;
-        }
-        
-        .table-wrapper {
-            overflow-x: auto;
-        }
-        
-        .pricing-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-        }
-        
-        .pricing-table th,
-        .pricing-table td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .pricing-table th {
-            background-color: #f8f8f8;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .tier-label {
-            font-weight: 600;
-            text-align: left;
-        }
-        
-        .price-cell {
-            font-size: 16px;
-            color: #3a7c52;
-            font-weight: 500;
-        }
-        
-        .pricing-note {
-            font-size: 14px;
-            color: #666;
-            text-align: center;
-            margin: 0;
-        }
-        
-        .pricing-error {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-        
-        .pricing-error a {
-            color: #3a7c52;
-            text-decoration: none;
-            font-weight: 600;
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .universal-pricing-columns {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body class="universal-theme">
     <!-- Universal Header -->
-    <header class="universal-pricing-header">
-        <!-- Contact Bar -->
-        <div class="universal-header-contact-bar">
-            <div class="universal-header-contact-content">
-                <div class="universal-header-contact-left">
-                    <a href="tel:253-922-5793" class="universal-header-contact-item">
-                        <i class="fas fa-phone universal-header-contact-icon"></i>
-                        253-922-5793
-                    </a>
-                    <a href="mailto:sales@nwcustomapparel.com" class="universal-header-contact-item">
-                        <i class="fas fa-envelope universal-header-contact-icon"></i>
-                        sales@nwcustomapparel.com
-                    </a>
-                    <span class="universal-header-contact-item">
-                        <i class="fas fa-clock universal-header-contact-icon"></i>
-                        9AM-5PM
-                    </span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Main Header -->
-        <div class="universal-header-main">
-            <div class="universal-header-main-content">
-                <!-- Logo -->
-                <a href="/" class="universal-header-logo">
-                    <div class="universal-header-logo-text">
-                        <h1 class="universal-header-company-name">NW NORTHWEST</h1>
-                        <p class="universal-header-tagline">CUSTOM APPAREL</p>
-                    </div>
-                </a>
-                
-                <!-- Navigation -->
-                <nav class="universal-header-nav">
-                    <a href="/" class="universal-header-nav-link">Home</a>
-                    <a href="/products" class="universal-header-nav-link">Products</a>
-                    <a href="/cap-embroidery-pricing" class="universal-header-nav-link active">Cap Embroidery</a>
-                </nav>
-                
-                <!-- CTA Buttons -->
-                <div class="universal-header-cta-group">
-                    <a href="#" class="universal-header-btn universal-header-btn-secondary">
-                        <i class="fas fa-arrow-left"></i>
-                        Back to Products
-                    </a>
-                    <a href="#" class="universal-header-btn universal-header-btn-primary">
-                        Get Quote
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
+    <div id="universal-header-container"></div>
     
     <!-- Page Title -->
     <div class="universal-pricing-page-title">
@@ -335,7 +387,7 @@
         <div class="universal-pricing-columns">
             <!-- Left Column: Product Display -->
             <div class="universal-product-column">
-                <div class="universal-product-card">
+                <div id="product-display" class="universal-product-card">
                     <!-- Product Header -->
                     <div class="universal-product-header">
                         <a href="#" class="universal-product-back-link">
@@ -427,6 +479,7 @@
     
     <!-- Scripts -->
     <!-- Core utilities and constants -->
+    <script src="/shared_components/js/nwca-namespace.js"></script>
     <script src="/shared_components/js/utils.js"></script>
     <script src="/shared_components/js/constants.js"></script>
     
@@ -434,6 +487,13 @@
     <script src="/shared_components/js/universal-header-component.js"></script>
     <script src="/shared_components/js/universal-image-gallery.js"></script>
     <script src="/shared_components/js/universal-product-display.js"></script>
+    
+    <!-- Pricing components -->
+    <script src="/shared_components/js/universal-quick-quote.js"></script>
+    <script src="/shared_components/js/universal-pricing-grid.js"></script>
+    
+    <!-- Color swatches helper -->
+    <script src="/shared_components/js/dp5-helper.js"></script>
     
     <!-- New simplified pricing implementation -->
     <script src="/shared_components/js/cap-embroidery-pricing-simple.js"></script>

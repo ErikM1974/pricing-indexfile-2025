@@ -8,6 +8,8 @@
  */
 
 (function(NWCA) {
+    // Add this at the top of constants.js
+    console.log('[CONSTANTS_DEBUG] Checking NWCA namespace:', typeof NWCA, NWCA);
     'use strict';
 
     // Ensure NWCA namespace exists
