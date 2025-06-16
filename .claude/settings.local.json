@@ -35,7 +35,8 @@
       "Bash(npm test:*)",
       "Bash(chmod:*)",
       "Bash(touch:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

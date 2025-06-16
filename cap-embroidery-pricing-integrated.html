@@ -532,12 +532,12 @@
         }
         
         /* Conditional display */
-        .conditional {
-            display: none;
+        .quote-line.conditional {
+            display: none !important;
         }
         
-        .conditional.show {
-            display: flex;
+        .quote-line.conditional.show {
+            display: flex !important;
         }
         
         /* Pricing note box */
@@ -640,6 +640,52 @@
             color: #3a7c52;
             padding-top: 10px;
             border-top: 2px solid #333;
+        }
+        
+        /* Call for Quote styling */
+        .call-for-quote-box {
+            text-align: center;
+            padding: 40px 20px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            border: 2px dashed #ddd;
+        }
+        
+        .call-for-quote-box i.fa-phone-alt {
+            font-size: 48px;
+            color: #3a7c52;
+            margin-bottom: 20px;
+        }
+        
+        .call-for-quote-box h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .call-for-quote-box p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .quote-phone-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #3a7c52;
+            text-decoration: none;
+            padding: 12px 24px;
+            border: 2px solid #3a7c52;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .quote-phone-link:hover {
+            background: #3a7c52;
+            color: white;
         }
         
         /* Responsive */
@@ -778,8 +824,10 @@
             console.log('[CapEmbroideryV2] Page loaded');
             
             // Initialize header if available
-            if (window.UniversalHeader) {
-                window.UniversalHeader.init();
+            if (window.UniversalHeader && window.UniversalHeader.initialize) {
+                window.UniversalHeader.initialize();
+            } else if (window.UniversalHeaderComponent && window.UniversalHeaderComponent.init) {
+                window.UniversalHeaderComponent.init();
             }
         });
     </script>

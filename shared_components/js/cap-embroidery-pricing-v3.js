@@ -44,8 +44,12 @@
         // Load product data for gallery and swatches
         loadProductData();
         
-        // Fetch pricing data directly
-        fetchPricingData();
+        // Fetch pricing data directly and update quote when loaded
+        fetchPricingData().then(() => {
+            console.log('[CAP-PRICING-V3] Initial pricing fetch completed');
+        }).catch(error => {
+            console.error('[CAP-PRICING-V3] Initial pricing fetch failed:', error);
+        });
     });
 
     // Handle Caspio pricing data
@@ -67,10 +71,15 @@
             basePrices = data.allPriceProfiles['8000'];
             pricingData = data;
             
+            console.log('[CAP-PRICING-V3] Base prices loaded:', basePrices);
+            console.log('[CAP-PRICING-V3] Available sizes:', Object.keys(basePrices));
+            
             // Build table structure once, then update prices
             createTableStructure(data);
             updatePricingTable();
             updateQuote();
+        } else {
+            console.error('[CAP-PRICING-V3] No pricing data found for 8000 stitches');
         }
     }
 
@@ -222,7 +231,7 @@
                         <!-- Base price -->
                         <div class="quote-line">
                             <span>Base Unit Price (8,000 stitches):</span>
-                            <span id="base-price">$0.00</span>
+                            <span id="base-price" class="loading-price">$0.00</span>
                         </div>
                         
                         <!-- Front logo adjustment (conditional) -->
@@ -500,7 +509,8 @@
         // Quantity input
         if (elements.quantityInput) {
             elements.quantityInput.addEventListener('input', function() {
-                currentQuantity = parseInt(this.value) || 0;
+                currentQuantity = parseInt(this.value) || MIN_QUANTITY;
+                updatePricingTable();
                 updateQuote();
             });
         }
@@ -589,10 +599,15 @@
 
     // Update pricing table
     function updatePricingTable() {
-        if (!basePrices) return;
+        if (!basePrices) {
+            console.warn('[CAP-PRICING-V3] No base prices available for table update');
+            return;
+        }
         
         const priceCells = document.querySelectorAll('.price-cell[data-size][data-tier]');
         const adjustment = frontAdjustment;
+        
+        console.log('[CAP-PRICING-V3] Updating pricing table with adjustment:', adjustment);
         
         priceCells.forEach(cell => {
             const size = cell.dataset.size;
@@ -604,6 +619,7 @@
                 cell.textContent = `$${adjustedPrice.toFixed(2)}`;
                 cell.dataset.basePrice = basePrice;
             } else {
+                console.warn('[CAP-PRICING-V3] No price found for size:', size, 'tier:', tier);
                 cell.textContent = '-';
             }
         });
@@ -620,18 +636,54 @@
 
     // Update quote calculator with proper rounding
     function updateQuote() {
-        const quoteSize = Object.keys(basePrices)[0];
-        if (!quoteSize) return;
+        // For caps, look for cap-specific sizes or use the first available size
+        let quoteSize = null;
+        const possibleCapSizes = ['OSFA', 'OS', 'One Size', 'ONE SIZE', 'S/M', 'M/L', 'L/XL'];
+        
+        // Try to find a cap-specific size
+        for (const size of possibleCapSizes) {
+            if (basePrices[size]) {
+                quoteSize = size;
+                break;
+            }
+        }
+        
+        // If no cap size found, use the first available size
+        if (!quoteSize) {
+            quoteSize = Object.keys(basePrices)[0];
+        }
+        
+        if (!quoteSize) {
+            console.error('[CAP-PRICING-V3] No size found in basePrices');
+            document.getElementById('base-price').textContent = 'Loading...';
+            // Try to fetch pricing data again
+            fetchPricingData();
+            return;
+        }
+        
+        console.log('[CAP-PRICING-V3] Using size for quote:', quoteSize);
         
         // Get base price
         const tier = getPriceTier(currentQuantity);
         let basePrice = 0;
         if (tier && basePrices[quoteSize] && basePrices[quoteSize][tier]) {
             basePrice = basePrices[quoteSize][tier];
+        } else if (basePrices[quoteSize] && basePrices[quoteSize]['24-47']) {
+            // Fallback to lowest tier if specific tier not found
+            basePrice = basePrices[quoteSize]['24-47'];
+            console.log('[CAP-PRICING-V3] Using fallback tier 24-47 for quantity:', currentQuantity);
+        } else {
+            console.error('[CAP-PRICING-V3] No price found for tier:', tier, 'size:', quoteSize);
+            console.log('[CAP-PRICING-V3] Available tiers for size', quoteSize + ':', basePrices[quoteSize] ? Object.keys(basePrices[quoteSize]) : 'none');
+            document.getElementById('base-price').textContent = 'Loading...';
+            return;
         }
         
         // Update base price display
-        document.getElementById('base-price').textContent = `$${basePrice.toFixed(2)}`;
+        const basePriceEl = document.getElementById('base-price');
+        if (basePriceEl) {
+            basePriceEl.textContent = `$${basePrice.toFixed(2)}`;
+        }
         
         // Front logo adjustment
         const frontLine = document.getElementById('front-adjust-line');
@@ -652,23 +704,41 @@
         }
         
         // Back logo
-        if (backLogoEnabled) {
-            const backStitches = currentBackStitches.toLocaleString();
-            document.getElementById('back-logo-label').textContent = `+ Back Logo (${backStitches} stitches):`;
-            document.getElementById('back-logo-amount').textContent = `$${backLogoPrice.toFixed(2)}`;
+        const backLine = document.getElementById('back-logo-line');
+        if (backLine) {
+            if (backLogoEnabled) {
+                backLine.classList.add('show');
+                const backStitches = currentBackStitches.toLocaleString();
+                document.getElementById('back-logo-label').textContent = `+ Back Logo (${backStitches} stitches):`;
+                document.getElementById('back-logo-amount').textContent = `$${backLogoPrice.toFixed(2)}`;
+            } else {
+                backLine.classList.remove('show');
+            }
         }
         
         // Side logos
-        if (leftLogoEnabled) {
-            const leftStitches = currentLeftStitches.toLocaleString();
-            document.getElementById('left-logo-label').textContent = `+ Left Side Logo (${leftStitches} stitches):`;
-            document.getElementById('left-logo-amount').textContent = `$${leftLogoPrice.toFixed(2)}`;
+        const leftLine = document.getElementById('left-logo-line');
+        if (leftLine) {
+            if (leftLogoEnabled) {
+                leftLine.classList.add('show');
+                const leftStitches = currentLeftStitches.toLocaleString();
+                document.getElementById('left-logo-label').textContent = `+ Left Side Logo (${leftStitches} stitches):`;
+                document.getElementById('left-logo-amount').textContent = `$${leftLogoPrice.toFixed(2)}`;
+            } else {
+                leftLine.classList.remove('show');
+            }
         }
         
-        if (rightLogoEnabled) {
-            const rightStitches = currentRightStitches.toLocaleString();
-            document.getElementById('right-logo-label').textContent = `+ Right Side Logo (${rightStitches} stitches):`;
-            document.getElementById('right-logo-amount').textContent = `$${rightLogoPrice.toFixed(2)}`;
+        const rightLine = document.getElementById('right-logo-line');
+        if (rightLine) {
+            if (rightLogoEnabled) {
+                rightLine.classList.add('show');
+                const rightStitches = currentRightStitches.toLocaleString();
+                document.getElementById('right-logo-label').textContent = `+ Right Side Logo (${rightStitches} stitches):`;
+                document.getElementById('right-logo-amount').textContent = `$${rightLogoPrice.toFixed(2)}`;
+            } else {
+                rightLine.classList.remove('show');
+            }
         }
         
         // LTM fee
@@ -696,14 +766,49 @@
         const orderTotal = Math.round(pieceTotal * currentQuantity * 100) / 100;
         
         // Update display
-        document.getElementById('quote-quantity').textContent = currentQuantity;
-        document.getElementById('piece-total').textContent = `$${pieceTotal.toFixed(2)}`;
-        document.getElementById('order-total').textContent = `$${orderTotal.toFixed(2)}`;
+        const quotePieceTotal = document.getElementById('piece-total');
+        const quoteOrderTotal = document.getElementById('order-total');
+        const quoteQuantityEl = document.getElementById('quote-quantity');
+        
+        if (quoteQuantityEl) quoteQuantityEl.textContent = currentQuantity;
+        if (quotePieceTotal) quotePieceTotal.textContent = `$${pieceTotal.toFixed(2)}`;
+        if (quoteOrderTotal) quoteOrderTotal.textContent = `$${orderTotal.toFixed(2)}`;
+    }
+
+    // Show call for quote message
+    function showCallForQuote() {
+        const quoteContainer = document.getElementById('quick-quote-container');
+        if (quoteContainer) {
+            quoteContainer.innerHTML = `
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2 class="step-title">Get Your Quote</h2>
+                    </div>
+                    
+                    <div class="call-for-quote-box">
+                        <i class="fas fa-phone-alt"></i>
+                        <h3>Call for Quote</h3>
+                        <p>Please contact us for pricing on this item.</p>
+                        <a href="tel:253-922-5793" class="quote-phone-link">
+                            <i class="fas fa-phone"></i> (253) 922-5793
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Hide pricing grid as well
+        const gridContainer = document.getElementById('pricing-grid-container');
+        if (gridContainer) {
+            gridContainer.innerHTML = '';
+        }
     }
 
     // Get price tier based on quantity
     function getPriceTier(quantity) {
-        if (quantity < 24) return null;
+        // For quantities less than 24, use the 24-47 tier pricing
+        if (quantity < 24) return '24-47';
         if (quantity <= 47) return '24-47';
         if (quantity <= 71) return '48-71';
         return '72+';
@@ -717,6 +822,7 @@
         const STITCH_COUNT = "8000";
         const urlParams = new URLSearchParams(window.location.search);
         const styleNumber = urlParams.get('StyleNumber');
+        const color = urlParams.get('COLOR') || 'Black';
         
         if (!styleNumber) {
             console.log('[CAP-PRICING-V3] No StyleNumber, skipping pricing fetch');
@@ -724,25 +830,49 @@
         }
         
         try {
+            // First, try to get cap base price using size-pricing endpoint
+            const sizePricingUrl = `${API_BASE_URL}/api/size-pricing?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color)}`;
+            const sizePricingRes = await fetch(sizePricingUrl);
+            
+            let capBasePrice = null;
+            let sizeDataResult = null;
+            
+            if (sizePricingRes.ok) {
+                const sizePricingData = await sizePricingRes.json();
+                console.log('[CAP-PRICING-V3] Size pricing data:', sizePricingData);
+                
+                // For caps, usually there's only one size (OSFA)
+                if (sizePricingData.baseSizePrice) {
+                    capBasePrice = sizePricingData.baseSizePrice;
+                }
+            }
+            
+            // Fetch other required data
             const tierApiUrl = `${API_BASE_URL}/api/pricing-tiers?method=EmbroideryCaps`;
             const ruleApiUrl = `${API_BASE_URL}/api/pricing-rules?method=EmbroideryCaps`;
-            const sizeDataApiUrl = `${API_BASE_URL}/api/max-prices-by-style?styleNumber=${encodeURIComponent(styleNumber)}`;
             const costApiUrl = `${API_BASE_URL}/api/embroidery-costs?itemType=Cap&stitchCount=${STITCH_COUNT}`;
             
-            const [tierRes, ruleRes, sizeDataRes, costRes] = await Promise.all([
+            // If size-pricing didn't work, try max-prices-by-style as fallback
+            if (!capBasePrice) {
+                const sizeDataApiUrl = `${API_BASE_URL}/api/max-prices-by-style?styleNumber=${encodeURIComponent(styleNumber)}`;
+                const sizeDataRes = await fetch(sizeDataApiUrl);
+                if (sizeDataRes.ok) {
+                    sizeDataResult = await sizeDataRes.json();
+                }
+            }
+            
+            const [tierRes, ruleRes, costRes] = await Promise.all([
                 fetch(tierApiUrl),
                 fetch(ruleApiUrl),
-                fetch(sizeDataApiUrl),
                 fetch(costApiUrl)
             ]);
             
-            if (!tierRes.ok || !ruleRes.ok || !sizeDataRes.ok || !costRes.ok) {
+            if (!tierRes.ok || !ruleRes.ok || !costRes.ok) {
                 throw new Error(`API fetch failed`);
             }
             
             const tiersResult = await tierRes.json();
             const rulesResult = await ruleRes.json();
-            const sizeDataResult = await sizeDataRes.json();
             const costsResult = await costRes.json();
             
             // Process data
@@ -753,16 +883,25 @@
             
             let priceProfile = {};
             const baseItemCosts = {};
-            sizeDataResult.sizes.forEach(item => {
-                if (item && item.size && baseItemCosts[item.size] === undefined && !isNaN(parseFloat(item.price))) {
-                    baseItemCosts[item.size] = parseFloat(item.price);
-                }
-            });
             
-            const uniqueSizes = [...new Set(sizeDataResult.sizes.map(s => s.size).filter(Boolean))];
+            // Use cap base price if we got it from size-pricing
+            if (capBasePrice !== null) {
+                baseItemCosts['OSFA'] = capBasePrice;
+            } else if (sizeDataResult && sizeDataResult.sizes) {
+                // Fallback to max-prices data
+                sizeDataResult.sizes.forEach(item => {
+                    if (item && item.size && baseItemCosts[item.size] === undefined && !isNaN(parseFloat(item.price))) {
+                        baseItemCosts[item.size] = parseFloat(item.price);
+                    }
+                });
+            }
+            
+            // For caps, we typically have OSFA
+            const uniqueSizes = Object.keys(baseItemCosts).length > 0 ? Object.keys(baseItemCosts) : ['OSFA'];
+            
             uniqueSizes.forEach(size => {
-                const maxCasePrice = baseItemCosts[size];
-                if (maxCasePrice !== undefined) {
+                const maxCasePrice = baseItemCosts[size] || capBasePrice || 0;
+                if (maxCasePrice > 0) {
                     priceProfile[size] = {};
                     for (const tierLabel in tierDefinitions) {
                         const tierInfo = tierDefinitions[tierLabel];
@@ -788,6 +927,7 @@
             };
             
             console.log('[CAP-PRICING-V3] Pricing data loaded:', masterBundle);
+            console.log('[CAP-PRICING-V3] Price profile structure:', priceProfile);
             processPricingData(masterBundle);
             
         } catch (error) {
@@ -817,12 +957,18 @@
 
     // Display error message
     function displayPricingError() {
+        console.error('[CAP-PRICING-V3] Displaying pricing error');
+        const basePrice = document.getElementById('base-price');
+        if (basePrice) {
+            basePrice.textContent = 'Error loading price';
+        }
+        
         const gridContainer = document.getElementById('pricing-grid-container');
         if (gridContainer) {
             gridContainer.innerHTML = `
                 <div class="pricing-error">
-                    <p>Sorry, pricing is currently unavailable. Please contact us for a quote.</p>
-                    <p>Call: <a href="tel:253-922-5793">253-922-5793</a></p>
+                    <p>Sorry, pricing is currently unavailable. Please try refreshing the page.</p>
+                    <p>If the problem persists, call: <a href="tel:253-922-5793">253-922-5793</a></p>
                 </div>
             `;
         }
