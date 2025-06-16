@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Embroidery Pricing - Redesigned Mockup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Header (simplified for mockup) */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #3a7c52;
+            font-size: 24px;
+        }
+        
+        /* Main container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Two column layout */
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Left column - Product Display */
+        .product-display {
+            padding: 25px;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 400px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #999;
+        }
+        
+        .color-swatches {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 20px;
+        }
+        
+        .swatch-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        
+        .swatch:nth-child(1) { background: #000; }
+        .swatch:nth-child(2) { background: #fff; border: 2px solid #ddd; }
+        .swatch:nth-child(3) { background: #c41e3a; }
+        .swatch:nth-child(4) { background: #003f87; }
+        .swatch:nth-child(5) { background: #ffb81c; }
+        
+        /* Right column - NEW LAYOUT */
+        .pricing-calculator {
+            background: white;
+        }
+        
+        /* Step sections */
+        .step-section {
+            padding: 25px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .step-section:last-child {
+            border-bottom: none;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .step-number {
+            background: #3a7c52;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Configuration controls */
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .control-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .quantity-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .quantity-input:focus {
+            outline: none;
+            border-color: #3a7c52;
+        }
+        
+        /* Slider styling */
+        .slider-container {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .stitch-display {
+            font-weight: 600;
+            color: #3a7c52;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 15px 0;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3a7c52;
+            cursor: pointer;
+        }
+        
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* Checkbox group */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Quote display */
+        .quote-box {
+            background: #f8fdf9;
+            border: 2px solid #3a7c52;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .quote-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .quote-line.total {
+            font-size: 20px;
+            font-weight: 600;
+            color: #3a7c52;
+            border-top: 2px solid #e0e0e0;
+            padding-top: 12px;
+            margin-top: 12px;
+            margin-bottom: 0;
+        }
+        
+        /* Pricing grid */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .pricing-table th {
+            background: #f8f8f8;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .pricing-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .pricing-table .tier-label {
+            text-align: left;
+            font-weight: 600;
+            background: #fafafa;
+        }
+        
+        .pricing-table .price {
+            color: #3a7c52;
+            font-weight: 500;
+        }
+        
+        .pricing-note {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+        
+        /* CTA Buttons */
+        .cta-section {
+            padding: 25px;
+            background: #f8f8f8;
+            text-align: center;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #3a7c52;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2d5f3f;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #3a7c52;
+            border: 2px solid #3a7c52;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f8f3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Simplified Header -->
+    <div class="header">
+        <div class="container">
+            <h1>Cap Embroidery Pricing - Redesigned Layout</h1>
+            <p style="color: #666; margin-top: 5px;">Improved user flow: Configure → See Quote → View Details</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="columns">
+            <!-- Left Column: Product Display (unchanged) -->
+            <div class="card">
+                <div class="product-display">
+                    <h2 style="margin-bottom: 10px;">New Era - Structured Stretch Cotton Cap</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Style: NE1000</p>
+                    
+                    <div class="product-image">
+                        [Product Image]
+                    </div>
+                    
+                    <div class="color-swatches">
+                        <h3 style="font-size: 16px; margin-bottom: 10px;">Available Colors</h3>
+                        <div class="swatch-grid">
+                            <div class="swatch"></div>
+                            <div class="swatch"></div>
+                            <div class="swatch"></div>
+                            <div class="swatch"></div>
+                            <div class="swatch"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: REDESIGNED FLOW -->
+            <div class="card pricing-calculator">
+                <!-- STEP 1: Configure Your Order -->
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h2 class="step-title">Configure Your Order</h2>
+                    </div>
+                    
+                    <!-- Quantity Input -->
+                    <div class="control-group">
+                        <label class="control-label" for="quantity">Order Quantity</label>
+                        <input type="number" id="quantity" class="quantity-input" value="24" min="1">
+                    </div>
+                    
+                    <!-- Front Logo Embroidery -->
+                    <div class="control-group">
+                        <label class="control-label">Front Logo Embroidery</label>
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <span>Stitch Count:</span>
+                                <span class="stitch-display">8,000 stitches</span>
+                            </div>
+                            <input type="range" class="slider" min="5000" max="20000" step="1000" value="8000">
+                            <div class="slider-labels">
+                                <span>5,000</span>
+                                <span>12,500</span>
+                                <span>20,000</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Back Logo Option -->
+                    <div class="control-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="back-logo">
+                            <label for="back-logo">Add Back Logo Embroidery</label>
+                        </div>
+                        <div class="slider-container" style="display: none;">
+                            <div class="slider-header">
+                                <span>Back Logo Stitch Count:</span>
+                                <span class="stitch-display">5,000 stitches</span>
+                            </div>
+                            <input type="range" class="slider" min="5000" max="20000" step="1000" value="5000">
+                            <div class="slider-labels">
+                                <span>5,000</span>
+                                <span>12,500</span>
+                                <span>20,000</span>
+                            </div>
+                            <p style="margin-top: 10px; font-size: 14px; color: #3a7c52;">
+                                Back Logo: +$5.00 per cap
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- STEP 2: Instant Quote -->
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2 class="step-title">Your Instant Quote</h2>
+                    </div>
+                    
+                    <div class="quote-box">
+                        <div class="quote-line">
+                            <span>Unit Price (S/M):</span>
+                            <span>$24.00</span>
+                        </div>
+                        <div class="quote-line">
+                            <span>× Quantity:</span>
+                            <span>24</span>
+                        </div>
+                        <div class="quote-line">
+                            <span>Subtotal:</span>
+                            <span>$576.00</span>
+                        </div>
+                        <div class="quote-line total">
+                            <span>Estimated Total:</span>
+                            <span>$576.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- STEP 3: Reference Pricing Grid -->
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h2 class="step-title">Price-Per-Unit Reference Grid</h2>
+                    </div>
+                    
+                    <table class="pricing-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>S/M</th>
+                                <th>M/L</th>
+                                <th>L/XL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="tier-label">24-47</td>
+                                <td class="price">$24.00</td>
+                                <td class="price">$24.00</td>
+                                <td class="price">$24.00</td>
+                            </tr>
+                            <tr>
+                                <td class="tier-label">48-71</td>
+                                <td class="price">$23.00</td>
+                                <td class="price">$23.00</td>
+                                <td class="price">$23.00</td>
+                            </tr>
+                            <tr>
+                                <td class="tier-label">72+</td>
+                                <td class="price">$21.00</td>
+                                <td class="price">$21.00</td>
+                                <td class="price">$21.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="pricing-note">
+                        Prices shown include 8,000 stitch embroidery on front
+                    </p>
+                </div>
+                
+                <!-- CTA Buttons -->
+                <div class="cta-section">
+                    <div class="cta-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-phone"></i>
+                            Call for Quote
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-envelope"></i>
+                            Email Quote
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simple interactivity demo
+        document.getElementById('back-logo').addEventListener('change', function() {
+            const backLogoControls = this.parentElement.nextElementSibling;
+            backLogoControls.style.display = this.checked ? 'block' : 'none';
+        });
+    </script>
+</body>
+</html>

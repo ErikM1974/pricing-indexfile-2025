@@ -182,218 +182,24 @@
             color: var(--primary);
         }
         
-        /* Step sections for V3 layout */
-        .step-section {
+        /* Embroidery customization styling */
+        .embroidery-customization-section {
             padding: 25px;
-            border-bottom: 1px solid #e0e0e0;
+            background: white;
         }
         
-        .step-section:last-child {
-            border-bottom: none;
+        .customization-section {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            border-radius: 0;
         }
         
-        .step-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .step-number {
-            background: #3a7c52;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 12px;
-        }
-        
-        .step-title {
-            font-size: 18px;
+        .section-title {
+            font-size: 16px;
             font-weight: 600;
-            color: #333;
-        }
-        
-        /* Control groups */
-        .control-group {
-            margin-bottom: 25px;
-        }
-        
-        .control-group:last-child {
-            margin-bottom: 0;
-        }
-        
-        .control-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        
-        /* Slider enhancements */
-        .slider-container {
-            background: #f8f8f8;
-            padding: 15px;
-            border-radius: 6px;
-            position: relative;
-        }
-        
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .price-display {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .price-display.positive { color: #d32f2f; }
-        .price-display.negative { color: #2e7d32; }
-        .price-display.neutral { color: #666; }
-        
-        .slider-wrapper {
-            position: relative;
-            margin: 20px 0;
-        }
-        
-        .slider {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #ddd;
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-        }
-        
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #3a7c52;
-            cursor: pointer;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #3a7c52;
-            cursor: pointer;
-        }
-        
-        /* Slider tooltip */
-        .slider-tooltip {
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .slider-tooltip.dual-line {
-            top: -50px;
-            padding: 4px 10px;
-            line-height: 1.3;
-        }
-        
-        .slider-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 4px solid transparent;
-            border-top-color: #333;
-        }
-        
-        .slider-wrapper:hover .slider-tooltip,
-        .slider:active ~ .slider-tooltip {
-            opacity: 1;
-        }
-        
-        /* Checkbox styling */
-        .checkbox-group {
-            display: flex;
-            align-items: center;
             margin-bottom: 15px;
-        }
-        
-        .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        
-        .checkbox-group label {
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        /* Additional logos section */
-        .additional-logos {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #e0e0e0;
-        }
-        
-        .expand-link {
-            color: #3a7c52;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-        
-        .expand-link:hover {
-            text-decoration: underline;
-        }
-        
-        .expand-link i {
-            font-size: 12px;
-            transition: transform 0.2s;
-        }
-        
-        .expand-link.expanded i {
-            transform: rotate(90deg);
-        }
-        
-        .additional-logo-options {
-            margin-top: 15px;
-            display: none;
-        }
-        
-        .additional-logo-options.show {
-            display: block;
-        }
-        
-        .pricing-info {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #666;
-            font-style: italic;
+            color: #333;
         }
         
         /* Stitch slider styles */
@@ -467,81 +273,6 @@
             color: #3a7c52;
             font-weight: 600;
             margin-top: 10px;
-        }
-        
-        /* Enhanced quote box styling */
-        .quote-box {
-            background: #f8fdf9;
-            border: 2px solid #3a7c52;
-            border-radius: 8px;
-            padding: 20px;
-        }
-        
-        .quote-line {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 15px;
-            align-items: center;
-        }
-        
-        .quote-line.indent {
-            padding-left: 20px;
-            font-size: 14px;
-            color: #555;
-        }
-        
-        .quote-line.subtotal {
-            font-weight: 700;
-            font-size: 18px;
-            margin-top: 10px;
-            margin-bottom: 15px;
-            padding: 12px;
-            background: #f0f8f3;
-            border-radius: 6px;
-            border: 1px solid #3a7c52;
-            color: #2d5f3f;
-        }
-        
-        .quote-line.subtotal span:last-child {
-            font-size: 20px;
-            color: #3a7c52;
-        }
-        
-        .quote-separator {
-            border-top: 2px solid #e0e0e0;
-            margin: 15px 0;
-        }
-        
-        .quote-line.total {
-            font-size: 20px;
-            font-weight: 600;
-            color: #3a7c52;
-            margin-bottom: 0;
-        }
-        
-        /* Conditional display */
-        .conditional {
-            display: none;
-        }
-        
-        .conditional.show {
-            display: flex;
-        }
-        
-        /* Pricing note box */
-        .pricing-note-box {
-            background: #f0f8f3;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border-left: 4px solid #3a7c52;
-        }
-        
-        .pricing-note-box p {
-            margin: 0;
-            font-size: 14px;
-            color: #2d5f3f;
         }
         
         /* Action buttons */
@@ -764,8 +495,8 @@
     <!-- Color swatches helper -->
     <script src="/shared_components/js/dp5-helper.js"></script>
     
-    <!-- V3 Enhanced pricing implementation -->
-    <script src="/shared_components/js/cap-embroidery-pricing-v3.js"></script>
+    <!-- New simplified pricing implementation -->
+    <script src="/shared_components/js/cap-embroidery-pricing-simple.js"></script>
     
     <script>
         // Set API URL globally
