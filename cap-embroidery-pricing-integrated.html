@@ -8,11 +8,17 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
+    <!-- Universal Header CSS -->
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    
     <!-- Universal Pricing CSS -->
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-layout.css">
     <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
+    
+    <!-- Force green theme for consistency -->
+    <link rel="stylesheet" href="/shared_components/css/force-green-theme.css">
     
     <!-- Cap Embroidery specific styles -->
     <link rel="stylesheet" href="/shared_components/css/cap-embroidery-styles.css">
@@ -43,10 +49,15 @@
             background-color: #f9f9f9;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             margin: 0;
-            padding-top: 80px;
+            padding: 0;
         }
         
-        /* Hide duplicate header */
+        /* Remove padding since universal header provides it */
+        body {
+            padding-top: 0;
+        }
+        
+        /* Hide duplicate pricing header if it appears */
         .universal-pricing-header {
             display: none;
         }
@@ -641,15 +652,8 @@
 </head>
 <body class="universal-theme">
     <!-- Universal Header -->
-    <div id="universal-header-container"></div>
+    <div id="universal-header-container" data-page-type="cap-embroidery"></div>
     
-    <!-- Page Title -->
-    <div class="universal-pricing-page-title">
-        <div class="universal-page-title-content">
-            <h1 class="universal-page-title">Cap Embroidery Pricing</h1>
-            <p class="universal-page-subtitle">Professional embroidery for caps, hats, and headwear</p>
-        </div>
-    </div>
 
     <!-- Main Content -->
     <div class="universal-pricing-container">
@@ -695,19 +699,14 @@
             <!-- Right Column: Calculator -->
             <div class="universal-calculator-column">
                 <div class="universal-calculator-card">
-                    <!-- Cap Selection (if needed) -->
-                    <div id="cap-selection-container" class="cap-selection-section">
-                        <!-- Cap selection UI -->
-                    </div>
+                    <!-- Step 1: Configuration Options -->
+                    <div id="embroidery-customization-container" class="embroidery-customization-section"></div>
                     
-                    <!-- Quick Quote Calculator -->
+                    <!-- Step 2: Quick Quote Calculator -->
                     <div id="quick-quote-container"></div>
                     
-                    <!-- Pricing Grid -->
+                    <!-- Step 3: Pricing Grid -->
                     <div id="pricing-grid-container"></div>
-                    
-                    <!-- Customization Options -->
-                    <div id="embroidery-customization-container" class="embroidery-customization-section"></div>
                     
                     <!-- Call to Action -->
                     <div class="universal-action-buttons">
@@ -752,8 +751,11 @@
     <script src="/shared_components/js/utils.js"></script>
     <script src="/shared_components/js/constants.js"></script>
     
-    <!-- Visual components -->
+    <!-- Universal Header -->
+    <script src="/shared_components/js/universal-header.js"></script>
     <script src="/shared_components/js/universal-header-component.js"></script>
+    
+    <!-- Visual components -->
     <script src="/shared_components/js/universal-image-gallery.js"></script>
     <script src="/shared_components/js/universal-product-display.js"></script>
     
