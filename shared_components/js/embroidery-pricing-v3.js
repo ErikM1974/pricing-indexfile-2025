@@ -21,7 +21,7 @@
     let backLogoEnabled = false;
     let leftLogoEnabled = false;
     let rightLogoEnabled = false;
-    let currentQuantity = 25; // Default to 25 to match user's example
+    let currentQuantity = 19; // Default to 19 to match user's example
     let pricingData = null;
     let frontAdjustment = 0;
     let backLogoPrice = 8.75; // 8000 stitches = $5 base + $3.75 for 3000 extra stitches
@@ -65,8 +65,21 @@
             if (window.nwcaPricingData) {
                 console.log('[EMBROIDERY-PRICING-V3] Found existing pricing data');
                 handlePricingData({ detail: window.nwcaPricingData });
+            } else {
+                // Try to extract from table directly
+                extractPricingFromTable();
+                updateQuote();
             }
         }, 1000);
+        
+        // Also try after a longer delay in case table loads slowly
+        setTimeout(() => {
+            if (Object.keys(basePrices).length === 0) {
+                console.log('[EMBROIDERY-PRICING-V3] No pricing data yet, trying to extract from table');
+                extractPricingFromTable();
+                updateQuote();
+            }
+        }, 2000);
         
         // Observe pricing table for changes
         observePricingTable();
@@ -650,43 +663,85 @@
     
     // Extract pricing from table
     function extractPricingFromTable() {
-        const table = document.querySelector('.pricing-grid table, #pricing-grid-container table');
-        if (!table) return;
+        // Try multiple selectors to find the pricing table
+        const table = document.querySelector('.pricing-grid table, #pricing-grid-container table, .universal-pricing-grid table');
+        if (!table) {
+            console.log('[EMBROIDERY-PRICING-V3] No pricing table found');
+            return;
+        }
         
         const tbody = table.querySelector('tbody');
-        if (!tbody) return;
+        if (!tbody) {
+            console.log('[EMBROIDERY-PRICING-V3] No tbody found in pricing table');
+            return;
+        }
         
-        // Get headers (sizes)
-        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim()).filter(h => h);
+        // Get headers (sizes) - skip the first column which is quantity
+        const headerRow = table.querySelector('thead tr');
+        if (!headerRow) {
+            console.log('[EMBROIDERY-PRICING-V3] No header row found');
+            return;
+        }
+        
+        const headers = [];
+        const headerCells = headerRow.querySelectorAll('th');
+        headerCells.forEach((cell, index) => {
+            if (index > 0) { // Skip first column (Quantity)
+                headers.push(cell.textContent.trim());
+            }
+        });
+        
+        console.log('[EMBROIDERY-PRICING-V3] Found headers:', headers);
         
         // Find the tier for current quantity
         const rows = tbody.querySelectorAll('tr');
-        for (const row of rows) {
-            const cells = row.querySelectorAll('td');
-            if (cells.length < 2) continue;
-            
-            const tierText = cells[0].textContent.trim();
-            const rangeMatch = tierText.match(/(\d+)(?:-(\d+)|(\+))?/);
-            if (rangeMatch) {
-                const min = parseInt(rangeMatch[1]);
-                const max = rangeMatch[2] ? parseInt(rangeMatch[2]) : (rangeMatch[3] ? 99999 : min);
-                
-                if (currentQuantity >= min && currentQuantity <= max) {
-                    // This is our tier
-                    for (let i = 1; i < cells.length && i < headers.length; i++) {
-                        const size = headers[i];
-                        const priceText = cells[i].textContent.trim();
-                        const price = parseFloat(priceText.replace(/[$,]/g, ''));
-                        if (!isNaN(price)) {
-                            basePrices[size] = price;
-                        }
+        let tierFound = false;
+        
+        // If quantity is less than 24, use the first tier (24-47)
+        if (currentQuantity < 24) {
+            const firstRow = rows[0];
+            if (firstRow) {
+                const cells = firstRow.querySelectorAll('td');
+                for (let i = 1; i < cells.length && i - 1 < headers.length; i++) {
+                    const size = headers[i - 1];
+                    const priceText = cells[i].textContent.trim();
+                    const price = parseFloat(priceText.replace(/[$,]/g, ''));
+                    if (!isNaN(price)) {
+                        basePrices[size] = price;
+                        tierFound = true;
                     }
-                    break;
+                }
+            }
+        } else {
+            // Normal tier finding for quantities >= 24
+            for (const row of rows) {
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 2) continue;
+                
+                const tierText = cells[0].textContent.trim();
+                const rangeMatch = tierText.match(/(\d+)(?:-(\d+)|(\+))?/);
+                if (rangeMatch) {
+                    const min = parseInt(rangeMatch[1]);
+                    const max = rangeMatch[2] ? parseInt(rangeMatch[2]) : (rangeMatch[3] ? 99999 : min);
+                    
+                    if (currentQuantity >= min && currentQuantity <= max) {
+                        // This is our tier
+                        for (let i = 1; i < cells.length && i - 1 < headers.length; i++) {
+                            const size = headers[i - 1];
+                            const priceText = cells[i].textContent.trim();
+                            const price = parseFloat(priceText.replace(/[$,]/g, ''));
+                            if (!isNaN(price)) {
+                                basePrices[size] = price;
+                                tierFound = true;
+                            }
+                        }
+                        break;
+                    }
                 }
             }
         }
         
-        console.log('[EMBROIDERY-PRICING-V3] Extracted prices from table:', basePrices);
+        console.log('[EMBROIDERY-PRICING-V3] Extracted prices from table:', basePrices, 'Tier found:', tierFound);
     }
     
     // Observe pricing table for updates
