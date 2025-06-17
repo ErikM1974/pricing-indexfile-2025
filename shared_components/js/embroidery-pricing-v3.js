@@ -21,7 +21,7 @@
     let backLogoEnabled = false;
     let leftLogoEnabled = false;
     let rightLogoEnabled = false;
-    let currentQuantity = MIN_QUANTITY;
+    let currentQuantity = 25; // Default to 25 to match user's example
     let pricingData = null;
     let frontAdjustment = 0;
     let backLogoPrice = LOGO_BASE_PRICE;
@@ -52,6 +52,17 @@
         
         // Update initial quote
         updateQuote();
+        
+        // Try to get existing pricing data if available
+        setTimeout(() => {
+            if (window.nwcaPricingData) {
+                console.log('[EMBROIDERY-PRICING-V3] Found existing pricing data');
+                handlePricingData({ detail: window.nwcaPricingData });
+            }
+        }, 1000);
+        
+        // Observe pricing table for changes
+        observePricingTable();
     });
 
     // Handle pricing data
@@ -485,6 +496,11 @@
         if (elements.quantityInput) {
             elements.quantityInput.addEventListener('change', function() {
                 currentQuantity = Math.max(1, parseInt(this.value) || 1);
+                
+                // Re-extract pricing for new quantity tier
+                basePrices = {};
+                extractPricingFromTable();
+                
                 updateQuote();
                 
                 // Trigger quantity changed event
@@ -581,6 +597,12 @@
         let baseUnitPrice = 0;
         if (Object.keys(basePrices).length > 0) {
             baseUnitPrice = Math.min(...Object.values(basePrices));
+        } else {
+            // Try to extract from pricing table if no data yet
+            extractPricingFromTable();
+            if (Object.keys(basePrices).length > 0) {
+                baseUnitPrice = Math.min(...Object.values(basePrices));
+            }
         }
         
         // Calculate adjustments
@@ -617,6 +639,69 @@
                 totalPrice: orderTotal
             }
         }));
+    }
+    
+    // Extract pricing from table
+    function extractPricingFromTable() {
+        const table = document.querySelector('.pricing-grid table, #pricing-grid-container table');
+        if (!table) return;
+        
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+        
+        // Get headers (sizes)
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim()).filter(h => h);
+        
+        // Find the tier for current quantity
+        const rows = tbody.querySelectorAll('tr');
+        for (const row of rows) {
+            const cells = row.querySelectorAll('td');
+            if (cells.length < 2) continue;
+            
+            const tierText = cells[0].textContent.trim();
+            const rangeMatch = tierText.match(/(\d+)(?:-(\d+)|(\+))?/);
+            if (rangeMatch) {
+                const min = parseInt(rangeMatch[1]);
+                const max = rangeMatch[2] ? parseInt(rangeMatch[2]) : (rangeMatch[3] ? 99999 : min);
+                
+                if (currentQuantity >= min && currentQuantity <= max) {
+                    // This is our tier
+                    for (let i = 1; i < cells.length && i < headers.length; i++) {
+                        const size = headers[i];
+                        const priceText = cells[i].textContent.trim();
+                        const price = parseFloat(priceText.replace(/[$,]/g, ''));
+                        if (!isNaN(price)) {
+                            basePrices[size] = price;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        
+        console.log('[EMBROIDERY-PRICING-V3] Extracted prices from table:', basePrices);
+    }
+    
+    // Observe pricing table for updates
+    function observePricingTable() {
+        const container = document.getElementById('pricing-grid-container');
+        if (!container) return;
+        
+        const observer = new MutationObserver((mutations) => {
+            // Check if table was added or updated
+            const table = container.querySelector('table');
+            if (table && table.querySelector('tbody tr')) {
+                console.log('[EMBROIDERY-PRICING-V3] Pricing table updated, extracting data');
+                extractPricingFromTable();
+                updateQuote();
+            }
+        });
+        
+        observer.observe(container, { 
+            childList: true, 
+            subtree: true,
+            attributes: true
+        });
     }
 
     // Update quote display
