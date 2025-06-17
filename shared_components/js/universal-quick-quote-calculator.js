@@ -18,6 +18,7 @@ class UniversalQuickQuoteCalculator {
             ltmFee: config.ltmFee || 50,
             showAdditionalLogos: config.showAdditionalLogos !== false,
             showPrimaryStitchCount: config.showPrimaryStitchCount !== false,
+            showQuickSelect: config.showQuickSelect !== false,
             pricePerThousandStitches: config.pricePerThousandStitches || 1.25,
             ...config
         };
@@ -184,6 +185,7 @@ class UniversalQuickQuoteCalculator {
                     <span id="ltm-warning-text">Orders under ${this.config.ltmThreshold} ${this.config.unitLabel} include a $${this.config.ltmFee} setup fee</span>
                 </div>
                 
+                ${this.config.showQuickSelect ? `
                 <!-- Quick Select -->
                 <div class="quick-select">
                     <span class="quick-select-label">Quick select:</span>
@@ -205,6 +207,7 @@ class UniversalQuickQuoteCalculator {
                         `}
                     </div>
                 </div>
+                ` : ''}
             </div>
         `;
     }
@@ -233,10 +236,12 @@ class UniversalQuickQuoteCalculator {
         this.elements.increaseBtn.addEventListener('click', () => this.updateQuantity(1));
         this.elements.quantityInput.addEventListener('change', () => this.handleQuantityChange());
 
-        // Quick select buttons
-        this.elements.quickSelectBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => this.setQuantity(parseInt(e.target.dataset.quantity)));
-        });
+        // Quick select buttons (only if they exist)
+        if (this.elements.quickSelectBtns && this.elements.quickSelectBtns.length > 0) {
+            this.elements.quickSelectBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => this.setQuantity(parseInt(e.target.dataset.quantity)));
+            });
+        }
         
         // Location selector (for DTG)
         if (this.elements.locationSelect) {
