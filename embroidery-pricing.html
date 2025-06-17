@@ -973,6 +973,295 @@
             }
         }
         
+        /* Step sections for V3 layout */
+        .step-section {
+            padding: 25px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .step-section:last-child {
+            border-bottom: none;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .step-number {
+            background: #3a7c52;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Control groups */
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .control-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        /* Slider enhancements */
+        .slider-container {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 6px;
+            position: relative;
+        }
+        
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .price-display {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .price-display.positive { color: #d32f2f; }
+        .price-display.negative { color: #2e7d32; }
+        .price-display.neutral { color: #666; }
+        
+        .slider-wrapper {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3a7c52;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3a7c52;
+            cursor: pointer;
+        }
+        
+        /* Slider tooltip */
+        .slider-tooltip {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .slider-tooltip.dual-line {
+            top: -50px;
+            padding: 4px 10px;
+            line-height: 1.3;
+        }
+        
+        .slider-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: #333;
+        }
+        
+        .slider-wrapper:hover .slider-tooltip,
+        .slider:active ~ .slider-tooltip {
+            opacity: 1;
+        }
+        
+        /* Checkbox styling */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Additional logos section */
+        .additional-logos {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .expand-link {
+            color: #3a7c52;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        
+        .expand-link:hover {
+            text-decoration: underline;
+        }
+        
+        .expand-link i {
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+        
+        .additional-logo-options {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .additional-logo-options.expanded {
+            max-height: 1000px;
+        }
+        
+        .pricing-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Quote box styles */
+        .quote-box {
+            background: #f8f8f8;
+            padding: 20px;
+            border-radius: 6px;
+        }
+        
+        .quote-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 15px;
+        }
+        
+        .quote-line.indent {
+            padding-left: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .quote-line.conditional {
+            display: none;
+        }
+        
+        .quote-line.conditional.show {
+            display: flex;
+        }
+        
+        .quote-line.subtotal {
+            border-top: 1px solid #ddd;
+            margin-top: 10px;
+            padding-top: 15px;
+            font-weight: 600;
+        }
+        
+        .quote-line.total {
+            font-size: 18px;
+            font-weight: 700;
+            color: #3a7c52;
+            margin-top: 10px;
+        }
+        
+        .quote-separator {
+            height: 1px;
+            background: #ddd;
+            margin: 15px 0;
+        }
+        
+        .loading-price {
+            color: #999;
+            font-style: italic;
+        }
+        
+        /* Quantity input styling */
+        .quantity-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        
+        .quantity-input:focus {
+            outline: none;
+            border-color: #3a7c52;
+            box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+        }
+        
     </style>
 </head>
 <body class="universal-theme">
@@ -1124,9 +1413,10 @@
     <script src="/shared_components/js/pricing-pages.js"></script>
     <script src="/shared_components/js/pricing-matrix-capture.js"></script>
     <script src="/shared_components/js/pricing-matrix-api.js"></script>
-    <script src="/shared_components/js/universal-quick-quote-calculator.js"></script>
-    <script src="/shared_components/js/embroidery-customization-options.js"></script>
     <script src="/shared_components/js/embroidery-enhanced-loading.js"></script>
+    
+    <!-- V3 Enhanced pricing implementation -->
+    <script src="/shared_components/js/embroidery-pricing-v3.js"></script>
     
     <script>
         // Set API URL globally
@@ -1184,20 +1474,6 @@
                 mobileColorLimit: 8,
                 sticky: false
             });
-            
-            // Initialize Quick Quote Calculator
-            const quickQuote = new UniversalQuickQuoteCalculator({
-                pageType: 'embroidery',
-                unitLabel: 'items',
-                defaultQuantity: 24,
-                includedStitches: 8000,
-                showPrimaryStitchCount: true,
-                showAdditionalLogos: true,
-                showQuickSelect: false
-            });
-            
-            // Initialize Customization Options
-            const customizationOptions = new EmbroideryCustomizationOptions(quickQuote);
             
             // Initialize Universal Pricing Grid
             const pricingGrid = new UniversalPricingGrid({
