@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Location Selector - With Real Image</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        /* Location Selector Grid */
+        .location-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        /* Location Card Styles */
+        .location-card {
+            position: relative;
+            cursor: pointer;
+            display: block;
+        }
+        
+        .location-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .card-content {
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: 100%;
+        }
+        
+        /* Hover effect */
+        .location-card:hover .card-content {
+            border-color: #3a7c52;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(58, 124, 82, 0.15);
+        }
+        
+        /* Selected state */
+        .location-card input[type="radio"]:checked + .card-content {
+            border-color: #3a7c52;
+            background: #f0f8f0;
+            box-shadow: 0 0 0 4px rgba(58, 124, 82, 0.15);
+        }
+        
+        /* Checkmark for selected state */
+        .location-card input[type="radio"]:checked + .card-content::before {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            background: #3a7c52;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Image container */
+        .shirt-image-container {
+            width: 100%;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f8f8;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Actual image styling */
+        .shirt-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        /* Placeholder styling for non-image cards */
+        .shirt-placeholder {
+            width: 100px;
+            height: 120px;
+            background: #e0e0e0;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+        }
+        
+        .shirt-placeholder::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 20px;
+            border-radius: 50%;
+            border: 4px solid #e0e0e0;
+            border-bottom: none;
+            background: white;
+        }
+        
+        /* Print area indicators */
+        .print-area {
+            position: absolute;
+            background: rgba(58, 124, 82, 0.6);
+            border: 2px solid #3a7c52;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .print-area.left-chest {
+            width: 25px;
+            height: 25px;
+            top: 30px;
+            left: 20px;
+        }
+        
+        .print-area.full-front {
+            width: 60px;
+            height: 70px;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .print-area.full-back {
+            width: 60px;
+            height: 70px;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(58, 124, 82, 0.4);
+            border-style: dashed;
+        }
+        
+        .print-area.jumbo {
+            width: 80px;
+            height: 90px;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(230, 126, 34, 0.6);
+            border-color: #e67e22;
+        }
+        
+        .location-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .location-size {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        /* Combo indicator */
+        .combo-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #ff9800;
+            color: white;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            z-index: 1;
+        }
+        
+        /* Selected location display */
+        .selected-display {
+            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e9 100%);
+            border: 2px solid #3a7c52;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .selected-display.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .selected-display h3 {
+            color: #3a7c52;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .selection-details {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .detail-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Notice box */
+        .notice-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .notice-box h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .location-selector-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .card-content {
+                padding: 12px;
+            }
+            
+            .shirt-image-container {
+                height: 140px;
+            }
+            
+            .selection-details {
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .location-selector-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Step 1: Select Print Location</h1>
+        <p class="subtitle">Choose where you'd like your design printed on the garment</p>
+        
+        <div class="notice-box">
+            <h4>
+                <span>💡</span>
+                Visual Example Implementation
+            </h4>
+            <p>This mockup shows how actual product images can be integrated. The "Full Front" option uses a real image from your CDN, while others show placeholder examples.</p>
+        </div>
+        
+        <!-- Location Cards Grid -->
+        <div class="location-selector-grid">
+            <label class="location-card">
+                <input type="radio" name="location" value="LC">
+                <div class="card-content">
+                    <div class="shirt-image-container">
+                        <div class="shirt-placeholder">
+                            <div class="print-area left-chest"></div>
+                        </div>
+                    </div>
+                    <div class="location-name">Left Chest</div>
+                    <div class="location-size">4" × 4"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="FF" checked>
+                <div class="card-content">
+                    <div class="shirt-image-container">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/mockup-of-a-man-showing-his-sublimated-tee-in-front-of-the-bars-at-a-gym-33056.png?ver=1" 
+                             alt="Full Front Print" 
+                             class="shirt-image">
+                    </div>
+                    <div class="location-name">Full Front</div>
+                    <div class="location-size">12" × 16"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="FB">
+                <div class="card-content">
+                    <div class="shirt-image-container">
+                        <div class="shirt-placeholder">
+                            <div class="print-area full-back"></div>
+                        </div>
+                    </div>
+                    <div class="location-name">Full Back</div>
+                    <div class="location-size">12" × 16"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="JF">
+                <div class="card-content">
+                    <div class="shirt-image-container">
+                        <div class="shirt-placeholder">
+                            <div class="print-area jumbo"></div>
+                        </div>
+                    </div>
+                    <div class="location-name">Jumbo Front</div>
+                    <div class="location-size">16" × 20"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="JB">
+                <div class="card-content">
+                    <div class="shirt-image-container">
+                        <div class="shirt-placeholder">
+                            <div class="print-area jumbo" style="background: rgba(230, 126, 34, 0.4); border-style: dashed;"></div>
+                        </div>
+                    </div>
+                    <div class="location-name">Jumbo Back</div>
+                    <div class="location-size">16" × 20"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="LC_FB">
+                <div class="card-content">
+                    <span class="combo-badge">COMBO</span>
+                    <div class="shirt-image-container">
+                        <div style="display: flex; gap: 10px; align-items: center; justify-content: center;">
+                            <div class="shirt-placeholder" style="width: 50px; height: 60px;">
+                                <div class="print-area left-chest" style="width: 12px; height: 12px; top: 15px; left: 10px;"></div>
+                            </div>
+                            <span style="color: #666; font-size: 20px;">+</span>
+                            <div class="shirt-placeholder" style="width: 50px; height: 60px;">
+                                <div class="print-area full-back" style="width: 30px; height: 35px; top: 15px; left: 10px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="location-name">Left Chest + Full Back</div>
+                    <div class="location-size">4"×4" + 12"×16"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="FF_FB">
+                <div class="card-content">
+                    <span class="combo-badge">COMBO</span>
+                    <div class="shirt-image-container">
+                        <div style="display: flex; gap: 10px; align-items: center; justify-content: center;">
+                            <div class="shirt-placeholder" style="width: 50px; height: 60px;">
+                                <div class="print-area full-front" style="width: 30px; height: 35px; top: 15px; left: 10px;"></div>
+                            </div>
+                            <span style="color: #666; font-size: 20px;">+</span>
+                            <div class="shirt-placeholder" style="width: 50px; height: 60px;">
+                                <div class="print-area full-back" style="width: 30px; height: 35px; top: 15px; left: 10px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="location-name">Full Front + Full Back</div>
+                    <div class="location-size">12"×16" + 12"×16"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="JF_JB">
+                <div class="card-content">
+                    <span class="combo-badge">MAX COVERAGE</span>
+                    <div class="shirt-image-container">
+                        <div style="display: flex; gap: 10px; align-items: center; justify-content: center;">
+                            <div class="shirt-placeholder" style="width: 50px; height: 60px;">
+                                <div class="print-area jumbo" style="width: 40px; height: 45px; top: 10px; left: 5px;"></div>
+                            </div>
+                            <span style="color: #e67e22; font-size: 20px; font-weight: bold;">+</span>
+                            <div class="shirt-placeholder" style="width: 50px; height: 60px;">
+                                <div class="print-area jumbo" style="width: 40px; height: 45px; top: 10px; left: 5px; background: rgba(230, 126, 34, 0.4); border-style: dashed;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="location-name">Jumbo Front + Back</div>
+                    <div class="location-size">16"×20" + 16"×20"</div>
+                </div>
+            </label>
+        </div>
+        
+        <!-- Selected Location Display -->
+        <div class="selected-display active">
+            <h3>
+                <span style="font-size: 24px;">✓</span>
+                Selected Print Location
+            </h3>
+            <div class="selection-details">
+                <div class="detail-item">
+                    <span class="detail-label">Location</span>
+                    <span class="detail-value" id="selected-location">Full Front</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Maximum Print Size</span>
+                    <span class="detail-value" id="selected-size">12" × 16"</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Coverage Type</span>
+                    <span class="detail-value" id="selected-coverage">Large Print</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Benefits of this approach -->
+        <div style="margin-top: 40px; padding: 25px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3a7c52;">
+            <h4 style="margin-bottom: 15px; color: #3a7c52;">Why This Design Works:</h4>
+            <ul style="margin-left: 20px; line-height: 2; color: #333;">
+                <li><strong>Visual Recognition:</strong> The Full Front option shows an actual printed shirt - customers instantly understand what they're selecting</li>
+                <li><strong>Size Context:</strong> Print dimensions (12" × 16") are always visible, preventing size confusion</li>
+                <li><strong>Clear Selection:</strong> Green highlight + checkmark makes the selected option obvious</li>
+                <li><strong>Mobile Friendly:</strong> Large touch targets work perfectly on phones</li>
+                <li><strong>Combo Options:</strong> Visual representation of front + back combinations</li>
+                <li><strong>No Cognitive Load:</strong> Everything is visible - no dropdowns to click through</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Update selected display when radio changes
+        const radios = document.querySelectorAll('input[name="location"]');
+        const selectedLocation = document.getElementById('selected-location');
+        const selectedSize = document.getElementById('selected-size');
+        const selectedCoverage = document.getElementById('selected-coverage');
+        const selectedDisplay = document.querySelector('.selected-display');
+        
+        const locationData = {
+            'LC': { name: 'Left Chest', size: '4" × 4"', coverage: 'Small Print' },
+            'FF': { name: 'Full Front', size: '12" × 16"', coverage: 'Large Print' },
+            'FB': { name: 'Full Back', size: '12" × 16"', coverage: 'Large Print' },
+            'JF': { name: 'Jumbo Front', size: '16" × 20"', coverage: 'Extra Large Print' },
+            'JB': { name: 'Jumbo Back', size: '16" × 20"', coverage: 'Extra Large Print' },
+            'LC_FB': { name: 'Left Chest + Full Back', size: '4"×4" + 12"×16"', coverage: 'Front & Back Combo' },
+            'FF_FB': { name: 'Full Front + Full Back', size: '12"×16" + 12"×16"', coverage: 'Double Large Print' },
+            'JF_JB': { name: 'Jumbo Front + Back', size: '16"×20" + 16"×20"', coverage: 'Maximum Coverage' }
+        };
+        
+        radios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const data = locationData[e.target.value];
+                if (data) {
+                    selectedLocation.textContent = data.name;
+                    selectedSize.textContent = data.size;
+                    selectedCoverage.textContent = data.coverage;
+                    
+                    // Animate the selected display
+                    selectedDisplay.classList.remove('active');
+                    setTimeout(() => {
+                        selectedDisplay.classList.add('active');
+                    }, 100);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

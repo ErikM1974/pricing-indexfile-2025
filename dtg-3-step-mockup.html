@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Pricing - 3-Step Process Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Page Header */
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .page-title {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .page-subtitle {
+            font-size: 18px;
+            color: #666;
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #e0e0e0;
+            color: #999;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .progress-step.active .step-number {
+            background: #3a7c52;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(58, 124, 82, 0.2);
+        }
+        
+        .progress-step.completed .step-number {
+            background: #3a7c52;
+            color: white;
+        }
+        
+        .progress-step.completed .step-number::after {
+            content: '✓';
+            position: absolute;
+            font-size: 14px;
+        }
+        
+        .step-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .progress-step.active .step-label {
+            color: #3a7c52;
+            font-weight: 600;
+        }
+        
+        /* Progress Line */
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .progress-line-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: #3a7c52;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        /* Step Sections */
+        .step-section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .step-section.inactive {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .step-number-large {
+            width: 48px;
+            height: 48px;
+            background: #3a7c52;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .step-title {
+            font-size: 28px;
+            color: #333;
+        }
+        
+        /* Step 1: Location Selector Grid */
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .location-card {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .location-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .location-content {
+            border: 3px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 0;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .location-card:hover .location-content {
+            border-color: #3a7c52;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(58, 124, 82, 0.15);
+        }
+        
+        .location-card input[type="radio"]:checked + .location-content {
+            border-color: #3a7c52;
+            background: #f8fcf9;
+        }
+        
+        .location-card input[type="radio"]:checked + .location-content::before {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            background: #3a7c52;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 10;
+        }
+        
+        .location-image {
+            width: 100%;
+            height: 160px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .location-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .location-info {
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .location-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .location-size {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .combo-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #ff9800;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 5;
+        }
+        
+        /* Step 2: Quantity Configuration */
+        .quantity-section {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .quantity-input-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .quantity-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #3a7c52;
+            background: white;
+            color: #3a7c52;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quantity-btn:hover {
+            background: #3a7c52;
+            color: white;
+        }
+        
+        .quantity-input {
+            width: 120px;
+            height: 60px;
+            text-align: center;
+            font-size: 28px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .quantity-input:focus {
+            outline: none;
+            border-color: #3a7c52;
+        }
+        
+        .quantity-presets {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        
+        .preset-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .preset-btn:hover {
+            border-color: #3a7c52;
+            background: #f0f8f0;
+        }
+        
+        /* Instant Quote Box */
+        .instant-quote {
+            background: #f8fcf9;
+            border: 2px solid #3a7c52;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .quote-header {
+            font-size: 20px;
+            font-weight: 600;
+            color: #3a7c52;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .quote-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .quote-line:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 18px;
+            color: #3a7c52;
+            padding-top: 15px;
+        }
+        
+        .ltm-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            color: #856404;
+        }
+        
+        /* Step 3: Pricing Grid */
+        .pricing-grid-wrapper {
+            overflow-x: auto;
+        }
+        
+        .pricing-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .pricing-table th {
+            background: #3a7c52;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .pricing-table th:first-child {
+            text-align: left;
+            background: #2d5f3f;
+        }
+        
+        .pricing-table td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+            border-right: 1px solid #f0f0f0;
+        }
+        
+        .pricing-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            background: #fafafa;
+        }
+        
+        .pricing-table tr:hover td {
+            background: #f0f8f0;
+        }
+        
+        .pricing-table tr.current-tier td {
+            background: #e8f5e9;
+            font-weight: 600;
+        }
+        
+        .tier-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            font-size: 11px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
+        
+        .tier-badge.popular {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .tier-badge.best-value {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .cta-title {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        .cta-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-btn {
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-btn.primary {
+            background: #3a7c52;
+            color: white;
+            border: 2px solid #3a7c52;
+        }
+        
+        .cta-btn.primary:hover {
+            background: #2d5f3f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(58, 124, 82, 0.3);
+        }
+        
+        .cta-btn.secondary {
+            background: white;
+            color: #3a7c52;
+            border: 2px solid #3a7c52;
+        }
+        
+        .cta-btn.secondary:hover {
+            background: #f0f8f0;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .step-section {
+                padding: 20px;
+            }
+            
+            .location-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .progress-steps {
+                font-size: 12px;
+            }
+            
+            .step-label {
+                font-size: 12px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+            
+            .cta-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">DTG Printing Pricing</h1>
+            <p class="page-subtitle">Get instant pricing for your Direct-to-Garment printing project</p>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-steps">
+                <div class="progress-line">
+                    <div class="progress-line-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Select Location</div>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Enter Quantity</div>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">View Pricing</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 1: Select Print Location -->
+        <div class="step-section" id="step-1">
+            <div class="step-header">
+                <div class="step-number-large">1</div>
+                <h2 class="step-title">Select Your Print Location</h2>
+            </div>
+            
+            <div class="location-grid">
+                <!-- Left Chest -->
+                <label class="location-card">
+                    <input type="radio" name="location" value="LC" checked>
+                    <div class="location-content">
+                        <div class="location-image">
+                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-left-chest-png.png?ver=1" alt="Left Chest">
+                        </div>
+                        <div class="location-info">
+                            <div class="location-name">Left Chest</div>
+                            <div class="location-size">4" × 4"</div>
+                        </div>
+                    </div>
+                </label>
+                
+                <!-- Full Front -->
+                <label class="location-card">
+                    <input type="radio" name="location" value="FF">
+                    <div class="location-content">
+                        <div class="location-image">
+                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-full-front.png.png?ver=1" alt="Full Front">
+                        </div>
+                        <div class="location-info">
+                            <div class="location-name">Full Front</div>
+                            <div class="location-size">12" × 16"</div>
+                        </div>
+                    </div>
+                </label>
+                
+                <!-- Full Back -->
+                <label class="location-card">
+                    <input type="radio" name="location" value="FB">
+                    <div class="location-content">
+                        <div class="location-image">
+                            <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9037959" alt="Full Back">
+                        </div>
+                        <div class="location-info">
+                            <div class="location-name">Full Back</div>
+                            <div class="location-size">12" × 16"</div>
+                        </div>
+                    </div>
+                </label>
+                
+                <!-- Left Chest + Full Back -->
+                <label class="location-card">
+                    <input type="radio" name="location" value="LC_FB">
+                    <div class="location-content">
+                        <span class="combo-badge">COMBO</span>
+                        <div class="location-image">
+                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-combo-lc-fb.png?ver=1" alt="LC + FB">
+                        </div>
+                        <div class="location-info">
+                            <div class="location-name">Left Chest + Full Back</div>
+                            <div class="location-size">4"×4" + 12"×16"</div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Step 2: Enter Quantity -->
+        <div class="step-section inactive" id="step-2">
+            <div class="step-header">
+                <div class="step-number-large">2</div>
+                <h2 class="step-title">Enter Your Quantity</h2>
+            </div>
+            
+            <div class="quantity-section">
+                <div class="quantity-input-wrapper">
+                    <button class="quantity-btn" onclick="decreaseQty()">−</button>
+                    <input type="number" class="quantity-input" id="quantity" value="24" min="1">
+                    <button class="quantity-btn" onclick="increaseQty()">+</button>
+                </div>
+                
+                <div class="quantity-presets">
+                    <button class="preset-btn" onclick="setQty(12)">1 Dozen</button>
+                    <button class="preset-btn" onclick="setQty(24)">2 Dozen</button>
+                    <button class="preset-btn" onclick="setQty(36)">3 Dozen</button>
+                    <button class="preset-btn" onclick="setQty(48)">4 Dozen</button>
+                    <button class="preset-btn" onclick="setQty(72)">6 Dozen</button>
+                    <button class="preset-btn" onclick="setQty(144)">12 Dozen</button>
+                </div>
+                
+                <!-- Instant Quote -->
+                <div class="instant-quote">
+                    <div class="quote-header">Your Instant Quote</div>
+                    <div class="quote-line">
+                        <span>Base Price (Left Chest)</span>
+                        <span>$28.00</span>
+                    </div>
+                    <div class="quote-line">
+                        <span>Quantity: 24 shirts</span>
+                        <span>× 24</span>
+                    </div>
+                    <div class="quote-line">
+                        <span><strong>Total Order Price</strong></span>
+                        <span><strong>$672.00</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 3: Complete Pricing Grid -->
+        <div class="step-section inactive" id="step-3">
+            <div class="step-header">
+                <div class="step-number-large">3</div>
+                <h2 class="step-title">Complete Price-Per-Unit Reference Grid</h2>
+            </div>
+            
+            <div class="pricing-grid-wrapper">
+                <table class="pricing-table">
+                    <thead>
+                        <tr>
+                            <th>QUANTITY</th>
+                            <th>S</th>
+                            <th>M</th>
+                            <th>L</th>
+                            <th>XL</th>
+                            <th>2XL</th>
+                            <th>3XL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1-11 <span class="tier-badge popular">POPULAR</span></td>
+                            <td>$35</td>
+                            <td>$35</td>
+                            <td>$35</td>
+                            <td>$35</td>
+                            <td>$37</td>
+                            <td>$38</td>
+                        </tr>
+                        <tr>
+                            <td>12-23</td>
+                            <td>$32</td>
+                            <td>$32</td>
+                            <td>$32</td>
+                            <td>$32</td>
+                            <td>$34</td>
+                            <td>$35</td>
+                        </tr>
+                        <tr class="current-tier">
+                            <td>24-47</td>
+                            <td>$28</td>
+                            <td>$28</td>
+                            <td>$28</td>
+                            <td>$28</td>
+                            <td>$30</td>
+                            <td>$31</td>
+                        </tr>
+                        <tr>
+                            <td>48-71</td>
+                            <td>$26</td>
+                            <td>$26</td>
+                            <td>$26</td>
+                            <td>$26</td>
+                            <td>$28</td>
+                            <td>$29</td>
+                        </tr>
+                        <tr>
+                            <td>72+ <span class="tier-badge best-value">BEST VALUE</span></td>
+                            <td>$24</td>
+                            <td>$24</td>
+                            <td>$24</td>
+                            <td>$24</td>
+                            <td>$26</td>
+                            <td>$27</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="ltm-warning">
+                <strong>Note:</strong> Orders under 24 shirts include a $50 setup fee
+            </div>
+        </div>
+        
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2 class="cta-title">Ready to Order?</h2>
+            <p class="cta-subtitle">Contact us for a custom quote with your exact specifications</p>
+            <div class="cta-buttons">
+                <a href="tel:253-922-5793" class="cta-btn primary">
+                    <span>📞</span>
+                    Call: 253-922-5793
+                </a>
+                <a href="mailto:sales@nwcustomapparel.com?subject=DTG Quote Request" class="cta-btn secondary">
+                    <span>✉️</span>
+                    Email Quote Request
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Mock functionality for demo
+        let currentStep = 1;
+        let quantity = 24;
+        
+        // Progress bar animation
+        function updateProgress(step) {
+            const progressFill = document.querySelector('.progress-line-fill');
+            const steps = document.querySelectorAll('.progress-step');
+            
+            // Update progress bar
+            progressFill.style.width = ((step - 1) / 2 * 100) + '%';
+            
+            // Update step indicators
+            steps.forEach((s, index) => {
+                if (index < step - 1) {
+                    s.classList.add('completed');
+                    s.classList.remove('active');
+                } else if (index === step - 1) {
+                    s.classList.add('active');
+                    s.classList.remove('completed');
+                } else {
+                    s.classList.remove('active', 'completed');
+                }
+            });
+            
+            // Update section visibility
+            document.querySelectorAll('.step-section').forEach((section, index) => {
+                if (index === step - 1) {
+                    section.classList.remove('inactive');
+                } else {
+                    section.classList.add('inactive');
+                }
+            });
+        }
+        
+        // Location selection
+        document.querySelectorAll('input[name="location"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                setTimeout(() => {
+                    currentStep = 2;
+                    updateProgress(2);
+                }, 500);
+            });
+        });
+        
+        // Quantity functions
+        function decreaseQty() {
+            const input = document.getElementById('quantity');
+            if (input.value > 1) {
+                input.value = parseInt(input.value) - 1;
+                updateQuote();
+            }
+        }
+        
+        function increaseQty() {
+            const input = document.getElementById('quantity');
+            input.value = parseInt(input.value) + 1;
+            updateQuote();
+        }
+        
+        function setQty(qty) {
+            document.getElementById('quantity').value = qty;
+            updateQuote();
+        }
+        
+        function updateQuote() {
+            quantity = document.getElementById('quantity').value;
+            // In real implementation, this would recalculate pricing
+            setTimeout(() => {
+                currentStep = 3;
+                updateProgress(3);
+            }, 500);
+        }
+        
+        // Quantity input change
+        document.getElementById('quantity').addEventListener('change', updateQuote);
+    </script>
+</body>
+</html>

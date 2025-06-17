@@ -42,11 +42,14 @@
             
             <!-- Right Column: Interactive Elements -->
             <div class="product-interactive-column">
-                <!-- Quick Quote Calculator with integrated location selector -->
-                <div id="quick-quote-container"></div>
-                
-                <!-- Pricing Grid Container -->
-                <div id="pricing-grid-container"></div>
+                <!-- DTG v3 Visual Location Selector takes over here -->
+                <div class="pricing-content-wrapper">
+                    <!-- Quick Quote Calculator (hidden, replaced by v3) -->
+                    <div id="quick-quote-container" style="display: none;"></div>
+                    
+                    <!-- Pricing Grid Container (moved into step 3 by v3) -->
+                    <div id="pricing-grid-container" style="display: none;"></div>
+                </div>
                 
                 <!-- Call to Action -->
                 <div class="dtg-cta-section">
@@ -97,6 +100,9 @@
     
     <!-- DTG Integration Layer -->
     <script src="/shared_components/js/dtg-integration.js"></script>
+    
+    <!-- DTG v3 Visual Location Selector -->
+    <script src="/shared_components/js/dtg-pricing-v3.js"></script>
     
     <!-- Initialization Scripts -->
     <script>

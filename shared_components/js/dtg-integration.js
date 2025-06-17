@@ -64,20 +64,27 @@ class DTGIntegration {
             infoBoxContent: 'Full-color DTG printing on high-quality garments.'
         });
         
-        // Initialize Quick Quote Calculator with DTG location support
-        this.components.quickQuote = new UniversalQuickQuoteCalculator({
-            ...this.config.quickQuote,
-            pageType: 'dtg',
-            unitLabel: this.config.unitLabel,
-            ltmThreshold: this.config.pricing.ltmThreshold,
-            ltmFee: this.config.pricing.ltmFee,
-            showLocationSelector: true,
-            locations: this.config.locations,
-            defaultLocation: this.config.quickQuote.defaultLocation || 'LC',
-            onQuantityChange: (quantity) => this.handleQuantityChange(quantity),
-            onLocationChange: (location) => this.handleLocationChange(location),
-            customPricingBreakdown: this.getDTGPricingBreakdown.bind(this)
-        });
+        // Check if DTG v3 is active
+        const isV3Active = window.DTGPricingV3 || document.querySelector('.dtg-steps-container');
+        
+        if (!isV3Active) {
+            // Initialize Quick Quote Calculator with DTG location support (only if v3 not active)
+            this.components.quickQuote = new UniversalQuickQuoteCalculator({
+                ...this.config.quickQuote,
+                pageType: 'dtg',
+                unitLabel: this.config.unitLabel,
+                ltmThreshold: this.config.pricing.ltmThreshold,
+                ltmFee: this.config.pricing.ltmFee,
+                showLocationSelector: true,
+                locations: this.config.locations,
+                defaultLocation: this.config.quickQuote.defaultLocation || 'LC',
+                onQuantityChange: (quantity) => this.handleQuantityChange(quantity),
+                onLocationChange: (location) => this.handleLocationChange(location),
+                customPricingBreakdown: this.getDTGPricingBreakdown.bind(this)
+            });
+        } else {
+            console.log('[DTGIntegration] DTG v3 detected, skipping quick quote initialization');
+        }
         
         // Initialize Universal Pricing Grid
         this.components.pricingGrid = new UniversalPricingGrid({
@@ -131,6 +138,14 @@ class DTGIntegration {
         window.addEventListener('quantityChanged', (event) => {
             if (event.detail && event.detail.totalQuantity) {
                 this.components.pricingGrid.highlightActiveTier(event.detail.totalQuantity);
+            }
+        });
+        
+        // Listen for location changes from DTG v3
+        window.addEventListener('dtgLocationSelected', (event) => {
+            if (event.detail && event.detail.locationCode) {
+                console.log('[DTGIntegration] Location selected from v3:', event.detail.locationCode);
+                this.handleLocationChange(event.detail.locationCode);
             }
         });
     }
@@ -240,7 +255,7 @@ class DTGIntegration {
             pricingNote.textContent = `Prices shown are per item and include ${locationInfo.displayName || locationInfo.name} printing.`;
         }
         
-        // Update Quick Quote if it exists
+        // Update Quick Quote if it exists (not in v3 mode)
         if (this.components.quickQuote) {
             this.components.quickQuote.updatePricing();
         }
@@ -267,7 +282,7 @@ class DTGIntegration {
             setTimeout(() => this.handleLocationChange(queuedLocation), 100);
         }
         
-        // Update Quick Quote with new pricing - pass the full data structure
+        // Update Quick Quote with new pricing - pass the full data structure (if not in v3 mode)
         if (this.components.quickQuote && data) {
             console.log('[DTGIntegration] Updating Quick Quote with headers:', data.headers);
             this.components.quickQuote.updatePricingData(data);
@@ -342,9 +357,14 @@ class DTGIntegration {
     handleTierClick(tier) {
         console.log('[DTGIntegration] Tier clicked:', tier);
         
-        // Update quick quote quantity to match tier
+        // Update quick quote quantity to match tier (if not in v3 mode)
         if (this.components.quickQuote) {
             this.components.quickQuote.setQuantity(tier.min);
+        }
+        
+        // Update v3 if active
+        if (window.DTGPricingV3) {
+            window.DTGPricingV3.setQuantity(tier.min);
         }
     }
     

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Location Selector Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        /* Location Selector Grid */
+        .location-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        /* Location Card Styles */
+        .location-card {
+            position: relative;
+            cursor: pointer;
+            display: block;
+        }
+        
+        .location-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .card-content {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        /* Hover effect */
+        .location-card:hover .card-content {
+            border-color: #3a7c52;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.15);
+        }
+        
+        /* Selected state */
+        .location-card input[type="radio"]:checked + .card-content {
+            border-color: #3a7c52;
+            background: #e8f5e9;
+            box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.2);
+        }
+        
+        /* Icon styles */
+        .location-icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Simple CSS shirt shapes */
+        .shirt-icon {
+            width: 35px;
+            height: 40px;
+            background: #ddd;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .shirt-icon::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 15px;
+            border-radius: 50%;
+            border: 3px solid #ddd;
+            border-bottom: none;
+            background: white;
+        }
+        
+        /* Print area indicators */
+        .shirt-icon.left-chest::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 8px;
+            width: 8px;
+            height: 8px;
+            background: #3a7c52;
+            border-radius: 2px;
+        }
+        
+        .shirt-icon.full-front::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #3a7c52;
+            border-radius: 2px;
+        }
+        
+        .shirt-icon.full-back {
+            background: #bbb;
+        }
+        
+        .shirt-icon.full-back::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #3a7c52;
+            border-radius: 2px;
+        }
+        
+        .shirt-icon.jumbo::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 28px;
+            height: 28px;
+            background: #e67e22;
+            border-radius: 2px;
+        }
+        
+        .location-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+        
+        .location-size {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* Combo indicator */
+        .combo-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff9800;
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        /* Selected location display */
+        .selected-display {
+            background: #f8f9fa;
+            border: 2px solid #3a7c52;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .selected-display.active {
+            display: block;
+        }
+        
+        .selected-display h3 {
+            color: #3a7c52;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .selection-details {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Comparison section */
+        .comparison {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+        }
+        
+        .comparison h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .old-dropdown {
+            margin-bottom: 30px;
+        }
+        
+        .old-dropdown label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .old-dropdown select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            .location-selector-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .card-content {
+                padding: 15px;
+                min-height: 110px;
+            }
+            
+            .location-icon {
+                font-size: 28px;
+            }
+            
+            .location-name {
+                font-size: 14px;
+            }
+            
+            .location-size {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Step 1: Select Print Location</h1>
+        <p class="subtitle">Choose where you'd like your design printed</p>
+        
+        <!-- New Radio Card Design -->
+        <div class="location-selector-grid">
+            <label class="location-card">
+                <input type="radio" name="location" value="LC" checked>
+                <div class="card-content">
+                    <div class="location-icon">
+                        <div class="shirt-icon left-chest"></div>
+                    </div>
+                    <div class="location-name">Left Chest</div>
+                    <div class="location-size">4" × 4"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="FF">
+                <div class="card-content">
+                    <div class="location-icon">
+                        <div class="shirt-icon full-front"></div>
+                    </div>
+                    <div class="location-name">Full Front</div>
+                    <div class="location-size">12" × 16"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="FB">
+                <div class="card-content">
+                    <div class="location-icon">
+                        <div class="shirt-icon full-back"></div>
+                    </div>
+                    <div class="location-name">Full Back</div>
+                    <div class="location-size">12" × 16"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="JF">
+                <div class="card-content">
+                    <div class="location-icon">
+                        <div class="shirt-icon jumbo"></div>
+                    </div>
+                    <div class="location-name">Jumbo Front</div>
+                    <div class="location-size">16" × 20"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="JB">
+                <div class="card-content">
+                    <div class="location-icon">
+                        <div class="shirt-icon jumbo full-back"></div>
+                    </div>
+                    <div class="location-name">Jumbo Back</div>
+                    <div class="location-size">16" × 20"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="LC_FB">
+                <div class="card-content">
+                    <span class="combo-badge">COMBO</span>
+                    <div class="location-icon">👕➕</div>
+                    <div class="location-name">Left Chest + Full Back</div>
+                    <div class="location-size">4"×4" + 12"×16"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="FF_FB">
+                <div class="card-content">
+                    <span class="combo-badge">COMBO</span>
+                    <div class="location-icon">👕➕</div>
+                    <div class="location-name">Full Front + Full Back</div>
+                    <div class="location-size">12"×16" + 12"×16"</div>
+                </div>
+            </label>
+            
+            <label class="location-card">
+                <input type="radio" name="location" value="JF_JB">
+                <div class="card-content">
+                    <span class="combo-badge">COMBO</span>
+                    <div class="location-icon">👕➕</div>
+                    <div class="location-name">Jumbo Front + Back</div>
+                    <div class="location-size">16"×20" + 16"×20"</div>
+                </div>
+            </label>
+        </div>
+        
+        <!-- Selected Location Display -->
+        <div class="selected-display active">
+            <h3>✓ Selected Location</h3>
+            <div class="selection-details">
+                <div class="detail-item">
+                    <span class="detail-label">Location</span>
+                    <span class="detail-value" id="selected-location">Left Chest</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Print Size</span>
+                    <span class="detail-value" id="selected-size">4" × 4"</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Coverage</span>
+                    <span class="detail-value" id="selected-coverage">Standard</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison with old dropdown -->
+        <div class="comparison">
+            <h2>Compare with Current Dropdown:</h2>
+            
+            <div class="old-dropdown">
+                <label for="old-location">Current DTG Location Selector:</label>
+                <select id="old-location">
+                    <option value="">-- Choose Print Location --</option>
+                    <option value="LC">Left Chest Only</option>
+                    <option value="FF">Full Front Only</option>
+                    <option value="FB">Full Back Only</option>
+                    <option value="JF">Jumbo Front Only</option>
+                    <option value="JB">Jumbo Back Only</option>
+                    <option value="LC_FB">Left Chest + Full Back</option>
+                    <option value="FF_FB">Full Front + Full Back</option>
+                    <option value="JF_JB">Jumbo Front + Jumbo Back</option>
+                </select>
+            </div>
+            
+            <div style="background: #f0f8f0; padding: 20px; border-radius: 8px; border-left: 4px solid #3a7c52;">
+                <h4 style="margin-bottom: 10px; color: #3a7c52;">Why Radio Cards are Better:</h4>
+                <ul style="margin-left: 20px; color: #333;">
+                    <li>All options visible at once - no clicking to explore</li>
+                    <li>Visual indicators show print placement</li>
+                    <li>Size information always visible</li>
+                    <li>Large touch targets for mobile</li>
+                    <li>Clear selected state with green highlight</li>
+                    <li>Combo options clearly marked</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Update selected display when radio changes
+        const radios = document.querySelectorAll('input[name="location"]');
+        const selectedLocation = document.getElementById('selected-location');
+        const selectedSize = document.getElementById('selected-size');
+        const selectedCoverage = document.getElementById('selected-coverage');
+        
+        const locationData = {
+            'LC': { name: 'Left Chest', size: '4" × 4"', coverage: 'Standard' },
+            'FF': { name: 'Full Front', size: '12" × 16"', coverage: 'Large' },
+            'FB': { name: 'Full Back', size: '12" × 16"', coverage: 'Large' },
+            'JF': { name: 'Jumbo Front', size: '16" × 20"', coverage: 'Extra Large' },
+            'JB': { name: 'Jumbo Back', size: '16" × 20"', coverage: 'Extra Large' },
+            'LC_FB': { name: 'Left Chest + Full Back', size: '4"×4" + 12"×16"', coverage: 'Combo' },
+            'FF_FB': { name: 'Full Front + Full Back', size: '12"×16" + 12"×16"', coverage: 'Combo' },
+            'JF_JB': { name: 'Jumbo Front + Back', size: '16"×20" + 16"×20"', coverage: 'Maximum' }
+        };
+        
+        radios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const data = locationData[e.target.value];
+                if (data) {
+                    selectedLocation.textContent = data.name;
+                    selectedSize.textContent = data.size;
+                    selectedCoverage.textContent = data.coverage;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
