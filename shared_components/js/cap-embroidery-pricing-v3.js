@@ -1028,12 +1028,17 @@
             // Find and set selected color
             if (data.colors && data.colors.length > 0) {
                 const selectedColor = color ? 
-                    data.colors.find(c => c.COLOR_NAME === color) || data.colors[0] : 
+                    data.colors.find(c => 
+                        c.COLOR_NAME === color || 
+                        c.CATALOG_COLOR === color ||
+                        (c.COLOR_NAME && c.COLOR_NAME.toLowerCase().replace(/\s+/g, '') === color.toLowerCase().replace(/\s+/g, '')) ||
+                        (c.CATALOG_COLOR && c.CATALOG_COLOR.toLowerCase().replace(/\s+/g, '') === color.toLowerCase().replace(/\s+/g, ''))
+                    ) || data.colors[0] : 
                     data.colors[0];
                     
                 window.selectedColorName = selectedColor.COLOR_NAME;
                 window.selectedColorData = selectedColor;
-                window.productMainImage = selectedColor.ImageURL || '';
+                window.productMainImage = selectedColor.MAIN_IMAGE_URL || '';
                 
                 // Update product display
                 const productNameEl = document.getElementById('product-name');

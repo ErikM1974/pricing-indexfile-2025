@@ -379,9 +379,11 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         // --- Step 6: Update URL and Reload Caspio ---
         const styleNumber = window.selectedStyleNumber;
         if (history.pushState) {
-            const newUrl = `${window.location.pathname}?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(newColorName)}`;
+            // Use CATALOG_COLOR for URL to ensure consistency with product links
+            const colorForUrl = newCatalogColor || newColorName;
+            const newUrl = `${window.location.pathname}?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorForUrl)}`;
             history.pushState({ path: newUrl }, '', newUrl);
-            console.log(`[handleColorSwatchClick] URL updated to: ${newUrl}`);
+            console.log(`[handleColorSwatchClick] URL updated to: ${newUrl} (using ${colorForUrl})`);
         } else {
             console.warn("[handleColorSwatchClick] history.pushState not supported, URL not updated dynamically.");
         }

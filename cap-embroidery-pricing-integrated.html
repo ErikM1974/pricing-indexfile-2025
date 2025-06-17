@@ -1128,6 +1128,142 @@
             color: var(--primary);
         }
         
+        /* Cap Embroidery Specific Enhancements */
+        #product-display .main-image-container {
+            max-width: 500px; /* Slightly larger for caps */
+            margin: 0 auto;
+        }
+        
+        /* Horizontal color swatches on desktop */
+        @media (min-width: 1024px) {
+            #product-display .color-swatches {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                max-height: none;
+                overflow: visible;
+            }
+        }
+        
+        /* SanMar-style color swatch layout */
+        #product-display .color-swatches-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        #product-display .color-swatches {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        /* Custom scrollbar for swatches */
+        #product-display .color-swatches::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #product-display .color-swatches::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        #product-display .color-swatches::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        
+        #product-display .color-swatches::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Swatch wrapper - horizontal layout */
+        #product-display .swatch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        #product-display .swatch-wrapper:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Square swatches like SanMar */
+        #product-display .color-swatch {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        #product-display .color-swatch:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border-color: var(--primary-color);
+        }
+        
+        #product-display .color-swatch.active {
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(58, 124, 82, 0.2);
+        }
+        
+        #product-display .color-swatch.active::after {
+            content: '✓';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--primary-color);
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        /* Color name to the right of swatch */
+        #product-display .color-name {
+            font-size: 14px;
+            color: #333;
+            flex: 1;
+            text-align: left;
+            line-height: 1.2;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            #product-display .color-swatches {
+                grid-template-columns: 1fr;
+                max-height: 300px;
+            }
+        }
+        
+        /* Live price badge styling */
+        .live-price-badge-container {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         /* Responsive */
         @media (max-width: 1024px) {
             .universal-pricing-columns {
@@ -1222,70 +1358,16 @@
     <!-- Main Content -->
     <div class="universal-pricing-container">
         <div class="universal-pricing-columns">
-            <!-- Left Column: Enhanced Product Display -->
+            <!-- Left Column: Product Display -->
             <div class="universal-product-column">
-                <div id="product-display" class="universal-product-card">
-                    <!-- Enhanced Product Header -->
-                    <div class="enhanced-product-header">
-                        <div class="product-header-top">
-                            <!-- Actions removed - no functionality -->
-                        </div>
-                        
-                        <div class="product-title-section">
-                            <div class="product-details">
-                                <h2 id="product-name" class="enhanced-product-title">Select a Cap Style</h2>
-                                <div class="selected-color-display">
-                                    <span class="color-label">Selected:</span>
-                                    <span id="selected-color-swatch" class="mini-color-swatch"></span>
-                                    <span id="selected-color-name" class="color-name">Choose Color</span>
-                                </div>
-                                <div class="product-meta-info">
-                                    <span>Style: <strong id="product-style">Choose from catalog</strong></span>
-                                </div>
-                            </div>
-                            
-                            <div class="live-price-badge">
-                                <div class="price-label-badge">Your Price</div>
-                                <div id="live-price-display" class="price-value-badge">$0.00</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Enhanced Gallery -->
-                    <div class="enhanced-gallery-container">
-                        <div class="main-image-wrapper">
-                            <img id="main-product-image" src="/assets/images/cap-placeholder.jpg" alt="Cap">
-                            <div class="zoom-indicator">
-                                <i class="fas fa-search-plus"></i> Hover to zoom
-                            </div>
-                        </div>
-                        
-                        <div id="image-thumbnails" class="image-thumbnails-grid">
-                            <!-- Thumbnails will be populated by JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <!-- Enhanced Info Box -->
-                    <div class="enhanced-info-box">
-                        <i class="fas fa-info-circle info-icon"></i>
-                        <div>
-                            <strong>Base pricing includes:</strong> 8,000 stitch embroidered logo on front.
-                            <br><small>Additional logos and stitches available in configuration.</small>
-                        </div>
-                    </div>
-                    
-                    <!-- Enhanced Color Swatches -->
-                    <div class="enhanced-color-swatches">
-                        <div class="color-section-header">
-                            <div>
-                                <h3 class="color-section-title">Available Colors</h3>
-                                <div id="color-count" class="color-count">Loading colors...</div>
-                            </div>
-                        </div>
-                        
-                        <div id="color-swatches-container" class="enhanced-color-grid">
-                            <!-- Colors will be populated by JavaScript -->
-                        </div>
+                <!-- Universal Product Display Component will render here -->
+                <div id="product-display"></div>
+                
+                <!-- Keep the live price badge separate for cap embroidery -->
+                <div class="live-price-badge-container" style="text-align: center; margin-top: 20px;">
+                    <div class="live-price-badge">
+                        <div class="price-label-badge">Your Price</div>
+                        <div id="live-price-display" class="price-value-badge">$0.00</div>
                     </div>
                 </div>
             </div>
@@ -1331,6 +1413,12 @@
     <!-- New Caspio Data Engine Container -->
     <div id="caspio-dp-container" style="display: none;"></div>
     
+    <!-- Hidden elements for UniversalProductDisplay compatibility -->
+    <div style="display: none;">
+        <h2 id="product-title-context">Cap Product</h2>
+        <img id="product-image-main-hidden" src="" alt="">
+    </div>
+    
     <!-- Legacy containers -->
     <div class="hero-section" style="display: none;">
         <div class="container">
@@ -1364,6 +1452,9 @@
     
     <!-- Color swatches helper -->
     <script src="/shared_components/js/dp5-helper.js"></script>
+    
+    <!-- Product URL handler -->
+    <script src="/product-url-handler.js"></script>
     
     <!-- V3 Enhanced pricing implementation -->
     <script src="/shared_components/js/cap-embroidery-pricing-v3.js"></script>
@@ -1406,112 +1497,6 @@
             }
         }
         
-        // Initialize enhanced gallery
-        function initializeEnhancedGallery(images) {
-            const mainImage = document.getElementById('main-product-image');
-            const thumbnailsContainer = document.getElementById('image-thumbnails');
-            
-            if (!thumbnailsContainer || !images || images.length === 0) return;
-            
-            thumbnailsContainer.innerHTML = '';
-            
-            images.forEach((image, index) => {
-                const thumbnailItem = document.createElement('div');
-                thumbnailItem.className = 'thumbnail-item' + (index === 0 ? ' active' : '');
-                
-                const img = document.createElement('img');
-                img.src = image.url;
-                img.alt = image.label;
-                
-                const label = document.createElement('div');
-                label.className = 'thumbnail-label';
-                label.textContent = image.label;
-                
-                thumbnailItem.appendChild(img);
-                thumbnailItem.appendChild(label);
-                
-                thumbnailItem.addEventListener('click', function() {
-                    // Update main image
-                    if (mainImage) mainImage.src = image.url;
-                    
-                    // Update active state
-                    document.querySelectorAll('.thumbnail-item').forEach(item => {
-                        item.classList.remove('active');
-                    });
-                    thumbnailItem.classList.add('active');
-                });
-                
-                thumbnailsContainer.appendChild(thumbnailItem);
-            });
-        }
-        
-        // Initialize enhanced color swatches
-        function initializeEnhancedColors(colors) {
-            const container = document.getElementById('color-swatches-container');
-            const countDisplay = document.getElementById('color-count');
-            
-            if (!container || !colors || colors.length === 0) return;
-            
-            if (countDisplay) {
-                countDisplay.textContent = `${colors.length} colors available`;
-            }
-            
-            container.innerHTML = '';
-            
-            colors.forEach((color, index) => {
-                const swatchWrapper = document.createElement('div');
-                swatchWrapper.className = 'enhanced-swatch-wrapper';
-                
-                const swatch = document.createElement('div');
-                swatch.className = 'enhanced-color-swatch' + (index === 0 ? ' active' : '');
-                swatch.style.backgroundImage = `url(${color.swatchImage})`;
-                swatch.setAttribute('data-color-name', color.name);
-                swatch.setAttribute('data-color-code', color.code);
-                swatch.setAttribute('data-main-image', color.mainImage);
-                
-                const colorName = document.createElement('div');
-                colorName.className = 'enhanced-color-name';
-                colorName.textContent = color.name;
-                
-                swatch.addEventListener('click', function() {
-                    // Update active state
-                    document.querySelectorAll('.enhanced-color-swatch').forEach(s => {
-                        s.classList.remove('active');
-                    });
-                    swatch.classList.add('active');
-                    
-                    // Update selected color display
-                    const selectedSwatch = document.getElementById('selected-color-swatch');
-                    const selectedName = document.getElementById('selected-color-name');
-                    
-                    if (selectedSwatch) {
-                        selectedSwatch.style.backgroundImage = `url(${color.swatchImage})`;
-                    }
-                    if (selectedName) {
-                        selectedName.textContent = color.name;
-                    }
-                    
-                    // Update main image
-                    const mainImage = document.getElementById('main-product-image');
-                    if (mainImage && color.mainImage) {
-                        mainImage.src = color.mainImage;
-                    }
-                    
-                    // Update header
-                    updateHeaderProduct(null, color.name, color.mainImage);
-                    
-                    // Trigger color change event
-                    window.dispatchEvent(new CustomEvent('colorChanged', {
-                        detail: { color: color }
-                    }));
-                });
-                
-                swatchWrapper.appendChild(swatch);
-                swatchWrapper.appendChild(colorName);
-                container.appendChild(swatchWrapper);
-            });
-        }
-        
         // Listen for pricing updates
         document.addEventListener('pricingUpdated', function(event) {
             if (event.detail) {
@@ -1520,35 +1505,11 @@
             }
         });
         
-        // Listen for product data
-        document.addEventListener('productDataLoaded', function(event) {
+        // Listen for color changes to update header
+        window.addEventListener('colorChanged', function(event) {
             if (event.detail) {
-                // Update product info
-                const productName = document.getElementById('product-name');
-                const productStyle = document.getElementById('product-style');
-                
-                if (productName) productName.textContent = event.detail.productTitle || 'Select a Cap Style';
-                if (productStyle) productStyle.textContent = event.detail.styleNumber || 'Choose from catalog';
-                
-                // Initialize gallery with sample images (would come from API)
-                const sampleImages = [
-                    { url: event.detail.mainImage || '/assets/images/cap-placeholder.jpg', label: 'Main' },
-                    { url: event.detail.frontImage || '/assets/images/cap-placeholder.jpg', label: 'Front Flat' },
-                    { url: event.detail.backImage || '/assets/images/cap-placeholder.jpg', label: 'Back Flat' },
-                    { url: event.detail.sideImage || '/assets/images/cap-placeholder.jpg', label: 'Side View' }
-                ];
-                initializeEnhancedGallery(sampleImages);
-                
-                // Initialize colors if available
-                if (event.detail.colors && event.detail.colors.length > 0) {
-                    const enhancedColors = event.detail.colors.map(color => ({
-                        name: color.COLOR_NAME,
-                        code: color.CATALOG_COLOR,
-                        swatchImage: color.COLOR_SQUARE_IMAGE,
-                        mainImage: color.MAIN_IMAGE_URL || color.FRONT_MODEL_IMAGE_URL
-                    }));
-                    initializeEnhancedColors(enhancedColors);
-                }
+                const colorData = event.detail.color || event.detail;
+                updateHeaderProduct(null, colorData.COLOR_NAME || colorData.name, colorData.MAIN_IMAGE_URL || colorData.mainImage);
             }
         });
         
@@ -1556,12 +1517,34 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[CapEmbroideryEnhanced] Page loaded');
             
+            // Initialize product context from URL parameters
+            if (window.initializeProductFromURL) {
+                window.initializeProductFromURL();
+            }
+            
             // Set initial progress
             updateProgressBar(1);
             
             // Initialize with default values
             updateHeaderPricing(24, '$0.00');
             updateLivePriceBadge('$0.00');
+            
+            // Initialize Universal Product Display
+            const productDisplay = new UniversalProductDisplay({
+                containerId: 'product-display',
+                pageType: 'cap-embroidery',
+                showBackButton: true,
+                showInfoBox: true,
+                infoBoxContent: '<strong>Base pricing includes:</strong> 8,000 stitch embroidered logo on front.<br><small>Additional logos and stitches available in configuration.</small>',
+                showSelectedColor: true,
+                enableGallery: true,
+                enableSwatches: true,
+                mobileColorLimit: 8,
+                sticky: false
+            });
+            
+            // Make it available globally if needed
+            window.productDisplay = productDisplay;
         });
     </script>
 </body>
