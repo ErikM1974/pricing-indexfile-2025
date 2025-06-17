@@ -356,7 +356,7 @@
                 </div>
                 <div class="pricing-content">
                     <div class="pricing-header">
-                        <h3 class="pricing-subtitle">Detailed Pricing Tiers</h3>
+                        <h3 class="pricing-subtitle">Embroidery Base Prices</h3>
                         <div class="selected-color-indicator">
                             <span>Selected Color:</span>
                             <div class="mini-color-swatch" id="pricing-color-swatch"></div>
