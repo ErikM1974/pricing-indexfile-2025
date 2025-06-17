@@ -83,6 +83,9 @@
         
         // Observe pricing table for changes
         observePricingTable();
+        
+        // Listen for color changes
+        window.addEventListener('colorChanged', handleColorChange);
     });
 
     // Handle pricing data
@@ -764,6 +767,36 @@
             subtree: true,
             attributes: true
         });
+    }
+    
+    // Handle color change events
+    function handleColorChange(event) {
+        console.log('[EMBROIDERY-PRICING-V3] Color changed:', event.detail);
+        
+        if (!event.detail) return;
+        
+        const colorData = event.detail.color || event.detail;
+        const colorName = colorData.COLOR_NAME || colorData.name || 'Unknown';
+        const imageUrl = colorData.MAIN_IMAGE_URL || colorData.mainImage || colorData.ImageURL || '';
+        
+        // Update the mini color swatch in the pricing grid
+        const miniSwatch = document.querySelector('.mini-color-swatch');
+        if (miniSwatch && imageUrl) {
+            miniSwatch.style.backgroundImage = `url('${imageUrl}')`;
+            miniSwatch.title = colorName;
+        }
+        
+        // Update the selected color text
+        const colorText = document.querySelector('.selected-color-indicator strong');
+        if (colorText) {
+            colorText.textContent = colorName;
+        }
+        
+        // Also update any color indicator in the pricing grid header
+        const pricingColorText = document.querySelector('.pricing-header .selected-color-indicator strong');
+        if (pricingColorText) {
+            pricingColorText.textContent = colorName;
+        }
     }
 
     // Update quote display

@@ -1262,6 +1262,164 @@
             box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
         }
         
+        /* Pricing Table Styling */
+        #pricing-grid-container .step-section {
+            padding: 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .pricing-grid {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .pricing-grid th {
+            background-color: #3a7c52 !important;
+            color: white !important;
+            padding: 14px 12px !important;
+            text-align: center !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            border: none !important;
+        }
+        
+        .pricing-grid th:first-child {
+            text-align: left !important;
+            padding-left: 20px !important;
+        }
+        
+        .pricing-grid td {
+            padding: 12px !important;
+            text-align: center !important;
+            border-bottom: 1px solid #e0e0e0 !important;
+            background: white !important;
+            font-size: 15px !important;
+            font-weight: 500 !important;
+            color: #333 !important;
+        }
+        
+        .pricing-grid td:first-child {
+            text-align: left !important;
+            padding-left: 20px !important;
+            font-weight: 600 !important;
+            color: #555 !important;
+        }
+        
+        .pricing-grid tbody tr:nth-child(even) td {
+            background-color: #f8f9fa !important;
+        }
+        
+        .pricing-grid tbody tr:hover td {
+            background-color: #e8f5e9 !important;
+            transition: background-color 0.2s ease;
+        }
+        
+        .pricing-grid tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+        
+        /* Tier badges */
+        .tier-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 10px;
+            font-size: 11px;
+            border-radius: 12px;
+            font-weight: 600;
+            vertical-align: middle;
+            text-transform: uppercase;
+        }
+        
+        .tier-badge.popular {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .tier-badge.best-value {
+            background-color: #3a7c52;
+            color: white;
+        }
+        
+        /* Pricing note */
+        .pricing-note {
+            margin-top: 15px;
+            padding: 12px 20px;
+            background: #f0f8f3;
+            border-left: 3px solid #3a7c52;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #2d5f3f;
+            font-style: italic;
+        }
+        
+        /* Color indicator styling */
+        .pricing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .selected-color-indicator {
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            background-color: #f0f8f3;
+            padding: 10px 16px;
+            border-radius: 6px;
+            border-left: 3px solid #3a7c52;
+        }
+        
+        .mini-color-swatch {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin: 0 10px;
+            border: 2px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mini-color-swatch:hover {
+            transform: scale(1.1);
+            border-color: #3a7c52;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .pricing-grid {
+                font-size: 13px;
+            }
+            
+            .pricing-grid th,
+            .pricing-grid td {
+                padding: 8px 6px !important;
+            }
+            
+            .pricing-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .selected-color-indicator {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
     </style>
 </head>
 <body class="universal-theme">
