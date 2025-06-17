@@ -3,38 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Embroidery Pricing | NWCA</title>
-    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <title>Embroidery Pricing | Northwest Custom Apparel</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Universal Header CSS -->
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     
-    <!-- Modern enhancements for consistent design -->
+    <!-- Universal Pricing CSS -->
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-layout.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
+    
+    <!-- Force green theme for consistency -->
+    <link rel="stylesheet" href="/shared_components/css/force-green-theme.css">
+    
+    <!-- Legacy styles for compatibility -->
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
-    
-    <!-- Cool customization styles -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-customization-cool.css">
-    
+    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
     <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
+    <link rel="stylesheet" href="/shared_components/css/enhanced-loading-animations.css">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-customization-cool.css">
     <style>
-        /* CSS Variables for consistency - Most are now in modern-enhancements.css */
+        /* Override blue theme with green */
         :root {
-            /* Override primary color if needed, otherwise inherit from modern-enhancements.css */
-            --primary: #0066cc;
-            --primary-dark: #0052a3;
+            --primary: #3a7c52 !important;
+            --primary-dark: #2d5f3f !important;
+            --primary-color: #3a7c52 !important;
+            --primary-light: #e8f5e9 !important;
+            --secondary: #f5f5f5;
+            --border-color: #e0e0e0;
         }
         
-        /* New layout styles for embroidery pricing page */
-        /* Improved layout styles */
-        .improved-layout {
+        /* Page-specific overrides */
+        body {
+            background-color: #f9f9f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-top: 200px; /* Space for fixed header */
+        }
+        
+        /* Enhanced Header Styles */
+        .enhanced-pricing-header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        /* Top contact bar */
+        .header-contact-bar {
+            background: #2d5f3f;
+            color: white;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+        
+        .contact-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
             display: flex;
-            flex-direction: column;
-            background-color: var(--white);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            margin-bottom: var(--spacing-md);
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .contact-info {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .contact-item i {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .business-hours {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        /* Main navigation header */
+        .header-nav {
+            padding: 15px 0;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Logo section */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .logo-image {
+            height: 50px;
+            width: auto;
+            max-width: 200px;
+        }
+        
+        /* Pricing context bar */
+        .pricing-context-bar {
+            background: #f8f9fa;
+            padding: 15px 0;
+            border-bottom: 2px solid #3a7c52;
+        }
+        
+        .context-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Breadcrumb */
+        .context-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Live pricing in header */
+        .header-live-pricing {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 16px;
+        }
+        
+        .header-price-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        
+        .header-price-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .header-price-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .header-price-value.highlight {
+            color: #3a7c52;
+            font-size: 18px;
+        }
+        
+        /* Container styling */
+        .universal-pricing-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .universal-pricing-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        /* Calculator card styling */
+        .universal-calculator-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             overflow: hidden;
+            padding: 0;
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #3a7c52;
+            width: 33%;
+            transition: width 0.3s;
         }
         
         /* Product header - Enhanced with shared styles */
@@ -761,40 +955,90 @@
             color: var(--gray-700);
         }
         
-        /* Two-column layout */
-        .product-page-columns-container {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-        }
-        
-        .product-context-column {
-            flex: 0 0 350px;
-        }
-        
-        .product-interactive-column {
-            flex: 1;
-            min-width: 0;
-        }
-        
+        /* Responsive */
         @media (max-width: 1024px) {
-            .product-page-columns-container {
-                flex-direction: column;
+            .universal-pricing-columns {
+                grid-template-columns: 1fr;
             }
             
-            .product-context-column {
-                flex: 0 0 auto;
-                margin-bottom: 20px;
+            body {
+                padding-top: 250px; /* More space for wrapped header on mobile */
+            }
+            
+            .contact-bar-content,
+            .nav-content,
+            .context-bar-content {
+                flex-wrap: wrap;
+                gap: 15px;
             }
         }
         
     </style>
 </head>
-<body>
-    <!-- Universal Header -->
-    <div id="universal-header-container" data-page-type="embroidery"></div>
-    
-    <div class="container">
+<body class="universal-theme">
+    <!-- Enhanced Pricing Header -->
+    <header class="enhanced-pricing-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <!-- Logo and Navigation -->
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             class="logo-image">
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pricing Context Bar -->
+        <div class="pricing-context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <span>Embroidery Pricing Calculator</span>
+                    </div>
+                </div>
+                
+                <!-- Live Pricing -->
+                <div class="header-live-pricing">
+                    <div class="header-price-item">
+                        <span class="header-price-label">Qty:</span>
+                        <span id="header-quantity" class="header-price-value">24</span>
+                    </div>
+                    <div class="header-price-item">
+                        <span class="header-price-label">Per Unit:</span>
+                        <span id="header-unit-price" class="header-price-value highlight">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="universal-pricing-container">
         
         <!-- Hidden elements for compatibility with legacy scripts -->
         <div style="display: none;">
@@ -810,103 +1054,108 @@
             <img id="product-image-main-hidden" src="" alt="">
         </div>
 
-        <!-- New Two-Column Layout Container -->
-        <div class="product-page-columns-container">
-
-            <!-- Left Column: Product Context (Potentially Sticky) -->
-            <div class="product-context-column">
+        <div class="universal-pricing-columns">
+            <!-- Left Column: Product Display -->
+            <div class="universal-product-column">
                 <!-- Universal Product Display Component will render here -->
                 <div id="product-display"></div>
             </div>
-
-            <!-- Right Column: Interactive Elements (Scrollable) -->
-            <div class="product-interactive-column">
-                <!-- Quick Quote Calculator -->
-                <div id="quick-quote-container">
-                    <!-- Quick Quote Calculator will be initialized here -->
-                </div>
-            </div> <!-- End .product-interactive-column -->
-        </div> <!-- End .product-page-columns-container -->
-        
-        <!-- Main Content Section (Below Hero) -->
-        <div class="main-content">
-            <div class="container">
-                <!-- Customization Options -->
-                <div id="customization-options-container">
-                    <!-- Customization options will be initialized here -->
-                </div>
-                
-                <!-- Pricing Content (Moved from right column) -->
-                <div class="content-section" id="pricing-details">
-                    <h2>Pricing by Quantity</h2>
-                    <p style="color: var(--gray-600); margin-bottom: 20px;">Volume discounts automatically applied • Pricing includes an 8,000 stitch embroidered logo</p>
-                    
-                    <!-- Hidden Caspio Matrix - Keep this for data source -->
-                    <div id="pricing-calculator" class="pricing-calculator">
-                        <div class="loading-message">Loading pricing data...</div>
+            
+            <!-- Right Column: Calculator -->
+            <div class="universal-calculator-column">
+                <div class="universal-calculator-card">
+                    <!-- Progress Bar -->
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
                     </div>
                     
-                    <!-- Universal Pricing Grid Component -->
-                    <div id="pricing-grid-container">
-                        <!-- Universal pricing grid will be initialized here -->
-                    </div>
-                        
-                </div>
-                
-                <!-- CTA Section -->
-                <div class="cta-section">
-                    <h2>Ready for Your Quote?</h2>
-                    <p>Contact us with your quantity and customization details for a personalized quote.</p>
-                    
-                    <div class="cta-buttons">
-                        <button class="btn btn-primary add-to-cart-button" onclick="window.location.href='tel:253-922-5793'">
-                            📞 Call for Quote: 253-922-5793
-                        </button>
-                        
-                        <button class="btn btn-secondary" style="background: white; color: var(--primary-color); border: 2px solid var(--primary-color);" onclick="window.location.href='mailto:sales@nwcustomapparel.com?subject=Embroidery Quote Request'">
-                            ✉️ Email Quote Request
-                        </button>
+                    <!-- Step 1: Customization Options -->
+                    <div id="customization-options-container">
+                        <!-- Customization options will be initialized here -->
                     </div>
                     
-                    <div class="features">
-                        <p>💚 <strong>Why Choose Northwest Custom Apparel?</strong></p>
-                        <p>Family Owned and Operated Since 1977 • Milton, WA • Quality embroidery</p>
-                        <p>📍 2025 Freeman Road East Milton, WA 98354</p>
-                        <p>📱 You can text us at 253-922-5793</p>
-                    </div>
+                    <!-- Step 2: Quick Quote Calculator -->
+                    <div id="quick-quote-container"></div>
+                    
+                    <!-- Step 3: Pricing Grid -->
+                    <div id="pricing-grid-container"></div>
                 </div>
-            </div> <!-- End .container -->
-        </div> <!-- End .main-content -->
-    </div> <!-- End #app -->
+            </div>
+        </div>
+    </div>
     
-    <!-- JavaScript Files -->
+    <!-- Hidden containers for compatibility -->
+    <div id="pricing-calculator" style="display:none !important; position: absolute; left: -9999px;">
+        <!-- Legacy Caspio removed - now using new data engine -->
+    </div>
+    
+    <!-- Hidden elements for UniversalProductDisplay compatibility -->
+    <div style="display: none;">
+        <h2 id="product-title-context">Product Title</h2>
+        <img id="product-image-main-hidden" src="" alt="">
+    </div>
+    
+    <!-- Scripts -->
+    <!-- Core utilities and constants -->
+    <script src="/shared_components/js/nwca-namespace.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/constants.js"></script>
+    
+    <!-- Universal Header -->
+    <script src="/shared_components/js/universal-header.js"></script>
+    <script src="/shared_components/js/universal-header-component.js"></script>
+    
+    <!-- Visual components -->
+    <script src="/shared_components/js/universal-image-gallery.js"></script>
+    <script src="/shared_components/js/universal-product-display.js"></script>
+    
+    <!-- Pricing components -->
+    <script src="/shared_components/js/universal-quick-quote.js"></script>
+    <script src="/shared_components/js/universal-pricing-grid.js"></script>
+    
+    <!-- Color swatches helper -->
+    <script src="/shared_components/js/dp5-helper.js"></script>
+    
+    <!-- Product URL handler -->
+    <script src="/product-url-handler.js"></script>
+    
+    <!-- Embroidery specific -->
     <script src="/shared_components/js/pricing-pages.js"></script>
     <script src="/shared_components/js/pricing-matrix-capture.js"></script>
     <script src="/shared_components/js/pricing-matrix-api.js"></script>
-    <script src="/shared_components/js/dp5-helper.js"></script>
-    <script src="/product-url-handler.js"></script>
-    
-    <!-- Quick Quote Calculator Scripts -->
     <script src="/shared_components/js/universal-quick-quote-calculator.js"></script>
     <script src="/shared_components/js/embroidery-customization-options.js"></script>
-    
-    <!-- Universal Pricing Grid Component -->
-    <script src="/shared_components/js/universal-pricing-grid.js"></script>
-    
-    <!-- Enhanced Loading Experience -->
     <script src="/shared_components/js/embroidery-enhanced-loading.js"></script>
     
-    <!-- Universal Header Component -->
-    <script src="/shared_components/js/universal-header-component.js"></script>
-    
-    <!-- Universal Product Display Component -->
-    <script src="/shared_components/js/universal-product-display.js"></script>
-    <script src="/shared_components/js/universal-image-gallery.js"></script>
-    
-    <!-- Initialize embroidery page -->
     <script>
+        // Set API URL globally
+        window.API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        
+        // Enhanced product display functions
+        function updateHeaderPricing(quantity, unitPrice) {
+            const headerQty = document.getElementById('header-quantity');
+            const headerPrice = document.getElementById('header-unit-price');
+            
+            if (headerQty) headerQty.textContent = quantity;
+            if (headerPrice) headerPrice.textContent = typeof unitPrice === 'number' ? `$${unitPrice.toFixed(2)}` : unitPrice;
+        }
+        
+        function updateProgressBar(step) {
+            const progressFill = document.getElementById('progress-fill');
+            if (progressFill) {
+                const percentage = (step / 3) * 100;
+                progressFill.style.width = percentage + '%';
+            }
+        }
+        
+        // Listen for pricing updates
+        document.addEventListener('pricingUpdated', function(event) {
+            if (event.detail) {
+                updateHeaderPricing(event.detail.quantity, event.detail.unitPrice);
+            }
+        });
+        
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[EMBROIDERY] Page initialized');
@@ -916,13 +1165,23 @@
                 window.initializeProductFromURL();
             }
             
-            // Initialize Universal Product Display immediately
-            let productDisplay = new UniversalProductDisplay({
+            // Set initial progress
+            updateProgressBar(1);
+            
+            // Initialize with default values
+            updateHeaderPricing(24, '$0.00');
+            
+            // Initialize Universal Product Display
+            const productDisplay = new UniversalProductDisplay({
                 containerId: 'product-display',
                 pageType: 'embroidery',
                 showBackButton: true,
                 showInfoBox: true,
+                infoBoxContent: '<strong>Base pricing includes:</strong> 8,000 stitch embroidered logo.<br><small>Additional logo locations available in configuration.</small>',
                 showSelectedColor: true,
+                enableGallery: true,
+                enableSwatches: true,
+                mobileColorLimit: 8,
                 sticky: false
             });
             
