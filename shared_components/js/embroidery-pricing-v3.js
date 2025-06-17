@@ -15,21 +15,28 @@
     // State
     let basePrices = {};
     let currentFrontStitches = BASE_STITCHES;
-    let currentBackStitches = 5000;
-    let currentLeftStitches = 5000;
-    let currentRightStitches = 5000;
+    let currentBackStitches = 8000;
+    let currentLeftStitches = 8000;
+    let currentRightStitches = 8000;
     let backLogoEnabled = false;
     let leftLogoEnabled = false;
     let rightLogoEnabled = false;
     let currentQuantity = 25; // Default to 25 to match user's example
     let pricingData = null;
     let frontAdjustment = 0;
-    let backLogoPrice = LOGO_BASE_PRICE;
-    let leftLogoPrice = LOGO_BASE_PRICE;
-    let rightLogoPrice = LOGO_BASE_PRICE;
+    let backLogoPrice = 8.75; // 8000 stitches = $5 base + $3.75 for 3000 extra stitches
+    let leftLogoPrice = 8.75;
+    let rightLogoPrice = 8.75;
     
     // DOM element references
     const elements = {};
+    
+    // Calculate additional logo price
+    function calculateAdditionalLogoPrice(stitches) {
+        const base = LOGO_BASE_PRICE;
+        const extraStitches = Math.max(0, stitches - LOGO_BASE_STITCHES);
+        return base + (extraStitches / 1000) * PRICE_PER_THOUSAND;
+    }
 
     // Initialize on DOM ready
     document.addEventListener('DOMContentLoaded', function() {
@@ -155,26 +162,26 @@
                     <div class="additional-logos">
                         <a href="#" class="expand-link" id="additional-logos-toggle">
                             <i class="fas fa-chevron-right"></i>
-                            Add Additional Logo Locations
+                            Add Additional Logos
                         </a>
                         
                         <div class="additional-logo-options" id="additional-logo-options">
-                            <!-- Back Logo Option -->
+                            <!-- Additional Logo 1 -->
                             <div class="control-group" style="margin-top: 15px;">
                                 <div class="checkbox-group">
                                     <input type="checkbox" id="back-logo-checkbox">
-                                    <label for="back-logo-checkbox">Add Back Logo Embroidery</label>
+                                    <label for="back-logo-checkbox">Add Additional Logo 1</label>
                                 </div>
                                 <div class="slider-container" id="back-logo-controls" style="display: none;">
                                     <div class="slider-header">
                                         <span>Stitch Count: <span class="stitch-display" id="back-stitch-display">${currentBackStitches.toLocaleString()} stitches</span></span>
-                                        <span class="price-display positive" id="back-price-display">+$${LOGO_BASE_PRICE.toFixed(2)}</span>
+                                        <span class="price-display positive" id="back-price-display">+$${calculateAdditionalLogoPrice(currentBackStitches).toFixed(2)}</span>
                                     </div>
                                     <div class="slider-wrapper">
                                         <input type="range" id="back-stitch-slider" class="slider" min="5000" max="20000" step="1000" value="${currentBackStitches}">
                                         <div class="slider-tooltip dual-line" id="back-tooltip">
                                             <div>${currentBackStitches.toLocaleString()}</div>
-                                            <div style="color: #f44336;">+$${LOGO_BASE_PRICE.toFixed(2)}</div>
+                                            <div style="color: #f44336;">+$${calculateAdditionalLogoPrice(currentBackStitches).toFixed(2)}</div>
                                         </div>
                                     </div>
                                     <div class="slider-labels">
@@ -186,11 +193,11 @@
                                 </div>
                             </div>
                             
-                            <!-- Left Side Logo -->
+                            <!-- Additional Logo 2 -->
                             <div class="control-group">
                                 <div class="checkbox-group">
                                     <input type="checkbox" id="left-logo-checkbox">
-                                    <label for="left-logo-checkbox">Add Left Side Logo</label>
+                                    <label for="left-logo-checkbox">Add Additional Logo 2</label>
                                 </div>
                                 <div class="slider-container" id="left-logo-controls" style="display: none;">
                                     <div class="slider-header">
@@ -212,11 +219,11 @@
                                 </div>
                             </div>
                             
-                            <!-- Right Side Logo -->
+                            <!-- Additional Logo 3 -->
                             <div class="control-group">
                                 <div class="checkbox-group">
                                     <input type="checkbox" id="right-logo-checkbox">
-                                    <label for="right-logo-checkbox">Add Right Side Logo</label>
+                                    <label for="right-logo-checkbox">Add Additional Logo 3</label>
                                 </div>
                                 <div class="slider-container" id="right-logo-controls" style="display: none;">
                                     <div class="slider-header">
@@ -266,27 +273,27 @@
                             <span id="front-adjust-amount">$0.00</span>
                         </div>
                         
-                        <!-- Back logo (conditional) -->
+                        <!-- Additional Logo 1 (conditional) -->
                         <div class="quote-line indent conditional" id="back-logo-line">
-                            <span id="back-logo-label">+ Back Logo (5,000 stitches):</span>
+                            <span id="back-logo-label">+ Additional Logo 1 (5,000 stitches):</span>
                             <span id="back-logo-amount">$5.00</span>
                         </div>
                         
-                        <!-- Left side logo (conditional) -->
+                        <!-- Additional Logo 2 (conditional) -->
                         <div class="quote-line indent conditional" id="left-logo-line">
-                            <span id="left-logo-label">+ Left Side Logo (5,000 stitches):</span>
+                            <span id="left-logo-label">+ Additional Logo 2 (5,000 stitches):</span>
                             <span id="left-logo-amount">$5.00</span>
                         </div>
                         
-                        <!-- Right side logo (conditional) -->
+                        <!-- Additional Logo 3 (conditional) -->
                         <div class="quote-line indent conditional" id="right-logo-line">
-                            <span id="right-logo-label">+ Right Side Logo (5,000 stitches):</span>
+                            <span id="right-logo-label">+ Additional Logo 3 (5,000 stitches):</span>
                             <span id="right-logo-amount">$5.00</span>
                         </div>
                         
                         <!-- LTM fee (conditional) -->
                         <div class="quote-line indent conditional" id="ltm-line">
-                            <span>+ Setup Fee (per piece):</span>
+                            <span>+ LTM Fee (per piece):</span>
                             <span id="ltm-amount">$0.00</span>
                         </div>
                         
@@ -730,7 +737,7 @@
             frontLine.classList.remove('show');
         }
         
-        // Back logo
+        // Additional Logo 1
         const backLine = document.getElementById('back-logo-line');
         const backLabel = document.getElementById('back-logo-label');
         const backAmount = document.getElementById('back-logo-amount');
@@ -738,7 +745,7 @@
         if (backLine && backLogoEnabled) {
             backLine.classList.add('show');
             if (backLabel) {
-                backLabel.textContent = `+ Back Logo (${currentBackStitches.toLocaleString()} stitches):`;
+                backLabel.textContent = `+ Additional Logo 1 (${currentBackStitches.toLocaleString()} stitches):`;
             }
             if (backAmount) {
                 backAmount.textContent = `$${backLogoPrice.toFixed(2)}`;
@@ -747,7 +754,7 @@
             backLine.classList.remove('show');
         }
         
-        // Left logo
+        // Additional Logo 2
         const leftLine = document.getElementById('left-logo-line');
         const leftLabel = document.getElementById('left-logo-label');
         const leftAmount = document.getElementById('left-logo-amount');
@@ -755,7 +762,7 @@
         if (leftLine && leftLogoEnabled) {
             leftLine.classList.add('show');
             if (leftLabel) {
-                leftLabel.textContent = `+ Left Side Logo (${currentLeftStitches.toLocaleString()} stitches):`;
+                leftLabel.textContent = `+ Additional Logo 2 (${currentLeftStitches.toLocaleString()} stitches):`;
             }
             if (leftAmount) {
                 leftAmount.textContent = `$${leftLogoPrice.toFixed(2)}`;
@@ -764,7 +771,7 @@
             leftLine.classList.remove('show');
         }
         
-        // Right logo
+        // Additional Logo 3
         const rightLine = document.getElementById('right-logo-line');
         const rightLabel = document.getElementById('right-logo-label');
         const rightAmount = document.getElementById('right-logo-amount');
@@ -772,7 +779,7 @@
         if (rightLine && rightLogoEnabled) {
             rightLine.classList.add('show');
             if (rightLabel) {
-                rightLabel.textContent = `+ Right Side Logo (${currentRightStitches.toLocaleString()} stitches):`;
+                rightLabel.textContent = `+ Additional Logo 3 (${currentRightStitches.toLocaleString()} stitches):`;
             }
             if (rightAmount) {
                 rightAmount.textContent = `$${rightLogoPrice.toFixed(2)}`;
