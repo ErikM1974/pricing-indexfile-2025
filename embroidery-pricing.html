@@ -1272,8 +1272,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
+            background: transparent !important;
+            padding: 0;
         }
         
         .pricing-subtitle {
@@ -1281,8 +1281,30 @@
             font-weight: 600;
             color: #333;
             margin: 0;
-            background: transparent;
+            background: transparent !important;
             padding: 0;
+            display: inline-block;
+        }
+        
+        /* Override any universal grid styles that add green background */
+        #pricing-grid-container .section-title {
+            background: transparent !important;
+            color: #333 !important;
+            padding: 0 !important;
+        }
+        
+        #pricing-grid-container h3 {
+            background: transparent !important;
+        }
+        
+        /* Hide the universal grid's default header since we're using our custom one */
+        #pricing-grid-container .pricing-header:first-child {
+            display: none !important;
+        }
+        
+        /* Ensure our custom pricing header is visible */
+        .step-section .pricing-header {
+            display: flex !important;
         }
         
         .selected-color-indicator {
