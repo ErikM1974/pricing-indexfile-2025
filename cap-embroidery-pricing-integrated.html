@@ -50,23 +50,276 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             margin: 0;
             padding: 0;
+            padding-top: 200px; /* Space for fixed header */
         }
         
-        /* Remove padding since universal header provides it */
-        body {
-            padding-top: 0;
+        /* Enhanced Header Styles */
+        .enhanced-pricing-header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
         
-        /* Hide duplicate pricing header if it appears */
-        .universal-pricing-header {
-            display: none;
+        /* Top contact bar */
+        .header-contact-bar {
+            background: #2d5f3f;
+            color: white;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+        
+        .contact-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .contact-info {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .contact-item i {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .business-hours {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        /* Main navigation header */
+        .header-nav {
+            padding: 15px 0;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Logo section */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .logo-image {
+            height: 50px;
+            width: auto;
+            max-width: 200px;
+        }
+        
+        /* Main navigation */
+        .main-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            position: relative;
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: #3a7c52;
+        }
+        
+        .nav-link.active {
+            color: #3a7c52;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #3a7c52;
+        }
+        
+        /* Dropdown arrow */
+        .nav-link.has-dropdown::after {
+            content: '▾';
+            margin-left: 5px;
+            font-size: 12px;
+        }
+        
+        /* Header actions */
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .quote-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #3a7c52;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .quote-btn:hover {
+            background: #2d5f3f;
+        }
+        
+        /* Pricing context bar */
+        .pricing-context-bar {
+            background: #f8f9fa;
+            padding: 15px 0;
+            border-bottom: 2px solid #3a7c52;
+        }
+        
+        .context-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Breadcrumb and product */
+        .context-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .breadcrumb a {
+            color: #3a7c52;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb-separator {
+            color: #999;
+        }
+        
+        
+        /* Current product display in header */
+        .header-current-product {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .header-product-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+            background: white;
+        }
+        
+        .header-product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .header-product-info {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .header-product-style {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .header-product-color {
+            color: #666;
+        }
+        
+        /* Live pricing in header */
+        .header-live-pricing {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 16px;
+        }
+        
+        .header-price-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        
+        .header-price-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .header-price-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .header-price-value.highlight {
+            color: #3a7c52;
+            font-size: 18px;
         }
         
         /* Container styling */
         .universal-pricing-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px 20px;
         }
         
         .universal-pricing-columns {
@@ -76,121 +329,329 @@
             align-items: start;
         }
         
-        /* Card styling */
-        .universal-product-card,
-        .universal-calculator-card {
+        /* Enhanced Product Display Card */
+        .universal-product-card {
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             overflow: hidden;
         }
         
-        /* Product display fixes */
-        #product-display {
-            padding: 0;
+        /* Product header with live price */
+        .enhanced-product-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
         }
         
-        .universal-product-display {
-            padding: 20px;
-        }
-        
-        /* Color swatches styling */
-        .upd-color-swatches {
-            padding: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-        
-        .color-swatches {
+        .product-header-top {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
         }
         
-        .color-swatch {
-            width: 40px;
-            height: 40px;
+        .product-back-link {
+            color: #3a7c52;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        
+        .product-back-link:hover {
+            opacity: 0.7;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .quick-action-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .quick-action-btn:hover {
+            border-color: #3a7c52;
+            color: #3a7c52;
+        }
+        
+        .product-title-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+        
+        .product-details {
+            flex: 1;
+        }
+        
+        .enhanced-product-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        
+        .selected-color-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        
+        .mini-color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .product-meta-info {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Live price badge */
+        .live-price-badge {
+            background: #f0f8f3;
+            border: 2px solid #3a7c52;
+            border-radius: 6px;
+            padding: 8px 12px;
+            text-align: center;
+            min-width: 100px;
+        }
+        
+        .price-label-badge {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .price-value-badge {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3a7c52;
+            margin-top: 2px;
+        }
+        
+        /* Enhanced Gallery */
+        .enhanced-gallery-container {
+            padding: 25px;
+            background: #fafafa;
+        }
+        
+        .main-image-wrapper {
+            position: relative;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .main-image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s;
+        }
+        
+        .main-image-wrapper:hover img {
+            transform: scale(1.05);
+        }
+        
+        .zoom-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .image-thumbnails-grid {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .thumbnail-item {
+            position: relative;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        
+        .thumbnail-item:hover {
+            border-color: #3a7c52;
+        }
+        
+        .thumbnail-item.active {
+            border-color: #3a7c52;
+            box-shadow: 0 0 0 2px rgba(58, 124, 82, 0.2);
+        }
+        
+        .thumbnail-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+        }
+        
+        .thumbnail-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 11px;
+            padding: 2px 4px;
+            text-align: center;
+        }
+        
+        /* Enhanced Info Box */
+        .enhanced-info-box {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #f0f8f3 0%, #e8f5e9 100%);
+            border-left: 4px solid #3a7c52;
+            font-size: 14px;
+            color: #2d5f3f;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .info-icon {
+            font-size: 24px;
+            color: #3a7c52;
+        }
+        
+        /* Enhanced Color Swatches */
+        .enhanced-color-swatches {
+            padding: 25px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .color-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .color-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .color-count {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .enhanced-color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 12px;
+        }
+        
+        .enhanced-swatch-wrapper {
+            text-align: center;
+        }
+        
+        .enhanced-color-swatch {
+            width: 100%;
+            aspect-ratio: 1;
             border-radius: 4px;
             cursor: pointer;
             border: 2px solid transparent;
             transition: all 0.2s;
+            background-size: cover;
+            background-position: center;
+            position: relative;
         }
         
-        .color-swatch:hover {
-            transform: scale(1.1);
+        .enhanced-color-swatch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         
-        .color-swatch.selected {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(58, 124, 82, 0.2);
+        .enhanced-color-swatch.active {
+            border-color: #3a7c52;
+        }
+        
+        .enhanced-color-swatch.active::after {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #3a7c52;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .enhanced-color-name {
+            font-size: 11px;
+            margin-top: 4px;
+            color: #666;
+            line-height: 1.2;
         }
         
         /* Calculator card styling */
         .universal-calculator-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
             padding: 0;
         }
         
-        .universal-calculator-card > div {
-            margin-bottom: 0;
+        /* Progress bar */
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+            position: relative;
         }
         
-        /* Quick quote styling */
-        .universal-quick-quote {
-            padding: 25px;
-            border-bottom: 1px solid var(--border-color);
-            margin: 0;
-        }
-        
-        .quote-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        
-        /* Pricing grid styling */
-        .universal-pricing-grid {
-            padding: 25px;
-            margin: 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .grid-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        
-        .pricing-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .pricing-table th {
-            background-color: #f8f8f8;
-            padding: 12px;
-            text-align: center;
-            font-weight: 600;
-            border-bottom: 2px solid var(--border-color);
-        }
-        
-        .pricing-table td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .tier-label {
-            font-weight: 600;
-            text-align: left;
-            background-color: #fafafa;
-        }
-        
-        .price-cell {
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--primary);
+        .progress-fill {
+            height: 100%;
+            background: #3a7c52;
+            width: 33%;
+            transition: width 0.3s;
         }
         
         /* Step sections for V3 layout */
@@ -622,70 +1083,49 @@
             padding-top: 15px;
         }
         
-        .quote-line {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 16px;
+        /* Pricing grid styling */
+        .universal-pricing-grid {
+            padding: 25px;
+            margin: 0;
+            border-bottom: 1px solid var(--border-color);
         }
         
-        .quote-line.subtotal {
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-        }
-        
-        .quote-line.total {
-            font-size: 20px;
+        .grid-title {
+            font-size: 18px;
             font-weight: 600;
-            color: #3a7c52;
-            padding-top: 10px;
-            border-top: 2px solid #333;
-        }
-        
-        /* Call for Quote styling */
-        .call-for-quote-box {
-            text-align: center;
-            padding: 40px 20px;
-            background: #f8f8f8;
-            border-radius: 8px;
-            border: 2px dashed #ddd;
-        }
-        
-        .call-for-quote-box i.fa-phone-alt {
-            font-size: 48px;
-            color: #3a7c52;
             margin-bottom: 20px;
-        }
-        
-        .call-for-quote-box h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
             color: #333;
         }
         
-        .call-for-quote-box p {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 20px;
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
         }
         
-        .quote-phone-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 20px;
+        .pricing-table th {
+            background-color: #f8f8f8;
+            padding: 12px;
+            text-align: center;
             font-weight: 600;
-            color: #3a7c52;
-            text-decoration: none;
-            padding: 12px 24px;
-            border: 2px solid #3a7c52;
-            border-radius: 4px;
-            transition: all 0.2s;
+            border-bottom: 2px solid var(--border-color);
         }
         
-        .quote-phone-link:hover {
-            background: #3a7c52;
-            color: white;
+        .pricing-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .tier-label {
+            font-weight: 600;
+            text-align: left;
+            background-color: #fafafa;
+        }
+        
+        .price-cell {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--primary);
         }
         
         /* Responsive */
@@ -693,51 +1133,159 @@
             .universal-pricing-columns {
                 grid-template-columns: 1fr;
             }
+            
+            body {
+                padding-top: 250px; /* More space for wrapped header on mobile */
+            }
+            
+            .contact-bar-content,
+            .nav-content,
+            .context-bar-content {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .main-nav {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
         }
     </style>
 </head>
 <body class="universal-theme">
-    <!-- Universal Header -->
-    <div id="universal-header-container" data-page-type="cap-embroidery"></div>
-    
+    <!-- Enhanced Pricing Header -->
+    <header class="enhanced-pricing-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <!-- Logo and Navigation -->
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             class="logo-image">
+                    </a>
+                    
+                    <!-- Navigation removed - no working links -->
+                </div>
+                
+                <!-- Actions removed - no working links -->
+            </div>
+        </div>
+        
+        <!-- Pricing Context Bar -->
+        <div class="pricing-context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <span>Cap Embroidery Pricing Calculator</span>
+                    </div>
+                    
+                </div>
+                
+                <!-- Live Pricing -->
+                <div class="header-live-pricing">
+                    <div class="header-price-item">
+                        <span class="header-price-label">Qty:</span>
+                        <span id="header-quantity" class="header-price-value">24</span>
+                    </div>
+                    <div class="header-price-item">
+                        <span class="header-price-label">Per Unit:</span>
+                        <span id="header-unit-price" class="header-price-value highlight">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
 
     <!-- Main Content -->
     <div class="universal-pricing-container">
         <div class="universal-pricing-columns">
-            <!-- Left Column: Product Display -->
+            <!-- Left Column: Enhanced Product Display -->
             <div class="universal-product-column">
                 <div id="product-display" class="universal-product-card">
-                    <!-- Product Header -->
-                    <div class="universal-product-header">
-                        <a href="#" class="universal-product-back-link">
-                            <i class="fas fa-arrow-left"></i>
-                            Back to Products
-                        </a>
-                        <h2 class="universal-product-name" id="product-name">Select a Cap Style</h2>
-                        <p class="universal-product-style" id="product-style">Choose from our catalog</p>
-                    </div>
-                    
-                    <!-- Cap Preview -->
-                    <div class="cap-preview-container">
-                        <div id="product-images-container" class="product-images-container">
-                            <img src="/assets/images/cap-placeholder.jpg" alt="Cap" class="cap-preview-image">
+                    <!-- Enhanced Product Header -->
+                    <div class="enhanced-product-header">
+                        <div class="product-header-top">
+                            <!-- Actions removed - no functionality -->
+                        </div>
+                        
+                        <div class="product-title-section">
+                            <div class="product-details">
+                                <h2 id="product-name" class="enhanced-product-title">Select a Cap Style</h2>
+                                <div class="selected-color-display">
+                                    <span class="color-label">Selected:</span>
+                                    <span id="selected-color-swatch" class="mini-color-swatch"></span>
+                                    <span id="selected-color-name" class="color-name">Choose Color</span>
+                                </div>
+                                <div class="product-meta-info">
+                                    <span>Style: <strong id="product-style">Choose from catalog</strong></span>
+                                </div>
+                            </div>
+                            
+                            <div class="live-price-badge">
+                                <div class="price-label-badge">Your Price</div>
+                                <div id="live-price-display" class="price-value-badge">$0.00</div>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Color Selection -->
-                    <div class="universal-product-colors">
-                        <h3 class="universal-colors-title">Available Colors</h3>
-                        <div id="color-swatches-container" class="color-swatches-grid">
-                            <!-- Colors will be populated here -->
+                    <!-- Enhanced Gallery -->
+                    <div class="enhanced-gallery-container">
+                        <div class="main-image-wrapper">
+                            <img id="main-product-image" src="/assets/images/cap-placeholder.jpg" alt="Cap">
+                            <div class="zoom-indicator">
+                                <i class="fas fa-search-plus"></i> Hover to zoom
+                            </div>
+                        </div>
+                        
+                        <div id="image-thumbnails" class="image-thumbnails-grid">
+                            <!-- Thumbnails will be populated by JavaScript -->
                         </div>
                     </div>
                     
-                    <!-- Info Box -->
-                    <div class="universal-info-box">
-                        <p class="universal-info-text">
-                            <i class="fas fa-info-circle universal-info-icon"></i>
-                            Cap embroidery includes up to 10,000 stitches. Additional charges apply for complex designs.
-                        </p>
+                    <!-- Enhanced Info Box -->
+                    <div class="enhanced-info-box">
+                        <i class="fas fa-info-circle info-icon"></i>
+                        <div>
+                            <strong>Base pricing includes:</strong> 8,000 stitch embroidered logo on front.
+                            <br><small>Additional logos and stitches available in configuration.</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Color Swatches -->
+                    <div class="enhanced-color-swatches">
+                        <div class="color-section-header">
+                            <div>
+                                <h3 class="color-section-title">Available Colors</h3>
+                                <div id="color-count" class="color-count">Loading colors...</div>
+                            </div>
+                        </div>
+                        
+                        <div id="color-swatches-container" class="enhanced-color-grid">
+                            <!-- Colors will be populated by JavaScript -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -745,6 +1293,11 @@
             <!-- Right Column: Calculator -->
             <div class="universal-calculator-column">
                 <div class="universal-calculator-card">
+                    <!-- Progress Bar -->
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    
                     <!-- Step 1: Configuration Options -->
                     <div id="embroidery-customization-container" class="embroidery-customization-section"></div>
                     
@@ -819,16 +1372,196 @@
         // Set API URL globally
         window.API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         
+        // Enhanced product display functions
+        function updateHeaderProduct(styleNumber, color, imageUrl) {
+            const headerStyle = document.getElementById('header-product-style');
+            const headerColor = document.getElementById('header-product-color');
+            const headerImage = document.getElementById('header-product-image');
+            
+            if (headerStyle) headerStyle.textContent = styleNumber || 'Select Style';
+            if (headerColor) headerColor.textContent = color || 'Choose Color';
+            if (headerImage && imageUrl) headerImage.src = imageUrl;
+        }
+        
+        function updateHeaderPricing(quantity, unitPrice) {
+            const headerQty = document.getElementById('header-quantity');
+            const headerPrice = document.getElementById('header-unit-price');
+            
+            if (headerQty) headerQty.textContent = quantity;
+            if (headerPrice) headerPrice.textContent = typeof unitPrice === 'number' ? `$${unitPrice.toFixed(2)}` : unitPrice;
+        }
+        
+        function updateLivePriceBadge(price) {
+            const priceDisplay = document.getElementById('live-price-display');
+            if (priceDisplay) {
+                priceDisplay.textContent = typeof price === 'number' ? `$${price.toFixed(2)}` : price;
+            }
+        }
+        
+        function updateProgressBar(step) {
+            const progressFill = document.getElementById('progress-fill');
+            if (progressFill) {
+                const percentage = (step / 3) * 100;
+                progressFill.style.width = percentage + '%';
+            }
+        }
+        
+        // Initialize enhanced gallery
+        function initializeEnhancedGallery(images) {
+            const mainImage = document.getElementById('main-product-image');
+            const thumbnailsContainer = document.getElementById('image-thumbnails');
+            
+            if (!thumbnailsContainer || !images || images.length === 0) return;
+            
+            thumbnailsContainer.innerHTML = '';
+            
+            images.forEach((image, index) => {
+                const thumbnailItem = document.createElement('div');
+                thumbnailItem.className = 'thumbnail-item' + (index === 0 ? ' active' : '');
+                
+                const img = document.createElement('img');
+                img.src = image.url;
+                img.alt = image.label;
+                
+                const label = document.createElement('div');
+                label.className = 'thumbnail-label';
+                label.textContent = image.label;
+                
+                thumbnailItem.appendChild(img);
+                thumbnailItem.appendChild(label);
+                
+                thumbnailItem.addEventListener('click', function() {
+                    // Update main image
+                    if (mainImage) mainImage.src = image.url;
+                    
+                    // Update active state
+                    document.querySelectorAll('.thumbnail-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    thumbnailItem.classList.add('active');
+                });
+                
+                thumbnailsContainer.appendChild(thumbnailItem);
+            });
+        }
+        
+        // Initialize enhanced color swatches
+        function initializeEnhancedColors(colors) {
+            const container = document.getElementById('color-swatches-container');
+            const countDisplay = document.getElementById('color-count');
+            
+            if (!container || !colors || colors.length === 0) return;
+            
+            if (countDisplay) {
+                countDisplay.textContent = `${colors.length} colors available`;
+            }
+            
+            container.innerHTML = '';
+            
+            colors.forEach((color, index) => {
+                const swatchWrapper = document.createElement('div');
+                swatchWrapper.className = 'enhanced-swatch-wrapper';
+                
+                const swatch = document.createElement('div');
+                swatch.className = 'enhanced-color-swatch' + (index === 0 ? ' active' : '');
+                swatch.style.backgroundImage = `url(${color.swatchImage})`;
+                swatch.setAttribute('data-color-name', color.name);
+                swatch.setAttribute('data-color-code', color.code);
+                swatch.setAttribute('data-main-image', color.mainImage);
+                
+                const colorName = document.createElement('div');
+                colorName.className = 'enhanced-color-name';
+                colorName.textContent = color.name;
+                
+                swatch.addEventListener('click', function() {
+                    // Update active state
+                    document.querySelectorAll('.enhanced-color-swatch').forEach(s => {
+                        s.classList.remove('active');
+                    });
+                    swatch.classList.add('active');
+                    
+                    // Update selected color display
+                    const selectedSwatch = document.getElementById('selected-color-swatch');
+                    const selectedName = document.getElementById('selected-color-name');
+                    
+                    if (selectedSwatch) {
+                        selectedSwatch.style.backgroundImage = `url(${color.swatchImage})`;
+                    }
+                    if (selectedName) {
+                        selectedName.textContent = color.name;
+                    }
+                    
+                    // Update main image
+                    const mainImage = document.getElementById('main-product-image');
+                    if (mainImage && color.mainImage) {
+                        mainImage.src = color.mainImage;
+                    }
+                    
+                    // Update header
+                    updateHeaderProduct(null, color.name, color.mainImage);
+                    
+                    // Trigger color change event
+                    window.dispatchEvent(new CustomEvent('colorChanged', {
+                        detail: { color: color }
+                    }));
+                });
+                
+                swatchWrapper.appendChild(swatch);
+                swatchWrapper.appendChild(colorName);
+                container.appendChild(swatchWrapper);
+            });
+        }
+        
+        // Listen for pricing updates
+        document.addEventListener('pricingUpdated', function(event) {
+            if (event.detail) {
+                updateHeaderPricing(event.detail.quantity, event.detail.unitPrice);
+                updateLivePriceBadge(event.detail.unitPrice);
+            }
+        });
+        
+        // Listen for product data
+        document.addEventListener('productDataLoaded', function(event) {
+            if (event.detail) {
+                // Update product info
+                const productName = document.getElementById('product-name');
+                const productStyle = document.getElementById('product-style');
+                
+                if (productName) productName.textContent = event.detail.productTitle || 'Select a Cap Style';
+                if (productStyle) productStyle.textContent = event.detail.styleNumber || 'Choose from catalog';
+                
+                // Initialize gallery with sample images (would come from API)
+                const sampleImages = [
+                    { url: event.detail.mainImage || '/assets/images/cap-placeholder.jpg', label: 'Main' },
+                    { url: event.detail.frontImage || '/assets/images/cap-placeholder.jpg', label: 'Front Flat' },
+                    { url: event.detail.backImage || '/assets/images/cap-placeholder.jpg', label: 'Back Flat' },
+                    { url: event.detail.sideImage || '/assets/images/cap-placeholder.jpg', label: 'Side View' }
+                ];
+                initializeEnhancedGallery(sampleImages);
+                
+                // Initialize colors if available
+                if (event.detail.colors && event.detail.colors.length > 0) {
+                    const enhancedColors = event.detail.colors.map(color => ({
+                        name: color.COLOR_NAME,
+                        code: color.CATALOG_COLOR,
+                        swatchImage: color.COLOR_SQUARE_IMAGE,
+                        mainImage: color.MAIN_IMAGE_URL || color.FRONT_MODEL_IMAGE_URL
+                    }));
+                    initializeEnhancedColors(enhancedColors);
+                }
+            }
+        });
+        
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('[CapEmbroideryV2] Page loaded');
+            console.log('[CapEmbroideryEnhanced] Page loaded');
             
-            // Initialize header if available
-            if (window.UniversalHeader && window.UniversalHeader.initialize) {
-                window.UniversalHeader.initialize();
-            } else if (window.UniversalHeaderComponent && window.UniversalHeaderComponent.init) {
-                window.UniversalHeaderComponent.init();
-            }
+            // Set initial progress
+            updateProgressBar(1);
+            
+            // Initialize with default values
+            updateHeaderPricing(24, '$0.00');
+            updateLivePriceBadge('$0.00');
         });
     </script>
 </body>

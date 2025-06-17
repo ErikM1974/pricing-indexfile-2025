@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Embroidery Enhanced Display - Mockup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #3a7c52;
+            font-size: 24px;
+        }
+        
+        /* Main container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Two column layout */
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        /* Enhanced Product Display */
+        .product-context-column {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .universal-product-display {
+            padding: 0;
+        }
+        
+        /* Product Header */
+        .upd-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .upd-navigation {
+            margin-bottom: 15px;
+        }
+        
+        .upd-back-button {
+            color: #3a7c52;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        
+        .upd-back-button:hover {
+            opacity: 0.7;
+        }
+        
+        .back-icon {
+            font-size: 18px;
+        }
+        
+        .upd-product-info {
+            margin-top: 10px;
+        }
+        
+        .upd-product-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .upd-selected-color {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .color-label {
+            color: #666;
+        }
+        
+        .mini-color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        
+        .color-name {
+            font-weight: 500;
+        }
+        
+        .upd-product-meta {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Gallery */
+        .upd-gallery-container {
+            padding: 25px;
+            background: #fafafa;
+        }
+        
+        .main-image-container {
+            position: relative;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .main-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .image-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+        }
+        
+        .thumbnail-item {
+            position: relative;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .thumbnail-item:hover {
+            border-color: #3a7c52;
+        }
+        
+        .thumbnail-item.active {
+            border-color: #3a7c52;
+        }
+        
+        .thumbnail-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+        }
+        
+        .thumbnail-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 11px;
+            padding: 2px 4px;
+            text-align: center;
+        }
+        
+        /* Info Box */
+        .upd-info-box {
+            padding: 15px 25px;
+            background: #f0f8f3;
+            border-left: 4px solid #3a7c52;
+            font-size: 14px;
+            color: #2d5f3f;
+        }
+        
+        .upd-info-box p {
+            margin: 0;
+        }
+        
+        /* Color Swatches */
+        .upd-color-swatches {
+            padding: 25px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .color-swatches {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 12px;
+        }
+        
+        .swatch-wrapper {
+            text-align: center;
+        }
+        
+        .color-swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.05);
+            border-color: #ddd;
+        }
+        
+        .color-swatch.active {
+            border-color: #3a7c52;
+            box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.2);
+        }
+        
+        .swatch-wrapper .color-name {
+            font-size: 11px;
+            margin-top: 4px;
+            color: #666;
+            line-height: 1.2;
+        }
+        
+        .show-more-colors {
+            margin-top: 15px;
+            background: none;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .show-more-colors:hover {
+            border-color: #3a7c52;
+            color: #3a7c52;
+        }
+        
+        /* Right Column - Calculator (V3 style) */
+        .calculator-column {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Step sections */
+        .step-section {
+            padding: 25px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .step-section:last-child {
+            border-bottom: none;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .step-number {
+            background: #3a7c52;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Quick preview of pricing sections */
+        .preview-content {
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <h1>Cap Embroidery Pricing - Enhanced Display Mockup</h1>
+            <p style="color: #666; margin-top: 5px;">Preview of the improved product display layout</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="columns">
+            <!-- Left Column: Enhanced Product Display -->
+            <div class="product-context-column">
+                <div id="product-display" class="upd-fade-in">
+                    <div class="universal-product-display column-layout">
+                        
+                        <!-- Product Header -->
+                        <div class="upd-header">
+                            <div class="upd-navigation">
+                                <a href="/product.html?StyleNumber=C112&COLOR=Black" class="upd-back-button">
+                                    <span class="back-icon">←</span> Back to Product
+                                </a>
+                            </div>
+                            
+                            <div class="upd-product-info">
+                                <h2 class="upd-product-title">Port Authority Snapback Trucker Cap. C112</h2>
+                                
+                                <div class="upd-selected-color">
+                                    <span class="color-label">Selected:</span>
+                                    <span class="mini-color-swatch" style="background-color: #000;"></span>
+                                    <span class="color-name">Black</span>
+                                </div>
+                                
+                                <div class="upd-product-meta">
+                                    <span class="meta-item">Style: <strong>C112</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Gallery -->
+                        <div class="upd-gallery-container">
+                            <div class="main-image-container">
+                                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y4ZjlmYSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIwMCIgeT0iMjAwIiBmaWxsPSIjNmM3NTdkIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiPkNhcCBJbWFnZTwvdGV4dD48L3N2Zz4=" alt="Cap Image">
+                            </div>
+                            <div class="image-thumbnails">
+                                <div class="thumbnail-item active">
+                                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2U4ZThlOCIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjUwIiB5PSI1MCIgZmlsbD0iIzY2NiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIj5NYWluPC90ZXh0Pjwvc3ZnPg==" alt="Main">
+                                    <div class="thumbnail-label">Main</div>
+                                </div>
+                                <div class="thumbnail-item">
+                                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2U4ZThlOCIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjUwIiB5PSI1MCIgZmlsbD0iIzY2NiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIj5Gcm9udDwvdGV4dD48L3N2Zz4=" alt="Front">
+                                    <div class="thumbnail-label">Front Flat</div>
+                                </div>
+                                <div class="thumbnail-item">
+                                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2U4ZThlOCIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjUwIiB5PSI1MCIgZmlsbD0iIzY2NiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIj5CYWNrPC90ZXh0Pjwvc3ZnPg==" alt="Back">
+                                    <div class="thumbnail-label">Back Flat</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Info Box -->
+                        <div class="upd-info-box">
+                            <p>Pricing includes an 8,000 stitch embroidered logo on front.</p>
+                        </div>
+                        
+                        <!-- Color Swatches -->
+                        <div class="upd-color-swatches">
+                            <h3 class="section-title">Available Colors</h3>
+                            <div class="color-swatches">
+                                <div class="swatch-wrapper">
+                                    <div class="color-swatch active" style="background-color: #000;"></div>
+                                    <div class="color-name">Black</div>
+                                </div>
+                                <div class="swatch-wrapper">
+                                    <div class="color-swatch" style="background: linear-gradient(45deg, #000 50%, #FFD700 50%);"></div>
+                                    <div class="color-name">Black/Gold</div>
+                                </div>
+                                <div class="swatch-wrapper">
+                                    <div class="color-swatch" style="background: linear-gradient(45deg, #000 50%, #708090 50%);"></div>
+                                    <div class="color-name">Black/Grey Steel</div>
+                                </div>
+                                <div class="swatch-wrapper">
+                                    <div class="color-swatch" style="background-color: #fff; border: 2px solid #ddd;"></div>
+                                    <div class="color-name">White</div>
+                                </div>
+                                <div class="swatch-wrapper">
+                                    <div class="color-swatch" style="background-color: #1e3a8a;"></div>
+                                    <div class="color-name">True Navy</div>
+                                </div>
+                                <div class="swatch-wrapper">
+                                    <div class="color-swatch" style="background-color: #dc2626;"></div>
+                                    <div class="color-name">Flame Red</div>
+                                </div>
+                                <div class="swatch-wrapper">
+                                    <div class="color-swatch" style="background-color: #708090;"></div>
+                                    <div class="color-name">Grey Steel</div>
+                                </div>
+                                <div class="swatch-wrapper">
+                                    <div class="color-swatch" style="background-color: #059669;"></div>
+                                    <div class="color-name">Forest Green</div>
+                                </div>
+                            </div>
+                            <button class="show-more-colors">Show More Colors</button>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: V3 Calculator -->
+            <div class="calculator-column">
+                <!-- Step 1 -->
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h2 class="step-title">Configure Your Order</h2>
+                    </div>
+                    <div class="preview-content">
+                        [Quantity input and logo configuration controls]
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2 class="step-title">Your Instant Quote</h2>
+                    </div>
+                    <div class="preview-content">
+                        [Itemized pricing breakdown]
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h2 class="step-title">Complete Price Reference Grid</h2>
+                    </div>
+                    <div class="preview-content">
+                        [Pricing table]
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Section -->
+    <div class="container" style="margin-top: 40px; margin-bottom: 40px;">
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #3a7c52; margin-bottom: 20px;">What's Improved:</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3 style="color: #666; margin-bottom: 10px;">Current Simple Display:</h3>
+                    <ul style="color: #666; line-height: 1.8;">
+                        <li>Basic product header without navigation</li>
+                        <li>Single image without thumbnails</li>
+                        <li>Color swatches without names</li>
+                        <li>No selected color indicator</li>
+                        <li>Less polished appearance</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #3a7c52; margin-bottom: 10px;">Enhanced Display:</h3>
+                    <ul style="color: #333; line-height: 1.8;">
+                        <li>✓ Professional header with back button</li>
+                        <li>✓ Gallery with labeled thumbnails</li>
+                        <li>✓ Color swatches with names below</li>
+                        <li>✓ Selected color shown in header</li>
+                        <li>✓ Matches other pricing pages perfectly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

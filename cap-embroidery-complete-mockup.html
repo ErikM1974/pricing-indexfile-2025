@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Embroidery - Complete Page Mockup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            padding-top: 200px; /* Space for fixed header */
+        }
+        
+        /* Enhanced Pricing Header */
+        .enhanced-pricing-header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        /* Top contact bar */
+        .header-contact-bar {
+            background: #2d5f3f;
+            color: white;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+        
+        .contact-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .contact-info {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .contact-item i {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .business-hours {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        /* Main navigation header */
+        .header-nav {
+            padding: 15px 0;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Logo section */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .logo-image {
+            height: 50px;
+            width: auto;
+            max-width: 200px;
+        }
+        
+        /* Main navigation */
+        .main-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            position: relative;
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: #3a7c52;
+        }
+        
+        .nav-link.active {
+            color: #3a7c52;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #3a7c52;
+        }
+        
+        /* Dropdown arrow */
+        .nav-link.has-dropdown::after {
+            content: '▾';
+            margin-left: 5px;
+            font-size: 12px;
+        }
+        
+        /* Header actions */
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-input {
+            padding: 8px 35px 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+            font-size: 14px;
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .quote-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #3a7c52;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .quote-btn:hover {
+            background: #2d5f3f;
+        }
+        
+        /* Pricing context bar */
+        .pricing-context-bar {
+            background: #f8f9fa;
+            padding: 15px 0;
+            border-bottom: 2px solid #3a7c52;
+        }
+        
+        .context-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Breadcrumb and product */
+        .context-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .breadcrumb a {
+            color: #3a7c52;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb-separator {
+            color: #999;
+        }
+        
+        .context-divider {
+            width: 1px;
+            height: 30px;
+            background: #ddd;
+        }
+        
+        /* Current product display */
+        .current-product {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .product-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+            background: white;
+        }
+        
+        .product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .product-style {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .product-color {
+            color: #666;
+        }
+        
+        /* Live pricing */
+        .live-pricing {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 16px;
+        }
+        
+        .price-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        
+        .price-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .price-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .price-value.highlight {
+            color: #3a7c52;
+            font-size: 18px;
+        }
+        
+        /* Main Content Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        /* Two column layout */
+        .content-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        /* Enhanced Product Display */
+        .product-display-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Product Header with live price */
+        .product-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+        }
+        
+        .product-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+        
+        .product-back-link {
+            color: #3a7c52;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        
+        .product-back-link:hover {
+            opacity: 0.7;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .quick-action-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .quick-action-btn:hover {
+            border-color: #3a7c52;
+            color: #3a7c52;
+        }
+        
+        .product-title-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+        
+        .product-details {
+            flex: 1;
+        }
+        
+        .product-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        
+        .selected-color {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        
+        .mini-color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        
+        .product-meta {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Live price badge */
+        .live-price-badge {
+            background: #f0f8f3;
+            border: 2px solid #3a7c52;
+            border-radius: 6px;
+            padding: 8px 12px;
+            text-align: center;
+            min-width: 100px;
+        }
+        
+        .price-label-badge {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .price-value-badge {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3a7c52;
+            margin-top: 2px;
+        }
+        
+        /* Enhanced Gallery */
+        .gallery-container {
+            padding: 25px;
+            background: #fafafa;
+        }
+        
+        .main-image-container {
+            position: relative;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .main-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s;
+        }
+        
+        .main-image-container:hover img {
+            transform: scale(1.05);
+        }
+        
+        .zoom-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .image-thumbnails {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .thumbnail-item {
+            position: relative;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        
+        .thumbnail-item:hover {
+            border-color: #3a7c52;
+        }
+        
+        .thumbnail-item.active {
+            border-color: #3a7c52;
+            box-shadow: 0 0 0 2px rgba(58, 124, 82, 0.2);
+        }
+        
+        .thumbnail-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+        }
+        
+        .thumbnail-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 11px;
+            padding: 2px 4px;
+            text-align: center;
+        }
+        
+        /* Info Box */
+        .info-box {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #f0f8f3 0%, #e8f5e9 100%);
+            border-left: 4px solid #3a7c52;
+            font-size: 14px;
+            color: #2d5f3f;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .info-icon {
+            font-size: 24px;
+            color: #3a7c52;
+        }
+        
+        /* Color Swatches */
+        .color-swatches-section {
+            padding: 25px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .color-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .color-count {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .color-search {
+            position: relative;
+        }
+        
+        .color-search input {
+            padding: 6px 30px 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 200px;
+        }
+        
+        .color-search i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .color-swatches {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 12px;
+        }
+        
+        .swatch-wrapper {
+            text-align: center;
+        }
+        
+        .color-swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            background-size: cover;
+            position: relative;
+        }
+        
+        .color-swatch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .color-swatch.active {
+            border-color: #3a7c52;
+        }
+        
+        .color-swatch.active::after {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #3a7c52;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .color-name {
+            font-size: 11px;
+            margin-top: 4px;
+            color: #666;
+            line-height: 1.2;
+        }
+        
+        /* Calculator Column */
+        .calculator-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #3a7c52;
+            width: 33%;
+            transition: width 0.3s;
+        }
+        
+        /* Step sections */
+        .step-section {
+            padding: 25px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .step-section:last-child {
+            border-bottom: none;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .step-number {
+            background: #3a7c52;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Placeholder for calculator content */
+        .calculator-content {
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 6px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* CTA section */
+        .cta-section {
+            padding: 25px;
+            background: #f8f8f8;
+            text-align: center;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #3a7c52;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2d5f3f;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #3a7c52;
+            border: 2px solid #3a7c52;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f8f3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Pricing Header -->
+    <header class="enhanced-pricing-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <!-- Logo and Navigation -->
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             class="logo-image">
+                    </a>
+                    
+                    <nav class="main-nav">
+                        <a href="/" class="nav-link">Home</a>
+                        <a href="/products" class="nav-link has-dropdown">Products</a>
+                        <a href="/services" class="nav-link has-dropdown">Services</a>
+                        <a href="/pricing" class="nav-link active">Pricing</a>
+                        <a href="/about" class="nav-link">About</a>
+                        <a href="/contact" class="nav-link">Contact</a>
+                    </nav>
+                </div>
+                
+                <!-- Search and Quote -->
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="Search products...">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <a href="#" class="quote-btn">
+                        <i class="fas fa-calculator"></i>
+                        Get Quote
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pricing Context Bar -->
+        <div class="pricing-context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <a href="/">Home</a>
+                        <span class="breadcrumb-separator">›</span>
+                        <a href="/pricing">Pricing Tools</a>
+                        <span class="breadcrumb-separator">›</span>
+                        <span>Cap Embroidery</span>
+                    </div>
+                    
+                    <div class="context-divider"></div>
+                    
+                    <!-- Current Product -->
+                    <div class="current-product">
+                        <div class="product-thumb">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzMzIi8+PC9zdmc+" alt="Cap">
+                        </div>
+                        <div class="product-info">
+                            <span class="product-style">C112</span>
+                            <span class="product-color">Black</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Live Pricing -->
+                <div class="live-pricing">
+                    <div class="price-item">
+                        <span class="price-label">Qty:</span>
+                        <span class="price-value">24</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Per Unit:</span>
+                        <span class="price-value highlight">$24.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="content-columns">
+            <!-- Left Column: Enhanced Product Display -->
+            <div class="product-display-card">
+                <!-- Product Header with Live Price -->
+                <div class="product-header">
+                    <div class="product-header-top">
+                        <a href="#" class="product-back-link">
+                            <span>←</span> Back to Product
+                        </a>
+                        <div class="quick-actions">
+                            <button class="quick-action-btn">
+                                <i class="fas fa-share-alt"></i> Share
+                            </button>
+                            <button class="quick-action-btn">
+                                <i class="fas fa-bookmark"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-title-section">
+                        <div class="product-details">
+                            <h2 class="product-title">Port Authority Snapback Trucker Cap. C112</h2>
+                            <div class="selected-color">
+                                <span class="color-label">Selected:</span>
+                                <span class="mini-color-swatch" style="background-color: #000;"></span>
+                                <span class="color-name">Black</span>
+                            </div>
+                            <div class="product-meta">
+                                <span>Style: <strong>C112</strong> • OSFA</span>
+                            </div>
+                        </div>
+                        
+                        <div class="live-price-badge">
+                            <div class="price-label-badge">Your Price</div>
+                            <div class="price-value-badge">$24.00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Gallery -->
+                <div class="gallery-container">
+                    <div class="main-image-container">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y4ZjlmYSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIwMCIgeT0iMjAwIiBmaWxsPSIjNmM3NTdkIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiPkNhcCBNYWluIEltYWdlPC90ZXh0Pjwvc3ZnPg==" alt="Cap Main Image">
+                        <div class="zoom-indicator">
+                            <i class="fas fa-search-plus"></i> Hover to zoom
+                        </div>
+                    </div>
+                    
+                    <div class="image-thumbnails">
+                        <div class="thumbnail-item active">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iODAiIGZpbGw9IiNlOGU4ZTgiLz48dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1MCIgeT0iNDAiIGZpbGw9IiM2NjYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiI+TWFpbjwvdGV4dD48L3N2Zz4=" alt="Main">
+                            <div class="thumbnail-label">Main</div>
+                        </div>
+                        <div class="thumbnail-item">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iODAiIGZpbGw9IiNlOGU4ZTgiLz48dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1MCIgeT0iNDAiIGZpbGw9IiM2NjYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiI+RnJvbnQ8L3RleHQ+PC9zdmc+" alt="Front">
+                            <div class="thumbnail-label">Front Flat</div>
+                        </div>
+                        <div class="thumbnail-item">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iODAiIGZpbGw9IiNlOGU4ZTgiLz48dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1MCIgeT0iNDAiIGZpbGw9IiM2NjYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiI+QmFjazwvdGV4dD48L3N2Zz4=" alt="Back">
+                            <div class="thumbnail-label">Back Flat</div>
+                        </div>
+                        <div class="thumbnail-item">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iODAiIGZpbGw9IiNlOGU4ZTgiLz48dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1MCIgeT0iNDAiIGZpbGw9IiM2NjYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiI+U2lkZTwvdGV4dD48L3N2Zz4=" alt="Side">
+                            <div class="thumbnail-label">Side View</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Info Box -->
+                <div class="info-box">
+                    <i class="fas fa-info-circle info-icon"></i>
+                    <div>
+                        <strong>Base pricing includes:</strong> 8,000 stitch embroidered logo on front.
+                        <br><small>Additional logos and stitches available in configuration.</small>
+                    </div>
+                </div>
+                
+                <!-- Color Swatches with Search -->
+                <div class="color-swatches-section">
+                    <div class="color-header">
+                        <div>
+                            <h3 class="section-title">Available Colors</h3>
+                            <div class="color-count">54 colors available</div>
+                        </div>
+                        <div class="color-search">
+                            <input type="text" placeholder="Search colors...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="color-swatches">
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch active" style="background-color: #000;"></div>
+                            <div class="color-name">Black</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background: linear-gradient(45deg, #000 50%, #FFD700 50%);"></div>
+                            <div class="color-name">Black/Gold</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background: linear-gradient(45deg, #000 50%, #708090 50%);"></div>
+                            <div class="color-name">Black/Grey Steel</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background-color: #fff; border: 2px solid #ddd;"></div>
+                            <div class="color-name">White</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background-color: #1e3a8a;"></div>
+                            <div class="color-name">True Navy</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background-color: #dc2626;"></div>
+                            <div class="color-name">Flame Red</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background-color: #708090;"></div>
+                            <div class="color-name">Grey Steel</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background-color: #059669;"></div>
+                            <div class="color-name">Forest Green</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background-color: #8B4513;"></div>
+                            <div class="color-name">Coyote Brown</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background-color: #4169E1;"></div>
+                            <div class="color-name">True Royal</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background-color: #800020;"></div>
+                            <div class="color-name">Maroon</div>
+                        </div>
+                        <div class="swatch-wrapper">
+                            <div class="color-swatch" style="background-color: #FF4500;"></div>
+                            <div class="color-name">Texas Orange</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: V3 Calculator -->
+            <div class="calculator-card">
+                <!-- Progress Bar -->
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                
+                <!-- Step 1: Configure -->
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h2 class="step-title">Configure Your Order</h2>
+                    </div>
+                    <div class="calculator-content">
+                        [Quantity input, front logo slider, additional logo options]
+                    </div>
+                </div>
+                
+                <!-- Step 2: Quote -->
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2 class="step-title">Your Instant Quote</h2>
+                    </div>
+                    <div class="calculator-content">
+                        [Itemized pricing breakdown with dynamic updates]
+                    </div>
+                </div>
+                
+                <!-- Step 3: Reference Grid -->
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h2 class="step-title">Complete Price Reference Grid</h2>
+                    </div>
+                    <div class="calculator-content">
+                        [Pricing table with all quantity tiers]
+                    </div>
+                </div>
+                
+                <!-- CTA Section -->
+                <div class="cta-section">
+                    <div class="cta-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-phone"></i>
+                            Call for Quote
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-envelope"></i>
+                            Email Quote
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

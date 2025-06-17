@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Embroidery - Final Header with Navigation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Enhanced Pricing Header */
+        .enhanced-pricing-header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        /* Top contact bar */
+        .header-contact-bar {
+            background: #2d5f3f;
+            color: white;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+        
+        .contact-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .contact-info {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .contact-item i {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .business-hours {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        /* Main navigation header */
+        .header-nav {
+            padding: 15px 0;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Logo section */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .logo-image {
+            height: 50px;
+            width: auto;
+            max-width: 200px;
+        }
+        
+        /* For demo - using styled div instead of image */
+        .logo-placeholder {
+            background: #3a7c52;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Main navigation */
+        .main-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            position: relative;
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: #3a7c52;
+        }
+        
+        .nav-link.active {
+            color: #3a7c52;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #3a7c52;
+        }
+        
+        /* Dropdown arrow */
+        .nav-link.has-dropdown::after {
+            content: '▾';
+            margin-left: 5px;
+            font-size: 12px;
+        }
+        
+        /* Header actions */
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-input {
+            padding: 8px 35px 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+            font-size: 14px;
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .quote-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #3a7c52;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .quote-btn:hover {
+            background: #2d5f3f;
+        }
+        
+        /* Pricing context bar */
+        .pricing-context-bar {
+            background: #f8f9fa;
+            padding: 15px 0;
+            border-bottom: 2px solid #3a7c52;
+        }
+        
+        .context-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Breadcrumb and product */
+        .context-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .breadcrumb a {
+            color: #3a7c52;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb-separator {
+            color: #999;
+        }
+        
+        .context-divider {
+            width: 1px;
+            height: 30px;
+            background: #ddd;
+        }
+        
+        /* Current product display */
+        .current-product {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .product-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+            background: white;
+        }
+        
+        .product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .product-style {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .product-color {
+            color: #666;
+        }
+        
+        /* Live pricing */
+        .live-pricing {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 16px;
+        }
+        
+        .price-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        
+        .price-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .price-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .price-value.highlight {
+            color: #3a7c52;
+            font-size: 18px;
+        }
+        
+        /* Content spacer */
+        .content-spacer {
+            height: 200px;
+        }
+        
+        /* Demo content */
+        .demo-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .demo-hero {
+            background: white;
+            padding: 60px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .demo-title {
+            font-size: 36px;
+            color: #3a7c52;
+            margin-bottom: 20px;
+        }
+        
+        .demo-subtitle {
+            font-size: 20px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .feature-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .comparison-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .standard-title {
+            color: #666;
+        }
+        
+        .enhanced-title {
+            color: #3a7c52;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            line-height: 2;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .check-icon {
+            color: #3a7c52;
+        }
+        
+        .x-icon {
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Pricing Header with Full Navigation -->
+    <header class="enhanced-pricing-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <!-- Logo and Navigation -->
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             class="logo-image">
+                    </a>
+                    
+                    <nav class="main-nav">
+                        <a href="/" class="nav-link">Home</a>
+                        <a href="/products" class="nav-link has-dropdown">Products</a>
+                        <a href="/services" class="nav-link has-dropdown">Services</a>
+                        <a href="/pricing" class="nav-link active">Pricing</a>
+                        <a href="/about" class="nav-link">About</a>
+                        <a href="/contact" class="nav-link">Contact</a>
+                    </nav>
+                </div>
+                
+                <!-- Search and Quote -->
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="Search products...">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <a href="#" class="quote-btn">
+                        <i class="fas fa-calculator"></i>
+                        Get Quote
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pricing Context Bar -->
+        <div class="pricing-context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <a href="/">Home</a>
+                        <span class="breadcrumb-separator">›</span>
+                        <a href="/pricing">Pricing Tools</a>
+                        <span class="breadcrumb-separator">›</span>
+                        <span>Cap Embroidery</span>
+                    </div>
+                    
+                    <div class="context-divider"></div>
+                    
+                    <!-- Current Product -->
+                    <div class="current-product">
+                        <div class="product-thumb">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzMzIi8+PC9zdmc+" alt="Cap">
+                        </div>
+                        <div class="product-info">
+                            <span class="product-style">C112</span>
+                            <span class="product-color">Black</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Live Pricing -->
+                <div class="live-pricing">
+                    <div class="price-item">
+                        <span class="price-label">Qty:</span>
+                        <span class="price-value">24</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Per Unit:</span>
+                        <span class="price-value highlight">$24.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Content Spacer -->
+    <div class="content-spacer"></div>
+    
+    <!-- Demo Content -->
+    <div class="demo-content">
+        <div class="demo-hero">
+            <h1 class="demo-title">Enhanced Pricing Header</h1>
+            <p class="demo-subtitle">
+                Combines the universal header navigation with pricing-specific features for a professional, integrated experience.
+            </p>
+        </div>
+        
+        <div class="feature-comparison">
+            <div class="comparison-card">
+                <h3 class="comparison-title standard-title">
+                    <i class="fas fa-times-circle x-icon"></i>
+                    Standard Universal Header
+                </h3>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check check-icon"></i> Basic navigation</li>
+                    <li><i class="fas fa-check check-icon"></i> Contact information</li>
+                    <li><i class="fas fa-times x-icon"></i> No pricing context</li>
+                    <li><i class="fas fa-times x-icon"></i> No product display</li>
+                    <li><i class="fas fa-times x-icon"></i> No live pricing</li>
+                    <li><i class="fas fa-times x-icon"></i> Generic for all pages</li>
+                </ul>
+            </div>
+            
+            <div class="comparison-card">
+                <h3 class="comparison-title enhanced-title">
+                    <i class="fas fa-check-circle check-icon"></i>
+                    Enhanced Pricing Header
+                </h3>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check check-icon"></i> Full site navigation</li>
+                    <li><i class="fas fa-check check-icon"></i> Contact always visible</li>
+                    <li><i class="fas fa-check check-icon"></i> Breadcrumb navigation</li>
+                    <li><i class="fas fa-check check-icon"></i> Current product display</li>
+                    <li><i class="fas fa-check check-icon"></i> Live pricing updates</li>
+                    <li><i class="fas fa-check check-icon"></i> Pricing-specific design</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; padding: 30px; background: #f0f8f3; border-radius: 8px; border-left: 4px solid #3a7c52;">
+            <h3 style="color: #2d5f3f; margin-bottom: 15px;">Key Features of the Enhanced Header:</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; color: #666;">
+                <div>
+                    <strong style="color: #333;">1. Three-Tier Structure</strong>
+                    <p>Contact bar → Navigation → Pricing context</p>
+                </div>
+                <div>
+                    <strong style="color: #333;">2. Full Navigation</strong>
+                    <p>Complete site navigation with active state</p>
+                </div>
+                <div>
+                    <strong style="color: #333;">3. Product Context</strong>
+                    <p>Shows current selection with thumbnail</p>
+                </div>
+                <div>
+                    <strong style="color: #333;">4. Live Pricing</strong>
+                    <p>Updates quantity and price in real-time</p>
+                </div>
+                <div>
+                    <strong style="color: #333;">5. Breadcrumb Trail</strong>
+                    <p>Clear path showing where user is</p>
+                </div>
+                <div>
+                    <strong style="color: #333;">6. Professional Look</strong>
+                    <p>Builds trust with polished design</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

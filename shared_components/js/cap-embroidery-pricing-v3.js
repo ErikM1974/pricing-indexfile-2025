@@ -35,6 +35,15 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('[CAP-PRICING-V3] Initializing...');
         
+        // Make updateHeaderPricing globally available
+        window.updateHeaderPricing = function(quantity, unitPrice) {
+            const headerQty = document.getElementById('header-quantity');
+            const headerPrice = document.getElementById('header-unit-price');
+            
+            if (headerQty) headerQty.textContent = quantity;
+            if (headerPrice) headerPrice.textContent = typeof unitPrice === 'number' ? `$${unitPrice.toFixed(2)}` : unitPrice;
+        };
+        
         // Listen for Caspio data
         document.addEventListener('caspioCapPricingCalculated', handleCaspioData);
         
@@ -773,6 +782,18 @@
         if (quoteQuantityEl) quoteQuantityEl.textContent = currentQuantity;
         if (quotePieceTotal) quotePieceTotal.textContent = `$${pieceTotal.toFixed(2)}`;
         if (quoteOrderTotal) quoteOrderTotal.textContent = `$${orderTotal.toFixed(2)}`;
+        
+        // Update header pricing dynamically
+        updateHeaderPricing(currentQuantity, pieceTotal);
+        
+        // Dispatch event for other components
+        document.dispatchEvent(new CustomEvent('pricingUpdated', {
+            detail: {
+                quantity: currentQuantity,
+                unitPrice: pieceTotal,
+                totalPrice: orderTotal
+            }
+        }));
     }
 
     // Show call for quote message
@@ -803,6 +824,9 @@
         if (gridContainer) {
             gridContainer.innerHTML = '';
         }
+        
+        // Update header to show "Call for Quote"
+        updateHeaderPricing(currentQuantity, 'Call for Quote');
     }
 
     // Get price tier based on quantity
