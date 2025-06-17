@@ -334,8 +334,8 @@
             }
 
             .step-section.inactive {
-                opacity: 0.5;
-                pointer-events: none;
+                opacity: 1;
+                pointer-events: auto;
             }
 
             .step-header {
