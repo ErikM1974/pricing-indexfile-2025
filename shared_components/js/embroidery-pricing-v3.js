@@ -86,6 +86,11 @@
         
         // Listen for color changes
         window.addEventListener('colorChanged', handleColorChange);
+        
+        // Initialize color display from current product
+        setTimeout(() => {
+            initializeColorDisplay();
+        }, 500);
     });
 
     // Handle pricing data
@@ -338,19 +343,39 @@
             `;
         }
 
-        // Step 3: Pricing Grid
+        // Step 3: Pricing Grid - Wrap it properly
         const pricingGridContainer = document.getElementById('pricing-grid-container');
         if (pricingGridContainer) {
-            // Add step header before the grid
-            const stepHeader = document.createElement('div');
-            stepHeader.className = 'step-section';
-            stepHeader.innerHTML = `
+            // Create a proper step section wrapper
+            const stepWrapper = document.createElement('div');
+            stepWrapper.className = 'step-section';
+            stepWrapper.innerHTML = `
                 <div class="step-header">
                     <div class="step-number">3</div>
                     <h2 class="step-title">Complete Price-Per-Unit Reference Grid</h2>
                 </div>
+                <div class="pricing-content">
+                    <div class="pricing-header">
+                        <h3 class="pricing-subtitle">Detailed Pricing Tiers</h3>
+                        <div class="selected-color-indicator">
+                            <span>Selected Color:</span>
+                            <div class="mini-color-swatch" id="pricing-color-swatch"></div>
+                            <strong id="pricing-color-name">Loading...</strong>
+                        </div>
+                    </div>
+                    <div id="pricing-grid-inner"></div>
+                </div>
             `;
-            pricingGridContainer.parentNode.insertBefore(stepHeader, pricingGridContainer);
+            
+            // Replace the container with our wrapped version
+            pricingGridContainer.parentNode.replaceChild(stepWrapper, pricingGridContainer);
+            
+            // Move the inner content
+            const innerContainer = document.getElementById('pricing-grid-inner');
+            if (innerContainer) {
+                // The UniversalPricingGrid will render into this container
+                innerContainer.id = 'pricing-grid-container';
+            }
         }
 
         // Store element references
@@ -776,27 +801,64 @@
         if (!event.detail) return;
         
         const colorData = event.detail.color || event.detail;
+        updateColorDisplay(colorData);
+    }
+    
+    // Initialize color display from current selection
+    function initializeColorDisplay() {
+        // Try to get color from various sources
+        const productDisplay = document.querySelector('#product-display');
+        if (productDisplay) {
+            // Check for active color swatch
+            const activeSwatch = productDisplay.querySelector('.color-swatch.active, .enhanced-color-swatch.active');
+            if (activeSwatch) {
+                const colorName = activeSwatch.querySelector('.color-name, .enhanced-color-name')?.textContent || 
+                                activeSwatch.getAttribute('title') || 
+                                activeSwatch.getAttribute('data-color-name');
+                const imageUrl = activeSwatch.style.backgroundImage?.match(/url\(['"]?(.+?)['"]?\)/)?.[1] || '';
+                
+                if (colorName || imageUrl) {
+                    updateColorDisplay({
+                        COLOR_NAME: colorName,
+                        MAIN_IMAGE_URL: imageUrl
+                    });
+                }
+            }
+        }
+        
+        // Also check window.selectedColorName
+        const colorNameEl = document.querySelector('#pricing-color-name');
+        if (window.selectedColorName && colorNameEl && 
+            (!colorNameEl.textContent || colorNameEl.textContent === 'Loading...')) {
+            updateColorDisplay({
+                COLOR_NAME: window.selectedColorName
+            });
+        }
+    }
+    
+    // Update color display elements
+    function updateColorDisplay(colorData) {
         const colorName = colorData.COLOR_NAME || colorData.name || 'Unknown';
         const imageUrl = colorData.MAIN_IMAGE_URL || colorData.mainImage || colorData.ImageURL || '';
         
-        // Update the mini color swatch in the pricing grid
-        const miniSwatch = document.querySelector('.mini-color-swatch');
+        // Update the mini color swatch in Step 3
+        const miniSwatch = document.getElementById('pricing-color-swatch');
         if (miniSwatch && imageUrl) {
             miniSwatch.style.backgroundImage = `url('${imageUrl}')`;
             miniSwatch.title = colorName;
         }
         
-        // Update the selected color text
-        const colorText = document.querySelector('.selected-color-indicator strong');
+        // Update the selected color text in Step 3
+        const colorText = document.getElementById('pricing-color-name');
         if (colorText) {
             colorText.textContent = colorName;
         }
         
-        // Also update any color indicator in the pricing grid header
-        const pricingColorText = document.querySelector('.pricing-header .selected-color-indicator strong');
-        if (pricingColorText) {
-            pricingColorText.textContent = colorName;
-        }
+        // Also update any other color indicators
+        const allColorTexts = document.querySelectorAll('.selected-color-indicator strong');
+        allColorTexts.forEach(text => {
+            text.textContent = colorName;
+        });
     }
 
     // Update quote display
