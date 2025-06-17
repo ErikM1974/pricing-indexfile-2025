@@ -1333,6 +1333,8 @@
         .pricing-grid th:first-child {
             text-align: left;
             padding-left: 20px;
+            background: #3a7c52;
+            color: white;
         }
         
         .pricing-grid td {
@@ -1425,6 +1427,17 @@
         
         #pricing-grid-container .pricing-header {
             display: none; /* Hide the duplicate header from UniversalPricingGrid */
+        }
+        
+        /* Remove animations from pricing table */
+        .pricing-grid .stagger-animation {
+            animation: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+        }
+        
+        .pricing-grid tr {
+            animation-delay: 0s !important;
         }
         
         /* Responsive */
