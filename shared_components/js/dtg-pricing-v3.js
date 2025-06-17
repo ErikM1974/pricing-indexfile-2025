@@ -801,7 +801,11 @@
 
         // Auto-advance to step 2
         if (state.currentStep === 1) {
-            setTimeout(() => updateStep(2), 500);
+            setTimeout(() => {
+                updateStep(2);
+                // Update pricing display when we reach step 2
+                updatePricingDisplay();
+            }, 500);
         }
     }
 
@@ -809,7 +813,7 @@
         console.log('[DTG-v3] Quantity changed:', quantity);
         state.quantity = quantity;
 
-        // Update pricing display
+        // Update pricing display immediately
         updatePricingDisplay();
 
         // Dispatch event for other components
@@ -844,7 +848,6 @@
 
     function updatePricingDisplay() {
         // This will be called when pricing data is available
-        // For now, show loading state
         const unitPriceEl = document.getElementById('dtg-unit-price');
         const totalPriceEl = document.getElementById('dtg-total-price');
         const breakdownEl = document.getElementById('dtg-pricing-breakdown');
@@ -854,23 +857,42 @@
         // Check if we have pricing data from the window
         if (window.nwcaPricingData && window.nwcaPricingData.prices) {
             const prices = window.nwcaPricingData.prices;
-            const tierData = window.nwcaPricingData.tierData;
+            const tierData = window.nwcaPricingData.tierData || window.nwcaPricingData.tiers;
             
             // Find the appropriate tier for the quantity
             let currentTier = null;
-            for (const [tierKey, tier] of Object.entries(tierData)) {
+            let basePrice = 0;
+            
+            // Find which tier the current quantity falls into
+            for (const [tierKey, tier] of Object.entries(tierData || {})) {
                 if (state.quantity >= tier.MinQuantity && state.quantity <= tier.MaxQuantity) {
                     currentTier = tierKey;
                     break;
                 }
             }
 
-            if (currentTier && prices['S-XL'] && prices['S-XL'][currentTier]) {
-                const basePrice = parseFloat(prices['S-XL'][currentTier]);
+            // Get the base price from S-XL group
+            if (currentTier && prices['S-XL'] && prices['S-XL'][currentTier] !== undefined) {
+                basePrice = parseFloat(prices['S-XL'][currentTier]);
+            } else {
+                // Fallback: try to find any valid price
+                console.log('[DTG-v3] Current tier not found, looking for fallback price');
+                const sxlPrices = prices['S-XL'] || {};
+                const availableTiers = Object.keys(sxlPrices);
+                if (availableTiers.length > 0) {
+                    // Use the first available tier as fallback
+                    currentTier = availableTiers[0];
+                    basePrice = parseFloat(sxlPrices[currentTier]) || 0;
+                }
+            }
+
+            if (basePrice > 0) {
                 let totalPrice = basePrice * state.quantity;
                 
                 // Apply LTM fee if under 24
+                let ltmFeePerUnit = 0;
                 if (state.quantity < 24) {
+                    ltmFeePerUnit = 50 / state.quantity;
                     totalPrice += 50;
                 }
 
@@ -880,30 +902,73 @@
                 // Update breakdown
                 if (breakdownEl) {
                     const locationInfo = DTG_LOCATIONS[state.selectedLocation];
-                    breakdownEl.innerHTML = `
+                    let breakdownHTML = `
                         <div class="breakdown-item">
-                            <span class="breakdown-label">Price per shirt:</span>
+                            <span class="breakdown-label">Price per shirt (S-XL):</span>
                             <span class="breakdown-value">$${basePrice.toFixed(2)}</span>
                         </div>
                         <div class="breakdown-item">
                             <span class="breakdown-label">${locationInfo.name} printing:</span>
                             <span class="breakdown-value">included</span>
                         </div>
-                        ${state.quantity < 24 ? `
-                        <div class="breakdown-item">
-                            <span class="breakdown-label">Setup fee (< 24 shirts):</span>
-                            <span class="breakdown-value">+$${(50 / state.quantity).toFixed(2)}</span>
-                        </div>
-                        ` : ''}
                     `;
+                    
+                    // Show size upcharges if any
+                    const upcharges = [];
+                    ['2XL', '3XL', '4XL+'].forEach(size => {
+                        if (prices[size] && prices[size][currentTier] !== undefined) {
+                            const sizePrice = parseFloat(prices[size][currentTier]);
+                            if (sizePrice > basePrice) {
+                                upcharges.push({
+                                    size: size,
+                                    upcharge: sizePrice - basePrice
+                                });
+                            }
+                        }
+                    });
+                    
+                    if (upcharges.length > 0) {
+                        breakdownHTML += `<div class="breakdown-item" style="margin-top: 8px;">
+                            <span class="breakdown-label">Size upcharges:</span>
+                        </div>`;
+                        upcharges.forEach(({ size, upcharge }) => {
+                            breakdownHTML += `
+                                <div class="breakdown-item" style="padding-left: 20px;">
+                                    <span class="breakdown-label">• ${size}:</span>
+                                    <span class="breakdown-value">+$${upcharge.toFixed(2)}</span>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    if (state.quantity < 24) {
+                        breakdownHTML += `
+                            <div class="breakdown-item" style="margin-top: 8px;">
+                                <span class="breakdown-label">Setup fee (< 24 shirts):</span>
+                                <span class="breakdown-value">+$${ltmFeePerUnit.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    breakdownEl.innerHTML = breakdownHTML;
                 }
+                
+                console.log('[DTG-v3] Updated pricing display:', { basePrice, totalPrice, currentTier });
             } else {
+                console.log('[DTG-v3] No valid price found, showing loading state');
                 unitPriceEl.textContent = 'Loading...';
                 totalPriceEl.textContent = '';
+                if (breakdownEl) {
+                    breakdownEl.innerHTML = '<div class="breakdown-item">Loading pricing data...</div>';
+                }
             }
         } else {
+            console.log('[DTG-v3] No pricing data available yet');
             unitPriceEl.textContent = 'Loading...';
             totalPriceEl.textContent = '';
+            if (breakdownEl) {
+                breakdownEl.innerHTML = '<div class="breakdown-item">Loading pricing data...</div>';
+            }
         }
     }
 
