@@ -1005,18 +1005,16 @@
             }
         });
 
-        // Show/hide pricing grid container based on step
+        // Ensure pricing grid container is moved to step 3 and always visible
         const pricingGridContainer = document.getElementById('pricing-grid-container');
         if (pricingGridContainer) {
-            if (step === 3) {
-                pricingGridContainer.style.display = 'block';
-                // Move it inside step 3 if it's not already there
-                const step3Section = document.getElementById('dtg-step-3');
-                if (step3Section && !step3Section.contains(pricingGridContainer)) {
-                    step3Section.appendChild(pricingGridContainer);
-                }
-            } else {
-                pricingGridContainer.style.display = 'none';
+            // Always show the pricing grid
+            pricingGridContainer.style.display = 'block';
+            
+            // Move it inside step 3 if it's not already there
+            const step3Section = document.getElementById('dtg-step-3');
+            if (step3Section && !step3Section.contains(pricingGridContainer)) {
+                step3Section.appendChild(pricingGridContainer);
             }
         }
     }
