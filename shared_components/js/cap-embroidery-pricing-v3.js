@@ -1047,17 +1047,8 @@
                 if (productNameEl) productNameEl.textContent = data.productTitle || `Style ${styleNumber}`;
                 if (productStyleEl) productStyleEl.textContent = `Style: ${styleNumber}`;
                 
-                // Initialize Universal Product Display
-                if (window.UniversalProductDisplay) {
-                    console.log('[CAP-PRICING-V3] Initializing UniversalProductDisplay');
-                    new window.UniversalProductDisplay({
-                        containerId: 'product-display',
-                        pageType: 'cap-embroidery',
-                        showBackButton: true,
-                        enableGallery: true,
-                        enableSwatches: true
-                    });
-                }
+                // Don't initialize UniversalProductDisplay here - it's already initialized in the HTML
+                // Just dispatch the event for existing components to update
                 
                 // Dispatch event
                 window.dispatchEvent(new CustomEvent('productColorsReady', {
