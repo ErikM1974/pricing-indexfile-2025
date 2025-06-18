@@ -177,9 +177,19 @@ h1 {
 }
 
 .color-swatches {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 15px;
+    align-items: start;
+}
+
+/* Swatch wrapper for proper alignment */
+.swatch-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
 }
 
 .color-swatch {
@@ -203,18 +213,13 @@ h1 {
 }
 
 .color-name {
-    /* position: absolute; */ /* Removed */
-    /* bottom: -25px; */ /* Removed */
-    /* left: 50%; */ /* Removed */
-    /* transform: translateX(-50%); */ /* Removed */
     font-size: 0.75em;
-    /* white-space: nowrap; */ /* Allow wrapping - handled in HTML style */
     color: var(--text-color);
     text-align: center;
-    width: 100%; /* Let it take the width of the wrapper */
-    display: block; /* Ensure it behaves as a block */
-    margin-top: 4px; /* Add some space below the swatch */
-    line-height: 1.2; /* Allow for wrapping */
+    width: 80px;
+    display: block;
+    margin-top: 8px;
+    line-height: 1.2;
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
@@ -458,6 +463,11 @@ h1 {
         scrollbar-width: thin;
     }
 
+    .color-swatches {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 12px;
+    }
+
     .color-swatch {
         width: 50px;
         height: 50px;
@@ -465,7 +475,7 @@ h1 {
 
     .color-name {
         font-size: 0.7em;
-        bottom: -22px;
+        width: 70px;
     }
 }
 
@@ -493,13 +503,18 @@ h1 {
         font-size: 1.1em;
     }
 
+    .color-swatches {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 10px;
+    }
+
     .color-swatch {
         width: 45px;
         height: 45px;
     }
 
     .color-name {
-        width: 70px;
+        width: 60px;
         font-size: 0.65em;
     }
 

@@ -427,7 +427,7 @@ class UniversalPricingGrid {
                         const priceNum = parseFloat(price);
                         let formattedPrice;
                         if (!isNaN(priceNum)) {
-                            formattedPrice = priceNum % 1 === 0 ? `$${priceNum}` : `$${priceNum.toFixed(2)}`;
+                            formattedPrice = `$${priceNum}`;
                         } else {
                             formattedPrice = 'N/A';
                         }

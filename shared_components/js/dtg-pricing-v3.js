@@ -896,7 +896,8 @@
                     totalPrice += 50;
                 }
 
-                unitPriceEl.textContent = `$${basePrice.toFixed(2)}`;
+                const displayPrice = basePrice + ltmFeePerUnit;
+                unitPriceEl.textContent = `$${displayPrice.toFixed(2)}`;
                 totalPriceEl.textContent = `Total: $${totalPrice.toFixed(2)}`;
 
                 // Update breakdown
@@ -904,8 +905,8 @@
                     const locationInfo = DTG_LOCATIONS[state.selectedLocation];
                     let breakdownHTML = `
                         <div class="breakdown-item">
-                            <span class="breakdown-label">Price per shirt (S-XL):</span>
-                            <span class="breakdown-value">$${basePrice.toFixed(2)}</span>
+                            <span class="breakdown-label">Base price (S-XL):</span>
+                            <span class="breakdown-value">$${basePrice}</span>
                         </div>
                         <div class="breakdown-item">
                             <span class="breakdown-label">${locationInfo.name} printing:</span>
@@ -913,39 +914,11 @@
                         </div>
                     `;
                     
-                    // Show size upcharges if any
-                    const upcharges = [];
-                    ['2XL', '3XL', '4XL+'].forEach(size => {
-                        if (prices[size] && prices[size][currentTier] !== undefined) {
-                            const sizePrice = parseFloat(prices[size][currentTier]);
-                            if (sizePrice > basePrice) {
-                                upcharges.push({
-                                    size: size,
-                                    upcharge: sizePrice - basePrice
-                                });
-                            }
-                        }
-                    });
-                    
-                    if (upcharges.length > 0) {
-                        breakdownHTML += `<div class="breakdown-item" style="margin-top: 8px;">
-                            <span class="breakdown-label">Size upcharges:</span>
-                        </div>`;
-                        upcharges.forEach(({ size, upcharge }) => {
-                            breakdownHTML += `
-                                <div class="breakdown-item" style="padding-left: 20px;">
-                                    <span class="breakdown-label">• ${size}:</span>
-                                    <span class="breakdown-value">+$${upcharge.toFixed(2)}</span>
-                                </div>
-                            `;
-                        });
-                    }
-                    
                     if (state.quantity < 24) {
                         breakdownHTML += `
                             <div class="breakdown-item" style="margin-top: 8px;">
-                                <span class="breakdown-label">Setup fee (< 24 shirts):</span>
-                                <span class="breakdown-value">+$${ltmFeePerUnit.toFixed(2)}</span>
+                                <span class="breakdown-label">Less than minimum fee:</span>
+                                <span class="breakdown-value">+$${ltmFeePerUnit.toFixed(2)}/shirt ($50 ÷ ${state.quantity} shirts)</span>
                             </div>
                         `;
                     }
