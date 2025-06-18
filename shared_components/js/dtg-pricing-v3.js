@@ -107,6 +107,24 @@
         handleLocationSelection(state.selectedLocation);
     }
 
+    // Function to update header pricing display
+    function updateHeaderPricing(quantity, unitPrice) {
+        const headerQty = document.getElementById('header-quantity');
+        const headerPrice = document.getElementById('header-unit-price');
+        
+        if (headerQty) {
+            headerQty.textContent = quantity;
+        }
+        
+        if (headerPrice) {
+            if (typeof unitPrice === 'number' && !isNaN(unitPrice)) {
+                headerPrice.textContent = `$${unitPrice.toFixed(2)}`;
+            } else {
+                headerPrice.textContent = '$0.00';
+            }
+        }
+    }
+
     function injectUIStructure() {
         const container = document.querySelector('.pricing-content-wrapper');
         if (!container) {
@@ -900,6 +918,9 @@
                 unitPriceEl.textContent = `$${displayPrice.toFixed(2)}`;
                 totalPriceEl.textContent = `Total: $${totalPrice.toFixed(2)}`;
 
+                // Update header pricing display with the same price shown in instant quote
+                updateHeaderPricing(state.quantity, displayPrice);
+
                 // Update breakdown
                 if (breakdownEl) {
                     const locationInfo = DTG_LOCATIONS[state.selectedLocation];
@@ -934,6 +955,8 @@
                 if (breakdownEl) {
                     breakdownEl.innerHTML = '<div class="breakdown-item">Loading pricing data...</div>';
                 }
+                // Update header to show loading state
+                updateHeaderPricing(state.quantity, 0);
             }
         } else {
             console.log('[DTG-v3] No pricing data available yet');
@@ -942,6 +965,8 @@
             if (breakdownEl) {
                 breakdownEl.innerHTML = '<div class="breakdown-item">Loading pricing data...</div>';
             }
+            // Update header to show loading state
+            updateHeaderPricing(state.quantity, 0);
         }
     }
 
