@@ -386,8 +386,12 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         console.log("[ADAPTER:DTG] Initializing DTG pricing adapter (Master Bundle)...");
         clearMessages();
 
-        window.addEventListener('message', handleCaspioMessage, false);
-        console.log('[ADAPTER:DTG] Added window message listener for Caspio master bundle.');
+        // Only add message listener once
+        if (!window.dtgMessageListenerAdded) {
+            window.addEventListener('message', handleCaspioMessage, false);
+            window.dtgMessageListenerAdded = true;
+            console.log('[ADAPTER:DTG] Added window message listener for Caspio master bundle.');
+        }
         
         setupParentLocationSelector();
 
@@ -396,6 +400,12 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
 
         const styleNumber = typeof NWCAUtils !== 'undefined' ? NWCAUtils.getUrlParameter('StyleNumber') : null;
         const colorName = (typeof NWCAUtils !== 'undefined' && NWCAUtils.getUrlParameter('COLOR')) ? decodeURIComponent(NWCAUtils.getUrlParameter('COLOR').replace(/\+/g, ' ')) : null;
+        
+        // Load Caspio datapage only once
+        if (!window.dtgCaspioLoaded) {
+            window.dtgCaspioLoaded = true;
+            loadCaspioDatapage(styleNumber, colorName);
+        }
 
         if (!styleNumber) {
             console.error("[ADAPTER:DTG] StyleNumber not found in URL. Cannot initialize DTG context fully.");
@@ -425,6 +435,28 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
     };
     
     const CASPIO_IFRAME_TIMEOUT_DURATION = 15000; // 15 seconds to allow for initial load
+
+    function loadCaspioDatapage(styleNumber, colorName) {
+        const container = document.getElementById('pricing-calculator');
+        if (!container) {
+            console.error('[ADAPTER:DTG] Pricing calculator container not found');
+            return;
+        }
+        
+        // Create the Caspio script dynamically with parameters
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        
+        // Build URL with parameters
+        const params = new URLSearchParams();
+        if (styleNumber) params.append('StyleNumber', styleNumber);
+        if (colorName) params.append('COLOR', colorName);
+        
+        script.src = `https://c3eku948.caspio.com/dp/a0e150002177c037d053438abf13/emb?${params.toString()}`;
+        
+        console.log('[ADAPTER:DTG] Loading Caspio datapage with URL:', script.src);
+        container.appendChild(script);
+    }
 
     function resetDtgCaspioMessageTimeout() {
         if (dtgCaspioMessageTimeoutId) {
