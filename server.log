@@ -1,7 +1,15 @@
+
+> nwca-pricing-tool@1.0.0 start
+> node server.js
+
 Server is running on port 3000
 Using existing Caspio API for quote functionality:
   Quote Sessions: /api/quote_sessions
   Quote Items: /api/quote_items
   Quote Analytics: /api/quote_analytics
-Serving product page from: /mnt/c/Users/erik/OneDrive - Northwest Custom Apparel/2025/Pricing Index File 2025/product-updated.html
-Serving product page from: /mnt/c/Users/erik/OneDrive - Northwest Custom Apparel/2025/Pricing Index File 2025/product-updated.html
+Serving product.html page
+Making GET request to: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-colors?styleNumber=C811
+Making GET request to: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=C811&color=Black
+Making GET request to: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/stylesearch?term=pc61
+Making GET request to: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-colors?styleNumber=PC61
+Making GET request to: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=PC61&color=Aquatic%20Blue

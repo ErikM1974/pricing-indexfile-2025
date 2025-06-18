@@ -37,11 +37,8 @@
         // Listen for pricing data loaded event - This is the primary trigger for the pricing grid.
         // DTG adapter dispatches on window, so we need to listen on window
         window.addEventListener('pricingDataLoaded', function(event) {
-            console.log("********************************************************************************");
-            console.log("[DP5-HELPER] RAW 'pricingDataLoaded' EVENT DETECTED. Timestamp:", new Date().toISOString());
-            console.log("[DP5-HELPER] Event object:", event);
-            console.log("[DP5-HELPER] Event detail stringified:", JSON.stringify(event.detail));
-            console.log("********************************************************************************");
+            // Reduced logging - only log key information
+            console.log("[DP5-HELPER] pricingDataLoaded event detected");
             
             // Check if this event has already been processed by dp5-helper to avoid loops
             if (event.detail && event.detail._dp5Processed) {
@@ -50,7 +47,7 @@
             }
             
             if (event.detail && event.detail.headers && event.detail.prices && (event.detail.tierData || event.detail.tiers)) {
-                console.log("[DP5-HELPER] Event passed primary validation (headers, prices, tierData/tiers exist). Event source might be:", event.detail.selectedLocationValue ? "dtg-adapter" : "pricing-matrix-capture/other");
+                // Event validation passed - process the data
                 const pricingDataFromEvent = {
                     headers: event.detail.headers,
                     prices: event.detail.prices,
@@ -68,22 +65,24 @@
                     _dp5Processed: true // Mark as processed by dp5-helper
                 };
         
-                // **** ADD DEBUG LOG ****
-                console.log("[DP5-HELPER] Constructed pricingDataFromEvent:", JSON.stringify(pricingDataFromEvent));
-                // **** END DEBUG LOG ****
         
                 // if (!window.directFixApplied) { // Temporarily remove this check to ensure adapter-driven updates are processed
-                    console.log("[DP5-HELPER] Pricing data is available from event. Updating custom pricing grid (directFixApplied check bypassed for testing).");
+                    // Update custom pricing grid with the new data
                     updateCustomPricingGrid(pricingDataFromEvent);
                     
-                    // Re-dispatch the event with the normalized data format
-                    // This ensures components expecting tierData will get it
-                    const normalizedEvent = new CustomEvent('pricingDataLoaded', {
-                        detail: pricingDataFromEvent,
-                        bubbles: true
-                    });
-                    window.dispatchEvent(normalizedEvent);
-                    console.log("[DP5-HELPER] Re-dispatched pricingDataLoaded event with normalized format");
+                    // Only re-dispatch if the original event didn't have the proper format
+                    if (!event.detail.tierData || !event.detail._dp5Processed) {
+                        // Re-dispatch the event with the normalized data format
+                        // This ensures components expecting tierData will get it
+                        const normalizedEvent = new CustomEvent('pricingDataLoaded', {
+                            detail: pricingDataFromEvent,
+                            bubbles: true
+                        });
+                        window.dispatchEvent(normalizedEvent);
+                        console.log("[DP5-HELPER] Re-dispatched pricingDataLoaded event with normalized format");
+                    } else {
+                        console.log("[DP5-HELPER] Skipping re-dispatch as event already has proper format");
+                    }
                 // } else {
                 //     console.log("[DP5-HELPER] Skipping custom pricing grid update (via 'pricingDataLoaded' event) as DIRECT-FIX already applied it.");
                 // }
@@ -162,13 +161,8 @@
     }
     
     function updateCustomPricingGrid(pricingDataInput) {
-        console.log("[DP5-HELPER] updateCustomPricingGrid called with data:", pricingDataInput);
         let dataToUse = pricingDataInput;
 
-        // **** ADD DEBUG LOG ****
-        console.log("[DP5-HELPER] updateCustomPricingGrid - Initial pricingDataInput:", JSON.stringify(pricingDataInput));
-        console.log("[DP5-HELPER] updateCustomPricingGrid - Initial window.nwcaPricingData:", JSON.stringify(window.nwcaPricingData));
-        // **** END DEBUG LOG ****
 
         // Primary validation: Check if the passed data is usable
         // Normalize tierData to tiers if present
@@ -192,18 +186,15 @@
             return;
         }
         
-        console.log("[DP5-HELPER] Using data for pricing grid. Headers:", dataToUse.headers, "Tiers:", dataToUse.tiers); // Added Tiers to log
         
         if (!dataToUse.uniqueSizes || dataToUse.uniqueSizes.length === 0) {
             if (dataToUse.headers && Array.isArray(dataToUse.headers)) {
                 if (dataToUse.embellishmentType === 'cap-embroidery') {
                     // For cap embroidery, use the headers directly without filtering slashes
                     dataToUse.uniqueSizes = [...new Set(dataToUse.headers)];
-                    console.log("[DP5-HELPER] Cap embroidery detected: Using headers directly for uniqueSizes:", dataToUse.uniqueSizes);
                 } else {
                     // Original logic for other embellishment types
                     dataToUse.uniqueSizes = [...new Set(dataToUse.headers.filter(h => h && typeof h === 'string' && !h.includes('-') && !h.includes('/')))];
-                    console.log("[DP5-HELPER] Derived uniqueSizes for grid update:", dataToUse.uniqueSizes);
                 }
             } else {
                 console.warn("[DP5-HELPER] Cannot derive uniqueSizes, headers are missing or not an array.");
@@ -211,13 +202,24 @@
             }
         }
 
-        const pricingGrid = document.getElementById('custom-pricing-grid');
+        // Try multiple possible pricing grid element IDs
+        let pricingGrid = document.getElementById('custom-pricing-grid');
         if (!pricingGrid) {
-            console.warn("[DP5-HELPER] Custom pricing grid element not found.");
+            // Try the universal pricing grid table ID
+            pricingGrid = document.getElementById('pricing-grid-container-table');
+        }
+        if (!pricingGrid) {
+            // Try to find any pricing grid table
+            pricingGrid = document.querySelector('.pricing-grid');
+        }
+        if (!pricingGrid) {
+            console.warn("[DP5-HELPER] No pricing grid element found (tried: custom-pricing-grid, pricing-grid-container-table, .pricing-grid)");
             return;
         }
         
-        const headerRow = document.getElementById('pricing-header-row') || pricingGrid.querySelector('thead tr');
+        const headerRow = document.getElementById('pricing-header-row') || 
+                          document.getElementById('pricing-grid-container-header-row') || 
+                          pricingGrid.querySelector('thead tr');
         if (headerRow) {
             // Clear all headers first
             headerRow.innerHTML = '';
@@ -244,7 +246,7 @@
             console.warn("[DP5-HELPER] Header row not found in custom pricing grid.");
         }
         
-        const tbody = pricingGrid.querySelector('tbody');
+        const tbody = document.getElementById('pricing-grid-container-tbody') || pricingGrid.querySelector('tbody');
         if (!tbody) {
             console.warn("[DP5-HELPER] Tbody element not found in custom pricing grid.");
             return;
@@ -382,6 +384,12 @@
     }
     
     function updateAddToCartSection(sizes) {
+        // Skip add to cart functionality for DTG pages
+        if (window.location.pathname.includes('dtg-pricing') || window.location.pathname.includes('/dtg')) {
+            console.log("[DP5-HELPER] Skipping Add to Cart section for DTG page");
+            return;
+        }
+        
         // Check if we're in quote-only mode
         if (window.NWCA && NWCA.config && NWCA.config.features && !NWCA.config.features.cartEnabled) {
             console.log("[DP5-HELPER] Quote mode active, skipping add-to-cart UI update");
@@ -493,7 +501,7 @@
             row.appendChild(sizeLabel);
             row.appendChild(inputContainer);
             row.appendChild(priceDisplay);
-            sizeQuantityGrid.appendChild(row);
+            currentSizeQuantityGrid.appendChild(row);
         });
         console.log("[DP5-HELPER] Add to Cart section updated by dp5-helper.");
         window.addToCartInitialized = true; // Mark that dp5-helper has done its job for add-to-cart UI
@@ -907,7 +915,7 @@
         // Keep legacy for any direct calls if necessary, or for the fallback path
         refreshColorSwatchesLegacy: initColorSwatchesLegacy,
         testListenerReach: function(source, data) {
-            console.log(`[DP5-HELPER] testListenerReach CALLED BY: ${source}`, data);
+            // Test function - logging disabled for production
         }
     };
 })();

@@ -306,12 +306,7 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: singleLocationDataPayload }));
         console.log('[ADAPTER:DTG] Dispatched pricingDataLoaded event ON WINDOW for selected location:', locationCode);
 
-        // TEST: Directly call DP5Helper to see if it's reachable
-        if (window.DP5Helper && typeof window.DP5Helper.testListenerReach === 'function') {
-            window.DP5Helper.testListenerReach('dtg-adapter after dispatch', singleLocationDataPayload);
-        } else {
-            console.warn('[ADAPTER:DTG] DP5Helper.testListenerReach not found or not a function!');
-        }
+        // DP5Helper test call removed for production
         
         // The universal pricing grid handles its own display, so we don't need to manipulate the old grid
         // Just make sure the data is dispatched and let the universal components handle display
@@ -385,6 +380,11 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
     async function initDTGPricing() {
         console.log("[ADAPTER:DTG] Initializing DTG pricing adapter (Master Bundle)...");
         clearMessages();
+        
+        // Reset the Caspio loaded flag to ensure it loads on each page initialization
+        // This is important for single-page applications or when navigating between products
+        window.dtgCaspioLoaded = false;
+        console.log('[ADAPTER:DTG] Reset Caspio loaded flag');
 
         // Only add message listener once
         if (!window.dtgMessageListenerAdded) {
@@ -402,9 +402,13 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         const colorName = (typeof NWCAUtils !== 'undefined' && NWCAUtils.getUrlParameter('COLOR')) ? decodeURIComponent(NWCAUtils.getUrlParameter('COLOR').replace(/\+/g, ' ')) : null;
         
         // Load Caspio datapage only once
+        console.log('[ADAPTER:DTG] Checking if Caspio needs to be loaded. Flag:', window.dtgCaspioLoaded);
         if (!window.dtgCaspioLoaded) {
+            console.log('[ADAPTER:DTG] Loading Caspio datapage for the first time');
             window.dtgCaspioLoaded = true;
             loadCaspioDatapage(styleNumber, colorName);
+        } else {
+            console.log('[ADAPTER:DTG] Caspio already loaded, skipping');
         }
 
         if (!styleNumber) {
@@ -437,11 +441,15 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
     const CASPIO_IFRAME_TIMEOUT_DURATION = 15000; // 15 seconds to allow for initial load
 
     function loadCaspioDatapage(styleNumber, colorName) {
+        console.log('[ADAPTER:DTG] loadCaspioDatapage called with:', { styleNumber, colorName });
+        
         const container = document.getElementById('pricing-calculator');
         if (!container) {
             console.error('[ADAPTER:DTG] Pricing calculator container not found');
             return;
         }
+        
+        console.log('[ADAPTER:DTG] Found pricing-calculator container');
         
         // Create the Caspio script dynamically with parameters
         const script = document.createElement('script');
@@ -455,7 +463,13 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
         script.src = `https://c3eku948.caspio.com/dp/a0e150002177c037d053438abf13/emb?${params.toString()}`;
         
         console.log('[ADAPTER:DTG] Loading Caspio datapage with URL:', script.src);
+        
+        // Add load and error handlers
+        script.onload = () => console.log('[ADAPTER:DTG] Caspio script loaded successfully');
+        script.onerror = (e) => console.error('[ADAPTER:DTG] Failed to load Caspio script:', e);
+        
         container.appendChild(script);
+        console.log('[ADAPTER:DTG] Script element appended to container');
     }
 
     function resetDtgCaspioMessageTimeout() {
