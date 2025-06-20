@@ -1,0 +1,287 @@
+/* Embroidery Pricing Page Layout Fix - Professional CSS Architecture */
+
+/* ========================================
+   1. HEADER FIXES - Consolidate and reduce height
+   ======================================== */
+
+/* Hide the duplicate universal header */
+#universal-header-container {
+    display: none !important;
+}
+
+/* Reduce body padding - was 200px, now reasonable */
+body.universal-theme {
+    padding-top: 140px !important; /* Reduced from 200px */
+}
+
+/* Streamline the enhanced header */
+.enhanced-pricing-header {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+/* Reduce contact bar height */
+.header-contact-bar {
+    padding: 6px 0 !important; /* Reduced from 10px */
+    font-size: 13px !important;
+}
+
+/* Reduce nav bar padding */
+.header-nav {
+    padding: 12px 0 !important; /* Reduced from default */
+}
+
+/* Smaller logo */
+.logo-image {
+    max-height: 40px !important; /* Ensure logo doesn't make header too tall */
+    width: auto;
+}
+
+/* Reduce pricing context bar */
+.pricing-context-bar {
+    padding: 10px 0 !important;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* ========================================
+   2. MAIN LAYOUT - Fix column alignment
+   ======================================== */
+
+/* Main container with proper spacing */
+.universal-pricing-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px !important; /* Reduced from 30px */
+}
+
+/* Fix two-column layout with CSS Grid */
+.universal-pricing-columns {
+    display: grid !important;
+    grid-template-columns: minmax(400px, 1fr) minmax(400px, 1fr);
+    gap: 24px;
+    align-items: start; /* Ensure columns align at top */
+    margin-top: 0 !important; /* Remove extra top margin */
+}
+
+/* Card styling for both columns */
+.universal-product-column,
+.universal-calculator-column {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e8e9eb;
+    overflow: hidden;
+    height: 100%;
+}
+
+/* Remove default padding, we'll control it */
+.universal-product-column {
+    padding: 0 !important;
+}
+
+.universal-calculator-column {
+    padding: 0 !important;
+}
+
+/* Product display internal padding */
+#product-display {
+    padding: 20px;
+}
+
+/* Calculator card already has internal padding from step-sections */
+.universal-calculator-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* ========================================
+   3. STEP SECTIONS - Better spacing
+   ======================================== */
+
+/* Step sections spacing */
+.step-section {
+    padding: 20px !important; /* Reduced from 25px */
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 0 !important; /* Remove margin, use border */
+}
+
+.step-section:last-child {
+    border-bottom: none;
+}
+
+/* Step headers more compact */
+.step-header {
+    margin-bottom: 16px !important; /* Reduced from 20px */
+}
+
+.step-number {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 14px !important;
+}
+
+.step-title {
+    font-size: 18px !important;
+    margin: 0 !important;
+}
+
+/* ========================================
+   4. RESPONSIVE DESIGN
+   ======================================== */
+
+/* Tablet (1024px and below) */
+@media (max-width: 1024px) {
+    .universal-pricing-columns {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    body.universal-theme {
+        padding-top: 120px !important;
+    }
+    
+    .universal-pricing-container {
+        padding: 16px !important;
+    }
+}
+
+/* Mobile (768px and below) */
+@media (max-width: 768px) {
+    body.universal-theme {
+        padding-top: 180px !important; /* More room for wrapped header */
+    }
+    
+    .header-contact-bar {
+        display: none !important; /* Hide contact bar on mobile to save space */
+    }
+    
+    .pricing-context-bar {
+        padding: 8px 0 !important;
+    }
+    
+    .header-live-pricing {
+        font-size: 13px !important;
+    }
+    
+    .step-section {
+        padding: 16px !important;
+    }
+}
+
+/* ========================================
+   5. VISUAL POLISH
+   ======================================== */
+
+/* Smooth transitions */
+.universal-product-column,
+.universal-calculator-column {
+    transition: box-shadow 0.2s ease;
+}
+
+/* Hover effect on cards */
+.universal-product-column:hover,
+.universal-calculator-column:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Better focus states */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid #3a7c52;
+    outline-offset: 2px;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ========================================
+   6. TYPOGRAPHY IMPROVEMENTS
+   ======================================== */
+
+/* Consistent font sizes */
+body {
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Headers */
+h1 { font-size: 28px; margin-bottom: 16px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 18px; margin-bottom: 12px; }
+
+/* Form labels */
+.control-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 6px !important;
+}
+
+/* ========================================
+   7. SPECIFIC FIXES
+   ======================================== */
+
+/* Fix progress bar alignment */
+.progress-bar {
+    margin-bottom: 0 !important;
+}
+
+/* Fix pricing table wrapper spacing */
+.pricing-table-wrapper {
+    margin: 20px 0 16px 0 !important;
+}
+
+/* Ensure proper spacing for control groups */
+.control-group {
+    margin-bottom: 20px !important;
+}
+
+.control-group:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Fix any z-index issues */
+.enhanced-pricing-header {
+    z-index: 1000;
+}
+
+.slider-tooltip {
+    z-index: 10;
+}
+
+/* ========================================
+   8. PRINT STYLES
+   ======================================== */
+
+@media print {
+    body.universal-theme {
+        padding-top: 0 !important;
+    }
+    
+    .enhanced-pricing-header,
+    #universal-header-container {
+        display: none !important;
+    }
+    
+    .universal-pricing-columns {
+        grid-template-columns: 1fr;
+    }
+    
+    .universal-product-column,
+    .universal-calculator-column {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        break-inside: avoid;
+    }
+}
