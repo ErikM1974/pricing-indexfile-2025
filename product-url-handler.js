@@ -9,6 +9,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Product URL Handler: Initializing...');
     
+    // Skip if we're on a page that handles its own URL parameters
+    if (window.location.pathname.includes('cap-embroidery') || 
+        window.location.pathname.includes('embroidery-pricing') ||
+        window.location.pathname.includes('dtg-pricing')) {
+        console.log('Product URL Handler: Skipping - page handles its own URL parameters');
+        return;
+    }
+    
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const styleNumber = urlParams.get('StyleNumber');
