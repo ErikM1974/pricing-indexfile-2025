@@ -33,7 +33,7 @@
 
     // Initialize on DOM ready
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('[CAP-PRICING-V3] Initializing...');
+        // console.log('[CAP-PRICING-V3] Initializing...');
         
         // Make updateHeaderPricing globally available
         window.updateHeaderPricing = function(quantity, unitPrice) {
@@ -56,7 +56,7 @@
 
     // Handle master bundle data
     function handleMasterBundle(event) {
-        console.log('[CAP-PRICING-V3] Received master bundle event:', event.detail);
+        // console.log('[CAP-PRICING-V3] Received master bundle event:', event.detail);
         
         if (!event.detail || !event.detail.raw) {
             displayPricingError();
@@ -68,7 +68,7 @@
 
     // Process master bundle data
     function processMasterBundleData(masterBundle) {
-        console.log('[CAP-PRICING-V3] Processing master bundle:', masterBundle);
+        // console.log('[CAP-PRICING-V3] Processing master bundle:', masterBundle);
         
         // Store the master bundle data
         pricingData = masterBundle;
@@ -90,8 +90,8 @@
                 });
             });
             
-            console.log('[CAP-PRICING-V3] Base prices loaded:', basePrices);
-            console.log('[CAP-PRICING-V3] Available sizes:', masterBundle.uniqueSizes);
+            // console.log('[CAP-PRICING-V3] Base prices loaded:', basePrices);
+            // console.log('[CAP-PRICING-V3] Available sizes:', masterBundle.uniqueSizes);
             
             // Build table structure with master bundle data
             createTableStructure(masterBundle);
@@ -563,7 +563,7 @@
             return;
         }
         
-        console.log('[CAP-PRICING-V3] Creating table structure with sizes:', data.uniqueSizes);
+        // console.log('[CAP-PRICING-V3] Creating table structure with sizes:', data.uniqueSizes);
 
         // Get available sizes from master bundle
         const availableSizes = data.uniqueSizes || [];
@@ -599,13 +599,13 @@
         `;
         
         gridContainer.innerHTML = tableHTML;
-        console.log('[CAP-PRICING-V3] Table structure created, checking cells...');
+        // console.log('[CAP-PRICING-V3] Table structure created, checking cells...');
         const cells = gridContainer.querySelectorAll('.price-cell');
-        console.log('[CAP-PRICING-V3] Found', cells.length, 'price cells after creation');
+        // console.log('[CAP-PRICING-V3] Found', cells.length, 'price cells after creation');
         
         // Set flag to prevent dp5-helper from overwriting our table
         window.directFixApplied = true;
-        console.log('[CAP-PRICING-V3] Set directFixApplied flag to prevent dp5-helper interference');
+        // console.log('[CAP-PRICING-V3] Set directFixApplied flag to prevent dp5-helper interference');
         
         // Also set a cap-specific flag
         window.capPricingTableCreated = true;
@@ -715,24 +715,24 @@
         const priceCells = document.querySelectorAll('.price-cell[data-size][data-tier]');
         const adjustment = frontAdjustment;
         
-        console.log('[CAP-PRICING-V3] Updating pricing table with adjustment:', adjustment);
-        console.log('[CAP-PRICING-V3] Base prices structure:', basePrices);
-        console.log('[CAP-PRICING-V3] Found price cells:', priceCells.length);
+        // console.log('[CAP-PRICING-V3] Updating pricing table with adjustment:', adjustment);
+        // console.log('[CAP-PRICING-V3] Base prices structure:', basePrices);
+        // console.log('[CAP-PRICING-V3] Found price cells:', priceCells.length);
         
         priceCells.forEach(cell => {
             const size = cell.dataset.size;
             const tier = cell.dataset.tier;
             
-            console.log('[CAP-PRICING-V3] Looking for price - Size:', size, 'Tier:', tier);
-            console.log('[CAP-PRICING-V3] Cell current content:', cell.textContent);
+            // console.log('[CAP-PRICING-V3] Looking for price - Size:', size, 'Tier:', tier);
+            // console.log('[CAP-PRICING-V3] Cell current content:', cell.textContent);
             
             if (basePrices[size] && basePrices[size][tier] !== undefined) {
                 const basePrice = basePrices[size][tier];
                 const adjustedPrice = basePrice + adjustment;
-                console.log('[CAP-PRICING-V3] Found price:', basePrice, 'Adjusted:', adjustedPrice);
+                // console.log('[CAP-PRICING-V3] Found price:', basePrice, 'Adjusted:', adjustedPrice);
                 cell.textContent = `$${adjustedPrice.toFixed(2)}`;
                 cell.dataset.basePrice = basePrice;
-                console.log('[CAP-PRICING-V3] Cell updated to:', cell.textContent);
+                // console.log('[CAP-PRICING-V3] Cell updated to:', cell.textContent);
             } else {
                 console.warn('[CAP-PRICING-V3] No price found for size:', size, 'tier:', tier);
                 console.warn('[CAP-PRICING-V3] Available data for size:', basePrices[size]);
@@ -756,10 +756,10 @@
         updateTierHighlight();
         
         // Verify the update
-        console.log('[CAP-PRICING-V3] Update complete. Verifying a sample cell...');
+        // console.log('[CAP-PRICING-V3] Update complete. Verifying a sample cell...');
         const sampleCell = document.querySelector('.price-cell[data-size="OSFA"][data-tier="24-47"]');
         if (sampleCell) {
-            console.log('[CAP-PRICING-V3] Sample cell content:', sampleCell.textContent);
+            // console.log('[CAP-PRICING-V3] Sample cell content:', sampleCell.textContent);
         }
     }
     
@@ -806,7 +806,7 @@
             return;
         }
         
-        console.log('[CAP-PRICING-V3] Using size for quote:', quoteSize);
+        // console.log('[CAP-PRICING-V3] Using size for quote:', quoteSize);
         
         // Get base price
         const tier = getPriceTier(currentQuantity);
@@ -816,10 +816,10 @@
         } else if (basePrices[quoteSize] && basePrices[quoteSize]['24-47']) {
             // Fallback to lowest tier if specific tier not found
             basePrice = basePrices[quoteSize]['24-47'];
-            console.log('[CAP-PRICING-V3] Using fallback tier 24-47 for quantity:', currentQuantity);
+            // console.log('[CAP-PRICING-V3] Using fallback tier 24-47 for quantity:', currentQuantity);
         } else {
             console.error('[CAP-PRICING-V3] No price found for tier:', tier, 'size:', quoteSize);
-            console.log('[CAP-PRICING-V3] Available tiers for size', quoteSize + ':', basePrices[quoteSize] ? Object.keys(basePrices[quoteSize]) : 'none');
+            // console.log('[CAP-PRICING-V3] Available tiers for size', quoteSize + ':', basePrices[quoteSize] ? Object.keys(basePrices[quoteSize]) : 'none');
             document.getElementById('base-price').textContent = 'Loading...';
             return;
         }
@@ -979,7 +979,7 @@
     // Keeping for reference but no longer used
     /*
     async function fetchPricingData() {
-        console.log('[CAP-PRICING-V3] Starting pricing data fetch...');
+        // console.log('[CAP-PRICING-V3] Starting pricing data fetch...');
         
         const API_BASE_URL = window.API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         const STITCH_COUNT = "8000";
@@ -988,7 +988,7 @@
         const color = urlParams.get('COLOR') || 'Black';
         
         if (!styleNumber) {
-            console.log('[CAP-PRICING-V3] No StyleNumber, skipping pricing fetch');
+            // console.log('[CAP-PRICING-V3] No StyleNumber, skipping pricing fetch');
             return;
         }
         
@@ -1002,7 +1002,7 @@
             
             if (sizePricingRes.ok) {
                 const sizePricingData = await sizePricingRes.json();
-                console.log('[CAP-PRICING-V3] Size pricing data:', sizePricingData);
+                // console.log('[CAP-PRICING-V3] Size pricing data:', sizePricingData);
                 
                 // For caps, usually there's only one size (OSFA)
                 if (sizePricingData.baseSizePrice) {
@@ -1089,8 +1089,8 @@
                 timestamp: new Date().toISOString()
             };
             
-            console.log('[CAP-PRICING-V3] Pricing data loaded:', masterBundle);
-            console.log('[CAP-PRICING-V3] Price profile structure:', priceProfile);
+            // console.log('[CAP-PRICING-V3] Pricing data loaded:', masterBundle);
+            // console.log('[CAP-PRICING-V3] Price profile structure:', priceProfile);
             processPricingData(masterBundle);
             
         } catch (error) {
@@ -1145,7 +1145,7 @@
         const color = urlParams.get('COLOR');
         
         if (!styleNumber) {
-            console.log('[CAP-PRICING-V3] No StyleNumber in URL, skipping product data load');
+            // console.log('[CAP-PRICING-V3] No StyleNumber in URL, skipping product data load');
             return;
         }
         
@@ -1158,7 +1158,7 @@
             }
             
             const data = await response.json();
-            console.log('[CAP-PRICING-V3] Product data loaded:', data);
+            // console.log('[CAP-PRICING-V3] Product data loaded:', data);
             
             // Set globals for compatibility
             window.productTitle = data.productTitle || `Style ${styleNumber}`;

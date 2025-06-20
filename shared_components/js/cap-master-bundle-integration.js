@@ -4,7 +4,7 @@
 (function() {
     'use strict';
 
-    console.log('[CAP-MASTER-BUNDLE] Integration handler loaded');
+    // console.log('[CAP-MASTER-BUNDLE] Integration handler loaded');
 
     // Data transformer function - converts master bundle to UI format
     function transformCapMasterBundle(masterBundle) {
@@ -62,18 +62,18 @@
         // Only process messages with a type property
         if (!event.data || !event.data.type) return;
 
-        console.log('[CAP-MASTER-BUNDLE] Received message:', event.data.type);
+        // console.log('[CAP-MASTER-BUNDLE] Received message:', event.data.type);
 
         if (event.data.type === 'caspioCapMasterBundleReady') {
             // SUCCESS - Process the master bundle
             const masterBundle = event.data.detail;
-            console.log('[CAP-MASTER-BUNDLE] Master bundle received:', masterBundle);
+            // console.log('[CAP-MASTER-BUNDLE] Master bundle received:', masterBundle);
 
             // Transform the data for UI
             const transformedData = transformCapMasterBundle(masterBundle);
             
             if (transformedData) {
-                console.log('[CAP-MASTER-BUNDLE] Transformed data:', transformedData);
+                // console.log('[CAP-MASTER-BUNDLE] Transformed data:', transformedData);
                 
                 // Store globally for debugging
                 window.nwcaCapMasterBundleData = masterBundle;
@@ -92,8 +92,8 @@
                 // Skip legacy pricingDataLoaded event for cap embroidery
                 // Cap embroidery pricing v3 handles its own table rendering
                 // and dp5-helper's updateCustomPricingGrid was overwriting it
-                console.log('[CAP-MASTER-BUNDLE] Bundle event dispatched successfully');
-                console.log('[CAP-MASTER-BUNDLE] Skipping legacy pricingDataLoaded event to prevent dp5-helper interference');
+                // console.log('[CAP-MASTER-BUNDLE] Bundle event dispatched successfully');
+                // console.log('[CAP-MASTER-BUNDLE] Skipping legacy pricingDataLoaded event to prevent dp5-helper interference');
                 
                 // Set flag to prevent other systems from triggering fallback
                 window.CAP_MASTER_BUNDLE_LOADED = true;
@@ -135,6 +135,6 @@
     // Export transformer function for testing
     window.transformCapMasterBundle = transformCapMasterBundle;
 
-    console.log('[CAP-MASTER-BUNDLE] Ready to receive master bundle data');
+    // console.log('[CAP-MASTER-BUNDLE] Ready to receive master bundle data');
 
 })();

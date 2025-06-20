@@ -40,7 +40,6 @@
 
     // Initialize on DOM ready
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('[EMBROIDERY-PRICING-V3] Initializing...');
         
         // Make updateHeaderPricing globally available
         window.updateHeaderPricing = function(quantity, unitPrice) {
@@ -56,7 +55,6 @@
         
         // Listen for master bundle data specifically
         document.addEventListener('masterBundleLoaded', function(event) {
-            console.log('[EMBROIDERY-PRICING-V3] Master bundle loaded event received');
             if (event.detail && event.detail.raw) {
                 window.nwcaMasterBundleData = event.detail.raw;
                 // Render the pricing table with the new data
@@ -73,10 +71,8 @@
         // Try to get existing pricing data if available
         setTimeout(() => {
             if (window.nwcaMasterBundleData) {
-                console.log('[EMBROIDERY-PRICING-V3] Found existing master bundle data');
                 renderPricingTable();
             } else if (window.nwcaPricingData) {
-                console.log('[EMBROIDERY-PRICING-V3] Found existing pricing data');
                 handlePricingData({ detail: window.nwcaPricingData });
             } else {
                 // Try to extract from table directly
@@ -88,7 +84,6 @@
         // Also try after a longer delay in case table loads slowly
         setTimeout(() => {
             if (Object.keys(basePrices).length === 0) {
-                console.log('[EMBROIDERY-PRICING-V3] No pricing data yet, trying to extract from table');
                 extractPricingFromTable();
                 updateQuote();
             }
@@ -115,7 +110,6 @@
 
     // Handle pricing data
     function handlePricingData(event) {
-        console.log('[EMBROIDERY-PRICING-V3] Received pricing data:', event.detail);
         
         if (!event.detail || !event.detail.prices) {
             console.error('[EMBROIDERY-PRICING-V3] Invalid pricing data');
@@ -168,7 +162,6 @@
                 }
             }
             
-            console.log('[EMBROIDERY-PRICING-V3] Selected tier:', selectedTier, 'for quantity:', currentQuantity);
             
             if (selectedTier) {
                 // Extract prices for each size group in the selected tier
@@ -183,8 +176,6 @@
             renderPricingTable();
         }
         
-        console.log('[EMBROIDERY-PRICING-V3] Base prices loaded:', basePrices);
-        console.log('[EMBROIDERY-PRICING-V3] Available size groups:', Object.keys(basePrices));
         updateQuote();
     }
     
@@ -192,7 +183,6 @@
     function renderPricingTable() {
         const container = document.getElementById('embroidery-pricing-table-container');
         if (!container) {
-            console.log('[EMBROIDERY-PRICING-V3] Pricing table container not found');
             return;
         }
         
@@ -201,13 +191,10 @@
         
         // Check if we have master bundle data with pricing
         if (!masterBundle || !masterBundle.pricing || !masterBundle.tierData) {
-            console.log('[EMBROIDERY-PRICING-V3] No master bundle data available for pricing table');
             container.innerHTML = '<p>Loading pricing data...</p>';
             return;
         }
         
-        console.log('[EMBROIDERY-PRICING-V3] Rendering pricing table with master bundle data');
-        console.log('[EMBROIDERY-PRICING-V3] Available sizes from master bundle:', masterBundle.uniqueSizes);
         
         // Get all unique sizes from the master bundle
         const allSizes = masterBundle.uniqueSizes || [];
@@ -227,8 +214,6 @@
         // Check if we have extended sizes
         const hasExtendedSizes = extendedSizes.length > 0;
         
-        console.log('[EMBROIDERY-PRICING-V3] Standard sizes:', standardSizes);
-        console.log('[EMBROIDERY-PRICING-V3] Extended sizes:', extendedSizes);
         
         // Build the main table with standard sizes
         let html = buildPricingTableHTML(masterBundle, standardSizes);
@@ -260,7 +245,6 @@
         `;
         
         container.innerHTML = html;
-        console.log('[EMBROIDERY-PRICING-V3] Pricing table rendered successfully');
         
         // Add accordion functionality if extended sizes exist
         if (hasExtendedSizes) {
@@ -962,27 +946,23 @@
     function extractPricingFromTable() {
         // If we already have pricing data from master bundle, don't extract from table
         if (pricingData && pricingData.prices && Object.keys(basePrices).length > 0) {
-            console.log('[EMBROIDERY-PRICING-V3] Already have pricing data, skipping table extraction');
             return;
         }
         
         // Try multiple selectors to find the pricing table
         const table = document.querySelector('.pricing-grid table, #pricing-grid-container table, .universal-pricing-grid table, #pricing-grid-container-table');
         if (!table) {
-            console.log('[EMBROIDERY-PRICING-V3] No pricing table found');
             return;
         }
         
         const tbody = table.querySelector('tbody');
         if (!tbody) {
-            console.log('[EMBROIDERY-PRICING-V3] No tbody found in pricing table');
             return;
         }
         
         // Get headers (sizes) - skip the first column which is quantity
         const headerRow = table.querySelector('thead tr') || table.querySelector('tr:first-child');
         if (!headerRow) {
-            console.log('[EMBROIDERY-PRICING-V3] No header row found');
             return;
         }
         
@@ -997,7 +977,6 @@
             }
         });
         
-        console.log('[EMBROIDERY-PRICING-V3] Found headers:', headers);
         
         // Find the tier for current quantity
         const rows = tbody.querySelectorAll('tr');
@@ -1047,7 +1026,6 @@
             }
         }
         
-        console.log('[EMBROIDERY-PRICING-V3] Extracted prices from table:', basePrices, 'Tier found:', tierFound);
     }
     
     // Observe pricing table for updates
@@ -1057,7 +1035,6 @@
         
         // Don't observe if we already have pricing data from master bundle
         if (pricingData && pricingData.prices && Object.keys(basePrices).length > 0) {
-            console.log('[EMBROIDERY-PRICING-V3] Already have pricing data from master bundle, skipping table observation');
             return;
         }
         
@@ -1071,7 +1048,6 @@
             // Check if table was added or updated
             const table = container.querySelector('table');
             if (table && table.querySelector('tbody tr')) {
-                console.log('[EMBROIDERY-PRICING-V3] Pricing table updated, extracting data');
                 extractPricingFromTable();
                 updateQuote();
             }
@@ -1086,7 +1062,6 @@
     
     // Handle color change events
     function handleColorChange(event) {
-        console.log('[EMBROIDERY-PRICING-V3] Color changed:', event.detail);
         
         if (!event.detail) return;
         

@@ -4,7 +4,7 @@
 (function() {
     'use strict';
 
-    console.log('[EMBROIDERY-MASTER-BUNDLE] Integration handler loaded');
+    // console.log('[EMBROIDERY-MASTER-BUNDLE] Integration handler loaded');
 
     // Data transformer function - converts master bundle to UI grid format
     function transformMasterBundleForGrid(masterBundle, dtgLocation = 'LC') {
@@ -82,18 +82,18 @@
         // Only process messages with a type property
         if (!event.data || !event.data.type) return;
 
-        console.log('[EMBROIDERY-MASTER-BUNDLE] Received message:', event.data.type);
+        // console.log('[EMBROIDERY-MASTER-BUNDLE] Received message:', event.data.type);
 
         if (event.data.type === 'caspioEmbroideryMasterBundleReady') {
             // SUCCESS - Process the master bundle
             const masterBundle = event.data.detail;
-            console.log('[EMBROIDERY-MASTER-BUNDLE] Master bundle received:', masterBundle);
+            // console.log('[EMBROIDERY-MASTER-BUNDLE] Master bundle received:', masterBundle);
 
             // Transform the data for UI
             const transformedData = transformMasterBundleForGrid(masterBundle);
             
             if (transformedData) {
-                console.log('[EMBROIDERY-MASTER-BUNDLE] Transformed data:', transformedData);
+                // console.log('[EMBROIDERY-MASTER-BUNDLE] Transformed data:', transformedData);
                 
                 // Store globally for debugging
                 window.nwcaMasterBundleData = masterBundle;
@@ -116,7 +116,7 @@
                 });
                 document.dispatchEvent(bundleEvent);
                 
-                console.log('[EMBROIDERY-MASTER-BUNDLE] Events dispatched successfully');
+                // console.log('[EMBROIDERY-MASTER-BUNDLE] Events dispatched successfully');
                 
                 // Set flag to prevent other systems from triggering fallback
                 window.EMBROIDERY_MASTER_BUNDLE_LOADED = true;
@@ -158,6 +158,6 @@
     // Export transformer function for testing
     window.transformMasterBundleForGrid = transformMasterBundleForGrid;
 
-    console.log('[EMBROIDERY-MASTER-BUNDLE] Ready to receive master bundle data');
+    // console.log('[EMBROIDERY-MASTER-BUNDLE] Ready to receive master bundle data');
 
 })();
