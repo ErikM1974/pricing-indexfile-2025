@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test DTG Reordered Flow</title>
+    
+    <!-- Copy CSS from dtg-pricing.html -->
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
+    <link rel="stylesheet" href="/shared_components/css/dtg-specific.css">
+    
+    <style>
+        body {
+            padding: 20px;
+            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-header h1 {
+            color: #2e5827;
+            margin-bottom: 10px;
+        }
+        .flow-description {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .flow-description h3 {
+            margin-top: 0;
+            color: #2e5827;
+        }
+        .flow-description ol {
+            margin: 10px 0;
+        }
+        .pricing-content-wrapper {
+            min-height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>DTG Pricing - Reordered Flow Test</h1>
+            <p>Testing the new user-friendly flow: Quantity → Location → Quote</p>
+        </div>
+        
+        <div class="flow-description">
+            <h3>New Flow Benefits:</h3>
+            <ol>
+                <li><strong>Step 1 - Configure Quantity:</strong> Start with the simplest decision</li>
+                <li><strong>Step 2 - Select Location:</strong> See real prices based on your quantity</li>
+                <li><strong>Step 3 - Your Quote:</strong> Complete breakdown with action buttons</li>
+            </ol>
+        </div>
+        
+        <!-- Container for DTG v3 -->
+        <div class="pricing-content-wrapper">
+            <!-- DTG v3 will inject the 3-step UI here -->
+        </div>
+        
+        <!-- Hidden elements for compatibility -->
+        <div id="pricing-grid-container" style="display: none;"></div>
+    </div>
+    
+    <!-- Mock pricing data for testing -->
+    <script>
+        // Simulate pricing data structure
+        window.nwcaPricingData = {
+            prices: {
+                'LC': {
+                    '24-47': { 'S': '11.50', 'M': '11.50', 'L': '11.50', 'XL': '11.50' },
+                    '48-71': { 'S': '10.50', 'M': '10.50', 'L': '10.50', 'XL': '10.50' },
+                    '72-143': { 'S': '9.50', 'M': '9.50', 'L': '9.50', 'XL': '9.50' },
+                    '144+': { 'S': '8.50', 'M': '8.50', 'L': '8.50', 'XL': '8.50' }
+                },
+                'FF': {
+                    '24-47': { 'S': '13.00', 'M': '13.00', 'L': '13.00', 'XL': '13.00' },
+                    '48-71': { 'S': '12.00', 'M': '12.00', 'L': '12.00', 'XL': '12.00' },
+                    '72-143': { 'S': '11.00', 'M': '11.00', 'L': '11.00', 'XL': '11.00' },
+                    '144+': { 'S': '10.00', 'M': '10.00', 'L': '10.00', 'XL': '10.00' }
+                },
+                'FB': {
+                    '24-47': { 'S': '13.00', 'M': '13.00', 'L': '13.00', 'XL': '13.00' },
+                    '48-71': { 'S': '12.00', 'M': '12.00', 'L': '12.00', 'XL': '12.00' },
+                    '72-143': { 'S': '11.00', 'M': '11.00', 'L': '11.00', 'XL': '11.00' },
+                    '144+': { 'S': '10.00', 'M': '10.00', 'L': '10.00', 'XL': '10.00' }
+                }
+            }
+        };
+        
+        // Mock DTG Adapter
+        window.DTGAdapter = {
+            displayPricingForSelectedLocation: function(location) {
+                console.log('DTG Adapter: Selected location', location);
+                // Trigger pricing data loaded event
+                setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent('pricingDataLoaded', {
+                        detail: { location: location }
+                    }));
+                }, 100);
+            }
+        };
+        
+        // Mock header pricing update
+        window.updateHeaderPricing = function(quantity, price) {
+            console.log('Header pricing update:', quantity, '$' + price.toFixed(2));
+        };
+    </script>
+    
+    <!-- Include the DTG v3 script -->
+    <script src="/shared_components/js/dtg-pricing-v3.js"></script>
+    
+    <script>
+        // Log state changes for testing
+        document.addEventListener('dtgLocationSelected', (e) => {
+            console.log('Location selected:', e.detail);
+        });
+        
+        document.addEventListener('quantityChanged', (e) => {
+            console.log('Quantity changed:', e.detail);
+        });
+    </script>
+</body>
+</html>

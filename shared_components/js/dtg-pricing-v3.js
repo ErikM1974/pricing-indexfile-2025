@@ -150,35 +150,23 @@
                         </div>
                         <div class="progress-step active" data-step="1">
                             <div class="step-number">1</div>
-                            <div class="step-label">Select Location</div>
+                            <div class="step-label">Configure Quantity</div>
                         </div>
                         <div class="progress-step" data-step="2">
                             <div class="step-number">2</div>
-                            <div class="step-label">Configure Quantity</div>
+                            <div class="step-label">Select Location</div>
                         </div>
                         <div class="progress-step" data-step="3">
                             <div class="step-number">3</div>
-                            <div class="step-label">View Pricing</div>
+                            <div class="step-label">Your Quote</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 1: Visual Location Selector -->
+                <!-- Step 1: Configure Quantity -->
                 <div class="step-section" id="dtg-step-1">
                     <div class="step-header">
                         <div class="step-number-large">1</div>
-                        <h2 class="step-title">Select Your Print Location</h2>
-                    </div>
-                    
-                    <div class="location-grid" id="location-grid">
-                        <!-- Location cards will be inserted here -->
-                    </div>
-                </div>
-
-                <!-- Step 2: Configure Quantity -->
-                <div class="step-section inactive" id="dtg-step-2">
-                    <div class="step-header">
-                        <div class="step-number-large">2</div>
                         <h2 class="step-title">Configure Your Quantity</h2>
                     </div>
                     
@@ -203,37 +191,71 @@
                             </div>
                         </div>
                         
-                        <!-- Instant Quote -->
-                        <div class="instant-quote">
-                            <div class="quote-header">Your Instant Quote</div>
-                            <div class="pricing-display">
-                                <div class="unit-price" id="dtg-unit-price">$0.00</div>
-                                <div class="unit-label">per shirt (starting price)</div>
-                                <div class="total-price" id="dtg-total-price">Total: $0.00</div>
-                            </div>
-                            
-                            <div class="pricing-breakdown" id="dtg-pricing-breakdown">
-                                <!-- Dynamic breakdown will be inserted here -->
-                            </div>
-                            
-                            <div class="ltm-warning" id="dtg-ltm-warning" style="display: none;">
-                                <span>⚠️</span>
-                                <span>Orders under 24 shirts include a $50 setup fee</span>
-                            </div>
+                        <div class="quantity-tier-message" id="dtg-tier-message" style="display: none;">
+                            <span class="tier-icon">🎯</span>
+                            <span class="tier-text"></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 3: Pricing Grid -->
+                <!-- Step 2: Visual Location Selector -->
+                <div class="step-section inactive" id="dtg-step-2">
+                    <div class="step-header">
+                        <div class="step-number-large">2</div>
+                        <h2 class="step-title">Select Your Print Location</h2>
+                    </div>
+                    
+                    <div class="location-grid" id="location-grid">
+                        <!-- Location cards will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Step 3: Your Instant Quote -->
                 <div class="step-section inactive" id="dtg-step-3">
                     <div class="step-header">
                         <div class="step-number-large">3</div>
-                        <h2 class="step-title">Complete Price-Per-Unit Reference Grid</h2>
+                        <h2 class="step-title">Your Instant Quote</h2>
                     </div>
                     
-                    <!-- Universal Pricing Grid will display here -->
-                    <div id="pricing-grid-container">
-                        <!-- Pricing grid populated by Universal Pricing Grid component -->
+                    <div class="instant-quote-final">
+                        <div class="selected-configuration">
+                            <div class="config-item">
+                                <span class="config-label">Quantity:</span>
+                                <span class="config-value" id="final-quantity">24 shirts</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Print Location:</span>
+                                <span class="config-value" id="final-location">Left Chest (4" × 4")</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pricing-display-large">
+                            <div class="unit-price-large" id="dtg-unit-price-final">$0.00</div>
+                            <div class="unit-label">per shirt</div>
+                            <div class="total-price-large" id="dtg-total-price-final">Total: $0.00</div>
+                        </div>
+                        
+                        <div class="pricing-breakdown" id="dtg-pricing-breakdown-final">
+                            <!-- Dynamic breakdown will be inserted here -->
+                        </div>
+                        
+                        <div class="ltm-warning" id="dtg-ltm-warning-final" style="display: none;">
+                            <span>⚠️</span>
+                            <span>Orders under 24 shirts include a $50 setup fee</span>
+                        </div>
+                        
+                        <div class="quote-actions">
+                            <button class="btn-primary" onclick="window.proceedToOrder()">Proceed to Order</button>
+                            <button class="btn-secondary" onclick="window.saveQuote()">Save Quote</button>
+                        </div>
+                        
+                        <!-- Reference Grid -->
+                        <div class="reference-grid-section">
+                            <h3>Complete Pricing Reference</h3>
+                            <div id="pricing-grid-container">
+                                <!-- Pricing grid populated by Universal Pricing Grid component -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -662,6 +684,161 @@
                 color: #856404;
                 font-size: 14px;
             }
+            
+            /* Tier Message */
+            .quantity-tier-message {
+                background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+                border: 2px solid #2e5827;
+                border-radius: 8px;
+                padding: 12px 20px;
+                margin: 20px auto;
+                max-width: 400px;
+                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                animation: slideIn 0.3s ease-out;
+            }
+            
+            .tier-icon {
+                font-size: 20px;
+            }
+            
+            .tier-text {
+                font-weight: 600;
+                color: #2e5827;
+            }
+            
+            /* Location Card Pricing */
+            .location-price {
+                background: #f0f8f0;
+                padding: 10px;
+                margin-top: 10px;
+                border-radius: 6px;
+                font-weight: 600;
+                color: #2e5827;
+                display: flex;
+                justify-content: center;
+                align-items: baseline;
+                gap: 5px;
+            }
+            
+            .location-price .price-value {
+                font-size: 18px;
+            }
+            
+            .location-price .price-label {
+                font-size: 13px;
+                color: #666;
+            }
+            
+            /* Step 3 Final Quote Styles */
+            .instant-quote-final {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            
+            .selected-configuration {
+                background: #f8faf9;
+                border: 1px solid #e1e4e8;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 30px;
+                display: flex;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+            
+            .config-item {
+                text-align: center;
+            }
+            
+            .config-label {
+                display: block;
+                font-size: 14px;
+                color: #666;
+                margin-bottom: 5px;
+            }
+            
+            .config-value {
+                font-size: 18px;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+            
+            .pricing-display-large {
+                text-align: center;
+                padding: 40px;
+                background: linear-gradient(135deg, #f8fcf9 0%, #e8f5e9 100%);
+                border-radius: 12px;
+                margin-bottom: 30px;
+            }
+            
+            .unit-price-large {
+                font-size: 48px;
+                font-weight: bold;
+                color: #2e5827;
+                margin-bottom: 10px;
+            }
+            
+            .total-price-large {
+                font-size: 24px;
+                font-weight: 600;
+                color: #333;
+                margin-top: 20px;
+            }
+            
+            .quote-actions {
+                display: flex;
+                gap: 20px;
+                justify-content: center;
+                margin: 30px 0;
+            }
+            
+            .btn-primary, .btn-secondary {
+                padding: 15px 30px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: none;
+            }
+            
+            .btn-primary {
+                background: #2e5827;
+                color: white;
+            }
+            
+            .btn-primary:hover {
+                background: #1e3a1e;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(46, 88, 39, 0.3);
+            }
+            
+            .btn-secondary {
+                background: white;
+                color: #2e5827;
+                border: 2px solid #2e5827;
+            }
+            
+            .btn-secondary:hover {
+                background: #f0f8f0;
+            }
+            
+            .reference-grid-section {
+                margin-top: 50px;
+                padding-top: 50px;
+                border-top: 2px solid #e1e4e8;
+            }
+            
+            .reference-grid-section h3 {
+                text-align: center;
+                color: #2c3e50;
+                margin-bottom: 20px;
+            }
 
             /* Mobile Responsive */
             @media (max-width: 768px) {
@@ -686,6 +863,18 @@
 
                 .quick-select-grid {
                     grid-template-columns: repeat(2, 1fr);
+                }
+            }
+            
+            /* Animations */
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
                 }
             }
         `;
@@ -715,6 +904,7 @@
     function createLocationCard(code, location) {
         const label = document.createElement('label');
         label.className = 'location-card';
+        label.dataset.location = code;
 
         const badgeHTML = location.isCombo ? 
             `<span class="combo-badge ${location.comboType === 'max' ? 'max' : ''}">
@@ -731,6 +921,10 @@
                 <div class="location-info">
                     <div class="location-name">${location.name}</div>
                     <div class="location-size">${location.size}</div>
+                    <div class="location-price" id="price-${code}" style="display: none;">
+                        <span class="price-value">$0.00</span>
+                        <span class="price-label">per shirt</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -817,12 +1011,12 @@
             }
         }));
 
-        // Auto-advance to step 2
-        if (state.currentStep === 1) {
+        // Auto-advance to step 3
+        if (state.currentStep === 2) {
             setTimeout(() => {
-                updateStep(2);
-                // Update pricing display when we reach step 2
-                updatePricingDisplay();
+                updateStep(3);
+                // Update final quote display
+                updateFinalQuoteDisplay();
             }, 500);
         }
     }
@@ -845,10 +1039,17 @@
             ltmWarning.style.display = quantity < 24 ? 'block' : 'none';
         }
 
-        // Auto-advance to step 3 if not already there
-        if (state.currentStep === 2) {
-            setTimeout(() => updateStep(3), 500);
+        // Auto-advance to step 2 if we're on step 1
+        if (state.currentStep === 1) {
+            setTimeout(() => {
+                updateStep(2);
+                // Update location cards with pricing
+                updateLocationCardsWithPricing();
+            }, 500);
         }
+        
+        // Show tier message
+        updateTierMessage(quantity);
     }
 
     function handlePricingDataLoaded(event) {
@@ -1016,6 +1217,138 @@
             }
         }
     }
+
+    function updateTierMessage(quantity) {
+        const tierMessageEl = document.getElementById('dtg-tier-message');
+        if (!tierMessageEl) return;
+        
+        const tierTextEl = tierMessageEl.querySelector('.tier-text');
+        if (!tierTextEl) return;
+        
+        let message = '';
+        if (quantity >= 144) {
+            message = 'Great choice! You qualify for our best Tier 4 pricing';
+        } else if (quantity >= 72) {
+            message = 'Excellent! You qualify for Tier 3 pricing';
+        } else if (quantity >= 48) {
+            message = 'Nice! You qualify for Tier 2 pricing';
+        } else if (quantity >= 24) {
+            message = 'You qualify for Tier 1 pricing';
+        } else {
+            message = 'Minimum order is 24 shirts (setup fee applies)';
+        }
+        
+        tierTextEl.textContent = message;
+        tierMessageEl.style.display = 'block';
+    }
+    
+    function updateLocationCardsWithPricing() {
+        // Get current pricing data
+        if (!window.nwcaPricingData || !window.nwcaPricingData.prices) {
+            console.log('[DTG-v3] No pricing data available for location cards');
+            return;
+        }
+        
+        const prices = window.nwcaPricingData.prices;
+        const tier = getPriceTier(state.quantity);
+        
+        // Update each location card with its price
+        Object.entries(DTG_LOCATIONS).forEach(([code, location]) => {
+            const priceEl = document.getElementById(`price-${code}`);
+            if (priceEl) {
+                // Get base price for this location
+                let basePrice = 0;
+                
+                // For single locations
+                if (!location.isCombo) {
+                    const tierData = prices[code];
+                    if (tierData && tierData[tier]) {
+                        basePrice = parseFloat(tierData[tier]['S']);
+                    }
+                } else {
+                    // For combo locations, add prices of individual components
+                    const parts = code.split('_');
+                    parts.forEach(part => {
+                        const tierData = prices[part];
+                        if (tierData && tierData[tier]) {
+                            basePrice += parseFloat(tierData[tier]['S']);
+                        }
+                    });
+                }
+                
+                // Add LTM fee if applicable
+                if (state.quantity < 24) {
+                    basePrice += 50 / state.quantity;
+                }
+                
+                const priceValueEl = priceEl.querySelector('.price-value');
+                if (priceValueEl && basePrice > 0) {
+                    priceValueEl.textContent = `$${basePrice.toFixed(2)}`;
+                    priceEl.style.display = 'block';
+                }
+            }
+        });
+    }
+    
+    function updateFinalQuoteDisplay() {
+        // Update final configuration display
+        const finalQuantityEl = document.getElementById('final-quantity');
+        const finalLocationEl = document.getElementById('final-location');
+        const unitPriceFinalEl = document.getElementById('dtg-unit-price-final');
+        const totalPriceFinalEl = document.getElementById('dtg-total-price-final');
+        const breakdownFinalEl = document.getElementById('dtg-pricing-breakdown-final');
+        const ltmWarningFinalEl = document.getElementById('dtg-ltm-warning-final');
+        
+        if (finalQuantityEl) {
+            finalQuantityEl.textContent = `${state.quantity} shirts`;
+        }
+        
+        if (finalLocationEl && DTG_LOCATIONS[state.selectedLocation]) {
+            const location = DTG_LOCATIONS[state.selectedLocation];
+            finalLocationEl.textContent = `${location.name} (${location.size})`;
+        }
+        
+        // Copy pricing from step 2
+        const sourceUnitPrice = document.getElementById('dtg-unit-price');
+        const sourceTotalPrice = document.getElementById('dtg-total-price');
+        const sourceBreakdown = document.getElementById('dtg-pricing-breakdown');
+        const sourceLtmWarning = document.getElementById('dtg-ltm-warning');
+        
+        if (unitPriceFinalEl && sourceUnitPrice) {
+            unitPriceFinalEl.textContent = sourceUnitPrice.textContent;
+        }
+        
+        if (totalPriceFinalEl && sourceTotalPrice) {
+            totalPriceFinalEl.textContent = sourceTotalPrice.textContent;
+        }
+        
+        if (breakdownFinalEl && sourceBreakdown) {
+            breakdownFinalEl.innerHTML = sourceBreakdown.innerHTML;
+        }
+        
+        if (ltmWarningFinalEl && sourceLtmWarning) {
+            ltmWarningFinalEl.style.display = sourceLtmWarning.style.display;
+        }
+    }
+    
+    function getPriceTier(quantity) {
+        if (quantity < 24) return '24-47';
+        if (quantity <= 47) return '24-47';
+        if (quantity <= 71) return '48-71';
+        if (quantity <= 143) return '72-143';
+        return '144+';
+    }
+    
+    // Global functions for quote actions
+    window.proceedToOrder = function() {
+        // Implement order flow
+        alert('Proceeding to order form...');
+    };
+    
+    window.saveQuote = function() {
+        // Implement quote saving
+        alert('Saving quote...');
+    };
 
     // Expose API for external access
     window.DTGPricingV3 = {
