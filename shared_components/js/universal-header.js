@@ -139,7 +139,8 @@
             const searchResults = document.getElementById('style-search-results');
             
             if (!searchInput || !searchResults) {
-                console.warn('[UNIVERSAL-HEADER] Style search elements not found');
+                // Style search is optional - not all pages have it
+                console.log('[UNIVERSAL-HEADER] Style search not available on this page');
                 return;
             }
             
