@@ -542,14 +542,16 @@
         }
     }
 
-    // Create table structure
+    // Create table structure with embroidery-style formatting
     function createTableStructure(data) {
         const gridContainer = document.getElementById('pricing-grid-container');
         if (!gridContainer) return;
 
-        const headers = data.groupedHeaders || [];
+        // Get available sizes - prioritize cap-specific sizes
+        const availableSizes = data.groupedHeaders || [];
         const displayTiers = ['24-47', '48-71', '72+'];
         
+        // Build the table HTML using embroidery-style structure
         let tableHTML = `
             <div class="step-section">
                 <div class="step-header">
@@ -557,57 +559,115 @@
                     <h2 class="step-title">Complete Price-Per-Unit Reference Grid</h2>
                 </div>
                 
-                <div class="pricing-note-box">
-                    <p><strong>Note:</strong> These are complete prices including cap + front logo embroidery</p>
-                </div>
-                
-                <div class="pricing-table-wrapper">
-                    <div class="pricing-table-scroll">
-                        <table class="pricing-grid pricing-table">
-                            <thead>
-                                <tr>
-                                    <th>Quantity</th>
-                                    <th colspan="${headers.length}" style="text-align: center;">Price Per Cap (with Front Logo)</th>
-                                </tr>
-                                <tr>
-                                    <th></th>
+                <div class="pricing-content">
+                    <div class="pricing-header">
+                        <h3 class="pricing-subtitle">Cap Embroidery Pricing</h3>
+                        <div class="pricing-note-inline">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Includes ${currentFrontStitches.toLocaleString()} stitch front logo</span>
+                        </div>
+                    </div>
         `;
         
-        // Add size headers
-        headers.forEach(size => {
-            tableHTML += `<th>${size}</th>`;
-        });
+        // Use helper function to build the table
+        tableHTML += buildCapPricingTable(availableSizes, displayTiers);
         
         tableHTML += `
-                                </tr>
-                            </thead>
-                            <tbody id="pricing-tbody">
-        `;
-        
-        // Add rows for each tier
-        displayTiers.forEach(tierKey => {
-            tableHTML += `<tr><td class="tier-label">${tierKey}</td>`;
-            
-            headers.forEach(size => {
-                tableHTML += `<td class="price-cell" data-size="${size}" data-tier="${tierKey}"></td>`;
-            });
-            
-            tableHTML += `</tr>`;
-        });
-        
-        tableHTML += `
-                            </tbody>
-                        </table>
+                    <div class="pricing-note">
+                        <strong>Volume Pricing:</strong> Save more when you order in bulk. All prices include cap + ${currentFrontStitches.toLocaleString()} stitch embroidered front logo.
                     </div>
                 </div>
-                <p class="pricing-note" id="pricing-note">
-                    <i class="fas fa-info-circle" style="color: #3a7c52;"></i>
-                    Prices shown are complete cap prices including ${currentFrontStitches.toLocaleString()} stitch embroidered logo on front
-                </p>
             </div>
         `;
         
         gridContainer.innerHTML = tableHTML;
+    }
+    
+    // Build cap pricing table HTML
+    function buildCapPricingTable(sizes, tiers) {
+        // Check if we need mobile data attributes for responsive design
+        const needsMobileData = sizes.length > 2;
+        
+        let html = `
+            <div class="pricing-table-wrapper">
+                <div class="pricing-table-scroll">
+                    <table class="pricing-grid">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+        `;
+        
+        // Add headers for each size
+        sizes.forEach(size => {
+            html += `<th>${formatCapSize(size)}</th>`;
+        });
+        
+        html += `
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+        
+        // Add rows for each tier
+        tiers.forEach(tierKey => {
+            const isActiveTier = currentQuantity >= getTierMin(tierKey) && currentQuantity <= getTierMax(tierKey);
+            
+            html += `
+                        <tr${isActiveTier ? ' class="active-tier"' : ''}>
+                            <td>${tierKey}</td>`;
+            
+            // Add price cells for each size
+            sizes.forEach(size => {
+                html += `<td class="price-cell" data-size="${size}" data-tier="${tierKey}"${needsMobileData ? ` data-size-label="${formatCapSize(size)}"` : ''}>-</td>`;
+            });
+            
+            html += `</tr>`;
+        });
+        
+        html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        return html;
+    }
+    
+    // Format cap size for display
+    function formatCapSize(size) {
+        // Handle common cap size formats
+        const sizeMap = {
+            'OSFA': 'One Size',
+            'OS': 'One Size',
+            'ONE SIZE': 'One Size',
+            'S/M': 'S/M',
+            'M/L': 'M/L',
+            'L/XL': 'L/XL',
+            'XL/2XL': 'XL/2XL'
+        };
+        
+        return sizeMap[size] || size;
+    }
+    
+    // Get minimum quantity for a tier
+    function getTierMin(tier) {
+        const mins = {
+            '24-47': 24,
+            '48-71': 48,
+            '72+': 72
+        };
+        return mins[tier] || 0;
+    }
+    
+    // Get maximum quantity for a tier
+    function getTierMax(tier) {
+        const maxs = {
+            '24-47': 47,
+            '48-71': 71,
+            '72+': 99999
+        };
+        return maxs[tier] || 99999;
     }
 
     // Update pricing table
@@ -637,13 +697,16 @@
             }
         });
         
-        // Update note
-        const note = document.getElementById('pricing-note');
+        // Update inline note if stitch count changed
+        const inlineNote = document.querySelector('.pricing-note-inline span');
+        if (inlineNote) {
+            inlineNote.textContent = `Includes ${currentFrontStitches.toLocaleString()} stitch front logo`;
+        }
+        
+        // Update full note
+        const note = document.querySelector('.pricing-note');
         if (note) {
-            note.innerHTML = `
-                <i class="fas fa-info-circle" style="color: #3a7c52;"></i>
-                Prices shown are complete cap prices including ${currentFrontStitches.toLocaleString()} stitch embroidered logo on front
-            `;
+            note.innerHTML = `<strong>Volume Pricing:</strong> Save more when you order in bulk. All prices include cap + ${currentFrontStitches.toLocaleString()} stitch embroidered front logo.`;
         }
         
         // Update tier highlighting

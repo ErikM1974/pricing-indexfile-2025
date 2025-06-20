@@ -1,0 +1,272 @@
+/* Cap Embroidery Pricing - Enhanced Styling */
+/* Builds on modern-pricing-table.css with cap-specific enhancements */
+
+/* ========================================
+   1. PRICING HEADER SECTION
+   ======================================== */
+
+.pricing-content {
+    margin-top: 20px;
+}
+
+.pricing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e1e4e8;
+}
+
+.pricing-subtitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: #24292e;
+    margin: 0;
+}
+
+.pricing-note-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #586069;
+}
+
+.pricing-note-inline i {
+    color: #3a7c52;
+    font-size: 16px;
+}
+
+/* ========================================
+   2. CAP-SPECIFIC TABLE STYLING
+   ======================================== */
+
+/* Since caps have fewer columns, we can make the table more spacious */
+.pricing-grid th,
+.pricing-grid td {
+    padding: 18px 16px; /* More generous padding */
+    min-width: 100px; /* Wider columns for cap sizes */
+}
+
+/* Cap size headers - make them stand out */
+.pricing-grid thead tr:first-child th {
+    background: #f8faf9;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: none; /* Keep "S/M", "L/XL" formatting */
+}
+
+/* Quantity column styling */
+.pricing-grid td:first-child {
+    font-weight: 600;
+    background: #fafbfc;
+    min-width: 100px;
+}
+
+/* Price cells for caps - slightly larger font */
+.pricing-grid .price-cell {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+/* ========================================
+   3. RESPONSIVE DESIGN FOR CAPS
+   ======================================== */
+
+/* Tablet - caps can stay in table format longer due to fewer columns */
+@media (max-width: 768px) {
+    .pricing-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .pricing-note-inline {
+        font-size: 13px;
+    }
+    
+    /* Keep table format on tablets for caps */
+    .pricing-grid {
+        min-width: auto;
+    }
+    
+    .pricing-grid th,
+    .pricing-grid td {
+        padding: 12px 8px;
+        min-width: 80px;
+        font-size: 14px;
+    }
+    
+    .pricing-grid .price-cell {
+        font-size: 15px;
+    }
+}
+
+/* Mobile - switch to card format */
+@media (max-width: 576px) {
+    /* Use data attributes for mobile display */
+    .pricing-grid td[data-size-label]::before {
+        content: attr(data-size-label);
+        font-weight: 600;
+        color: #586069;
+        font-size: 14px;
+        min-width: 80px;
+        display: inline-block;
+    }
+    
+    /* Stack size/price pairs vertically in cards */
+    .pricing-grid tr {
+        padding: 20px 16px;
+    }
+    
+    .pricing-grid td:not(:first-child) {
+        padding: 10px 0;
+        font-size: 16px;
+    }
+}
+
+/* ========================================
+   4. TIER HIGHLIGHTING ENHANCEMENTS
+   ======================================== */
+
+/* Enhanced active tier for caps */
+.pricing-grid tr.active-tier {
+    background: linear-gradient(to right, #e8f5e9 0%, #f1f8f4 100%);
+    position: relative;
+}
+
+/* Add subtle left border for active tier */
+.pricing-grid tr.active-tier::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #3a7c52;
+}
+
+/* Active tier quantity cell */
+.pricing-grid tr.active-tier td:first-child {
+    background: #e8f5e9;
+    color: #2d5f3f;
+    font-weight: 700;
+}
+
+/* ========================================
+   5. LOADING STATES
+   ======================================== */
+
+/* Price cells loading animation */
+.price-cell:empty::before {
+    content: '•••';
+    color: #d1d5da;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+/* ========================================
+   6. PRINT STYLES FOR CAPS
+   ======================================== */
+
+@media print {
+    .pricing-header {
+        border-bottom: 1px solid #333;
+    }
+    
+    .pricing-note-inline {
+        color: #000;
+    }
+    
+    .pricing-grid tr.active-tier {
+        border: 2px solid #000;
+        background: none;
+    }
+    
+    .pricing-grid tr.active-tier::before {
+        display: none;
+    }
+}
+
+/* ========================================
+   7. HOVER EFFECTS
+   ======================================== */
+
+/* Row hover - more subtle for professional look */
+.pricing-grid tbody tr:hover {
+    background-color: #f8faf9;
+    cursor: pointer;
+}
+
+.pricing-grid tbody tr:hover td:first-child {
+    background-color: #f0f7f4;
+}
+
+/* Don't override active tier hover */
+.pricing-grid tbody tr.active-tier:hover {
+    background: linear-gradient(to right, #e8f5e9 0%, #f1f8f4 100%);
+}
+
+/* ========================================
+   8. CAP SIZE FORMATTING
+   ======================================== */
+
+/* Special styling for "One Size" */
+.pricing-grid th:contains("One Size"),
+.pricing-grid td[data-size-label="One Size"] {
+    font-weight: 700;
+}
+
+/* Size pair formatting (S/M, L/XL) */
+.pricing-grid th {
+    white-space: nowrap; /* Keep size pairs together */
+}
+
+/* ========================================
+   9. ANIMATION IMPROVEMENTS
+   ======================================== */
+
+/* Smooth transitions for tier changes */
+.pricing-grid tr {
+    transition: all 0.3s ease;
+}
+
+/* Tier highlight animation */
+.pricing-grid tr.active-tier {
+    animation: highlightTier 0.5s ease-out;
+}
+
+@keyframes highlightTier {
+    from {
+        background-color: #c8e6c9;
+    }
+    to {
+        background: linear-gradient(to right, #e8f5e9 0%, #f1f8f4 100%);
+    }
+}
+
+/* ========================================
+   10. INTEGRATION WITH EXISTING STYLES
+   ======================================== */
+
+/* Ensure compatibility with modern-pricing-table.css */
+.pricing-table-wrapper {
+    margin-top: 0; /* Remove extra spacing */
+}
+
+/* Override for cap-specific needs */
+.pricing-table-scroll {
+    overflow-x: auto; /* Only scroll if needed */
+}
+
+/* Caps typically don't need horizontal scroll on desktop */
+@media (min-width: 1024px) {
+    .pricing-table-scroll {
+        overflow-x: visible;
+    }
+}
