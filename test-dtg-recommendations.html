@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test DTG Recommendations</title>
+    
+    <!-- Copy CSS from dtg-pricing.html -->
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
+    <link rel="stylesheet" href="/shared_components/css/dtg-specific.css">
+    <link rel="stylesheet" href="/shared_components/css/dtg-recommendations.css">
+    
+    <style>
+        body {
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .status-message {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>DTG Recommendations Test Page</h1>
+        
+        <div class="status-message">
+            This page tests the DTG product recommendations component in isolation.
+        </div>
+        
+        <!-- Test container for recommendations -->
+        <div class="dtg-steps-container">
+            <!-- Recommendations will be injected here by the script -->
+        </div>
+        
+        <!-- Test product selection feedback -->
+        <div id="selection-feedback" style="margin-top: 30px; padding: 20px; background: white; border-radius: 8px;">
+            <h3>Product Selection Test</h3>
+            <p>Click on any product card to test the selection functionality.</p>
+            <div id="selected-product" style="margin-top: 10px; font-weight: bold; color: #3a7c52;"></div>
+        </div>
+    </div>
+    
+    <!-- Include the recommendations script -->
+    <script src="/shared_components/js/dtg-product-recommendations.js"></script>
+    
+    <script>
+        // Override the selectDTGProduct function for testing
+        const originalSelect = window.selectDTGProduct;
+        window.selectDTGProduct = function(styleNumber) {
+            document.getElementById('selected-product').textContent = `Selected: Style ${styleNumber}`;
+            
+            // Call original function if it exists
+            if (originalSelect) {
+                originalSelect(styleNumber);
+            }
+        };
+        
+        // Test the full guide modal
+        setTimeout(() => {
+            console.log('Recommendations should now be visible');
+        }, 1000);
+    </script>
+</body>
+</html>
