@@ -604,12 +604,15 @@
                     <table class="pricing-grid">
                         <thead>
                             <tr>
-                                <th>Quantity</th>
+                                <th rowspan="2" class="tier-label">Quantity</th>
+                                <th colspan="${sizes.length}" style="text-align: center;">Price Per Cap (with Front Logo)</th>
+                            </tr>
+                            <tr>
         `;
         
         // Add headers for each size
         sizes.forEach(size => {
-            html += `<th>${formatCapSize(size)}</th>`;
+            html += `<th class="size-header">${formatCapSize(size)}</th>`;
         });
         
         html += `
@@ -620,11 +623,11 @@
         
         // Add rows for each tier
         tiers.forEach(tierKey => {
-            const isActiveTier = currentQuantity >= getTierMin(tierKey) && currentQuantity <= getTierMax(tierKey);
+            const isActiveTier = getPriceTier(currentQuantity) === tierKey;
             
             html += `
                         <tr${isActiveTier ? ' class="active-tier"' : ''}>
-                            <td>${tierKey}</td>`;
+                            <td class="tier-label">${tierKey}</td>`;
             
             // Add price cells for each size
             sizes.forEach(size => {
@@ -691,19 +694,25 @@
         const adjustment = frontAdjustment;
         
         console.log('[CAP-PRICING-V3] Updating pricing table with adjustment:', adjustment);
+        console.log('[CAP-PRICING-V3] Base prices structure:', basePrices);
+        console.log('[CAP-PRICING-V3] Found price cells:', priceCells.length);
         
         priceCells.forEach(cell => {
             const size = cell.dataset.size;
             const tier = cell.dataset.tier;
             
+            console.log('[CAP-PRICING-V3] Looking for price - Size:', size, 'Tier:', tier);
+            
             if (basePrices[size] && basePrices[size][tier] !== undefined) {
                 const basePrice = basePrices[size][tier];
                 const adjustedPrice = basePrice + adjustment;
+                console.log('[CAP-PRICING-V3] Found price:', basePrice, 'Adjusted:', adjustedPrice);
                 cell.textContent = `$${adjustedPrice.toFixed(2)}`;
                 cell.dataset.basePrice = basePrice;
             } else {
                 console.warn('[CAP-PRICING-V3] No price found for size:', size, 'tier:', tier);
-                cell.textContent = '-';
+                console.warn('[CAP-PRICING-V3] Available data for size:', basePrices[size]);
+                cell.textContent = 'N/A';
             }
         });
         
@@ -734,7 +743,7 @@
         
         // Find and highlight the matching row
         allRows.forEach(row => {
-            const tierCell = row.querySelector('.tier-label');
+            const tierCell = row.querySelector('td.tier-label');
             if (tierCell && tierCell.textContent === tier) {
                 row.classList.add('active-tier');
             }

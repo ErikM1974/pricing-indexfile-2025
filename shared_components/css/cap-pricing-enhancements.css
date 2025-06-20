@@ -5,6 +5,24 @@
    1. PRICING HEADER SECTION
    ======================================== */
 
+/* Fix cap pricing header spacing */
+.enhanced-pricing-header {
+    padding-bottom: 0;
+}
+
+.header-content {
+    padding: 15px 0;
+}
+
+.header-main h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.header-pricing {
+    padding: 8px 0;
+}
+
 .pricing-content {
     margin-top: 20px;
 }
@@ -55,6 +73,16 @@
     font-weight: 700;
     font-size: 14px;
     text-transform: none; /* Keep "S/M", "L/XL" formatting */
+}
+
+/* Ensure size headers in second row are visible */
+.pricing-grid th.size-header {
+    background: #f8faf9;
+    font-weight: 600;
+    padding: 12px 16px;
+    text-align: center;
+    border-bottom: 1px solid #e1e4e8;
+    color: #2c3e50;
 }
 
 /* Quantity column styling */
