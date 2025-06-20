@@ -561,14 +561,16 @@
                     <p><strong>Note:</strong> These are complete prices including cap + front logo embroidery</p>
                 </div>
                 
-                <table class="pricing-table">
-                    <thead>
-                        <tr>
-                            <th>Quantity</th>
-                            <th colspan="3" style="text-align: center;">Price Per Cap (with Front Logo)</th>
-                        </tr>
-                        <tr style="background: #f0f0f0;">
-                            <th></th>
+                <div class="pricing-table-wrapper">
+                    <div class="pricing-table-scroll">
+                        <table class="pricing-grid pricing-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th colspan="${headers.length}" style="text-align: center;">Price Per Cap (with Front Logo)</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
         `;
         
         // Add size headers
@@ -577,9 +579,9 @@
         });
         
         tableHTML += `
-                        </tr>
-                    </thead>
-                    <tbody id="pricing-tbody">
+                                </tr>
+                            </thead>
+                            <tbody id="pricing-tbody">
         `;
         
         // Add rows for each tier
@@ -594,8 +596,10 @@
         });
         
         tableHTML += `
-                    </tbody>
-                </table>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 <p class="pricing-note" id="pricing-note">
                     <i class="fas fa-info-circle" style="color: #3a7c52;"></i>
                     Prices shown are complete cap prices including ${currentFrontStitches.toLocaleString()} stitch embroidered logo on front
@@ -641,6 +645,27 @@
                 Prices shown are complete cap prices including ${currentFrontStitches.toLocaleString()} stitch embroidered logo on front
             `;
         }
+        
+        // Update tier highlighting
+        updateTierHighlight();
+    }
+    
+    // Update tier highlighting based on current quantity
+    function updateTierHighlight() {
+        // Remove existing highlights
+        const allRows = document.querySelectorAll('.pricing-grid tbody tr');
+        allRows.forEach(row => row.classList.remove('active-tier'));
+        
+        // Get current tier
+        const tier = getPriceTier(currentQuantity);
+        
+        // Find and highlight the matching row
+        allRows.forEach(row => {
+            const tierCell = row.querySelector('.tier-label');
+            if (tierCell && tierCell.textContent === tier) {
+                row.classList.add('active-tier');
+            }
+        });
     }
 
     // Update quote calculator with proper rounding
