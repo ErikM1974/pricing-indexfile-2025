@@ -95,11 +95,9 @@
             
             // Build table structure with master bundle data
             createTableStructure(masterBundle);
-            // Small delay to ensure DOM is ready
-            setTimeout(() => {
-                updatePricingTable();
-                updateQuote();
-            }, 10);
+            // Update prices immediately after creating table
+            updatePricingTable();
+            updateQuote();
         } else {
             console.error('[CAP-PRICING-V3] No pricing data found in master bundle');
         }
@@ -494,8 +492,10 @@
         slider.addEventListener('mousedown', () => tooltip.style.opacity = '1');
         slider.addEventListener('mouseup', () => tooltip.style.opacity = '0');
         
-        // Initialize
-        slider.dispatchEvent(new Event('input'));
+        // Initialize - but don't update pricing table yet if basePrices is empty
+        if (Object.keys(basePrices).length > 0) {
+            slider.dispatchEvent(new Event('input'));
+        }
     }
 
     // Attach all event listeners
@@ -698,6 +698,13 @@
     function updatePricingTable() {
         if (!basePrices) {
             console.warn('[CAP-PRICING-V3] No base prices available for table update');
+            return;
+        }
+        
+        // Check if the pricing grid container exists
+        const gridContainer = document.getElementById('pricing-grid-container');
+        if (!gridContainer || !gridContainer.innerHTML.trim()) {
+            console.warn('[CAP-PRICING-V3] Pricing grid container is empty, skipping update');
             return;
         }
         
