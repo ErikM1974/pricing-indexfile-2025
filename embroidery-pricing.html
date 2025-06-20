@@ -980,9 +980,20 @@
         .step-section {
             padding: 25px;
             border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
         }
         
         .step-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        /* Ensure proper spacing between sections */
+        #customization-options-container .step-section {
+            margin-bottom: 0;
+        }
+        
+        #pricing-grid-container .step-section {
             border-bottom: none;
         }
         
@@ -1466,8 +1477,14 @@
                     
                     <!-- Step 3: Pricing Grid -->
                     <div id="pricing-grid-container" style="display: block;">
-                        <!-- Pricing table container for embroidery-pricing-v3.js -->
-                        <div id="embroidery-pricing-table-container"></div>
+                        <div class="step-section">
+                            <div class="step-header">
+                                <div class="step-number">3</div>
+                                <h2 class="step-title">Pricing Grid</h2>
+                            </div>
+                            <!-- Pricing table container for embroidery-pricing-v3.js -->
+                            <div id="embroidery-pricing-table-container"></div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -211,19 +211,14 @@
         // Get all unique sizes from the master bundle
         const sizesToShow = masterBundle.uniqueSizes || ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
         
-        // Build the complete Step 3 section with header and table
+        // Build the pricing table without step header (container already has it)
         let html = `
-            <div class="step-section">
-                <div class="step-header">
-                    <div class="step-number">3</div>
-                    <h2 class="step-title">Pricing Grid</h2>
-                </div>
-                <div class="pricing-table-wrapper">
-                    <div class="pricing-table-scroll">
-                        <table class="pricing-grid">
-                            <thead>
-                                <tr>
-                                    <th>Quantity</th>
+            <div class="pricing-table-wrapper">
+                <div class="pricing-table-scroll">
+                    <table class="pricing-grid">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
         `;
         
         // Add headers for each size
@@ -242,6 +237,10 @@
         
         tierData.forEach(tier => {
             const tierLabel = tier.TierLabel || `${tier.MinQuantity}-${tier.MaxQuantity}`;
+            
+            // Skip the 1-23 tier (less than minimum quantity)
+            if (tierLabel === '1-23') return;
+            
             const isActiveTier = currentQuantity >= tier.MinQuantity && currentQuantity <= (tier.MaxQuantity || 99999);
             
             html += `
@@ -269,13 +268,12 @@
         });
         
         html += `
-                            </tbody>
-                        </table>
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="pricing-note">
-                    <strong>Volume Pricing:</strong> Save more when you order in bulk. Prices shown include an 8,000 stitch embroidered logo.
-                </div>
+            </div>
+            <div class="pricing-note">
+                <strong>Volume Pricing:</strong> Save more when you order in bulk. Prices shown include an 8,000 stitch embroidered logo.
             </div>
         `;
         
