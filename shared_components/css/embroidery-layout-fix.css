@@ -63,9 +63,9 @@ body.universal-theme {
 /* Fix two-column layout with CSS Grid */
 .universal-pricing-columns {
     display: grid !important;
-    grid-template-columns: minmax(400px, 1fr) minmax(400px, 1fr);
-    gap: 24px;
-    align-items: start; /* Ensure columns align at top */
+    grid-template-columns: 350px 1fr; /* Fixed product column, flexible pricing */
+    gap: 20px; /* Reduced gap */
+    align-items: start !important; /* Ensure columns align at top */
     margin-top: 0 !important; /* Remove extra top margin */
 }
 
@@ -77,21 +77,31 @@ body.universal-theme {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     border: 1px solid #e8e9eb;
     overflow: hidden;
-    height: 100%;
+    /* Remove height: 100% to prevent stretching */
+    margin-top: 0 !important; /* Ensure no top margin */
+    padding-top: 0 !important; /* Ensure no top padding */
+    position: relative !important; /* Reset any absolute positioning */
+    top: auto !important; /* Reset any top positioning */
 }
 
 /* Remove default padding, we'll control it */
 .universal-product-column {
     padding: 0 !important;
+    width: 350px !important; /* Fixed width */
+    max-width: 350px !important;
+    flex-shrink: 0 !important;
 }
 
 .universal-calculator-column {
     padding: 0 !important;
+    min-width: 0 !important; /* Allow it to shrink properly */
+    width: 100% !important; /* Take remaining space */
 }
 
 /* Product display internal padding */
 #product-display {
     padding: 20px;
+    margin-top: 0 !important; /* Ensure no top margin */
 }
 
 /* Calculator card already has internal padding from step-sections */
@@ -99,6 +109,13 @@ body.universal-theme {
     background: transparent !important;
     box-shadow: none !important;
     padding: 0 !important;
+    margin-top: 0 !important; /* Ensure no top margin */
+}
+
+/* Ensure progress bar starts at the very top */
+.progress-bar {
+    margin-top: 0 !important;
+    margin-bottom: 20px !important;
 }
 
 /* ========================================
@@ -136,11 +153,28 @@ body.universal-theme {
    4. RESPONSIVE DESIGN
    ======================================== */
 
+/* Large screens (1400px and above) - Even better spacing */
+@media (min-width: 1400px) {
+    .universal-pricing-columns {
+        grid-template-columns: 380px 1fr; /* Slightly larger product column on big screens */
+    }
+    
+    .universal-product-column {
+        width: 380px !important;
+        max-width: 380px !important;
+    }
+}
+
 /* Tablet (1024px and below) */
 @media (max-width: 1024px) {
     .universal-pricing-columns {
         grid-template-columns: 1fr;
         gap: 20px;
+    }
+    
+    .universal-product-column {
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
     body.universal-theme {
@@ -240,6 +274,16 @@ h3 { font-size: 18px; margin-bottom: 12px; }
 /* Fix pricing table wrapper spacing */
 .pricing-table-wrapper {
     margin: 20px 0 16px 0 !important;
+    width: 100% !important; /* Ensure full width */
+}
+
+/* Ensure pricing grid container uses full width */
+#pricing-grid-container {
+    width: 100% !important;
+}
+
+#embroidery-pricing-table-container {
+    width: 100% !important;
 }
 
 /* Ensure proper spacing for control groups */
@@ -258,6 +302,91 @@ h3 { font-size: 18px; margin-bottom: 12px; }
 
 .slider-tooltip {
     z-index: 10;
+}
+
+/* Fix universal product display potential spacing issues */
+.universal-product-display {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.upd-header {
+    margin-top: 0 !important;
+}
+
+.upd-navigation {
+    margin-top: 0 !important;
+    margin-bottom: 10px !important;
+}
+
+/* Remove any phantom margins from first child elements */
+.universal-product-column > *:first-child,
+.universal-calculator-column > *:first-child,
+#product-display > *:first-child,
+.universal-calculator-card > *:first-child {
+    margin-top: 0 !important;
+}
+
+/* Fix any potential clearfix issues */
+.universal-pricing-columns::before,
+.universal-pricing-columns::after {
+    display: none !important;
+}
+
+/* Ensure no floats are affecting layout */
+.universal-product-column,
+.universal-calculator-column {
+    float: none !important;
+    clear: none !important;
+}
+
+/* Fix calculator steps spacing */
+.universal-calculator-steps {
+    margin-top: 0 !important;
+}
+
+/* Fix step 1 container spacing */
+#customization-options-container {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Ensure the first step section has no top margin */
+#customization-options-container .step-section:first-child {
+    margin-top: 0 !important;
+    padding-top: 20px !important; /* Match other step sections */
+}
+
+/* Debug: Add visual indicator to see spacing */
+.universal-pricing-columns {
+    /* background: rgba(255, 0, 0, 0.1); */ /* Uncomment to debug */
+}
+
+.universal-product-column {
+    /* background: rgba(0, 255, 0, 0.1); */ /* Uncomment to debug */
+}
+
+.universal-calculator-column {
+    /* background: rgba(0, 0, 255, 0.1); */ /* Uncomment to debug */
+}
+
+/* Force calculator card to start at the top */
+.universal-calculator-card {
+    position: relative !important;
+    top: 0 !important;
+    transform: translateY(0) !important;
+}
+
+/* Remove any margins from progress bar container */
+.progress-bar {
+    position: relative !important;
+    top: 0 !important;
+    margin: 0 0 20px 0 !important;
+}
+
+/* Ensure calculator column content starts at top */
+.universal-calculator-column > * {
+    vertical-align: top !important;
 }
 
 /* ========================================

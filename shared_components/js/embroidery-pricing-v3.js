@@ -21,7 +21,7 @@
     let backLogoEnabled = false;
     let leftLogoEnabled = false;
     let rightLogoEnabled = false;
-    let currentQuantity = 19; // Default to 19 to match user's example
+    let currentQuantity = 24; // Default to minimum quantity (no LTM fee)
     let pricingData = null;
     let frontAdjustment = 0;
     let backLogoPrice = 8.75; // 8000 stitches = $5 base + $3.75 for 3000 extra stitches
@@ -209,11 +209,129 @@
         console.log('[EMBROIDERY-PRICING-V3] Rendering pricing table with master bundle data');
         
         // Get all unique sizes from the master bundle
-        const sizesToShow = masterBundle.uniqueSizes || ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+        const allSizes = masterBundle.uniqueSizes || ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
         
-        // Build the pricing table without step header (container already has it)
+        // Define standard and extended sizes
+        const standardSizeOrder = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+        const extendedSizeOrder = ['4XL', '5XL', '6XL'];
+        
+        // Filter to only include sizes that actually exist
+        const standardSizes = standardSizeOrder.filter(size => allSizes.includes(size));
+        const extendedSizes = extendedSizeOrder.filter(size => allSizes.includes(size));
+        
+        // Check if we have extended sizes
+        const hasExtendedSizes = extendedSizes.length > 0;
+        
+        // Build the main table with standard sizes
+        let html = buildPricingTableHTML(masterBundle, standardSizes);
+        
+        if (hasExtendedSizes) {
+            // Add accordion for extended sizes
+            html += `
+                <div class="extended-sizes-accordion">
+                    <button class="extended-sizes-toggle" id="extended-sizes-toggle">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Show Extended Sizes (${extendedSizes.join(', ')})</span>
+                        <i class="fas fa-chevron-down toggle-arrow"></i>
+                    </button>
+                    <div class="extended-sizes-content" id="extended-sizes-content" style="display: none;">
+            `;
+            
+            html += buildPricingTableHTML(masterBundle, extendedSizes, 'extended-sizes-table');
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        }
+        
+        html += `
+            <div class="pricing-note">
+                <strong>Volume Pricing:</strong> Save more when you order in bulk. Prices shown include an 8,000 stitch embroidered logo.
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        console.log('[EMBROIDERY-PRICING-V3] Pricing table rendered successfully');
+        
+        // Add accordion functionality if extended sizes exist
+        if (hasExtendedSizes) {
+            const toggleBtn = document.getElementById('extended-sizes-toggle');
+            const content = document.getElementById('extended-sizes-content');
+            
+            toggleBtn.addEventListener('click', function() {
+                const isExpanded = content.classList.contains('show');
+                
+                if (isExpanded) {
+                    // Collapse with animation
+                    content.style.height = content.scrollHeight + 'px';
+                    content.offsetHeight; // Force reflow
+                    content.style.height = '0';
+                    content.classList.remove('show');
+                    
+                    toggleBtn.classList.remove('expanded');
+                    toggleBtn.querySelector('span').textContent = `Show Extended Sizes (${extendedSizes.join(', ')})`;
+                    const icon = toggleBtn.querySelector('.fas');
+                    icon.classList.remove('fa-minus-circle');
+                    icon.classList.add('fa-plus-circle');
+                    
+                    // After animation, hide completely
+                    setTimeout(() => {
+                        if (!content.classList.contains('show')) {
+                            content.style.display = 'none';
+                        }
+                    }, 300);
+                } else {
+                    // Expand with animation
+                    content.style.display = 'block';
+                    content.style.height = '0';
+                    content.offsetHeight; // Force reflow
+                    content.style.height = content.scrollHeight + 'px';
+                    content.classList.add('show');
+                    
+                    toggleBtn.classList.add('expanded');
+                    toggleBtn.querySelector('span').textContent = `Hide Extended Sizes`;
+                    const icon = toggleBtn.querySelector('.fas');
+                    icon.classList.remove('fa-plus-circle');
+                    icon.classList.add('fa-minus-circle');
+                    
+                    // After animation, set height to auto
+                    setTimeout(() => {
+                        if (content.classList.contains('show')) {
+                            content.style.height = 'auto';
+                        }
+                    }, 300);
+                }
+                
+                // Store preference
+                localStorage.setItem('embroidery-extended-sizes-expanded', !isExpanded);
+            });
+            
+            // Check if user previously expanded
+            const wasExpanded = localStorage.getItem('embroidery-extended-sizes-expanded') === 'true';
+            if (wasExpanded) {
+                toggleBtn.click();
+            }
+        }
+        
+        // Add scroll event listeners for tablet shadow effect
+        const scrollContainers = container.querySelectorAll('.pricing-table-scroll');
+        scrollContainers.forEach(scrollContainer => {
+            scrollContainer.addEventListener('scroll', function() {
+                const maxScroll = this.scrollWidth - this.clientWidth;
+                if (this.scrollLeft >= maxScroll - 5) {
+                    this.classList.add('scrolled-end');
+                } else {
+                    this.classList.remove('scrolled-end');
+                }
+            });
+        });
+    }
+    
+    // Helper function to build the table HTML
+    function buildPricingTableHTML(masterBundle, sizesToShow, additionalClass = '') {
         let html = `
-            <div class="pricing-table-wrapper">
+            <div class="pricing-table-wrapper ${additionalClass}">
                 <div class="pricing-table-scroll">
                     <table class="pricing-grid">
                         <thead>
@@ -227,9 +345,9 @@
         });
         
         html += `
-                        </tr>
-                    </thead>
-                    <tbody>
+                            </tr>
+                        </thead>
+                        <tbody>
         `;
         
         // Get tiers from master bundle
@@ -272,26 +390,9 @@
                     </table>
                 </div>
             </div>
-            <div class="pricing-note">
-                <strong>Volume Pricing:</strong> Save more when you order in bulk. Prices shown include an 8,000 stitch embroidered logo.
-            </div>
         `;
         
-        container.innerHTML = html;
-        console.log('[EMBROIDERY-PRICING-V3] Pricing table rendered successfully');
-        
-        // Add scroll event listener for tablet shadow effect
-        const scrollContainer = container.querySelector('.pricing-table-scroll');
-        if (scrollContainer) {
-            scrollContainer.addEventListener('scroll', function() {
-                const maxScroll = this.scrollWidth - this.clientWidth;
-                if (this.scrollLeft >= maxScroll - 5) {
-                    this.classList.add('scrolled-end');
-                } else {
-                    this.classList.remove('scrolled-end');
-                }
-            });
-        }
+        return html;
     }
 
     // Initialize UI components
@@ -693,8 +794,13 @@
     function attachEventListeners() {
         // Quantity input
         if (elements.quantityInput) {
-            elements.quantityInput.addEventListener('change', function() {
+            elements.quantityInput.addEventListener('input', function() {
                 currentQuantity = Math.max(1, parseInt(this.value) || 1);
+                
+                // Re-render the pricing table to update active tier highlighting
+                if (window.nwcaMasterBundleData) {
+                    renderPricingTable();
+                }
                 
                 // Re-process pricing data if we have master bundle data
                 if (pricingData && pricingData.prices) {

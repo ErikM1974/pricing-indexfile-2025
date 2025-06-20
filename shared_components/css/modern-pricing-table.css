@@ -41,7 +41,7 @@
 /* Main table styles */
 .pricing-grid {
     width: 100%;
-    min-width: 800px; /* Ensure minimum width for all columns */
+    min-width: 550px; /* Reduced to be more flexible with available space */
     border-collapse: collapse;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background: white;
@@ -54,7 +54,7 @@
 }
 
 .pricing-grid th {
-    padding: 16px 12px;
+    padding: 16px 8px;
     text-align: center;
     font-weight: 600;
     font-size: 13px;
@@ -62,7 +62,7 @@
     text-transform: uppercase;
     letter-spacing: 0.03em;
     white-space: nowrap;
-    min-width: 80px; /* Minimum width for size columns */
+    min-width: 65px; /* Reduced minimum width for size columns */
 }
 
 .pricing-grid th:first-child {
@@ -87,10 +87,10 @@
 
 /* Table cells */
 .pricing-grid td {
-    padding: 20px 12px;
+    padding: 18px 8px;
     text-align: center;
     color: #24292e;
-    font-size: 16px;
+    font-size: 15px;
     white-space: nowrap;
 }
 
@@ -125,18 +125,8 @@
 
 /* Active tier highlighting */
 .pricing-grid tr.active-tier {
-    background-color: rgba(58, 124, 82, 0.04);
-    position: relative;
-}
-
-.pricing-grid tr.active-tier::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background-color: #3a7c52;
+    background-color: #e8f5e9;
+    box-shadow: inset 0 0 0 2px #3a7c52;
 }
 
 .pricing-grid tr.active-tier td {
@@ -145,11 +135,12 @@
 
 .pricing-grid tr.active-tier td:first-child {
     color: #3a7c52;
-    background-color: rgba(58, 124, 82, 0.04);
+    background-color: #e8f5e9;
 }
 
 .pricing-grid tr.active-tier .price-cell {
     color: #3a7c52;
+    background-color: #f1f8f4;
 }
 
 /* Remove old badge styles */
@@ -213,6 +204,81 @@
     .pricing-table-scroll.scrolled-end::after {
         opacity: 0;
     }
+}
+
+/* Extended sizes accordion */
+.extended-sizes-accordion {
+    margin-top: 20px;
+}
+
+.extended-sizes-toggle {
+    width: 100%;
+    padding: 14px 20px;
+    background: #f8faf9;
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2c3e50;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.extended-sizes-toggle:hover {
+    background: #f0f7f4;
+    border-color: #3a7c52;
+    color: #3a7c52;
+}
+
+.extended-sizes-toggle.expanded {
+    background: #3a7c52;
+    color: white;
+    border-color: #3a7c52;
+}
+
+.extended-sizes-toggle i {
+    font-size: 16px;
+}
+
+.extended-sizes-toggle i:first-child {
+    margin-right: 10px;
+}
+
+.extended-sizes-toggle .toggle-arrow {
+    transition: transform 0.3s ease;
+    margin-left: auto;
+}
+
+.extended-sizes-toggle.expanded .toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.extended-sizes-content {
+    overflow: hidden;
+    transition: height 0.3s ease;
+    height: 0;
+}
+
+.extended-sizes-content.show {
+    height: auto;
+}
+
+/* Extended sizes table styling */
+.extended-sizes-table {
+    margin-top: 16px;
+}
+
+.extended-sizes-table .pricing-table-wrapper {
+    margin-top: 0;
+}
+
+/* Ensure extended sizes table doesn't need scroll */
+.extended-sizes-table .pricing-grid {
+    min-width: auto;
 }
 
 /* Mobile (<768px) - Card-based design */
@@ -305,6 +371,16 @@
     
     .price-cell {
         font-size: 16px;
+    }
+    
+    /* Extended sizes accordion on mobile */
+    .extended-sizes-toggle {
+        font-size: 14px;
+        padding: 12px 16px;
+    }
+    
+    .extended-sizes-toggle i {
+        font-size: 14px;
     }
 }
 
