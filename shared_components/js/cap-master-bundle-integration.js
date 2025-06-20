@@ -89,14 +89,11 @@
                 });
                 document.dispatchEvent(bundleEvent);
                 
-                // Also dispatch legacy pricingDataLoaded event for compatibility
-                const pricingEvent = new CustomEvent('pricingDataLoaded', {
-                    detail: transformedData,
-                    bubbles: true
-                });
-                document.dispatchEvent(pricingEvent);
-                
-                console.log('[CAP-MASTER-BUNDLE] Events dispatched successfully');
+                // Skip legacy pricingDataLoaded event for cap embroidery
+                // Cap embroidery pricing v3 handles its own table rendering
+                // and dp5-helper's updateCustomPricingGrid was overwriting it
+                console.log('[CAP-MASTER-BUNDLE] Bundle event dispatched successfully');
+                console.log('[CAP-MASTER-BUNDLE] Skipping legacy pricingDataLoaded event to prevent dp5-helper interference');
                 
                 // Set flag to prevent other systems from triggering fallback
                 window.CAP_MASTER_BUNDLE_LOADED = true;
