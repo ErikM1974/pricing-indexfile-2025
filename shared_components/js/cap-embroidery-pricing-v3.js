@@ -95,8 +95,11 @@
             
             // Build table structure with master bundle data
             createTableStructure(masterBundle);
-            updatePricingTable();
-            updateQuote();
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                updatePricingTable();
+                updateQuote();
+            }, 10);
         } else {
             console.error('[CAP-PRICING-V3] No pricing data found in master bundle');
         }
@@ -555,7 +558,12 @@
     // Create table structure with embroidery-style formatting
     function createTableStructure(data) {
         const gridContainer = document.getElementById('pricing-grid-container');
-        if (!gridContainer) return;
+        if (!gridContainer) {
+            console.error('[CAP-PRICING-V3] No pricing-grid-container found!');
+            return;
+        }
+        
+        console.log('[CAP-PRICING-V3] Creating table structure with sizes:', data.uniqueSizes);
 
         // Get available sizes from master bundle
         const availableSizes = data.uniqueSizes || [];
@@ -591,6 +599,9 @@
         `;
         
         gridContainer.innerHTML = tableHTML;
+        console.log('[CAP-PRICING-V3] Table structure created, checking cells...');
+        const cells = gridContainer.querySelectorAll('.price-cell');
+        console.log('[CAP-PRICING-V3] Found', cells.length, 'price cells after creation');
     }
     
     // Build cap pricing table HTML
@@ -631,7 +642,7 @@
             
             // Add price cells for each size
             sizes.forEach(size => {
-                html += `<td class="price-cell" data-size="${size}" data-tier="${tierKey}"${needsMobileData ? ` data-size-label="${formatCapSize(size)}"` : ''}>-</td>`;
+                html += `<td class="price-cell" data-size="${size}" data-tier="${tierKey}"${needsMobileData ? ` data-size-label="${formatCapSize(size)}"` : ''}>N/A</td>`;
             });
             
             html += `</tr>`;
@@ -702,6 +713,7 @@
             const tier = cell.dataset.tier;
             
             console.log('[CAP-PRICING-V3] Looking for price - Size:', size, 'Tier:', tier);
+            console.log('[CAP-PRICING-V3] Cell current content:', cell.textContent);
             
             if (basePrices[size] && basePrices[size][tier] !== undefined) {
                 const basePrice = basePrices[size][tier];
@@ -709,6 +721,7 @@
                 console.log('[CAP-PRICING-V3] Found price:', basePrice, 'Adjusted:', adjustedPrice);
                 cell.textContent = `$${adjustedPrice.toFixed(2)}`;
                 cell.dataset.basePrice = basePrice;
+                console.log('[CAP-PRICING-V3] Cell updated to:', cell.textContent);
             } else {
                 console.warn('[CAP-PRICING-V3] No price found for size:', size, 'tier:', tier);
                 console.warn('[CAP-PRICING-V3] Available data for size:', basePrices[size]);
@@ -730,6 +743,13 @@
         
         // Update tier highlighting
         updateTierHighlight();
+        
+        // Verify the update
+        console.log('[CAP-PRICING-V3] Update complete. Verifying a sample cell...');
+        const sampleCell = document.querySelector('.price-cell[data-size="OSFA"][data-tier="24-47"]');
+        if (sampleCell) {
+            console.log('[CAP-PRICING-V3] Sample cell content:', sampleCell.textContent);
+        }
     }
     
     // Update tier highlighting based on current quantity
