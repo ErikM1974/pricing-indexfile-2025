@@ -174,6 +174,43 @@ git push origin branch-name
 
 ## Recently Discovered Issues (2025-01-20)
 
+### Cap Pricing Implementation Issues (2025-01-20)
+- **PROBLEM 1**: dp5-helper overwrites custom pricing tables when `pricingDataLoaded` event fires
+  - **CAUSE**: dp5-helper listens to this event and rebuilds tables with `innerHTML = ''`
+  - **SOLUTION**: Don't dispatch legacy `pricingDataLoaded` event from master bundle integrations
+  - **ALTERNATIVE**: Set `window.directFixApplied = true` after creating table
+  - **FILES AFFECTED**: `cap-master-bundle-integration.js` (removed event dispatch)
+  
+- **PROBLEM 2**: Table headers showing as white text on white background
+  - **CAUSE**: CSS inheritance/specificity issues
+  - **SOLUTION**: Force colors with `!important` in decoration-specific CSS
+  - **EXAMPLE**: `.pricing-grid th { color: #586069 !important; }`
+  
+- **PROBLEM 3**: Console errors from shared scripts on specialized pages
+  - **CAUSE**: Scripts looking for functions/elements that don't exist on pricing pages
+  - **SOLUTION**: Add page-specific checks before initialization
+  - **EXAMPLE**: 
+    ```javascript
+    if (window.location.pathname.includes('cap-embroidery')) {
+        console.log('Skipping - page handles its own parameters');
+        return;
+    }
+    ```
+
+### Master Bundle Integration Best Practices
+- **PATTERN**: Follow `cap-master-bundle-integration.js` as template
+- **DATA FLOW**: Caspio iframe → postMessage → integration script → custom event → UI component
+- **EVENT NAMING**: Use specific events like `capMasterBundleLoaded` not generic `pricingDataLoaded`
+- **DEBUGGING**: Store data globally: `window.nwca[Type]MasterBundleData`
+- **TABLE STRUCTURE**: 
+  - Use single-row headers for CSS compatibility
+  - Match embroidery table HTML structure exactly
+  - Avoid IDs that dp5-helper searches for (`pricing-grid-container-table`)
+- **CSS REQUIREMENTS**:
+  - Always include `modern-pricing-table.css` first
+  - Add decoration-specific CSS after (e.g., `screenprint-pricing-enhancements.css`)
+  - Use green theme consistently (#3a7c52)
+
 ### Pricing Table Width Issues with Many Sizes
 - **PROBLEM**: Tables with 9 size columns (S-6XL) get cramped and hard to read
 - **SOLUTION**: Created `modern-pricing-table.css` with:
