@@ -79,6 +79,13 @@
     font-weight: 700;
     font-size: 14px;
     text-transform: none; /* Keep "S/M", "L/XL" formatting */
+    color: #24292e !important; /* Ensure dark text */
+}
+
+/* Ensure all table headers are visible */
+.pricing-grid th {
+    color: #586069 !important; /* Force dark gray text */
+    background: #fafbfc !important; /* Light gray background */
 }
 
 /* Ensure size headers in second row are visible */
@@ -88,7 +95,7 @@
     padding: 12px 16px;
     text-align: center;
     border-bottom: 1px solid #e1e4e8;
-    color: #2c3e50;
+    color: #2c3e50 !important;
 }
 
 /* Quantity column styling */
