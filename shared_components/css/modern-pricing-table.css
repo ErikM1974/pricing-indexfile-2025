@@ -1,0 +1,357 @@
+/* Modern Pricing Table Design - Clean and Professional */
+
+/* Container wrapper for scroll handling */
+.pricing-table-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 20px 0;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+/* Scroll container */
+.pricing-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #e0e0e0 #f5f5f5;
+}
+
+/* Custom scrollbar for webkit browsers */
+.pricing-table-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.pricing-table-scroll::-webkit-scrollbar-track {
+    background: #f5f5f5;
+}
+
+.pricing-table-scroll::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 3px;
+}
+
+.pricing-table-scroll::-webkit-scrollbar-thumb:hover {
+    background: #d0d0d0;
+}
+
+/* Main table styles */
+.pricing-grid {
+    width: 100%;
+    min-width: 800px; /* Ensure minimum width for all columns */
+    border-collapse: collapse;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: white;
+}
+
+/* Table headers */
+.pricing-grid thead {
+    background: #fafbfc;
+    border-bottom: 1px solid #e1e4e8;
+}
+
+.pricing-grid th {
+    padding: 16px 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+    color: #586069;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    min-width: 80px; /* Minimum width for size columns */
+}
+
+.pricing-grid th:first-child {
+    text-align: left;
+    padding-left: 24px;
+    min-width: 120px;
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: #fafbfc;
+}
+
+/* Table body */
+.pricing-grid tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+.pricing-grid tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Table cells */
+.pricing-grid td {
+    padding: 20px 12px;
+    text-align: center;
+    color: #24292e;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.pricing-grid td:first-child {
+    text-align: left;
+    padding-left: 24px;
+    font-weight: 500;
+    color: #586069;
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 9;
+}
+
+/* Price cells - tabular numbers for alignment */
+.price-cell {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 16px;
+    letter-spacing: -0.02em;
+}
+
+/* Hover state */
+.pricing-grid tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.pricing-grid tbody tr:hover td:first-child {
+    background-color: #f8f9fa;
+}
+
+/* Active tier highlighting */
+.pricing-grid tr.active-tier {
+    background-color: rgba(58, 124, 82, 0.04);
+    position: relative;
+}
+
+.pricing-grid tr.active-tier::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: #3a7c52;
+}
+
+.pricing-grid tr.active-tier td {
+    font-weight: 600;
+}
+
+.pricing-grid tr.active-tier td:first-child {
+    color: #3a7c52;
+    background-color: rgba(58, 124, 82, 0.04);
+}
+
+.pricing-grid tr.active-tier .price-cell {
+    color: #3a7c52;
+}
+
+/* Remove old badge styles */
+.tier-badge {
+    display: none !important;
+}
+
+/* Pricing note - more subtle */
+.pricing-note {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #f6f8fa;
+    border-left: 3px solid #3a7c52;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #586069;
+    line-height: 1.5;
+}
+
+.pricing-note strong {
+    color: #24292e;
+    font-weight: 600;
+}
+
+/* Responsive Design */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .pricing-grid {
+        min-width: 700px;
+    }
+    
+    .pricing-grid th,
+    .pricing-grid td {
+        padding: 14px 10px;
+    }
+    
+    .pricing-grid th {
+        font-size: 12px;
+        min-width: 70px;
+    }
+    
+    .price-cell {
+        font-size: 15px;
+    }
+    
+    /* Scroll hint shadow */
+    .pricing-table-wrapper::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8));
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+    }
+    
+    .pricing-table-scroll.scrolled-end::after {
+        opacity: 0;
+    }
+}
+
+/* Mobile (<768px) - Card-based design */
+@media (max-width: 768px) {
+    .pricing-table-wrapper {
+        box-shadow: none;
+        background: transparent;
+    }
+    
+    .pricing-table-scroll {
+        overflow-x: visible;
+    }
+    
+    .pricing-grid {
+        display: block;
+        min-width: auto;
+    }
+    
+    .pricing-grid thead {
+        display: none;
+    }
+    
+    .pricing-grid tbody {
+        display: block;
+    }
+    
+    .pricing-grid tr {
+        display: block;
+        margin-bottom: 16px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e1e4e8;
+        padding: 16px;
+    }
+    
+    .pricing-grid tr.active-tier {
+        border-color: #3a7c52;
+        box-shadow: 0 4px 8px rgba(58, 124, 82, 0.15);
+    }
+    
+    .pricing-grid tr.active-tier::before {
+        display: none;
+    }
+    
+    .pricing-grid td {
+        display: block;
+        text-align: left;
+        padding: 4px 0;
+        position: static;
+    }
+    
+    .pricing-grid td:first-child {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        padding-left: 0;
+        border-bottom: 1px solid #e1e4e8;
+        padding-bottom: 12px;
+    }
+    
+    /* Create a grid for size/price pairs */
+    .pricing-grid tr {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+    
+    .pricing-grid td:first-child {
+        grid-column: 1 / -1;
+    }
+    
+    .pricing-grid td:not(:first-child) {
+        display: inline-flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .pricing-grid td:not(:first-child)::before {
+        content: attr(data-size);
+        font-weight: 500;
+        color: #586069;
+        font-size: 14px;
+    }
+    
+    .pricing-grid td:last-child {
+        border-bottom: none;
+    }
+    
+    .price-cell {
+        font-size: 16px;
+    }
+}
+
+/* Focus states for accessibility */
+.pricing-grid tr:focus-within {
+    outline: 2px solid #3a7c52;
+    outline-offset: -2px;
+}
+
+/* Animation for initial load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pricing-grid tbody tr {
+    animation: fadeInUp 0.4s ease-out backwards;
+}
+
+.pricing-grid tbody tr:nth-child(1) { animation-delay: 0.05s; }
+.pricing-grid tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.pricing-grid tbody tr:nth-child(3) { animation-delay: 0.15s; }
+.pricing-grid tbody tr:nth-child(4) { animation-delay: 0.2s; }
+
+/* Utility class to disable animations if needed */
+.no-animation .pricing-grid tbody tr {
+    animation: none !important;
+}
+
+/* Print styles */
+@media print {
+    .pricing-table-wrapper {
+        box-shadow: none;
+        page-break-inside: avoid;
+    }
+    
+    .pricing-grid {
+        min-width: auto;
+    }
+    
+    .pricing-grid tr {
+        page-break-inside: avoid;
+    }
+}

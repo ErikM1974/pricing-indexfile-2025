@@ -218,13 +218,12 @@
                     <div class="step-number">3</div>
                     <h2 class="step-title">Pricing Grid</h2>
                 </div>
-                <div class="pricing-note">
-                    <strong>Bulk Discounts:</strong> Prices decrease as quantity increases. Current selection highlighted below.
-                </div>
-                <table class="pricing-grid">
-                    <thead>
-                        <tr>
-                            <th>Quantity</th>
+                <div class="pricing-table-wrapper">
+                    <div class="pricing-table-scroll">
+                        <table class="pricing-grid">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
         `;
         
         // Add headers for each size
@@ -247,16 +246,7 @@
             
             html += `
                         <tr${isActiveTier ? ' class="active-tier"' : ''}>
-                            <td>${tierLabel}`;
-            
-            // Add badges
-            if (tierLabel === '24-47') {
-                html += ' <span class="tier-badge popular">POPULAR</span>';
-            } else if (tierLabel === '48-71') {
-                html += ' <span class="tier-badge best-value">BEST VALUE</span>';
-            }
-            
-            html += `</td>`;
+                            <td>${tierLabel}</td>`;
             
             // Add prices for each size from master bundle
             sizesToShow.forEach(size => {
@@ -269,9 +259,9 @@
                 
                 // Format and display the price
                 if (price !== null && price !== undefined) {
-                    html += `<td class="price-cell">$${parseFloat(price).toFixed(2)}</td>`;
+                    html += `<td class="price-cell" data-size="${size}">$${parseFloat(price).toFixed(2)}</td>`;
                 } else {
-                    html += `<td class="price-cell">N/A</td>`;
+                    html += `<td class="price-cell" data-size="${size}">N/A</td>`;
                 }
             });
             
@@ -279,13 +269,31 @@
         });
         
         html += `
-                    </tbody>
-                </table>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="pricing-note">
+                    <strong>Volume Pricing:</strong> Save more when you order in bulk. Prices shown include an 8,000 stitch embroidered logo.
+                </div>
             </div>
         `;
         
         container.innerHTML = html;
         console.log('[EMBROIDERY-PRICING-V3] Pricing table rendered successfully');
+        
+        // Add scroll event listener for tablet shadow effect
+        const scrollContainer = container.querySelector('.pricing-table-scroll');
+        if (scrollContainer) {
+            scrollContainer.addEventListener('scroll', function() {
+                const maxScroll = this.scrollWidth - this.clientWidth;
+                if (this.scrollLeft >= maxScroll - 5) {
+                    this.classList.add('scrolled-end');
+                } else {
+                    this.classList.remove('scrolled-end');
+                }
+            });
+        }
     }
 
     // Initialize UI components

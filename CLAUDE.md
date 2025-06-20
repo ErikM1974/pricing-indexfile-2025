@@ -172,6 +172,18 @@ git push origin branch-name
 - Check test-*.html files for working examples
 - Console logs are your friend - the system logs extensively
 
+## Recently Discovered Issues (2025-01-20)
+
+### Pricing Table Width Issues with Many Sizes
+- **PROBLEM**: Tables with 9 size columns (S-6XL) get cramped and hard to read
+- **SOLUTION**: Created `modern-pricing-table.css` with:
+  - Responsive wrapper with horizontal scroll
+  - Minimum column widths (80px) 
+  - Card-based mobile layout
+  - Sticky first column on tablet
+- **REMOVED**: "POPULAR" and "BEST VALUE" badges (unnecessary clutter)
+- **FILE**: `/shared_components/css/modern-pricing-table.css`
+
 ## Final Tips
 
 1. **Read the console logs** - They tell you exactly what's happening

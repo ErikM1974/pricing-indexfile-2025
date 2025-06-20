@@ -20,6 +20,9 @@
     <!-- Force green theme for consistency -->
     <link rel="stylesheet" href="/shared_components/css/force-green-theme.css">
     
+    <!-- Modern pricing table design -->
+    <link rel="stylesheet" href="/shared_components/css/modern-pricing-table.css">
+    
     <!-- Legacy styles for compatibility -->
     <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
     <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
@@ -1331,118 +1334,7 @@
             font-weight: 600;
         }
         
-        /* Modern Table Design */
-        .pricing-grid {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .pricing-grid th {
-            background: #f0f8f3;
-            color: #2d5f3f;
-            padding: 14px 16px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 14px;
-            border-bottom: 2px solid #e0e0e0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .pricing-grid th:first-child {
-            text-align: left;
-            padding-left: 20px;
-            background: #3a7c52;
-            color: white;
-        }
-        
-        .pricing-grid td {
-            padding: 14px 16px;
-            text-align: center;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 15px;
-            color: #333;
-        }
-        
-        .pricing-grid td:first-child {
-            text-align: left;
-            padding-left: 20px;
-            font-weight: 500;
-            color: #555;
-            white-space: nowrap;
-        }
-        
-        .pricing-grid tbody tr:hover td {
-            background-color: #fafafa;
-        }
-        
-        .pricing-grid tbody tr:last-child td {
-            border-bottom: none;
-        }
-        
-        /* Price cells */
-        .price-cell {
-            font-weight: 600;
-            color: #2d5f3f;
-        }
-        
-        /* Tier badges - Cleaner design */
-        .tier-badge {
-            display: inline-block;
-            margin-left: 10px;
-            padding: 3px 10px;
-            font-size: 11px;
-            border-radius: 4px;
-            font-weight: 500;
-            vertical-align: middle;
-        }
-        
-        .tier-badge.popular {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        
-        .tier-badge.best-value {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        /* Inventory indicators - Better colors */
-        .inventory-indicator {
-            display: inline-block;
-            margin-left: 6px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        
-        .inventory-indicator.inventory-low {
-            color: #856404;
-        }
-        
-        .inventory-indicator.inventory-none {
-            color: #721c24;
-        }
-        
-        /* Pricing note */
-        .pricing-note {
-            margin-top: 20px;
-            padding: 12px 16px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .pricing-note strong {
-            color: #333;
-        }
+        /* Pricing table styles moved to modern-pricing-table.css */
         
         /* Make the universal pricing grid inherit these styles */
         #pricing-grid-container .universal-pricing-grid {
@@ -1451,45 +1343,6 @@
         
         #pricing-grid-container .pricing-header {
             display: none; /* Hide the duplicate header from UniversalPricingGrid */
-        }
-        
-        /* Remove animations from pricing table */
-        .pricing-grid .stagger-animation {
-            animation: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-        }
-        
-        .pricing-grid tr {
-            animation-delay: 0s !important;
-        }
-        
-        /* Active tier highlighting */
-        .pricing-grid tr.active-tier {
-            background-color: #e8f5e9 !important;
-            font-weight: 600;
-            position: relative;
-        }
-        
-        .pricing-grid tr.active-tier::before {
-            content: '→';
-            position: absolute;
-            left: -20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #3a7c52;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .pricing-grid tr.active-tier td {
-            background-color: transparent;
-        }
-        
-        .pricing-grid tr.active-tier td:first-child {
-            position: relative;
-            font-weight: 700;
-            color: #2d5f3f;
         }
         
         /* Responsive */
@@ -1501,24 +1354,6 @@
             
             .selected-color-indicator {
                 width: 100%;
-            }
-            
-            .pricing-grid {
-                font-size: 13px;
-            }
-            
-            .pricing-grid th,
-            .pricing-grid td {
-                padding: 10px 8px;
-            }
-            
-            .pricing-grid th {
-                font-size: 12px;
-            }
-            
-            .pricing-grid tr.active-tier::before {
-                left: -15px;
-                font-size: 16px;
             }
         }
         
