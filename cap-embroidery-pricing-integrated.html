@@ -1442,6 +1442,9 @@
     <!-- Product URL handler -->
     <script src="/product-url-handler.js"></script>
     
+    <!-- Cap Master Bundle Integration -->
+    <script src="/shared_components/js/cap-master-bundle-integration.js"></script>
+    
     <!-- V3 Enhanced pricing implementation -->
     <script src="/shared_components/js/cap-embroidery-pricing-v3.js"></script>
     
@@ -1531,6 +1534,20 @@
             
             // Make it available globally if needed
             window.productDisplay = productDisplay;
+            
+            // Load Caspio data page with master bundle
+            // Get URL parameters for dynamic loading
+            const urlParams = new URLSearchParams(window.location.search);
+            const styleNumber = urlParams.get('StyleNumber') || 'C112';
+            const color = urlParams.get('COLOR') || 'Black';
+            
+            // Create and inject Caspio script
+            const caspioScript = document.createElement('script');
+            caspioScript.src = `https://c3eku948.caspio.com/dp/a0e150004ecd0739f853449c8d7f/emb?StyleNumber=${styleNumber}&COLOR=${encodeURIComponent(color)}`;
+            caspioScript.async = true;
+            document.body.appendChild(caspioScript);
+            
+            console.log('[CapEmbroideryEnhanced] Loading Caspio master bundle for:', styleNumber, color);
         });
     </script>
 </body>

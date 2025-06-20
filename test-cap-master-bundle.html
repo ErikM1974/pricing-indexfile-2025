@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Master Bundle Integration - Implementation Summary</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .code-block {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 3px solid #3a7c52;
+        }
+        .success {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+        .deprecated {
+            color: #f57c00;
+            font-weight: 600;
+        }
+        .change-list {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .change-list h3 {
+            margin-top: 0;
+            color: #2e7d32;
+        }
+        .data-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .flow-step {
+            background: #f0f7f4;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #3a7c52;
+        }
+        .flow-step h4 {
+            margin-top: 0;
+            color: #3a7c52;
+        }
+        .arrow {
+            font-size: 24px;
+            color: #3a7c52;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        th {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cap Embroidery Master Bundle Integration</h1>
+        <p style="color: #666; margin-bottom: 30px;">Implemented the new master bundle architecture for cap embroidery pricing</p>
+        
+        <div class="section">
+            <h2>🎯 Overview</h2>
+            <p>The cap embroidery pricing page has been updated to use the modern Master Bundle architecture, following the same pattern as the embroidery page. This provides:</p>
+            <ul>
+                <li>Clean separation of data (Caspio) and display (webpage) logic</li>
+                <li>Support for any cap sizing configuration (OSFA, S/M, M/L, L/XL, etc.)</li>
+                <li>Consistent event-driven architecture</li>
+                <li>Better debugging with global data access</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>📊 Data Flow</h2>
+            <div class="data-flow">
+                <div class="flow-step">
+                    <h4>1. Caspio DataPage</h4>
+                    <p>Calculates prices and sends complete JSON bundle</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="flow-step">
+                    <h4>2. postMessage</h4>
+                    <p>Browser API transfers data from iframe</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="flow-step">
+                    <h4>3. Integration Handler</h4>
+                    <p>Receives and transforms data</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="flow-step">
+                    <h4>4. Cap Pricing V3</h4>
+                    <p>Renders UI with pricing data</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 Implementation Details</h2>
+            
+            <div class="change-list">
+                <h3>New Files Created:</h3>
+                <ul>
+                    <li><strong>cap-master-bundle-integration.js</strong> - Handles postMessage communication and data transformation</li>
+                </ul>
+            </div>
+            
+            <div class="change-list">
+                <h3>Files Modified:</h3>
+                <ul>
+                    <li><strong>cap-embroidery-pricing-integrated.html</strong> - Added new Caspio URL and integration script</li>
+                    <li><strong>cap-embroidery-pricing-v3.js</strong> - Updated to use master bundle instead of old API</li>
+                </ul>
+            </div>
+            
+            <h3>Key Changes in cap-embroidery-pricing-v3.js:</h3>
+            <table>
+                <tr>
+                    <th>Old Method</th>
+                    <th>New Method</th>
+                </tr>
+                <tr>
+                    <td><span class="deprecated">caspioCapPricingCalculated</span> event</td>
+                    <td><span class="success">capMasterBundleLoaded</span> event</td>
+                </tr>
+                <tr>
+                    <td><span class="deprecated">fetchPricingData()</span> API calls</td>
+                    <td><span class="success">Master bundle via postMessage</span></td>
+                </tr>
+                <tr>
+                    <td><span class="deprecated">data.allPriceProfiles['8000']</span></td>
+                    <td><span class="success">masterBundle.pricing[tier][size]</span></td>
+                </tr>
+                <tr>
+                    <td><span class="deprecated">data.groupedHeaders</span></td>
+                    <td><span class="success">masterBundle.uniqueSizes</span></td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>📦 Master Bundle Structure</h2>
+            <p>The cap master bundle contains all pricing data in a clean structure:</p>
+            
+            <div class="code-block">
+{
+    "styleNumber": "C112",
+    "colorName": "Black",
+    "embellishmentType": "cap_embroidery",
+    "uniqueSizes": ["OSFA"],  // or ["S/M", "M/L", "L/XL"] for fitted caps
+    "tierData": [
+        { "TierLabel": "24-47", "MinQuantity": 24, ... },
+        { "TierLabel": "48-71", "MinQuantity": 48, ... },
+        { "TierLabel": "72+", "MinQuantity": 72, ... }
+    ],
+    "pricing": {
+        "24-47": { "OSFA": 15.00 },
+        "48-71": { "OSFA": 14.00 },
+        "72+": { "OSFA": 13.00 }
+    }
+}</div>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 Event Listeners</h2>
+            <p>The integration uses the following event flow:</p>
+            
+            <div class="code-block">
+// 1. Master bundle integration listens for Caspio messages
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'caspioCapMasterBundleReady') {
+        // Process and dispatch events
+    }
+});
+
+// 2. Cap pricing V3 listens for the processed data
+document.addEventListener('capMasterBundleLoaded', function(event) {
+    const masterBundle = event.detail.raw;
+    processMasterBundleData(masterBundle);
+});</div>
+        </div>
+        
+        <div class="section">
+            <h2>✅ Testing</h2>
+            <p>To test the integration:</p>
+            <ol>
+                <li>Load the cap pricing page with a cap style: <code>?StyleNumber=C112&COLOR=Black</code></li>
+                <li>Open browser console and check for:
+                    <ul>
+                        <li><code>window.nwcaCapMasterBundleData</code> - Raw master bundle</li>
+                        <li><code>window.nwcaCapTransformedData</code> - Transformed data</li>
+                    </ul>
+                </li>
+                <li>Verify pricing table shows correct sizes (OSFA or S/M, M/L, L/XL)</li>
+                <li>Test quantity changes to verify tier highlighting</li>
+            </ol>
+            
+            <h3>Console Commands for Debugging:</h3>
+            <div class="code-block">
+// Check raw master bundle data
+console.log(window.nwcaCapMasterBundleData);
+
+// Check available sizes
+console.log(window.nwcaCapMasterBundleData.uniqueSizes);
+
+// Check pricing for specific tier/size
+console.log(window.nwcaCapMasterBundleData.pricing['24-47']['OSFA']);</div>
+        </div>
+        
+        <div class="section">
+            <h2>🚀 Benefits</h2>
+            <ul>
+                <li><strong>Consistency</strong> - Follows same pattern as embroidery page</li>
+                <li><strong>Flexibility</strong> - Works with any cap sizing configuration</li>
+                <li><strong>Maintainability</strong> - Clean separation of concerns</li>
+                <li><strong>Debugging</strong> - Easy access to data via global variables</li>
+                <li><strong>Future-proof</strong> - Ready for new cap types and sizing</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

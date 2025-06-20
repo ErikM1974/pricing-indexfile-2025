@@ -44,51 +44,61 @@
             if (headerPrice) headerPrice.textContent = typeof unitPrice === 'number' ? `$${unitPrice.toFixed(2)}` : unitPrice;
         };
         
-        // Listen for Caspio data
-        document.addEventListener('caspioCapPricingCalculated', handleCaspioData);
+        // Listen for master bundle data
+        document.addEventListener('capMasterBundleLoaded', handleMasterBundle);
         
         // Initialize UI
         initializeUI();
         
         // Load product data for gallery and swatches
         loadProductData();
-        
-        // Fetch pricing data directly and update quote when loaded
-        fetchPricingData().then(() => {
-            console.log('[CAP-PRICING-V3] Initial pricing fetch completed');
-        }).catch(error => {
-            console.error('[CAP-PRICING-V3] Initial pricing fetch failed:', error);
-        });
     });
 
-    // Handle Caspio pricing data
-    function handleCaspioData(event) {
-        console.log('[CAP-PRICING-V3] Received Caspio data:', event.detail);
+    // Handle master bundle data
+    function handleMasterBundle(event) {
+        console.log('[CAP-PRICING-V3] Received master bundle event:', event.detail);
         
-        if (!event.detail || !event.detail.success) {
+        if (!event.detail || !event.detail.raw) {
             displayPricingError();
             return;
         }
 
-        processPricingData(event.detail);
+        processMasterBundleData(event.detail.raw);
     }
 
-    // Process pricing data
-    function processPricingData(data) {
-        // Extract base prices at 8000 stitches
-        if (data.allPriceProfiles && data.allPriceProfiles['8000']) {
-            basePrices = data.allPriceProfiles['8000'];
-            pricingData = data;
+    // Process master bundle data
+    function processMasterBundleData(masterBundle) {
+        console.log('[CAP-PRICING-V3] Processing master bundle:', masterBundle);
+        
+        // Store the master bundle data
+        pricingData = masterBundle;
+        
+        // Build base prices structure from master bundle
+        // For caps, we get prices directly from the pricing object
+        basePrices = {};
+        
+        if (masterBundle.uniqueSizes && masterBundle.pricing) {
+            // For each size, build the tier structure
+            masterBundle.uniqueSizes.forEach(size => {
+                basePrices[size] = {};
+                
+                // Copy prices from each tier
+                Object.keys(masterBundle.pricing).forEach(tierLabel => {
+                    if (masterBundle.pricing[tierLabel] && masterBundle.pricing[tierLabel][size] !== undefined) {
+                        basePrices[size][tierLabel] = masterBundle.pricing[tierLabel][size];
+                    }
+                });
+            });
             
             console.log('[CAP-PRICING-V3] Base prices loaded:', basePrices);
-            console.log('[CAP-PRICING-V3] Available sizes:', Object.keys(basePrices));
+            console.log('[CAP-PRICING-V3] Available sizes:', masterBundle.uniqueSizes);
             
-            // Build table structure once, then update prices
-            createTableStructure(data);
+            // Build table structure with master bundle data
+            createTableStructure(masterBundle);
             updatePricingTable();
             updateQuote();
         } else {
-            console.error('[CAP-PRICING-V3] No pricing data found for 8000 stitches');
+            console.error('[CAP-PRICING-V3] No pricing data found in master bundle');
         }
     }
 
@@ -547,8 +557,8 @@
         const gridContainer = document.getElementById('pricing-grid-container');
         if (!gridContainer) return;
 
-        // Get available sizes - prioritize cap-specific sizes
-        const availableSizes = data.groupedHeaders || [];
+        // Get available sizes from master bundle
+        const availableSizes = data.uniqueSizes || [];
         const displayTiers = ['24-47', '48-71', '72+'];
         
         // Build the table HTML using embroidery-style structure
@@ -753,8 +763,6 @@
         if (!quoteSize) {
             console.error('[CAP-PRICING-V3] No size found in basePrices');
             document.getElementById('base-price').textContent = 'Loading...';
-            // Try to fetch pricing data again
-            fetchPricingData();
             return;
         }
         
@@ -927,6 +935,9 @@
     }
 
     // Fetch pricing data directly
+    // DEPRECATED: Now using master bundle instead of API fetch
+    // Keeping for reference but no longer used
+    /*
     async function fetchPricingData() {
         console.log('[CAP-PRICING-V3] Starting pricing data fetch...');
         
@@ -1047,6 +1058,7 @@
             displayPricingError();
         }
     }
+    */
 
     // Helper function for rounding
     function applyDynamicRounding(amount, ruleName) {
