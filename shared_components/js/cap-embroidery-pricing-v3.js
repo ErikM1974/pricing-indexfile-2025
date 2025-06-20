@@ -606,6 +606,9 @@
         // Set flag to prevent dp5-helper from overwriting our table
         window.directFixApplied = true;
         console.log('[CAP-PRICING-V3] Set directFixApplied flag to prevent dp5-helper interference');
+        
+        // Also set a cap-specific flag
+        window.capPricingTableCreated = true;
     }
     
     // Build cap pricing table HTML
@@ -616,24 +619,21 @@
         let html = `
             <div class="pricing-table-wrapper">
                 <div class="pricing-table-scroll">
-                    <table class="pricing-grid" id="pricing-grid-container-table">
-                        <thead id="pricing-grid-container-header-row">
+                    <table class="pricing-grid">
+                        <thead>
                             <tr>
-                                <th rowspan="2" class="tier-label">Quantity</th>
-                                <th colspan="${sizes.length}" style="text-align: center;">Price Per Cap (with Front Logo)</th>
-                            </tr>
-                            <tr>
+                                <th>Quantity</th>
         `;
         
         // Add headers for each size
         sizes.forEach(size => {
-            html += `<th class="size-header">${formatCapSize(size)}</th>`;
+            html += `<th>${formatCapSize(size)}</th>`;
         });
         
         html += `
                             </tr>
                         </thead>
-                        <tbody id="pricing-grid-container-tbody">
+                        <tbody>
         `;
         
         // Add rows for each tier
@@ -642,7 +642,7 @@
             
             html += `
                         <tr${isActiveTier ? ' class="active-tier"' : ''}>
-                            <td class="tier-label">${tierKey}</td>`;
+                            <td>${tierKey}</td>`;
             
             // Add price cells for each size
             sizes.forEach(size => {
