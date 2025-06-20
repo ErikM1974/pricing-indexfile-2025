@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Embroidery Master Bundle Integration</title>
+    <style>
+        body {
+            font-family: -apple-system, Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .iframe-container {
+            border: 2px solid #ddd;
+            padding: 10px;
+            background: white;
+        }
+        .log-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .status.waiting { background: #ffc107; color: #000; }
+        .status.success { background: #4caf50; color: #fff; }
+        .status.error { background: #f44336; color: #fff; }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        .data-display {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Embroidery Master Bundle Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="reloadIframe()">Reload Iframe</button>
+        <button onclick="changeStyle('PC61', 'Black')">Test PC61 Black</button>
+        <button onclick="changeStyle('5190', 'Red')">Test 5190 Red</button>
+        <button onclick="clearLog()">Clear Log</button>
+        
+        <div id="status" class="status waiting">Waiting for data...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Caspio Iframe</h2>
+        <div class="iframe-container">
+            <iframe id="embroidery-master-bundle-iframe" 
+                    src="https://c3eku948.caspio.com/dp/a0e150001c7143d027a54c439c01?StyleNumber=5190&COLOR=Black"
+                    style="width: 100%; height: 200px; border: 1px solid #ccc;"
+                    title="Embroidery Pricing Data">
+            </iframe>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Log</h2>
+        <div id="log" class="log-output">Starting test...\n</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Raw Master Bundle Data</h2>
+        <div id="raw-data" class="data-display">
+            <pre>No data received yet...</pre>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Transformed Data</h2>
+        <div id="transformed-data" class="data-display">
+            <pre>No data transformed yet...</pre>
+        </div>
+    </div>
+    
+    <script>
+        // Log function
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : '📝';
+            logDiv.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[TEST] ${message}`);
+        }
+        
+        function clearLog() {
+            document.getElementById('log').textContent = 'Log cleared...\n';
+        }
+        
+        // Update status
+        function updateStatus(text, className) {
+            const status = document.getElementById('status');
+            status.textContent = text;
+            status.className = 'status ' + className;
+        }
+        
+        // Reload iframe
+        function reloadIframe() {
+            const iframe = document.getElementById('embroidery-master-bundle-iframe');
+            const currentSrc = iframe.src;
+            log('Reloading iframe...');
+            iframe.src = '';
+            setTimeout(() => {
+                iframe.src = currentSrc;
+                updateStatus('Waiting for data...', 'waiting');
+            }, 100);
+        }
+        
+        // Change style/color
+        function changeStyle(styleNumber, color) {
+            const iframe = document.getElementById('embroidery-master-bundle-iframe');
+            const baseUrl = 'https://c3eku948.caspio.com/dp/a0e150001c7143d027a54c439c01';
+            const newUrl = `${baseUrl}?StyleNumber=${styleNumber}&COLOR=${color}`;
+            log(`Changing to ${styleNumber} / ${color}`);
+            iframe.src = newUrl;
+            updateStatus('Waiting for data...', 'waiting');
+        }
+        
+        // Load the integration script
+        const script = document.createElement('script');
+        script.src = '/shared_components/js/embroidery-master-bundle-integration.js';
+        script.onload = () => log('Integration script loaded successfully', 'success');
+        script.onerror = () => log('Failed to load integration script', 'error');
+        document.head.appendChild(script);
+        
+        // Listen for events
+        document.addEventListener('masterBundleLoaded', function(event) {
+            log('Master bundle loaded event received!', 'success');
+            updateStatus('Data received successfully!', 'success');
+            
+            // Display raw data
+            const rawDataDiv = document.getElementById('raw-data');
+            rawDataDiv.innerHTML = '<pre>' + JSON.stringify(event.detail.raw, null, 2) + '</pre>';
+            
+            // Display transformed data
+            const transformedDataDiv = document.getElementById('transformed-data');
+            transformedDataDiv.innerHTML = '<pre>' + JSON.stringify(event.detail.transformed, null, 2) + '</pre>';
+            
+            // Log key information
+            if (event.detail.raw) {
+                log(`Embellishment Type: ${event.detail.raw.embellishmentType}`);
+                log(`Style Number: ${event.detail.raw.styleNumber}`);
+                log(`Unique Sizes: ${event.detail.raw.uniqueSizes.join(', ')}`);
+                log(`Tier Count: ${Array.isArray(event.detail.raw.tierData) ? event.detail.raw.tierData.length : Object.keys(event.detail.raw.tierData).length}`);
+            }
+            
+            if (event.detail.transformed) {
+                log(`Grouped Headers: ${event.detail.transformed.headers.join(', ')}`);
+                log(`Price Groups: ${Object.keys(event.detail.transformed.prices).length}`);
+            }
+        });
+        
+        document.addEventListener('masterBundleError', function(event) {
+            log(`Error: ${event.detail.error}`, 'error');
+            updateStatus('Error loading data!', 'error');
+        });
+        
+        // Also log the pricing data loaded event
+        document.addEventListener('pricingDataLoaded', function(event) {
+            log('Pricing data loaded event dispatched');
+        });
+        
+        // Log all postMessage events for debugging
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type) {
+                log(`PostMessage received: ${event.data.type}`);
+            }
+        });
+        
+        log('Test page initialized');
+    </script>
+</body>
+</html>

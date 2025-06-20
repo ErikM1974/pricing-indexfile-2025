@@ -54,6 +54,16 @@
         // Listen for pricing data
         document.addEventListener('pricingDataLoaded', handlePricingData);
         
+        // Listen for master bundle data specifically
+        document.addEventListener('masterBundleLoaded', function(event) {
+            console.log('[EMBROIDERY-PRICING-V3] Master bundle loaded event received');
+            if (event.detail && event.detail.raw) {
+                window.nwcaMasterBundleData = event.detail.raw;
+                // Render the pricing table with the new data
+                renderPricingTable();
+            }
+        });
+        
         // Initialize UI
         initializeUI();
         
@@ -62,7 +72,10 @@
         
         // Try to get existing pricing data if available
         setTimeout(() => {
-            if (window.nwcaPricingData) {
+            if (window.nwcaMasterBundleData) {
+                console.log('[EMBROIDERY-PRICING-V3] Found existing master bundle data');
+                renderPricingTable();
+            } else if (window.nwcaPricingData) {
                 console.log('[EMBROIDERY-PRICING-V3] Found existing pricing data');
                 handlePricingData({ detail: window.nwcaPricingData });
             } else {
@@ -86,6 +99,13 @@
         
         // Listen for color changes
         window.addEventListener('colorChanged', handleColorChange);
+        
+        // Listen for render pricing table events
+        document.addEventListener('renderPricingTable', function() {
+            if (window.nwcaMasterBundleData) {
+                renderPricingTable();
+            }
+        });
         
         // Initialize color display from current product
         setTimeout(() => {
@@ -111,30 +131,161 @@
         basePrices = {};
         pricingData = data;
         
-        // For embroidery, we need to extract prices from the tier data
-        if (data.tierData && data.prices) {
-            // Find the tier that contains our current quantity
-            let currentTier = null;
-            for (const tierKey in data.tierData) {
-                const tier = data.tierData[tierKey];
-                if (currentQuantity >= tier.MinQuantity && currentQuantity <= tier.MaxQuantity) {
-                    currentTier = tierKey;
-                    break;
-                }
-            }
+        // Handle master bundle format
+        if (data.prices && data.headers) {
+            // This is the transformed master bundle data
+            // Store all pricing data for tier switching
+            pricingData = data;
             
-            if (currentTier && data.prices) {
-                // Extract prices for each size group in the current tier
-                for (const sizeGroup in data.prices) {
-                    if (data.prices[sizeGroup] && data.prices[sizeGroup][currentTier]) {
-                        basePrices[sizeGroup] = parseFloat(data.prices[sizeGroup][currentTier]);
+            // Find the appropriate tier for current quantity
+            let selectedTier = null;
+            if (data.tierData) {
+                // tierData could be an array or object
+                const tiers = Array.isArray(data.tierData) ? data.tierData : Object.values(data.tierData);
+                
+                for (const tier of tiers) {
+                    const minQty = tier.MinQuantity || tier.min || 0;
+                    const maxQty = tier.MaxQuantity || tier.max || 99999;
+                    
+                    if (currentQuantity >= minQty && currentQuantity <= maxQty) {
+                        selectedTier = tier.TierLabel || tier.label || `${minQty}-${maxQty}`;
+                        break;
                     }
                 }
             }
+            
+            // If no tier found, use the first available tier
+            if (!selectedTier && data.prices) {
+                // Try to find the first tier from the price structure
+                for (const sizeGroup in data.prices) {
+                    if (data.prices[sizeGroup]) {
+                        const tierKeys = Object.keys(data.prices[sizeGroup]);
+                        if (tierKeys.length > 0) {
+                            selectedTier = tierKeys[0];
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            console.log('[EMBROIDERY-PRICING-V3] Selected tier:', selectedTier, 'for quantity:', currentQuantity);
+            
+            if (selectedTier) {
+                // Extract prices for each size group in the selected tier
+                Object.keys(data.prices).forEach(sizeGroup => {
+                    if (data.prices[sizeGroup] && data.prices[sizeGroup][selectedTier] !== null && data.prices[sizeGroup][selectedTier] !== undefined) {
+                        basePrices[sizeGroup] = parseFloat(data.prices[sizeGroup][selectedTier]);
+                    }
+                });
+            }
+            
+            // Render the pricing table
+            renderPricingTable();
         }
         
         console.log('[EMBROIDERY-PRICING-V3] Base prices loaded:', basePrices);
+        console.log('[EMBROIDERY-PRICING-V3] Available size groups:', Object.keys(basePrices));
         updateQuote();
+    }
+    
+    // Render pricing table
+    function renderPricingTable() {
+        const container = document.getElementById('embroidery-pricing-table-container');
+        if (!container) {
+            console.log('[EMBROIDERY-PRICING-V3] Pricing table container not found');
+            return;
+        }
+        
+        // Get the raw master bundle data if available
+        const masterBundle = window.nwcaMasterBundleData;
+        
+        // Check if we have master bundle data with pricing
+        if (!masterBundle || !masterBundle.pricing || !masterBundle.tierData) {
+            console.log('[EMBROIDERY-PRICING-V3] No master bundle data available for pricing table');
+            container.innerHTML = '<p>Loading pricing data...</p>';
+            return;
+        }
+        
+        console.log('[EMBROIDERY-PRICING-V3] Rendering pricing table with master bundle data');
+        
+        // Get all unique sizes from the master bundle
+        const sizesToShow = masterBundle.uniqueSizes || ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+        
+        // Build the complete Step 3 section with header and table
+        let html = `
+            <div class="step-section">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h2 class="step-title">Pricing Grid</h2>
+                </div>
+                <div class="pricing-note">
+                    <strong>Bulk Discounts:</strong> Prices decrease as quantity increases. Current selection highlighted below.
+                </div>
+                <table class="pricing-grid">
+                    <thead>
+                        <tr>
+                            <th>Quantity</th>
+        `;
+        
+        // Add headers for each size
+        sizesToShow.forEach(size => {
+            html += `<th>${size}</th>`;
+        });
+        
+        html += `
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        // Get tiers from master bundle
+        const tierData = Array.isArray(masterBundle.tierData) ? masterBundle.tierData : Object.values(masterBundle.tierData);
+        
+        tierData.forEach(tier => {
+            const tierLabel = tier.TierLabel || `${tier.MinQuantity}-${tier.MaxQuantity}`;
+            const isActiveTier = currentQuantity >= tier.MinQuantity && currentQuantity <= (tier.MaxQuantity || 99999);
+            
+            html += `
+                        <tr${isActiveTier ? ' class="active-tier"' : ''}>
+                            <td>${tierLabel}`;
+            
+            // Add badges
+            if (tierLabel === '24-47') {
+                html += ' <span class="tier-badge popular">POPULAR</span>';
+            } else if (tierLabel === '48-71') {
+                html += ' <span class="tier-badge best-value">BEST VALUE</span>';
+            }
+            
+            html += `</td>`;
+            
+            // Add prices for each size from master bundle
+            sizesToShow.forEach(size => {
+                let price = null;
+                
+                // Try to get price from master bundle pricing structure
+                if (masterBundle.pricing && masterBundle.pricing[tierLabel] && masterBundle.pricing[tierLabel][size] !== undefined) {
+                    price = masterBundle.pricing[tierLabel][size];
+                }
+                
+                // Format and display the price
+                if (price !== null && price !== undefined) {
+                    html += `<td class="price-cell">$${parseFloat(price).toFixed(2)}</td>`;
+                } else {
+                    html += `<td class="price-cell">N/A</td>`;
+                }
+            });
+            
+            html += `</tr>`;
+        });
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        console.log('[EMBROIDERY-PRICING-V3] Pricing table rendered successfully');
     }
 
     // Initialize UI components
@@ -343,39 +494,33 @@
             `;
         }
 
-        // Step 3: Pricing Grid - Wrap it properly
+        // Step 3: Pricing Grid - Simple direct implementation
         const pricingGridContainer = document.getElementById('pricing-grid-container');
         if (pricingGridContainer) {
-            // Create a proper step section wrapper
-            const stepWrapper = document.createElement('div');
-            stepWrapper.className = 'step-section';
-            stepWrapper.innerHTML = `
-                <div class="step-header">
-                    <div class="step-number">3</div>
-                    <h2 class="step-title">Complete Price-Per-Unit Reference Grid</h2>
-                </div>
-                <div class="pricing-content">
-                    <div class="pricing-header">
-                        <h3 class="pricing-subtitle">Embroidery Base Prices</h3>
-                        <div class="selected-color-indicator">
-                            <span>Selected Color:</span>
-                            <div class="mini-color-swatch" id="pricing-color-swatch"></div>
-                            <strong id="pricing-color-name">Loading...</strong>
+            pricingGridContainer.innerHTML = `
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h2 class="step-title">Complete Price-Per-Unit Reference Grid</h2>
+                    </div>
+                    <div class="pricing-content">
+                        <div class="pricing-header">
+                            <h3 class="pricing-subtitle">Embroidery Base Prices</h3>
+                            <div class="selected-color-indicator">
+                                <span>Selected Color:</span>
+                                <div class="mini-color-swatch" id="pricing-color-swatch"></div>
+                                <strong id="pricing-color-name">Loading...</strong>
+                            </div>
+                        </div>
+                        <div id="embroidery-pricing-table-container">
+                            <!-- Table will be rendered here -->
+                        </div>
+                        <div class="pricing-note">
+                            <strong>Note:</strong> Prices shown are per unit and include an 8,000 stitch embroidered logo.
                         </div>
                     </div>
-                    <div id="pricing-grid-inner"></div>
                 </div>
             `;
-            
-            // Replace the container with our wrapped version
-            pricingGridContainer.parentNode.replaceChild(stepWrapper, pricingGridContainer);
-            
-            // Move the inner content
-            const innerContainer = document.getElementById('pricing-grid-inner');
-            if (innerContainer) {
-                // The UniversalPricingGrid will render into this container
-                innerContainer.id = 'pricing-grid-container';
-            }
         }
 
         // Store element references
@@ -545,11 +690,15 @@
             elements.quantityInput.addEventListener('change', function() {
                 currentQuantity = Math.max(1, parseInt(this.value) || 1);
                 
-                // Re-extract pricing for new quantity tier
-                basePrices = {};
-                extractPricingFromTable();
-                
-                updateQuote();
+                // Re-process pricing data if we have master bundle data
+                if (pricingData && pricingData.prices) {
+                    processPricingData(pricingData);
+                } else {
+                    // Otherwise try to extract from table
+                    basePrices = {};
+                    extractPricingFromTable();
+                    updateQuote();
+                }
                 
                 // Trigger quantity changed event
                 window.dispatchEvent(new CustomEvent('quantityChanged', {
@@ -691,8 +840,14 @@
     
     // Extract pricing from table
     function extractPricingFromTable() {
+        // If we already have pricing data from master bundle, don't extract from table
+        if (pricingData && pricingData.prices && Object.keys(basePrices).length > 0) {
+            console.log('[EMBROIDERY-PRICING-V3] Already have pricing data, skipping table extraction');
+            return;
+        }
+        
         // Try multiple selectors to find the pricing table
-        const table = document.querySelector('.pricing-grid table, #pricing-grid-container table, .universal-pricing-grid table');
+        const table = document.querySelector('.pricing-grid table, #pricing-grid-container table, .universal-pricing-grid table, #pricing-grid-container-table');
         if (!table) {
             console.log('[EMBROIDERY-PRICING-V3] No pricing table found');
             return;
@@ -705,17 +860,20 @@
         }
         
         // Get headers (sizes) - skip the first column which is quantity
-        const headerRow = table.querySelector('thead tr');
+        const headerRow = table.querySelector('thead tr') || table.querySelector('tr:first-child');
         if (!headerRow) {
             console.log('[EMBROIDERY-PRICING-V3] No header row found');
             return;
         }
         
         const headers = [];
-        const headerCells = headerRow.querySelectorAll('th');
+        const headerCells = headerRow.querySelectorAll('th, td');
         headerCells.forEach((cell, index) => {
             if (index > 0) { // Skip first column (Quantity)
-                headers.push(cell.textContent.trim());
+                const headerText = cell.textContent.trim();
+                if (headerText) {
+                    headers.push(headerText);
+                }
             }
         });
         
@@ -777,7 +935,19 @@
         const container = document.getElementById('pricing-grid-container');
         if (!container) return;
         
+        // Don't observe if we already have pricing data from master bundle
+        if (pricingData && pricingData.prices && Object.keys(basePrices).length > 0) {
+            console.log('[EMBROIDERY-PRICING-V3] Already have pricing data from master bundle, skipping table observation');
+            return;
+        }
+        
         const observer = new MutationObserver((mutations) => {
+            // Stop observing if we now have pricing data
+            if (pricingData && pricingData.prices && Object.keys(basePrices).length > 0) {
+                observer.disconnect();
+                return;
+            }
+            
             // Check if table was added or updated
             const table = container.querySelector('table');
             if (table && table.querySelector('tbody tr')) {

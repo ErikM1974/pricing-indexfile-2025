@@ -129,6 +129,13 @@
         // Fallback check for pricing grid (not swatches)
         setTimeout(function() {
             console.log("[DP5-HELPER] Performing delayed final check for pricing data (7s).");
+            
+            // Skip fallback if master bundle mode is active
+            if (window.EMBROIDERY_MASTER_BUNDLE_MODE || window.EMBROIDERY_MASTER_BUNDLE_LOADED) {
+                console.log("[DP5-HELPER] Master bundle mode is active, skipping fallback check.");
+                return;
+            }
+            
             const customGridTbody = document.getElementById('custom-pricing-grid')?.querySelector('tbody');
             
             if (!window.directFixApplied && (!customGridTbody || !customGridTbody.hasChildNodes())) {

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Embroidery Pricing Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .pricing-grid {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .pricing-grid th, .pricing-grid td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .pricing-grid th {
+            background: #3a7c52;
+            color: white;
+            font-weight: bold;
+        }
+        .pricing-grid tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .pricing-grid tr.active-tier {
+            background: #e8f5e9;
+            font-weight: bold;
+        }
+        .price-cell {
+            font-family: monospace;
+            color: #2e7d32;
+        }
+        .tier-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            margin-left: 8px;
+            font-size: 11px;
+            border-radius: 3px;
+            font-weight: normal;
+        }
+        .tier-badge.popular {
+            background: #ff9800;
+            color: white;
+        }
+        .tier-badge.best-value {
+            background: #4caf50;
+            color: white;
+        }
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        button {
+            padding: 8px 16px;
+            margin-right: 10px;
+            background: #3a7c52;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #2d5f3f;
+        }
+        #status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Embroidery Pricing Table Test</h1>
+        
+        <div class="controls">
+            <button onclick="loadMockData()">Load Mock Master Bundle Data</button>
+            <button onclick="clearData()">Clear Data</button>
+            <div id="status"></div>
+        </div>
+        
+        <div id="embroidery-pricing-table-container">
+            <p>Click "Load Mock Master Bundle Data" to test the pricing table.</p>
+        </div>
+    </div>
+
+    <script>
+        // Mock master bundle data based on user's console logs
+        const mockMasterBundle = {
+            embellishmentType: "embroidery",
+            styleNumber: "WS675",
+            color: "Dark Navy Heather",
+            uniqueSizes: ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "6XL"],
+            tierData: [
+                { TierLabel: "1-23", MinQuantity: 1, MaxQuantity: 23 },
+                { TierLabel: "24-47", MinQuantity: 24, MaxQuantity: 47 },
+                { TierLabel: "48-71", MinQuantity: 48, MaxQuantity: 71 },
+                { TierLabel: "72+", MinQuantity: 72, MaxQuantity: 99999 }
+            ],
+            pricing: {
+                "1-23": {
+                    "S": 31.65, "M": 31.65, "L": 31.65, "XL": 31.65,
+                    "2XL": 34.65, "3XL": 37.64, "4XL": 40.64, "5XL": 43.64, "6XL": 46.64
+                },
+                "24-47": {
+                    "S": 28.49, "M": 28.49, "L": 28.49, "XL": 28.49,
+                    "2XL": 31.19, "3XL": 33.88, "4XL": 36.58, "5XL": 39.28, "6XL": 41.98
+                },
+                "48-71": {
+                    "S": 25.32, "M": 25.32, "L": 25.32, "XL": 25.32,
+                    "2XL": 27.72, "3XL": 30.12, "4XL": 32.52, "5XL": 34.91, "6XL": 37.31
+                },
+                "72+": {
+                    "S": 22.16, "M": 22.16, "L": 22.16, "XL": 22.16,
+                    "2XL": 24.26, "3XL": 26.36, "4XL": 28.45, "5XL": 30.55, "6XL": 32.65
+                }
+            }
+        };
+
+        let currentQuantity = 19; // Default quantity
+
+        function loadMockData() {
+            // Set the mock data globally
+            window.nwcaMasterBundleData = mockMasterBundle;
+            
+            // Call the render function
+            renderPricingTable();
+            
+            document.getElementById('status').textContent = 'Mock data loaded successfully!';
+        }
+
+        function clearData() {
+            window.nwcaMasterBundleData = null;
+            document.getElementById('embroidery-pricing-table-container').innerHTML = '<p>Click "Load Mock Master Bundle Data" to test the pricing table.</p>';
+            document.getElementById('status').textContent = 'Data cleared.';
+        }
+
+        // Copy of the renderPricingTable function from embroidery-pricing-v3.js
+        function renderPricingTable() {
+            const container = document.getElementById('embroidery-pricing-table-container');
+            if (!container) {
+                console.log('[TEST] Pricing table container not found');
+                return;
+            }
+            
+            // Get the raw master bundle data if available
+            const masterBundle = window.nwcaMasterBundleData;
+            
+            // Check if we have master bundle data with pricing
+            if (!masterBundle || !masterBundle.pricing || !masterBundle.tierData) {
+                console.log('[TEST] No master bundle data available for pricing table');
+                container.innerHTML = '<p>Loading pricing data...</p>';
+                return;
+            }
+            
+            console.log('[TEST] Rendering pricing table with master bundle data');
+            
+            // Get all unique sizes from the master bundle
+            const sizesToShow = masterBundle.uniqueSizes || ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+            
+            // Build the table HTML
+            let tableHTML = `
+                <table class="pricing-grid">
+                    <thead>
+                        <tr>
+                            <th>Quantity</th>
+            `;
+            
+            // Add headers for each size
+            sizesToShow.forEach(size => {
+                tableHTML += `<th>${size}</th>`;
+            });
+            
+            tableHTML += `
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            // Get tiers from master bundle
+            const tierData = Array.isArray(masterBundle.tierData) ? masterBundle.tierData : Object.values(masterBundle.tierData);
+            
+            tierData.forEach(tier => {
+                const tierLabel = tier.TierLabel || `${tier.MinQuantity}-${tier.MaxQuantity}`;
+                const isActiveTier = currentQuantity >= tier.MinQuantity && currentQuantity <= (tier.MaxQuantity || 99999);
+                
+                tableHTML += `
+                    <tr${isActiveTier ? ' class="active-tier"' : ''}>
+                        <td>${tierLabel}`;
+                
+                // Add badges
+                if (tierLabel === '24-47') {
+                    tableHTML += ' <span class="tier-badge popular">POPULAR</span>';
+                } else if (tierLabel === '48-71') {
+                    tableHTML += ' <span class="tier-badge best-value">BEST VALUE</span>';
+                }
+                
+                tableHTML += `</td>`;
+                
+                // Add prices for each size from master bundle
+                sizesToShow.forEach(size => {
+                    let price = null;
+                    
+                    // Try to get price from master bundle pricing structure
+                    if (masterBundle.pricing && masterBundle.pricing[tierLabel] && masterBundle.pricing[tierLabel][size] !== undefined) {
+                        price = masterBundle.pricing[tierLabel][size];
+                    }
+                    
+                    // Format and display the price
+                    if (price !== null && price !== undefined) {
+                        tableHTML += `<td class="price-cell">$${parseFloat(price).toFixed(2)}</td>`;
+                    } else {
+                        tableHTML += `<td class="price-cell">N/A</td>`;
+                    }
+                });
+                
+                tableHTML += `</tr>`;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+            console.log('[TEST] Pricing table rendered successfully');
+        }
+    </script>
+</body>
+</html>

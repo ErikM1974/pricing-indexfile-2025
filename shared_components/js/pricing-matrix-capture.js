@@ -106,6 +106,14 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
             captureInterval = null;
             return;
         }
+        
+        // Check if master bundle mode is active
+        if (window.EMBROIDERY_MASTER_BUNDLE_MODE || window.EMBROIDERY_MASTER_BUNDLE_LOADED) {
+            console.log("[PRICING-MATRIX:CHECK] Master bundle mode is active, stopping interval.");
+            if (captureInterval) clearInterval(captureInterval);
+            captureInterval = null;
+            return;
+        }
 
         captureAttempts++;
         // console.log(`[PRICING-MATRIX:CHECK] Checking for pricing table (Attempt ${captureAttempts}/${MAX_CAPTURE_ATTEMPTS})`);
@@ -341,6 +349,13 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
     // Fallback data initialization (called if capture fails after max attempts)
     function initializeFallbackPricingData(embType) {
         if (window.nwcaPricingData || captureCompleted) return; // Don't overwrite if data was captured
+        
+        // Skip fallback if master bundle is handling the pricing
+        if ((embType === 'embroidery' || embType === 'dtg') && (window.EMBROIDERY_MASTER_BUNDLE_MODE || window.EMBROIDERY_MASTER_BUNDLE_LOADED)) {
+            console.log('[PRICING-MATRIX] Skipping fallback - master bundle is active');
+            return;
+        }
+        
         console.warn(`[PRICING-MATRIX] No pricing table found for ${embType}. Triggering fallback mode.`);
         
         // For DTF pages, we'll fetch real data via API instead of using hardcoded fallback

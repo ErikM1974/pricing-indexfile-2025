@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Transformation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .test-section { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        h2 { color: #333; margin-top: 0; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        .data-display { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; margin: 10px 0; }
+        pre { margin: 0; overflow-x: auto; }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .warning { color: #ffc107; font-weight: bold; }
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) {
+            .grid-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Embroidery Data Transformation Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="testCaspioExtraction()">Test Caspio Table Extraction</button>
+        <button onclick="testMasterBundle()">Test Master Bundle Format</button>
+        <button onclick="testTransformation()">Test Full Transformation</button>
+        <button onclick="clearDisplays()">Clear All</button>
+    </div>
+    
+    <div class="grid-container">
+        <div class="test-section">
+            <h2>Input Data (Raw)</h2>
+            <div id="input-data" class="data-display">
+                <pre>No data loaded</pre>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Output Data (Transformed)</h2>
+            <div id="output-data" class="data-display">
+                <pre>No transformation yet</pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Transformation Log</h2>
+        <div id="log" class="data-display" style="max-height: 300px; overflow-y: auto;">
+            <div>Ready for testing...</div>
+        </div>
+    </div>
+    
+    <!-- Load the handlers -->
+    <script>
+        window.EMBROIDERY_MASTER_BUNDLE_MODE = true;
+    </script>
+    <script src="/shared_components/js/embroidery-event-coordinator.js"></script>
+    
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.innerHTML = `[${new Date().toLocaleTimeString()}] <span class="${type}">${message}</span>`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function displayData(elementId, data, title) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<strong>${title}:</strong><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+        
+        function clearDisplays() {
+            document.getElementById('input-data').innerHTML = '<pre>No data loaded</pre>';
+            document.getElementById('output-data').innerHTML = '<pre>No transformation yet</pre>';
+            document.getElementById('log').innerHTML = '<div>Cleared. Ready for testing...</div>';
+        }
+        
+        // Test 1: Simulate Caspio table extraction format
+        function testCaspioExtraction() {
+            log('Testing Caspio table extraction format...', 'info');
+            
+            const caspioData = {
+                tierData: {
+                    "24-47": { MinQuantity: 24, MaxQuantity: 47 },
+                    "48-71": { MinQuantity: 48, MaxQuantity: 71 },
+                    "72+": { MinQuantity: 72, MaxQuantity: undefined }
+                },
+                headers: ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "6XL"],
+                pricing: {
+                    "24-47": {
+                        "S": 13.95, "M": 13.95, "L": 13.95, "XL": 13.95,
+                        "2XL": 15.95, "3XL": 16.95, "4XL": 17.95, "5XL": 18.95, "6XL": 19.95
+                    },
+                    "48-71": {
+                        "S": 12.95, "M": 12.95, "L": 12.95, "XL": 12.95,
+                        "2XL": 14.95, "3XL": 15.95, "4XL": 16.95, "5XL": 17.95, "6XL": 18.95
+                    },
+                    "72+": {
+                        "S": 11.95, "M": 11.95, "L": 11.95, "XL": 11.95,
+                        "2XL": 13.95, "3XL": 14.95, "4XL": 15.95, "5XL": 16.95, "6XL": 17.95
+                    }
+                },
+                uniqueSizes: ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "6XL"],
+                embellishmentType: 'embroidery',
+                styleNumber: 'PC54',
+                color: 'White',
+                extractedFrom: 'table'
+            };
+            
+            displayData('input-data', caspioData, 'Caspio Table Extraction');
+            
+            // Simulate transformation
+            simulateTransformation(caspioData);
+        }
+        
+        // Test 2: Simulate master bundle format
+        function testMasterBundle() {
+            log('Testing master bundle format...', 'info');
+            
+            const masterBundleData = {
+                tierData: {
+                    "24-47": { MinQuantity: 24, MaxQuantity: 47 },
+                    "48-71": { MinQuantity: 48, MaxQuantity: 71 },
+                    "72+": { MinQuantity: 72, MaxQuantity: undefined }
+                },
+                headers: ["S-XL", "2XL", "3XL", "4XL-6XL"],
+                pricing: {
+                    "24-47": {
+                        "S-XL": 13.95,
+                        "2XL": 15.95,
+                        "3XL": 16.95,
+                        "4XL-6XL": 18.95
+                    },
+                    "48-71": {
+                        "S-XL": 12.95,
+                        "2XL": 14.95,
+                        "3XL": 15.95,
+                        "4XL-6XL": 17.95
+                    },
+                    "72+": {
+                        "S-XL": 11.95,
+                        "2XL": 13.95,
+                        "3XL": 14.95,
+                        "4XL-6XL": 16.95
+                    }
+                },
+                uniqueSizes: ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "6XL"],
+                embellishmentType: 'embroidery',
+                styleNumber: 'PC54',
+                color: 'White',
+                fromMasterBundle: true
+            };
+            
+            displayData('input-data', masterBundleData, 'Master Bundle Format');
+            
+            // Simulate transformation
+            simulateTransformation(masterBundleData);
+        }
+        
+        // Simulate the transformation that happens in the event coordinator
+        function simulateTransformation(inputData) {
+            log('Starting transformation...', 'info');
+            
+            // Check if needs grouping
+            const individualSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+            const hasIndividualSizes = inputData.headers.some(header => individualSizes.includes(header));
+            const hasGroupedSizes = inputData.headers.some(header => header.includes('-') && !header.includes('OSFA'));
+            const needsGrouping = hasIndividualSizes && !hasGroupedSizes;
+            
+            log(`Needs grouping: ${needsGrouping}`, needsGrouping ? 'warning' : 'success');
+            
+            let outputData = inputData;
+            
+            if (needsGrouping) {
+                log('Applying size grouping...', 'info');
+                
+                // Simulate the grouping logic
+                const groups = [
+                    { header: "S-XL", sizes: ["S", "M", "L", "XL"] },
+                    { header: "2XL", sizes: ["2XL"] },
+                    { header: "3XL", sizes: ["3XL"] },
+                    { header: "4XL", sizes: ["4XL"] },
+                    { header: "5XL", sizes: ["5XL"] },
+                    { header: "6XL", sizes: ["6XL"] }
+                ];
+                
+                // Build new prices object
+                const newPrices = {};
+                Object.keys(inputData.pricing).forEach(tierKey => {
+                    newPrices[tierKey] = {};
+                    groups.forEach(group => {
+                        // Use price from first size in group
+                        const price = inputData.pricing[tierKey][group.sizes[0]];
+                        if (price !== undefined) {
+                            newPrices[tierKey][group.header] = price;
+                        }
+                    });
+                });
+                
+                outputData = {
+                    ...inputData,
+                    headers: groups.map(g => g.header).filter(h => 
+                        Object.values(newPrices).some(tier => tier[h] !== undefined)
+                    ),
+                    prices: newPrices,
+                    pricing: newPrices,
+                    originalHeaders: inputData.headers,
+                    sizeGroups: groups
+                };
+                
+                log('Size grouping complete', 'success');
+            } else {
+                // Just ensure both prices and pricing exist
+                outputData = {
+                    ...inputData,
+                    prices: inputData.prices || inputData.pricing,
+                    pricing: inputData.pricing || inputData.prices
+                };
+            }
+            
+            // Add compatibility fields
+            outputData.tiers = outputData.tierData;
+            outputData._dp5Processed = false;
+            outputData.fromMasterBundle = inputData.fromMasterBundle || false;
+            
+            displayData('output-data', outputData, 'Transformed Data');
+            
+            // Validate the output
+            validateOutput(outputData);
+        }
+        
+        function validateOutput(data) {
+            log('Validating output...', 'info');
+            
+            const requiredFields = ['headers', 'prices', 'tierData', 'embellishmentType'];
+            const missingFields = requiredFields.filter(field => !data[field]);
+            
+            if (missingFields.length > 0) {
+                log(`Missing required fields: ${missingFields.join(', ')}`, 'error');
+            } else {
+                log('All required fields present', 'success');
+            }
+            
+            // Check header format
+            const hasGroupedHeaders = data.headers.some(h => h.includes('-') || h.length > 3);
+            log(`Headers are ${hasGroupedHeaders ? 'grouped' : 'individual'}: ${data.headers.join(', ')}`, 
+                hasGroupedHeaders ? 'success' : 'warning');
+            
+            // Check price structure
+            const firstTier = Object.keys(data.prices || {})[0];
+            if (firstTier) {
+                const tierPrices = data.prices[firstTier];
+                log(`Price structure for ${firstTier}: ${Object.keys(tierPrices).join(', ')}`, 'info');
+            }
+        }
+        
+        function testTransformation() {
+            log('Testing full transformation with event coordinator...', 'info');
+            
+            // Create test data
+            const testData = {
+                tierData: {
+                    "24-47": { MinQuantity: 24, MaxQuantity: 47 },
+                    "48-71": { MinQuantity: 48, MaxQuantity: 71 },
+                    "72+": { MinQuantity: 72, MaxQuantity: undefined }
+                },
+                headers: ["S", "M", "L", "XL", "2XL", "3XL"],
+                pricing: {
+                    "24-47": { "S": 13.95, "M": 13.95, "L": 13.95, "XL": 13.95, "2XL": 15.95, "3XL": 16.95 },
+                    "48-71": { "S": 12.95, "M": 12.95, "L": 12.95, "XL": 12.95, "2XL": 14.95, "3XL": 15.95 }
+                },
+                uniqueSizes: ["S", "M", "L", "XL", "2XL", "3XL"],
+                embellishmentType: 'embroidery'
+            };
+            
+            displayData('input-data', testData, 'Test Input');
+            
+            // Dispatch event to trigger coordinator
+            const event = new CustomEvent('embroideryMasterBundleProcessed', {
+                detail: testData
+            });
+            
+            // Listen for the transformed result
+            window.addEventListener('pricingDataLoaded', function(e) {
+                log('Received pricingDataLoaded event', 'success');
+                displayData('output-data', e.detail, 'Event Coordinator Output');
+                validateOutput(e.detail);
+            }, { once: true });
+            
+            window.dispatchEvent(event);
+        }
+        
+        log('Test page ready', 'success');
+    </script>
+</body>
+</html>

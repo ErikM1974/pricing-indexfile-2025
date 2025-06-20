@@ -53,7 +53,8 @@ const UniversalHeaderComponent = {
         // Find container
         const container = document.getElementById('universal-header-container');
         if (!container) {
-            console.error('[Universal Header] Container not found! Add <div id="universal-header-container"></div> to your page.');
+            console.log('[Universal Header] Container not found. This component may not be needed for this page.');
+            // Not all pages need this component, so just exit quietly
             return;
         }
 

@@ -639,7 +639,19 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         const fullUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}/emb?${params.toString()}`;
         console.log(`PricingPages: Loading Caspio embed from URL: ${fullUrl}`);
         const script = document.createElement('script'); script.type = 'text/javascript'; script.src = fullUrl; script.async = true;
-        script.onload = function() { console.log(`PricingPages: Caspio script ${caspioAppKey} loaded from ${fullUrl}`); container.classList.remove('loading'); setTimeout(() => checkCaspioRender(container, caspioAppKey), 5000); };
+        script.onload = function() { 
+            console.log(`PricingPages: Caspio script ${caspioAppKey} loaded from ${fullUrl}`); 
+            container.classList.remove('loading'); 
+            
+            // Skip render check for embroidery master bundle - it uses postMessage instead of visible tables
+            if (embType === 'embroidery' && caspioAppKey === 'a0e150001c7143d027a54c439c01') {
+                console.log('PricingPages: Skipping render check for embroidery master bundle (uses postMessage)');
+                return;
+            }
+            
+            // Legacy render check for other pages
+            setTimeout(() => checkCaspioRender(container, caspioAppKey), 5000); 
+        };
         script.onerror = function() { console.error(`PricingPages: Error loading Caspio script ${caspioAppKey} from ${fullUrl}`); container.classList.remove('loading'); container.classList.add('pricing-unavailable'); container.dataset.loadFailed = 'true'; };
         container.appendChild(script);
     }

@@ -1464,6 +1464,34 @@
             animation-delay: 0s !important;
         }
         
+        /* Active tier highlighting */
+        .pricing-grid tr.active-tier {
+            background-color: #e8f5e9 !important;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .pricing-grid tr.active-tier::before {
+            content: '→';
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #3a7c52;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .pricing-grid tr.active-tier td {
+            background-color: transparent;
+        }
+        
+        .pricing-grid tr.active-tier td:first-child {
+            position: relative;
+            font-weight: 700;
+            color: #2d5f3f;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .pricing-header {
@@ -1486,6 +1514,11 @@
             
             .pricing-grid th {
                 font-size: 12px;
+            }
+            
+            .pricing-grid tr.active-tier::before {
+                left: -15px;
+                font-size: 16px;
             }
         }
         
@@ -1553,6 +1586,9 @@
         </div>
     </header>
 
+    <!-- Universal Header Container (required by universal-header-component.js) -->
+    <div id="universal-header-container"></div>
+
     <!-- Main Content -->
     <div class="universal-pricing-container">
         
@@ -1586,15 +1622,18 @@
                     </div>
                     
                     <!-- Step 1: Customization Options -->
-                    <div id="customization-options-container">
+                    <div id="customization-options-container" style="display: block;">
                         <!-- Customization options will be initialized here -->
                     </div>
                     
                     <!-- Step 2: Quick Quote Calculator -->
-                    <div id="quick-quote-container"></div>
+                    <div id="quick-quote-container" style="display: block;"></div>
                     
                     <!-- Step 3: Pricing Grid -->
-                    <div id="pricing-grid-container"></div>
+                    <div id="pricing-grid-container" style="display: block;">
+                        <!-- Pricing table container for embroidery-pricing-v3.js -->
+                        <div id="embroidery-pricing-table-container"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1602,7 +1641,31 @@
     
     <!-- Hidden containers for compatibility -->
     <div id="pricing-calculator" style="display:none !important; position: absolute; left: -9999px;">
-        <!-- Legacy Caspio removed - now using new data engine -->
+        <!-- Caspio Master Bundle iframe -->
+        <iframe id="embroidery-master-bundle-iframe" 
+                src="https://c3eku948.caspio.com/dp/a0e150001c7143d027a54c439c01?StyleNumber=5190&COLOR=Black"
+                style="width: 1px; height: 1px; border: none; position: absolute; left: -9999px;"
+                title="Embroidery Pricing Data">
+        </iframe>
+    </div>
+    
+    <!-- Add loading elements for embroidery-enhanced-loading.js -->
+    <div id="pricing-initial-state" style="display:none;"></div>
+    <div id="pricing-table-loading" style="display:none;">
+        <div class="enhanced-loading-container">
+            <div class="loading-spinner"></div>
+            <div id="loading-status">Loading your custom pricing...</div>
+            <div id="loading-step">Connecting to pricing database...</div>
+            <div id="loading-progress-bar" style="width: 0%;"></div>
+        </div>
+    </div>
+    <div id="custom-pricing-grid" style="display:none;">
+        <table>
+            <thead>
+                <tr id="pricing-header-row"></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
     
     <!-- Hidden elements for UniversalProductDisplay compatibility -->
@@ -1628,7 +1691,8 @@
     
     <!-- Pricing components -->
     <script src="/shared_components/js/universal-quick-quote.js"></script>
-    <script src="/shared_components/js/universal-pricing-grid.js"></script>
+    <!-- Commented out - embroidery-pricing-v3.js handles the pricing grid -->
+    <!-- <script src="/shared_components/js/universal-pricing-grid.js"></script> -->
     
     <!-- Color swatches helper -->
     <script src="/shared_components/js/dp5-helper.js"></script>
@@ -1644,6 +1708,9 @@
     
     <!-- V3 Enhanced pricing implementation -->
     <script src="/shared_components/js/embroidery-pricing-v3.js"></script>
+    
+    <!-- Master Bundle Integration -->
+    <script src="/shared_components/js/embroidery-master-bundle-integration.js"></script>
     
     <script>
         // Set API URL globally
@@ -1673,13 +1740,39 @@
             }
         });
         
+        // Function to update master bundle iframe URL
+        function updateMasterBundleIframe(styleNumber, color) {
+            const iframe = document.getElementById('embroidery-master-bundle-iframe');
+            if (iframe && styleNumber) {
+                const baseUrl = 'https://c3eku948.caspio.com/dp/a0e150001c7143d027a54c439c01';
+                const params = new URLSearchParams({
+                    StyleNumber: styleNumber,
+                    COLOR: color || 'Black'
+                });
+                iframe.src = `${baseUrl}?${params.toString()}`;
+                console.log('[EMBROIDERY] Updated master bundle iframe:', iframe.src);
+            }
+        }
+        
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[EMBROIDERY] Page initialized');
             
+            // Set flag to indicate we're using master bundle mode for embroidery
+            window.EMBROIDERY_MASTER_BUNDLE_MODE = true;
+            
             // Initialize product context from URL parameters
             if (window.initializeProductFromURL) {
                 window.initializeProductFromURL();
+                
+                // Update iframe with URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const styleNumber = urlParams.get('style') || urlParams.get('styleNumber');
+                const color = urlParams.get('color') || urlParams.get('COLOR');
+                
+                if (styleNumber) {
+                    updateMasterBundleIframe(styleNumber, color);
+                }
             }
             
             // Set initial progress
@@ -1702,26 +1795,40 @@
                 sticky: false
             });
             
-            // Initialize Universal Pricing Grid
-            const pricingGrid = new UniversalPricingGrid({
-                containerId: 'pricing-grid-container',
-                showInventory: true,
-                inventoryThreshold: 10,
-                loadingAnimation: true,
-                showColorIndicator: true
-            });
+            // Comment out Universal Pricing Grid - embroidery-pricing-v3.js handles the pricing table
+            // const pricingGrid = new UniversalPricingGrid({
+            //     containerId: 'pricing-grid-container',
+            //     showInventory: true,
+            //     inventoryThreshold: 10,
+            //     loadingAnimation: true,
+            //     showColorIndicator: true
+            // });
             
             // Update color when changed
             window.addEventListener('colorChanged', (event) => {
                 if (event.detail) {
-                    pricingGrid.updateSelectedColor(event.detail.COLOR_NAME, event.detail);
+                    // pricingGrid.updateSelectedColor(event.detail.COLOR_NAME, event.detail);
+                    
+                    // Update master bundle iframe with new color
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const styleNumber = urlParams.get('style') || urlParams.get('styleNumber') || window.selectedStyleNumber;
+                    const colorName = event.detail.COLOR_NAME || event.detail.color;
+                    
+                    if (styleNumber && colorName) {
+                        updateMasterBundleIframe(styleNumber, colorName);
+                    }
                 }
             });
             
             // Highlight active tier when quantity changes
             window.addEventListener('quantityChanged', (event) => {
                 if (event.detail && event.detail.totalQuantity) {
-                    pricingGrid.highlightActiveTier(event.detail.totalQuantity);
+                    // pricingGrid.highlightActiveTier(event.detail.totalQuantity);
+                    // Trigger a re-render of the pricing table to update active tier
+                    if (window.nwcaMasterBundleData) {
+                        const renderEvent = new Event('renderPricingTable');
+                        document.dispatchEvent(renderEvent);
+                    }
                 }
             });
             

@@ -74,7 +74,16 @@
                 logoImg.alt = 'NW Custom Apparel Logo';
                 console.log('[UNIVERSAL-HEADER] Logo image replaced with text-free version');
             } else {
-                console.warn('[UNIVERSAL-HEADER] Logo image element not found');
+                // Try alternative selectors
+                const altLogoImg = document.querySelector('.logo-image, img[alt*="Northwest Custom Apparel"]');
+                if (altLogoImg) {
+                    const textFreeLogoUrl = 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1';
+                    altLogoImg.src = textFreeLogoUrl;
+                    altLogoImg.alt = 'NW Custom Apparel Logo';
+                    console.log('[UNIVERSAL-HEADER] Logo image replaced with text-free version (alternative selector)');
+                } else {
+                    console.log('[UNIVERSAL-HEADER] Logo image element not found');
+                }
             }
         },
 
