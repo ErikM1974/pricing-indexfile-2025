@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embroidery Pricing - Dynamic Sizes Fix</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .fix-summary {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .problem {
+            background: #fff5f5;
+            border: 1px solid #ffcdd2;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .problem h3 {
+            color: #c62828;
+            margin-top: 0;
+        }
+        .solution {
+            background: #f1f8f4;
+            border: 1px solid #c8e6c9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .solution h3 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+        .code-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .code-block {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .code-block pre {
+            margin: 0;
+            font-size: 13px;
+        }
+        .before {
+            border-left: 3px solid #d32f2f;
+        }
+        .after {
+            border-left: 3px solid #2e7d32;
+        }
+        .example {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .console-log {
+            background: #263238;
+            color: #aed581;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Embroidery Pricing - Dynamic Sizes Fix</h1>
+        <p style="color: #666; margin-bottom: 30px;">Fixed hardcoded size arrays to use actual sizes from master bundle data</p>
+        
+        <div class="fix-summary">
+            <div class="problem">
+                <h3>🔴 The Problem</h3>
+                <p>The embroidery pricing page was hardcoding standard apparel sizes (S, M, L, XL, 2XL, etc.) and trying to filter the actual product sizes against these hardcoded values.</p>
+                <p><strong>Result:</strong> When a cap product like NE1000 has sizes S/M, M/L, L/XL, none of them match the hardcoded sizes, resulting in an empty pricing table.</p>
+                
+                <div class="console-log">
+[EMBROIDERY-MASTER-BUNDLE] Master bundle received: {
+  "uniqueSizes": ["S/M", "M/L", "L/XL"],
+  ...
+}
+[EMBROIDERY-PRICING-V3] Available sizes from master bundle: ["S/M", "M/L", "L/XL"]
+[EMBROIDERY-PRICING-V3] Standard sizes: []  // Empty because none matched!
+[EMBROIDERY-PRICING-V3] Extended sizes: []
+                </div>
+            </div>
+            
+            <div class="solution">
+                <h3>✅ The Solution</h3>
+                <p>Use the actual sizes from the master bundle without any hardcoded assumptions. Dynamically split sizes into standard/extended based on count:</p>
+                <ul>
+                    <li>6 or fewer sizes → All in main table, no accordion</li>
+                    <li>More than 6 sizes → First 6 in main table, rest in accordion</li>
+                </ul>
+                
+                <div class="console-log">
+[EMBROIDERY-PRICING-V3] Available sizes from master bundle: ["S/M", "M/L", "L/XL"]
+[EMBROIDERY-PRICING-V3] Standard sizes: ["S/M", "M/L", "L/XL"]
+[EMBROIDERY-PRICING-V3] Extended sizes: []
+                </div>
+            </div>
+        </div>
+        
+        <div class="fix-summary">
+            <h2>Code Changes</h2>
+            
+            <div class="code-comparison">
+                <div class="code-block before">
+                    <h4>❌ Before (Hardcoded)</h4>
+                    <pre>// Get all unique sizes from the master bundle
+const allSizes = masterBundle.uniqueSizes || 
+    ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+
+// Define standard and extended sizes
+const standardSizeOrder = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+const extendedSizeOrder = ['4XL', '5XL', '6XL'];
+
+// Filter to only include sizes that actually exist
+const standardSizes = standardSizeOrder.filter(
+    size => allSizes.includes(size)
+);
+const extendedSizes = extendedSizeOrder.filter(
+    size => allSizes.includes(size)
+);</pre>
+                </div>
+                
+                <div class="code-block after">
+                    <h4>✅ After (Dynamic)</h4>
+                    <pre>// Get all unique sizes from the master bundle
+const allSizes = masterBundle.uniqueSizes || [];
+
+// Determine standard vs extended sizes dynamically
+let standardSizes, extendedSizes;
+if (allSizes.length <= 6) {
+    // 6 or fewer sizes - no need for accordion
+    standardSizes = allSizes;
+    extendedSizes = [];
+} else {
+    // More than 6 sizes - split them
+    standardSizes = allSizes.slice(0, 6);
+    extendedSizes = allSizes.slice(6);
+}</pre>
+                </div>
+            </div>
+        </div>
+        
+        <div class="fix-summary">
+            <h2>Examples of How It Works</h2>
+            
+            <div class="example">
+                <h4>Cap Product (NE1000)</h4>
+                <p><strong>Sizes:</strong> ["S/M", "M/L", "L/XL"]</p>
+                <p><strong>Result:</strong> All 3 sizes shown in main table, no accordion needed</p>
+            </div>
+            
+            <div class="example">
+                <h4>Standard Apparel</h4>
+                <p><strong>Sizes:</strong> ["S", "M", "L", "XL", "2XL", "3XL"]</p>
+                <p><strong>Result:</strong> All 6 sizes shown in main table, no accordion needed</p>
+            </div>
+            
+            <div class="example">
+                <h4>Extended Apparel</h4>
+                <p><strong>Sizes:</strong> ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "6XL"]</p>
+                <p><strong>Result:</strong> First 6 sizes (S-3XL) in main table, last 3 (4XL-6XL) in accordion</p>
+            </div>
+            
+            <div class="example">
+                <h4>Youth Apparel</h4>
+                <p><strong>Sizes:</strong> ["YXS", "YS", "YM", "YL", "YXL"]</p>
+                <p><strong>Result:</strong> All 5 sizes shown in main table, no accordion needed</p>
+            </div>
+        </div>
+        
+        <div class="fix-summary">
+            <h2>Benefits</h2>
+            <ul>
+                <li>✅ Works with any product type (caps, apparel, youth, etc.)</li>
+                <li>✅ No hardcoded assumptions about size names</li>
+                <li>✅ Automatically adapts to the actual sizes in the data</li>
+                <li>✅ Cleaner, more maintainable code</li>
+                <li>✅ Future-proof for new product types</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

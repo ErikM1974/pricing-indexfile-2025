@@ -207,20 +207,28 @@
         }
         
         console.log('[EMBROIDERY-PRICING-V3] Rendering pricing table with master bundle data');
+        console.log('[EMBROIDERY-PRICING-V3] Available sizes from master bundle:', masterBundle.uniqueSizes);
         
         // Get all unique sizes from the master bundle
-        const allSizes = masterBundle.uniqueSizes || ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+        const allSizes = masterBundle.uniqueSizes || [];
         
-        // Define standard and extended sizes
-        const standardSizeOrder = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
-        const extendedSizeOrder = ['4XL', '5XL', '6XL'];
-        
-        // Filter to only include sizes that actually exist
-        const standardSizes = standardSizeOrder.filter(size => allSizes.includes(size));
-        const extendedSizes = extendedSizeOrder.filter(size => allSizes.includes(size));
+        // Determine standard vs extended sizes dynamically
+        let standardSizes, extendedSizes;
+        if (allSizes.length <= 6) {
+            // 6 or fewer sizes - no need for accordion
+            standardSizes = allSizes;
+            extendedSizes = [];
+        } else {
+            // More than 6 sizes - split them
+            standardSizes = allSizes.slice(0, 6);
+            extendedSizes = allSizes.slice(6);
+        }
         
         // Check if we have extended sizes
         const hasExtendedSizes = extendedSizes.length > 0;
+        
+        console.log('[EMBROIDERY-PRICING-V3] Standard sizes:', standardSizes);
+        console.log('[EMBROIDERY-PRICING-V3] Extended sizes:', extendedSizes);
         
         // Build the main table with standard sizes
         let html = buildPricingTableHTML(masterBundle, standardSizes);
