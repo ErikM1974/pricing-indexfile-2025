@@ -602,6 +602,10 @@
         console.log('[CAP-PRICING-V3] Table structure created, checking cells...');
         const cells = gridContainer.querySelectorAll('.price-cell');
         console.log('[CAP-PRICING-V3] Found', cells.length, 'price cells after creation');
+        
+        // Set flag to prevent dp5-helper from overwriting our table
+        window.directFixApplied = true;
+        console.log('[CAP-PRICING-V3] Set directFixApplied flag to prevent dp5-helper interference');
     }
     
     // Build cap pricing table HTML
@@ -612,8 +616,8 @@
         let html = `
             <div class="pricing-table-wrapper">
                 <div class="pricing-table-scroll">
-                    <table class="pricing-grid">
-                        <thead>
+                    <table class="pricing-grid" id="pricing-grid-container-table">
+                        <thead id="pricing-grid-container-header-row">
                             <tr>
                                 <th rowspan="2" class="tier-label">Quantity</th>
                                 <th colspan="${sizes.length}" style="text-align: center;">Price Per Cap (with Front Logo)</th>
@@ -629,7 +633,7 @@
         html += `
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="pricing-grid-container-tbody">
         `;
         
         // Add rows for each tier
