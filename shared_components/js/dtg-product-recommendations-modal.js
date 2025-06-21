@@ -19,7 +19,7 @@
                 salesData: '18,753+ units sold',
                 rating: 5,
                 rank: 'Top Seller',
-                image: 'https://cdnm.sanmar.com/imglib/mresjpg/2020/f20/PC54_athletichtr_model_front_032019.jpg',
+                image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/Clyde%27s%20Water%20Slide%20Website%20Image%20300x300.png?ver=1',
                 bestColors: ['Jet Black', 'Dk Hthr Grey', 'Navy', 'White'],
                 notes: 'Best overall quality and consistency'
             },
@@ -31,7 +31,7 @@
                 salesData: '15,621+ units sold',
                 rating: 5,
                 rank: 'Top Seller',
-                image: 'https://cdnm.sanmar.com/imglib/mresjpg/2016/f17/PC61_athletichthr_model_front_102016.jpg',
+                image: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9042891',
                 bestColors: ['Jet Black', 'Navy', 'Athletic Heather'],
                 warnings: '⚠️ Avoid Red color - causes staining, needs 24hr drying'
             },
