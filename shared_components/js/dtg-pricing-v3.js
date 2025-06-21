@@ -103,7 +103,14 @@
         
         state.isInitialized = true;
         
-        // Don't trigger location selection on init since we start with quantity
+        // Trigger initial pricing load after a delay to ensure DTG adapter is ready
+        setTimeout(() => {
+            console.log('[DTG-v3] Triggering initial pricing load for default location:', state.selectedLocation);
+            // This will load the pricing data needed for all steps
+            if (window.DTGAdapter && window.DTGAdapter.displayPricingForSelectedLocation) {
+                window.DTGAdapter.displayPricingForSelectedLocation(state.selectedLocation);
+            }
+        }, 1000); // Give time for DTG adapter to initialize
     }
 
     // Function to update header pricing display
@@ -1014,7 +1021,9 @@
         if (state.currentStep === 2) {
             setTimeout(() => {
                 updateStep(3);
-                // Update final quote display
+                // Update pricing display first to ensure we have the latest data
+                updatePricingDisplay();
+                // Then update final quote display
                 updateFinalQuoteDisplay();
             }, 500);
         }
@@ -1035,19 +1044,16 @@
             ltmWarning.style.display = quantity < 24 ? 'block' : 'none';
         }
 
-        // Update pricing display if we have data
-        if (window.nwcaPricingData && window.nwcaPricingData.prices) {
-            updatePricingDisplay();
+        // Always update pricing display when quantity changes
+        updatePricingDisplay();
+        
+        // Update location cards if we're on step 2
+        if (state.currentStep === 2) {
             updateLocationCardsWithPricing();
-        } else {
-            // If no pricing data yet, trigger location selection to load it
-            if (state.selectedLocation && window.DTGAdapter && window.DTGAdapter.displayPricingForSelectedLocation) {
-                window.DTGAdapter.displayPricingForSelectedLocation(state.selectedLocation);
-            }
         }
 
         // Auto-advance to step 2 if we're on step 1
-        if (state.currentStep === 1) {
+        if (state.currentStep === 1 && quantity >= 1) {
             setTimeout(() => {
                 updateStep(2);
                 // Update location cards with pricing
@@ -1080,12 +1086,15 @@
     }
 
     function updatePricingDisplay() {
-        // This will be called when pricing data is available
-        const unitPriceEl = document.getElementById('dtg-unit-price');
-        const totalPriceEl = document.getElementById('dtg-total-price');
-        const breakdownEl = document.getElementById('dtg-pricing-breakdown');
+        // Update pricing in step 3 (final quote)
+        const unitPriceEl = document.getElementById('dtg-unit-price-final');
+        const totalPriceEl = document.getElementById('dtg-total-price-final');
+        const breakdownEl = document.getElementById('dtg-pricing-breakdown-final');
 
-        if (!unitPriceEl || !totalPriceEl) return;
+        if (!unitPriceEl || !totalPriceEl) {
+            console.log('[DTG-v3] Pricing elements not found, may not be on step 3 yet');
+            return;
+        }
 
         console.log('[DTG-v3] updatePricingDisplay called', {
             hasData: !!(window.nwcaPricingData && window.nwcaPricingData.prices),
@@ -1100,6 +1109,7 @@
             // Get the appropriate tier for the quantity
             const tier = getPriceTier(state.quantity);
             console.log('[DTG-v3] Tier for quantity', state.quantity, 'is', tier);
+            console.log('[DTG-v3] Available price data:', prices);
             let basePrice = 0;
             
             // DTG adapter uses grouped pricing (S-XL, 2XL, 3XL, 4XL+)
@@ -1217,12 +1227,13 @@
             }
         } else {
             console.log('[DTG-v3] No pricing data available yet');
-            unitPriceEl.textContent = 'Loading...';
-            totalPriceEl.textContent = '';
+            // Show $0.00 instead of "Loading..." to match the visual
+            unitPriceEl.textContent = '$0.00';
+            totalPriceEl.textContent = 'Total: $0.00';
             if (breakdownEl) {
-                breakdownEl.innerHTML = '<div class="breakdown-item">Loading pricing data...</div>';
+                breakdownEl.innerHTML = '<div class="breakdown-item">Select a location to view pricing</div>';
             }
-            // Update header to show loading state
+            // Update header to show $0.00
             updateHeaderPricing(state.quantity, 0);
         }
     }
@@ -1362,46 +1373,82 @@
             finalLocationEl.textContent = `${location.name} (${location.size})`;
         }
         
-        // Copy pricing from step 2
-        const sourceUnitPrice = document.getElementById('dtg-unit-price');
-        const sourceTotalPrice = document.getElementById('dtg-total-price');
-        const sourceBreakdown = document.getElementById('dtg-pricing-breakdown');
-        const sourceLtmWarning = document.getElementById('dtg-ltm-warning');
-        
-        if (unitPriceFinalEl && sourceUnitPrice) {
-            unitPriceFinalEl.textContent = sourceUnitPrice.textContent;
-        }
-        
-        if (totalPriceFinalEl && sourceTotalPrice) {
-            totalPriceFinalEl.textContent = sourceTotalPrice.textContent;
-        }
-        
-        if (breakdownFinalEl && sourceBreakdown) {
-            breakdownFinalEl.innerHTML = sourceBreakdown.innerHTML;
-        }
-        
-        if (ltmWarningFinalEl && sourceLtmWarning) {
-            ltmWarningFinalEl.style.display = sourceLtmWarning.style.display;
+        // Since we don't have step 2 pricing elements anymore, we need to calculate the pricing here
+        if (window.nwcaPricingData && window.nwcaPricingData.prices) {
+            const prices = window.nwcaPricingData.prices;
+            const tier = getPriceTier(state.quantity);
+            let basePrice = 0;
+            
+            // Get S-XL group price
+            const sxlPrices = prices['S-XL'];
+            if (sxlPrices && sxlPrices[tier] !== undefined) {
+                basePrice = parseFloat(sxlPrices[tier]);
+                
+                // For combo locations, double the price
+                if (DTG_LOCATIONS[state.selectedLocation] && DTG_LOCATIONS[state.selectedLocation].isCombo) {
+                    basePrice *= 2;
+                }
+            }
+            
+            if (basePrice > 0) {
+                let totalPrice = basePrice * state.quantity;
+                let ltmFeePerUnit = 0;
+                
+                // Apply LTM fee if under 24
+                if (state.quantity < 24) {
+                    ltmFeePerUnit = 50 / state.quantity;
+                    totalPrice += 50;
+                }
+                
+                const displayPrice = basePrice + ltmFeePerUnit;
+                
+                if (unitPriceFinalEl) {
+                    unitPriceFinalEl.textContent = `$${displayPrice.toFixed(2)}`;
+                }
+                
+                if (totalPriceFinalEl) {
+                    totalPriceFinalEl.textContent = `Total: $${totalPrice.toFixed(2)}`;
+                }
+                
+                // Update breakdown
+                if (breakdownFinalEl) {
+                    const locationInfo = DTG_LOCATIONS[state.selectedLocation];
+                    let breakdownHTML = `
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Base price (S-XL):</span>
+                            <span class="breakdown-value">$${basePrice.toFixed(2)}</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">${locationInfo.name} printing:</span>
+                            <span class="breakdown-value">included</span>
+                        </div>
+                    `;
+                    
+                    if (state.quantity < 24) {
+                        breakdownHTML += `
+                            <div class="breakdown-item" style="margin-top: 8px;">
+                                <span class="breakdown-label">Less than minimum fee:</span>
+                                <span class="breakdown-value">+$${ltmFeePerUnit.toFixed(2)}/shirt ($50 ÷ ${state.quantity} shirts)</span>
+                            </div>
+                        `;
+                    }
+                    
+                    breakdownFinalEl.innerHTML = breakdownHTML;
+                }
+                
+                if (ltmWarningFinalEl) {
+                    ltmWarningFinalEl.style.display = state.quantity < 24 ? 'block' : 'none';
+                }
+            }
         }
     }
     
     function getPriceTier(quantity) {
-        // DTG adapter uses numeric tier keys (1, 2, 3) not range names
-        if (quantity < 24) return '1';  // Tier 1
-        if (quantity <= 47) return '1';  // Tier 1
-        if (quantity <= 71) return '2';  // Tier 2
-        if (quantity <= 143) return '3'; // Tier 3
-        return '3'; // For DTG, max tier is 3
-    }
-    
-    // Helper to get tier display name for UI
-    function getTierDisplayName(tierKey) {
-        const tierMap = {
-            '1': '24-47',
-            '2': '48-71',
-            '3': '72+'
-        };
-        return tierMap[tierKey] || tierKey;
+        // DTG uses tier range keys that match the Caspio data structure
+        if (quantity < 24) return '24-47';  // Minimum order with LTM fee
+        if (quantity <= 47) return '24-47';  // Tier 1
+        if (quantity <= 71) return '48-71';  // Tier 2
+        return '72+';  // Tier 3 (72 and above)
     }
     
     // Global functions for quote actions
