@@ -1,0 +1,64 @@
+/* DTG Pricing Table Fix - Green header style like embroidery */
+
+/* Override any previous styles - use green headers like embroidery page */
+.dtg-pricing-page .pricing-grid thead,
+.dtg-pricing-page .pricing-grid thead tr {
+    background-color: #3a7c52 !important;
+    background: #3a7c52 !important;
+}
+
+.dtg-pricing-page .pricing-grid th {
+    background-color: #3a7c52 !important;
+    background: #3a7c52 !important;
+    color: white !important;
+}
+
+/* Ensure headers are visible with white text on green background */
+.dtg-pricing-page .pricing-grid thead th {
+    background-color: #3a7c52 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    padding: 16px 8px !important;
+    border: none !important;
+}
+
+/* First column header */
+.dtg-pricing-page .pricing-grid th:first-child {
+    text-align: left !important;
+    padding-left: 24px !important;
+    background-color: #3a7c52 !important;
+    color: white !important;
+}
+
+/* Ensure all header cells have green background */
+.dtg-pricing-page .pricing-table-wrapper .pricing-grid th {
+    background: #3a7c52 !important;
+    color: white !important;
+}
+
+/* Extended sizes accordion - default to closed */
+.dtg-pricing-page .extended-sizes-content {
+    display: none !important;
+}
+
+.dtg-pricing-page .extended-sizes-content.show {
+    display: block !important;
+}
+
+/* Fix for color indicator visibility */
+.dtg-pricing-page .selected-color-indicator {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.dtg-pricing-page .mini-color-swatch {
+    display: inline-block !important;
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 4px !important;
+    border: 1px solid #ddd !important;
+}

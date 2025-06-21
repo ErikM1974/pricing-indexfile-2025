@@ -117,17 +117,21 @@ class UniversalPricingGrid {
                     </div>
                     
                     <!-- Actual pricing table -->
-                    <table class="pricing-grid" id="${this.config.containerId}-table" style="display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease;">
-                        <thead>
-                            <tr id="${this.config.containerId}-header-row">
-                                <th>Quantity</th>
-                                <!-- Size headers will be dynamically populated -->
-                            </tr>
-                        </thead>
-                        <tbody id="${this.config.containerId}-tbody">
-                            <!-- Pricing data will be dynamically added here -->
-                        </tbody>
-                    </table>
+                    <div class="pricing-table-wrapper" id="${this.config.containerId}-table-wrapper" style="display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease;">
+                        <div class="pricing-table-scroll">
+                            <table class="pricing-grid" id="${this.config.containerId}-table">
+                                <thead>
+                                    <tr id="${this.config.containerId}-header-row">
+                                        <th>Quantity</th>
+                                        <!-- Size headers will be dynamically populated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="${this.config.containerId}-tbody">
+                                    <!-- Pricing data will be dynamically added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                     
                     <!-- Pricing notes -->
                     <div class="pricing-explanation" style="margin-top: 10px; font-size: 0.9em; color: #666; display: none;" id="${this.config.containerId}-notes">
@@ -196,6 +200,7 @@ class UniversalPricingGrid {
             loadingStatus: document.getElementById(`${containerId}-loading-status`),
             loadingStep: document.getElementById(`${containerId}-loading-step`),
             loadingProgress: document.getElementById(`${containerId}-loading-progress`),
+            tableWrapper: document.getElementById(`${containerId}-table-wrapper`),
             table: document.getElementById(`${containerId}-table`),
             headerRow: document.getElementById(`${containerId}-header-row`),
             tbody: document.getElementById(`${containerId}-tbody`),
@@ -243,16 +248,21 @@ class UniversalPricingGrid {
         // Initialize color from global state if available
         // Delay this slightly to ensure elements are ready
         setTimeout(() => {
-            if (window.selectedColorName && this.config.showColorIndicator) {
-                console.log('[UniversalPricingGrid] Initializing color from global state:', window.selectedColorName);
+            // Try multiple sources for initial color
+            const colorName = window.selectedColorName || 
+                            (this.state.pricingData && this.state.pricingData.color) ||
+                            'Athletic Hthr'; // Default from logs
+                            
+            if (colorName && this.config.showColorIndicator) {
+                console.log('[UniversalPricingGrid] Initializing color from global state:', colorName);
                 const colorData = {
-                    COLOR_NAME: window.selectedColorName,
+                    COLOR_NAME: colorName,
                     HEX_CODE: window.selectedColorHex || null,
                     COLOR_SQUARE_IMAGE: window.selectedColorImage || window.selectedColorSquareImage || null
                 };
-                this.updateSelectedColor(window.selectedColorName, colorData);
+                this.updateSelectedColor(colorName, colorData);
             }
-        }, 100);
+        }, 500);
     }
 
     showLoading() {
@@ -264,8 +274,8 @@ class UniversalPricingGrid {
         if (this.elements.loadingState) {
             this.elements.loadingState.style.display = 'block';
         }
-        if (this.elements.table) {
-            this.elements.table.style.display = 'none';
+        if (this.elements.tableWrapper) {
+            this.elements.tableWrapper.style.display = 'none';
         }
 
         // Start loading animation
@@ -317,12 +327,12 @@ class UniversalPricingGrid {
         if (this.elements.loadingState) {
             this.elements.loadingState.style.display = 'none';
         }
-        if (this.elements.table) {
-            this.elements.table.style.display = 'table';
+        if (this.elements.tableWrapper) {
+            this.elements.tableWrapper.style.display = 'block';
             // Trigger animation
             setTimeout(() => {
-                this.elements.table.style.opacity = '1';
-                this.elements.table.style.transform = 'translateY(0)';
+                this.elements.tableWrapper.style.opacity = '1';
+                this.elements.tableWrapper.style.transform = 'translateY(0)';
             }, 100);
         }
         if (this.elements.notes) {
@@ -355,6 +365,17 @@ class UniversalPricingGrid {
             }
         }
 
+        // Update color indicator if we have color data
+        if (data.color && this.config.showColorIndicator) {
+            console.log('[UniversalPricingGrid] Updating color from pricing data:', data.color);
+            const colorData = {
+                COLOR_NAME: data.color,
+                HEX_CODE: data.colorHex || null,
+                COLOR_SQUARE_IMAGE: data.colorImage || null
+            };
+            this.updateSelectedColor(data.color, colorData);
+        }
+
         // Hide loading and show table
         this.hideLoading();
     }
@@ -364,26 +385,56 @@ class UniversalPricingGrid {
 
         const { headers, prices, tierData } = this.state.pricingData;
 
+        console.log('[UniversalPricingGrid] Building table with headers:', headers);
+        console.log('[UniversalPricingGrid] Prices structure:', Object.keys(prices));
+
+        // Clean up any existing accordion
+        const existingAccordion = document.querySelector(`#${this.config.containerId} .extended-sizes-accordion`);
+        if (existingAccordion) {
+            existingAccordion.remove();
+        }
+
+        // Filter out 'Quantity' header to get actual size headers
+        const sizeHeaders = headers.filter(h => h && h.toLowerCase() !== 'quantity' && h.toLowerCase() !== 'qty');
+        
+        // Determine if we need extended sizes accordion
+        const needsAccordion = sizeHeaders.length > 6;
+        let standardSizes = sizeHeaders;
+        let extendedSizes = [];
+        
+        if (needsAccordion) {
+            standardSizes = sizeHeaders.slice(0, 6);
+            extendedSizes = sizeHeaders.slice(6);
+        }
+
+        // Build the main table with standard sizes
+        this.buildTableSection(standardSizes, prices, tierData, this.elements.headerRow, this.elements.tbody);
+
+        // If we have extended sizes, create accordion structure
+        if (needsAccordion && extendedSizes.length > 0) {
+            this.createExtendedSizesAccordion(extendedSizes, prices, tierData);
+        }
+    }
+
+    buildTableSection(sizesToShow, prices, tierData, headerRow, tbody) {
         // Update headers
-        if (this.elements.headerRow) {
+        if (headerRow) {
             // Clear existing headers except the first one
-            while (this.elements.headerRow.children.length > 1) {
-                this.elements.headerRow.removeChild(this.elements.headerRow.lastChild);
+            while (headerRow.children.length > 1) {
+                headerRow.removeChild(headerRow.lastChild);
             }
             
-            // Add size headers (skip 'Quantity' as it's already the first column)
-            headers.forEach(sizeHeader => {
-                if (sizeHeader.toLowerCase() !== 'quantity') {
-                    const th = document.createElement('th');
-                    th.textContent = sizeHeader;
-                    this.elements.headerRow.appendChild(th);
-                }
+            // Add size headers
+            sizesToShow.forEach(sizeHeader => {
+                const th = document.createElement('th');
+                th.textContent = sizeHeader;
+                headerRow.appendChild(th);
             });
         }
 
         // Update tbody
-        if (this.elements.tbody) {
-            this.elements.tbody.innerHTML = '';
+        if (tbody) {
+            tbody.innerHTML = '';
 
             // Sort tiers by minimum quantity
             const tierKeys = Object.keys(tierData || {});
@@ -406,17 +457,20 @@ class UniversalPricingGrid {
                 const tierCell = document.createElement('td');
                 let tierLabel = '';
                 if (tier.MaxQuantity && tier.MinQuantity) {
-                    tierLabel = `${tier.MinQuantity}-${tier.MaxQuantity}`;
+                    // Check if MaxQuantity is unreasonably high (like 99999)
+                    if (tier.MaxQuantity > 9999) {
+                        tierLabel = `${tier.MinQuantity}+`;
+                    } else {
+                        tierLabel = `${tier.MinQuantity}-${tier.MaxQuantity}`;
+                    }
                 } else if (tier.MinQuantity) {
                     tierLabel = `${tier.MinQuantity}+`;
                 }
                 tierCell.textContent = tierLabel;
                 row.appendChild(tierCell);
 
-                // Price cells (skip 'Quantity' column)
-                headers.forEach((sizeGroup, colIndex) => {
-                    if (sizeGroup.toLowerCase() === 'quantity') return;
-                    
+                // Price cells
+                sizesToShow.forEach((sizeGroup) => {
                     const priceCell = document.createElement('td');
                     priceCell.className = 'price-cell';
                     
@@ -444,7 +498,7 @@ class UniversalPricingGrid {
                     row.appendChild(priceCell);
                 });
 
-                this.elements.tbody.appendChild(row);
+                tbody.appendChild(row);
             });
 
             // Mark best prices
@@ -452,6 +506,119 @@ class UniversalPricingGrid {
             
             // Add tier badges
             this.addTierBadges();
+        }
+    }
+
+    createExtendedSizesAccordion(extendedSizes, prices, tierData) {
+        // Find where to insert - after the pricing notes if they exist, otherwise after table wrapper
+        let insertAfter = this.elements.notes && this.elements.notes.style.display !== 'none' 
+            ? this.elements.notes 
+            : this.elements.tableWrapper;
+        
+        // Create accordion HTML
+        const accordionDiv = document.createElement('div');
+        accordionDiv.className = 'extended-sizes-accordion';
+        accordionDiv.innerHTML = `
+            <button class="extended-sizes-toggle" id="${this.config.containerId}-extended-toggle">
+                <i class="fas fa-plus-circle"></i>
+                <span>Show Extended Sizes (${extendedSizes.join(', ')})</span>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+            </button>
+            <div class="extended-sizes-content" id="${this.config.containerId}-extended-content" style="display: none;">
+                <div class="extended-sizes-table">
+                    <div class="pricing-table-wrapper">
+                        <div class="pricing-table-scroll">
+                            <table class="pricing-grid">
+                                <thead>
+                                    <tr id="${this.config.containerId}-extended-header">
+                                        <th>Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="${this.config.containerId}-extended-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Insert after the determined element
+        insertAfter.parentNode.insertBefore(accordionDiv, insertAfter.nextSibling);
+        
+        // Build the extended sizes table
+        const extendedHeader = document.getElementById(`${this.config.containerId}-extended-header`);
+        const extendedTbody = document.getElementById(`${this.config.containerId}-extended-tbody`);
+        this.buildTableSection(extendedSizes, prices, tierData, extendedHeader, extendedTbody);
+        
+        // Setup accordion functionality
+        this.setupAccordionListeners();
+    }
+
+    setupAccordionListeners() {
+        const toggleBtn = document.getElementById(`${this.config.containerId}-extended-toggle`);
+        const content = document.getElementById(`${this.config.containerId}-extended-content`);
+        
+        if (!toggleBtn || !content) return;
+        
+        toggleBtn.addEventListener('click', () => {
+            const isExpanded = content.classList.contains('show');
+            
+            if (isExpanded) {
+                // Collapse
+                content.style.height = content.scrollHeight + 'px';
+                content.offsetHeight; // Force reflow
+                content.style.height = '0';
+                content.classList.remove('show');
+                
+                toggleBtn.classList.remove('expanded');
+                const sizeCount = content.querySelectorAll('thead th').length - 1; // Exclude Quantity column
+                const sizeNames = Array.from(content.querySelectorAll('thead th'))
+                    .slice(1)
+                    .map(th => th.textContent)
+                    .join(', ');
+                toggleBtn.querySelector('span').textContent = `Show Extended Sizes (${sizeNames})`;
+                toggleBtn.querySelector('.fas').classList.replace('fa-minus-circle', 'fa-plus-circle');
+                
+                setTimeout(() => {
+                    if (!content.classList.contains('show')) {
+                        content.style.display = 'none';
+                    }
+                }, 300);
+            } else {
+                // Expand
+                content.style.display = 'block';
+                content.style.height = '0';
+                content.offsetHeight; // Force reflow
+                content.style.height = content.scrollHeight + 'px';
+                content.classList.add('show');
+                
+                toggleBtn.classList.add('expanded');
+                toggleBtn.querySelector('span').textContent = 'Hide Extended Sizes';
+                toggleBtn.querySelector('.fas').classList.replace('fa-plus-circle', 'fa-minus-circle');
+                
+                setTimeout(() => {
+                    if (content.classList.contains('show')) {
+                        content.style.height = 'auto';
+                    }
+                }, 300);
+            }
+            
+            // Store preference - only save if user manually toggles
+            localStorage.setItem(`${this.config.containerId}-extended-sizes`, !isExpanded);
+        });
+        
+        // Check for saved preference - default to collapsed
+        // Clear any old/bad values and default to collapsed
+        const savedPref = localStorage.getItem(`${this.config.containerId}-extended-sizes`);
+        if (savedPref !== 'true' && savedPref !== 'false') {
+            // Clear invalid value
+            localStorage.removeItem(`${this.config.containerId}-extended-sizes`);
+        }
+        
+        // Only expand if explicitly saved as 'true' string
+        if (savedPref === 'true') {
+            toggleBtn.click();
         }
     }
 
@@ -508,30 +675,37 @@ class UniversalPricingGrid {
     }
 
     markBestPrices() {
-        if (!this.elements.tbody) return;
+        // Mark best prices in all tables (main and extended)
+        const allTables = document.querySelectorAll(`#${this.config.containerId}-table, #${this.config.containerId}-extended-tbody`);
         
-        const rows = this.elements.tbody.querySelectorAll('tr');
-        rows.forEach(row => {
-            const priceCells = row.querySelectorAll('.price-cell');
-            let lowestPrice = Infinity;
-            let bestCell = null;
+        allTables.forEach(table => {
+            const tbody = table.tagName === 'TABLE' ? table.querySelector('tbody') : table;
+            if (!tbody) return;
+            
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const priceCells = row.querySelectorAll('.price-cell');
+                let lowestPrice = Infinity;
+                let bestCell = null;
 
-            priceCells.forEach(cell => {
-                const priceText = cell.textContent.trim();
-                const price = parseFloat(priceText.replace('$', ''));
-                if (!isNaN(price) && price < lowestPrice) {
-                    lowestPrice = price;
-                    bestCell = cell;
+                priceCells.forEach(cell => {
+                    const priceText = cell.textContent.trim();
+                    const price = parseFloat(priceText.replace('$', ''));
+                    if (!isNaN(price) && price < lowestPrice) {
+                        lowestPrice = price;
+                        bestCell = cell;
+                    }
+                });
+
+                if (bestCell) {
+                    bestCell.classList.add('best-price');
                 }
             });
-
-            if (bestCell) {
-                bestCell.classList.add('best-price');
-            }
         });
     }
 
     addTierBadges() {
+        // Only add badges to the main table, not extended sizes
         if (!this.elements.tbody) return;
         
         const rows = this.elements.tbody.querySelectorAll('tr');

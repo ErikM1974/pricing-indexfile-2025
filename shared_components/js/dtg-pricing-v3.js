@@ -1191,8 +1191,8 @@
                     if (state.quantity < 24) {
                         breakdownHTML += `
                             <div class="breakdown-item" style="margin-top: 8px;">
-                                <span class="breakdown-label">Less than minimum fee:</span>
-                                <span class="breakdown-value">+$${ltmFeePerUnit.toFixed(2)}/shirt ($50 ÷ ${state.quantity} shirts)</span>
+                                <span class="breakdown-label">LTM (less than minimum) fee (under 24):</span>
+                                <span class="breakdown-value">+$${ltmFeePerUnit.toFixed(2)}/shirt</span>
                             </div>
                         `;
                     }
@@ -1255,8 +1255,8 @@
                     if (state.quantity < 24) {
                         breakdownHTML += `
                             <div class="breakdown-item" style="margin-top: 8px;">
-                                <span class="breakdown-label">Less than minimum fee:</span>
-                                <span class="breakdown-value">+$${ltmFeePerUnit.toFixed(2)}/shirt ($50 ÷ ${state.quantity} shirts)</span>
+                                <span class="breakdown-label">LTM (less than minimum) fee (under 24):</span>
+                                <span class="breakdown-value">+$${ltmFeePerUnit.toFixed(2)}/shirt</span>
                             </div>
                         `;
                     }
@@ -1468,8 +1468,8 @@
                     if (state.quantity < 24) {
                         breakdownHTML += `
                             <div class="breakdown-item" style="margin-top: 8px;">
-                                <span class="breakdown-label">Less than minimum fee:</span>
-                                <span class="breakdown-value">+$${ltmFeePerUnit.toFixed(2)}/shirt ($50 ÷ ${state.quantity} shirts)</span>
+                                <span class="breakdown-label">LTM (less than minimum) fee (under 24):</span>
+                                <span class="breakdown-value">+$${ltmFeePerUnit.toFixed(2)}/shirt</span>
                             </div>
                         `;
                     }

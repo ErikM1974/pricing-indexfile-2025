@@ -217,7 +217,7 @@
 }
 
 .pricing-grid th {
-    background-color: var(--primary-color, #0066cc);
+    background-color: #3a7c52;
     color: white;
     padding: 12px 8px;
     text-align: center;

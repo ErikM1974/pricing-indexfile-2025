@@ -191,7 +191,7 @@
                             <span class="breakdown-value" id="location-display">Left Chest</span>
                         </div>
                         <div class="ltm-fee-item" id="ltm-fee-display" style="display: none;">
-                            <span class="breakdown-label">Setup fee (under 24):</span>
+                            <span class="breakdown-label">LTM (less than minimum) fee (under 24):</span>
                             <span class="breakdown-value" id="ltm-fee-value">+$0.00</span>
                         </div>
                     </div>
