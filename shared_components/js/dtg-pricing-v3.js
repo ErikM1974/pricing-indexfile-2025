@@ -1002,6 +1002,7 @@
 
     function handleLocationSelection(locationCode) {
         console.log('[DTG-v3] Location selected:', locationCode);
+        console.log('[DTG-v3] Previous location was:', state.selectedLocation);
         state.selectedLocation = locationCode;
 
         // Trigger DTG adapter to load pricing
@@ -1051,6 +1052,11 @@
         if (state.currentStep === 2) {
             updateLocationCardsWithPricing();
         }
+        
+        // Update final quote if we're on step 3
+        if (state.currentStep === 3) {
+            updateFinalQuoteDisplay();
+        }
 
         // Auto-advance to step 2 if we're on step 1
         if (state.currentStep === 1 && quantity >= 1) {
@@ -1068,6 +1074,11 @@
     function handlePricingDataLoaded(event) {
         console.log('[DTG-v3] Pricing data loaded:', event.detail);
         console.log('[DTG-v3] Price structure:', window.nwcaPricingData?.prices);
+        console.log('[DTG-v3] Current state:', { 
+            location: state.selectedLocation, 
+            quantity: state.quantity,
+            step: state.currentStep 
+        });
         
         // Update pricing display with new data
         updatePricingDisplay();
