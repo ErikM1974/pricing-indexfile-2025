@@ -1087,19 +1087,32 @@
 
         if (!unitPriceEl || !totalPriceEl) return;
 
+        console.log('[DTG-v3] updatePricingDisplay called', {
+            hasData: !!(window.nwcaPricingData && window.nwcaPricingData.prices),
+            quantity: state.quantity,
+            location: state.selectedLocation
+        });
+
         // Check if we have pricing data from the window
         if (window.nwcaPricingData && window.nwcaPricingData.prices) {
             const prices = window.nwcaPricingData.prices;
             
             // Get the appropriate tier for the quantity
             const tier = getPriceTier(state.quantity);
+            console.log('[DTG-v3] Tier for quantity', state.quantity, 'is', tier);
             let basePrice = 0;
             
             // DTG adapter uses grouped pricing (S-XL, 2XL, 3XL, 4XL+)
             // For DTG, we'll use the S-XL group price
             const sxlPrices = prices['S-XL'];
+            console.log('[DTG-v3] S-XL prices:', sxlPrices);
+            console.log('[DTG-v3] Looking for tier', tier, 'in S-XL prices');
+            
             if (sxlPrices && sxlPrices[tier] !== undefined) {
                 basePrice = parseFloat(sxlPrices[tier]);
+                console.log('[DTG-v3] Found base price:', basePrice, 'for tier', tier);
+            } else {
+                console.log('[DTG-v3] No price found for tier', tier, 'in S-XL prices');
             }
             
             // If no S-XL price, check if we have location-specific pricing
@@ -1148,11 +1161,22 @@
                 }
 
                 const displayPrice = basePrice + ltmFeePerUnit;
+                console.log('[DTG-v3] Calculated prices:', {
+                    basePrice,
+                    ltmFeePerUnit,
+                    displayPrice,
+                    totalPrice
+                });
+                
                 unitPriceEl.textContent = `$${displayPrice.toFixed(2)}`;
                 totalPriceEl.textContent = `Total: $${totalPrice.toFixed(2)}`;
 
                 // Update header pricing display with the same price shown in instant quote
-                updateHeaderPricing(state.quantity, displayPrice);
+                if (typeof updateHeaderPricing === 'function') {
+                    updateHeaderPricing(state.quantity, displayPrice);
+                } else {
+                    console.warn('[DTG-v3] updateHeaderPricing function not found');
+                }
 
                 // Update breakdown
                 if (breakdownEl) {
@@ -1258,14 +1282,13 @@
         if (!tierTextEl) return;
         
         let message = '';
-        if (quantity >= 144) {
-            message = 'Great choice! You qualify for our best Tier 4 pricing';
-        } else if (quantity >= 72) {
-            message = 'Excellent! You qualify for Tier 3 pricing';
+        // DTG has 3 tiers, not 4
+        if (quantity >= 72) {
+            message = 'Great choice! You qualify for our best Tier 3 pricing (72+)';
         } else if (quantity >= 48) {
-            message = 'Nice! You qualify for Tier 2 pricing';
+            message = 'Nice! You qualify for Tier 2 pricing (48-71)';
         } else if (quantity >= 24) {
-            message = 'You qualify for Tier 1 pricing';
+            message = 'You qualify for Tier 1 pricing (24-47)';
         } else {
             message = 'Minimum order is 24 shirts (setup fee applies)';
         }
@@ -1283,6 +1306,7 @@
         
         const prices = window.nwcaPricingData.prices;
         const tier = getPriceTier(state.quantity);
+        console.log('[DTG-v3] Updating location cards with tier', tier, 'for quantity', state.quantity);
         
         // Update each location card with its price
         Object.entries(DTG_LOCATIONS).forEach(([code, location]) => {
@@ -1295,11 +1319,15 @@
                 const sxlPrices = prices['S-XL'];
                 if (sxlPrices && sxlPrices[tier] !== undefined) {
                     basePrice = parseFloat(sxlPrices[tier]);
+                    console.log('[DTG-v3] Location card', code, 'base price:', basePrice);
                     
                     // For combo locations, we need to double the price
                     if (location.isCombo) {
                         basePrice *= 2;
+                        console.log('[DTG-v3] Combo location', code, 'adjusted price:', basePrice);
                     }
+                } else {
+                    console.log('[DTG-v3] No price found for location', code, 'tier', tier);
                 }
                 
                 // Add LTM fee if applicable
@@ -1358,11 +1386,22 @@
     }
     
     function getPriceTier(quantity) {
-        if (quantity < 24) return '24-47';
-        if (quantity <= 47) return '24-47';
-        if (quantity <= 71) return '48-71';
-        if (quantity <= 143) return '72-143';
-        return '144+';
+        // DTG adapter uses numeric tier keys (1, 2, 3) not range names
+        if (quantity < 24) return '1';  // Tier 1
+        if (quantity <= 47) return '1';  // Tier 1
+        if (quantity <= 71) return '2';  // Tier 2
+        if (quantity <= 143) return '3'; // Tier 3
+        return '3'; // For DTG, max tier is 3
+    }
+    
+    // Helper to get tier display name for UI
+    function getTierDisplayName(tierKey) {
+        const tierMap = {
+            '1': '24-47',
+            '2': '48-71',
+            '3': '72+'
+        };
+        return tierMap[tierKey] || tierKey;
     }
     
     // Global functions for quote actions
