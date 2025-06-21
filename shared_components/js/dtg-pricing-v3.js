@@ -380,8 +380,7 @@
             }
 
             .step-section.inactive {
-                opacity: 1;
-                pointer-events: auto;
+                display: none;
             }
 
             .step-header {
@@ -1017,6 +1016,9 @@
                 locationInfo: DTG_LOCATIONS[locationCode]
             }
         }));
+        
+        // Always update final quote display to keep it in sync
+        updateFinalQuoteDisplay();
 
         // Auto-advance to step 3
         if (state.currentStep === 2) {
@@ -1024,7 +1026,7 @@
                 updateStep(3);
                 // Update pricing display first to ensure we have the latest data
                 updatePricingDisplay();
-                // Then update final quote display
+                // Update final quote display again after step transition
                 updateFinalQuoteDisplay();
             }, 500);
         }
@@ -1053,10 +1055,8 @@
             updateLocationCardsWithPricing();
         }
         
-        // Update final quote if we're on step 3
-        if (state.currentStep === 3) {
-            updateFinalQuoteDisplay();
-        }
+        // Always update final quote display to keep it in sync
+        updateFinalQuoteDisplay();
 
         // Auto-advance to step 2 if we're on step 1
         if (state.currentStep === 1 && quantity >= 1) {
@@ -1084,10 +1084,8 @@
         updatePricingDisplay();
         updateLocationCardsWithPricing();
         
-        // Update final quote if on step 3
-        if (state.currentStep === 3) {
-            updateFinalQuoteDisplay();
-        }
+        // Always update final quote display to keep it in sync
+        updateFinalQuoteDisplay();
         
         // Make sure pricing grid is visible
         const pricingGridContainer = document.getElementById('pricing-grid-container');
