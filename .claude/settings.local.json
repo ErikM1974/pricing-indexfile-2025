@@ -36,7 +36,8 @@
       "Bash(chmod:*)",
       "Bash(touch:*)",
       "Bash(sed:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "WebFetch(domain:cdn.caspio.com)"
     ],
     "deny": []
   }
