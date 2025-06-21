@@ -62,3 +62,40 @@
     border-radius: 4px !important;
     border: 1px solid #ddd !important;
 }
+
+/* Active tier highlighting for DTG */
+.dtg-pricing-page .pricing-grid tr.active-tier {
+    background-color: #e8f5e9 !important;
+    box-shadow: inset 0 0 0 2px #3a7c52 !important;
+}
+
+.dtg-pricing-page .pricing-grid tr.active-tier td {
+    font-weight: 600 !important;
+}
+
+.dtg-pricing-page .pricing-grid tr.active-tier td:first-child {
+    color: #3a7c52 !important;
+    background-color: #e8f5e9 !important;
+    font-weight: 700 !important;
+}
+
+.dtg-pricing-page .pricing-grid tr.active-tier .price-cell {
+    color: #3a7c52 !important;
+    background-color: #f1f8f4 !important;
+}
+
+/* Ensure extended table also highlights properly */
+.dtg-pricing-page .extended-tbody tr.active-tier {
+    background-color: #e8f5e9 !important;
+    box-shadow: inset 0 0 0 2px #3a7c52 !important;
+}
+
+.dtg-pricing-page .extended-tbody tr.active-tier td {
+    font-weight: 600 !important;
+}
+
+.dtg-pricing-page .extended-tbody tr.active-tier td:first-child {
+    color: #3a7c52 !important;
+    background-color: #e8f5e9 !important;
+    font-weight: 700 !important;
+}

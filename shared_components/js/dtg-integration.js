@@ -137,7 +137,9 @@ class DTGIntegration {
         // Listen for quantity changes from Quick Quote
         window.addEventListener('quantityChanged', (event) => {
             if (event.detail && event.detail.totalQuantity) {
-                this.components.pricingGrid.highlightActiveTier(event.detail.totalQuantity);
+                if (this.components.pricingGrid) {
+                    this.components.pricingGrid.highlightActiveTier(event.detail.totalQuantity);
+                }
             }
         });
         
@@ -294,6 +296,18 @@ class DTGIntegration {
             const transformedData = this.transformPricingData(data);
             console.log('[DTGIntegration] Updating Pricing Grid with headers:', transformedData.headers);
             this.components.pricingGrid.updatePricingData(transformedData);
+            
+            // Highlight the current tier after data is loaded
+            // Get current quantity from v4 or quick quote
+            let currentQuantity = 24; // default
+            if (window.DTGPricingV4 && window.DTGPricingV4.getState) {
+                currentQuantity = window.DTGPricingV4.getState().quantity;
+            } else if (this.components.quickQuote && this.components.quickQuote.getQuantity) {
+                currentQuantity = this.components.quickQuote.getQuantity();
+            }
+            
+            console.log('[DTGIntegration] Highlighting tier for current quantity after data load:', currentQuantity);
+            this.components.pricingGrid.highlightActiveTier(currentQuantity);
         }
         
         // Show pricing notes

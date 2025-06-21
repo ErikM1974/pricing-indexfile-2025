@@ -113,6 +113,14 @@
             if (window.DTGAdapter && window.DTGAdapter.displayPricingForSelectedLocation) {
                 window.DTGAdapter.displayPricingForSelectedLocation(state.selectedLocation);
             }
+            
+            // Trigger initial quantity change event for tier highlighting after pricing data loads
+            setTimeout(() => {
+                console.log('[DTG-v4] Dispatching initial quantityChanged event with default quantity:', state.quantity);
+                window.dispatchEvent(new CustomEvent('quantityChanged', {
+                    detail: { totalQuantity: state.quantity }
+                }));
+            }, 2000); // Wait for pricing data to load
         }, 500);
     }
 
@@ -138,13 +146,6 @@
                             <button class="quantity-btn" id="dtg-decrease">−</button>
                             <input type="number" class="quantity-input" id="dtg-quantity" value="24" min="1">
                             <button class="quantity-btn" id="dtg-increase">+</button>
-                        </div>
-                        <div class="quick-select-inline">
-                            <button class="quick-qty" data-qty="12">12</button>
-                            <button class="quick-qty active" data-qty="24">24</button>
-                            <button class="quick-qty" data-qty="48">48</button>
-                            <button class="quick-qty" data-qty="72">72</button>
-                            <button class="quick-qty" data-qty="144">144</button>
                         </div>
                     </div>
                     
@@ -305,31 +306,7 @@
                 outline: none;
             }
 
-            .quick-select-inline {
-                display: flex;
-                gap: 8px;
-            }
-
-            .quick-qty {
-                padding: 6px 14px;
-                border: 1px solid #ddd;
-                background: white;
-                border-radius: 20px;
-                font-size: 14px;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-
-            .quick-qty:hover {
-                border-color: #2e5827;
-                color: #2e5827;
-            }
-
-            .quick-qty.active {
-                background: #2e5827;
-                color: white;
-                border-color: #2e5827;
-            }
+            /* Quick select buttons removed - cleaner interface */
 
             /* Price Display */
             .price-display-section {
@@ -714,20 +691,7 @@
             });
         }
 
-        // Quick quantity buttons
-        document.querySelectorAll('.quick-qty').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const qty = parseInt(e.target.dataset.qty);
-                if (quantityInput) {
-                    quantityInput.value = qty;
-                    handleQuantityChange(qty);
-                }
-                
-                // Update active state
-                document.querySelectorAll('.quick-qty').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-            });
-        });
+        // Quick quantity buttons removed - no longer needed
 
         // Location selection
         document.addEventListener('change', (e) => {

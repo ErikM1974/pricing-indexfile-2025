@@ -118,6 +118,14 @@
             // Store product data globally for Universal Product Display
             window.productColors = productData.colors;
             window.selectedColorData = selectedColorObject;
+            
+            // Set the selected color name globally for other components
+            if (selectedColorObject) {
+                window.selectedColorName = selectedColorObject.COLOR_NAME;
+                window.selectedCatalogColor = selectedColorObject.CATALOG_COLOR;
+                window.selectedColorHex = selectedColorObject.HEX_CODE || null;
+                window.selectedColorImage = selectedColorObject.COLOR_SQUARE_IMAGE || null;
+            }
 
             // Dispatch productColorsReady event for Universal Product Display
             console.log("DTG-PAGE-SETUP: Dispatching productColorsReady event");

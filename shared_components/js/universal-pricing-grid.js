@@ -148,9 +148,9 @@ class UniversalPricingGrid {
         return `
             <div class="pricing-header" style="margin-bottom: 20px;">
                 <h3 class="section-title" style="font-size: 1.3em; margin: 0;">
-                    Detailed Pricing Tiers
+                    Detailed Pricing per Quantity Tier
                     <span class="location-indicator" id="${this.config.containerId}-location-indicator" style="display: none;">
-                        for <span class="location-name" style="color: var(--primary-color); font-weight: 700;"></span>
+                        (<span class="location-name"></span>)
                     </span>
                 </h3>
                 <div class="selected-color-indicator">
@@ -238,6 +238,15 @@ class UniversalPricingGrid {
             }
         });
 
+        // Listen for product colors ready event (initial load)
+        window.addEventListener('productColorsReady', (event) => {
+            console.log('[UniversalPricingGrid] Product colors ready event received');
+            if (event.detail && event.detail.selectedColor && this.config.showColorIndicator) {
+                const colorData = event.detail.selectedColor;
+                this.updateSelectedColor(colorData.COLOR_NAME, colorData);
+            }
+        });
+
         // Setup mini color swatch click handler
         if (this.elements.colorSwatch) {
             this.elements.colorSwatch.addEventListener('click', () => {
@@ -250,12 +259,11 @@ class UniversalPricingGrid {
         setTimeout(() => {
             // Try multiple sources for initial color
             const colorName = window.selectedColorName || 
-                            (this.state.pricingData && this.state.pricingData.color) ||
-                            'Athletic Hthr'; // Default from logs
+                            (this.state.pricingData && this.state.pricingData.color);
                             
             if (colorName && this.config.showColorIndicator) {
                 console.log('[UniversalPricingGrid] Initializing color from global state:', colorName);
-                const colorData = {
+                const colorData = window.selectedColorData || {
                     COLOR_NAME: colorName,
                     HEX_CODE: window.selectedColorHex || null,
                     COLOR_SQUARE_IMAGE: window.selectedColorImage || window.selectedColorSquareImage || null
@@ -376,8 +384,20 @@ class UniversalPricingGrid {
             this.updateSelectedColor(data.color, colorData);
         }
 
+        // Update location indicator if we have location data
+        if (data.selectedLocationValue) {
+            console.log('[UniversalPricingGrid] Updating location indicator:', data.selectedLocationValue);
+            this.updateLocationIndicator(data.selectedLocationValue);
+        }
+
         // Hide loading and show table
         this.hideLoading();
+        
+        // Highlight the active tier based on current quantity (default 24)
+        setTimeout(() => {
+            const currentQuantity = window.DTGPricingV4?.getState?.()?.quantity || 24;
+            this.highlightActiveTier(currentQuantity);
+        }, 100);
     }
 
     buildPricingTable() {
@@ -856,38 +876,80 @@ class UniversalPricingGrid {
         return '#CCCCCC'; // Default gray
     }
 
+    updateLocationIndicator(locationCode) {
+        // DTG location names mapping
+        const locationNames = {
+            'LC': 'Left Chest Only',
+            'FF': 'Full Front Only',
+            'FB': 'Full Back Only',
+            'JF': 'Jumbo Front Only',
+            'JB': 'Jumbo Back Only',
+            'LC_FB': 'Left Chest + Full Back',
+            'FF_FB': 'Full Front + Full Back',
+            'JF_JB': 'Jumbo Front + Back',
+            'LC_JB': 'Left Chest + Jumbo Back'
+        };
+
+        const locationIndicator = document.getElementById(`${this.config.containerId}-location-indicator`);
+        const locationNameEl = locationIndicator ? locationIndicator.querySelector('.location-name') : null;
+
+        if (locationIndicator && locationNameEl) {
+            const locationName = locationNames[locationCode] || locationCode;
+            locationNameEl.textContent = locationName;
+            locationIndicator.style.display = 'inline';
+            console.log('[UniversalPricingGrid] Location indicator updated to:', locationName);
+        }
+    }
+
     highlightActiveTier(quantity) {
-        if (!this.state.pricingData || !this.elements.tbody) return;
+        if (!this.state.pricingData) return;
         
         const { tierData } = this.state.pricingData;
         
-        // Remove previous highlights
-        this.elements.tbody.querySelectorAll('tr.current-pricing-level-highlight').forEach(row => {
-            row.classList.remove('current-pricing-level-highlight');
+        // Remove previous highlights from all tables
+        const allTables = document.querySelectorAll(`#${this.config.containerId}-table, #${this.config.containerId}-extended-tbody`);
+        allTables.forEach(table => {
+            const tbody = table.tagName === 'TABLE' ? table.querySelector('tbody') : table;
+            if (tbody) {
+                tbody.querySelectorAll('tr.active-tier, tr.current-pricing-level-highlight').forEach(row => {
+                    row.classList.remove('active-tier', 'current-pricing-level-highlight');
+                });
+            }
         });
         
-        // Find and highlight the current tier
+        // Find the current tier
+        let currentTierLabel = null;
         const tierKeys = Object.keys(tierData || {});
         for (const tierKey of tierKeys) {
             const tier = tierData[tierKey];
             if (quantity >= tier.MinQuantity && (!tier.MaxQuantity || quantity <= tier.MaxQuantity)) {
-                // Find the row with this tier
-                const rows = this.elements.tbody.querySelectorAll('tr');
-                rows.forEach(row => {
-                    const firstCell = row.querySelector('td:first-child');
-                    if (firstCell) {
-                        const cellText = firstCell.textContent.trim();
-                        const tierLabel = tier.MaxQuantity ? 
-                            `${tier.MinQuantity}-${tier.MaxQuantity}` : 
-                            `${tier.MinQuantity}+`;
-                        
-                        if (cellText === tierLabel) {
-                            row.classList.add('current-pricing-level-highlight');
-                        }
-                    }
-                });
+                // Format tier label to match what's displayed
+                if (tier.MaxQuantity && tier.MaxQuantity > 9999) {
+                    currentTierLabel = `${tier.MinQuantity}+`;
+                } else if (tier.MaxQuantity) {
+                    currentTierLabel = `${tier.MinQuantity}-${tier.MaxQuantity}`;
+                } else {
+                    currentTierLabel = `${tier.MinQuantity}+`;
+                }
                 break;
             }
+        }
+        
+        // Highlight the matching rows in all tables
+        if (currentTierLabel) {
+            allTables.forEach(table => {
+                const tbody = table.tagName === 'TABLE' ? table.querySelector('tbody') : table;
+                if (tbody) {
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        const firstCell = row.querySelector('td:first-child');
+                        if (firstCell && firstCell.textContent.trim() === currentTierLabel) {
+                            row.classList.add('active-tier');
+                        }
+                    });
+                }
+            });
+            console.log('[UniversalPricingGrid] Highlighted tier:', currentTierLabel, 'for quantity:', quantity);
         }
     }
 }
