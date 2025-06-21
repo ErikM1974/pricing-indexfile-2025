@@ -207,81 +207,36 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version.");
             console.log('[ADAPTER:DTG] Added missing tiers to ensure complete tier structure');
         }
         
-        // Group sizes as requested: S-XL, 2XL, 3XL, 4XL+
-        const standardDTGGroups = ['S-XL', '2XL', '3XL', '4XL+'];
-        const groupedHeaders = [...standardDTGGroups]; // Always include all standard groups
-        const groupedPrices = {};
-        const sizeMapping = {
-            'S': 'S-XL',
-            'M': 'S-XL',
-            'L': 'S-XL',
-            'XL': 'S-XL',
-            '2XL': '2XL',
-            '3XL': '3XL',
-            '4XL': '4XL+',
-            '5XL': '4XL+',
-            '6XL': '4XL+'
-        };
+        // Use individual sizes for the pricing table (no grouping)
+        const individualHeaders = masterBundle.uniqueSizes || ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+        const individualPrices = {};
         
-        // Log the standard groups being used
-        console.log('[ADAPTER:DTG] Using standard DTG size groups:', groupedHeaders);
+        // Log the sizes being used
+        console.log('[ADAPTER:DTG] Using individual sizes for pricing table:', individualHeaders);
         
-        // Group prices - use the highest price within each group
-        groupedHeaders.forEach(group => {
-            groupedPrices[group] = {};
+        // Get prices for each individual size
+        individualHeaders.forEach(size => {
+            individualPrices[size] = {};
             Object.keys(ensuredTierData).forEach(tierKey => {
-                let maxPrice = 0;
-                let foundPrice = false;
-                
-                if (group === 'S-XL') {
-                    // For S-XL group, check S, M, L, XL
-                    ['S', 'M', 'L', 'XL'].forEach(size => {
-                        if (locationPriceProfile[size] && locationPriceProfile[size][tierKey] !== undefined) {
-                            const price = parseFloat(locationPriceProfile[size][tierKey]);
-                            if (!isNaN(price) && price > maxPrice) {
-                                maxPrice = price;
-                                foundPrice = true;
-                            }
-                        }
-                    });
-                } else if (group === '4XL+') {
-                    // For 4XL+ group, check 4XL, 5XL, 6XL
-                    ['4XL', '5XL', '6XL'].forEach(size => {
-                        if (locationPriceProfile[size] && locationPriceProfile[size][tierKey] !== undefined) {
-                            const price = parseFloat(locationPriceProfile[size][tierKey]);
-                            if (!isNaN(price) && price > maxPrice) {
-                                maxPrice = price;
-                                foundPrice = true;
-                            }
-                        }
-                    });
+                if (locationPriceProfile[size] && locationPriceProfile[size][tierKey] !== undefined) {
+                    individualPrices[size][tierKey] = parseFloat(locationPriceProfile[size][tierKey]);
                 } else {
-                    // For individual sizes (2XL, 3XL)
-                    if (locationPriceProfile[group] && locationPriceProfile[group][tierKey] !== undefined) {
-                        const price = parseFloat(locationPriceProfile[group][tierKey]);
-                        if (!isNaN(price)) {
-                            maxPrice = price;
-                            foundPrice = true;
-                        }
-                    }
+                    individualPrices[size][tierKey] = 0;
                 }
-                
-                groupedPrices[group][tierKey] = foundPrice ? maxPrice : 0;
             });
         });
         
-        console.log('[ADAPTER:DTG] Size grouping applied:', {
-            originalHeaders: masterBundle.uniqueSizes,
-            groupedHeaders: groupedHeaders,
-            samplePrices: groupedPrices['24-47'] || {}
+        console.log('[ADAPTER:DTG] Individual size pricing prepared:', {
+            headers: individualHeaders,
+            samplePrices: individualPrices['S'] || {}
         });
         
         const singleLocationDataPayload = {
             styleNumber: masterBundle.styleNumber,
             color: masterBundle.color,
             embellishmentType: "dtg",
-            headers: groupedHeaders,
-            prices: groupedPrices,
+            headers: individualHeaders,  // Use individual sizes
+            prices: individualPrices,    // Use individual size prices
             tierData: ensuredTierData,
             tiers: ensuredTierData, // Add both for compatibility
             uniqueSizes: masterBundle.uniqueSizes || [], // Keep original for cart functionality
