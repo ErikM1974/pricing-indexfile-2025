@@ -60,26 +60,12 @@
 /* Current tier highlighting */
 .sp-current-tier {
     background-color: #ecfdf5 !important;
-    position: relative;
-}
-
-.sp-current-tier::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background-color: #3a7c52;
+    box-shadow: inset 4px 0 0 #3a7c52;
 }
 
 .sp-current-tier td {
     font-weight: 600;
     color: #047857;
-}
-
-.sp-current-tier td:first-child {
-    padding-left: 20px; /* Compensate for 4px accent bar */
 }
 
 /* Price cells */
