@@ -99,6 +99,10 @@ class ScreenPrintPricing {
             console.error('[ScreenPrintV2] Container not found');
             return;
         }
+        
+        // Diagnostic logging for 6-color issue
+        console.log('[ScreenPrintV2] Color options configuration:', this.config.colorOptions);
+        console.log('[ScreenPrintV2] Number of color options:', this.config.colorOptions.length);
 
         container.innerHTML = `
             <div class="sp-calculator">
@@ -245,6 +249,13 @@ class ScreenPrintPricing {
         this.elements.tiersContent = document.getElementById('sp-tiers-content');
         this.elements.additionalLocationGuideContent = document.getElementById('sp-location-guide');
         // No longer need to cache setupImpactContainer/Display and ltmImpactContainer/Display as separate items for this box
+        
+        // Diagnostic: Check DOM after creation
+        const frontColorOptions = document.querySelectorAll('#sp-front-colors option');
+        console.log('[ScreenPrintV2] Front color options in DOM:', frontColorOptions.length);
+        frontColorOptions.forEach((opt, i) => {
+            console.log(`[ScreenPrintV2] Option ${i}: value="${opt.value}", text="${opt.text}"`);
+        });
     }
 
     bindEvents() {
@@ -940,6 +951,13 @@ class ScreenPrintPricing {
         console.log('[ScreenPrintV2] Received master bundle:', data);
         this.state.masterBundle = data;
         this.state.pricingData = data;
+        
+        // Diagnostic: Check if 6-color pricing exists
+        console.log('[ScreenPrintV2] Available color counts from bundle:', data.availableColorCounts);
+        console.log('[ScreenPrintV2] Has 6-color pricing in finalPrices?', 
+            !!(data.finalPrices?.PrimaryLocation?.["37-72"]?.["6"]));
+        console.log('[ScreenPrintV2] Has 6-color pricing in primaryLocationPricing?', 
+            !!(data.primaryLocationPricing?.["6"]));
         
         if (data.styleNumber) this.state.styleNumber = data.styleNumber;
         if (data.productTitle) this.state.productTitle = data.productTitle;
