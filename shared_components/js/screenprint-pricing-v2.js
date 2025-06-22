@@ -99,10 +99,6 @@ class ScreenPrintPricing {
             console.error('[ScreenPrintV2] Container not found');
             return;
         }
-        
-        // Diagnostic logging for 6-color issue
-        console.log('[ScreenPrintV2] Color options configuration:', this.config.colorOptions);
-        console.log('[ScreenPrintV2] Number of color options:', this.config.colorOptions.length);
 
         container.innerHTML = `
             <div class="sp-calculator">
@@ -482,6 +478,16 @@ class ScreenPrintPricing {
         }
         pricing.colorBreakdown.front = effectiveFrontPrintColors;
 
+        // Cap effective colors at the maximum available in pricing data
+        const maxAvailableColors = Math.max(...Object.keys(pricingData.primaryLocationPricing || {})
+            .filter(key => !isNaN(parseInt(key)))
+            .map(key => parseInt(key)));
+        
+        if (effectiveFrontPrintColors > maxAvailableColors) {
+            console.log(`[ScreenPrintV2] Capping effective colors from ${effectiveFrontPrintColors} to ${maxAvailableColors} (max available in pricing data)`);
+            effectiveFrontPrintColors = maxAvailableColors;
+        }
+
         if (frontColors > 0) {
             const frontPricingData = pricingData.primaryLocationPricing?.[effectiveFrontPrintColors.toString()];
             if (frontPricingData?.tiers) {
@@ -520,6 +526,17 @@ class ScreenPrintPricing {
                     if (isDarkGarment) {
                         effectiveColorsForThisLoc += 1;
                     }
+                    
+                    // Cap effective colors at the maximum available in additional location pricing data
+                    const maxAvailableAddlColors = Math.max(...Object.keys(additionalPricingMaster || {})
+                        .filter(key => !isNaN(parseInt(key)))
+                        .map(key => parseInt(key)));
+                    
+                    if (effectiveColorsForThisLoc > maxAvailableAddlColors) {
+                        console.log(`[ScreenPrintV2] Capping additional location effective colors from ${effectiveColorsForThisLoc} to ${maxAvailableAddlColors} (max available in pricing data)`);
+                        effectiveColorsForThisLoc = maxAvailableAddlColors;
+                    }
+                    
                     const locPricingData = additionalPricingMaster[effectiveColorsForThisLoc.toString()];
                     if (locPricingData?.tiers) {
                         const tier = locPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
