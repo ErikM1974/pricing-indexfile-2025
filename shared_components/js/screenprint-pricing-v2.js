@@ -780,50 +780,89 @@ class ScreenPrintPricing {
             return;
         }
 
-        let html = '<table class="sp-tiers-table"><thead><tr><th>Quantity</th>';
+        // Calculate effective colors for current selection
+        let effectiveFrontColors = this.state.frontColors;
+        if (this.state.isDarkGarment && this.state.frontColors > 0) {
+            effectiveFrontColors += 1;
+        }
         
-        const firstColorPricing = this.state.pricingData.primaryLocationPricing['1'];
-        if (!firstColorPricing?.tiers?.[0]?.prices) {
-            this.elements.tiersContent.innerHTML = '<p>Pricing tiers not available (No base data for 1-color front).</p>';
+        // Cap effective colors at maximum available
+        const maxAvailableColors = Math.max(...Object.keys(this.state.pricingData.primaryLocationPricing || {})
+            .filter(key => !isNaN(parseInt(key)))
+            .map(key => parseInt(key)));
+        
+        if (effectiveFrontColors > maxAvailableColors) {
+            effectiveFrontColors = maxAvailableColors;
+        }
+
+        // Get pricing data for current color selection
+        const selectedColorPricing = this.state.pricingData.primaryLocationPricing[effectiveFrontColors.toString()];
+        if (!selectedColorPricing?.tiers?.[0]?.prices) {
+            this.elements.tiersContent.innerHTML = '<p>Pricing tiers not available for selected options.</p>';
             return;
         }
 
-        const sizes = Object.keys(firstColorPricing.tiers[0].prices);
+        // Wrap table in responsive wrapper
+        let html = '<div class="sp-tiers-table-wrapper">';
+        html += '<table class="sp-tiers-table"><thead><tr><th>Quantity Range</th>';
+        
+        const sizes = Object.keys(selectedColorPricing.tiers[0].prices);
         sizes.forEach(size => {
             html += `<th>${size}</th>`;
         });
-        html += '<th>Savings</th></tr></thead><tbody>';
+        html += '</tr></thead><tbody>';
 
-        let basePriceForSavings = null;
-        firstColorPricing.tiers.forEach((tier, index) => {
+        selectedColorPricing.tiers.forEach((tier, index) => {
             const isCurrentTier = this.state.quantity >= tier.minQty && 
                                   (!tier.maxQty || this.state.quantity <= tier.maxQty);
             
             html += `<tr class="${isCurrentTier ? 'sp-current-tier' : ''}">`;
-            html += `<td class="sp-tier-range">${tier.minQty}-${tier.maxQty || 'Max'}</td>`;
+            html += `<td class="sp-tier-range">${tier.minQty}${tier.maxQty ? '-' + tier.maxQty : '+'}</td>`;
             
-            let firstPriceInTier = null;
             sizes.forEach(size => {
                 const price = tier.prices[size];
-                if (price !== null && price !== undefined && !firstPriceInTier) firstPriceInTier = parseFloat(price);
                 html += `<td>${(price !== null && price !== undefined) ? `$${parseFloat(price).toFixed(2)}` : '-'}</td>`;
             });
-            
-            if (index === 0) {
-                basePriceForSavings = firstPriceInTier;
-                html += '<td>-</td>';
-            } else if (basePriceForSavings && firstPriceInTier !== null) {
-                const savings = ((basePriceForSavings - firstPriceInTier) / basePriceForSavings * 100);
-                html += `<td class="sp-savings">${savings > 0 ? savings.toFixed(0) + '% off' : '-'}</td>`;
-            } else {
-                html += '<td>-</td>';
-            }
             
             html += '</tr>';
         });
 
         html += '</tbody></table>';
-        html += '<p class="sp-tiers-note">Prices shown are per shirt for garment + 1 color front print.</p>';
+        html += '</div>'; // Close wrapper
+        
+        // Dynamic note based on current selection
+        let noteText = '';
+        if (this.state.frontColors === 0) {
+            noteText = 'Prices shown are per shirt for garment only (no printing).';
+        } else {
+            const colorText = this.state.frontColors === 1 ? '1 color' : `${this.state.frontColors} colors`;
+            const underbaseNote = (this.state.isDarkGarment && this.state.frontColors > 0) ? ' (includes white underbase)' : '';
+            noteText = `Prices shown are per shirt for garment + ${colorText} front print${underbaseNote}.`;
+        }
+        html += `<p class="sp-tiers-note">${noteText}</p>`;
+        
+        // Add mobile card view for small screens
+        html += '<div class="sp-tiers-table-mobile" style="display: none;">';
+        selectedColorPricing.tiers.forEach((tier) => {
+            const isCurrentTier = this.state.quantity >= tier.minQty && 
+                                  (!tier.maxQty || this.state.quantity <= tier.maxQty);
+            
+            html += `<div class="sp-tier-card ${isCurrentTier ? 'sp-current-tier-card' : ''}">`;
+            html += `<div class="sp-tier-card-header">${tier.minQty}${tier.maxQty ? '-' + tier.maxQty : '+'} items</div>`;
+            
+            sizes.forEach(size => {
+                const price = tier.prices[size];
+                if (price !== null && price !== undefined) {
+                    html += `<div class="sp-tier-size-row">`;
+                    html += `<span class="sp-tier-size-label">Size ${size}:</span>`;
+                    html += `<span class="sp-tier-size-price">$${parseFloat(price).toFixed(2)}</span>`;
+                    html += `</div>`;
+                }
+            });
+            
+            html += '</div>';
+        });
+        html += '</div>';
         
         this.elements.tiersContent.innerHTML = html;
     }
@@ -919,28 +958,33 @@ class ScreenPrintPricing {
         }
 
         let html = `
-            <p>The table below shows the <strong>per-piece cost</strong> for adding a print to an additional location (includes underbase cost if dark garment selected). Setup fees also apply per color, per location.</p>
-            <table class="sp-tiers-table">
-                <thead>
-                    <tr>
-                        <th>Quantity Tier</th>
-                        <th>1 Eff.Color</th>
-                        <th>2 Eff.Colors</th>
-                        <th>3 Eff.Colors</th>
-                        <th>4 Eff.Colors</th>
-                        <th>5 Eff.Colors</th>
-                        <th>6 Eff.Colors</th>
-                        <th>7 Eff.Colors</th> 
-                    </tr>
-                </thead>
-                <tbody>
+            <div class="sp-location-guide-header">
+                <p>The table below shows the <strong>per-piece cost</strong> for adding a print to an additional location (includes underbase cost if dark garment selected). Setup fees also apply per color, per location.</p>
+            </div>
+            <div class="sp-tiers-table-wrapper">
+                <table class="sp-tiers-table">
+                    <thead>
+                        <tr>
+                            <th>Quantity Range</th>
+                            <th>1 Color</th>
+                            <th>2 Colors</th>
+                            <th>3 Colors</th>
+                            <th>4 Colors</th>
+                            <th>5 Colors</th>
+                            <th>6 Colors</th>
+                        </tr>
+                    </thead>
+                    <tbody>
         `;
 
         tierLabels.forEach(tierLabel => {
             html += `<tr><td class="sp-tier-range">${tierLabel}</td>`;
-            for (let i = 1; i <= 7; i++) { // Iterate up to 7 for 6 colors + underbase
+            for (let i = 1; i <= 6; i++) { // Show up to 6 colors
                 let pricePerPiece = '-';
-                const colorData = additionalPricing[i.toString()];
+                // Check for pricing with underbase if needed
+                const maxColors = 6;
+                const effectiveColors = Math.min(i + (this.state.isDarkGarment ? 1 : 0), maxColors);
+                const colorData = additionalPricing[effectiveColors.toString()];
                 if (colorData && colorData.tiers) {
                     const tierInfo = colorData.tiers.find(t => t.label === tierLabel);
                     if (tierInfo && tierInfo.pricePerPiece !== null && tierInfo.pricePerPiece !== undefined) {
@@ -953,9 +997,10 @@ class ScreenPrintPricing {
         });
 
         html += `
-                </tbody>
-            </table>
-            <p class="sp-tiers-note">"Eff.Color" means effective colors, including a white underbase for dark garments if applicable. Setup fee per effective color, per additional location: $${this.config.setupFeePerColor.toFixed(2)}.</p>
+                    </tbody>
+                </table>
+            </div>
+            <p class="sp-tiers-note">Prices include white underbase for dark garments if applicable. Setup fee per color, per additional location: $${this.config.setupFeePerColor.toFixed(2)}.</p>
         `;
         this.elements.additionalLocationGuideContent.innerHTML = html;
     }

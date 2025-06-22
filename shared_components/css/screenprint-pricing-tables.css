@@ -1,0 +1,259 @@
+/**
+ * Screen Print Pricing Tables - Modern Styling
+ * Clean, professional table design with improved readability
+ */
+
+/* Pricing Tiers Table Styling */
+.sp-tiers-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 16px;
+}
+
+.sp-tiers-table th,
+.sp-tiers-table td {
+    padding: 14px 16px;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.95em;
+}
+
+.sp-tiers-table th {
+    background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.sp-tiers-table th:first-child {
+    text-align: left;
+}
+
+.sp-tiers-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.sp-tiers-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.sp-tiers-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Tier range column */
+.sp-tier-range {
+    text-align: left !important;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+}
+
+/* Current tier highlighting */
+.sp-current-tier {
+    background-color: #ecfdf5 !important;
+    position: relative;
+}
+
+.sp-current-tier::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: #3a7c52;
+}
+
+.sp-current-tier td {
+    font-weight: 600;
+    color: #047857;
+}
+
+/* Price cells */
+.sp-tiers-table td:not(.sp-tier-range) {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    color: #111827;
+}
+
+/* Pricing note */
+.sp-tiers-note {
+    font-size: 0.875em;
+    color: #6b7280;
+    text-align: center;
+    margin-top: 12px;
+    font-style: normal;
+    background-color: #f9fafb;
+    padding: 12px 16px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+/* Additional Location Pricing Table */
+.sp-location-guide-header {
+    margin-bottom: 16px;
+    padding: 16px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.sp-location-guide-header p {
+    margin: 0;
+    color: #374151;
+    line-height: 1.6;
+}
+
+.sp-location-guide-header strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sp-tiers-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -16px;
+        padding: 0 16px;
+    }
+    
+    .sp-tiers-table {
+        min-width: 600px;
+        font-size: 0.875em;
+    }
+    
+    .sp-tiers-table th,
+    .sp-tiers-table td {
+        padding: 10px 8px;
+    }
+    
+    .sp-tiers-note {
+        font-size: 0.813em;
+        padding: 10px 12px;
+    }
+}
+
+/* Mobile card view for very small screens */
+@media (max-width: 480px) {
+    .sp-tiers-table-mobile {
+        display: block;
+    }
+    
+    .sp-tiers-table {
+        display: none;
+    }
+    
+    .sp-tier-card {
+        background: white;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .sp-tier-card.sp-current-tier-card {
+        border-color: #3a7c52;
+        border-width: 2px;
+        background-color: #ecfdf5;
+    }
+    
+    .sp-tier-card-header {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .sp-tier-size-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+    }
+    
+    .sp-tier-size-label {
+        color: #6b7280;
+        font-size: 0.875em;
+    }
+    
+    .sp-tier-size-price {
+        font-weight: 600;
+        color: #111827;
+        font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    }
+}
+
+/* Zebra striping for better readability */
+.sp-tiers-table tbody tr:nth-child(even):not(.sp-current-tier) {
+    background-color: #fafafa;
+}
+
+/* Loading state */
+.sp-tiers-loading {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+}
+
+.sp-tiers-loading::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #3a7c52;
+    border-radius: 50%;
+    animation: sp-spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes sp-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Accordion improvements */
+.sp-accordion-content {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 0;
+    overflow: hidden;
+}
+
+.sp-accordion-content > div {
+    padding: 24px;
+}
+
+/* Size column headers - ensure they're visible */
+.sp-tiers-table th:not(:first-child) {
+    min-width: 70px;
+}
+
+/* Print styles */
+@media print {
+    .sp-tiers-table {
+        box-shadow: none;
+        border: 1px solid #d1d5db;
+    }
+    
+    .sp-current-tier {
+        background-color: #f3f4f6 !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .sp-current-tier::before {
+        display: none;
+    }
+}
