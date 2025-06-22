@@ -78,6 +78,10 @@
     color: #047857;
 }
 
+.sp-current-tier td:first-child {
+    padding-left: 20px; /* Compensate for 4px accent bar */
+}
+
 /* Price cells */
 .sp-tiers-table td:not(.sp-tier-range) {
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
