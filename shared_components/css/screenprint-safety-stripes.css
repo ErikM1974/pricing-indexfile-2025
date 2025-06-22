@@ -1,0 +1,215 @@
+/**
+ * Screen Print Safety Stripes - Safety Orange Theme
+ * High-visibility styling for construction safety stripes option
+ */
+
+/* Safety Stripes Section */
+.sp-safety-stripes-section {
+    background: linear-gradient(135deg, #fff5f0 0%, #ffe8dc 100%);
+    border: 2px solid #ff6b35;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.sp-safety-stripes-section.sp-safety-active {
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.3);
+    border-color: #ff6b35;
+    background: linear-gradient(135deg, #fff0e6 0%, #ffdcc6 100%);
+}
+
+/* Safety Label and Icon */
+.sp-safety-label {
+    color: #ff6b35 !important;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sp-safety-icon {
+    color: #ff6b35;
+    font-size: 1.2em;
+}
+
+/* Safety Info Button */
+.sp-safety-info-btn {
+    background: #ff6b35;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.3s;
+    margin-left: auto;
+}
+
+.sp-safety-info-btn:hover {
+    background: #e55a2b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+}
+
+/* Safety Thumbnail */
+.sp-safety-thumbnail {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Safety Details */
+.sp-safety-details {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.sp-safety-badge {
+    background: #ff6b35;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.sp-safety-cost {
+    color: #d64520;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+/* Safety Checkbox Custom Styling */
+.sp-safety-label input[type="checkbox"] {
+    accent-color: #ff6b35;
+}
+
+.sp-safety-label input[type="checkbox"]:checked {
+    background-color: #ff6b35;
+}
+
+/* Safety Modal */
+.sp-safety-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.3s ease;
+}
+
+.sp-safety-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sp-safety-modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    animation: slideIn 0.3s ease;
+    text-align: center;
+}
+
+.sp-safety-modal-content img {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sp-safety-modal-content h3 {
+    color: #ff6b35;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+}
+
+.sp-safety-modal-content p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.sp-safety-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.sp-safety-modal-close:hover {
+    color: #ff6b35;
+}
+
+/* Safety Row in Order Summary */
+.sp-safety-row {
+    background-color: #fff5f0;
+}
+
+.sp-safety-row td {
+    color: #d64520;
+    font-weight: 500;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sp-safety-stripes-section {
+        padding: 12px;
+    }
+    
+    .sp-safety-info-btn {
+        padding: 6px 10px;
+        font-size: 0.85em;
+    }
+    
+    .sp-safety-thumbnail {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .sp-safety-modal-content {
+        padding: 20px;
+        width: 95%;
+    }
+}

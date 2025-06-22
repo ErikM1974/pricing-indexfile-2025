@@ -44,7 +44,9 @@ class ScreenPrintPricing {
             styleNumber: '',
             productTitle: '',
             pricingData: null,
-            masterBundle: null
+            masterBundle: null,
+            hasSafetyStripes: false,
+            safetyStripeSurcharge: 2.00
         };
 
         // DOM elements cache
@@ -141,6 +143,27 @@ class ScreenPrintPricing {
                                 Dark garment (needs white underbase)
                             </label>
                             <span class="sp-help-text">Adds 1 color per location</span>
+                        </div>
+                        
+                        <!-- Safety Stripes Option -->
+                        <div class="sp-safety-stripes-section">
+                            <div class="sp-control-group" style="display: flex; align-items: center; margin-bottom: 0;">
+                                <label class="sp-checkbox-label sp-safety-label">
+                                    <input type="checkbox" id="sp-safety-stripes">
+                                    <span class="sp-safety-icon">⚠️</span>
+                                    Add Safety Stripes
+                                </label>
+                                <button type="button" class="sp-safety-info-btn" id="sp-safety-info">
+                                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Safety%20Stripes.jpg?ver=1" 
+                                         alt="Safety Stripes Example" 
+                                         class="sp-safety-thumbnail">
+                                    See Example
+                                </button>
+                            </div>
+                            <div class="sp-safety-details" style="display: none;">
+                                <span class="sp-safety-badge">4-COLOR PRINT</span>
+                                <span class="sp-safety-cost">+$2.00 per location</span>
+                            </div>
                         </div>
                     </div>
 
@@ -269,6 +292,17 @@ class ScreenPrintPricing {
         this.elements.darkGarmentCheckbox?.addEventListener('change', (e) => {
             this.updateDarkGarment(e.target.checked);
         });
+        
+        // Safety stripes toggle
+        document.getElementById('sp-safety-stripes')?.addEventListener('change', (e) => {
+            this.updateSafetyStripes(e.target.checked);
+        });
+        
+        // Safety stripes info button
+        document.getElementById('sp-safety-info')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showSafetyStripesModal();
+        });
 
         // Accordion toggles
         document.querySelectorAll('.sp-accordion-trigger').forEach(trigger => {
@@ -337,6 +371,79 @@ class ScreenPrintPricing {
             this.elements.darkGarmentCheckbox.checked = isDark;
         }
         this.updateDisplay();
+    }
+    
+    updateSafetyStripes(enabled) {
+        this.state.hasSafetyStripes = enabled;
+        const section = document.querySelector('.sp-safety-stripes-section');
+        const details = document.querySelector('.sp-safety-details');
+        
+        if (enabled) {
+            section?.classList.add('sp-safety-active');
+            if (details) details.style.display = 'flex';
+            
+            // Ensure minimum 4 colors for front
+            if (this.state.frontColors < 4) {
+                this.elements.frontColorsSelect.value = '4';
+                this.state.frontColors = 4;
+            }
+            
+            // Add back location if not exists
+            const hasBack = this.state.additionalLocations.some(loc => loc.location === 'back');
+            if (!hasBack) {
+                this.addLocation();
+                // Set the new location to back with 4 colors
+                setTimeout(() => {
+                    const lastRow = this.elements.locationsContainer.querySelector('.sp-location-row:last-child');
+                    if (lastRow) {
+                        const locationSelect = lastRow.querySelector('.sp-location-select');
+                        const colorsSelect = lastRow.querySelector('.sp-location-colors');
+                        if (locationSelect) locationSelect.value = 'back';
+                        if (colorsSelect) colorsSelect.value = '4';
+                        this.updateLocations();
+                    }
+                }, 0);
+            }
+        } else {
+            section?.classList.remove('sp-safety-active');
+            if (details) details.style.display = 'none';
+        }
+        
+        this.updateDisplay();
+    }
+    
+    showSafetyStripesModal() {
+        // Create modal if it doesn't exist
+        let modal = document.querySelector('.sp-safety-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.className = 'sp-safety-modal';
+            modal.innerHTML = `
+                <div class="sp-safety-modal-content">
+                    <span class="sp-safety-modal-close">&times;</span>
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Safety%20Stripes.jpg?ver=1" 
+                         alt="Safety Stripes Example">
+                    <h3>Safety Stripes</h3>
+                    <p>High-visibility 4-color reflective stripes for maximum safety. Perfect for construction, 
+                       road work, and industrial applications. Adds $2.00 per location for specialized ink and printing process.</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Add close handler
+            modal.querySelector('.sp-safety-modal-close')?.addEventListener('click', () => {
+                modal.classList.remove('show');
+            });
+            
+            // Close on outside click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        }
+        
+        modal.classList.add('show');
     }
 
     addLocation() {
@@ -555,10 +662,29 @@ class ScreenPrintPricing {
             pricing.ltmFee = tierBasedLtmFee !== null ? tierBasedLtmFee : this.config.ltmFee;
         }
 
+        // Add safety stripes surcharge if enabled
+        let safetyStripesSurcharge = 0;
+        if (this.state.hasSafetyStripes) {
+            // Add surcharge for front if printing
+            if (frontColors > 0) {
+                safetyStripesSurcharge += this.state.safetyStripeSurcharge;
+            }
+            
+            // Add surcharge for each additional location with printing
+            additionalLocations.forEach(loc => {
+                if (loc.colors > 0) {
+                    safetyStripesSurcharge += this.state.safetyStripeSurcharge;
+                }
+            });
+        }
+        
+        // Store safety stripes info
+        pricing.safetyStripesSurcharge = safetyStripesSurcharge;
+        
         // Prices are always pre-calculated in the new format
         if (pricingData.embellishmentType === 'screenprint') {
             // Prices already include garment, print, and margin
-            pricing.totalPerShirtPrintOnlyCost = pricing.basePrice + pricing.additionalCost;
+            pricing.totalPerShirtPrintOnlyCost = pricing.basePrice + pricing.additionalCost + safetyStripesSurcharge;
             pricing.perShirtTotal = pricing.totalPerShirtPrintOnlyCost;
             
             // Setup and LTM are separate one-time fees
@@ -672,9 +798,14 @@ class ScreenPrintPricing {
         
         let garmentLineDisplayed = false;
         if (this.state.frontColors > 0 && pricing.basePrice > 0) {
+            // Calculate base price without safety stripes for display
+            const basePriceWithoutSafety = this.state.hasSafetyStripes ? 
+                pricing.basePrice - this.state.safetyStripeSurcharge : pricing.basePrice;
+            const safetyNote = this.state.hasSafetyStripes ? ' + Safety' : '';
+            
             html += `
                 <tr>
-                    <td>${pricing.quantity} × ${this.state.styleNumber || 'Shirts'} (Front: ${pricing.colorBreakdown.front}c)</td>
+                    <td>${pricing.quantity} × ${this.state.styleNumber || 'Shirts'} (Front: ${pricing.colorBreakdown.front}c${safetyNote})</td>
                     <td>@ $${pricing.basePrice.toFixed(2)} ea</td>
                     <td class="sp-summary-total">$${(pricing.basePrice * pricing.quantity).toFixed(2)}</td>
                 </tr>
@@ -697,9 +828,10 @@ class ScreenPrintPricing {
             pricing.colorBreakdown.locations.forEach(loc => {
                 if (loc.colors > 0) { 
                     const label = this.config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
+                    const safetyNote = this.state.hasSafetyStripes ? ' + Safety' : '';
                     additionalLocationsHtml += `
                         <tr class="sp-summary-indent">
-                            <td>${label} (${loc.totalColors}c)</td>
+                            <td>${label} (${loc.totalColors}c${safetyNote})</td>
                             <td>@ $${loc.costPerPiece.toFixed(2)} ea</td>
                             <td class="sp-summary-total">$${(loc.costPerPiece * pricing.quantity).toFixed(2)}</td>
                         </tr>
