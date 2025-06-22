@@ -654,6 +654,16 @@ class ScreenPrintPricing {
             this.elements.ltmFee.textContent = `$${pricing.ltmFee.toFixed(2)}`;
         }
         this.updateOrderSummary(pricing);
+        
+        // Update pricing tiers if accordion is open
+        if (this.tiersLoaded && document.getElementById('pricing-tiers')?.style.display !== 'none') {
+            this.updatePricingTiers();
+        }
+        
+        // Update additional location guide if open
+        if (this.locationGuideLoaded && document.getElementById('location-pricing')?.style.display !== 'none') {
+            this.updateAdditionalLocationPricingGuide();
+        }
     }
 
     updateSetupBreakdown(pricing) {
