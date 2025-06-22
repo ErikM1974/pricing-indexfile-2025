@@ -948,7 +948,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         const mainColorName = window.selectedColorName || document.getElementById('product-color-context')?.textContent || 'N/A'; 
         
         if (!pricingColorNameEl || !miniColorSwatchEl) { 
-            console.warn("PricingPages: Mini swatch elements not found."); 
+            // Silently return - mini swatches are not used on all pages
             return; 
         } 
         

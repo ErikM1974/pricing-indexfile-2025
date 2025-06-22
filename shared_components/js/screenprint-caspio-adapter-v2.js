@@ -65,14 +65,23 @@ class ScreenPrintCaspioAdapter {
 
         console.log('[CaspioAdapterV2] Processing master bundle. Raw data:', JSON.stringify(data, null, 2));
 
-        // Only accept the new format with separate garmentSellingPrices and printCosts
+        // Check for new format with separate garmentSellingPrices and printCosts
         if (data.garmentSellingPrices && data.printCosts && data.tierData) {
-            console.log('[CaspioAdapterV2] Valid bundle format detected. Transforming data...');
+            console.log('[CaspioAdapterV2] New bundle format detected. Transforming data...');
             data = this.transformBundleData(data);
-        } else {
-            console.error('[CaspioAdapterV2] CRITICAL: Invalid bundle format. Expected format with garmentSellingPrices and printCosts.');
+        } 
+        // Temporary support for old format while Caspio is being updated
+        else if (data.allScreenprintCostsR && data.sizes) {
+            console.warn('[CaspioAdapterV2] WARNING: Old bundle format detected. Please update Caspio to send new format with garmentSellingPrices and printCosts.');
+            console.log('[CaspioAdapterV2] Transforming old format to new format...');
+            data = this.transformOldFormatToNew(data);
+            data = this.transformBundleData(data);
+        }
+        else {
+            console.error('[CaspioAdapterV2] CRITICAL: Invalid bundle format.');
             console.error('[CaspioAdapterV2] Received keys:', Object.keys(data));
-            this.dispatchError('Invalid bundle format - please ensure Caspio is sending the new format with garmentSellingPrices and printCosts');
+            console.error('[CaspioAdapterV2] Expected either new format (garmentSellingPrices + printCosts) or old format (allScreenprintCostsR + sizes)');
+            this.dispatchError('Invalid bundle format - unable to process data');
             return;
         }
 
@@ -86,6 +95,85 @@ class ScreenPrintCaspioAdapter {
 
         // Dispatch success event
         this.dispatchReady(data);
+    }
+
+    transformOldFormatToNew(oldData) {
+        console.log('[CaspioAdapterV2] Converting old format to new format...');
+        
+        // Initialize the new format structure
+        const newFormat = {
+            styleNumber: oldData.styleNumber,
+            colorName: oldData.colorName,
+            embellishmentType: oldData.embellishmentType,
+            timestamp: oldData.timestamp,
+            tierData: oldData.tierData,
+            rulesData: oldData.rulesData,
+            uniqueSizes: oldData.sizes ? oldData.sizes.map(s => s.size) : [],
+            sellingPriceDisplayAddOns: oldData.sellingPriceDisplayAddOns,
+            printLocationMeta: oldData.printLocationMeta,
+            availableColorCounts: [1, 2, 3, 4, 5, 6], // Standard color counts
+            garmentSellingPrices: {},
+            printCosts: {
+                PrimaryLocation: {},
+                AdditionalLocation: {}
+            }
+        };
+        
+        // Get setup fee and flash charge from rules
+        const flashCharge = parseFloat(oldData.rulesData.FlashCharge) || 0.35;
+        
+        // Build garment selling prices and print costs from the raw data
+        oldData.tierData.forEach(tier => {
+            const tierLabel = tier.TierLabel;
+            
+            // Initialize tier objects
+            newFormat.garmentSellingPrices[tierLabel] = {};
+            newFormat.printCosts.PrimaryLocation[tierLabel] = {};
+            newFormat.printCosts.AdditionalLocation[tierLabel] = {};
+            
+            // Calculate garment selling prices for each size
+            oldData.sizes.forEach(sizeData => {
+                const size = sizeData.size;
+                const garmentCost = sizeData.price || 0;
+                const upcharge = oldData.sellingPriceDisplayAddOns[size] || 0;
+                
+                // Apply margin to get selling price
+                const garmentSellingPrice = garmentCost / tier.MarginDenominator;
+                newFormat.garmentSellingPrices[tierLabel][size] = garmentSellingPrice + upcharge;
+            });
+            
+            // Extract print costs for each color count
+            for (let colorCount = 1; colorCount <= 6; colorCount++) {
+                // Find primary location cost
+                const primaryCost = oldData.allScreenprintCostsR.find(c => 
+                    c.CostType === 'PrimaryLocation' && 
+                    c.TierLabel === tierLabel && 
+                    c.ColorCount === colorCount
+                );
+                
+                if (primaryCost) {
+                    // Apply margin and add flash charge for primary location
+                    const printCost = primaryCost.BasePrintCost / tier.MarginDenominator;
+                    newFormat.printCosts.PrimaryLocation[tierLabel][colorCount] = printCost + flashCharge;
+                }
+                
+                // Find additional location cost
+                const additionalCost = oldData.allScreenprintCostsR.find(c => 
+                    c.CostType === 'AdditionalLocation' && 
+                    c.TierLabel === tierLabel && 
+                    c.ColorCount === colorCount
+                );
+                
+                if (additionalCost) {
+                    // Apply margin (no flash charge for additional locations)
+                    const printCost = additionalCost.BasePrintCost / tier.MarginDenominator;
+                    newFormat.printCosts.AdditionalLocation[tierLabel][colorCount] = printCost;
+                }
+            }
+        });
+        
+        console.log('[CaspioAdapterV2] Old format converted to new format:', newFormat);
+        return newFormat;
     }
 
     transformBundleData(rawData) {
