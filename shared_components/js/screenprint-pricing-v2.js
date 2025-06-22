@@ -823,11 +823,17 @@ class ScreenPrintPricing {
         html += '</tr></thead><tbody>';
 
         selectedColorPricing.tiers.forEach((tier, index) => {
+            // Adjust display for first tier if it starts below 24
+            let displayMinQty = tier.minQty;
+            if (tier.minQty < 24 && tier.maxQty >= 24) {
+                displayMinQty = 24; // Change to 24 for display only
+            }
+            
             const isCurrentTier = this.state.quantity >= tier.minQty && 
                                   (!tier.maxQty || this.state.quantity <= tier.maxQty);
             
             html += `<tr class="${isCurrentTier ? 'sp-current-tier' : ''}">`;
-            html += `<td class="sp-tier-range">${tier.minQty}${tier.maxQty ? '-' + tier.maxQty : '+'}</td>`;
+            html += `<td class="sp-tier-range">${displayMinQty}${tier.maxQty ? '-' + tier.maxQty : '+'}</td>`;
             
             sizes.forEach(size => {
                 const price = tier.prices[size];
@@ -850,6 +856,7 @@ class ScreenPrintPricing {
             noteText = `Prices shown are per shirt for garment + ${colorText} front print${underbaseNote}.`;
         }
         html += `<p class="sp-tiers-note">${noteText}</p>`;
+        html += '<p class="sp-tiers-note" style="margin-top: 8px;">Minimum order quantity: 24 pieces</p>';
         
         // Add mobile card view for small screens
         html += '<div class="sp-tiers-table-mobile" style="display: none;">';
@@ -988,7 +995,18 @@ class ScreenPrintPricing {
         `;
 
         tierLabels.forEach(tierLabel => {
-            html += `<tr><td class="sp-tier-range">${tierLabel}</td>`;
+            // Parse and adjust tier label if needed for minimum 24
+            let displayLabel = tierLabel;
+            const match = tierLabel.match(/(\d+)-(\d+)/);
+            if (match) {
+                const min = parseInt(match[1]);
+                const max = parseInt(match[2]);
+                if (min < 24 && max >= 24) {
+                    displayLabel = `24-${max}`;
+                }
+            }
+            
+            html += `<tr><td class="sp-tier-range">${displayLabel}</td>`;
             for (let i = 1; i <= 6; i++) { // Show up to 6 colors
                 let pricePerPiece = '-';
                 // Check for pricing with underbase if needed
@@ -1011,6 +1029,7 @@ class ScreenPrintPricing {
                 </table>
             </div>
             <p class="sp-tiers-note">Prices include white underbase for dark garments if applicable. Setup fee per color, per additional location: $${this.config.setupFeePerColor.toFixed(2)}.</p>
+            <p class="sp-tiers-note" style="margin-top: 8px;">Minimum order quantity: 24 pieces</p>
         `;
         this.elements.additionalLocationGuideContent.innerHTML = html;
     }
