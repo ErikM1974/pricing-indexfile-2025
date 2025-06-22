@@ -65,14 +65,19 @@ class ScreenPrintCaspioAdapter {
 
         console.log('[CaspioAdapterV2] Processing master bundle. Raw data:', JSON.stringify(data, null, 2));
 
-        // Check for new format with separate garmentSellingPrices and printCosts
-        if (data.garmentSellingPrices && data.printCosts && data.tierData) {
-            console.log('[CaspioAdapterV2] New bundle format detected. Transforming data...');
+        // Check for newest format with finalPrices (pre-calculated, rounded prices)
+        if (data.finalPrices && data.tierData) {
+            console.log('[CaspioAdapterV2] Latest bundle format with finalPrices detected. Using pre-calculated prices...');
+            data = this.transformBundleData(data);
+        }
+        // Check for intermediate format with separate garmentSellingPrices and printCosts
+        else if (data.garmentSellingPrices && data.printCosts && data.tierData) {
+            console.log('[CaspioAdapterV2] Bundle format with garmentSellingPrices detected. Transforming data...');
             data = this.transformBundleData(data);
         } 
         // Temporary support for old format while Caspio is being updated
         else if (data.allScreenprintCostsR && data.sizes) {
-            console.warn('[CaspioAdapterV2] WARNING: Old bundle format detected. Please update Caspio to send new format with garmentSellingPrices and printCosts.');
+            console.warn('[CaspioAdapterV2] WARNING: Old bundle format detected. Please update Caspio to send new format with finalPrices.');
             console.log('[CaspioAdapterV2] Transforming old format to new format...');
             data = this.transformOldFormatToNew(data);
             data = this.transformBundleData(data);
@@ -193,9 +198,10 @@ class ScreenPrintCaspioAdapter {
             printLocationMeta: rawData.printLocationMeta,
             availableColorCounts: rawData.availableColorCounts,
             
-            // Keep new structure data
+            // Keep pricing data
             garmentSellingPrices: rawData.garmentSellingPrices,
             printCosts: rawData.printCosts,
+            finalPrices: rawData.finalPrices, // Add finalPrices if available
             
             // Transform pricing structure
             primaryLocationPricing: {},
@@ -206,8 +212,42 @@ class ScreenPrintCaspioAdapter {
         const setupFee = parseFloat(rawData.rulesData.SetupFeePerColor) || 30;
         const flashCharge = parseFloat(rawData.rulesData.FlashCharge) || 0.35;
         
-        // Process primary location pricing
-        if (rawData.printCosts.PrimaryLocation) {
+        // Check if we have finalPrices (newest format with pre-calculated, rounded prices)
+        if (rawData.finalPrices && rawData.finalPrices.PrimaryLocation) {
+            console.log('[CaspioAdapterV2] Using finalPrices for pricing data (pre-calculated, rounded)');
+            
+            // Process primary location pricing from finalPrices
+            Object.keys(rawData.finalPrices.PrimaryLocation).forEach(tierLabel => {
+                const tierPrices = rawData.finalPrices.PrimaryLocation[tierLabel];
+                const tierData = rawData.tierData.find(t => t.TierLabel === tierLabel);
+                
+                if (tierData && tierPrices) {
+                    // Process each color count for this tier
+                    Object.keys(tierPrices).forEach(colorCount => {
+                        if (!transformed.primaryLocationPricing[colorCount]) {
+                            transformed.primaryLocationPricing[colorCount] = {
+                                tiers: [],
+                                setupFee: setupFee,
+                                flashCharge: colorCount === "0" ? 0 : flashCharge
+                            };
+                        }
+                        
+                        transformed.primaryLocationPricing[colorCount].tiers.push({
+                            label: tierLabel,
+                            minQty: tierData.MinQuantity,
+                            maxQty: tierData.MaxQuantity,
+                            prices: tierPrices[colorCount], // Direct use of finalPrices
+                            ltmFee: tierData.LTM_Fee || 0,
+                            marginDenominator: tierData.MarginDenominator
+                        });
+                    });
+                }
+            });
+        }
+        // Fall back to calculating from printCosts if no finalPrices
+        else if (rawData.printCosts && rawData.printCosts.PrimaryLocation) {
+            console.log('[CaspioAdapterV2] Using printCosts + garmentSellingPrices (calculating prices)');
+            
             rawData.availableColorCounts.forEach(colorCount => {
                 transformed.primaryLocationPricing[colorCount.toString()] = {
                     tiers: [],
@@ -240,31 +280,76 @@ class ScreenPrintCaspioAdapter {
             });
         }
         
-        // Add garment-only pricing (0 colors)
-        transformed.primaryLocationPricing["0"] = {
-            tiers: [],
-            setupFee: 0,
-            flashCharge: 0
-        };
-        
-        rawData.tierData.forEach(tier => {
-            const tierLabel = tier.TierLabel;
-            const garmentPrices = rawData.garmentSellingPrices[tierLabel];
+        // Handle garment-only pricing (0 colors) - only needed if not in finalPrices
+        if (!rawData.finalPrices || !rawData.finalPrices.PrimaryLocation || !rawData.finalPrices.PrimaryLocation[rawData.tierData[0].TierLabel]["0"]) {
+            transformed.primaryLocationPricing["0"] = {
+                tiers: [],
+                setupFee: 0,
+                flashCharge: 0
+            };
             
-            if (garmentPrices) {
-                transformed.primaryLocationPricing["0"].tiers.push({
-                    label: tierLabel,
-                    minQty: tier.MinQuantity,
-                    maxQty: tier.MaxQuantity,
-                    prices: garmentPrices,
-                    ltmFee: tier.LTM_Fee || 0,
-                    marginDenominator: tier.MarginDenominator
-                });
-            }
-        });
+            rawData.tierData.forEach(tier => {
+                const tierLabel = tier.TierLabel;
+                const garmentPrices = rawData.garmentSellingPrices ? rawData.garmentSellingPrices[tierLabel] : null;
+                
+                if (garmentPrices) {
+                    transformed.primaryLocationPricing["0"].tiers.push({
+                        label: tierLabel,
+                        minQty: tier.MinQuantity,
+                        maxQty: tier.MaxQuantity,
+                        prices: garmentPrices,
+                        ltmFee: tier.LTM_Fee || 0,
+                        marginDenominator: tier.MarginDenominator
+                    });
+                }
+            });
+        }
         
         // Process additional location pricing
-        if (rawData.printCosts.AdditionalLocation) {
+        if (rawData.finalPrices && rawData.finalPrices.AdditionalLocation) {
+            console.log('[CaspioAdapterV2] Using finalPrices for additional location pricing');
+            
+            // Process additional location pricing from finalPrices
+            Object.keys(rawData.finalPrices.AdditionalLocation).forEach(tierLabel => {
+                const tierPrices = rawData.finalPrices.AdditionalLocation[tierLabel];
+                const tierData = rawData.tierData.find(t => t.TierLabel === tierLabel);
+                
+                if (tierData && tierPrices) {
+                    // Process each color count for this tier
+                    Object.keys(tierPrices).forEach(colorCount => {
+                        if (!transformed.additionalLocationPricing[colorCount]) {
+                            transformed.additionalLocationPricing[colorCount] = {
+                                tiers: [],
+                                setupFee: setupFee,
+                                flashCharge: 0  // No flash charge for additional locations
+                            };
+                        }
+                        
+                        // For each size in this color count
+                        const prices = tierPrices[colorCount];
+                        if (prices && typeof prices === 'object') {
+                            // Calculate average price for pricePerPiece (for backward compatibility)
+                            const priceValues = Object.values(prices).filter(p => typeof p === 'number');
+                            const avgPrice = priceValues.length > 0 ? 
+                                priceValues.reduce((sum, p) => sum + p, 0) / priceValues.length : 0;
+                            
+                            transformed.additionalLocationPricing[colorCount].tiers.push({
+                                label: tierLabel,
+                                minQty: tierData.MinQuantity,
+                                maxQty: tierData.MaxQuantity,
+                                prices: prices, // Full size breakdown
+                                pricePerPiece: avgPrice, // Average for UI display
+                                ltmFee: tierData.LTM_Fee || 0,
+                                marginDenominator: tierData.MarginDenominator
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        else if (rawData.printCosts && rawData.printCosts.AdditionalLocation) {
+            console.log('[CaspioAdapterV2] Using printCosts for additional location pricing');
+            
             rawData.availableColorCounts.forEach(colorCount => {
                 transformed.additionalLocationPricing[colorCount.toString()] = {
                     tiers: [],
