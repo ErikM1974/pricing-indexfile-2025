@@ -6,6 +6,13 @@
 (function() {
     "use strict";
 
+    // Exit early if not on a DTG page
+    const currentPath = window.location.pathname.toLowerCase();
+    if (!currentPath.includes('dtg')) {
+        console.log("DTG-PAGE-SETUP: Not a DTG page, skipping initialization");
+        return;
+    }
+
     console.log("DTG-PAGE-SETUP: Initializing DTG page setup...");
 
     // Configuration

@@ -553,12 +553,26 @@ class ScreenPrintPricing {
             pricing.ltmFee = tierBasedLtmFee !== null ? tierBasedLtmFee : this.config.ltmFee;
         }
 
-        pricing.totalPerShirtPrintOnlyCost = pricing.basePrice + pricing.additionalCost;
-        pricing.subtotal = pricing.totalPerShirtPrintOnlyCost * quantity;
-        pricing.grandTotal = pricing.subtotal + pricing.setupFee + pricing.ltmFee;
-        pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
-        pricing.ltmImpactPerShirt = (pricing.ltmFee > 0 && quantity > 0) ? pricing.ltmFee / quantity : 0;
-        pricing.perShirtTotal = quantity > 0 ? pricing.totalPerShirtPrintOnlyCost + pricing.setupPerShirt + pricing.ltmImpactPerShirt : 0;
+        // Prices are always pre-calculated in the new format
+        if (pricingData.embellishmentType === 'screenprint') {
+            // Prices already include garment, print, and margin
+            pricing.totalPerShirtPrintOnlyCost = pricing.basePrice + pricing.additionalCost;
+            pricing.perShirtTotal = pricing.totalPerShirtPrintOnlyCost;
+            
+            // Setup and LTM are separate one-time fees
+            pricing.subtotal = pricing.totalPerShirtPrintOnlyCost * quantity;
+            pricing.grandTotal = pricing.subtotal + pricing.setupFee + pricing.ltmFee;
+            pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
+            pricing.ltmImpactPerShirt = (pricing.ltmFee > 0 && quantity > 0) ? pricing.ltmFee / quantity : 0;
+        } else {
+            // Legacy calculation where basePrice needs margin applied
+            pricing.totalPerShirtPrintOnlyCost = pricing.basePrice + pricing.additionalCost;
+            pricing.subtotal = pricing.totalPerShirtPrintOnlyCost * quantity;
+            pricing.grandTotal = pricing.subtotal + pricing.setupFee + pricing.ltmFee;
+            pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
+            pricing.ltmImpactPerShirt = (pricing.ltmFee > 0 && quantity > 0) ? pricing.ltmFee / quantity : 0;
+            pricing.perShirtTotal = quantity > 0 ? pricing.totalPerShirtPrintOnlyCost + pricing.setupPerShirt + pricing.ltmImpactPerShirt : 0;
+        }
         
         return pricing;
     }
@@ -627,6 +641,10 @@ class ScreenPrintPricing {
             }
         });
         this.elements.setupBreakdown.innerHTML = html;
+        
+        // Prevent dp5-helper interference
+        window.directFixApplied = true;
+        console.log('[ScreenPrintV2] Set directFixApplied = true to prevent dp5-helper interference');
     }
 
     updateOrderSummary(pricing) {
@@ -854,15 +872,23 @@ class ScreenPrintPricing {
 
     updateAdditionalLocationPricingGuide() {
         if (!this.elements.additionalLocationGuideContent) return;
-        if (!this.state.masterBundle || !this.state.masterBundle.additionalLocationPricing || !this.state.masterBundle.tierData) {
+        if (!this.state.masterBundle || !this.state.masterBundle.additionalLocationPricing || !this.state.masterBundle.tiers) {
             this.elements.additionalLocationGuideContent.innerHTML = '<p>Additional location pricing data not yet available.</p>';
             return;
         }
 
         const additionalPricing = this.state.masterBundle.additionalLocationPricing;
-        const tierLabels = Object.keys(this.state.masterBundle.tierData).sort((a, b) =>
-            this.state.masterBundle.tierData[a].MinQuantity - this.state.masterBundle.tierData[b].MinQuantity
-        );
+        // Handle both array format (new) and object format (legacy)
+        let tierLabels;
+        if (Array.isArray(this.state.masterBundle.tiers)) {
+            tierLabels = this.state.masterBundle.tiers
+                .sort((a, b) => a.MinQuantity - b.MinQuantity)
+                .map(tier => tier.TierLabel);
+        } else {
+            tierLabels = Object.keys(this.state.masterBundle.tierData || this.state.masterBundle.tiers).sort((a, b) =>
+                this.state.masterBundle.tierData[a].MinQuantity - this.state.masterBundle.tierData[b].MinQuantity
+            );
+        }
 
         let html = `
             <p>The table below shows the <strong>per-piece cost</strong> for adding a print to an additional location (includes underbase cost if dark garment selected). Setup fees also apply per color, per location.</p>

@@ -1096,7 +1096,15 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         const appKeys = CASPIO_APP_KEYS[embType] || [];
         const pricingContainer = document.getElementById(pricingContainerId);
 
-        if (!pricingContainer) { console.error(`PricingPages: Pricing container #${pricingContainerId} not found.`); return; }
+        if (!pricingContainer) { 
+            // Screen print has its own pricing system, not using the standard container
+            if (embType === 'screenprint') {
+                console.log(`PricingPages: Screen print uses custom pricing, skipping container check.`);
+                return;
+            }
+            console.error(`PricingPages: Pricing container #${pricingContainerId} not found.`); 
+            return; 
+        }
         if (embType === 'unknown' || (embType !== 'dtf' && appKeys.length === 0)) { console.error(`PricingPages: Unknown page type or no AppKeys for ${embType}.`); displayContactMessage(pricingContainer, embType); return; }
         if (embType === 'dtf') { console.log("PricingPages: Handling DTF page (coming soon)."); displayContactMessage(pricingContainer, embType); initializeFallbackPricingData(embType); return; }
 

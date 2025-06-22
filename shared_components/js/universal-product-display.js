@@ -410,11 +410,15 @@ class UniversalProductDisplay {
             setTimeout(() => {
                 const galleryContainer = document.getElementById('product-image-gallery');
                 if (galleryContainer) {
-                    new UniversalImageGallery('product-image-gallery', {
-                        enableZoom: true,
-                        enableThumbnails: true,
-                        enableLoading: true
-                    });
+                    // Check if gallery is already initialized
+                    if (!galleryContainer.hasAttribute('data-gallery-initialized')) {
+                        new UniversalImageGallery('product-image-gallery', {
+                            enableZoom: true,
+                            enableThumbnails: true,
+                            enableLoading: true
+                        });
+                        galleryContainer.setAttribute('data-gallery-initialized', 'true');
+                    }
                 } else {
                     console.warn('[UniversalProductDisplay] Gallery container not found');
                 }

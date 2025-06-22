@@ -28,11 +28,13 @@ class ScreenPrintCaspioAdapter {
     }
 
     handleMessage(event) {
-        console.log('[CaspioAdapterV2] handleMessage called. Event Origin:', event.origin, 'Event Data:', event.data);
+        // Log ALL messages for debugging
+        console.log('[CaspioAdapterV2] Message received from:', event.origin);
+        console.log('[CaspioAdapterV2] Message data:', event.data);
 
         // Basic check for event data and type
         if (!event.data || typeof event.data !== 'object') {
-            console.warn('[CaspioAdapterV2] Received message with no data or non-object data. Ignoring.');
+            console.log('[CaspioAdapterV2] Non-object message received, ignoring');
             return;
         }
         
@@ -43,9 +45,9 @@ class ScreenPrintCaspioAdapter {
 
         console.log('[CaspioAdapterV2] Received message with type:', event.data.type);
 
-        if (event.data.type === 'caspioScreenPrintMasterBundleReady') {
-            console.log('[CaspioAdapterV2] "caspioScreenPrintMasterBundleReady" message received. Processing bundle...');
-            this.processMasterBundle(event.data.data);
+        if (event.data.type === 'caspioScreenPrintMasterBundleReady' || event.data.type === 'caspioScreenprintMasterBundleReady') {
+            console.log('[CaspioAdapterV2] Master bundle ready message received. Processing bundle...');
+            this.processMasterBundle(event.data.detail || event.data.data);
         } else if (event.data.type === 'caspioPricingError') {
             console.error('[CaspioAdapterV2] "caspioPricingError" message received. Error:', event.data.error);
             this.dispatchError(event.data.error);
@@ -63,26 +65,20 @@ class ScreenPrintCaspioAdapter {
 
         console.log('[CaspioAdapterV2] Processing master bundle. Raw data:', JSON.stringify(data, null, 2));
 
-        // Convert shortened field names from Caspio to full names
-        if (data.sN) {
-            console.log('[CaspioAdapterV2] Shortened field names (sN) detected. Converting to full names.');
-            data.styleNumber = data.sN;
-            data.colorName = data.cN;
-            data.productTitle = data.pT;
-            // Potentially remove old keys if they cause issues, or ensure downstream code handles both
-            // delete data.sN; delete data.cN; delete data.pT;
-            console.log('[CaspioAdapterV2] Converted master bundle:', JSON.stringify(data, null, 2));
+        // Only accept the new format with separate garmentSellingPrices and printCosts
+        if (data.garmentSellingPrices && data.printCosts && data.tierData) {
+            console.log('[CaspioAdapterV2] Valid bundle format detected. Transforming data...');
+            data = this.transformBundleData(data);
         } else {
-            console.log('[CaspioAdapterV2] No shortened field names (sN) detected. Using data as is.');
-        }
-
-        // Validate required fields
-        if (!data.primaryLocationPricing) {
-            console.error('[CaspioAdapterV2] CRITICAL: Missing "primaryLocationPricing" in master bundle. This is essential for pricing.');
-            this.dispatchError('Missing primaryLocationPricing in bundle');
+            console.error('[CaspioAdapterV2] CRITICAL: Invalid bundle format. Expected format with garmentSellingPrices and printCosts.');
+            console.error('[CaspioAdapterV2] Received keys:', Object.keys(data));
+            this.dispatchError('Invalid bundle format - please ensure Caspio is sending the new format with garmentSellingPrices and printCosts');
             return;
         }
-        console.log('[CaspioAdapterV2] "primaryLocationPricing" found in bundle.');
+
+        // Store master bundle globally for debugging
+        window.nwcaScreenPrintMasterBundleData = data;
+        console.log('[CaspioAdapterV2] Stored bundle in window.nwcaScreenPrintMasterBundleData for debugging');
 
         this.masterBundle = data;
         this.isReady = true;
@@ -91,6 +87,125 @@ class ScreenPrintCaspioAdapter {
         // Dispatch success event
         this.dispatchReady(data);
     }
+
+    transformBundleData(rawData) {
+        console.log('[CaspioAdapterV2] Transforming bundle data...');
+        
+        const transformed = {
+            // Keep original data
+            styleNumber: rawData.styleNumber,
+            colorName: rawData.colorName,
+            embellishmentType: rawData.embellishmentType,
+            
+            // Keep metadata
+            tiers: rawData.tierData,
+            rules: rawData.rulesData,
+            uniqueSizes: rawData.uniqueSizes,
+            sellingPriceDisplayAddOns: rawData.sellingPriceDisplayAddOns,
+            printLocationMeta: rawData.printLocationMeta,
+            availableColorCounts: rawData.availableColorCounts,
+            
+            // Keep new structure data
+            garmentSellingPrices: rawData.garmentSellingPrices,
+            printCosts: rawData.printCosts,
+            
+            // Transform pricing structure
+            primaryLocationPricing: {},
+            additionalLocationPricing: {}
+        };
+        
+        // Get setup fee and flash charge from rules
+        const setupFee = parseFloat(rawData.rulesData.SetupFeePerColor) || 30;
+        const flashCharge = parseFloat(rawData.rulesData.FlashCharge) || 0.35;
+        
+        // Process primary location pricing
+        if (rawData.printCosts.PrimaryLocation) {
+            rawData.availableColorCounts.forEach(colorCount => {
+                transformed.primaryLocationPricing[colorCount.toString()] = {
+                    tiers: [],
+                    setupFee: setupFee,
+                    flashCharge: flashCharge
+                };
+                
+                rawData.tierData.forEach(tier => {
+                    const tierLabel = tier.TierLabel;
+                    const printCost = rawData.printCosts.PrimaryLocation[tierLabel];
+                    const garmentPrices = rawData.garmentSellingPrices[tierLabel];
+                    
+                    if (printCost && printCost[colorCount] !== undefined && garmentPrices) {
+                        const prices = {};
+                        Object.keys(garmentPrices).forEach(size => {
+                            // Total price = garment price + print cost
+                            prices[size] = garmentPrices[size] + printCost[colorCount];
+                        });
+                        
+                        transformed.primaryLocationPricing[colorCount.toString()].tiers.push({
+                            label: tierLabel,
+                            minQty: tier.MinQuantity,
+                            maxQty: tier.MaxQuantity,
+                            prices: prices,
+                            ltmFee: tier.LTM_Fee || 0,
+                            marginDenominator: tier.MarginDenominator
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Add garment-only pricing (0 colors)
+        transformed.primaryLocationPricing["0"] = {
+            tiers: [],
+            setupFee: 0,
+            flashCharge: 0
+        };
+        
+        rawData.tierData.forEach(tier => {
+            const tierLabel = tier.TierLabel;
+            const garmentPrices = rawData.garmentSellingPrices[tierLabel];
+            
+            if (garmentPrices) {
+                transformed.primaryLocationPricing["0"].tiers.push({
+                    label: tierLabel,
+                    minQty: tier.MinQuantity,
+                    maxQty: tier.MaxQuantity,
+                    prices: garmentPrices,
+                    ltmFee: tier.LTM_Fee || 0,
+                    marginDenominator: tier.MarginDenominator
+                });
+            }
+        });
+        
+        // Process additional location pricing
+        if (rawData.printCosts.AdditionalLocation) {
+            rawData.availableColorCounts.forEach(colorCount => {
+                transformed.additionalLocationPricing[colorCount.toString()] = {
+                    tiers: [],
+                    setupFee: setupFee,
+                    flashCharge: 0  // No flash charge for additional locations
+                };
+                
+                rawData.tierData.forEach(tier => {
+                    const tierLabel = tier.TierLabel;
+                    const additionalCost = rawData.printCosts.AdditionalLocation[tierLabel];
+                    
+                    if (additionalCost && additionalCost[colorCount] !== undefined) {
+                        transformed.additionalLocationPricing[colorCount.toString()].tiers.push({
+                            label: tierLabel,
+                            minQty: tier.MinQuantity,
+                            maxQty: tier.MaxQuantity,
+                            pricePerPiece: additionalCost[colorCount], // This is the selling price for additional location
+                            ltmFee: tier.LTM_Fee || 0,
+                            marginDenominator: tier.MarginDenominator
+                        });
+                    }
+                });
+            });
+        }
+        
+        console.log('[CaspioAdapterV2] Bundle transformation complete:', transformed);
+        return transformed;
+    }
+
 
     dispatchReady(data) {
         console.log('[CaspioAdapterV2] Dispatching "screenPrintMasterBundleReady" event with data:', data);
