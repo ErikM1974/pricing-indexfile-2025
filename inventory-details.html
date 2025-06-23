@@ -894,7 +894,7 @@
         
         // Navigate to pricing page
         window.navigateToPricing = function(type) {
-            const baseUrl = type === 'cap-embroidery' ? '/cap-embroidery-pricing.html' : `/${type}-pricing.html`;
+            const baseUrl = type === 'cap-embroidery' ? '/cap-embroidery-pricing-integrated.html' : `/${type}-pricing.html`;
             const params = `?StyleNumber=${styleNumber}&COLOR=${encodeURIComponent(selectedColor)}`;
             window.location.href = baseUrl + params;
         };
