@@ -498,6 +498,75 @@ button {
     box-shadow: var(--shadow-sm);
 }
 
+/* Inventory Summary (Compact View) */
+.inventory-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.stock-status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.stock-indicator {
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stock-indicator.high-stock {
+    color: #2d7a2d;
+}
+
+.stock-indicator.medium-stock {
+    color: #2d7a2d;
+}
+
+.stock-indicator.low-stock {
+    color: #d4a017;
+}
+
+.stock-indicator.out-of-stock {
+    color: #dc3545;
+}
+
+.stock-details {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.check-inventory-btn {
+    background: #0078d4;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.check-inventory-btn:hover {
+    background: #106ebe;
+}
+
+.inventory-summary.loading {
+    justify-content: center;
+    color: var(--text-light);
+}
+
+.inventory-summary.error {
+    justify-content: center;
+}
+
 .inventory-header {
     display: flex;
     justify-content: space-between;

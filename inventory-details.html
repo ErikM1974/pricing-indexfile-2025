@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Details - Northwest Custom Apparel</title>
+    <link rel="stylesheet" href="/product/styles/product.css">
+    <style>
+        .inventory-page-header {
+            background: white;
+            border-bottom: 2px solid #2f661e;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .inventory-page-content {
+            display: flex;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .color-selector {
+            flex: 0 0 200px;
+        }
+        
+        .inventory-main {
+            flex: 1;
+        }
+        
+        .color-list {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .color-list h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            color: #2f661e;
+        }
+        
+        .color-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .color-option:hover {
+            background: #f5f5f5;
+        }
+        
+        .color-option.selected {
+            background: #eaf2e9;
+            border: 1px solid #2f661e;
+        }
+        
+        .color-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        @media (max-width: 768px) {
+            .inventory-page-content {
+                flex-direction: column;
+            }
+            
+            .color-selector {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="inventory-page-header">
+        <div class="header-content">
+            <h1 id="product-name">Product Inventory</h1>
+            <a href="#" id="back-to-product" class="back-link">← Back to Product</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="inventory-page-content">
+        <!-- Color Selector -->
+        <aside class="color-selector">
+            <div class="color-list">
+                <h3>Select Color:</h3>
+                <div id="color-options">
+                    <!-- Color options will be populated by JavaScript -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Inventory Display -->
+        <main class="inventory-main">
+            <section class="inventory-section">
+                <div id="inventory-display" class="inventory-container">
+                    <!-- Inventory table will be populated by JavaScript -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <script type="module">
+        import { API } from '/product/services/api.js';
+        import { InventoryDisplay } from '/product/components/inventory.js';
+        
+        // Initialize
+        const api = new API();
+        const inventoryDisplay = new InventoryDisplay(document.getElementById('inventory-display'));
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const styleNumber = urlParams.get('style');
+        const colorCode = urlParams.get('color');
+        
+        // State
+        let productData = null;
+        let selectedColor = colorCode;
+        
+        // Update back link
+        function updateBackLink() {
+            const backLink = document.getElementById('back-to-product');
+            backLink.href = `/product.html?StyleNumber=${styleNumber}&COLOR=${encodeURIComponent(selectedColor)}`;
+        }
+        
+        // Load product data
+        async function loadProduct() {
+            try {
+                showLoading(true);
+                productData = await api.getProduct(styleNumber);
+                
+                if (!productData) {
+                    throw new Error('Product not found');
+                }
+                
+                // Update header
+                document.getElementById('product-name').textContent = `${productData.name} (${styleNumber}) - Inventory`;
+                
+                // Populate color options
+                populateColors(productData.colors);
+                
+                // Load inventory for selected color
+                if (selectedColor) {
+                    await loadInventory(selectedColor);
+                }
+                
+                updateBackLink();
+                
+            } catch (error) {
+                console.error('Failed to load product:', error);
+                showError('Failed to load product data');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Populate color options
+        function populateColors(colors) {
+            const container = document.getElementById('color-options');
+            container.innerHTML = '';
+            
+            colors.forEach(color => {
+                const colorCode = color.catalogColor || color.CATALOG_COLOR;
+                const colorName = color.colorName || color.COLOR_NAME;
+                
+                const option = document.createElement('div');
+                option.className = 'color-option';
+                option.dataset.color = colorCode;
+                
+                if (colorCode === selectedColor) {
+                    option.classList.add('selected');
+                }
+                
+                // Create swatch
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                
+                if (color.COLOR_SQUARE_IMAGE || color.colorSquareImage) {
+                    swatch.style.backgroundImage = `url('${color.COLOR_SQUARE_IMAGE || color.colorSquareImage}')`;
+                    swatch.style.backgroundSize = 'cover';
+                } else if (color.HEX_CODE || color.hexCode) {
+                    swatch.style.backgroundColor = color.HEX_CODE || color.hexCode;
+                }
+                
+                // Create name
+                const name = document.createElement('span');
+                name.textContent = colorName;
+                
+                option.appendChild(swatch);
+                option.appendChild(name);
+                
+                // Click handler
+                option.addEventListener('click', () => {
+                    // Update selection
+                    document.querySelectorAll('.color-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+                    
+                    // Load inventory
+                    selectedColor = colorCode;
+                    loadInventory(colorCode);
+                    updateBackLink();
+                });
+                
+                container.appendChild(option);
+            });
+        }
+        
+        // Load inventory
+        async function loadInventory(colorCode) {
+            try {
+                const inventory = await api.getInventory(styleNumber, colorCode);
+                inventoryDisplay.update(inventory);
+            } catch (error) {
+                console.error('Failed to load inventory:', error);
+                inventoryDisplay.showError('Failed to load inventory');
+            }
+        }
+        
+        // Show/hide loading
+        function showLoading(show) {
+            document.getElementById('loading-overlay').classList.toggle('hidden', !show);
+        }
+        
+        // Show error
+        function showError(message) {
+            const display = document.getElementById('inventory-display');
+            display.innerHTML = `<div class="inventory-error"><p>${message}</p></div>`;
+        }
+        
+        // Initialize on load
+        if (styleNumber) {
+            loadProduct();
+        } else {
+            showError('No product specified');
+        }
+    </script>
+</body>
+</html>
