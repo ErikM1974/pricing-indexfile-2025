@@ -44,6 +44,176 @@
             --nwca-primary: #3a7c52 !important;
         }
         
+        /* Enhanced Header Styles for DTF */
+        body.dtf-pricing-page {
+            padding-top: 180px; /* Space for fixed header */
+        }
+        
+        .enhanced-pricing-header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        /* Top contact bar */
+        .header-contact-bar {
+            background: #2d5f3f;
+            color: white;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+        
+        .contact-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .contact-info {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .contact-item i {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .business-hours {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        /* Main navigation header */
+        .header-nav {
+            padding: 15px 0;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-link {
+            display: inline-block;
+        }
+        
+        .logo-image {
+            height: 40px;
+            width: auto;
+        }
+        
+        /* Pricing Context Bar */
+        .pricing-context-bar {
+            background: #f8f9fa;
+            border-bottom: 2px solid #3a7c52;
+            padding: 15px 0;
+        }
+        
+        .context-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .breadcrumb {
+            font-size: 18px;
+            font-weight: 600;
+            color: #3a7c52;
+        }
+        
+        /* Live Pricing Display */
+        .header-live-pricing {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .header-price-item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        
+        .header-price-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .header-price-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .header-price-value.highlight {
+            color: #3a7c52;
+            font-size: 24px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body.dtf-pricing-page {
+                padding-top: 220px;
+            }
+            
+            .contact-bar-content {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .context-bar-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .header-live-pricing {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        /* Hide universal header since we're using enhanced header */
+        #universal-header-container {
+            display: none !important;
+        }
+        
         /* Force green header styling */
         #universal-header-container .header-main,
         .universal-header,
@@ -156,17 +326,67 @@
         }
     </style>
 </head>
-<body class="universal-theme">
-    <!-- Universal Header -->
-    <universal-header></universal-header>
-    
-    <!-- Page Header -->
-    <div class="page-header">
-        <div class="container">
-            <h1>DTF Transfer Pricing Calculator</h1>
-            <p>Calculate pricing for Direct-to-Film transfers with multiple locations</p>
+<body class="dtf-pricing-page">
+    <!-- Enhanced Pricing Header -->
+    <header class="enhanced-pricing-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:253-872-8790" style="color: white; text-decoration: none;">253-872-8790</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:sales@nwcustomapparel.com" style="color: white; text-decoration: none;">sales@nwcustomapparel.com</a>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
         </div>
-    </div>
+        
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <!-- Logo and Navigation -->
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             class="logo-image">
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pricing Context Bar -->
+        <div class="pricing-context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <span>DTF Pricing Calculator</span>
+                    </div>
+                </div>
+                
+                <!-- Live Pricing -->
+                <div class="header-live-pricing">
+                    <div class="header-price-item">
+                        <span class="header-price-label">Qty:</span>
+                        <span id="header-quantity" class="header-price-value">12</span>
+                    </div>
+                    <div class="header-price-item">
+                        <span class="header-price-label">Per Shirt:</span>
+                        <span id="header-unit-price" class="header-price-value highlight">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
     
     <!-- Main Content Container -->
     <div class="container">

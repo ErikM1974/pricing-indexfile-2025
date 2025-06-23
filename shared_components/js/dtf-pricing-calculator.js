@@ -351,6 +351,23 @@ class DTFPricingCalculator {
         };
     }
 
+    updateHeaderPricing(quantity, unitPrice) {
+        const headerQty = document.getElementById('header-quantity');
+        const headerPrice = document.getElementById('header-unit-price');
+        
+        if (headerQty) {
+            headerQty.textContent = quantity;
+        }
+        
+        if (headerPrice) {
+            if (typeof unitPrice === 'number' && !isNaN(unitPrice) && unitPrice > 0) {
+                headerPrice.textContent = `$${unitPrice.toFixed(2)}`;
+            } else {
+                headerPrice.textContent = '$0.00';
+            }
+        }
+    }
+
     updateSummary() {
         const pricing = this.calculatePricing();
         const summaryContainer = document.getElementById('order-summary-content');
@@ -370,6 +387,8 @@ class DTFPricingCalculator {
                     </div>
                 </div>
             `;
+            // Update header with current quantity but $0.00 price
+            this.updateHeaderPricing(this.currentData.quantity, 0);
             return;
         }
 
@@ -384,6 +403,8 @@ class DTFPricingCalculator {
                     </div>
                 </div>
             `;
+            // Update header with current quantity but $0.00 price
+            this.updateHeaderPricing(this.currentData.quantity, 0);
             return;
         }
 
@@ -486,6 +507,9 @@ class DTFPricingCalculator {
             </div>
         `;
 
+        // Update header pricing
+        this.updateHeaderPricing(pricing.quantity, pricing.totalPerShirt);
+        
         // Dispatch pricing update event
         this.container.dispatchEvent(new CustomEvent('dtfPricingUpdated', {
             detail: pricing,
