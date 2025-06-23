@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Northwest Custom Apparel</title>
+    <link rel="stylesheet" href="/product/styles/product.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Product Details</h1>
+            <a href="/" class="back-link">← Back to Gallery</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Product Search Section -->
+        <section id="product-search" class="search-section">
+            <div class="search-container">
+                <label for="style-search">Search Products:</label>
+                <input 
+                    type="text" 
+                    id="style-search" 
+                    placeholder="Enter style number (e.g., PC61)" 
+                    autocomplete="off"
+                >
+                <div id="search-results" class="search-results hidden"></div>
+            </div>
+        </section>
+
+        <!-- Product Display Section -->
+        <section id="product-display" class="product-section hidden">
+            <!-- Product Info and Gallery -->
+            <div class="product-content">
+                <div id="product-gallery" class="product-gallery">
+                    <!-- Gallery will be populated by JavaScript -->
+                </div>
+                
+                <div id="product-info" class="product-info">
+                    <!-- Product details will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Color Swatches -->
+            <div id="color-swatches" class="color-swatches">
+                <!-- Swatches will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Pricing Options Section -->
+        <section id="pricing-options" class="pricing-section hidden">
+            <h2>Select Embellishment Type</h2>
+            <div class="pricing-cards">
+                <!-- Pricing cards will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Inventory Section -->
+        <section id="inventory-display" class="inventory-section hidden">
+            <h2>Inventory Levels</h2>
+            <div id="inventory-table" class="inventory-container">
+                <!-- Inventory table will be populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="error-message hidden">
+        <p id="error-text"></p>
+        <button onclick="location.reload()">Reload Page</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/product/app.js" type="module"></script>
+</body>
+</html>

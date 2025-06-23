@@ -4,21 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details - Northwest Custom Apparel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/product/styles/product.css">
+    <link rel="stylesheet" href="/product/styles/product-redesign.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="page-header">
-        <div class="header-content">
-            <h1>Product Details</h1>
-            <a href="/" class="back-link">← Back to Gallery</a>
+    <!-- Enhanced Header -->
+    <header class="enhanced-header">
+        <div class="header-top">
+            <div class="header-top-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <div class="header-main">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                         alt="Northwest Custom Apparel">
+                </a>
+                
+                <div class="header-search">
+                    <input type="text" class="search-input" placeholder="Search products by style number or name..." id="header-style-search">
+                    <button class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                
+                <nav class="nav-links">
+                    <a href="/">Home</a>
+                    <a href="/products">Products</a>
+                    <a href="/resources">Resources</a>
+                    <a href="/contact">Contact</a>
+                </nav>
+            </div>
         </div>
     </header>
 
     <!-- Main Container -->
-    <main class="container">
-        <!-- Product Search Section -->
-        <section id="product-search" class="search-section">
+    <main class="main-container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">Home</a> / <a href="/products">Products</a> / <span id="breadcrumb-product">Product</span>
+        </div>
+        <!-- Product Search Section (Hidden - using header search instead) -->
+        <section id="product-search" class="search-section" style="display: none;">
             <div class="search-container">
                 <label for="style-search">Search Products:</label>
                 <input 
@@ -33,33 +76,46 @@
 
         <!-- Product Display Section -->
         <section id="product-display" class="product-section hidden">
-            <!-- Product Info and Gallery -->
-            <div class="product-content">
+            <div class="product-layout">
+                <!-- Left: Thumbnails -->
+                <div id="product-thumbnails" class="product-thumbnails">
+                    <!-- Thumbnails will be populated by JavaScript -->
+                </div>
+                
+                <!-- Center: Main Image -->
                 <div id="product-gallery" class="product-gallery">
                     <!-- Gallery will be populated by JavaScript -->
                 </div>
                 
-                <div id="product-info" class="product-info">
-                    <!-- Product details will be populated by JavaScript -->
+                <!-- Right: Product Info -->
+                <div class="product-info-column">
+                    <div id="product-info" class="product-info">
+                        <!-- Product details will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Color Swatches -->
+                    <div id="color-swatches" class="color-swatches">
+                        <!-- Swatches will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Decoration Method Selector -->
+                    <div id="decoration-selector" class="decoration-selector hidden">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
                 </div>
-            </div>
-
-            <!-- Color Swatches -->
-            <div id="color-swatches" class="color-swatches">
-                <!-- Swatches will be populated by JavaScript -->
             </div>
         </section>
 
-        <!-- Pricing Options Section -->
-        <section id="pricing-options" class="pricing-section hidden">
+        <!-- Pricing Options Section (Hidden - functionality moved to decoration selector) -->
+        <section id="pricing-options" class="pricing-section hidden" style="display: none;">
             <h2>Select Embellishment Type</h2>
             <div class="pricing-cards">
                 <!-- Pricing cards will be populated by JavaScript -->
             </div>
         </section>
 
-        <!-- Inventory Section -->
-        <section id="inventory-display" class="inventory-section hidden">
+        <!-- Inventory Section (Hidden - using summary in product info) -->
+        <section id="inventory-display" class="inventory-section hidden" style="display: none;">
             <h2>Inventory Levels</h2>
             <div id="inventory-table" class="inventory-container">
                 <!-- Inventory table will be populated by JavaScript -->

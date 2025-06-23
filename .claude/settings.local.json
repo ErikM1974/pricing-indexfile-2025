@@ -37,7 +37,8 @@
       "Bash(touch:*)",
       "Bash(sed:*)",
       "Bash(cat:*)",
-      "WebFetch(domain:cdn.caspio.com)"
+      "WebFetch(domain:cdn.caspio.com)",
+      "Bash(npx http-server:*)"
     ],
     "deny": []
   }
