@@ -695,6 +695,9 @@ class ScreenPrintPricing {
         
         this.elements.basePrice.textContent = pricing.perShirtTotal.toFixed(2); 
         this.updateDynamicSubtitle(pricing); // Pass the whole pricing object
+        
+        // Update header pricing
+        this.updateHeaderPricing(this.state.quantity, pricing.perShirtTotal);
 
         const setupImpactContainer = document.getElementById('sp-setup-impact-container');
         const setupImpactDisplay = document.getElementById('sp-setup-impact-display');
@@ -1146,6 +1149,23 @@ class ScreenPrintPricing {
 
     showError(message) {
         alert(message);
+    }
+
+    updateHeaderPricing(quantity, unitPrice) {
+        const headerQty = document.getElementById('header-quantity');
+        const headerPrice = document.getElementById('header-unit-price');
+        
+        if (headerQty) {
+            headerQty.textContent = quantity;
+        }
+        
+        if (headerPrice) {
+            if (typeof unitPrice === 'number' && !isNaN(unitPrice)) {
+                headerPrice.textContent = `$${unitPrice.toFixed(2)}`;
+            } else {
+                headerPrice.textContent = '$0.00';
+            }
+        }
     }
 
     handleMasterBundle(data) {
