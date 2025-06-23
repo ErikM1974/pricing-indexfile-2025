@@ -10,7 +10,7 @@
     <style>
         /* Enhanced Header Styles */
         body {
-            padding-top: 160px; /* Space for fixed header */
+            padding-top: 190px; /* Space for fixed header - contact(35) + nav(80) + context(70) + buffer */
             margin: 0;
         }
         
@@ -35,7 +35,7 @@
         .contact-bar-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -66,7 +66,7 @@
         .nav-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -97,24 +97,24 @@
         /* Context Bar */
         .inventory-context-bar {
             background: #f8f9fa;
-            padding: 15px 0;
+            padding: 20px 0;
             border-bottom: 1px solid #e0e0e0;
         }
         
         .context-bar-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 20px;
+            gap: 30px;
         }
         
         .context-left {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 25px;
             flex: 1;
         }
         
@@ -133,7 +133,7 @@
         /* Navigation Buttons */
         .nav-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
         }
         
@@ -220,7 +220,7 @@
         /* Search Box in Header */
         .header-search {
             position: relative;
-            width: 300px;
+            width: 400px;
         }
         
         .header-search-input {
@@ -311,6 +311,28 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
+        /* Print Button */
+        .print-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #2f661e;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+        
+        .print-btn:hover {
+            background: #1e4d0f;
+        }
+        
         .color-list h3 {
             margin: 0 0 1rem 0;
             font-size: 1rem;
@@ -345,6 +367,10 @@
         }
         
         @media (max-width: 768px) {
+            body {
+                padding-top: 240px; /* More space needed on mobile when bars stack */
+            }
+            
             .inventory-page-content {
                 flex-direction: column;
             }
@@ -509,7 +535,11 @@
 
         <!-- Inventory Display -->
         <main class="inventory-main">
-            <section class="inventory-section">
+            <section class="inventory-section" style="position: relative;">
+                <button class="print-btn" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    Print
+                </button>
                 <div id="inventory-display" class="inventory-container">
                     <!-- Inventory table will be populated by JavaScript -->
                 </div>
@@ -701,9 +731,12 @@
                 searchTimeout = setTimeout(async () => {
                     try {
                         const results = await api.searchProducts(query);
+                        console.log('[Inventory Search] Results:', results);
                         displaySearchResults(results);
                     } catch (error) {
-                        console.error('Search failed:', error);
+                        console.error('[Inventory Search] Failed:', error);
+                        searchResults.innerHTML = '<div style="padding: 10px; text-align: center; color: #dc3545;">Search failed. Please try again.</div>';
+                        searchResults.classList.remove('hidden');
                     }
                 }, 300);
             });
@@ -726,12 +759,23 @@
                 return;
             }
             
-            const html = results.slice(0, 5).map(product => `
-                <div class="search-result-item" onclick="navigateToProduct('${product.styleNumber}')">
-                    <div style="font-weight: 600; color: #2f661e;">${product.styleNumber}</div>
-                    <div style="font-size: 14px; color: #666;">${product.name || product.title || product.productTitle || 'Product'}</div>
-                </div>
-            `).join('');
+            // Debug: Log first result to see structure
+            if (results.length > 0) {
+                console.log('[Inventory Search] First result structure:', results[0]);
+            }
+            
+            const html = results.slice(0, 5).map(product => {
+                // Handle different API response formats
+                const styleNumber = product.value || product.STYLE_NUMBER || product.styleNumber || product.style_number || 'Unknown';
+                const productName = product.label || product.PRODUCT_NAME || product.PRODUCT_TITLE || product.productTitle || product.productName || product.title || product.name || 'Product';
+                
+                return `
+                    <div class="search-result-item" onclick="navigateToProduct('${styleNumber}')">
+                        <div style="font-weight: 600; color: #2f661e;">${styleNumber}</div>
+                        <div style="font-size: 14px; color: #666;">${productName}</div>
+                    </div>
+                `;
+            }).join('');
             
             searchResults.innerHTML = html;
             searchResults.classList.remove('hidden');
