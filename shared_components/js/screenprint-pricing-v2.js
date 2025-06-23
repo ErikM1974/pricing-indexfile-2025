@@ -783,15 +783,26 @@ class ScreenPrintPricing {
         
         let garmentLineDisplayed = false;
         if (this.state.frontColors > 0 && pricing.basePrice > 0) {
-            const safetyNote = this.state.frontHasSafetyStripes ? ' + Safety' : '';
-            
-            html += `
-                <tr>
-                    <td>${pricing.quantity} × ${this.state.styleNumber || 'Shirts'} (Front: ${pricing.colorBreakdown.front}c${safetyNote})</td>
-                    <td>@ $${pricing.basePrice.toFixed(2)} ea</td>
-                    <td class="sp-summary-total">$${(pricing.basePrice * pricing.quantity).toFixed(2)}</td>
-                </tr>
-            `;
+            if (this.state.frontHasSafetyStripes) {
+                // Calculate the per-shirt price with safety surcharge for front
+                const basePrice = pricing.basePrice;
+                const totalWithSafety = basePrice + this.state.safetyStripeSurcharge;
+                html += `
+                    <tr>
+                        <td>${pricing.quantity} × ${this.state.styleNumber || 'Shirts'} (Front: ${pricing.colorBreakdown.front}c)</td>
+                        <td>$${basePrice.toFixed(2)} + $${this.state.safetyStripeSurcharge.toFixed(2)} safety = $${totalWithSafety.toFixed(2)} ea</td>
+                        <td class="sp-summary-total">$${(totalWithSafety * pricing.quantity).toFixed(2)}</td>
+                    </tr>
+                `;
+            } else {
+                html += `
+                    <tr>
+                        <td>${pricing.quantity} × ${this.state.styleNumber || 'Shirts'} (Front: ${pricing.colorBreakdown.front}c)</td>
+                        <td>@ $${pricing.basePrice.toFixed(2)} ea</td>
+                        <td class="sp-summary-total">$${(pricing.basePrice * pricing.quantity).toFixed(2)}</td>
+                    </tr>
+                `;
+            }
             garmentLineDisplayed = true;
         } else if (this.state.frontColors === 0 && pricing.basePrice > 0) { 
              html += `
@@ -810,14 +821,26 @@ class ScreenPrintPricing {
             pricing.colorBreakdown.locations.forEach(loc => {
                 if (loc.colors > 0) { 
                     const label = this.config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
-                    const safetyNote = loc.hasSafetyStripes ? ' + Safety' : '';
-                    additionalLocationsHtml += `
-                        <tr class="sp-summary-indent">
-                            <td>${label} (${loc.totalColors}c${safetyNote})</td>
-                            <td>@ $${loc.costPerPiece.toFixed(2)} ea</td>
-                            <td class="sp-summary-total">$${(loc.costPerPiece * pricing.quantity).toFixed(2)}</td>
-                        </tr>
-                    `;
+                    if (loc.hasSafetyStripes) {
+                        // Calculate the per-shirt price with safety surcharge for additional location
+                        const baseCost = loc.costPerPiece;
+                        const totalWithSafety = baseCost + this.state.safetyStripeSurcharge;
+                        additionalLocationsHtml += `
+                            <tr class="sp-summary-indent">
+                                <td>${label} (${loc.totalColors}c)</td>
+                                <td>$${baseCost.toFixed(2)} + $${this.state.safetyStripeSurcharge.toFixed(2)} safety = $${totalWithSafety.toFixed(2)} ea</td>
+                                <td class="sp-summary-total">$${(totalWithSafety * pricing.quantity).toFixed(2)}</td>
+                            </tr>
+                        `;
+                    } else {
+                        additionalLocationsHtml += `
+                            <tr class="sp-summary-indent">
+                                <td>${label} (${loc.totalColors}c)</td>
+                                <td>@ $${loc.costPerPiece.toFixed(2)} ea</td>
+                                <td class="sp-summary-total">$${(loc.costPerPiece * pricing.quantity).toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }
                     hasAdditionalCosts = true;
                 }
             });
@@ -836,18 +859,6 @@ class ScreenPrintPricing {
                 <td class="sp-summary-total">$${pricing.subtotal.toFixed(2)}</td>
             </tr>
         `;
-
-        // Show safety stripes surcharge if applicable
-        if (pricing.safetyStripesSurcharge > 0) {
-            const safetyLocCount = (this.state.frontHasSafetyStripes && this.state.frontColors > 0 ? 1 : 0) + 
-                this.state.additionalLocations.filter(loc => loc.hasSafetyStripes && loc.colors > 0).length;
-            html += `
-                <tr class="sp-safety-row">
-                    <td colspan="2">Safety Stripes Surcharge (${safetyLocCount} location${safetyLocCount > 1 ? 's' : ''} × $${this.state.safetyStripeSurcharge.toFixed(2)}):</td>
-                    <td class="sp-summary-total">$${(pricing.safetyStripesSurcharge * pricing.quantity).toFixed(2)}</td>
-                </tr>
-            `;
-        }
 
         if (pricing.setupFee > 0) {
             html += '<tr><td colspan="3" class="sp-summary-divider"></td></tr>';
