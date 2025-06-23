@@ -67,11 +67,31 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .logo-image {
             height: 50px;
             width: auto;
+        }
+        
+        .main-nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .main-nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+        
+        .main-nav-links a:hover {
+            color: #2f661e;
         }
         
         /* Context Bar */
@@ -88,6 +108,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 20px;
+        }
+        
+        .context-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
         }
         
         .breadcrumb {
@@ -100,6 +128,93 @@
         
         .breadcrumb i {
             color: #666;
+        }
+        
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn-back {
+            background: #2f661e;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+        
+        .btn-back:hover {
+            background: #1e4d0f;
+            text-decoration: none;
+        }
+        
+        /* Pricing Dropdown */
+        .pricing-dropdown {
+            position: relative;
+        }
+        
+        .btn-pricing {
+            background: white;
+            color: #2f661e;
+            border: 1px solid #2f661e;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        
+        .btn-pricing:hover {
+            background: #2f661e;
+            color: white;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 4px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 180px;
+            z-index: 1002;
+            display: none;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: #2f661e;
         }
         
         /* Search Box in Header */
@@ -252,6 +367,25 @@
                 flex-direction: column;
                 gap: 10px;
             }
+            
+            .context-left {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+            
+            .nav-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .breadcrumb {
+                justify-content: center;
+            }
+            
+            .main-nav-links {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -288,6 +422,12 @@
                              class="logo-image">
                     </a>
                 </div>
+                
+                <nav class="main-nav-links">
+                    <a href="/">Home</a>
+                    <a href="/product.html">Products</a>
+                    <a href="/contact.html">Contact</a>
+                </nav>
             </div>
         </div>
         
@@ -295,10 +435,43 @@
         <div class="inventory-context-bar">
             <div class="context-bar-content">
                 <div class="context-left">
+                    <!-- Navigation Buttons -->
+                    <div class="nav-buttons">
+                        <a href="#" id="back-to-product" class="btn-back">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Product
+                        </a>
+                        
+                        <div class="pricing-dropdown">
+                            <button class="btn-pricing" onclick="togglePricingDropdown()">
+                                <i class="fas fa-calculator"></i>
+                                View Pricing
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div id="pricing-dropdown-menu" class="dropdown-menu">
+                                <a href="#" class="dropdown-item" onclick="navigateToPricing('embroidery')">
+                                    <i class="fas fa-sewing-needle"></i> Embroidery
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="navigateToPricing('screen-print')">
+                                    <i class="fas fa-print"></i> Screen Print
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="navigateToPricing('dtg')">
+                                    <i class="fas fa-tshirt"></i> DTG
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="navigateToPricing('dtf')">
+                                    <i class="fas fa-film"></i> DTF
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="navigateToPricing('cap-embroidery')">
+                                    <i class="fas fa-hat-baseball"></i> Cap Embroidery
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Breadcrumb -->
                     <div class="breadcrumb">
                         <i class="fas fa-warehouse"></i>
-                        <span>Inventory Check</span>
-                        <span>›</span>
+                        <span>Inventory:</span>
                         <span id="header-product-name">Loading...</span>
                     </div>
                 </div>
@@ -369,7 +542,9 @@
         // Update back link
         function updateBackLink() {
             const backLink = document.getElementById('back-to-product');
-            backLink.href = `/product.html?StyleNumber=${styleNumber}&COLOR=${encodeURIComponent(selectedColor)}`;
+            if (backLink) {
+                backLink.href = `/product.html?StyleNumber=${styleNumber}&COLOR=${encodeURIComponent(selectedColor)}`;
+            }
         }
         
         // Load product data
@@ -566,6 +741,28 @@
         window.navigateToProduct = function(style) {
             window.location.href = `/inventory-details.html?style=${style}`;
         };
+        
+        // Toggle pricing dropdown
+        window.togglePricingDropdown = function() {
+            const dropdown = document.getElementById('pricing-dropdown-menu');
+            dropdown.classList.toggle('show');
+        };
+        
+        // Navigate to pricing page
+        window.navigateToPricing = function(type) {
+            const baseUrl = type === 'cap-embroidery' ? '/cap-embroidery-pricing.html' : `/${type}-pricing.html`;
+            const params = `?StyleNumber=${styleNumber}&COLOR=${encodeURIComponent(selectedColor)}`;
+            window.location.href = baseUrl + params;
+        };
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('pricing-dropdown-menu');
+            const button = e.target.closest('.btn-pricing');
+            if (!button && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
         
         // Initialize on load
         if (styleNumber) {
