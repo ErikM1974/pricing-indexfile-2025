@@ -462,6 +462,106 @@
             margin-top: 10px;
             font-style: italic;
         }
+        
+        /* Color row with safety checkbox */
+        .sp-color-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .sp-safety-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            position: relative;
+        }
+        
+        .sp-safety-checkbox input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #ff6b35;
+        }
+        
+        .sp-safety-price {
+            color: #3a7c52;
+            font-weight: normal;
+        }
+        
+        /* Tooltip for safety stripes pricing */
+        .sp-safety-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-5px);
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            z-index: 1000;
+            font-weight: normal;
+        }
+        
+        .sp-safety-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+        }
+        
+        .sp-safety-checkbox:hover .sp-safety-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Safety label styling */
+        .sp-safety-label {
+            color: #ff6b35;
+            font-size: 0.9em;
+        }
+        
+        /* Compact safety checkbox for additional locations */
+        .sp-location-row .sp-safety-checkbox {
+            margin-left: 10px;
+        }
+        
+        /* Keep full text for front safety checkbox */
+        .sp-front-safety .sp-safety-label {
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        /* Safety row in order summary */
+        .sp-safety-row {
+            background-color: #fff5f0;
+        }
+        
+        .sp-safety-row td {
+            color: #d64520;
+            font-weight: 500;
+        }
+        
+        /* Location row styling */
+        .sp-location-row {
+            display: grid;
+            grid-template-columns: 180px minmax(250px, 1fr) 50px;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        }
 
         /* Size Upcharge Info Box */
         .sp-size-upcharge-info {
@@ -561,6 +661,16 @@
             .sp-btn-remove {
                 width: 100%;
                 margin-top: 5px;
+            }
+            
+            .sp-color-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .sp-safety-checkbox {
+                width: 100%;
             }
 
             .sp-size-upcharge-grid {
