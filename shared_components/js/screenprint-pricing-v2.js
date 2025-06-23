@@ -720,14 +720,8 @@ class ScreenPrintPricing {
         
         const darkIndicator = this.elements.darkGarmentIndicator;
         if (darkIndicator) {
-            const hasFrontPrint = this.state.frontColors > 0;
-            const hasAdditionalPrints = this.state.additionalLocations.some(loc => loc.colors > 0);
-            if (this.state.isDarkGarment && (hasFrontPrint || hasAdditionalPrints)) {
-                darkIndicator.textContent = '(Includes underbase for dark garment)';
-                darkIndicator.style.display = 'block';
-            } else {
-                darkIndicator.style.display = 'none';
-            }
+            // Hide the dark garment indicator - underbase is already included in pricing
+            darkIndicator.style.display = 'none';
         }
         
         if (this.elements.setupFee) this.elements.setupFee.textContent = `$${pricing.setupFee.toFixed(2)}`; 
@@ -1023,10 +1017,17 @@ class ScreenPrintPricing {
         let subtitleParts = [];
         const styleName = this.state.styleNumber || "Item";
         
+        // Check if we have any safety stripes
+        const hasSafetyStripes = this.state.frontHasSafetyStripes || 
+            pricing.colorBreakdown.locations.some(loc => loc.hasSafetyStripes);
+        
         // Front print part - uses effective colors for label
         if (this.state.frontColors > 0 && pricing.basePrice >= 0) { 
             // pricing.basePrice is garment + front print (incl. its underbase)
-            subtitleParts.push(`${pricing.colorBreakdown.front} Color Front $${pricing.basePrice.toFixed(2)}`);
+            const displayPrice = this.state.frontHasSafetyStripes ? 
+                pricing.basePrice + this.state.safetyStripeSurcharge : 
+                pricing.basePrice;
+            subtitleParts.push(`${pricing.colorBreakdown.front} Color Front $${displayPrice.toFixed(2)}`);
         }
     
         // Additional locations part - uses effective colors for label
@@ -1034,7 +1035,10 @@ class ScreenPrintPricing {
             // loc.costPerPiece is already calculated with underbase if applicable
             if (loc.colors > 0 ) { // Only add if design colors > 0 for this location
                 const locLabel = this.config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
-                subtitleParts.push(`${loc.totalColors} Color ${locLabel} $${loc.costPerPiece.toFixed(2)}`);
+                const displayPrice = loc.hasSafetyStripes ? 
+                    loc.costPerPiece + this.state.safetyStripeSurcharge : 
+                    loc.costPerPiece;
+                subtitleParts.push(`${loc.totalColors} Color ${locLabel} $${displayPrice.toFixed(2)}`);
             }
         });
     
@@ -1043,15 +1047,10 @@ class ScreenPrintPricing {
             subtitleText = `${styleName} - ${subtitleParts.join(' + ')}`;
             subtitleText += ` = <span class="sp-print-only-total">$${pricing.totalPerShirtPrintOnlyCost.toFixed(2)}</span>`; // Sum of print-only costs
             
-            // Append setup and LTM impact if they apply
-            if (pricing.setupPerShirt > 0 && pricing.quantity > 0) {
-                subtitleText += `<br/>+ Setup $${pricing.setupPerShirt.toFixed(2)}`;
+            // Add safety stripes note if applicable
+            if (hasSafetyStripes) {
+                subtitleText += `<br/><span style="font-size: 0.85em; color: #ff6b35;">(Includes safety stripe surcharges)</span>`;
             }
-            if (pricing.ltmImpactPerShirt > 0 && pricing.quantity > 0) {
-                subtitleText += `<br/>+ LTM $${pricing.ltmImpactPerShirt.toFixed(2)}`;
-            }
-            // The main price (pricing.perShirtTotal) is the sum of these.
-            // No need to add another "= $TOTAL_ALL_IN" here as the main price shows it.
 
         } else if (pricing.basePrice > 0 && this.state.frontColors === 0 && pricing.additionalCost === 0) { 
             // This case implies pricing.basePrice might be garment-only if no prints are selected.
