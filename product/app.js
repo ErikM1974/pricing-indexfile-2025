@@ -9,7 +9,7 @@ import { AppState } from './services/state.js';
 import { ProductSearch } from './components/search.js';
 import { ProductGallery } from './components/gallery.js';
 import { PricingCards } from './components/pricing.js';
-import { InventoryDisplay } from './components/inventory.js';
+import { InventorySummary } from './components/inventory-summary.js';
 import { ProductInfo } from './components/info.js';
 import { ColorSwatches } from './components/swatches.js';
 
@@ -72,8 +72,8 @@ class ProductPageApp {
             document.querySelector('.pricing-cards')
         );
 
-        // Initialize inventory display component
-        this.components.inventory = new InventoryDisplay(
+        // Initialize inventory summary component
+        this.components.inventory = new InventorySummary(
             document.getElementById('inventory-table')
         );
     }
@@ -201,7 +201,7 @@ class ProductPageApp {
     async loadInventory(styleNumber, colorCode) {
         try {
             const inventory = await this.api.getInventory(styleNumber, colorCode);
-            this.components.inventory.update(inventory);
+            this.components.inventory.update(inventory, styleNumber, colorCode);
         } catch (error) {
             console.error('Failed to load inventory:', error);
             this.components.inventory.showError('Failed to load inventory');
