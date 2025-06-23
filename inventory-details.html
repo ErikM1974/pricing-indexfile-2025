@@ -5,12 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Details - Northwest Custom Apparel</title>
     <link rel="stylesheet" href="/product/styles/product.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .inventory-page-header {
+        /* Enhanced Header Styles */
+        body {
+            padding-top: 160px; /* Space for fixed header */
+            margin: 0;
+        }
+        
+        .enhanced-inventory-header {
             background: white;
-            border-bottom: 2px solid #2f661e;
-            padding: 1rem 0;
-            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        /* Contact Bar */
+        .header-contact-bar {
+            background: #2d5f3f;
+            color: white;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        
+        .contact-bar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .contact-info {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .contact-item i {
+            font-size: 12px;
+        }
+        
+        /* Navigation Bar */
+        .header-nav {
+            background: white;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo-image {
+            height: 50px;
+            width: auto;
+        }
+        
+        /* Context Bar */
+        .inventory-context-bar {
+            background: #f8f9fa;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .context-bar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .breadcrumb i {
+            color: #666;
+        }
+        
+        /* Search Box in Header */
+        .header-search {
+            position: relative;
+            width: 300px;
+        }
+        
+        .header-search-input {
+            width: 100%;
+            padding: 8px 12px 8px 35px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .header-search-input:focus {
+            outline: none;
+            border-color: #2f661e;
+        }
+        
+        .header-search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        
+        .header-search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 4px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1001;
+        }
+        
+        .search-result-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .search-result-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
         }
         
         .inventory-page-content {
@@ -33,6 +179,20 @@
             background: white;
             border-radius: 8px;
             padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        /* Product Image above colors */
+        .product-image-container {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .product-image {
+            width: 100%;
+            max-width: 180px;
+            height: auto;
+            border-radius: 4px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
@@ -77,15 +237,83 @@
             .color-selector {
                 flex: 1;
             }
+            
+            .header-search {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .contact-bar-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .context-bar-content {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="inventory-page-header">
-        <div class="header-content">
-            <h1 id="product-name">Product Inventory</h1>
-            <a href="#" id="back-to-product" class="back-link">← Back to Product</a>
+    <!-- Enhanced Header -->
+    <header class="enhanced-inventory-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             class="logo-image">
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Context Bar -->
+        <div class="inventory-context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <div class="breadcrumb">
+                        <i class="fas fa-warehouse"></i>
+                        <span>Inventory Check</span>
+                        <span>›</span>
+                        <span id="header-product-name">Loading...</span>
+                    </div>
+                </div>
+                
+                <!-- Search Box -->
+                <div class="header-search">
+                    <i class="fas fa-search header-search-icon"></i>
+                    <input type="text" 
+                           id="header-style-search" 
+                           class="header-search-input" 
+                           placeholder="Search another style..."
+                           autocomplete="off">
+                    <div id="header-search-results" class="header-search-results hidden"></div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -94,6 +322,11 @@
         <!-- Color Selector -->
         <aside class="color-selector">
             <div class="color-list">
+                <!-- Product Image -->
+                <div class="product-image-container">
+                    <img id="sidebar-product-image" src="" alt="Product" class="product-image">
+                </div>
+                
                 <h3>Select Color:</h3>
                 <div id="color-options">
                     <!-- Color options will be populated by JavaScript -->
@@ -150,10 +383,27 @@
                 }
                 
                 // Update header
-                document.getElementById('product-name').textContent = `${productData.name} (${styleNumber}) - Inventory`;
+                const productName = productData.title || productData.productTitle || productData.PRODUCT_TITLE || styleNumber;
+                document.getElementById('header-product-name').textContent = `${productName} (${styleNumber})`;
                 
                 // Populate color options
                 populateColors(productData.colors);
+                
+                // Find and set initial product image
+                if (productData.colors && productData.colors.length > 0) {
+                    let selectedColorData = null;
+                    if (selectedColor) {
+                        selectedColorData = productData.colors.find(c => 
+                            (c.catalogColor || c.CATALOG_COLOR) === selectedColor ||
+                            (c.colorName || c.COLOR_NAME) === selectedColor
+                        );
+                    }
+                    if (!selectedColorData) {
+                        selectedColorData = productData.colors[0];
+                        selectedColor = selectedColorData.catalogColor || selectedColorData.CATALOG_COLOR;
+                    }
+                    updateProductImage(selectedColorData);
+                }
                 
                 // Load inventory for selected color
                 if (selectedColor) {
@@ -213,6 +463,9 @@
                     });
                     option.classList.add('selected');
                     
+                    // Update product image
+                    updateProductImage(color);
+                    
                     // Load inventory
                     selectedColor = colorCode;
                     loadInventory(colorCode);
@@ -245,9 +498,79 @@
             display.innerHTML = `<div class="inventory-error"><p>${message}</p></div>`;
         }
         
+        // Update product image
+        function updateProductImage(colorData) {
+            const productImage = document.getElementById('sidebar-product-image');
+            if (colorData && (colorData.MAIN_IMAGE_URL || colorData.mainImageUrl)) {
+                productImage.src = colorData.MAIN_IMAGE_URL || colorData.mainImageUrl;
+                productImage.alt = `${productData.title || productData.productTitle || 'Product'} - ${colorData.colorName || colorData.COLOR_NAME}`;
+            }
+        }
+        
+        // Initialize search
+        function initializeSearch() {
+            const searchInput = document.getElementById('header-style-search');
+            const searchResults = document.getElementById('header-search-results');
+            let searchTimeout = null;
+            
+            searchInput.addEventListener('input', async (e) => {
+                const query = e.target.value.trim();
+                
+                clearTimeout(searchTimeout);
+                
+                if (query.length < 2) {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+                
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        const results = await api.searchProducts(query);
+                        displaySearchResults(results);
+                    } catch (error) {
+                        console.error('Search failed:', error);
+                    }
+                }, 300);
+            });
+            
+            // Click outside to close
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Display search results
+        function displaySearchResults(results) {
+            const searchResults = document.getElementById('header-search-results');
+            
+            if (!results || results.length === 0) {
+                searchResults.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">No products found</div>';
+                searchResults.classList.remove('hidden');
+                return;
+            }
+            
+            const html = results.slice(0, 5).map(product => `
+                <div class="search-result-item" onclick="navigateToProduct('${product.styleNumber}')">
+                    <div style="font-weight: 600; color: #2f661e;">${product.styleNumber}</div>
+                    <div style="font-size: 14px; color: #666;">${product.name || product.title || product.productTitle || 'Product'}</div>
+                </div>
+            `).join('');
+            
+            searchResults.innerHTML = html;
+            searchResults.classList.remove('hidden');
+        }
+        
+        // Navigate to product
+        window.navigateToProduct = function(style) {
+            window.location.href = `/inventory-details.html?style=${style}`;
+        };
+        
         // Initialize on load
         if (styleNumber) {
             loadProduct();
+            initializeSearch();
         } else {
             showError('No product specified');
         }
