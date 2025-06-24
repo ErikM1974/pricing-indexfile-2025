@@ -38,6 +38,11 @@ export class ProductInfo {
                 Check Inventory
             </button>
             
+            <button class="send-quote-btn" id="send-quote-btn">
+                <i class="fas fa-envelope"></i>
+                Send Quote
+            </button>
+            
             ${product.AVAILABLE_SIZES ? `
                 <div class="available-sizes">
                     <strong>Available Sizes:</strong> ${this.escapeHtml(product.AVAILABLE_SIZES)}

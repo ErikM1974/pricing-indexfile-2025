@@ -13,6 +13,7 @@ import { InventorySummary } from './components/inventory-summary.js';
 import { ProductInfo } from './components/info.js';
 import { ColorSwatches } from './components/swatches.js';
 import { DecorationSelector } from './components/decoration-selector.js';
+import { QuoteModal } from './components/quote-modal.js';
 
 // Initialize application
 class ProductPageApp {
@@ -84,6 +85,9 @@ class ProductPageApp {
         this.components.inventory = new InventorySummary(
             document.getElementById('inventory-table')
         );
+        
+        // Initialize quote modal
+        this.components.quoteModal = new QuoteModal();
     }
 
     setupEventListeners() {
@@ -109,6 +113,13 @@ class ProductPageApp {
                 if (headerSearch) {
                     headerSearch.focus();
                 }
+            }
+        });
+        
+        // Listen for send quote button clicks
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#send-quote-btn')) {
+                this.handleSendQuote();
             }
         });
     }
@@ -334,6 +345,33 @@ class ProductPageApp {
             resourcesHTML += '</div>';
             resourcesContainer.innerHTML = resourcesHTML;
         }
+    }
+    
+    handleSendQuote() {
+        const product = this.state.get('product');
+        const selectedColor = this.state.get('selectedColor');
+        
+        if (!product || !selectedColor) {
+            alert('Please select a product first');
+            return;
+        }
+        
+        // Prepare product data for quote
+        const quoteData = {
+            productName: product.title || product.productTitle || product.PRODUCT_TITLE || product.styleNumber,
+            styleNumber: product.styleNumber,
+            productImage: selectedColor.MAIN_IMAGE_URL || selectedColor.FRONT_MODEL_IMAGE_URL || '',
+            colorName: selectedColor.COLOR_NAME || selectedColor.colorName || 'N/A',
+            sizes: product.AVAILABLE_SIZES || 'Contact for sizes',
+            description: product.description || product.PRODUCT_DESCRIPTION || '',
+            brandLogo: selectedColor.BRAND_LOGO_IMAGE || '',
+            brandName: product.BRAND_NAME || '',
+            allColors: product.colors || [],
+            selectedColorIndex: product.colors ? product.colors.indexOf(selectedColor) : 0
+        };
+        
+        // Open quote modal with product data
+        this.components.quoteModal.open(quoteData);
     }
 }
 
