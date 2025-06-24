@@ -11,35 +11,9 @@ export class ProductSearch {
         this.onProductSelect = onProductSelect;
         this.api = new API();
         
-        console.log('[ProductSearch] Initializing with container:', container);
-        
-        // Elements - support both header and page search
-        this.input = document.getElementById('header-style-search') || (container ? container.querySelector('#style-search') : null);
-        
-        console.log('[ProductSearch] Found input:', this.input);
-        
-        // Handle results container based on which input we're using
-        if (this.input && this.input.id === 'header-style-search') {
-            // For header search, create results container in header
-            const headerSearch = this.input.closest('.header-search');
-            console.log('[ProductSearch] Header search container:', headerSearch);
-            
-            if (headerSearch) {
-                this.resultsContainer = headerSearch.querySelector('#header-search-results');
-                if (!this.resultsContainer) {
-                    this.resultsContainer = document.createElement('div');
-                    this.resultsContainer.id = 'header-search-results';
-                    this.resultsContainer.className = 'search-results hidden';
-                    headerSearch.appendChild(this.resultsContainer);
-                    console.log('[ProductSearch] Created results container');
-                }
-            }
-        } else if (container) {
-            // For page search, use existing container
-            this.resultsContainer = container.querySelector('#search-results');
-        }
-        
-        console.log('[ProductSearch] Final setup - Input:', this.input?.id, 'Results container:', this.resultsContainer);
+        // Elements
+        this.input = container.querySelector('#style-search');
+        this.resultsContainer = container.querySelector('#search-results');
         
         // State
         this.searchTimeout = null;
@@ -52,14 +26,6 @@ export class ProductSearch {
     }
 
     init() {
-        // Check if input element exists
-        if (!this.input) {
-            console.error('[ProductSearch] No search input found');
-            return;
-        }
-        
-        console.log('[ProductSearch] Initializing with input:', this.input.id);
-        
         // Set up event listeners
         this.input.addEventListener('input', this.handleInput.bind(this));
         this.input.addEventListener('keydown', this.handleKeydown.bind(this));
@@ -67,9 +33,7 @@ export class ProductSearch {
         
         // Click outside to close
         document.addEventListener('click', (e) => {
-            const searchParent = this.input ? this.input.closest('.header-search') : null;
-            if ((!this.container || !this.container.contains(e.target)) && 
-                (!searchParent || !searchParent.contains(e.target))) {
+            if (!this.container.contains(e.target)) {
                 this.hideResults();
             }
         });
@@ -77,7 +41,6 @@ export class ProductSearch {
 
     handleInput(e) {
         const value = e.target.value.trim();
-        console.log('[ProductSearch] Input value:', value);
         
         // Clear previous timeout
         clearTimeout(this.searchTimeout);
@@ -132,15 +95,12 @@ export class ProductSearch {
     }
 
     async search(term) {
-        console.log('[ProductSearch] Searching for:', term);
-        
         try {
             // Show loading state
             this.showLoading();
             
             // Perform search
             const results = await this.api.searchProducts(term);
-            console.log('[ProductSearch] Search results:', results);
             this.results = results;
             
             if (results.length > 0) {
@@ -149,17 +109,12 @@ export class ProductSearch {
                 this.showNoResults();
             }
         } catch (error) {
-            console.error('[ProductSearch] Search error:', error);
+            console.error('Search error:', error);
             this.showError();
         }
     }
 
     showResults(results) {
-        if (!this.resultsContainer) {
-            console.error('[ProductSearch] No results container available');
-            return;
-        }
-        
         let html = '<div class="search-results-list">';
         
         results.forEach((result, index) => {
@@ -194,7 +149,7 @@ export class ProductSearch {
     }
 
     showRecentSearches() {
-        if (this.recentSearches.length === 0 || !this.resultsContainer) return;
+        if (this.recentSearches.length === 0) return;
         
         let html = '<div class="search-results-list">';
         html += '<div class="recent-searches-header">Recent Searches</div>';
@@ -225,11 +180,6 @@ export class ProductSearch {
     }
 
     showLoading() {
-        if (!this.resultsContainer) {
-            console.error('[ProductSearch] No results container available');
-            return;
-        }
-        
         this.resultsContainer.innerHTML = `
             <div class="search-loading">
                 <div class="mini-spinner"></div>
@@ -240,11 +190,6 @@ export class ProductSearch {
     }
 
     showNoResults() {
-        if (!this.resultsContainer) {
-            console.error('[ProductSearch] No results container available');
-            return;
-        }
-        
         this.resultsContainer.innerHTML = `
             <div class="search-no-results">
                 No products found
@@ -254,11 +199,6 @@ export class ProductSearch {
     }
 
     showError() {
-        if (!this.resultsContainer) {
-            console.error('[ProductSearch] No results container available');
-            return;
-        }
-        
         this.resultsContainer.innerHTML = `
             <div class="search-error">
                 Search failed. Please try again.
@@ -268,10 +208,6 @@ export class ProductSearch {
     }
 
     hideResults() {
-        if (!this.resultsContainer) {
-            return;
-        }
-        
         this.resultsContainer.classList.add('hidden');
         this.results = [];
         this.selectedIndex = -1;
@@ -293,8 +229,6 @@ export class ProductSearch {
     }
 
     updateSelection() {
-        if (!this.resultsContainer) return;
-        
         const items = this.resultsContainer.querySelectorAll('.search-result-item');
         items.forEach((item, index) => {
             item.classList.toggle('selected', index === this.selectedIndex);

@@ -4,9 +4,8 @@
  */
 
 export class ProductGallery {
-    constructor(container, thumbnailContainer = null) {
+    constructor(container) {
         this.container = container;
-        this.thumbnailContainer = thumbnailContainer;
         this.currentIndex = 0;
         this.images = [];
         this.imageCache = new Map();
@@ -16,7 +15,6 @@ export class ProductGallery {
     }
 
     render() {
-        // Main image area
         this.container.innerHTML = `
             <div class="gallery-main">
                 <img id="main-image" class="main-image" alt="Product image">
@@ -24,22 +22,14 @@ export class ProductGallery {
                     <div class="mini-spinner"></div>
                 </div>
             </div>
+            <div class="gallery-thumbnails" id="gallery-thumbnails">
+                <!-- Thumbnails will be added here -->
+            </div>
         `;
-        
-        // If separate thumbnail container provided, use it; otherwise create within gallery
-        if (!this.thumbnailContainer) {
-            this.container.innerHTML += `
-                <div class="gallery-thumbnails" id="gallery-thumbnails">
-                    <!-- Thumbnails will be added here -->
-                </div>
-            `;
-            this.thumbnailsContainer = this.container.querySelector('#gallery-thumbnails');
-        } else {
-            this.thumbnailsContainer = this.thumbnailContainer;
-        }
         
         // Get references
         this.mainImage = this.container.querySelector('#main-image');
+        this.thumbnailsContainer = this.container.querySelector('#gallery-thumbnails');
         this.loadingIndicator = this.container.querySelector('.image-loading');
         
         // Set up event listeners

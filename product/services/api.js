@@ -27,6 +27,7 @@ export class API {
             }
 
             const data = await response.json();
+            console.log('[API] Search response:', data);
             return data || [];
         } catch (error) {
             console.error('Search API error:', error);

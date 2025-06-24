@@ -21,31 +21,34 @@ export class ProductInfo {
 
         // Show initial content with loading price
         this.container.innerHTML = `
-            <div class="product-header">
-                <h2 class="product-title">${this.escapeHtml(product.title || product.productTitle || product.PRODUCT_TITLE || product.styleNumber)}</h2>
-                <div class="product-style">Style: ${this.escapeHtml(product.styleNumber)}</div>
-            </div>
+            <h2 class="product-title">${this.escapeHtml(product.title || product.productTitle || product.PRODUCT_TITLE || product.styleNumber)}</h2>
+            <div class="product-style">Style: ${this.escapeHtml(product.styleNumber)}</div>
             
-            <button class="inventory-button" onclick="window.checkInventoryDetails('${this.escapeHtml(product.styleNumber)}', '${this.escapeHtml(selectedColor.CATALOG_COLOR || selectedColor.catalogColor || selectedColor.catalog_color || 'NA')}')">
-                <i class="fas fa-warehouse"></i>
-                Check Inventory
-            </button>
-            
-            <div class="price-estimate hidden" id="price-estimate-container">
+            <div class="price-estimate" id="price-estimate-container">
                 <span class="price-label">Estimated Price:</span>
                 <span class="price-value" id="estimated-price">Calculating...</span>
                 <span class="price-note">(24pc with basic logo)</span>
             </div>
             
-            <div class="selected-color hidden">
+            <div class="selected-color">
                 <strong>Selected Color:</strong> 
                 <span id="selected-color-name">${this.escapeHtml(colorName)}</span>
             </div>
+            
+            <div class="product-description">
+                <h3>Description</h3>
+                <p>${this.formatDescription(product.description || product.PRODUCT_DESCRIPTION || '')}</p>
+            </div>
+            
+            <div class="product-actions">
+                <button class="copy-info-btn" onclick="window.copyProductInfo()">
+                    📋 Copy Product Info
+                </button>
+            </div>
         `;
 
-        // Store product reference for later use
-        this.currentProduct = product;
-        this.currentSelectedColor = selectedColor;
+        // Add copy function to window
+        window.copyProductInfo = () => this.copyProductInfo(product);
 
         // Fetch and calculate estimated price
         this.calculateAndDisplayPrice(product.styleNumber);
@@ -119,11 +122,6 @@ export class ProductInfo {
             .filter(line => line.trim())
             .map(line => this.escapeHtml(line))
             .join('<br>');
-    }
-
-    getProductDescription() {
-        if (!this.currentProduct) return '';
-        return this.currentProduct.description || this.currentProduct.PRODUCT_DESCRIPTION || 'No description available.';
     }
 
     copyProductInfo(product) {

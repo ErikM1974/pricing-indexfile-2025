@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page Redesign - Complete Mockup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2f661e;
+            --primary-dark: #1e4d0f;
+            --primary-light: #eaf2e9;
+            --secondary-color: #5cb85c;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #d8e0d6;
+            --background: #fff;
+            --background-light: #f9fbf8;
+            --info-blue: #0078d4;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--background-light);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            background: #2d5f3f;
+            color: white;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .header-top-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-main {
+            padding: 15px 0;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        /* Search Box */
+        .header-search {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            bottom: 2px;
+            padding: 0 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 2px 2px 0;
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Navigation */
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Product Layout */
+        .product-layout {
+            display: grid;
+            grid-template-columns: 100px 1fr 420px;
+            gap: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        /* Thumbnails */
+        .thumbnails {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .thumbnail:hover {
+            border-color: #ccc;
+        }
+
+        .thumbnail.active {
+            border-color: var(--primary-color);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Main Image */
+        .main-image-container {
+            background: #f8f8f8;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+            position: relative;
+        }
+
+        .main-image {
+            max-width: 100%;
+            max-height: 500px;
+            width: auto;
+            height: auto;
+        }
+
+        /* Product Info Column */
+        .product-info-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .product-header {
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+
+        .product-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 5px 0;
+            color: var(--text-color);
+        }
+
+        .product-style {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        /* Check Inventory Button */
+        .inventory-button {
+            background: var(--info-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .inventory-button:hover {
+            background: #106ebe;
+        }
+
+        /* Color Section */
+        .color-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 42px;
+            height: 42px;
+            border-radius: 4px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .color-swatch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.2);
+        }
+
+        /* Decoration Selector */
+        .decoration-selector {
+            background: var(--background-light);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .decoration-selector h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Segmented Control - Compact */
+        .segmented-control {
+            display: flex;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .segment {
+            flex: 1;
+            padding: 10px 8px;
+            background: none;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-color);
+            transition: all 0.2s;
+            text-align: center;
+            white-space: nowrap;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .segment:last-child {
+            border-right: none;
+        }
+
+        .segment:hover {
+            background: rgba(47, 102, 30, 0.05);
+        }
+
+        .segment.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .segment-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .segment-label {
+            font-size: 11px;
+            line-height: 1.2;
+        }
+
+        /* Method Content - Simplified */
+        .method-content {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .method-info {
+            margin-bottom: 15px;
+        }
+
+        .method-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0 0 5px 0;
+        }
+
+        .method-tagline {
+            font-size: 14px;
+            color: var(--text-light);
+            margin: 0 0 10px 0;
+        }
+
+        .method-details {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cta-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(47, 102, 30, 0.3);
+        }
+
+        /* Product Description */
+        .product-description {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .product-description h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+
+        .product-description p {
+            font-size: 14px;
+            color: var(--text-light);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .product-layout {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .thumbnails {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+
+            .main-image-container {
+                min-height: 300px;
+            }
+
+            .product-info-column {
+                max-width: 100%;
+            }
+
+            .color-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-wrap: wrap;
+            }
+
+            .header-search {
+                order: 3;
+                flex: 0 0 100%;
+                margin-top: 10px;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .segment {
+                padding: 8px 4px;
+            }
+
+            .segment-label {
+                font-size: 10px;
+            }
+
+            .color-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+
+            .method-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="header-top-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <div class="header-main">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                         alt="Northwest Custom Apparel">
+                </a>
+                
+                <div class="header-search">
+                    <input type="text" class="search-input" placeholder="Search products by style number or name...">
+                    <button class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                
+                <nav class="nav-links">
+                    <a href="/">Home</a>
+                    <a href="/products">Products</a>
+                    <a href="/resources">Resources</a>
+                    <a href="/contact">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">Home</a> / <a href="/products">Products</a> / Port & Company® Essential Tee
+        </div>
+
+        <!-- Product Layout -->
+        <div class="product-layout">
+            <!-- Thumbnails -->
+            <div class="thumbnails">
+                <div class="thumbnail active">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%237FFF00'/%3E%3C/svg%3E" alt="Lime">
+                </div>
+                <div class="thumbnail">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23e0e0e0'/%3E%3C/svg%3E" alt="View 2">
+                </div>
+                <div class="thumbnail">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23e0e0e0'/%3E%3C/svg%3E" alt="View 3">
+                </div>
+                <div class="thumbnail">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23e0e0e0'/%3E%3C/svg%3E" alt="View 4">
+                </div>
+            </div>
+
+            <!-- Main Image -->
+            <div class="main-image-container">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='%237FFF00'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' font-family='Arial' font-size='24' fill='%23333'%3EMain Product Image%3C/text%3E%3C/svg%3E" 
+                     alt="Port & Company Essential Tee" 
+                     class="main-image">
+            </div>
+
+            <!-- Product Info Column -->
+            <div class="product-info-column">
+                <!-- Product Header -->
+                <div class="product-header">
+                    <h1 class="product-title">Port & Company® Essential Tee</h1>
+                    <div class="product-style">Style: PC61</div>
+                </div>
+
+                <!-- Check Inventory Button -->
+                <button class="inventory-button">
+                    <i class="fas fa-warehouse"></i>
+                    Check Inventory
+                </button>
+
+                <!-- Color Swatches -->
+                <div class="color-section">
+                    <h3>Select Color:</h3>
+                    <div class="color-grid">
+                        <div class="color-swatch active" style="background: #7FFF00" title="Lime"></div>
+                        <div class="color-swatch" style="background: #000000" title="Black"></div>
+                        <div class="color-swatch" style="background: #FF0000" title="Red"></div>
+                        <div class="color-swatch" style="background: #0000FF" title="Blue"></div>
+                        <div class="color-swatch" style="background: #808080" title="Grey"></div>
+                        <div class="color-swatch" style="background: #FFFFFF; border-color: #ccc;" title="White"></div>
+                        <div class="color-swatch" style="background: #000080" title="Navy"></div>
+                        <div class="color-swatch" style="background: #4169E1" title="Royal"></div>
+                        <div class="color-swatch" style="background: #FFA500" title="Orange"></div>
+                        <div class="color-swatch" style="background: #FFFF00" title="Yellow"></div>
+                        <div class="color-swatch" style="background: #008000" title="Green"></div>
+                        <div class="color-swatch" style="background: #800080" title="Purple"></div>
+                        <div class="color-swatch" style="background: #8B4513" title="Brown"></div>
+                        <div class="color-swatch" style="background: #FFB6C1" title="Pink"></div>
+                    </div>
+                </div>
+
+                <!-- Decoration Method Selector -->
+                <div class="decoration-selector">
+                    <h3>How would you like to customize this?</h3>
+                    
+                    <div class="segmented-control">
+                        <button class="segment active" onclick="selectMethod(this, 'embroidery')">
+                            <span class="segment-icon">🧵</span>
+                            <span class="segment-label">Embroidery</span>
+                        </button>
+                        <button class="segment" onclick="selectMethod(this, 'cap-embroidery')">
+                            <span class="segment-icon">🧢</span>
+                            <span class="segment-label">Cap<br>Embroidery</span>
+                        </button>
+                        <button class="segment" onclick="selectMethod(this, 'dtg')">
+                            <span class="segment-icon">👕</span>
+                            <span class="segment-label">DTG</span>
+                        </button>
+                        <button class="segment" onclick="selectMethod(this, 'screenprint')">
+                            <span class="segment-icon">🖨️</span>
+                            <span class="segment-label">Screen<br>Print</span>
+                        </button>
+                        <button class="segment" onclick="selectMethod(this, 'dtf')">
+                            <span class="segment-icon">🎨</span>
+                            <span class="segment-label">DTF</span>
+                        </button>
+                    </div>
+
+                    <div class="method-content" id="method-content">
+                        <div class="method-info">
+                            <h4 class="method-title">Embroidery</h4>
+                            <p class="method-tagline">Professional thread embroidery for logos and text</p>
+                        </div>
+                        <div class="method-details">
+                            <div class="detail-item">
+                                <i class="fas fa-star" style="color: #ffa500;"></i>
+                                <span>Premium quality</span>
+                            </div>
+                        </div>
+                        <button class="cta-button">
+                            View Embroidery Pricing
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Description -->
+                <div class="product-description">
+                    <h3>Description</h3>
+                    <p>
+                        An indispensable t-shirt in our classic silhouette—with a very friendly price. 5.4-ounce 100% cotton 98/2 cotton/poly (Ash) 90/10 cotton/poly (Athletic Heather) 50/50 cotton/poly (Black Heather Dark Heather Grey Graphite Heather Heather Athletic Maroon Heather Dark Chocolate Brown Heather Navy Heather Purple Heather Red Heather Royal Heather Sangria Heathered Dusty Peach Neon Blue Neon Green Neon Orange Neon Pink Neon Yellow Oatmeal Heather Olive Drab Green Heather S. Green S. Orange) Removable tag for comfort and relabeling
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Method data
+        const methodData = {
+            'embroidery': {
+                title: 'Embroidery',
+                tagline: 'Professional thread embroidery for logos and text',
+                details: [
+                    { icon: 'fas fa-star', text: 'Premium quality', color: '#ffa500' }
+                ],
+                cta: 'View Embroidery Pricing'
+            },
+            'cap-embroidery': {
+                title: 'Cap Embroidery',
+                tagline: 'Specialized embroidery for headwear',
+                details: [
+                    { icon: 'fas fa-hat-cowboy', text: '3D puff available', color: '#2f661e' }
+                ],
+                cta: 'View Cap Pricing'
+            },
+            'dtg': {
+                title: 'DTG Printing',
+                tagline: 'Full-color printing for complex designs',
+                details: [
+                    { icon: 'fas fa-palette', text: 'Unlimited colors', color: '#e91e63' }
+                ],
+                cta: 'View DTG Pricing'
+            },
+            'screenprint': {
+                title: 'Screen Printing',
+                tagline: 'Classic printing for bold graphics',
+                details: [
+                    { icon: 'fas fa-dollar-sign', text: 'Great for bulk', color: '#4caf50' }
+                ],
+                cta: 'View Screen Print Pricing'
+            },
+            'dtf': {
+                title: 'DTF Transfer',
+                tagline: 'Versatile heat transfer for any fabric',
+                details: [
+                    { icon: 'fas fa-tshirt', text: 'Works on all fabrics', color: '#2196f3' }
+                ],
+                cta: 'View DTF Pricing'
+            }
+        };
+
+        function selectMethod(element, methodKey) {
+            // Update active state
+            document.querySelectorAll('.segment').forEach(seg => seg.classList.remove('active'));
+            element.classList.add('active');
+
+            // Get method data
+            const method = methodData[methodKey];
+
+            // Build details HTML
+            const detailsHtml = method.details.map(detail => `
+                <div class="detail-item">
+                    <i class="${detail.icon}" style="color: ${detail.color};"></i>
+                    <span>${detail.text}</span>
+                </div>
+            `).join('');
+
+            // Update content
+            document.getElementById('method-content').innerHTML = `
+                <div class="method-info">
+                    <h4 class="method-title">${method.title}</h4>
+                    <p class="method-tagline">${method.tagline}</p>
+                </div>
+                <div class="method-details">
+                    ${detailsHtml}
+                </div>
+                <button class="cta-button">
+                    ${method.cta}
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            `;
+        }
+
+        // Simulate color swatch clicks
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Simulate thumbnail clicks
+        document.querySelectorAll('.thumbnail').forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

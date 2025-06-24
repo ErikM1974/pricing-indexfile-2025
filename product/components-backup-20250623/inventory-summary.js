@@ -36,7 +36,7 @@ export class InventorySummary {
                     ${stockStatus.details ? `<span class="stock-details">${stockStatus.details}</span>` : ''}
                 </div>
                 <button class="check-inventory-btn" onclick="window.checkInventoryDetails('${this.styleNumber}', '${this.colorCode}')">
-                    View Full Inventory
+                    Check Inventory
                 </button>
             </div>
         `;
