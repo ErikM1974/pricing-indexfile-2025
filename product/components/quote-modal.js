@@ -133,6 +133,29 @@ export class QuoteModal {
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         this.modal = document.getElementById('quote-modal');
         
+        // Add preview modal
+        const previewModalHTML = `
+            <div id="quote-preview-modal" class="quote-modal hidden">
+                <div class="quote-modal-overlay"></div>
+                <div class="quote-preview-content">
+                    <div class="quote-preview-header">
+                        <h2>Quote Preview</h2>
+                        <button class="quote-modal-close" id="close-preview">&times;</button>
+                    </div>
+                    <div class="quote-preview-body">
+                        <div id="preview-content">
+                            <!-- Preview will be inserted here -->
+                        </div>
+                    </div>
+                    <div class="quote-preview-footer">
+                        <button class="btn-secondary" id="edit-quote">Edit Quote</button>
+                        <button class="btn-primary" id="send-from-preview">Send Quote</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', previewModalHTML);
+        
         // Pre-select sales rep if saved
         const savedRep = localStorage.getItem('nwca_sales_rep');
         if (savedRep) {
@@ -160,9 +183,17 @@ export class QuoteModal {
         document.getElementById('close-success').addEventListener('click', () => this.close());
         document.getElementById('retry-send').addEventListener('click', () => this.showForm());
         
-        // Preview quote (future feature)
+        // Preview quote
         document.getElementById('preview-quote').addEventListener('click', () => {
-            alert('Quote preview coming soon!');
+            this.showPreview();
+        });
+        
+        // Preview modal controls
+        document.getElementById('close-preview').addEventListener('click', () => this.closePreview());
+        document.getElementById('edit-quote').addEventListener('click', () => this.closePreview());
+        document.getElementById('send-from-preview').addEventListener('click', () => {
+            this.closePreview();
+            this.sendQuote();
         });
     }
 
@@ -290,5 +321,128 @@ export class QuoteModal {
         
         // Reset total
         document.getElementById('total-price').textContent = '$0.00';
+    }
+    
+    showPreview() {
+        const formData = new FormData(document.getElementById('quote-form'));
+        const salesRepData = formData.get('salesRep');
+        
+        // Validate form first
+        if (!document.getElementById('quote-form').checkValidity()) {
+            document.getElementById('quote-form').reportValidity();
+            return;
+        }
+        
+        // Parse sales rep data
+        const [senderName, senderEmail] = salesRepData ? salesRepData.split('|') : ['', ''];
+        
+        // Calculate total
+        const total = this.calculateTotal();
+        
+        // Generate preview HTML
+        const previewHTML = `
+            <div class="email-preview-container">
+                <div class="email-header">
+                    <h1>NORTHWEST CUSTOM APPAREL</h1>
+                    <p>Custom Product Quote</p>
+                </div>
+                
+                <div class="email-content">
+                    <!-- Product Information -->
+                    <div class="preview-card">
+                        ${this.productData.brandLogo ? `<img src="${this.productData.brandLogo}" alt="${this.productData.brandName}" class="brand-logo-preview">` : ''}
+                        <img src="${this.productData.productImage}" alt="${this.productData.productName}" class="product-image-preview">
+                        <h2>${this.productData.productName}</h2>
+                        <p><strong>Style:</strong> ${this.productData.styleNumber}</p>
+                        <p><strong>Brand:</strong> ${this.productData.brandName || 'N/A'}</p>
+                        <p><strong>Color:</strong> ${this.productData.colorName}</p>
+                        <p><strong>Available Sizes:</strong> ${this.productData.sizes}</p>
+                        
+                        ${this.productData.description ? `
+                            <div class="preview-description">
+                                ${this.productData.description}
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Color Swatches -->
+                        ${this.generateColorSwatchesPreview()}
+                    </div>
+                    
+                    <!-- Quote Details -->
+                    <div class="preview-card">
+                        <h3>Quote Details</h3>
+                        <table class="preview-table">
+                            <tr>
+                                <td><strong>Quantity:</strong></td>
+                                <td style="text-align: right;">${formData.get('quantity')} pieces</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Decoration Method:</strong></td>
+                                <td style="text-align: right;">${formData.get('decorationMethod')}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Price per Item:</strong></td>
+                                <td style="text-align: right;">$${parseFloat(formData.get('pricePerItem') || 0).toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Setup Fee:</strong></td>
+                                <td style="text-align: right;">$${parseFloat(formData.get('setupFee') || 0).toFixed(2)}</td>
+                            </tr>
+                            <tr class="preview-total-row">
+                                <td><strong>TOTAL:</strong></td>
+                                <td style="text-align: right;"><strong>$${total.toFixed(2)}</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Notes Section -->
+                    ${formData.get('notes') ? `
+                        <div class="preview-card notes-preview">
+                            <h3>Notes from your sales representative:</h3>
+                            <p>${formData.get('notes').replace(/\n/g, '<br>')}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Footer -->
+                    <div class="preview-footer">
+                        <p>This quote is valid for 30 days</p>
+                        <p>Questions? Reply to this email or call (253) 922-5793</p>
+                        <hr>
+                        <p><strong>${senderName}</strong></p>
+                        <p>${senderEmail}</p>
+                        <p>Northwest Custom Apparel</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Show preview
+        document.getElementById('preview-content').innerHTML = previewHTML;
+        document.getElementById('quote-preview-modal').classList.remove('hidden');
+    }
+    
+    closePreview() {
+        document.getElementById('quote-preview-modal').classList.add('hidden');
+    }
+    
+    generateColorSwatchesPreview() {
+        if (!this.productData.allColors || this.productData.allColors.length === 0) return '';
+        
+        let html = '<div class="color-swatches-preview"><p><strong>Available Colors:</strong></p><div class="swatches-grid-preview">';
+        
+        this.productData.allColors.forEach((color, index) => {
+            const colorName = color.COLOR_NAME || color.colorName || 'Color';
+            const isSelected = index === this.productData.selectedColorIndex;
+            
+            html += `
+                <div class="swatch-item-preview ${isSelected ? 'selected' : ''}">
+                    <img src="${color.COLOR_SQUARE_IMAGE}" alt="${colorName}">
+                    <span>${colorName}</span>
+                </div>
+            `;
+        });
+        
+        html += '</div></div>';
+        return html;
     }
 }
