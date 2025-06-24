@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decoration Method Selector - Product Page Integration</title>
+    <style>
+        :root {
+            --primary-color: #2f661e;
+            --primary-dark: #1e4d0f;
+            --primary-light: #eaf2e9;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #d8e0d6;
+            --background: #fff;
+            --background-light: #f9fbf8;
+            --info-blue: #0078d4;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Product Page Context */
+        .page-mockup {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .page-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 20px 30px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .product-layout {
+            display: grid;
+            grid-template-columns: 100px 1fr 400px;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        /* Thumbnail column (placeholder) */
+        .thumbnails {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            border: 2px solid transparent;
+        }
+
+        .thumbnail.active {
+            border-color: var(--primary-color);
+        }
+
+        /* Main image area (placeholder) */
+        .main-image {
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 18px;
+            min-height: 500px;
+        }
+
+        /* Right column - Product Info */
+        .product-info-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .product-header {
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 20px;
+        }
+
+        .product-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 5px 0;
+            color: var(--text-color);
+        }
+
+        .product-style {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        /* Check Inventory Button */
+        .inventory-button {
+            background: var(--info-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .inventory-button:hover {
+            background: #106ebe;
+        }
+
+        /* Color Swatches */
+        .color-section h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-swatch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.2);
+        }
+
+        /* DECORATION METHOD SELECTOR */
+        .decoration-selector {
+            background: var(--background-light);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .decoration-selector h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        /* Segmented Control */
+        .segmented-control {
+            display: flex;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .segment {
+            flex: 1;
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color);
+            transition: all 0.2s;
+            position: relative;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .segment:last-child {
+            border-right: none;
+        }
+
+        .segment:hover {
+            background: rgba(47, 102, 30, 0.05);
+        }
+
+        .segment.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .segment-icon {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Decoration Method Content */
+        .method-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .method-header {
+            display: flex;
+            align-items: start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .method-icon-large {
+            font-size: 36px;
+            line-height: 1;
+        }
+
+        .method-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+
+        .method-tagline {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .method-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .detail-block h5 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .detail-block ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .detail-block ul li {
+            margin-bottom: 4px;
+        }
+
+        .rating {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 4px;
+        }
+
+        .star {
+            color: #ffa500;
+        }
+
+        .star.empty {
+            color: #ddd;
+        }
+
+        .cta-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(47, 102, 30, 0.3);
+        }
+
+        /* Future methods */
+        .coming-soon {
+            text-align: center;
+            padding: 10px;
+            background: var(--background-light);
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .coming-soon a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .coming-soon a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .product-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .thumbnails {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .main-image {
+                min-height: 300px;
+            }
+
+            .segmented-control {
+                flex-wrap: wrap;
+            }
+
+            .segment {
+                flex: 1 1 33%;
+                border-bottom: 1px solid var(--border-color);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .segment {
+                flex: 1 1 50%;
+            }
+
+            .method-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-mockup">
+            <div class="page-header">
+                Product Page - SanMar Style Layout
+            </div>
+            
+            <div class="product-layout">
+                <!-- Left: Thumbnails -->
+                <div class="thumbnails">
+                    <div class="thumbnail active"></div>
+                    <div class="thumbnail"></div>
+                    <div class="thumbnail"></div>
+                    <div class="thumbnail"></div>
+                </div>
+
+                <!-- Center: Main Image -->
+                <div class="main-image">
+                    Main Product Image
+                </div>
+
+                <!-- Right: Product Info Column -->
+                <div class="product-info-column">
+                    <!-- Product Header -->
+                    <div class="product-header">
+                        <h1 class="product-title">Port & Company® Essential Tee</h1>
+                        <div class="product-style">Style: PC61</div>
+                    </div>
+
+                    <!-- Check Inventory Button (moved up) -->
+                    <button class="inventory-button">
+                        Check Inventory & Pricing
+                    </button>
+
+                    <!-- Color Swatches -->
+                    <div class="color-section">
+                        <h3>Select Color:</h3>
+                        <div class="color-grid">
+                            <div class="color-swatch active" style="background: #7FFF00"></div>
+                            <div class="color-swatch" style="background: #000000"></div>
+                            <div class="color-swatch" style="background: #FF0000"></div>
+                            <div class="color-swatch" style="background: #0000FF"></div>
+                            <div class="color-swatch" style="background: #808080"></div>
+                            <div class="color-swatch" style="background: #FFFFFF; border-color: #ccc;"></div>
+                            <div class="color-swatch" style="background: #000080"></div>
+                            <div class="color-swatch" style="background: #4169E1"></div>
+                            <div class="color-swatch" style="background: #FFA500"></div>
+                            <div class="color-swatch" style="background: #FFFF00"></div>
+                            <div class="color-swatch" style="background: #008000"></div>
+                            <div class="color-swatch" style="background: #800080"></div>
+                        </div>
+                    </div>
+
+                    <!-- DECORATION METHOD SELECTOR -->
+                    <div class="decoration-selector">
+                        <h3>How would you like to customize this?</h3>
+                        
+                        <div class="segmented-control">
+                            <button class="segment active" onclick="selectMethod(this, 'embroidery')">
+                                <span class="segment-icon">🧵</span>
+                                Embroidery
+                            </button>
+                            <button class="segment" onclick="selectMethod(this, 'screenprint')">
+                                <span class="segment-icon">🖨️</span>
+                                Screen Print
+                            </button>
+                            <button class="segment" onclick="selectMethod(this, 'dtg')">
+                                <span class="segment-icon">👕</span>
+                                DTG
+                            </button>
+                            <button class="segment" onclick="selectMethod(this, 'dtf')">
+                                <span class="segment-icon">🎨</span>
+                                DTF
+                            </button>
+                            <button class="segment" onclick="selectMethod(this, 'cap')">
+                                <span class="segment-icon">🧢</span>
+                                Caps
+                            </button>
+                        </div>
+
+                        <div class="method-content" id="method-content">
+                            <!-- Default embroidery content -->
+                            <div class="method-header">
+                                <div class="method-icon-large">🧵</div>
+                                <div class="method-info">
+                                    <h4>Embroidery</h4>
+                                    <div class="method-tagline">Professional thread embroidery for a premium, lasting finish</div>
+                                </div>
+                            </div>
+                            
+                            <div class="method-details">
+                                <div class="detail-block">
+                                    <h5>Best For:</h5>
+                                    <ul>
+                                        <li>Company logos</li>
+                                        <li>Monograms & names</li>
+                                        <li>Polos & dress shirts</li>
+                                        <li>Uniforms & workwear</li>
+                                    </ul>
+                                </div>
+                                <div class="detail-block">
+                                    <h5>Key Features:</h5>
+                                    <ul>
+                                        <li>3D dimensional look</li>
+                                        <li>Extremely durable</li>
+                                        <li>Professional appearance</li>
+                                        <li>Won't fade or peel</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; font-size: 14px;">
+                                <div>
+                                    <strong>Durability:</strong>
+                                    <div class="rating">
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <strong>Typical Turnaround:</strong> 7-10 days
+                                </div>
+                            </div>
+
+                            <button class="cta-button">
+                                Configure Embroidery
+                                <span>→</span>
+                            </button>
+                        </div>
+
+                        <div class="coming-soon">
+                            More decoration methods coming soon! 
+                            <a href="#">Contact us</a> about laser engraving, vinyl, and patches.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Method data
+        const methodData = {
+            embroidery: {
+                icon: '🧵',
+                title: 'Embroidery',
+                tagline: 'Professional thread embroidery for a premium, lasting finish',
+                bestFor: [
+                    'Company logos',
+                    'Monograms & names',
+                    'Polos & dress shirts',
+                    'Uniforms & workwear'
+                ],
+                features: [
+                    '3D dimensional look',
+                    'Extremely durable',
+                    'Professional appearance',
+                    "Won't fade or peel"
+                ],
+                durability: 5,
+                turnaround: '7-10 days',
+                cta: 'Configure Embroidery'
+            },
+            screenprint: {
+                icon: '🖨️',
+                title: 'Screen Printing',
+                tagline: 'Classic printing method for bold, vibrant designs',
+                bestFor: [
+                    'T-shirt designs',
+                    'Large quantities',
+                    'Simple graphics',
+                    'Team uniforms'
+                ],
+                features: [
+                    'Vibrant colors',
+                    'Cost-effective for bulk',
+                    'Smooth finish',
+                    'Great color opacity'
+                ],
+                durability: 4,
+                turnaround: '5-7 days',
+                cta: 'Configure Screen Print'
+            },
+            dtg: {
+                icon: '👕',
+                title: 'DTG Printing',
+                tagline: 'Direct to Garment printing for detailed, full-color designs',
+                bestFor: [
+                    'Photographic images',
+                    'Complex artwork',
+                    'Small quantities',
+                    'Gradient designs'
+                ],
+                features: [
+                    'Unlimited colors',
+                    'No setup fees',
+                    'Soft hand feel',
+                    'Fine detail capability'
+                ],
+                durability: 3,
+                turnaround: '3-5 days',
+                cta: 'Configure DTG Print'
+            },
+            dtf: {
+                icon: '🎨',
+                title: 'DTF Transfer',
+                tagline: 'Versatile heat transfer for vibrant designs on any fabric',
+                bestFor: [
+                    'Detailed designs',
+                    'Mixed fabric types',
+                    'Small text & logos',
+                    'Athletic wear'
+                ],
+                features: [
+                    'Works on any fabric',
+                    'Stretchable prints',
+                    'Vibrant colors',
+                    'Sharp details'
+                ],
+                durability: 4,
+                turnaround: '5-7 days',
+                cta: 'Configure DTF Transfer'
+            },
+            cap: {
+                icon: '🧢',
+                title: 'Cap Embroidery',
+                tagline: 'Specialized embroidery designed specifically for headwear',
+                bestFor: [
+                    'Baseball caps',
+                    'Beanies',
+                    'Visors',
+                    'Trucker hats'
+                ],
+                features: [
+                    '3D puff embroidery',
+                    'Curved surface expertise',
+                    'Front, side & back options',
+                    'Professional finish'
+                ],
+                durability: 5,
+                turnaround: '7-10 days',
+                cta: 'Configure Cap Design'
+            }
+        };
+
+        function selectMethod(element, methodKey) {
+            // Update active state
+            document.querySelectorAll('.segment').forEach(seg => seg.classList.remove('active'));
+            element.classList.add('active');
+
+            // Get method data
+            const method = methodData[methodKey];
+
+            // Generate stars
+            const stars = Array(5).fill('★').map((star, i) => 
+                `<span class="star${i >= method.durability ? ' empty' : ''}">${star}</span>`
+            ).join('');
+
+            // Update content
+            document.getElementById('method-content').innerHTML = `
+                <div class="method-header">
+                    <div class="method-icon-large">${method.icon}</div>
+                    <div class="method-info">
+                        <h4>${method.title}</h4>
+                        <div class="method-tagline">${method.tagline}</div>
+                    </div>
+                </div>
+                
+                <div class="method-details">
+                    <div class="detail-block">
+                        <h5>Best For:</h5>
+                        <ul>
+                            ${method.bestFor.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="detail-block">
+                        <h5>Key Features:</h5>
+                        <ul>
+                            ${method.features.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; font-size: 14px;">
+                    <div>
+                        <strong>Durability:</strong>
+                        <div class="rating">${stars}</div>
+                    </div>
+                    <div>
+                        <strong>Typical Turnaround:</strong> ${method.turnaround}
+                    </div>
+                </div>
+
+                <button class="cta-button">
+                    ${method.cta}
+                    <span>→</span>
+                </button>
+            `;
+        }
+    </script>
+</body>
+</html>

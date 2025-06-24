@@ -12,7 +12,6 @@ import { PricingCards } from './components/pricing.js';
 import { InventorySummary } from './components/inventory-summary.js';
 import { ProductInfo } from './components/info.js';
 import { ColorSwatches } from './components/swatches.js';
-import { DecorationSelector } from './components/decoration-selector.js';
 
 // Initialize application
 class ProductPageApp {
@@ -45,17 +44,15 @@ class ProductPageApp {
     }
 
     initializeComponents() {
-        // Initialize search component - pass header search container
-        const headerSearchContainer = document.querySelector('.header-search');
+        // Initialize search component
         this.components.search = new ProductSearch(
-            headerSearchContainer,
+            document.getElementById('product-search'),
             this.handleProductSelect
         );
 
-        // Initialize gallery component with separate thumbnail container
+        // Initialize gallery component
         this.components.gallery = new ProductGallery(
-            document.getElementById('product-gallery'),
-            document.getElementById('product-thumbnails')
+            document.getElementById('product-gallery')
         );
 
         // Initialize product info component
@@ -70,17 +67,12 @@ class ProductPageApp {
             this.handleColorSelect
         );
 
-        // Initialize decoration selector component
-        this.components.decorationSelector = new DecorationSelector(
-            document.getElementById('decoration-selector')
-        );
-
-        // Initialize pricing cards component (hidden but still functional)
+        // Initialize pricing cards component
         this.components.pricing = new PricingCards(
             document.querySelector('.pricing-cards')
         );
 
-        // Initialize inventory summary component (hidden but still functional)
+        // Initialize inventory summary component
         this.components.inventory = new InventorySummary(
             document.getElementById('inventory-table')
         );
@@ -105,10 +97,7 @@ class ProductPageApp {
             // Ctrl+K or Cmd+K to focus search
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
-                const headerSearch = document.getElementById('header-style-search');
-                if (headerSearch) {
-                    headerSearch.focus();
-                }
+                document.getElementById('style-search').focus();
             }
         });
     }
@@ -167,7 +156,9 @@ class ProductPageApp {
     updateProductDisplay(product) {
         // Show product sections
         document.getElementById('product-display').classList.remove('hidden');
-        
+        document.getElementById('pricing-options').classList.remove('hidden');
+        document.getElementById('inventory-display').classList.remove('hidden');
+
         // Update components
         const firstColor = product.colors[0];
         const catalogColor = firstColor.CATALOG_COLOR || firstColor.catalogColor || firstColor.catalog_color || 'NA';
@@ -177,16 +168,7 @@ class ProductPageApp {
         this.components.gallery.update(firstColor);
         this.components.info.update(product);
         this.components.swatches.update(product.colors);
-        this.components.decorationSelector.update(product.styleNumber, catalogColor);
-        
-        // Update breadcrumb
-        const breadcrumbProduct = document.getElementById('breadcrumb-product');
-        if (breadcrumbProduct) {
-            breadcrumbProduct.textContent = product.title || product.productTitle || product.PRODUCT_TITLE || product.styleNumber;
-        }
-        
-        // Add product description at the end
-        this.addProductDescription();
+        this.components.pricing.update(product.styleNumber, catalogColor);
     }
 
     async handleColorSelect(color) {
@@ -206,8 +188,8 @@ class ProductPageApp {
         // Update gallery
         this.components.gallery.update(color);
         
-        // Update decoration selector
-        this.components.decorationSelector.update(product.styleNumber, catalogColor);
+        // Update pricing links
+        this.components.pricing.update(product.styleNumber, catalogColor);
         
         // Load inventory
         await this.loadInventory(product.styleNumber, catalogColor);
@@ -244,40 +226,7 @@ class ProductPageApp {
         errorText.textContent = message;
         errorEl.classList.remove('hidden');
     }
-    
-    addProductDescription() {
-        // Check if product info component has description
-        if (this.components.info && this.components.info.getProductDescription) {
-            const description = this.components.info.getProductDescription();
-            
-            // Find or create description container
-            let descContainer = document.getElementById('product-description-section');
-            if (!descContainer) {
-                descContainer = document.createElement('div');
-                descContainer.id = 'product-description-section';
-                descContainer.className = 'product-description-section';
-                
-                const infoColumn = document.querySelector('.product-info-column');
-                if (infoColumn) {
-                    infoColumn.appendChild(descContainer);
-                }
-            }
-            
-            if (descContainer && description) {
-                descContainer.innerHTML = `
-                    <h3>Description</h3>
-                    <p>${description}</p>
-                `;
-            }
-        }
-    }
 }
-
-// Global function for inventory button
-window.checkInventoryDetails = function(styleNumber, colorCode) {
-    // Navigate to inventory details page
-    window.location.href = `/inventory-details.html?style=${styleNumber}&color=${encodeURIComponent(colorCode)}`;
-};
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
