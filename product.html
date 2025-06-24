@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/product/styles/product.css">
     <link rel="stylesheet" href="/product/styles/product-redesign.css">
+    <link rel="stylesheet" href="/product/styles/quote-modal.css">
 </head>
 <body>
     <!-- Enhanced Header -->
@@ -58,7 +59,7 @@
     <main class="main-container">
         <!-- Breadcrumb -->
         <div class="breadcrumb">
-            <a href="/">Home</a> / <a href="/products">Products</a> / <span id="breadcrumb-product">Product</span>
+            <a href="/">Home</a> / Products / <span id="breadcrumb-product">Product</span>
         </div>
         <!-- Product Search Section (Hidden - using header search instead) -->
         <section id="product-search" class="search-section" style="display: none;">
@@ -135,6 +136,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="/product/app.js" type="module"></script>
     <script src="/product/components/image-zoom.js"></script>
 </body>

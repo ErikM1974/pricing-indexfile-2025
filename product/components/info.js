@@ -22,14 +22,32 @@ export class ProductInfo {
         // Show initial content with loading price
         this.container.innerHTML = `
             <div class="product-header">
-                <h2 class="product-title">${this.escapeHtml(product.title || product.productTitle || product.PRODUCT_TITLE || product.styleNumber)}</h2>
-                <div class="product-style">Style: ${this.escapeHtml(product.styleNumber)}</div>
+                <div class="product-header-text">
+                    <h2 class="product-title">${this.escapeHtml(product.title || product.productTitle || product.PRODUCT_TITLE || product.styleNumber)}</h2>
+                    <div class="product-style">Style: ${this.escapeHtml(product.styleNumber)}</div>
+                </div>
+                ${product.colors[0].BRAND_LOGO_IMAGE ? `
+                    <div class="brand-logo">
+                        <img src="${this.escapeHtml(product.colors[0].BRAND_LOGO_IMAGE)}" alt="${this.escapeHtml(product.BRAND_NAME || 'Brand Logo')}" />
+                    </div>
+                ` : ''}
             </div>
             
             <button class="inventory-button" onclick="window.checkInventoryDetails('${this.escapeHtml(product.styleNumber)}', '${this.escapeHtml(selectedColor.CATALOG_COLOR || selectedColor.catalogColor || selectedColor.catalog_color || 'NA')}')">
                 <i class="fas fa-warehouse"></i>
                 Check Inventory
             </button>
+            
+            <button class="send-quote-btn" id="send-quote-btn">
+                <i class="fas fa-envelope"></i>
+                Send Quote
+            </button>
+            
+            ${product.AVAILABLE_SIZES ? `
+                <div class="available-sizes">
+                    <strong>Available Sizes:</strong> ${this.escapeHtml(product.AVAILABLE_SIZES)}
+                </div>
+            ` : ''}
             
             <div class="price-estimate hidden" id="price-estimate-container">
                 <span class="price-label">Estimated Price:</span>
