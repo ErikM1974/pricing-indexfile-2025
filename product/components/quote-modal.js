@@ -5,7 +5,6 @@
 
 import { EmailService } from '../services/email-service.js';
 import { API } from '../services/api.js';
-import { ProductSearch } from './search.js';
 
 export class QuoteModal {
     constructor() {
@@ -628,16 +627,132 @@ export class QuoteModal {
         
         if (!searchInput || !resultsContainer) return;
         
-        // Create a mini search instance
-        const searchInstance = new ProductSearch(
-            { querySelector: () => searchInput },
-            async (styleNumber) => {
-                await this.loadProductData(productId, styleNumber);
-            }
-        );
+        let searchTimeout = null;
         
-        // Override the results container
-        searchInstance.resultsContainer = resultsContainer;
+        // Handle search input
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value.trim();
+            
+            clearTimeout(searchTimeout);
+            
+            if (value.length < 2) {
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+            
+            // Show loading
+            resultsContainer.innerHTML = `
+                <div class="search-loading">
+                    <div class="mini-spinner"></div>
+                    <span>Searching...</span>
+                </div>
+            `;
+            resultsContainer.classList.remove('hidden');
+            
+            // Debounce search
+            searchTimeout = setTimeout(async () => {
+                await this.searchProducts(productId, value);
+            }, 300);
+        });
+        
+        // Handle click outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+        
+        // Handle keyboard navigation
+        searchInput.addEventListener('keydown', (e) => {
+            const items = resultsContainer.querySelectorAll('.search-result-item');
+            const selected = resultsContainer.querySelector('.search-result-item.selected');
+            let currentIndex = -1;
+            
+            if (selected) {
+                currentIndex = Array.from(items).indexOf(selected);
+            }
+            
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    currentIndex = (currentIndex + 1) % items.length;
+                    this.selectSearchItem(items, currentIndex);
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    currentIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
+                    this.selectSearchItem(items, currentIndex);
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (selected) {
+                        selected.click();
+                    }
+                    break;
+                case 'Escape':
+                    resultsContainer.classList.add('hidden');
+                    break;
+            }
+        });
+    }
+    
+    selectSearchItem(items, index) {
+        items.forEach((item, i) => {
+            item.classList.toggle('selected', i === index);
+        });
+    }
+    
+    async searchProducts(productId, searchTerm) {
+        const resultsContainer = document.getElementById(`search-results-${productId}`);
+        
+        try {
+            const results = await this.api.searchProducts(searchTerm);
+            
+            if (results.length > 0) {
+                let html = '<div class="search-results-list">';
+                
+                results.forEach((result, index) => {
+                    html += `
+                        <div class="search-result-item" data-style="${result.value}">
+                            <div class="result-style">${result.value}</div>
+                            <div class="result-name">${result.label}</div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+                
+                // Add click handlers
+                resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                    item.addEventListener('click', async () => {
+                        const styleNumber = item.dataset.style;
+                        resultsContainer.classList.add('hidden');
+                        await this.loadProductData(productId, styleNumber);
+                    });
+                    
+                    item.addEventListener('mouseenter', () => {
+                        resultsContainer.querySelectorAll('.search-result-item').forEach(i => {
+                            i.classList.remove('selected');
+                        });
+                        item.classList.add('selected');
+                    });
+                });
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="search-no-results">
+                        No products found
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Search failed:', error);
+            resultsContainer.innerHTML = `
+                <div class="search-error">
+                    Search failed. Please try again.
+                </div>
+            `;
+        }
     }
     
     async loadProductData(productId, styleNumber) {
