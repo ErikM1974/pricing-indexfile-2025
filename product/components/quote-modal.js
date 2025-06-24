@@ -5,10 +5,12 @@
 
 import { EmailService } from '../services/email-service.js';
 import { API } from '../services/api.js';
+import { QuoteService } from '../services/quote-service.js';
 
 export class QuoteModal {
     constructor() {
         this.emailService = new EmailService();
+        this.quoteService = new QuoteService();
         this.modal = null;
         this.products = [];
         this.nextProductId = 1;
@@ -83,6 +85,7 @@ export class QuoteModal {
                         
                         <div class="form-actions">
                             <button type="button" class="btn-secondary" id="preview-quote">Preview Quote</button>
+                            <button type="button" class="btn-secondary" id="save-quote-test" style="background: #4CAF50; color: white;">Save Quote (Test)</button>
                             <button type="submit" class="btn-primary">Send Quote</button>
                         </div>
                     </form>
@@ -174,6 +177,11 @@ export class QuoteModal {
         document.getElementById('send-from-preview').addEventListener('click', () => {
             this.closePreview();
             this.sendQuote();
+        });
+        
+        // Save quote test button
+        document.getElementById('save-quote-test').addEventListener('click', () => {
+            this.testSaveQuote();
         });
     }
 
@@ -911,4 +919,62 @@ export class QuoteModal {
         document.getElementById('quote-preview-modal').classList.add('hidden');
     }
     
+    async testSaveQuote() {
+        const formData = new FormData(document.getElementById('quote-form'));
+        const customerEmail = formData.get('customerEmail');
+        const salesRepData = formData.get('salesRep');
+        
+        // Validate
+        if (!this.emailService.isValidEmail(customerEmail)) {
+            alert('Please enter a valid email address');
+            return;
+        }
+        
+        if (!this.validateProducts()) {
+            return;
+        }
+        
+        // Parse sales rep data
+        const [senderName, senderEmail] = salesRepData ? salesRepData.split('|') : ['', ''];
+        
+        // Get valid products
+        const validProducts = this.products.filter(p => p.styleNumber && p.quantity && p.pricePerItem);
+        const grandTotal = validProducts.reduce((sum, p) => sum + p.subtotal, 0);
+        
+        // Prepare quote data
+        const quoteData = {
+            customerEmail: customerEmail,
+            senderName: senderName,
+            senderEmail: senderEmail,
+            products: validProducts,
+            grandTotal: grandTotal,
+            notes: formData.get('notes')
+        };
+        
+        console.log('[QuoteModal] Testing save with data:', quoteData);
+        
+        // Show loading
+        const saveButton = document.getElementById('save-quote-test');
+        const originalText = saveButton.textContent;
+        saveButton.textContent = 'Saving...';
+        saveButton.disabled = true;
+        
+        try {
+            const result = await this.quoteService.saveQuote(quoteData);
+            
+            if (result.success) {
+                console.log('[QuoteModal] Quote saved successfully:', result);
+                alert(`Quote saved successfully!\n\nQuote ID: ${result.quoteID}\n\nCheck console for details.`);
+            } else {
+                console.error('[QuoteModal] Save failed:', result.error);
+                alert(`Failed to save quote: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('[QuoteModal] Unexpected error:', error);
+            alert(`Error: ${error.message}`);
+        } finally {
+            saveButton.textContent = originalText;
+            saveButton.disabled = false;
+        }
+    }
 }
