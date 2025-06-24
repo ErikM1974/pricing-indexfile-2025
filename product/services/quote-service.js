@@ -133,15 +133,19 @@ export class QuoteService {
             console.log('[QuoteService] Session created:', sessionResult);
 
             // Step 2: Add items to quote
-            const itemPromises = quoteData.products.map(async (product) => {
+            const itemPromises = quoteData.products.map(async (product, index) => {
+                // Format current timestamp for AddedAt
+                const addedAt = new Date().toISOString().replace(/\.\d{3}Z$/, '');
+                
                 const itemData = {
                     QuoteID: quoteID,
+                    LineNumber: index + 1, // Sequential line numbers
                     StyleNumber: product.styleNumber,
                     ProductName: product.productName,
                     Color: product.colorName,
-                    ColorCode: 'NA', // Would need color code mapping
+                    ColorCode: '', // Empty for now
                     EmbellishmentType: this.mapEmbellishmentType(product.decorationMethod),
-                    PrintLocation: 'FC', // Default to Front Center
+                    PrintLocation: 'Front Center', // Full name instead of code
                     PrintLocationName: 'Front Center',
                     Quantity: parseInt(product.quantity),
                     HasLTM: product.quantity < 12 ? 'Yes' : 'No',
@@ -149,9 +153,10 @@ export class QuoteService {
                     LTMPerUnit: product.quantity < 12 ? 2.00 : 0,
                     FinalUnitPrice: parseFloat(product.pricePerItem),
                     LineTotal: parseFloat(product.subtotal),
-                    SizeBreakdown: '{}', // Empty for now
+                    SizeBreakdown: '{}', // Empty JSON for now
                     PricingTier: this.getPricingTier(product.quantity),
-                    ImageURL: product.productImage || ''
+                    ImageURL: product.productImage || '',
+                    AddedAt: addedAt
                 };
 
                 console.log('[QuoteService] Item data:', itemData);
