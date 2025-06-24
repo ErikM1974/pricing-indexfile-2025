@@ -65,19 +65,23 @@ export class QuoteService {
             console.log('[QuoteService] Saving quote with ID:', quoteID);
 
             // Step 1: Create quote session
+            // Format date as MM/DD/YYYY for Caspio
+            const validUntilDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+            const formattedValidUntil = `${(validUntilDate.getMonth() + 1).toString().padStart(2, '0')}/${validUntilDate.getDate().toString().padStart(2, '0')}/${validUntilDate.getFullYear()}`;
+            
             const sessionData = {
                 QuoteID: quoteID,
                 SessionID: sessionID,
                 CustomerEmail: quoteData.customerEmail,
                 CustomerName: quoteData.senderName || 'Guest',
-                CompanyName: 'Northwest Custom Apparel', // Default for now
+                CompanyName: 'Northwest Custom Apparel',
                 Status: 'Active',
                 TotalItems: quoteData.products.length,
-                SubtotalAmount: quoteData.grandTotal,
-                TaxAmount: 0, // Not calculating tax yet
-                TotalAmount: quoteData.grandTotal,
+                SubtotalAmount: parseFloat(quoteData.grandTotal.toFixed(2)),
+                TaxAmount: 0,
+                TotalAmount: parseFloat(quoteData.grandTotal.toFixed(2)),
                 Currency: 'USD',
-                ValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                ValidUntil: formattedValidUntil, // MM/DD/YYYY format
                 Notes: quoteData.notes || ''
             };
 
@@ -91,11 +95,32 @@ export class QuoteService {
                 body: JSON.stringify(sessionData)
             });
 
+            // Get response text first to see error details
+            const responseText = await sessionResponse.text();
+            console.log('[QuoteService] Session response status:', sessionResponse.status);
+            console.log('[QuoteService] Session response text:', responseText);
+
             if (!sessionResponse.ok) {
-                throw new Error(`Session creation failed: ${sessionResponse.status}`);
+                // Try to parse error message
+                let errorMessage = `Session creation failed: ${sessionResponse.status}`;
+                try {
+                    const errorData = JSON.parse(responseText);
+                    errorMessage = errorData.message || errorData.error || errorMessage;
+                } catch (e) {
+                    errorMessage += ` - ${responseText}`;
+                }
+                throw new Error(errorMessage);
             }
 
-            const sessionResult = await sessionResponse.json();
+            // Parse successful response
+            let sessionResult;
+            try {
+                sessionResult = JSON.parse(responseText);
+            } catch (e) {
+                console.error('[QuoteService] Failed to parse success response:', e);
+                sessionResult = { success: true, message: responseText };
+            }
+            
             console.log('[QuoteService] Session created:', sessionResult);
 
             // Step 2: Add items to quote
@@ -130,11 +155,26 @@ export class QuoteService {
                     body: JSON.stringify(itemData)
                 });
 
+                const itemResponseText = await itemResponse.text();
+                console.log('[QuoteService] Item response status:', itemResponse.status);
+                console.log('[QuoteService] Item response text:', itemResponseText);
+
                 if (!itemResponse.ok) {
-                    throw new Error(`Item creation failed: ${itemResponse.status}`);
+                    let errorMessage = `Item creation failed: ${itemResponse.status}`;
+                    try {
+                        const errorData = JSON.parse(itemResponseText);
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage += ` - ${itemResponseText}`;
+                    }
+                    throw new Error(errorMessage);
                 }
 
-                return await itemResponse.json();
+                try {
+                    return JSON.parse(itemResponseText);
+                } catch (e) {
+                    return { success: true, message: itemResponseText };
+                }
             });
 
             const itemResults = await Promise.all(itemPromises);
