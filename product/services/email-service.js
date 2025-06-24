@@ -37,6 +37,7 @@ export class EmailService {
         const templateParams = {
             // Recipient
             to_email: quoteData.customerEmail,
+            cc_email: quoteData.senderEmail,  // CC the sales rep
             
             // Sender
             from_name: quoteData.senderName,
