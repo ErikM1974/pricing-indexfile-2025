@@ -297,6 +297,17 @@ button {
     padding-left: var(--spacing-lg);
 }
 
+.product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-lg);
+}
+
+.product-header-text {
+    flex: 1;
+}
+
 .product-title {
     font-size: 1.5rem;
     margin-bottom: var(--spacing-sm);
@@ -305,6 +316,63 @@ button {
 .product-style {
     color: var(--text-light);
     margin-bottom: var(--spacing-md);
+}
+
+.brand-logo {
+    flex-shrink: 0;
+    margin-left: var(--spacing-lg);
+}
+
+.brand-logo img {
+    max-height: 40px;
+    width: auto;
+    display: block;
+}
+
+.available-sizes {
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.95rem;
+    color: var(--text-color);
+}
+
+/* Product Resources Section */
+.product-resources-section {
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+}
+
+.resources-header {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-bottom: var(--spacing-sm);
+}
+
+.resources-links {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.resource-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 0.875rem;
+    color: var(--text-light);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.resource-link:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.resource-link i {
+    font-size: 1rem;
+    opacity: 0.7;
 }
 
 .price-estimate {
@@ -763,6 +831,16 @@ button {
     .product-info {
         padding-left: 0;
         padding-top: var(--spacing-lg);
+    }
+    
+    .product-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .brand-logo {
+        margin-left: 0;
+        margin-top: var(--spacing-md);
     }
     
     .pricing-cards {

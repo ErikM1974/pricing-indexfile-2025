@@ -187,6 +187,9 @@ class ProductPageApp {
         
         // Add product description at the end
         this.addProductDescription();
+        
+        // Add product resources (PDFs)
+        this.addProductResources();
     }
 
     async handleColorSelect(color) {
@@ -215,6 +218,9 @@ class ProductPageApp {
         
         // Update decoration selector
         this.components.decorationSelector.update(product.styleNumber, catalogColor);
+        
+        // Update product resources for new color
+        this.addProductResources();
         
         // Load inventory
         await this.loadInventory(product.styleNumber, catalogColor);
@@ -276,6 +282,57 @@ class ProductPageApp {
                     <p>${description}</p>
                 `;
             }
+        }
+    }
+    
+    addProductResources() {
+        const product = this.state.get('product');
+        const selectedColor = this.state.get('selectedColor');
+        
+        if (!product || !selectedColor) return;
+        
+        // Check if we have any PDF links
+        const hasSpecSheet = selectedColor.SPEC_SHEET;
+        const hasDecorationSheet = selectedColor.DECORATION_SPEC_SHEET;
+        
+        if (!hasSpecSheet && !hasDecorationSheet) return;
+        
+        // Find or create resources container
+        let resourcesContainer = document.getElementById('product-resources-section');
+        if (!resourcesContainer) {
+            resourcesContainer = document.createElement('div');
+            resourcesContainer.id = 'product-resources-section';
+            resourcesContainer.className = 'product-resources-section';
+            
+            const infoColumn = document.querySelector('.product-info-column');
+            if (infoColumn) {
+                infoColumn.appendChild(resourcesContainer);
+            }
+        }
+        
+        if (resourcesContainer) {
+            let resourcesHTML = '<div class="resources-header">Product Resources:</div><div class="resources-links">';
+            
+            if (hasSpecSheet) {
+                resourcesHTML += `
+                    <a href="${selectedColor.SPEC_SHEET}" target="_blank" class="resource-link">
+                        <i class="fas fa-file-pdf"></i>
+                        Product Specifications
+                    </a>
+                `;
+            }
+            
+            if (hasDecorationSheet) {
+                resourcesHTML += `
+                    <a href="${selectedColor.DECORATION_SPEC_SHEET}" target="_blank" class="resource-link">
+                        <i class="fas fa-file-pdf"></i>
+                        Decoration Guidelines
+                    </a>
+                `;
+            }
+            
+            resourcesHTML += '</div>';
+            resourcesContainer.innerHTML = resourcesHTML;
         }
     }
 }

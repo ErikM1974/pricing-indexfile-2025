@@ -56,12 +56,23 @@ export class API {
 
             const data = await response.json();
             
-            // Transform data to consistent format
+            // Transform data to consistent format, including all new fields
             const product = {
                 styleNumber: styleNumber,
                 title: data.productTitle || '',
                 description: data.PRODUCT_DESCRIPTION || '',
-                colors: data.colors || []
+                colors: data.colors || [],
+                // Include all the new fields from the API
+                AVAILABLE_SIZES: data.AVAILABLE_SIZES || '',
+                BRAND_NAME: data.BRAND_NAME || '',
+                CATEGORY_NAME: data.CATEGORY_NAME || '',
+                SUBCATEGORY_NAME: data.SUBCATEGORY_NAME || '',
+                PRODUCT_STATUS: data.PRODUCT_STATUS || '',
+                basePriceRange: data.basePriceRange || '',
+                MSRP: data.MSRP || null,
+                // Also preserve the original fields in case they're needed
+                productTitle: data.productTitle || '',
+                PRODUCT_DESCRIPTION: data.PRODUCT_DESCRIPTION || ''
             };
 
             // Cache the result
