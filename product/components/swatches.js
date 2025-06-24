@@ -23,8 +23,17 @@ export class ColorSwatches {
     }
 
     render() {
+        const selectedColorName = this.selectedColor ? 
+            (this.selectedColor.COLOR_NAME || this.selectedColor.colorName || this.selectedColor.color_name || 'Unknown') : 
+            '';
+        
         this.container.innerHTML = `
             <h3>Available Colors (${this.colors.length})</h3>
+            <div class="selected-color-display">
+                <span class="checkmark">✓</span>
+                <span class="selected-label">Color selected:</span>
+                <span class="selected-name">${selectedColorName}</span>
+            </div>
             <div class="swatches-grid">
                 ${this.colors.map((color, index) => this.createSwatchHtml(color, index)).join('')}
             </div>
@@ -101,21 +110,15 @@ export class ColorSwatches {
     selectColor(color) {
         this.selectedColor = color;
         
-        const catalogColor = color.CATALOG_COLOR || color.catalogColor || color.catalog_color;
-        const colorName = color.COLOR_NAME || color.colorName || color.color_name;
+        // Store scroll position to prevent jumping
+        const scrollPos = window.scrollY;
         
-        // Update visual selection
-        this.container.querySelectorAll('.color-swatch').forEach(swatch => {
-            const isSelected = swatch.dataset.color === catalogColor;
-            swatch.classList.toggle('selected', isSelected);
-        });
-
-        // Update product info display
-        const colorNameEl = document.getElementById('selected-color-name');
-        if (colorNameEl) {
-            colorNameEl.textContent = colorName;
-        }
-
+        // Re-render to update the selected color display
+        this.render();
+        
+        // Restore scroll position
+        window.scrollTo(0, scrollPos);
+        
         // Trigger callback
         if (this.onColorSelect) {
             this.onColorSelect(color);

@@ -16,9 +16,9 @@ export class ProductGallery {
     }
 
     render() {
-        // Main image area
+        // Main image area - Add zoom-ready class
         this.container.innerHTML = `
-            <div class="gallery-main">
+            <div class="gallery-main zoom-ready">
                 <img id="main-image" class="main-image" alt="Product image">
                 <div class="image-loading">
                     <div class="mini-spinner"></div>
@@ -219,6 +219,11 @@ export class ProductGallery {
         this.mainImage.style.opacity = '0';
         setTimeout(() => {
             this.mainImage.style.opacity = '1';
+            // Dispatch event for zoom component
+            this.mainImage.dispatchEvent(new CustomEvent('imageUpdated', { 
+                detail: { url, alt },
+                bubbles: true 
+            }));
         }, 50);
     }
 
