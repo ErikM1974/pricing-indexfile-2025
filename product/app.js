@@ -206,6 +206,13 @@ class ProductPageApp {
         // Update gallery
         this.components.gallery.update(color);
         
+        // Re-initialize zoom after gallery update
+        setTimeout(() => {
+            if (window.NWCA && window.NWCA.ImageZoom) {
+                window.NWCA.ImageZoom.init();
+            }
+        }, 500);
+        
         // Update decoration selector
         this.components.decorationSelector.update(product.styleNumber, catalogColor);
         

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Selection Display Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2f661e;
+            --primary-dark: #1e4d0f;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #d8e0d6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .comparison-box {
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .comparison-box h3 {
+            margin: 0 0 15px 0;
+            color: var(--primary-dark);
+        }
+
+        .comparison-box img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Color Selection Styles */
+        .color-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .color-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Selected Color Display - SanMar Style */
+        .selected-color-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f0f7f0;
+            border: 1px solid #d4e8d4;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .selected-color-display .checkmark {
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .selected-color-display .selected-label {
+            color: var(--text-light);
+        }
+
+        .selected-color-display .selected-name {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        /* Color Swatches */
+        .swatches-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        .color-swatch {
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .color-swatch:hover {
+            transform: translateY(-2px);
+        }
+
+        .swatch-color {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            border: 2px solid #ddd;
+            margin: 0 auto 5px;
+            transition: all 0.2s;
+        }
+
+        .color-swatch.active .swatch-color {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.2);
+        }
+
+        .swatch-name {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .benefits {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .benefits h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary-dark);
+        }
+
+        .benefits ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .benefits li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>✓ Color Selection Display Demo</h1>
+        
+        <div class="comparison">
+            <div class="comparison-box">
+                <h3>SanMar's Implementation</h3>
+                <img src="/mnt/c/Users/erik/Downloads/selected color swatch.png" alt="SanMar Color Selection">
+            </div>
+            
+            <div class="comparison-box">
+                <h3>Our Implementation</h3>
+                <div class="color-section">
+                    <h3>Available Colors (12)</h3>
+                    <div class="selected-color-display">
+                        <span class="checkmark">✓</span>
+                        <span class="selected-label">Color selected:</span>
+                        <span class="selected-name">Ash</span>
+                    </div>
+                    <div class="swatches-grid">
+                        <div class="color-swatch active" data-color="Ash">
+                            <div class="swatch-color" style="background: #E5E5E5;"></div>
+                            <div class="swatch-name">Ash</div>
+                        </div>
+                        <div class="color-swatch" data-color="Black">
+                            <div class="swatch-color" style="background: #000000;"></div>
+                            <div class="swatch-name">Black</div>
+                        </div>
+                        <div class="color-swatch" data-color="Navy">
+                            <div class="swatch-color" style="background: #1F2F56;"></div>
+                            <div class="swatch-name">Navy</div>
+                        </div>
+                        <div class="color-swatch" data-color="Red">
+                            <div class="swatch-color" style="background: #CE1126;"></div>
+                            <div class="swatch-name">Red</div>
+                        </div>
+                        <div class="color-swatch" data-color="Royal">
+                            <div class="swatch-color" style="background: #0066CC;"></div>
+                            <div class="swatch-name">Royal</div>
+                        </div>
+                        <div class="color-swatch" data-color="White">
+                            <div class="swatch-color" style="background: #FFFFFF; border-color: #ccc;"></div>
+                            <div class="swatch-name">White</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="benefits">
+            <h3>✨ Benefits of This Feature:</h3>
+            <ul>
+                <li><strong>Clear Confirmation:</strong> Users know exactly which color they've selected</li>
+                <li><strong>Reduces Errors:</strong> Prevents ordering the wrong color</li>
+                <li><strong>Professional Look:</strong> Matches major e-commerce sites</li>
+                <li><strong>Accessibility:</strong> Text confirmation helps colorblind users</li>
+                <li><strong>Clean Design:</strong> Subtle green styling matches your brand</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Demo interaction
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                // Remove active from all
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                
+                // Add active to clicked
+                this.classList.add('active');
+                
+                // Update selected color display
+                const colorName = this.dataset.color;
+                document.querySelector('.selected-name').textContent = colorName;
+                
+                // Add a subtle animation
+                const display = document.querySelector('.selected-color-display');
+                display.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    display.style.transform = 'scale(1)';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>

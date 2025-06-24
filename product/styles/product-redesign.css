@@ -163,11 +163,11 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-/* Product Grid Layout */
+/* Product Grid Layout - Enhanced */
 .product-layout {
     display: grid;
-    grid-template-columns: 100px 1fr 420px;
-    gap: 30px;
+    grid-template-columns: 100px 1fr 380px;
+    gap: 25px;
 }
 
 /* Thumbnails */
@@ -201,23 +201,29 @@
     object-fit: cover;
 }
 
-/* Main Gallery */
+/* Main Gallery - Enhanced */
 .product-gallery .gallery-main {
     background: #f8f8f8;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 500px;
+    min-height: 600px;
     position: relative;
+    overflow: hidden;
+    cursor: zoom-in;
+    transition: all 0.3s ease;
 }
 
 .product-gallery .main-image {
     max-width: 100%;
-    max-height: 500px;
+    max-height: 600px;
     width: auto;
     height: auto;
+    transition: transform 0.3s ease;
+    will-change: transform;
 }
+
 
 /* Product Info Column */
 .product-info-column {
@@ -277,6 +283,35 @@
     margin: 0 0 12px 0;
     font-size: 16px;
     font-weight: 600;
+}
+
+/* Selected Color Display - SanMar Style */
+.selected-color-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0f7f0;
+    border: 1px solid #d4e8d4;
+    padding: 8px 16px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.selected-color-display .checkmark {
+    color: #4caf50;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.selected-color-display .selected-label {
+    color: var(--text-light);
+}
+
+.selected-color-display .selected-name {
+    font-weight: 600;
+    color: var(--text-color);
 }
 
 .swatches-grid {
@@ -501,7 +536,11 @@
     }
 
     .product-gallery .gallery-main {
-        min-height: 300px;
+        min-height: 400px;
+    }
+    
+    .product-gallery .main-image {
+        max-height: 400px;
     }
 
     .product-info-column {
@@ -563,5 +602,171 @@
     .color-swatch .swatch-image {
         width: 40px;
         height: 40px;
+    }
+}
+
+/* Simple Image Zoom Modal - SanMar Style */
+.image-zoom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.image-zoom-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Close Button - Top Right */
+.zoom-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+.zoom-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+.zoom-close svg {
+    color: white;
+}
+
+/* Content Container */
+.zoom-content {
+    position: relative;
+    width: 90%;
+    height: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Loader */
+.zoom-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.image-zoom-modal.loading .zoom-loader {
+    display: block;
+}
+
+.image-zoom-modal.loading .zoom-image {
+    opacity: 0;
+}
+
+.zoom-loader .spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Main Image */
+.zoom-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    cursor: default;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Gallery Cursor */
+.gallery-main {
+    cursor: pointer;
+}
+
+.main-image {
+    cursor: zoom-in;
+}
+
+/* Loading State */
+.gallery-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-light);
+}
+
+.gallery-loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Smooth Image Transitions */
+.product-gallery .main-image {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.product-gallery .main-image.loading {
+    opacity: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .zoom-close {
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .zoom-content {
+        width: 95%;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .zoom-close {
+        background: rgba(0, 0, 0, 0.7);
+    }
+    
+    .zoom-image {
+        box-shadow: none;
     }
 }
