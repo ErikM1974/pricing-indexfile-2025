@@ -65,9 +65,18 @@ export class QuoteService {
             console.log('[QuoteService] Saving quote with ID:', quoteID);
 
             // Step 1: Create quote session
-            // Format date as MM/DD/YYYY for Caspio
-            const validUntilDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-            const formattedValidUntil = `${(validUntilDate.getMonth() + 1).toString().padStart(2, '0')}/${validUntilDate.getDate().toString().padStart(2, '0')}/${validUntilDate.getFullYear()}`;
+            // Format date as ISO for Caspio (YYYY-MM-DDTHH:MM:SS)
+            const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+            const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
+            
+            // Calculate total quantity from all products
+            const totalQuantity = quoteData.products.reduce((sum, product) => sum + parseInt(product.quantity), 0);
+            
+            // Calculate LTM fee total
+            const ltmFeeTotal = quoteData.products.reduce((sum, product) => {
+                const ltmFee = product.quantity < 12 ? 2.00 * product.quantity : 0;
+                return sum + ltmFee;
+            }, 0);
             
             const sessionData = {
                 QuoteID: quoteID,
@@ -75,13 +84,13 @@ export class QuoteService {
                 CustomerEmail: quoteData.customerEmail,
                 CustomerName: quoteData.senderName || 'Guest',
                 CompanyName: 'Northwest Custom Apparel',
-                Status: 'Active',
-                TotalItems: quoteData.products.length,
+                Phone: '', // TODO: Add phone field to form
+                TotalQuantity: totalQuantity,
                 SubtotalAmount: parseFloat(quoteData.grandTotal.toFixed(2)),
-                TaxAmount: 0,
+                LTMFeeTotal: parseFloat(ltmFeeTotal.toFixed(2)),
                 TotalAmount: parseFloat(quoteData.grandTotal.toFixed(2)),
-                Currency: 'USD',
-                ValidUntil: formattedValidUntil, // MM/DD/YYYY format
+                Status: 'Open',
+                ExpiresAt: formattedExpiresAt,
                 Notes: quoteData.notes || ''
             };
 
