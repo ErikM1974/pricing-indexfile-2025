@@ -65,13 +65,13 @@ export class EmailService {
             brand_name: !isMultiProduct && quoteData.products?.length === 1 ? quoteData.products[0].brandName : (isMultiProduct ? 'Multiple Brands' : (quoteData.brandName || '')),
             
             // Product HTML (used for both single and multiple products)
-            products_html: quoteData.products && quoteData.products.length > 0 ? this.generateMultiProductHTML(quoteData.products) : '',
+            products_html: quoteData.products && quoteData.products.length > 0 ? this.generateMultiProductHTML(quoteData.products, quoteData.decorationMethod, quoteData.setupFee) : '',
             
             // Quote details (single product fields for backwards compatibility)
             quantity: !isMultiProduct && quoteData.products?.length === 1 ? quoteData.products[0].quantity : (isMultiProduct ? 'See breakdown' : quoteData.quantity),
-            decoration_method: !isMultiProduct && quoteData.products?.length === 1 ? quoteData.products[0].decorationMethod : (isMultiProduct ? 'Various' : quoteData.decorationMethod),
+            decoration_method: quoteData.decorationMethod || 'Not specified',
             price_per_item: !isMultiProduct && quoteData.products?.length === 1 ? this.formatPrice(quoteData.products[0].pricePerItem) : (isMultiProduct ? 'See breakdown' : this.formatPrice(quoteData.pricePerItem)),
-            setup_fee: !isMultiProduct && quoteData.products?.length === 1 ? this.formatPrice(quoteData.products[0].setupFee) : (isMultiProduct ? 'See breakdown' : this.formatPrice(quoteData.setupFee)),
+            setup_fee: this.formatPrice(quoteData.setupFee || 0),
             total_price: this.formatPrice(quoteData.grandTotal || quoteData.totalPrice),
             
             // Additional info
@@ -143,11 +143,16 @@ export class EmailService {
     /**
      * Generate HTML for multiple products
      */
-    generateMultiProductHTML(products) {
+    generateMultiProductHTML(products, decorationMethod, setupFee) {
         if (!products || products.length === 0) return '';
         
         let html = '<div style="margin: 20px 0;">';
         html += '<h2 style="color: #2f661e; margin-bottom: 20px;">Product Quote Details</h2>';
+        
+        // Show decoration method at the top
+        if (decorationMethod) {
+            html += `<p style="font-size: 16px; margin-bottom: 20px;"><strong>Decoration Method:</strong> ${decorationMethod}</p>`;
+        }
         
         // Simple products table
         html += `
@@ -190,13 +195,25 @@ export class EmailService {
         `;
         
         // Grand total
-        const grandTotal = products.reduce((sum, p) => sum + p.subtotal, 0);
+        const productsSubtotal = products.reduce((sum, p) => sum + p.subtotal, 0);
+        const grandTotal = productsSubtotal + (setupFee || 0);
+        
         html += `
             <div style="background: #f9f9f9; border: 2px solid #2f661e; border-radius: 8px; padding: 20px; margin-top: 30px;">
-                <table style="width: 100%; font-size: 18px;">
+                <table style="width: 100%; font-size: 16px;">
                     <tr>
-                        <td><strong>GRAND TOTAL:</strong></td>
-                        <td style="text-align: right;"><strong>$${this.formatPrice(grandTotal)}</strong></td>
+                        <td>Products Subtotal:</td>
+                        <td style="text-align: right;">$${this.formatPrice(productsSubtotal)}</td>
+                    </tr>
+                    ${setupFee > 0 ? `
+                    <tr>
+                        <td>Setup Fee (one-time):</td>
+                        <td style="text-align: right;">$${this.formatPrice(setupFee)}</td>
+                    </tr>
+                    ` : ''}
+                    <tr style="border-top: 2px solid #2f661e; padding-top: 10px;">
+                        <td style="padding-top: 10px; font-size: 18px;"><strong>GRAND TOTAL:</strong></td>
+                        <td style="text-align: right; padding-top: 10px; font-size: 18px;"><strong>$${this.formatPrice(grandTotal)}</strong></td>
                     </tr>
                 </table>
             </div>

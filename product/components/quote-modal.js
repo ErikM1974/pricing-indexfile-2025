@@ -69,6 +69,29 @@ export class QuoteModal {
                         </div>
                         
                         <div class="form-section">
+                            <h3>Decoration Details</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="decoration-method">Decoration Method *</label>
+                                    <select id="decoration-method" name="decorationMethod" required>
+                                        <option value="">Select Method</option>
+                                        <option value="Embroidery">Embroidery</option>
+                                        <option value="Screen Print">Screen Print</option>
+                                        <option value="DTG">DTG (Direct to Garment)</option>
+                                        <option value="DTF">DTF (Direct to Film)</option>
+                                        <option value="Heat Transfer">Heat Transfer</option>
+                                        <option value="Sublimation">Sublimation</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="setup-fee">Setup Fee ($)</label>
+                                    <input type="number" id="setup-fee" name="setupFee" value="0" min="0" step="0.01">
+                                    <small style="color: #666;">One-time fee for artwork/screen setup</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
                             <h3>Products</h3>
                             <div id="products-container" class="products-container">
                                 <!-- Product lines will be added here dynamically -->
@@ -219,8 +242,6 @@ export class QuoteModal {
             brandName: productData.brandName,
             quantity: '',
             pricePerItem: '',
-            setupFee: '0',
-            decorationMethod: '',
             subtotal: 0
         };
         
@@ -285,14 +306,6 @@ export class QuoteModal {
             return false;
         }
         
-        // Check each valid product has required fields
-        for (const product of validProducts) {
-            if (!product.decorationMethod) {
-                alert(`Please select a decoration method for ${product.productName}`);
-                return false;
-            }
-        }
-        
         return true;
     }
 
@@ -321,8 +334,12 @@ export class QuoteModal {
         // Get valid products with complete data
         const validProducts = this.products.filter(p => p.styleNumber && p.quantity && p.pricePerItem);
         
+        // Get quote-level details
+        const decorationMethod = formData.get('decorationMethod');
+        const setupFee = parseFloat(formData.get('setupFee') || 0);
+        
         // Calculate grand total
-        const grandTotal = validProducts.reduce((sum, p) => sum + p.subtotal, 0);
+        const grandTotal = validProducts.reduce((sum, p) => sum + p.subtotal, 0) + setupFee;
         
         // Prepare quote data with multiple products
         const quoteData = {
@@ -333,6 +350,10 @@ export class QuoteModal {
             companyName: companyName,
             senderName: senderName,
             senderEmail: senderEmail,
+            
+            // Quote-level details
+            decorationMethod: decorationMethod,
+            setupFee: setupFee,
             
             // Multiple products
             products: validProducts.map(p => ({
@@ -345,9 +366,7 @@ export class QuoteModal {
                 brandLogo: p.brandLogo,
                 brandName: p.brandName,
                 quantity: p.quantity,
-                decorationMethod: p.decorationMethod,
                 pricePerItem: p.pricePerItem,
-                setupFee: p.setupFee,
                 subtotal: p.subtotal
             })),
             
@@ -502,23 +521,6 @@ export class QuoteModal {
                                    required>
                         </div>
                         <div class="form-group">
-                            <label>Decoration Method *</label>
-                            <select id="decoration-${product.id}" 
-                                    class="product-decoration" 
-                                    data-product-id="${product.id}"
-                                    required>
-                                <option value="">Select Method</option>
-                                <option value="Embroidery" ${product.decorationMethod === 'Embroidery' ? 'selected' : ''}>Embroidery</option>
-                                <option value="Screen Print" ${product.decorationMethod === 'Screen Print' ? 'selected' : ''}>Screen Print</option>
-                                <option value="DTG" ${product.decorationMethod === 'DTG' ? 'selected' : ''}>DTG</option>
-                                <option value="DTF" ${product.decorationMethod === 'DTF' ? 'selected' : ''}>DTF</option>
-                                <option value="Other" ${product.decorationMethod === 'Other' ? 'selected' : ''}>Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
                             <label>Price per Item ($) *</label>
                             <input type="number" 
                                    id="price-${product.id}" 
@@ -529,17 +531,8 @@ export class QuoteModal {
                                    min="0" 
                                    required>
                         </div>
-                        <div class="form-group">
-                            <label>Setup Fee ($)</label>
-                            <input type="number" 
-                                   id="setup-${product.id}" 
-                                   class="product-setup" 
-                                   data-product-id="${product.id}"
-                                   value="${product.setupFee || '0'}"
-                                   step="0.01" 
-                                   min="0">
-                        </div>
                     </div>
+                    
                     
                     <div class="product-subtotal">
                         Subtotal: <span id="subtotal-${product.id}">$0.00</span>
@@ -563,7 +556,7 @@ export class QuoteModal {
         }
         
         // Input listeners for calculations
-        const inputs = ['quantity', 'price', 'setup'].map(type => 
+        const inputs = ['quantity', 'price'].map(type => 
             document.getElementById(`${type}-${product.id}`)
         );
         
@@ -575,13 +568,6 @@ export class QuoteModal {
             }
         });
         
-        // Decoration method
-        const decorationSelect = document.getElementById(`decoration-${product.id}`);
-        if (decorationSelect) {
-            decorationSelect.addEventListener('change', (e) => {
-                this.updateProduct(product.id, { decorationMethod: e.target.value });
-            });
-        }
         
         // Color select
         const colorSelect = document.getElementById(`color-select-${product.id}`);
@@ -615,8 +601,6 @@ export class QuoteModal {
             brandName: '',
             quantity: '',
             pricePerItem: '',
-            setupFee: '0',
-            decorationMethod: '',
             subtotal: 0
         };
         
@@ -652,9 +636,7 @@ export class QuoteModal {
         product.brandLogo = '';
         product.brandName = '';
         product.quantity = 1;
-        product.decorationMethod = 'Screen Print';
         product.pricePerItem = 0;
-        product.setupFee = 0;
         product.subtotal = 0;
         
         // Re-render all products to update the UI
@@ -682,12 +664,10 @@ export class QuoteModal {
         
         const quantity = parseFloat(document.getElementById(`quantity-${productId}`)?.value) || 0;
         const pricePerItem = parseFloat(document.getElementById(`price-${productId}`)?.value) || 0;
-        const setupFee = parseFloat(document.getElementById(`setup-${productId}`)?.value) || 0;
         
         product.quantity = quantity;
         product.pricePerItem = pricePerItem;
-        product.setupFee = setupFee;
-        product.subtotal = (quantity * pricePerItem) + setupFee;
+        product.subtotal = quantity * pricePerItem;
         
         // Update subtotal display
         const subtotalEl = document.getElementById(`subtotal-${productId}`);
@@ -923,17 +903,35 @@ export class QuoteModal {
         
         // Get valid products
         const validProducts = this.products.filter(p => p.styleNumber && p.quantity && p.pricePerItem);
-        const grandTotal = validProducts.reduce((sum, p) => sum + p.subtotal, 0);
+        
+        // Get quote level details
+        const decorationMethod = formData.get('decorationMethod');
+        const setupFee = parseFloat(formData.get('setupFee') || 0);
+        const customerName = formData.get('customerName');
+        const companyName = formData.get('companyName');
+        const customerPhone = formData.get('customerPhone');
+        const quoteID = this.quoteService.generateQuoteID();
+        
+        const grandTotal = validProducts.reduce((sum, p) => sum + p.subtotal, 0) + setupFee;
         
         // Generate preview HTML
         const previewHTML = `
             <div class="email-preview-container">
                 <div class="email-header">
                     <h1>NORTHWEST CUSTOM APPAREL</h1>
-                    <p>Custom Product Quote</p>
+                    <p>Custom Product Quote - ${quoteID}</p>
                 </div>
                 
                 <div class="email-content">
+                    <!-- Customer Information -->
+                    <div class="customer-info-preview">
+                        <h3>Customer Information</h3>
+                        <p><strong>Name:</strong> ${customerName}</p>
+                        ${companyName ? `<p><strong>Company:</strong> ${companyName}</p>` : ''}
+                        ${customerPhone ? `<p><strong>Phone:</strong> ${customerPhone}</p>` : ''}
+                        <p><strong>Decoration Method:</strong> ${decorationMethod}</p>
+                    </div>
+                    
                     <h2 style="color: var(--primary-color); margin-bottom: 20px;">Product Quote Summary</h2>
                     
                     <!-- Products -->
@@ -956,19 +954,9 @@ export class QuoteModal {
                                     <td style="text-align: right;">${product.quantity} pieces</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Decoration Method:</strong></td>
-                                    <td style="text-align: right;">${product.decorationMethod}</td>
-                                </tr>
-                                <tr>
                                     <td><strong>Price per Item:</strong></td>
                                     <td style="text-align: right;">$${product.pricePerItem.toFixed(2)}</td>
                                 </tr>
-                                ${product.setupFee > 0 ? `
-                                <tr>
-                                    <td><strong>Setup Fee:</strong></td>
-                                    <td style="text-align: right;">$${product.setupFee.toFixed(2)}</td>
-                                </tr>
-                                ` : ''}
                                 <tr style="background: var(--primary-light);">
                                     <td><strong>Subtotal:</strong></td>
                                     <td style="text-align: right;"><strong>$${product.subtotal.toFixed(2)}</strong></td>
@@ -981,6 +969,16 @@ export class QuoteModal {
                     <div class="preview-card" style="background: #f9f9f9;">
                         <h3>Quote Summary</h3>
                         <table class="preview-table">
+                            <tr>
+                                <td><strong>Products Subtotal:</strong></td>
+                                <td style="text-align: right;">$${validProducts.reduce((sum, p) => sum + p.subtotal, 0).toFixed(2)}</td>
+                            </tr>
+                            ${setupFee > 0 ? `
+                            <tr>
+                                <td><strong>Setup Fee (one-time):</strong></td>
+                                <td style="text-align: right;">$${setupFee.toFixed(2)}</td>
+                            </tr>
+                            ` : ''}
                             <tr class="preview-total-row" style="font-size: 1.2em;">
                                 <td><strong>GRAND TOTAL:</strong></td>
                                 <td style="text-align: right;"><strong>$${grandTotal.toFixed(2)}</strong></td>

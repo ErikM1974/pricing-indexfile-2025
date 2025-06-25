@@ -619,12 +619,38 @@ textarea {
     font-size: 24px;
     font-weight: bold;
     letter-spacing: 1px;
+    color: white;
 }
 
 .email-header p {
     margin: 10px 0 0;
     font-size: 16px;
     opacity: 0.9;
+    color: white;
+}
+
+/* Customer info at top of preview */
+.customer-info-preview {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.customer-info-preview h3 {
+    color: #333;
+    margin: 0 0 12px;
+    font-size: 18px;
+}
+
+.customer-info-preview p {
+    margin: 6px 0;
+    color: #555;
+    font-size: 16px;
+}
+
+.customer-info-preview strong {
+    color: #333;
 }
 
 .email-content {
