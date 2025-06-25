@@ -4,12 +4,17 @@
  */
 
 import { EmailService } from '../services/email-service.js';
+import { API } from '../services/api.js';
+import { QuoteService } from '../services/quote-service.js';
 
 export class QuoteModal {
     constructor() {
         this.emailService = new EmailService();
+        this.quoteService = new QuoteService();
         this.modal = null;
-        this.productData = null;
+        this.products = [];
+        this.nextProductId = 1;
+        this.api = new API();
         
         this.createModal();
         this.attachEventListeners();
@@ -30,13 +35,30 @@ export class QuoteModal {
                             <h3>Contact Information</h3>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="customer-email">Customer Email *</label>
-                                    <input type="email" id="customer-email" name="customerEmail" required>
+                                    <label for="customer-name">Customer Name *</label>
+                                    <input type="text" id="customer-name" name="customerName" placeholder="John Smith" required>
                                 </div>
                                 <div class="form-group">
+                                    <label for="customer-email">Customer Email *</label>
+                                    <input type="email" id="customer-email" name="customerEmail" placeholder="john@company.com" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="customer-phone">Phone Number</label>
+                                    <input type="tel" id="customer-phone" name="customerPhone" placeholder="(555) 123-4567">
+                                </div>
+                                <div class="form-group">
+                                    <label for="company-name">Company Name</label>
+                                    <input type="text" id="company-name" name="companyName" placeholder="ABC Company">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="grid-column: 1 / -1;">
                                     <label for="sales-rep">Sales Representative *</label>
                                     <select id="sales-rep" name="salesRep" required>
                                         <option value="">Select Sales Rep</option>
+                                        <option value="Sales Team|sales@nwcustomapparel.com">Sales Team</option>
                                         <option value="Nika|nika@nwcustomapparel.com">Nika</option>
                                         <option value="Taylar|taylar@nwcustomapparel.com">Taylar</option>
                                         <option value="Adriyella|adriyella@nwcustomapparel.com">Adriyella</option>
@@ -47,52 +69,29 @@ export class QuoteModal {
                         </div>
                         
                         <div class="form-section">
-                            <h3>Quote Details</h3>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="quantity">Quantity *</label>
-                                    <input type="number" id="quantity" name="quantity" min="1" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Decoration Method *</label>
-                                    <div class="radio-group">
-                                        <label>
-                                            <input type="radio" name="decorationMethod" value="Embroidery" required>
-                                            Embroidery
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="decorationMethod" value="Screen Print" required>
-                                            Screen Print
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="decorationMethod" value="DTG" required>
-                                            DTG
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="decorationMethod" value="DTF" required>
-                                            DTF
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="decorationMethod" value="Other" required>
-                                            Other
-                                        </label>
-                                    </div>
-                                </div>
+                            <h3>Products</h3>
+                            <div id="products-container" class="products-container">
+                                <!-- Product lines will be added here dynamically -->
                             </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="price-per-item">Price per Item ($) *</label>
-                                    <input type="number" id="price-per-item" name="pricePerItem" step="0.01" min="0" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="setup-fee">Setup Fee ($)</label>
-                                    <input type="number" id="setup-fee" name="setupFee" step="0.01" min="0" value="0">
-                                </div>
-                            </div>
-                            
-                            <div class="total-display">
-                                <strong>Total:</strong> <span id="total-price">$0.00</span>
+                            <button type="button" class="btn-add-product" id="add-product-btn">
+                                <i class="fas fa-plus"></i> Add Another Product
+                            </button>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3>Quote Summary</h3>
+                            <div class="quote-summary">
+                                <table class="summary-table">
+                                    <tbody id="summary-tbody">
+                                        <!-- Summary rows will be added dynamically -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="grand-total-row">
+                                            <td colspan="2"><strong>Grand Total:</strong></td>
+                                            <td class="text-right"><strong id="grand-total">$0.00</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
                         </div>
                         
@@ -103,6 +102,7 @@ export class QuoteModal {
                         
                         <div class="form-actions">
                             <button type="button" class="btn-secondary" id="preview-quote">Preview Quote</button>
+                            <button type="button" class="btn-secondary" id="save-quote-test" style="background: #4CAF50; color: white;">Save Quote (Test)</button>
                             <button type="submit" class="btn-primary">Send Quote</button>
                         </div>
                     </form>
@@ -174,9 +174,9 @@ export class QuoteModal {
             this.sendQuote();
         });
         
-        // Calculate total on input change
-        ['quantity', 'price-per-item', 'setup-fee'].forEach(id => {
-            document.getElementById(id).addEventListener('input', () => this.calculateTotal());
+        // Add product button
+        document.getElementById('add-product-btn').addEventListener('click', () => {
+            this.addProduct();
         });
         
         // Success/Error close buttons
@@ -195,12 +195,45 @@ export class QuoteModal {
             this.closePreview();
             this.sendQuote();
         });
+        
+        // Save quote test button
+        document.getElementById('save-quote-test').addEventListener('click', () => {
+            this.testSaveQuote();
+        });
     }
 
     open(productData) {
-        this.productData = productData;
+        // Clear any existing products
+        this.products = [];
+        this.nextProductId = 1;
+        
+        // Add the primary product from the current page
+        const primaryProduct = {
+            id: this.nextProductId++,
+            isPrimary: true,
+            styleNumber: productData.styleNumber,
+            productName: productData.productName,
+            productImage: productData.productImage,
+            colorName: productData.colorName,
+            colorData: productData.selectedColor || productData.allColors?.[0],
+            allColors: productData.allColors || [],
+            sizes: productData.sizes,
+            description: productData.description,
+            brandLogo: productData.brandLogo,
+            brandName: productData.brandName,
+            quantity: '',
+            pricePerItem: '',
+            setupFee: '0',
+            decorationMethod: '',
+            subtotal: 0
+        };
+        
+        this.products.push(primaryProduct);
         this.modal.classList.remove('hidden');
         this.showForm();
+        
+        // Render the primary product
+        this.renderAllProducts();
         
         // Focus first input
         setTimeout(() => {
@@ -225,10 +258,17 @@ export class QuoteModal {
         document.getElementById('quote-loading').classList.remove('hidden');
     }
 
-    showSuccess(email) {
+    showSuccess(email, quoteID = null) {
         document.getElementById('quote-loading').classList.add('hidden');
         document.getElementById('quote-success').classList.remove('hidden');
         document.getElementById('success-email').textContent = email;
+        
+        // Update success message to include Quote ID if available
+        if (quoteID) {
+            const successDiv = document.getElementById('quote-success');
+            const h3 = successDiv.querySelector('h3');
+            h3.innerHTML = `Quote Sent Successfully!<br><small style="font-size: 16px; color: #666;">Quote ID: ${quoteID}</small>`;
+        }
     }
 
     showError(message) {
@@ -237,20 +277,31 @@ export class QuoteModal {
         document.getElementById('error-message').textContent = message;
     }
 
-    calculateTotal() {
-        const quantity = parseFloat(document.getElementById('quantity').value) || 0;
-        const pricePerItem = parseFloat(document.getElementById('price-per-item').value) || 0;
-        const setupFee = parseFloat(document.getElementById('setup-fee').value) || 0;
+    validateProducts() {
+        const validProducts = this.products.filter(p => p.styleNumber && p.quantity && p.pricePerItem);
         
-        const total = (quantity * pricePerItem) + setupFee;
-        document.getElementById('total-price').textContent = `$${total.toFixed(2)}`;
+        if (validProducts.length === 0) {
+            alert('Please add at least one product with quantity and pricing');
+            return false;
+        }
         
-        return total;
+        // Check each valid product has required fields
+        for (const product of validProducts) {
+            if (!product.decorationMethod) {
+                alert(`Please select a decoration method for ${product.productName}`);
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     async sendQuote() {
         const formData = new FormData(document.getElementById('quote-form'));
+        const customerName = formData.get('customerName');
         const customerEmail = formData.get('customerEmail');
+        const customerPhone = formData.get('customerPhone');
+        const companyName = formData.get('companyName');
         const salesRepData = formData.get('salesRep');
         
         // Validate email
@@ -259,38 +310,50 @@ export class QuoteModal {
             return;
         }
         
+        // Validate products
+        if (!this.validateProducts()) {
+            return;
+        }
+        
         // Parse sales rep data
         const [senderName, senderEmail] = salesRepData ? salesRepData.split('|') : ['', ''];
         
-        // Calculate total
-        const total = this.calculateTotal();
+        // Get valid products with complete data
+        const validProducts = this.products.filter(p => p.styleNumber && p.quantity && p.pricePerItem);
         
-        // Prepare quote data
+        // Calculate grand total
+        const grandTotal = validProducts.reduce((sum, p) => sum + p.subtotal, 0);
+        
+        // Prepare quote data with multiple products
         const quoteData = {
             // Contact info
+            customerName: customerName,
             customerEmail: customerEmail,
+            customerPhone: customerPhone,
+            companyName: companyName,
             senderName: senderName,
             senderEmail: senderEmail,
             
-            // Product info from current page
-            productName: this.productData.productName,
-            styleNumber: this.productData.styleNumber,
-            productImage: this.productData.productImage,
-            colorName: this.productData.colorName,
-            sizes: this.productData.sizes,
-            productUrl: window.location.href,
-            description: this.productData.description,
-            brandLogo: this.productData.brandLogo,
-            brandName: this.productData.brandName,
-            allColors: this.productData.allColors,
-            selectedColorIndex: this.productData.selectedColorIndex,
+            // Multiple products
+            products: validProducts.map(p => ({
+                styleNumber: p.styleNumber,
+                productName: p.productName,
+                productImage: p.productImage,
+                colorName: p.colorName,
+                sizes: p.sizes,
+                description: p.description,
+                brandLogo: p.brandLogo,
+                brandName: p.brandName,
+                quantity: p.quantity,
+                decorationMethod: p.decorationMethod,
+                pricePerItem: p.pricePerItem,
+                setupFee: p.setupFee,
+                subtotal: p.subtotal
+            })),
             
-            // Quote details
-            quantity: formData.get('quantity'),
-            decorationMethod: formData.get('decorationMethod'),
-            pricePerItem: formData.get('pricePerItem'),
-            setupFee: formData.get('setupFee'),
-            totalPrice: total,
+            // Quote totals
+            grandTotal: grandTotal,
+            productUrl: window.location.href,
             notes: formData.get('notes')
         };
         
@@ -298,12 +361,26 @@ export class QuoteModal {
         this.showLoading();
         
         try {
-            await this.emailService.sendQuote(quoteData);
-            // Save selected sales rep
-            if (salesRepData) {
-                localStorage.setItem('nwca_sales_rep', salesRepData);
+            // First save to database
+            const saveResult = await this.quoteService.saveQuote(quoteData);
+            
+            if (saveResult.success) {
+                // Add quote ID to the data before sending email
+                quoteData.quoteID = saveResult.quoteID;
+                
+                // Then send email
+                await this.emailService.sendQuote(quoteData);
+                
+                // Save selected sales rep
+                if (salesRepData) {
+                    localStorage.setItem('nwca_sales_rep', salesRepData);
+                }
+                
+                // Show success with Quote ID
+                this.showSuccess(customerEmail, saveResult.quoteID);
+            } else {
+                throw new Error('Failed to save quote to database');
             }
-            this.showSuccess(customerEmail);
         } catch (error) {
             console.error('Failed to send quote:', error);
             this.showError('Failed to send quote. Please try again or contact support.');
@@ -319,8 +396,504 @@ export class QuoteModal {
             document.getElementById('sales-rep').value = savedRep;
         }
         
-        // Reset total
-        document.getElementById('total-price').textContent = '$0.00';
+        // Clear products
+        this.products = [];
+        this.nextProductId = 1;
+        document.getElementById('products-container').innerHTML = '';
+        this.updateSummary();
+    }
+    
+    renderAllProducts() {
+        const container = document.getElementById('products-container');
+        container.innerHTML = '';
+        
+        this.products.forEach((product, index) => {
+            this.renderProductLine(product, index);
+        });
+        
+        this.updateSummary();
+    }
+    
+    renderProductLine(product, index) {
+        const container = document.getElementById('products-container');
+        const productHTML = this.createProductLineHTML(product, index);
+        
+        const productDiv = document.createElement('div');
+        productDiv.className = 'product-line';
+        productDiv.id = `product-line-${product.id}`;
+        productDiv.innerHTML = productHTML;
+        
+        container.appendChild(productDiv);
+        
+        // Attach event listeners for this product line
+        this.attachProductLineListeners(product);
+        
+        // Initialize search for additional products
+        if (!product.isPrimary && !product.styleNumber) {
+            this.initializeProductSearch(product.id);
+        }
+    }
+    
+    createProductLineHTML(product, index) {
+        const isPrimary = product.isPrimary;
+        const hasProduct = !!product.styleNumber;
+        
+        return `
+            <div class="product-line-header">
+                <h4>${isPrimary ? 'Primary Product' : `Product ${index + 1}`}</h4>
+                ${!isPrimary ? `<button type="button" class="btn-remove-product" data-product-id="${product.id}">
+                    <i class="fas fa-times"></i>
+                </button>` : ''}
+            </div>
+            
+            <div class="product-line-content">
+                ${!isPrimary ? `
+                    <div class="product-search-container">
+                        <input type="text" 
+                               id="product-search-${product.id}" 
+                               class="product-search-input" 
+                               placeholder="Search by style number..."
+                               value="${product.styleNumber || ''}"
+                               ${hasProduct ? 'readonly' : ''}>
+                        <div id="search-results-${product.id}" class="search-results hidden"></div>
+                    </div>
+                ` : ''}
+                
+                ${hasProduct ? `
+                    <div class="product-info-row">
+                        ${product.productImage ? `<img src="${product.productImage}" alt="${product.productName}" class="product-thumb">` : ''}
+                        <div class="product-details">
+                            <strong>${product.productName}</strong><br>
+                            Style: ${product.styleNumber}<br>
+                            ${product.colorName ? `Color: ${product.colorName}` : ''}
+                            ${!isPrimary ? `<br><button type="button" class="btn-change-product" data-product-id="${product.id}" style="font-size: 0.85rem; padding: 4px 8px; margin-top: 8px;">Change Product</button>` : ''}
+                        </div>
+                    </div>
+                    
+                    ${!isPrimary && product.allColors && product.allColors.length > 1 ? `
+                        <div class="form-group">
+                            <label>Select Color</label>
+                            <select id="color-select-${product.id}" class="color-select" data-product-id="${product.id}">
+                                ${product.allColors.map((color, idx) => `
+                                    <option value="${idx}" ${color === product.colorData ? 'selected' : ''}>
+                                        ${color.COLOR_NAME || color.colorName || 'Color ' + (idx + 1)}
+                                    </option>
+                                `).join('')}
+                            </select>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Quantity *</label>
+                            <input type="number" 
+                                   id="quantity-${product.id}" 
+                                   class="product-quantity" 
+                                   data-product-id="${product.id}"
+                                   value="${product.quantity || ''}"
+                                   min="1" 
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label>Decoration Method *</label>
+                            <select id="decoration-${product.id}" 
+                                    class="product-decoration" 
+                                    data-product-id="${product.id}"
+                                    required>
+                                <option value="">Select Method</option>
+                                <option value="Embroidery" ${product.decorationMethod === 'Embroidery' ? 'selected' : ''}>Embroidery</option>
+                                <option value="Screen Print" ${product.decorationMethod === 'Screen Print' ? 'selected' : ''}>Screen Print</option>
+                                <option value="DTG" ${product.decorationMethod === 'DTG' ? 'selected' : ''}>DTG</option>
+                                <option value="DTF" ${product.decorationMethod === 'DTF' ? 'selected' : ''}>DTF</option>
+                                <option value="Other" ${product.decorationMethod === 'Other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Price per Item ($) *</label>
+                            <input type="number" 
+                                   id="price-${product.id}" 
+                                   class="product-price" 
+                                   data-product-id="${product.id}"
+                                   value="${product.pricePerItem || ''}"
+                                   step="0.01" 
+                                   min="0" 
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label>Setup Fee ($)</label>
+                            <input type="number" 
+                                   id="setup-${product.id}" 
+                                   class="product-setup" 
+                                   data-product-id="${product.id}"
+                                   value="${product.setupFee || '0'}"
+                                   step="0.01" 
+                                   min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="product-subtotal">
+                        Subtotal: <span id="subtotal-${product.id}">$0.00</span>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+    
+    attachProductLineListeners(product) {
+        // Remove button
+        const removeBtn = document.querySelector(`#product-line-${product.id} .btn-remove-product`);
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => this.removeProduct(product.id));
+        }
+        
+        // Change product button
+        const changeBtn = document.querySelector(`#product-line-${product.id} .btn-change-product`);
+        if (changeBtn) {
+            changeBtn.addEventListener('click', () => this.resetProduct(product.id));
+        }
+        
+        // Input listeners for calculations
+        const inputs = ['quantity', 'price', 'setup'].map(type => 
+            document.getElementById(`${type}-${product.id}`)
+        );
+        
+        inputs.forEach(input => {
+            if (input) {
+                input.addEventListener('input', () => {
+                    this.updateProductCalculations(product.id);
+                });
+            }
+        });
+        
+        // Decoration method
+        const decorationSelect = document.getElementById(`decoration-${product.id}`);
+        if (decorationSelect) {
+            decorationSelect.addEventListener('change', (e) => {
+                this.updateProduct(product.id, { decorationMethod: e.target.value });
+            });
+        }
+        
+        // Color select
+        const colorSelect = document.getElementById(`color-select-${product.id}`);
+        if (colorSelect) {
+            colorSelect.addEventListener('change', (e) => {
+                const colorIndex = parseInt(e.target.value);
+                const selectedColor = product.allColors[colorIndex];
+                this.updateProduct(product.id, { 
+                    colorData: selectedColor,
+                    colorName: selectedColor.COLOR_NAME || selectedColor.colorName,
+                    productImage: selectedColor.MAIN_IMAGE_URL || selectedColor.FRONT_MODEL_IMAGE_URL
+                });
+                this.renderAllProducts();
+            });
+        }
+    }
+    
+    addProduct() {
+        const newProduct = {
+            id: this.nextProductId++,
+            isPrimary: false,
+            styleNumber: '',
+            productName: '',
+            productImage: '',
+            colorName: '',
+            colorData: null,
+            allColors: [],
+            sizes: '',
+            description: '',
+            brandLogo: '',
+            brandName: '',
+            quantity: '',
+            pricePerItem: '',
+            setupFee: '0',
+            decorationMethod: '',
+            subtotal: 0
+        };
+        
+        this.products.push(newProduct);
+        this.renderProductLine(newProduct, this.products.length - 1);
+        
+        // Focus the search input
+        setTimeout(() => {
+            const searchInput = document.getElementById(`product-search-${newProduct.id}`);
+            if (searchInput) searchInput.focus();
+        }, 100);
+    }
+    
+    removeProduct(productId) {
+        this.products = this.products.filter(p => p.id !== productId);
+        document.getElementById(`product-line-${productId}`).remove();
+        this.updateSummary();
+    }
+    
+    resetProduct(productId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product) return;
+        
+        // Reset product data but keep the ID
+        product.styleNumber = '';
+        product.productName = '';
+        product.productImage = '';
+        product.colorName = '';
+        product.colorData = null;
+        product.allColors = [];
+        product.sizes = '';
+        product.description = '';
+        product.brandLogo = '';
+        product.brandName = '';
+        product.quantity = 1;
+        product.decorationMethod = 'Screen Print';
+        product.pricePerItem = 0;
+        product.setupFee = 0;
+        product.subtotal = 0;
+        
+        // Re-render all products to update the UI
+        this.renderAllProducts();
+        
+        // Focus the search input after re-rendering
+        setTimeout(() => {
+            const searchInput = document.getElementById(`product-search-${productId}`);
+            if (searchInput) {
+                searchInput.focus();
+            }
+        }, 100);
+    }
+    
+    updateProduct(productId, updates) {
+        const product = this.products.find(p => p.id === productId);
+        if (product) {
+            Object.assign(product, updates);
+        }
+    }
+    
+    updateProductCalculations(productId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product) return;
+        
+        const quantity = parseFloat(document.getElementById(`quantity-${productId}`)?.value) || 0;
+        const pricePerItem = parseFloat(document.getElementById(`price-${productId}`)?.value) || 0;
+        const setupFee = parseFloat(document.getElementById(`setup-${productId}`)?.value) || 0;
+        
+        product.quantity = quantity;
+        product.pricePerItem = pricePerItem;
+        product.setupFee = setupFee;
+        product.subtotal = (quantity * pricePerItem) + setupFee;
+        
+        // Update subtotal display
+        const subtotalEl = document.getElementById(`subtotal-${productId}`);
+        if (subtotalEl) {
+            subtotalEl.textContent = `$${product.subtotal.toFixed(2)}`;
+        }
+        
+        this.updateSummary();
+    }
+    
+    updateSummary() {
+        const tbody = document.getElementById('summary-tbody');
+        tbody.innerHTML = '';
+        
+        let grandTotal = 0;
+        
+        this.products.forEach((product, index) => {
+            if (product.styleNumber && product.subtotal > 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.productName || 'Product ' + (index + 1)}</td>
+                    <td class="text-center">${product.quantity || 0} × $${(product.pricePerItem || 0).toFixed(2)}</td>
+                    <td class="text-right">$${product.subtotal.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+                grandTotal += product.subtotal;
+            }
+        });
+        
+        document.getElementById('grand-total').textContent = `$${grandTotal.toFixed(2)}`;
+    }
+    
+    initializeProductSearch(productId) {
+        console.log('[QuoteModal] Initializing product search for product:', productId);
+        
+        const searchInput = document.getElementById(`product-search-${productId}`);
+        const resultsContainer = document.getElementById(`search-results-${productId}`);
+        
+        if (!searchInput || !resultsContainer) {
+            console.error('[QuoteModal] Search elements not found for product:', productId);
+            return;
+        }
+        
+        let searchTimeout = null;
+        
+        // Handle search input
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value.trim();
+            
+            clearTimeout(searchTimeout);
+            
+            if (value.length < 2) {
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+            
+            // Show loading
+            resultsContainer.innerHTML = `
+                <div class="search-loading">
+                    <div class="mini-spinner"></div>
+                    <span>Searching...</span>
+                </div>
+            `;
+            resultsContainer.classList.remove('hidden');
+            
+            // Debounce search
+            searchTimeout = setTimeout(async () => {
+                await this.searchProducts(productId, value);
+            }, 300);
+        });
+        
+        // Handle click outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+        
+        // Handle keyboard navigation
+        searchInput.addEventListener('keydown', (e) => {
+            const items = resultsContainer.querySelectorAll('.search-result-item');
+            const selected = resultsContainer.querySelector('.search-result-item.selected');
+            let currentIndex = -1;
+            
+            if (selected) {
+                currentIndex = Array.from(items).indexOf(selected);
+            }
+            
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    currentIndex = (currentIndex + 1) % items.length;
+                    this.selectSearchItem(items, currentIndex);
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    currentIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
+                    this.selectSearchItem(items, currentIndex);
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (selected) {
+                        selected.click();
+                    }
+                    break;
+                case 'Escape':
+                    resultsContainer.classList.add('hidden');
+                    break;
+            }
+        });
+    }
+    
+    selectSearchItem(items, index) {
+        items.forEach((item, i) => {
+            item.classList.toggle('selected', i === index);
+        });
+    }
+    
+    async searchProducts(productId, searchTerm) {
+        const resultsContainer = document.getElementById(`search-results-${productId}`);
+        console.log('[QuoteModal] Searching products for:', searchTerm, 'Product ID:', productId);
+        
+        try {
+            const results = await this.api.searchProducts(searchTerm);
+            console.log('[QuoteModal] Search results:', results.length, 'items found');
+            
+            if (results.length > 0) {
+                let html = '<div class="search-results-list">';
+                
+                results.forEach((result, index) => {
+                    html += `
+                        <div class="search-result-item" data-style="${result.value}">
+                            <div class="result-style">${result.value}</div>
+                            <div class="result-name">${result.label}</div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+                resultsContainer.classList.remove('hidden');
+                
+                // Add click handlers
+                resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                    item.addEventListener('click', async () => {
+                        const styleNumber = item.dataset.style;
+                        resultsContainer.classList.add('hidden');
+                        await this.loadProductData(productId, styleNumber);
+                    });
+                    
+                    item.addEventListener('mouseenter', () => {
+                        resultsContainer.querySelectorAll('.search-result-item').forEach(i => {
+                            i.classList.remove('selected');
+                        });
+                        item.classList.add('selected');
+                    });
+                });
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="search-no-results">
+                        No products found
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Search failed:', error);
+            resultsContainer.innerHTML = `
+                <div class="search-error">
+                    Search failed. Please try again.
+                </div>
+            `;
+        }
+    }
+    
+    async loadProductData(productId, styleNumber) {
+        try {
+            const searchInput = document.getElementById(`product-search-${productId}`);
+            if (searchInput) {
+                searchInput.value = 'Loading...';
+                searchInput.disabled = true;
+            }
+            
+            const productData = await this.api.getProduct(styleNumber);
+            
+            if (productData && productData.colors && productData.colors.length > 0) {
+                const firstColor = productData.colors[0];
+                
+                this.updateProduct(productId, {
+                    styleNumber: productData.styleNumber,
+                    productName: productData.title || productData.productTitle || productData.styleNumber,
+                    productImage: firstColor.MAIN_IMAGE_URL || firstColor.FRONT_MODEL_IMAGE_URL || '',
+                    colorName: firstColor.COLOR_NAME || firstColor.colorName || 'N/A',
+                    colorData: firstColor,
+                    allColors: productData.colors,
+                    sizes: productData.AVAILABLE_SIZES || 'Contact for sizes',
+                    description: productData.description || productData.PRODUCT_DESCRIPTION || '',
+                    brandLogo: firstColor.BRAND_LOGO_IMAGE || '',
+                    brandName: productData.BRAND_NAME || ''
+                });
+                
+                this.renderAllProducts();
+            }
+        } catch (error) {
+            console.error('Failed to load product data:', error);
+            alert('Failed to load product. Please try again.');
+            
+            const searchInput = document.getElementById(`product-search-${productId}`);
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.disabled = false;
+                searchInput.focus();
+            }
+        }
     }
     
     showPreview() {
@@ -333,11 +906,17 @@ export class QuoteModal {
             return;
         }
         
+        // Validate products
+        if (!this.validateProducts()) {
+            return;
+        }
+        
         // Parse sales rep data
         const [senderName, senderEmail] = salesRepData ? salesRepData.split('|') : ['', ''];
         
-        // Calculate total
-        const total = this.calculateTotal();
+        // Get valid products
+        const validProducts = this.products.filter(p => p.styleNumber && p.quantity && p.pricePerItem);
+        const grandTotal = validProducts.reduce((sum, p) => sum + p.subtotal, 0);
         
         // Generate preview HTML
         const previewHTML = `
@@ -348,49 +927,56 @@ export class QuoteModal {
                 </div>
                 
                 <div class="email-content">
-                    <!-- Product Information -->
-                    <div class="preview-card">
-                        ${this.productData.brandLogo ? `<img src="${this.productData.brandLogo}" alt="${this.productData.brandName}" class="brand-logo-preview">` : ''}
-                        <img src="${this.productData.productImage}" alt="${this.productData.productName}" class="product-image-preview">
-                        <h2>${this.productData.productName}</h2>
-                        <p><strong>Style:</strong> ${this.productData.styleNumber}</p>
-                        <p><strong>Brand:</strong> ${this.productData.brandName || 'N/A'}</p>
-                        <p><strong>Color:</strong> ${this.productData.colorName}</p>
-                        <p><strong>Available Sizes:</strong> ${this.productData.sizes}</p>
-                        
-                        ${this.productData.description ? `
-                            <div class="preview-description">
-                                ${this.productData.description}
-                            </div>
-                        ` : ''}
-                        
-                        <!-- Color Swatches -->
-                        ${this.generateColorSwatchesPreview()}
-                    </div>
+                    <h2 style="color: var(--primary-color); margin-bottom: 20px;">Product Quote Summary</h2>
                     
-                    <!-- Quote Details -->
-                    <div class="preview-card">
-                        <h3>Quote Details</h3>
+                    <!-- Products -->
+                    ${validProducts.map((product, index) => `
+                        <div class="preview-card">
+                            <h3>Product ${index + 1}: ${product.productName}</h3>
+                            <div style="display: flex; gap: 20px;">
+                                ${product.productImage ? `<img src="${product.productImage}" alt="${product.productName}" style="width: 150px; height: auto; border-radius: 4px;">` : ''}
+                                <div style="flex: 1;">
+                                    <p><strong>Style:</strong> ${product.styleNumber}</p>
+                                    ${product.brandName ? `<p><strong>Brand:</strong> ${product.brandName}</p>` : ''}
+                                    <p><strong>Color:</strong> ${product.colorName}</p>
+                                    ${product.sizes ? `<p><strong>Available Sizes:</strong> ${product.sizes}</p>` : ''}
+                                </div>
+                            </div>
+                            
+                            <table class="preview-table" style="margin-top: 15px;">
+                                <tr>
+                                    <td><strong>Quantity:</strong></td>
+                                    <td style="text-align: right;">${product.quantity} pieces</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Decoration Method:</strong></td>
+                                    <td style="text-align: right;">${product.decorationMethod}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Price per Item:</strong></td>
+                                    <td style="text-align: right;">$${product.pricePerItem.toFixed(2)}</td>
+                                </tr>
+                                ${product.setupFee > 0 ? `
+                                <tr>
+                                    <td><strong>Setup Fee:</strong></td>
+                                    <td style="text-align: right;">$${product.setupFee.toFixed(2)}</td>
+                                </tr>
+                                ` : ''}
+                                <tr style="background: var(--primary-light);">
+                                    <td><strong>Subtotal:</strong></td>
+                                    <td style="text-align: right;"><strong>$${product.subtotal.toFixed(2)}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                    `).join('')}
+                    
+                    <!-- Grand Total -->
+                    <div class="preview-card" style="background: #f9f9f9;">
+                        <h3>Quote Summary</h3>
                         <table class="preview-table">
-                            <tr>
-                                <td><strong>Quantity:</strong></td>
-                                <td style="text-align: right;">${formData.get('quantity')} pieces</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Decoration Method:</strong></td>
-                                <td style="text-align: right;">${formData.get('decorationMethod')}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Price per Item:</strong></td>
-                                <td style="text-align: right;">$${parseFloat(formData.get('pricePerItem') || 0).toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Setup Fee:</strong></td>
-                                <td style="text-align: right;">$${parseFloat(formData.get('setupFee') || 0).toFixed(2)}</td>
-                            </tr>
-                            <tr class="preview-total-row">
-                                <td><strong>TOTAL:</strong></td>
-                                <td style="text-align: right;"><strong>$${total.toFixed(2)}</strong></td>
+                            <tr class="preview-total-row" style="font-size: 1.2em;">
+                                <td><strong>GRAND TOTAL:</strong></td>
+                                <td style="text-align: right;"><strong>$${grandTotal.toFixed(2)}</strong></td>
                             </tr>
                         </table>
                     </div>
@@ -425,24 +1011,68 @@ export class QuoteModal {
         document.getElementById('quote-preview-modal').classList.add('hidden');
     }
     
-    generateColorSwatchesPreview() {
-        if (!this.productData.allColors || this.productData.allColors.length === 0) return '';
+    async testSaveQuote() {
+        const formData = new FormData(document.getElementById('quote-form'));
+        const customerName = formData.get('customerName');
+        const customerEmail = formData.get('customerEmail');
+        const customerPhone = formData.get('customerPhone');
+        const companyName = formData.get('companyName');
+        const salesRepData = formData.get('salesRep');
         
-        let html = '<div class="color-swatches-preview"><p><strong>Available Colors:</strong></p><div class="swatches-grid-preview">';
+        // Validate
+        if (!this.emailService.isValidEmail(customerEmail)) {
+            alert('Please enter a valid email address');
+            return;
+        }
         
-        this.productData.allColors.forEach((color, index) => {
-            const colorName = color.COLOR_NAME || color.colorName || 'Color';
-            const isSelected = index === this.productData.selectedColorIndex;
+        if (!this.validateProducts()) {
+            return;
+        }
+        
+        // Parse sales rep data
+        const [senderName, senderEmail] = salesRepData ? salesRepData.split('|') : ['', ''];
+        
+        // Get valid products
+        const validProducts = this.products.filter(p => p.styleNumber && p.quantity && p.pricePerItem);
+        const grandTotal = validProducts.reduce((sum, p) => sum + p.subtotal, 0);
+        
+        // Prepare quote data
+        const quoteData = {
+            customerName: customerName,
+            customerEmail: customerEmail,
+            customerPhone: customerPhone,
+            companyName: companyName,
+            senderName: senderName,
+            senderEmail: senderEmail,
+            products: validProducts,
+            grandTotal: grandTotal,
+            notes: formData.get('notes')
+        };
+        
+        console.log('[QuoteModal] Testing save with data:', quoteData);
+        
+        // Show loading
+        const saveButton = document.getElementById('save-quote-test');
+        const originalText = saveButton.textContent;
+        saveButton.textContent = 'Saving...';
+        saveButton.disabled = true;
+        
+        try {
+            const result = await this.quoteService.saveQuote(quoteData);
             
-            html += `
-                <div class="swatch-item-preview ${isSelected ? 'selected' : ''}">
-                    <img src="${color.COLOR_SQUARE_IMAGE}" alt="${colorName}">
-                    <span>${colorName}</span>
-                </div>
-            `;
-        });
-        
-        html += '</div></div>';
-        return html;
+            if (result.success) {
+                console.log('[QuoteModal] Quote saved successfully:', result);
+                this.showSuccess(customerEmail, result.quoteID);
+            } else {
+                console.error('[QuoteModal] Save failed:', result.error);
+                alert(`Failed to save quote: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('[QuoteModal] Unexpected error:', error);
+            alert(`Error: ${error.message}`);
+        } finally {
+            saveButton.textContent = originalText;
+            saveButton.disabled = false;
+        }
     }
 }
