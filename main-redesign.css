@@ -459,6 +459,77 @@
             height: 18px;
         }
 
+        /* Staff Login Icon */
+        .staff-login-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            margin-left: 1rem;
+            color: #1a472a;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            position: relative;
+        }
+
+        .staff-login-icon:hover {
+            color: white;
+            background: #3a7c52;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.3);
+        }
+
+        .staff-login-icon svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .staff-login-icon:hover svg {
+            transform: scale(1.1);
+        }
+
+        /* Tooltip for Staff Login */
+        .staff-login-icon::before {
+            content: 'Staff Portal';
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a472a;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .staff-login-icon::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-bottom-color: #1a472a;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .staff-login-icon:hover::before,
+        .staff-login-icon:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
         .nav-autocomplete-list {
             position: absolute;
             top: calc(100% + 8px);
@@ -1354,6 +1425,22 @@
             /* Top Navigation Mobile */
             .top-navigation {
                 display: none; /* Hide on mobile for now */
+            }
+            
+            /* Staff Login Icon Mobile */
+            .staff-login-icon {
+                position: absolute;
+                right: 60px;
+                top: 50%;
+                transform: translateY(-50%);
+                margin-left: 0;
+                width: 36px;
+                height: 36px;
+            }
+            
+            .staff-login-icon::before,
+            .staff-login-icon::after {
+                display: none; /* Hide tooltip on mobile */
             }
 
             .sidebar {
