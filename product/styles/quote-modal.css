@@ -344,7 +344,7 @@ textarea {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     margin-bottom: 20px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .product-line-header {
@@ -396,12 +396,14 @@ textarea {
 
 .product-line-content {
     padding: 20px;
+    overflow: visible;
 }
 
 /* Product Search Container */
 .product-search-container {
     position: relative;
     margin-bottom: 20px;
+    overflow: visible !important;
 }
 
 .product-search-input {
@@ -548,7 +550,7 @@ textarea {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     max-height: 300px;
     overflow-y: auto;
-    z-index: 1000;
+    z-index: 2100;
 }
 
 /* Preview Modal Styles */

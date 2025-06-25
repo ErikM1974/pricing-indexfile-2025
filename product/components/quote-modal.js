@@ -101,8 +101,8 @@ export class QuoteModal {
                         </div>
                         
                         <div class="form-actions">
+                            <button type="button" class="btn-secondary" id="close-modal">Cancel</button>
                             <button type="button" class="btn-secondary" id="preview-quote">Preview Quote</button>
-                            <button type="button" class="btn-secondary" id="save-quote-test" style="background: #4CAF50; color: white;">Save Quote (Test)</button>
                             <button type="submit" class="btn-primary">Send Quote</button>
                         </div>
                     </form>
@@ -196,10 +196,6 @@ export class QuoteModal {
             this.sendQuote();
         });
         
-        // Save quote test button
-        document.getElementById('save-quote-test').addEventListener('click', () => {
-            this.testSaveQuote();
-        });
     }
 
     open(productData) {
@@ -258,16 +254,20 @@ export class QuoteModal {
         document.getElementById('quote-loading').classList.remove('hidden');
     }
 
-    showSuccess(email, quoteID = null) {
+    showSuccess(email, quoteID = null, emailSent = true) {
         document.getElementById('quote-loading').classList.add('hidden');
         document.getElementById('quote-success').classList.remove('hidden');
-        document.getElementById('success-email').textContent = email;
         
-        // Update success message to include Quote ID if available
-        if (quoteID) {
-            const successDiv = document.getElementById('quote-success');
-            const h3 = successDiv.querySelector('h3');
+        const successDiv = document.getElementById('quote-success');
+        const h3 = successDiv.querySelector('h3');
+        const p = successDiv.querySelector('p');
+        
+        if (emailSent) {
             h3.innerHTML = `Quote Sent Successfully!<br><small style="font-size: 16px; color: #666;">Quote ID: ${quoteID}</small>`;
+            p.innerHTML = `The quote has been emailed to <span id="success-email">${email}</span>`;
+        } else {
+            h3.innerHTML = `Quote Saved Successfully!<br><small style="font-size: 16px; color: #666;">Quote ID: ${quoteID}</small>`;
+            p.innerHTML = `Quote ID: <strong>${quoteID}</strong><br><span style="color: #ff6b6b;">Note: Email could not be sent. Please contact the customer directly.</span>`;
         }
     }
 
@@ -368,22 +368,29 @@ export class QuoteModal {
                 // Add quote ID to the data before sending email
                 quoteData.quoteID = saveResult.quoteID;
                 
-                // Then send email
-                await this.emailService.sendQuote(quoteData);
-                
                 // Save selected sales rep
                 if (salesRepData) {
                     localStorage.setItem('nwca_sales_rep', salesRepData);
                 }
                 
-                // Show success with Quote ID
-                this.showSuccess(customerEmail, saveResult.quoteID);
+                let emailSent = false;
+                try {
+                    // Try to send email
+                    await this.emailService.sendQuote(quoteData);
+                    emailSent = true;
+                } catch (emailError) {
+                    console.error('Failed to send email:', emailError);
+                    // Continue anyway - quote is saved
+                }
+                
+                // Show success with Quote ID and email status
+                this.showSuccess(customerEmail, saveResult.quoteID, emailSent);
             } else {
                 throw new Error('Failed to save quote to database');
             }
         } catch (error) {
-            console.error('Failed to send quote:', error);
-            this.showError('Failed to send quote. Please try again or contact support.');
+            console.error('Failed to save quote:', error);
+            this.showError('Failed to save quote. Please try again or contact support.');
         }
     }
 
@@ -1009,70 +1016,5 @@ export class QuoteModal {
     
     closePreview() {
         document.getElementById('quote-preview-modal').classList.add('hidden');
-    }
-    
-    async testSaveQuote() {
-        const formData = new FormData(document.getElementById('quote-form'));
-        const customerName = formData.get('customerName');
-        const customerEmail = formData.get('customerEmail');
-        const customerPhone = formData.get('customerPhone');
-        const companyName = formData.get('companyName');
-        const salesRepData = formData.get('salesRep');
-        
-        // Validate
-        if (!this.emailService.isValidEmail(customerEmail)) {
-            alert('Please enter a valid email address');
-            return;
-        }
-        
-        if (!this.validateProducts()) {
-            return;
-        }
-        
-        // Parse sales rep data
-        const [senderName, senderEmail] = salesRepData ? salesRepData.split('|') : ['', ''];
-        
-        // Get valid products
-        const validProducts = this.products.filter(p => p.styleNumber && p.quantity && p.pricePerItem);
-        const grandTotal = validProducts.reduce((sum, p) => sum + p.subtotal, 0);
-        
-        // Prepare quote data
-        const quoteData = {
-            customerName: customerName,
-            customerEmail: customerEmail,
-            customerPhone: customerPhone,
-            companyName: companyName,
-            senderName: senderName,
-            senderEmail: senderEmail,
-            products: validProducts,
-            grandTotal: grandTotal,
-            notes: formData.get('notes')
-        };
-        
-        console.log('[QuoteModal] Testing save with data:', quoteData);
-        
-        // Show loading
-        const saveButton = document.getElementById('save-quote-test');
-        const originalText = saveButton.textContent;
-        saveButton.textContent = 'Saving...';
-        saveButton.disabled = true;
-        
-        try {
-            const result = await this.quoteService.saveQuote(quoteData);
-            
-            if (result.success) {
-                console.log('[QuoteModal] Quote saved successfully:', result);
-                this.showSuccess(customerEmail, result.quoteID);
-            } else {
-                console.error('[QuoteModal] Save failed:', result.error);
-                alert(`Failed to save quote: ${result.error}`);
-            }
-        } catch (error) {
-            console.error('[QuoteModal] Unexpected error:', error);
-            alert(`Error: ${error.message}`);
-        } finally {
-            saveButton.textContent = originalText;
-            saveButton.disabled = false;
-        }
     }
 }
