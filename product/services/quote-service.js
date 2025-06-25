@@ -13,18 +13,33 @@ export class QuoteService {
      */
     generateQuoteID() {
         const now = new Date();
-        const year = now.getFullYear().toString().slice(-2); // Last 2 digits of year
         const month = (now.getMonth() + 1).toString().padStart(2, '0');
         const day = now.getDate().toString().padStart(2, '0');
+        const dateKey = `${month}${day}`;
         
-        // Generate 4 random alphanumeric characters
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let random = '';
-        for (let i = 0; i < 4; i++) {
-            random += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
+        // Get or initialize daily sequence from sessionStorage
+        const storageKey = `quote_sequence_${dateKey}`;
+        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
         
-        return `Q-${year}${month}${day}-${random}`;
+        // Store the updated sequence
+        sessionStorage.setItem(storageKey, sequence.toString());
+        
+        // Clean up old date keys (optional - keeps storage clean)
+        this.cleanupOldSequences(dateKey);
+        
+        return `Q${dateKey}-${sequence}`;
+    }
+    
+    /**
+     * Clean up sequence numbers from previous days
+     */
+    cleanupOldSequences(currentDateKey) {
+        const keys = Object.keys(sessionStorage);
+        keys.forEach(key => {
+            if (key.startsWith('quote_sequence_') && !key.endsWith(currentDateKey)) {
+                sessionStorage.removeItem(key);
+            }
+        });
     }
 
     /**

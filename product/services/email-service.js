@@ -33,8 +33,8 @@ export class EmailService {
             throw new Error('EmailJS not initialized');
         }
 
-        // Check if this is a multi-product quote
-        const isMultiProduct = quoteData.products && quoteData.products.length > 0;
+        // Check if this is a multi-product quote (more than 1 product)
+        const isMultiProduct = quoteData.products && quoteData.products.length > 1;
 
         // Format the data for the template
         const templateParams = {
@@ -53,33 +53,37 @@ export class EmailService {
             reply_to: quoteData.senderEmail || 'sales@nwcustomapparel.com',
             sender_email: quoteData.senderEmail || 'sales@nwcustomapparel.com',
             
-            // For backwards compatibility with single product quotes
-            product_name: isMultiProduct ? 'Multiple Products' : quoteData.productName,
-            style_number: isMultiProduct ? 'See details below' : quoteData.styleNumber,
-            product_image: isMultiProduct ? (quoteData.products[0]?.productImage || '') : quoteData.productImage,
-            color_name: isMultiProduct ? 'Various' : quoteData.colorName,
-            sizes: isMultiProduct ? 'See individual products' : quoteData.sizes,
+            // For single product quotes (when products array has 1 item, use that data)
+            product_name: !isMultiProduct && quoteData.products?.length === 1 ? quoteData.products[0].productName : (isMultiProduct ? 'Multiple Products' : quoteData.productName),
+            style_number: !isMultiProduct && quoteData.products?.length === 1 ? quoteData.products[0].styleNumber : (isMultiProduct ? 'See details below' : quoteData.styleNumber),
+            product_image: !isMultiProduct && quoteData.products?.length === 1 ? quoteData.products[0].productImage : (isMultiProduct ? '' : quoteData.productImage),
+            color_name: !isMultiProduct && quoteData.products?.length === 1 ? quoteData.products[0].colorName : (isMultiProduct ? 'Various' : quoteData.colorName),
+            sizes: !isMultiProduct && quoteData.products?.length === 1 ? quoteData.products[0].sizes : (isMultiProduct ? 'See individual products' : quoteData.sizes),
             product_url: quoteData.productUrl,
-            product_description: isMultiProduct ? '' : (quoteData.description || ''),
-            brand_logo: isMultiProduct ? '' : (quoteData.brandLogo || ''),
-            brand_name: isMultiProduct ? 'Multiple Brands' : (quoteData.brandName || ''),
+            product_description: !isMultiProduct && quoteData.products?.length === 1 ? (quoteData.products[0].description || '') : (isMultiProduct ? '' : (quoteData.description || '')),
+            brand_logo: !isMultiProduct && quoteData.products?.length === 1 ? (quoteData.products[0].brandLogo || '') : (isMultiProduct ? (quoteData.products?.[0]?.brandLogo || '') : (quoteData.brandLogo || '')),
+            brand_name: !isMultiProduct && quoteData.products?.length === 1 ? quoteData.products[0].brandName : (isMultiProduct ? 'Multiple Brands' : (quoteData.brandName || '')),
             
-            // Multi-product HTML
-            products_html: isMultiProduct ? this.generateMultiProductHTML(quoteData.products) : '',
-            
-            // Color swatches HTML (empty for multi-product)
-            color_swatches_html: isMultiProduct ? '' : this.generateColorSwatchesHTML(quoteData.allColors, quoteData.selectedColorIndex),
+            // Product HTML (used for both single and multiple products)
+            products_html: quoteData.products && quoteData.products.length > 0 ? this.generateMultiProductHTML(quoteData.products, quoteData.decorationMethod, quoteData.setupFee) : '',
             
             // Quote details (single product fields for backwards compatibility)
-            quantity: isMultiProduct ? 'See breakdown' : quoteData.quantity,
-            decoration_method: isMultiProduct ? 'Various' : quoteData.decorationMethod,
-            price_per_item: isMultiProduct ? 'See breakdown' : this.formatPrice(quoteData.pricePerItem),
-            setup_fee: isMultiProduct ? 'See breakdown' : this.formatPrice(quoteData.setupFee),
-            total_price: this.formatPrice(isMultiProduct ? quoteData.grandTotal : quoteData.totalPrice),
+            quantity: !isMultiProduct && quoteData.products?.length === 1 ? quoteData.products[0].quantity : (isMultiProduct ? 'See breakdown' : quoteData.quantity),
+            decoration_method: quoteData.decorationMethod || 'Not specified',
+            price_per_item: !isMultiProduct && quoteData.products?.length === 1 ? this.formatPrice(quoteData.products[0].pricePerItem) : (isMultiProduct ? 'See breakdown' : this.formatPrice(quoteData.pricePerItem)),
+            setup_fee: this.formatPrice(quoteData.setupFee || 0),
+            total_price: this.formatPrice(quoteData.grandTotal || quoteData.totalPrice),
             
             // Additional info
             notes: quoteData.notes || '',
-            quote_date: this.formatDate(new Date())
+            quote_date: this.formatDate(new Date()),
+            
+            // Pricing disclaimer HTML
+            pricing_disclaimer_html: `
+                <p style="margin-top: 20px; color: #666; font-size: 13px; text-align: center;">
+                    *Pricing subject to final artwork and specifications
+                </p>
+            `
         };
 
         try {
@@ -139,71 +143,84 @@ export class EmailService {
     /**
      * Generate HTML for multiple products
      */
-    generateMultiProductHTML(products) {
+    generateMultiProductHTML(products, decorationMethod, setupFee) {
         if (!products || products.length === 0) return '';
         
         let html = '<div style="margin: 20px 0;">';
         html += '<h2 style="color: #2f661e; margin-bottom: 20px;">Product Quote Details</h2>';
         
-        // Product cards
+        // Show decoration method at the top
+        if (decorationMethod) {
+            html += `<p style="font-size: 16px; margin-bottom: 20px;"><strong>Decoration Method:</strong> ${decorationMethod}</p>`;
+        }
+        
+        // Simple products table
+        html += `
+            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden;">
+                <thead>
+                    <tr style="background: #f5f5f5; border-bottom: 2px solid #e0e0e0;">
+                        <th style="padding: 12px; text-align: left;">Product</th>
+                        <th style="padding: 12px; text-align: left;">Color</th>
+                        <th style="padding: 12px; text-align: center;">Qty</th>
+                        <th style="padding: 12px; text-align: right;">Price</th>
+                        <th style="padding: 12px; text-align: right;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
         products.forEach((product, index) => {
             html += `
-                <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #ffffff;">
-                    <h3 style="color: #2f661e; margin-top: 0;">Product ${index + 1}: ${product.productName}</h3>
-                    
-                    <table style="width: 100%;">
-                        <tr>
-                            <td style="width: 150px; vertical-align: top;">
-                                ${product.productImage ? `<img src="${product.productImage}" alt="${product.productName}" style="width: 140px; height: auto; border-radius: 4px;">` : ''}
-                            </td>
-                            <td style="padding-left: 20px; vertical-align: top;">
-                                <p style="margin: 5px 0;"><strong>Style:</strong> ${product.styleNumber}</p>
-                                ${product.brandName ? `<p style="margin: 5px 0;"><strong>Brand:</strong> ${product.brandName}</p>` : ''}
-                                <p style="margin: 5px 0;"><strong>Color:</strong> ${product.colorName}</p>
-                                ${product.sizes ? `<p style="margin: 5px 0;"><strong>Available Sizes:</strong> ${product.sizes}</p>` : ''}
-                            </td>
-                        </tr>
-                    </table>
-                    
-                    <table style="width: 100%; margin-top: 15px; border-top: 1px solid #e0e0e0; padding-top: 15px;">
-                        <tr>
-                            <td style="width: 50%;"><strong>Quantity:</strong></td>
-                            <td style="text-align: right;">${product.quantity} pieces</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Decoration Method:</strong></td>
-                            <td style="text-align: right;">${product.decorationMethod}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Price per Item:</strong></td>
-                            <td style="text-align: right;">$${this.formatPrice(product.pricePerItem)}</td>
-                        </tr>
-                        ${product.setupFee > 0 ? `
-                        <tr>
-                            <td><strong>Setup Fee:</strong></td>
-                            <td style="text-align: right;">$${this.formatPrice(product.setupFee)}</td>
-                        </tr>
-                        ` : ''}
-                        <tr style="background: #f5f5f5; font-weight: bold;">
-                            <td style="padding: 8px;"><strong>Subtotal:</strong></td>
-                            <td style="text-align: right; padding: 8px;">$${this.formatPrice(product.subtotal)}</td>
-                        </tr>
-                    </table>
-                </div>
+                <tr style="border-bottom: 1px solid #e0e0e0;">
+                    <td style="padding: 12px;">
+                        <div style="display: flex; align-items: center;">
+                            ${product.productImage ? `<img src="${product.productImage}" alt="${product.productName}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 12px;">` : ''}
+                            <div>
+                                <div style="font-weight: bold;">${product.productName}</div>
+                                <div style="color: #666; font-size: 14px;">Style: ${product.styleNumber}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 12px;">${product.colorName}</td>
+                    <td style="padding: 12px; text-align: center;">${product.quantity}</td>
+                    <td style="padding: 12px; text-align: right;">$${this.formatPrice(product.pricePerItem)}</td>
+                    <td style="padding: 12px; text-align: right; font-weight: bold;">$${this.formatPrice(product.subtotal)}</td>
+                </tr>
             `;
         });
         
+        html += `
+                </tbody>
+            </table>
+        `;
+        
         // Grand total
-        const grandTotal = products.reduce((sum, p) => sum + p.subtotal, 0);
+        const productsSubtotal = products.reduce((sum, p) => sum + p.subtotal, 0);
+        const grandTotal = productsSubtotal + (setupFee || 0);
+        
         html += `
             <div style="background: #f9f9f9; border: 2px solid #2f661e; border-radius: 8px; padding: 20px; margin-top: 30px;">
-                <table style="width: 100%; font-size: 18px;">
+                <table style="width: 100%; font-size: 16px;">
                     <tr>
-                        <td><strong>GRAND TOTAL:</strong></td>
-                        <td style="text-align: right;"><strong>$${this.formatPrice(grandTotal)}</strong></td>
+                        <td>Products Subtotal:</td>
+                        <td style="text-align: right;">$${this.formatPrice(productsSubtotal)}</td>
+                    </tr>
+                    ${setupFee > 0 ? `
+                    <tr>
+                        <td>Setup Fee (one-time):</td>
+                        <td style="text-align: right;">$${this.formatPrice(setupFee)}</td>
+                    </tr>
+                    ` : ''}
+                    <tr style="border-top: 2px solid #2f661e; padding-top: 10px;">
+                        <td style="padding-top: 10px; font-size: 18px;"><strong>GRAND TOTAL:</strong></td>
+                        <td style="text-align: right; padding-top: 10px; font-size: 18px;"><strong>$${this.formatPrice(grandTotal)}</strong></td>
                     </tr>
                 </table>
             </div>
+            
+            <p style="margin-top: 20px; color: #666; font-size: 13px; text-align: center;">
+                *Pricing subject to final artwork and specifications
+            </p>
         `;
         
         html += '</div>';
