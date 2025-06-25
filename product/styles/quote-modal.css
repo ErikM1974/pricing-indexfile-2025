@@ -377,6 +377,23 @@ textarea {
     color: var(--error-color);
 }
 
+.btn-change-product {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    color: #666;
+    font-size: 0.85rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-change-product:hover {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    border-color: var(--primary-color);
+}
+
 .product-line-content {
     padding: 20px;
 }

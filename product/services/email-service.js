@@ -42,6 +42,12 @@ export class EmailService {
             to_email: quoteData.customerEmail,
             cc_email: quoteData.senderEmail,  // CC the sales rep
             
+            // Customer info
+            customer_name: quoteData.customerName || 'Customer',
+            customer_phone: quoteData.customerPhone || 'Not provided',
+            company_name: quoteData.companyName || 'Not provided',
+            quote_id: quoteData.quoteID || '',
+            
             // Sender
             from_name: quoteData.senderName,
             reply_to: quoteData.senderEmail || 'sales@nwcustomapparel.com',

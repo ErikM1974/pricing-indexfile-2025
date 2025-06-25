@@ -12,10 +12,19 @@ export class QuoteService {
      * Generate unique quote ID
      */
     generateQuoteID() {
-        const timestamp = new Date().toISOString()
-            .replace(/[-:]/g, '')
-            .replace(/\..+/, '');
-        return `Q_${timestamp}`;
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2); // Last 2 digits of year
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        
+        // Generate 4 random alphanumeric characters
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let random = '';
+        for (let i = 0; i < 4; i++) {
+            random += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        
+        return `Q-${year}${month}${day}-${random}`;
     }
 
     /**
@@ -82,9 +91,9 @@ export class QuoteService {
                 QuoteID: quoteID,
                 SessionID: sessionID,
                 CustomerEmail: quoteData.customerEmail,
-                CustomerName: quoteData.senderName || 'Guest',
-                CompanyName: 'Northwest Custom Apparel',
-                Phone: '', // TODO: Add phone field to form
+                CustomerName: quoteData.customerName || 'Guest',
+                CompanyName: quoteData.companyName || 'Not Provided',
+                Phone: quoteData.customerPhone || '',
                 TotalQuantity: totalQuantity,
                 SubtotalAmount: parseFloat(quoteData.grandTotal.toFixed(2)),
                 LTMFeeTotal: parseFloat(ltmFeeTotal.toFixed(2)),

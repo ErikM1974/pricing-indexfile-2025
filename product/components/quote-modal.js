@@ -35,13 +35,30 @@ export class QuoteModal {
                             <h3>Contact Information</h3>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="customer-email">Customer Email *</label>
-                                    <input type="email" id="customer-email" name="customerEmail" required>
+                                    <label for="customer-name">Customer Name *</label>
+                                    <input type="text" id="customer-name" name="customerName" placeholder="John Smith" required>
                                 </div>
                                 <div class="form-group">
+                                    <label for="customer-email">Customer Email *</label>
+                                    <input type="email" id="customer-email" name="customerEmail" placeholder="john@company.com" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="customer-phone">Phone Number</label>
+                                    <input type="tel" id="customer-phone" name="customerPhone" placeholder="(555) 123-4567">
+                                </div>
+                                <div class="form-group">
+                                    <label for="company-name">Company Name</label>
+                                    <input type="text" id="company-name" name="companyName" placeholder="ABC Company">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="grid-column: 1 / -1;">
                                     <label for="sales-rep">Sales Representative *</label>
                                     <select id="sales-rep" name="salesRep" required>
                                         <option value="">Select Sales Rep</option>
+                                        <option value="Sales Team|sales@nwcustomapparel.com">Sales Team</option>
                                         <option value="Nika|nika@nwcustomapparel.com">Nika</option>
                                         <option value="Taylar|taylar@nwcustomapparel.com">Taylar</option>
                                         <option value="Adriyella|adriyella@nwcustomapparel.com">Adriyella</option>
@@ -241,10 +258,17 @@ export class QuoteModal {
         document.getElementById('quote-loading').classList.remove('hidden');
     }
 
-    showSuccess(email) {
+    showSuccess(email, quoteID = null) {
         document.getElementById('quote-loading').classList.add('hidden');
         document.getElementById('quote-success').classList.remove('hidden');
         document.getElementById('success-email').textContent = email;
+        
+        // Update success message to include Quote ID if available
+        if (quoteID) {
+            const successDiv = document.getElementById('quote-success');
+            const h3 = successDiv.querySelector('h3');
+            h3.innerHTML = `Quote Sent Successfully!<br><small style="font-size: 16px; color: #666;">Quote ID: ${quoteID}</small>`;
+        }
     }
 
     showError(message) {
@@ -274,7 +298,10 @@ export class QuoteModal {
 
     async sendQuote() {
         const formData = new FormData(document.getElementById('quote-form'));
+        const customerName = formData.get('customerName');
         const customerEmail = formData.get('customerEmail');
+        const customerPhone = formData.get('customerPhone');
+        const companyName = formData.get('companyName');
         const salesRepData = formData.get('salesRep');
         
         // Validate email
@@ -300,7 +327,10 @@ export class QuoteModal {
         // Prepare quote data with multiple products
         const quoteData = {
             // Contact info
+            customerName: customerName,
             customerEmail: customerEmail,
+            customerPhone: customerPhone,
+            companyName: companyName,
             senderName: senderName,
             senderEmail: senderEmail,
             
@@ -331,12 +361,26 @@ export class QuoteModal {
         this.showLoading();
         
         try {
-            await this.emailService.sendQuote(quoteData);
-            // Save selected sales rep
-            if (salesRepData) {
-                localStorage.setItem('nwca_sales_rep', salesRepData);
+            // First save to database
+            const saveResult = await this.quoteService.saveQuote(quoteData);
+            
+            if (saveResult.success) {
+                // Add quote ID to the data before sending email
+                quoteData.quoteID = saveResult.quoteID;
+                
+                // Then send email
+                await this.emailService.sendQuote(quoteData);
+                
+                // Save selected sales rep
+                if (salesRepData) {
+                    localStorage.setItem('nwca_sales_rep', salesRepData);
+                }
+                
+                // Show success with Quote ID
+                this.showSuccess(customerEmail, saveResult.quoteID);
+            } else {
+                throw new Error('Failed to save quote to database');
             }
-            this.showSuccess(customerEmail);
         } catch (error) {
             console.error('Failed to send quote:', error);
             this.showError('Failed to send quote. Please try again or contact support.');
@@ -422,6 +466,7 @@ export class QuoteModal {
                             <strong>${product.productName}</strong><br>
                             Style: ${product.styleNumber}<br>
                             ${product.colorName ? `Color: ${product.colorName}` : ''}
+                            ${!isPrimary ? `<br><button type="button" class="btn-change-product" data-product-id="${product.id}" style="font-size: 0.85rem; padding: 4px 8px; margin-top: 8px;">Change Product</button>` : ''}
                         </div>
                     </div>
                     
@@ -504,6 +549,12 @@ export class QuoteModal {
             removeBtn.addEventListener('click', () => this.removeProduct(product.id));
         }
         
+        // Change product button
+        const changeBtn = document.querySelector(`#product-line-${product.id} .btn-change-product`);
+        if (changeBtn) {
+            changeBtn.addEventListener('click', () => this.resetProduct(product.id));
+        }
+        
         // Input listeners for calculations
         const inputs = ['quantity', 'price', 'setup'].map(type => 
             document.getElementById(`${type}-${product.id}`)
@@ -578,6 +629,39 @@ export class QuoteModal {
         this.updateSummary();
     }
     
+    resetProduct(productId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product) return;
+        
+        // Reset product data but keep the ID
+        product.styleNumber = '';
+        product.productName = '';
+        product.productImage = '';
+        product.colorName = '';
+        product.colorData = null;
+        product.allColors = [];
+        product.sizes = '';
+        product.description = '';
+        product.brandLogo = '';
+        product.brandName = '';
+        product.quantity = 1;
+        product.decorationMethod = 'Screen Print';
+        product.pricePerItem = 0;
+        product.setupFee = 0;
+        product.subtotal = 0;
+        
+        // Re-render all products to update the UI
+        this.renderAllProducts();
+        
+        // Focus the search input after re-rendering
+        setTimeout(() => {
+            const searchInput = document.getElementById(`product-search-${productId}`);
+            if (searchInput) {
+                searchInput.focus();
+            }
+        }, 100);
+    }
+    
     updateProduct(productId, updates) {
         const product = this.products.find(p => p.id === productId);
         if (product) {
@@ -630,10 +714,15 @@ export class QuoteModal {
     }
     
     initializeProductSearch(productId) {
+        console.log('[QuoteModal] Initializing product search for product:', productId);
+        
         const searchInput = document.getElementById(`product-search-${productId}`);
         const resultsContainer = document.getElementById(`search-results-${productId}`);
         
-        if (!searchInput || !resultsContainer) return;
+        if (!searchInput || !resultsContainer) {
+            console.error('[QuoteModal] Search elements not found for product:', productId);
+            return;
+        }
         
         let searchTimeout = null;
         
@@ -712,9 +801,11 @@ export class QuoteModal {
     
     async searchProducts(productId, searchTerm) {
         const resultsContainer = document.getElementById(`search-results-${productId}`);
+        console.log('[QuoteModal] Searching products for:', searchTerm, 'Product ID:', productId);
         
         try {
             const results = await this.api.searchProducts(searchTerm);
+            console.log('[QuoteModal] Search results:', results.length, 'items found');
             
             if (results.length > 0) {
                 let html = '<div class="search-results-list">';
@@ -730,6 +821,7 @@ export class QuoteModal {
                 
                 html += '</div>';
                 resultsContainer.innerHTML = html;
+                resultsContainer.classList.remove('hidden');
                 
                 // Add click handlers
                 resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
@@ -921,7 +1013,10 @@ export class QuoteModal {
     
     async testSaveQuote() {
         const formData = new FormData(document.getElementById('quote-form'));
+        const customerName = formData.get('customerName');
         const customerEmail = formData.get('customerEmail');
+        const customerPhone = formData.get('customerPhone');
+        const companyName = formData.get('companyName');
         const salesRepData = formData.get('salesRep');
         
         // Validate
@@ -943,7 +1038,10 @@ export class QuoteModal {
         
         // Prepare quote data
         const quoteData = {
+            customerName: customerName,
             customerEmail: customerEmail,
+            customerPhone: customerPhone,
+            companyName: companyName,
             senderName: senderName,
             senderEmail: senderEmail,
             products: validProducts,
@@ -964,7 +1062,7 @@ export class QuoteModal {
             
             if (result.success) {
                 console.log('[QuoteModal] Quote saved successfully:', result);
-                alert(`Quote saved successfully!\n\nQuote ID: ${result.quoteID}\n\nCheck console for details.`);
+                this.showSuccess(customerEmail, result.quoteID);
             } else {
                 console.error('[QuoteModal] Save failed:', result.error);
                 alert(`Failed to save quote: ${result.error}`);
