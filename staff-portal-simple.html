@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
     <title>Staff Portal - Northwest Custom Apparel</title>
-    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
@@ -34,49 +32,6 @@
             line-height: 1.6;
         }
 
-        /* Loading State */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.3s ease;
-        }
-
-        .loading-overlay.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .loading-spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--border-color);
-            border-top-color: var(--primary-green);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Hidden Caspio Container */
-        .caspio-hidden-container {
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-        }
-
         /* Header */
         .header {
             background: var(--card-bg);
@@ -86,14 +41,6 @@
             top: 0;
             z-index: 100;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-        }
-
-        .header.show {
-            opacity: 1;
-            transform: translateY(0);
         }
 
         .header-container {
@@ -123,45 +70,13 @@
             font-weight: bold;
         }
 
-        .user-info {
-            display: flex;
-            flex-direction: column;
-        }
-
         .welcome-text {
             font-size: 1.125rem;
             font-weight: 600;
             color: var(--text-primary);
         }
 
-        .user-role {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .last-login {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            display: none;
-        }
-
-        .last-login.show {
-            display: block;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .nav-link {
+        .sign-out {
             background: none;
             border: 1px solid var(--border-color);
             padding: 0.5rem 1rem;
@@ -175,21 +90,9 @@
             gap: 0.5rem;
         }
 
-        .nav-link:hover {
+        .sign-out:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
-            border-color: var(--primary-green);
-        }
-
-        .nav-link.primary {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
-        }
-
-        .nav-link.primary:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary-dark);
         }
 
         /* Main Container */
@@ -197,48 +100,6 @@
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 2rem;
-            opacity: 0;
-            transition: opacity 0.3s ease 0.2s;
-        }
-
-        .main-container.show {
-            opacity: 1;
-        }
-
-        /* Personal Welcome Banner */
-        .personal-welcome {
-            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
-            color: white;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            display: none;
-        }
-
-        .personal-welcome.show {
-            display: block;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .personal-welcome h1 {
-            font-size: 1.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .personal-welcome p {
-            opacity: 0.9;
-            font-size: 1.125rem;
         }
 
         /* Dashboard Grid */
@@ -478,6 +339,18 @@
             font-weight: 500;
         }
 
+        /* Caspio Embed Section */
+        .caspio-section {
+            background: #e5f3ff;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #1e40af;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .dashboard-grid {
@@ -505,82 +378,33 @@
                 font-size: 1rem;
             }
 
-            .nav-link span {
+            .sign-out span {
                 display: none;
-            }
-
-            .last-login {
-                display: none !important;
-            }
-
-            .personal-welcome {
-                padding: 1.5rem;
-            }
-
-            .personal-welcome h1 {
-                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-    </div>
-
-    <!-- Hidden Caspio Authentication Container -->
-    <div class="caspio-hidden-container">
-        <!-- Caspio Authentication DataPage -->
-        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
-        
-        <!-- 
-        IMPORTANT: Configure your Caspio DataPage to output this HTML:
-        
-        <div id="caspio-auth-data">
-            <span id="auth-firstname">[@authfield:First_Name]</span>
-            <span id="auth-lastname">[@authfield:Last_Name]</span>
-            <span id="auth-email">[@authfield:Email]</span>
-            <span id="auth-role">[@authfield:Role]</span>
-            <span id="auth-lastlogin">[@authfield:Last_Login]</span>
-        </div>
-        
-        The JavaScript will read these values to personalize the page.
-        -->
-    </div>
-
-    <!-- Header (Initially Hidden) -->
-    <header class="header" id="mainHeader">
+    <!-- Header -->
+    <header class="header">
         <div class="header-container">
             <div class="welcome-section">
                 <div class="logo">NW</div>
-                <div class="user-info">
-                    <div class="welcome-text" id="headerWelcome">Welcome</div>
-                    <div class="user-role" id="headerRole"></div>
-                </div>
+                <!-- This is where Caspio auth data will display -->
+                <div class="welcome-text">Welcome, [@authfield:First_Name] [@authfield:Last_Name]</div>
             </div>
-            <div class="header-actions">
-                <div class="last-login" id="lastLogin"></div>
-                <div class="nav-links">
-                    <a href="/" class="nav-link primary">
-                        <i class="fas fa-home"></i>
-                        <span>Main Website</span>
-                    </a>
-                    <a href="https://c3eku948.caspio.com/folderlogout" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Sign Out</span>
-                    </a>
-                </div>
-            </div>
+            <a href="https://c3eku948.caspio.com/folderlogout" class="sign-out">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sign Out</span>
+            </a>
         </div>
     </header>
 
-    <!-- Main Content (Initially Hidden) -->
-    <main class="main-container" id="mainContent">
-        <!-- Personal Welcome Banner -->
-        <div class="personal-welcome" id="personalWelcome">
-            <h1 id="welcomeGreeting">Welcome back!</h1>
-            <p id="welcomeMessage">Select a calculator below to get started</p>
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Caspio Authentication Note -->
+        <div class="caspio-section">
+            <i class="fas fa-info-circle"></i> This section will contain the Caspio authentication datapage embed
         </div>
 
         <!-- Dashboard Grid -->
@@ -746,116 +570,5 @@
             </div>
         </section>
     </main>
-
-    <script>
-        // Wait for page and Caspio to load
-        window.addEventListener('load', function() {
-            // Give Caspio time to render and insert auth data
-            setTimeout(function() {
-                initializePortal();
-            }, 1500);
-        });
-
-        function initializePortal() {
-            // Try to get authenticated user data from Caspio
-            // Caspio should populate spans with IDs like auth-firstname
-            const firstName = document.getElementById('auth-firstname')?.textContent?.trim() || 
-                            document.querySelector('[id*="firstname"]')?.textContent?.trim() || 
-                            'Team Member';
-            const lastName = document.getElementById('auth-lastname')?.textContent?.trim() || 
-                           document.querySelector('[id*="lastname"]')?.textContent?.trim() || '';
-            const email = document.getElementById('auth-email')?.textContent?.trim() || '';
-            const role = document.getElementById('auth-role')?.textContent?.trim() || 'Staff';
-            const lastLogin = document.getElementById('auth-lastlogin')?.textContent?.trim() || '';
-
-            // Create full name
-            const fullName = lastName ? `${firstName} ${lastName}` : firstName;
-
-            // Update header with first name only for welcome
-            document.getElementById('headerWelcome').textContent = `Welcome, ${firstName}`;
-            if (role) {
-                document.getElementById('headerRole').textContent = role;
-            }
-
-            // Update personal welcome banner with first name
-            const hour = new Date().getHours();
-            let greeting = 'Welcome back';
-            if (hour < 12) greeting = 'Good morning';
-            else if (hour < 17) greeting = 'Good afternoon';
-            else greeting = 'Good evening';
-
-            document.getElementById('welcomeGreeting').textContent = `${greeting}, ${firstName}!`;
-            
-            // Personalized message based on time/day
-            const messages = [
-                "Let's make today productive!",
-                "Ready to help customers create something amazing?",
-                "Select a calculator below to get started",
-                "Here to help you provide excellent service"
-            ];
-            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-            document.getElementById('welcomeMessage').textContent = randomMessage;
-
-            // Show last login if available
-            if (lastLogin) {
-                const lastLoginEl = document.getElementById('lastLogin');
-                lastLoginEl.textContent = `Last login: ${formatDate(lastLogin)}`;
-                lastLoginEl.classList.add('show');
-            }
-
-            // Hide loading and show content with animation
-            document.getElementById('loadingOverlay').classList.add('fade-out');
-            document.getElementById('mainHeader').classList.add('show');
-            document.getElementById('mainContent').classList.add('show');
-            document.getElementById('personalWelcome').classList.add('show');
-
-            // Store user info for use in calculators
-            sessionStorage.setItem('nwca_user_name', fullName);
-            sessionStorage.setItem('nwca_user_email', email);
-            sessionStorage.setItem('nwca_user_role', role);
-            sessionStorage.setItem('nwca_user_firstname', firstName);
-
-            // Log successful initialization
-            console.log('Portal initialized for:', firstName);
-        }
-
-        function formatDate(dateString) {
-            try {
-                const date = new Date(dateString);
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-
-                if (date.toDateString() === today.toDateString()) {
-                    return 'Today at ' + date.toLocaleTimeString('en-US', { 
-                        hour: 'numeric', 
-                        minute: '2-digit' 
-                    });
-                } else if (date.toDateString() === yesterday.toDateString()) {
-                    return 'Yesterday at ' + date.toLocaleTimeString('en-US', { 
-                        hour: 'numeric', 
-                        minute: '2-digit' 
-                    });
-                } else {
-                    return date.toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit'
-                    });
-                }
-            } catch (e) {
-                return dateString;
-            }
-        }
-
-        // Fallback if Caspio doesn't load or user data not found
-        setTimeout(function() {
-            if (!document.getElementById('mainContent').classList.contains('show')) {
-                console.warn('Caspio data not loaded, showing default view');
-                initializePortal();
-            }
-        }, 3000);
-    </script>
 </body>
 </html>

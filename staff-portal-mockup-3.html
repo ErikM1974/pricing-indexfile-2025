@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal - Layout 3 (Mega Menu)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #3a7c52;
+            --primary-dark: #1a472a;
+            --accent-sales: #27ae60;
+            --accent-forms: #805AD5;
+            --accent-resources: #4A5568;
+            --accent-company: #DD6B20;
+            --bg-primary: #f0f4f8;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        /* Header */
+        .main-header {
+            background: var(--bg-card);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-green);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 2rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            background: var(--bg-primary);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .search-wrapper input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            background: white;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .action-btn {
+            position: relative;
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+
+        .action-btn:hover {
+            background: var(--bg-primary);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-profile:hover {
+            background: var(--bg-primary);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-green);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Mega Menu Navigation */
+        .mega-nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 0;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 0;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-green);
+        }
+
+        .nav-link.active {
+            color: var(--primary-green);
+            border-bottom-color: var(--primary-green);
+        }
+
+        /* Mega Menu Dropdown */
+        .mega-menu {
+            position: absolute;
+            top: 100%;
+            left: -2rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            padding: 2rem;
+            min-width: 600px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover .mega-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .mega-menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .mega-menu-section h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .mega-menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mega-menu-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .mega-menu-link:hover {
+            background: var(--bg-primary);
+            color: var(--primary-green);
+        }
+
+        .mega-menu-link i {
+            width: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            border-radius: 24px;
+            padding: 3rem;
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .hero-stat {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .hero-stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-stat-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .view-all-link {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .view-all-link:hover {
+            gap: 0.75rem;
+        }
+
+        /* Two Column Layout */
+        .two-column-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Announcement List */
+        .announcement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .announcement-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .announcement-item:hover {
+            background: #e5e7eb;
+        }
+
+        .announcement-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.25rem;
+        }
+
+        /* Quick Tools Grid */
+        .quick-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .quick-tool {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .quick-tool:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .quick-tool-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+        }
+
+        .quick-tool.sales .quick-tool-icon { background: #d1fae5; color: #065f46; }
+        .quick-tool.forms .quick-tool-icon { background: #e9d8fd; color: #553c9a; }
+        .quick-tool.resources .quick-tool-icon { background: #e2e8f0; color: #334155; }
+
+        .quick-tool-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.3;
+        }
+
+        .new-indicator {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 20px;
+            height: 20px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 3px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Production Widget */
+        .production-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .production-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .production-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .production-item::before {
+            content: '';
+            position: absolute;
+            left: -1.5rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: var(--bg-card);
+            border: 2px solid var(--primary-green);
+            border-radius: 50%;
+        }
+
+        .production-item.rush::before {
+            border-color: #f59e0b;
+            background: #f59e0b;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .mega-nav {
+                display: none;
+            }
+
+            .search-container {
+                display: none;
+            }
+
+            .hero-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .two-column-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 1rem;
+            }
+
+            .hero-section {
+                padding: 2rem;
+            }
+
+            .hero-content h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .quick-tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-top">
+                <div class="logo-section">
+                    <div class="logo">NW</div>
+                    <div>
+                        <div style="font-size: 1.25rem; font-weight: 600;">Staff Portal</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary);">Northwest Custom Apparel</div>
+                    </div>
+                </div>
+
+                <div class="search-container">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="search" placeholder="Search calculators, forms, guides...">
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="action-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <div class="user-avatar">EM</div>
+                        <div>
+                            <div style="font-weight: 600;">Erik Mickelson</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Administrator</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mega Menu Navigation -->
+            <nav class="mega-nav">
+                <div class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-calculator"></i>
+                        <span>Pricing Tools</span>
+                        <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i>
+                    </a>
+                    <div class="mega-menu">
+                        <div class="mega-menu-grid">
+                            <div class="mega-menu-section">
+                                <h3>Contract Pricing</h3>
+                                <div class="mega-menu-links">
+                                    <a href="#" class="mega-menu-link">
+                                        <i class="fas fa-tshirt"></i>
+                                        <span>DTG Calculator</span>
+                                    </a>
+                                    <a href="#" class="mega-menu-link">
+                                        <i class="fas fa-hat-cowboy"></i>
+                                        <span>Embroidery (Flats & Caps)</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <h3>Customer Supplied</h3>
+                                <div class="mega-menu-links">
+                                    <a href="#" class="mega-menu-link">
+                                        <i class="fas fa-hand-holding"></i>
+                                        <span>Embroidery Pricing</span>
+                                    </a>
+                                    <a href="#" class="mega-menu-link">
+                                        <i class="fas fa-print"></i>
+                                        <span>Screen Print</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <h3>Specialty Items</h3>
+                                <div class="mega-menu-links">
+                                    <a href="#" class="mega-menu-link">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span>Embroidered Emblems</span>
+                                    </a>
+                                    <a href="#" class="mega-menu-link">
+                                        <i class="fas fa-tag"></i>
+                                        <span>Leatherette Patches</span>
+                                    </a>
+                                    <a href="#" class="mega-menu-link">
+                                        <i class="fas fa-mug-hot"></i>
+                                        <span>Laser Engraved Tumblers</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <h3>Programs</h3>
+                                <div class="mega-menu-links">
+                                    <a href="#" class="mega-menu-link">
+                                        <i class="fas fa-store"></i>
+                                        <span>Company Webstores</span>
+                                    </a>
+                                    <a href="#" class="mega-menu-link">
+                                        <i class="fas fa-concierge-bell"></i>
+                                        <span>À La Carte Ordering</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Forms & Orders</span>
+                        <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-book"></i>
+                        <span>Resources</span>
+                        <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-building"></i>
+                        <span>Company</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Good morning, Erik! ☀️</h1>
+                <p style="font-size: 1.25rem; opacity: 0.9;">Here's your dashboard for Wednesday, June 26</p>
+                
+                <div class="hero-grid">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">12</div>
+                        <div class="hero-stat-label">Today's Quotes</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">3</div>
+                        <div class="hero-stat-label">Hot Tickets</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">45</div>
+                        <div class="hero-stat-label">Active Orders</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">$124k</div>
+                        <div class="hero-stat-label">MTD Revenue</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Two Column Layout -->
+        <div class="two-column-grid">
+            <!-- Announcements -->
+            <div class="card">
+                <div class="section-header">
+                    <h2 class="section-title">📢 Latest Updates</h2>
+                    <a href="#" class="view-all-link">
+                        View all
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <div class="announcement-list">
+                    <div class="announcement-item">
+                        <div class="announcement-icon" style="background: #d1fae5; color: #065f46;">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">2025 Pricing Updates Released</div>
+                            <div style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">
+                                New Contract DTG and Customer Supplied Goods calculators are now available with updated pricing structures.
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">
+                                    <i class="far fa-clock"></i> 2 hours ago
+                                </span>
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary-green); text-decoration: none; font-weight: 500;">
+                                    View calculators →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="announcement-item">
+                        <div class="announcement-icon" style="background: #dbeafe; color: #1e40af;">
+                            <i class="fas fa-birthday-cake"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">June Birthday Celebration BBQ</div>
+                            <div style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">
+                                Join us for a company BBQ on June 30th to celebrate all June birthdays! RSVP by Friday.
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                <i class="far fa-clock"></i> Yesterday at 3:45 PM
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="announcement-item">
+                        <div class="announcement-icon" style="background: #fee2e2; color: #991b1b;">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">Hot Ticket Process Update</div>
+                            <div style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">
+                                All priority rush orders are now called "Hot Tickets" and will be printed on bright orange paper for visibility.
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                <i class="far fa-clock"></i> June 23 at 9:00 AM
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Production Schedule -->
+            <div class="card">
+                <div class="section-header">
+                    <h2 class="section-title">📅 Production Schedule</h2>
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">Updated by Ruthie</span>
+                </div>
+                
+                <div class="production-timeline">
+                    <div class="production-item">
+                        <div style="font-weight: 600;">DTG Production</div>
+                        <div style="color: var(--text-secondary); font-size: 0.875rem;">Available after July 16</div>
+                    </div>
+                    <div class="production-item rush">
+                        <div style="font-weight: 600; color: #f59e0b;">DTG Rush/Sneak-In</div>
+                        <div style="color: #92400e; font-size: 0.875rem;">Available after July 9</div>
+                    </div>
+                    <div class="production-item">
+                        <div style="font-weight: 600;">Embroidery</div>
+                        <div style="color: var(--text-secondary); font-size: 0.875rem;">Available after July 8</div>
+                    </div>
+                    <div class="production-item">
+                        <div style="font-weight: 600;">Screen Print</div>
+                        <div style="color: var(--text-secondary); font-size: 0.875rem;">Available after July 12</div>
+                    </div>
+                </div>
+                
+                <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 12px; padding: 1rem; text-align: center; margin-top: 1rem;">
+                    <div style="font-weight: 600; color: #92400e;">Current Capacity: 100-200 Prints</div>
+                    <div style="color: #b45309; font-size: 0.875rem; margin-top: 0.25rem;">Please ask for rushes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Access Tools -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title">⚡ Quick Access</h2>
+                <a href="#" class="view-all-link">
+                    Browse all tools
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="quick-tools-grid">
+                <a href="#" class="quick-tool sales">
+                    <span class="new-indicator"></span>
+                    <div class="quick-tool-icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <div class="quick-tool-title">Contract DTG</div>
+                </a>
+
+                <a href="#" class="quick-tool sales">
+                    <div class="quick-tool-icon">
+                        <i class="fas fa-hat-cowboy"></i>
+                    </div>
+                    <div class="quick-tool-title">Embroidery</div>
+                </a>
+
+                <a href="#" class="quick-tool forms">
+                    <div class="quick-tool-icon">
+                        <i class="fas fa-fire-flame-curved"></i>
+                    </div>
+                    <div class="quick-tool-title">Hot Ticket</div>
+                </a>
+
+                <a href="#" class="quick-tool forms">
+                    <div class="quick-tool-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="quick-tool-title">Lead Form</div>
+                </a>
+
+                <a href="#" class="quick-tool sales">
+                    <div class="quick-tool-icon">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <div class="quick-tool-title">Screen Print</div>
+                </a>
+
+                <a href="#" class="quick-tool resources">
+                    <div class="quick-tool-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="quick-tool-title">Task Guide</div>
+                </a>
+
+                <a href="#" class="quick-tool sales">
+                    <span class="new-indicator"></span>
+                    <div class="quick-tool-icon">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div class="quick-tool-title">Leatherette</div>
+                </a>
+
+                <a href="#" class="quick-tool resources">
+                    <div class="quick-tool-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="quick-tool-title">Skills Guide</div>
+                </a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

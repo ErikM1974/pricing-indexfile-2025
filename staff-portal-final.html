@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
     <title>Staff Portal - Northwest Custom Apparel</title>
-    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
@@ -155,13 +153,7 @@
             display: block;
         }
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .nav-link {
+        .sign-out {
             background: none;
             border: 1px solid var(--border-color);
             padding: 0.5rem 1rem;
@@ -175,21 +167,10 @@
             gap: 0.5rem;
         }
 
-        .nav-link:hover {
+        .sign-out:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
             border-color: var(--primary-green);
-        }
-
-        .nav-link.primary {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
-        }
-
-        .nav-link.primary:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary-dark);
         }
 
         /* Main Container */
@@ -505,7 +486,7 @@
                 font-size: 1rem;
             }
 
-            .nav-link span {
+            .sign-out span {
                 display: none;
             }
 
@@ -531,11 +512,9 @@
 
     <!-- Hidden Caspio Authentication Container -->
     <div class="caspio-hidden-container">
-        <!-- Caspio Authentication DataPage -->
-        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
-        
         <!-- 
-        IMPORTANT: Configure your Caspio DataPage to output this HTML:
+        INSTRUCTIONS FOR CASPIO SETUP:
+        1. In your Caspio DataPage, set the HTML content to:
         
         <div id="caspio-auth-data">
             <span id="auth-firstname">[@authfield:First_Name]</span>
@@ -545,8 +524,9 @@
             <span id="auth-lastlogin">[@authfield:Last_Login]</span>
         </div>
         
-        The JavaScript will read these values to personalize the page.
+        2. Then embed your Caspio script here:
         -->
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
     </div>
 
     <!-- Header (Initially Hidden) -->
@@ -561,16 +541,10 @@
             </div>
             <div class="header-actions">
                 <div class="last-login" id="lastLogin"></div>
-                <div class="nav-links">
-                    <a href="/" class="nav-link primary">
-                        <i class="fas fa-home"></i>
-                        <span>Main Website</span>
-                    </a>
-                    <a href="https://c3eku948.caspio.com/folderlogout" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Sign Out</span>
-                    </a>
-                </div>
+                <a href="https://c3eku948.caspio.com/folderlogout" class="sign-out">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sign Out</span>
+                </a>
             </div>
         </div>
     </header>
@@ -750,20 +724,19 @@
     <script>
         // Wait for page and Caspio to load
         window.addEventListener('load', function() {
-            // Give Caspio time to render and insert auth data
+            // Give Caspio time to render
             setTimeout(function() {
                 initializePortal();
             }, 1500);
         });
 
         function initializePortal() {
-            // Try to get authenticated user data from Caspio
-            // Caspio should populate spans with IDs like auth-firstname
+            // Try to get authenticated user data from hidden Caspio fields
             const firstName = document.getElementById('auth-firstname')?.textContent?.trim() || 
-                            document.querySelector('[id*="firstname"]')?.textContent?.trim() || 
+                            document.getElementById('user-firstname')?.textContent?.trim() || 
                             'Team Member';
             const lastName = document.getElementById('auth-lastname')?.textContent?.trim() || 
-                           document.querySelector('[id*="lastname"]')?.textContent?.trim() || '';
+                           document.getElementById('user-lastname')?.textContent?.trim() || '';
             const email = document.getElementById('auth-email')?.textContent?.trim() || '';
             const role = document.getElementById('auth-role')?.textContent?.trim() || 'Staff';
             const lastLogin = document.getElementById('auth-lastlogin')?.textContent?.trim() || '';
@@ -771,13 +744,13 @@
             // Create full name
             const fullName = lastName ? `${firstName} ${lastName}` : firstName;
 
-            // Update header with first name only for welcome
-            document.getElementById('headerWelcome').textContent = `Welcome, ${firstName}`;
+            // Update header
+            document.getElementById('headerWelcome').textContent = `Welcome, ${fullName}`;
             if (role) {
                 document.getElementById('headerRole').textContent = role;
             }
 
-            // Update personal welcome banner with first name
+            // Update personal welcome banner
             const hour = new Date().getHours();
             let greeting = 'Welcome back';
             if (hour < 12) greeting = 'Good morning';
@@ -813,10 +786,9 @@
             sessionStorage.setItem('nwca_user_name', fullName);
             sessionStorage.setItem('nwca_user_email', email);
             sessionStorage.setItem('nwca_user_role', role);
-            sessionStorage.setItem('nwca_user_firstname', firstName);
 
             // Log successful initialization
-            console.log('Portal initialized for:', firstName);
+            console.log('Portal initialized for:', fullName);
         }
 
         function formatDate(dateString) {
@@ -849,7 +821,7 @@
             }
         }
 
-        // Fallback if Caspio doesn't load or user data not found
+        // Fallback if Caspio doesn't load
         setTimeout(function() {
             if (!document.getElementById('mainContent').classList.contains('show')) {
                 console.warn('Caspio data not loaded, showing default view');
