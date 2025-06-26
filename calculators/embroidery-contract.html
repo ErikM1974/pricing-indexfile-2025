@@ -923,12 +923,6 @@
                             <span class="summary-label">Thread Colors:</span>
                             <span class="summary-value">${this.currentQuote.threadColors} colors</span>
                         </div>
-                        ${this.currentQuote.hasLTM ? `
-                        <div class="summary-row">
-                            <span class="summary-label">LTM Charge:</span>
-                            <span class="summary-value">$${this.currentQuote.ltmPerPiece.toFixed(2)} per item</span>
-                        </div>
-                        ` : ''}
                     </div>
                     
                     <table class="quote-table">
@@ -966,12 +960,31 @@
                     </table>
                 `;
                 
-                // Add LTM note if applicable
+                // Add LTM note and pricing comparison if applicable
                 if (this.currentQuote.hasLTM) {
+                    const regularPerPiece = (this.currentQuote.baseTotal + this.currentQuote.extraColorCharge) / this.currentQuote.quantity;
+                    const ltmPerPiece = this.currentQuote.grandTotal / this.currentQuote.quantity;
+                    
                     resultsHtml += `
                         <div class="ltm-note">
                             <i class="fas fa-info-circle"></i>
-                            Less than minimum charge of $${this.currentQuote.ltmFee.toFixed(2)} applied ($${this.currentQuote.ltmPerPiece.toFixed(2)} per item)
+                            Less than minimum charge of $${this.currentQuote.ltmFee.toFixed(2)} applied
+                        </div>
+                        
+                        <div class="pricing-comparison" style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: #1976d2; font-size: 0.875rem;">Pricing Breakdown:</h4>
+                            <div class="summary-row">
+                                <span class="summary-label">Regular Price per Item:</span>
+                                <span class="summary-value">$${regularPerPiece.toFixed(2)}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">With LTM per Item:</span>
+                                <span class="summary-value" style="font-weight: bold;">$${ltmPerPiece.toFixed(2)}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">LTM Impact per Item:</span>
+                                <span class="summary-value">+$${this.currentQuote.ltmPerPiece.toFixed(2)}</span>
+                            </div>
                         </div>
                     `;
                 }
@@ -1206,9 +1219,28 @@
             
             let ltmNote = '';
             if (quote.hasLTM) {
+                const regularPerPiece = (quote.baseTotal + quote.extraColorCharge) / quote.quantity;
+                const ltmPerPiece = quote.grandTotal / quote.quantity;
+                
                 ltmNote = `
                     <div style="background: #fef3c7; color: #92400e; padding: 10px; border-radius: 4px; margin: 20px 0;">
-                        <strong>Note:</strong> Less than minimum charge of $${quote.ltmFee.toFixed(2)} applied ($${quote.ltmPerPiece.toFixed(2)} per item)
+                        <strong>Note:</strong> Less than minimum charge of $${quote.ltmFee.toFixed(2)} applied
+                    </div>
+                    
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                        <h4 style="margin: 0 0 10px 0; color: #1976d2;">Pricing Breakdown:</h4>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Regular Price per Item:</span>
+                            <span>$${regularPerPiece.toFixed(2)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>With LTM per Item:</span>
+                            <strong>$${ltmPerPiece.toFixed(2)}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>LTM Impact per Item:</span>
+                            <span>+$${quote.ltmPerPiece.toFixed(2)}</span>
+                        </div>
                     </div>
                 `;
             }
