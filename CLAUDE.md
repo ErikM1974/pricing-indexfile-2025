@@ -232,6 +232,25 @@ git push origin branch-name
 - **IMPACT**: 30% header height reduction, perfect alignment, cleaner layout
 - **FILE**: `/shared_components/css/embroidery-layout-fix.css`
 
+### Caspio Authentication and Personalization (2025-01-26)
+- **PROBLEM**: Displaying authenticated user's first name from Caspio DataPage
+- **DISCOVERY**: Caspio outputs user data in `<dd class="cbResultSetData">Erik</dd>` elements
+- **AUTHENTICATION DIFFERENCES**:
+  - **Localhost**: Authentication cookies don't work due to cross-origin restrictions
+  - **Production (Heroku)**: Works perfectly with proper domain and HTTPS
+- **SOLUTION**: 
+  ```javascript
+  // Wait for Caspio to load with retry mechanism
+  const caspioData = document.querySelector('.cbResultSetData');
+  const firstName = caspioData?.textContent?.trim() || 'Team Member';
+  ```
+- **IMPLEMENTATION**: 
+  - Added retry mechanism (checks every 500ms up to 10 times)
+  - Personalized greetings: "Good morning/afternoon/evening, [Name]!"
+  - Graceful fallback when not authenticated
+- **FILES AFFECTED**: `staff-dashboard.html`
+- **KEY LEARNING**: Always test authentication features on production, not just localhost
+
 ## Final Tips
 
 1. **Read the console logs** - They tell you exactly what's happening
