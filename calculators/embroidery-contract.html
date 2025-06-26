@@ -888,6 +888,7 @@
                     extraColorCharge,
                     hasLTM,
                     ltmFee,
+                    ltmPerPiece: ltmFee / quantity,
                     grandTotal,
                     finalUnitPrice: grandTotal / quantity
                 };
@@ -922,6 +923,12 @@
                             <span class="summary-label">Thread Colors:</span>
                             <span class="summary-value">${this.currentQuote.threadColors} colors</span>
                         </div>
+                        ${this.currentQuote.hasLTM ? `
+                        <div class="summary-row">
+                            <span class="summary-label">LTM Charge:</span>
+                            <span class="summary-value">$${this.currentQuote.ltmPerPiece.toFixed(2)} per item</span>
+                        </div>
+                        ` : ''}
                     </div>
                     
                     <table class="quote-table">
@@ -964,7 +971,7 @@
                     resultsHtml += `
                         <div class="ltm-note">
                             <i class="fas fa-info-circle"></i>
-                            Less than minimum charge of $${this.currentQuote.ltmFee.toFixed(2)} applied
+                            Less than minimum charge of $${this.currentQuote.ltmFee.toFixed(2)} applied ($${this.currentQuote.ltmPerPiece.toFixed(2)} per item)
                         </div>
                     `;
                 }
@@ -1137,7 +1144,7 @@
                         grand_total: `$${this.currentQuote.grandTotal.toFixed(2)}`,
                         sales_rep_name: quoteData.salesRepName,
                         sales_rep_email: quoteData.salesRepEmail,
-                        sales_rep_phone: '(253) 987-4339',
+                        sales_rep_phone: '253-922-5793',
                         company_year: '1977'
                     };
                     
@@ -1201,7 +1208,7 @@
             if (quote.hasLTM) {
                 ltmNote = `
                     <div style="background: #fef3c7; color: #92400e; padding: 10px; border-radius: 4px; margin: 20px 0;">
-                        <strong>Note:</strong> Less than minimum charge of $${quote.ltmFee.toFixed(2)} applied
+                        <strong>Note:</strong> Less than minimum charge of $${quote.ltmFee.toFixed(2)} applied ($${quote.ltmPerPiece.toFixed(2)} per item)
                     </div>
                 `;
             }
@@ -1251,7 +1258,7 @@
                     
                     <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
                         <p><strong>Northwest Custom Apparel</strong></p>
-                        <p>Phone: (253) 987-4339 | Email: sales@nwcustomapparel.com</p>
+                        <p>Phone: 253-922-5793 | Email: sales@nwcustomapparel.com</p>
                         <p>Proudly serving since 1977</p>
                     </div>
                 </div>
