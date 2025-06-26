@@ -273,15 +273,60 @@
 
         .calculator-group {
             margin-bottom: 2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .calculator-group.contract-pricing {
+            background: rgba(58, 124, 82, 0.05);
+            border: 1px solid rgba(58, 124, 82, 0.1);
+        }
+
+        .calculator-group.customer-supplied {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .calculator-group.specialty-items {
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        .calculator-group.other-vendors {
+            background: rgba(107, 114, 128, 0.05);
+            border: 1px solid rgba(107, 114, 128, 0.1);
         }
 
         .group-title {
             font-size: 0.875rem;
             font-weight: 600;
-            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 1rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .contract-pricing .group-title {
+            background: rgba(58, 124, 82, 0.1);
+            color: #2d6a4f;
+        }
+
+        .customer-supplied .group-title {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1d4ed8;
+        }
+
+        .specialty-items .group-title {
+            background: rgba(139, 92, 246, 0.1);
+            color: #6d28d9;
+        }
+
+        .other-vendors .group-title {
+            background: rgba(107, 114, 128, 0.1);
+            color: #374151;
         }
 
         .calculator-grid {
@@ -321,7 +366,7 @@
         }
 
         .calculator-name {
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.875rem;
             line-height: 1.2;
         }
@@ -329,7 +374,7 @@
         .new-badge {
             background: #dc2626;
             color: white;
-            font-size: 0.625rem;
+            font-size: 0.5rem;
             font-weight: 700;
             padding: 0.125rem 0.375rem;
             border-radius: 4px;
@@ -594,36 +639,36 @@
                 </div>
 
                 <!-- Contract Pricing Group -->
-                <div class="calculator-group">
+                <div class="calculator-group contract-pricing">
                     <h2 class="group-title">Contract Pricing</h2>
                     <div class="calculator-grid">
-                        <a href="calculators/dtg-contract.html" class="calculator-card">
+                        <a href="calculators/dtg-contract.html" class="calculator-card" 
+                           title="Wholesale DTG pricing for blank apparel. Contact: Taylar">
                             <i class="fas fa-tshirt calculator-icon"></i>
-                            <span class="calculator-name">DTG Calculator</span>
+                            <span class="calculator-name">DTG Calculator-Contract</span>
                             <span class="new-badge">NEW 2025</span>
                         </a>
-                        <a href="calculators/richardson-2025.html" class="calculator-card">
-                            <i class="fas fa-baseball-cap calculator-icon"></i>
-                            <span class="calculator-name">Richardson Caps</span>
+                        <a href="/calculators/embroidery-contract.html" class="calculator-card"
+                           title="Flat &amp; cap embroidery pricing. Contact: Ruthie">
+                            <i class="fas fa-sewing-needle calculator-icon"></i>
+                            <span class="calculator-name">Contract Embroidery</span>
                             <span class="new-badge">NEW 2025</span>
-                        </a>
-                        <a href="/calculators/embroidery-contract.html" class="calculator-card">
-                            <i class="fas fa-hat-cowboy calculator-icon"></i>
-                            <span class="calculator-name">Embroidery</span>
                         </a>
                     </div>
                 </div>
 
                 <!-- Customer Supplied Group -->
-                <div class="calculator-group">
+                <div class="calculator-group customer-supplied">
                     <h2 class="group-title">Customer Supplied Goods</h2>
                     <div class="calculator-grid">
-                        <a href="/calculators/embroidery-customer.html" class="calculator-card">
+                        <a href="/calculators/embroidery-customer.html" class="calculator-card"
+                           title="Embroidery pricing for customer-supplied garments">
                             <i class="fas fa-hand-holding calculator-icon"></i>
                             <span class="calculator-name">Embroidery</span>
                             <span class="new-badge">NEW 2025</span>
                         </a>
-                        <a href="/calculators/screen-print-customer.html" class="calculator-card">
+                        <a href="/calculators/screen-print-customer.html" class="calculator-card"
+                           title="Screen printing for customer-supplied items">
                             <i class="fas fa-print calculator-icon"></i>
                             <span class="calculator-name">Screen Print</span>
                         </a>
@@ -631,26 +676,43 @@
                 </div>
 
                 <!-- Specialty Items Group -->
-                <div class="calculator-group">
+                <div class="calculator-group specialty-items">
                     <h2 class="group-title">Specialty Items</h2>
                     <div class="calculator-grid">
-                        <a href="/calculators/emblems.html" class="calculator-card">
+                        <a href="/calculators/emblems.html" class="calculator-card"
+                           title="Custom emblem and patch pricing">
                             <i class="fas fa-shield-alt calculator-icon"></i>
                             <span class="calculator-name">Emblems</span>
                         </a>
-                        <a href="/calculators/leatherette.html" class="calculator-card">
+                        <a href="/calculators/leatherette.html" class="calculator-card"
+                           title="Leatherette patch pricing. Note: Tariff applies">
                             <i class="fas fa-tag calculator-icon"></i>
                             <span class="calculator-name">Leatherette</span>
                             <span class="new-badge">TARIFF</span>
                         </a>
-                        <a href="/calculators/laser.html" class="calculator-card">
+                        <a href="/calculators/laser.html" class="calculator-card"
+                           title="Laser engraving on tumblers. Note: Tariff applies">
                             <i class="fas fa-mug-hot calculator-icon"></i>
                             <span class="calculator-name">Laser Tumblers</span>
                             <span class="new-badge">TARIFF</span>
                         </a>
-                        <a href="/calculators/webstores.html" class="calculator-card">
+                        <a href="/calculators/webstores.html" class="calculator-card"
+                           title="Webstore setup and management pricing">
                             <i class="fas fa-store calculator-icon"></i>
                             <span class="calculator-name">Webstores</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Other Vendors Group -->
+                <div class="calculator-group other-vendors">
+                    <h2 class="group-title">Other Vendors</h2>
+                    <div class="calculator-grid">
+                        <a href="calculators/richardson-2025.html" class="calculator-card"
+                           title="Cap pricing from Richardson vendor">
+                            <i class="fas fa-baseball-cap calculator-icon"></i>
+                            <span class="calculator-name">Richardson Caps</span>
+                            <span class="new-badge">NEW 2025</span>
                         </a>
                     </div>
                 </div>

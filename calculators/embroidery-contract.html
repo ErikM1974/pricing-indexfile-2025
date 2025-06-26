@@ -1,0 +1,2451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Contract Embroidery Pricing Calculator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Embroidery Quote Service -->
+    <script src="embroidery-quote-service.js"></script>
+    
+    <style>
+        /* Root variables matching dashboard theme with embroidery accent */
+        :root {
+            --primary-color: #4A5568; /* Slate blue for embroidery */
+            --primary-dark: #2D3748;
+            --primary-light: #718096;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(74, 85, 104, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+        }
+
+        .user-welcome {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .title-icon {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* Calculator Grid */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: var(--focus-shadow);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-fullwidth {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #d1d5db;
+        }
+
+        /* Quote Summary */
+        .quote-summary {
+            background: var(--hover-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .summary-label {
+            color: var(--text-secondary);
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Quote Table */
+        .quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .quote-table th {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .quote-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Total Section */
+        .total-section {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-label {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        .total-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .ltm-note {
+            font-size: 0.75rem;
+            color: var(--warning-text);
+            background: var(--warning-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-backdrop.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: var(--primary-color);
+        }
+
+        /* Messages */
+        .success-message {
+            background: var(--success-bg);
+            color: var(--success-text);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Loading */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .title-icon {
+                font-size: 2rem;
+            }
+
+            .total-amount {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Buyer's Guide Styles */
+        .guide-button {
+            background: var(--primary-light);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .guide-button:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .guide-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 1rem;
+        }
+
+        .guide-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .guide-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .guide-modal.active .guide-content {
+            transform: translateY(0);
+        }
+
+        .guide-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .guide-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .guide-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .guide-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .guide-tabs {
+            display: flex;
+            background: var(--hover-bg);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .guide-tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .guide-tab:hover {
+            color: var(--primary-color);
+            background: rgba(74, 85, 104, 0.05);
+        }
+
+        .guide-tab.active {
+            color: var(--primary-color);
+            background: white;
+        }
+
+        .guide-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        .guide-body {
+            overflow-y: auto;
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .guide-section {
+            display: none;
+        }
+
+        .guide-section.active {
+            display: block;
+        }
+
+        .faq-category {
+            margin-bottom: 2rem;
+        }
+
+        .faq-category h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-answer {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .order-step {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-content li {
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .step-content li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .po-example {
+            background: var(--hover-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .po-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .po-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .po-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .po-value {
+            background: white;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .contact-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .contact-card {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .contact-card h4 {
+            margin-bottom: 1rem;
+        }
+
+        .contact-card p {
+            margin: 0.25rem 0;
+            opacity: 0.9;
+        }
+
+        .contact-card a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .guide-note {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+        }
+
+        .guide-note i {
+            flex-shrink: 0;
+        }
+
+        /* Buyer's Guide Button */
+        .guide-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .guide-button:hover {
+            background: #e5e7eb;
+        }
+
+        /* Buyer's Guide Modal */
+        .guide-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .guide-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .guide-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .guide-modal.active .guide-content {
+            transform: translateY(0);
+        }
+
+        .guide-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .guide-header h2 {
+            color: var(--primary-color);
+            font-size: 1.75rem;
+            margin: 0;
+        }
+
+        .guide-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .guide-close:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .guide-tabs {
+            display: flex;
+            background: var(--hover-bg);
+            padding: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .guide-tab {
+            flex: 1;
+            padding: 1rem;
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .guide-tab:hover {
+            color: var(--primary-color);
+        }
+
+        .guide-tab.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .guide-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .guide-section {
+            display: none;
+        }
+
+        .guide-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .faq-category {
+            margin-bottom: 2rem;
+        }
+
+        .faq-category h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-answer {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .order-step {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: start;
+        }
+
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .step-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .step-content li {
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .step-content li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            #printContent, #printContent * {
+                visibility: visible;
+            }
+            
+            #printContent {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>Contract Embroidery</span>
+                </nav>
+            </div>
+            <div class="user-welcome">
+                Contract Embroidery Calculator
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-sewing-needle title-icon"></i>
+                    Contract Embroidery Pricing
+                </h1>
+                <p class="page-subtitle">Calculate pricing for flat embroidery and caps with stitch count based pricing</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="guide-button" onclick="openBuyersGuide()">
+                    <i class="fas fa-book"></i>
+                    Buyer's Guide
+                </button>
+                <button class="guide-button" onclick="openEmailGuideModal()">
+                    <i class="fas fa-envelope"></i>
+                    Email Guide
+                </button>
+            </div>
+        </div>
+
+        <div class="calculator-grid">
+            <!-- Input Section -->
+            <div class="input-section">
+                <h2 class="section-title">
+                    <i class="fas fa-calculator"></i>
+                    Build Your Quote
+                </h2>
+
+                <form id="calculatorForm">
+                    <!-- Customer Info -->
+                    <div class="form-group">
+                        <label class="form-label" for="customerName">Customer Name</label>
+                        <input type="text" id="customerName" class="form-input" placeholder="Enter customer name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="projectName">Project Name</label>
+                        <input type="text" id="projectName" class="form-input" placeholder="Enter project name">
+                    </div>
+
+                    <!-- Product Type -->
+                    <div class="form-group">
+                        <label class="form-label" for="productType">Product Type</label>
+                        <select id="productType" class="form-select" required>
+                            <option value="">Select product type...</option>
+                            <option value="Flat Embroidery">Flat Embroidery</option>
+                            <option value="Caps">Caps</option>
+                        </select>
+                    </div>
+
+                    <!-- Stitch Count -->
+                    <div class="form-group">
+                        <label class="form-label" for="stitchCount">Stitch Count</label>
+                        <select id="stitchCount" class="form-select" required>
+                            <option value="">Select stitch count...</option>
+                            <option value="6,000">6,000 stitches</option>
+                            <option value="7,000">7,000 stitches</option>
+                            <option value="8,000">8,000 stitches</option>
+                            <option value="9,000">9,000 stitches</option>
+                            <option value="10,000">10,000 stitches</option>
+                            <option value="11,000">11,000 stitches</option>
+                            <option value="12,000">12,000 stitches</option>
+                            <option value="13,000">13,000 stitches</option>
+                            <option value="14,000">14,000 stitches</option>
+                            <option value="15,000">15,000 stitches</option>
+                            <option value="16,000">16,000 stitches</option>
+                            <option value="17,000">17,000 stitches</option>
+                            <option value="18,000">18,000 stitches</option>
+                            <option value="19,000">19,000 stitches</option>
+                            <option value="20,000">20,000 stitches</option>
+                            <option value="21,000">21,000 stitches</option>
+                            <option value="22,000">22,000 stitches</option>
+                            <option value="23,000">23,000 stitches</option>
+                            <option value="24,000">24,000 stitches</option>
+                            <option value="25,000">25,000 stitches</option>
+                        </select>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="form-group">
+                        <label class="form-label" for="quantity">Quantity</label>
+                        <input type="number" id="quantity" class="form-input" min="1" placeholder="Enter quantity" required>
+                    </div>
+
+                    <!-- Thread Colors -->
+                    <div class="form-group">
+                        <label class="form-label" for="threadColors">Number of Thread Colors</label>
+                        <input type="number" id="threadColors" class="form-input" min="1" value="1" required>
+                        <small style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                            First 4 colors included, $1.00 per additional color per item
+                        </small>
+                    </div>
+
+                    <!-- Calculate Button -->
+                    <button type="submit" class="btn btn-primary btn-fullwidth">
+                        <i class="fas fa-calculator"></i>
+                        Calculate Quote
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <div id="emptyState" class="empty-state">
+                    <i class="fas fa-sewing-needle"></i>
+                    <h3>Your embroidery quote will appear here</h3>
+                    <p>Enter your project details and click calculate</p>
+                </div>
+
+                <div id="resultsDisplay" class="hidden">
+                    <!-- Quote results will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Quote Modal -->
+    <div id="quoteModal" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Send Quote</h2>
+                <button type="button" class="modal-close" id="modalClose">&times;</button>
+            </div>
+
+            <!-- Sales Rep Selection -->
+            <div class="form-group">
+                <label class="form-label" for="salesRep">Sales Representative</label>
+                <select id="salesRep" class="form-select" required>
+                    <option value="">Select a sales rep...</option>
+                    <option value="ruth@nwcustomapparel.com" selected>Ruth</option>
+                    <option value="taylar@nwcustomapparel.com">Taylar</option>
+                    <option value="nika@nwcustomapparel.com">Nika</option>
+                    <option value="erik@nwcustomapparel.com">Erik</option>
+                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                    <option value="sales@nwcustomapparel.com">General Sales</option>
+                </select>
+            </div>
+
+            <form id="quoteForm">
+                <div class="form-group">
+                    <label class="form-label" for="quoteCustomerName">Customer Name</label>
+                    <input type="text" id="quoteCustomerName" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="customerEmail">Customer Email</label>
+                    <input type="email" id="customerEmail" class="form-input" required placeholder="customer@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="customerPhone">Phone Number (optional)</label>
+                    <input type="tel" id="customerPhone" class="form-input" placeholder="(555) 123-4567">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="companyName">Company Name (optional)</label>
+                    <input type="text" id="companyName" class="form-input">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="saveToDatabase" checked>
+                    <label for="saveToDatabase">Save quote to database</label>
+                </div>
+
+                <div id="quotePreview" class="quote-summary">
+                    <!-- Quote preview will be shown here -->
+                </div>
+
+                <button type="submit" class="btn btn-success btn-fullwidth">
+                    <i class="fas fa-paper-plane"></i>
+                    Send Quote
+                </button>
+            </form>
+
+            <div id="successMessage" class="success-message hidden">
+                <i class="fas fa-check-circle"></i>
+                <span>Quote sent successfully!</span>
+            </div>
+
+            <div id="errorMessage" class="error-message hidden">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorText">An error occurred. Please try again.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden print content -->
+    <div id="printContent" style="display: none;"></div>
+
+    <!-- Buyer's Guide Modal -->
+    <div id="buyersGuideModal" class="guide-modal">
+        <div class="guide-content">
+            <div class="guide-header">
+                <h2>Contract Embroidery FAQ & Order Guide</h2>
+                <button class="guide-close" onclick="closeBuyersGuide()">&times;</button>
+            </div>
+            
+            <div class="guide-tabs">
+                <button class="guide-tab active" onclick="showGuideSection('guide-faq')">Frequently Asked Questions</button>
+                <button class="guide-tab" onclick="showGuideSection('guide-order')">Order Placement Guide</button>
+            </div>
+            
+            <div class="guide-body">
+                <!-- FAQ Section -->
+                <div id="guide-faq" class="guide-section active">
+                    <div class="faq-category">
+                        <h3>📋 General Questions</h3>
+                        <div class="faq-item">
+                            <div class="faq-question">What is your minimum order quantity?</div>
+                            <div class="faq-answer">Our standard minimum order is $100. Orders below this minimum are subject to a $50.00 charge plus a 25% upcharge on the embroidery cost.</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">What is your standard turnaround time?</div>
+                            <div class="faq-answer">We request 12-14 working days after all approvals are received, with a minimum of 3 days processing time after receiving the product. Rush orders (4-7 working days) incur a 25% surcharge.</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">What file formats do you accept for artwork?</div>
+                            <div class="faq-answer">We accept JPEG (.jpg), PNG (.png), TIFF (.tiff), CorelDRAW (.cdr), and Adobe Illustrator (.ai). Vector files (.ai or .cdr) are preferred for optimal results.</div>
+                        </div>
+                    </div>
+
+                    <div class="faq-category">
+                        <h3>💰 Pricing Questions</h3>
+                        <div class="faq-item">
+                            <div class="faq-question">How is embroidery pricing calculated?</div>
+                            <div class="faq-answer">Pricing is based on stitch count and quantity ordered. Additional charges apply for: designs over 4 thread colors ($1.00 per color), metallic thread (25% surcharge), bulky items (50% surcharge), and rush orders (25% surcharge).</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">What additional services do you offer?</div>
+                            <div class="faq-answer">Product mock-ups ($35.00), minor edits ($35.00), personalization ($13.50), emblem sewing ($5.00 each), poly bagging ($0.45-$1.20), and drop shipping ($5.00 per box).</div>
+                        </div>
+                    </div>
+
+                    <div class="faq-category">
+                        <h3>🎯 Technical Questions</h3>
+                        <div class="faq-item">
+                            <div class="faq-question">What are the size limitations for cap embroidery?</div>
+                            <div class="faq-answer">Standard cap front embroidery can be up to 5 inches wide and 2.25 inches in height, depending on the cap's structure and front panel shape.</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">What thread do you use?</div>
+                            <div class="faq-answer">We exclusively use Robison Anton Rayon thread for its durability and vibrant color selection. We can closely match Pantone colors from our extensive inventory.</div>
+                        </div>
+                    </div>
+
+                    <div class="faq-category">
+                        <h3>💳 Payment & Shipping</h3>
+                        <div class="faq-item">
+                            <div class="faq-question">What payment methods do you accept?</div>
+                            <div class="faq-answer">We accept net terms (with approved credit application), checks, cash, and Visa or Mastercard.</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">Where should I ship blank garments?</div>
+                            <div class="faq-answer">Ship to: Northwest Custom Apparel, 2025 Freeman Road East, Milton, WA 98354</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Guide Section -->
+                <div id="guide-order" class="guide-section">
+                    <h3 style="color: var(--primary-color); margin-bottom: 2rem;">How to Place Your Order</h3>
+                    
+                    <div class="order-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Prepare Your Order Information</h4>
+                            <ul>
+                                <li>Company and contact details</li>
+                                <li>Purchase order number</li>
+                                <li>Due date and in-hands date</li>
+                                <li>Artwork files (vector preferred)</li>
+                                <li>Garment specifications</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="order-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Specify Decoration Details</h4>
+                            <ul>
+                                <li>Exact placement location</li>
+                                <li>Design dimensions</li>
+                                <li>Thread colors (from our chart)</li>
+                                <li>Total stitch count</li>
+                                <li>Digitizing company (if applicable)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="order-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Complete Purchase Order</h4>
+                            <ul>
+                                <li>Use our order checklist format</li>
+                                <li>Include all required fields</li>
+                                <li>Add special instructions if needed</li>
+                                <li>Double-check all information</li>
+                                <li>Save as PDF (required)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="order-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Submit Your Order</h4>
+                            <ul>
+                                <li>Email PDF to ruth@nwcustomapparel.com</li>
+                                <li>Or call Ruthie at 253-922-5793, ext. 119</li>
+                                <li>Wait for order and design approval</li>
+                                <li>Ship garments 3+ days before production</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="guide-note">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Important:</strong> We do NOT accept orders typed in email body text. All orders must be submitted as PDF attachments using our order format to ensure accuracy and avoid delays.
+                        </div>
+                    </div>
+
+                    <!-- Purchase Order Example -->
+                    <h3 style="color: var(--primary-color); margin-top: 3rem; margin-bottom: 1.5rem;">Purchase Order Example</h3>
+                    
+                    <div class="po-example">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+                            <div>
+                                <h4>PURCHASE ORDER #2025-001</h4>
+                                <p style="color: var(--text-secondary);">Northwest Custom Apparel</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <p><strong>Date:</strong> June 26, 2025</p>
+                                <p><strong>Due Date:</strong> July 10, 2025</p>
+                            </div>
+                        </div>
+
+                        <h4 style="color: var(--primary-color); margin-bottom: 1rem;">1. Job Information</h4>
+                        <div class="po-grid">
+                            <div class="po-field">
+                                <span class="po-label">Company Name</span>
+                                <span class="po-value">ABC Corporation</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Contact Name</span>
+                                <span class="po-value">John Smith</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Phone</span>
+                                <span class="po-value">(555) 123-4567</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Email</span>
+                                <span class="po-value">john@abccorp.com</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Job Name</span>
+                                <span class="po-value">Summer Team Polos</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">In-hands Date</span>
+                                <span class="po-value">July 8, 2025</span>
+                            </div>
+                        </div>
+
+                        <h4 style="color: var(--primary-color); margin-top: 2rem; margin-bottom: 1rem;">2. Art Information</h4>
+                        <div class="po-grid">
+                            <div class="po-field">
+                                <span class="po-label">Art Type</span>
+                                <span class="po-value">✓ Repeat Order</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Mockup Needed?</span>
+                                <span class="po-value">Yes</span>
+                            </div>
+                        </div>
+
+                        <h4 style="color: var(--primary-color); margin-top: 2rem; margin-bottom: 1rem;">3. Garment Details</h4>
+                        <div class="po-grid">
+                            <div class="po-field">
+                                <span class="po-label">Style #</span>
+                                <span class="po-value">K500</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Color</span>
+                                <span class="po-value">Navy Blue</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Description</span>
+                                <span class="po-value">Port Authority Silk Touch Polo</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Quantity</span>
+                                <span class="po-value">48 pieces</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Vendor</span>
+                                <span class="po-value">SanMar</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Vendor PO#</span>
+                                <span class="po-value">SM-789456</span>
+                            </div>
+                        </div>
+
+                        <h4 style="color: var(--primary-color); margin-top: 2rem; margin-bottom: 1rem;">4. Decoration Details</h4>
+                        <div class="po-grid">
+                            <div class="po-field">
+                                <span class="po-label">Location</span>
+                                <span class="po-value">Left Chest</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Thread Colors</span>
+                                <span class="po-value">White, Red, Blue</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Design #</span>
+                                <span class="po-value">ABC-LOGO-2025</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Stitches</span>
+                                <span class="po-value">8,500</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Size</span>
+                                <span class="po-value">3.5" wide</span>
+                            </div>
+                        </div>
+
+                        <h4 style="color: var(--primary-color); margin-top: 2rem; margin-bottom: 1rem;">5. Shipping Information</h4>
+                        <div class="po-grid">
+                            <div class="po-field">
+                                <span class="po-label">Ship To</span>
+                                <span class="po-value">ABC Corporation</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Address</span>
+                                <span class="po-value">123 Main Street</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">City, State, ZIP</span>
+                                <span class="po-value">Seattle, WA 98101</span>
+                            </div>
+                            <div class="po-field">
+                                <span class="po-label">Ship Method</span>
+                                <span class="po-value">UPS Ground</span>
+                            </div>
+                        </div>
+
+                        <h4 style="color: var(--primary-color); margin-top: 2rem; margin-bottom: 1rem;">6. Special Notes</h4>
+                        <div class="po-value" style="width: 100%; min-height: 60px;">
+                            Please ensure consistent placement across all sizes. Pack by size for easy distribution.
+                        </div>
+                    </div>
+
+                    <!-- Contact Cards -->
+                    <div class="contact-cards">
+                        <div class="contact-card">
+                            <h4>📧 Submit Orders</h4>
+                            <p><strong>Ruthie Nhoung</strong></p>
+                            <p>Production Manager</p>
+                            <p><a href="mailto:ruth@nwcustomapparel.com">ruth@nwcustomapparel.com</a></p>
+                            <p>253-922-5793, ext. 119</p>
+                        </div>
+                        <div class="contact-card">
+                            <h4>🎨 Graphic Design</h4>
+                            <p><strong>Steve Deland</strong></p>
+                            <p>40+ Years Experience</p>
+                            <p><a href="mailto:art@nwcustomapparel.com">art@nwcustomapparel.com</a></p>
+                            <p>253-922-5793, ext. 103</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Guide Modal -->
+    <div id="emailGuideModal" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Send Contract Embroidery Guide</h2>
+                <button type="button" class="modal-close" onclick="closeEmailGuideModal()">&times;</button>
+            </div>
+            
+            <form id="emailGuideForm">
+                <div class="form-group">
+                    <label class="form-label" for="guideRecipientEmail">Recipient Email *</label>
+                    <input type="email" id="guideRecipientEmail" class="form-input" required 
+                           placeholder="customer@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="guideRecipientName">Recipient Name *</label>
+                    <input type="text" id="guideRecipientName" class="form-input" required 
+                           placeholder="John Smith">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="guidePersonalMessage">Personal Message (optional)</label>
+                    <textarea id="guidePersonalMessage" class="form-input" rows="3" 
+                              placeholder="Add a personal note..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="guideSalesRep">Send From</label>
+                    <select id="guideSalesRep" class="form-select" required>
+                        <option value="ruth@nwcustomapparel.com" selected>Ruth</option>
+                        <option value="taylar@nwcustomapparel.com">Taylar</option>
+                        <option value="nika@nwcustomapparel.com">Nika</option>
+                        <option value="erik@nwcustomapparel.com">Erik</option>
+                        <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-success btn-fullwidth">
+                    <i class="fas fa-paper-plane"></i>
+                    Send Buyer's Guide
+                </button>
+            </form>
+            
+            <div id="guideSuccessMessage" class="success-message hidden">
+                <i class="fas fa-check-circle"></i>
+                <span>Guide sent successfully!</span>
+            </div>
+            
+            <div id="guideErrorMessage" class="error-message hidden">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="guideErrorText">An error occurred. Please try again.</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CALCULATOR_CONFIG = {
+            name: 'Contract Embroidery',
+            quotePrefix: 'EMB',
+            emailTemplateId: 'Embroidery_Template',
+            emailServiceId: 'service_1c4k67j',
+            emailPublicKey: '4qSbDO-SQs19TbP80'
+        };
+
+        // Pricing Matrix (extracted from provided HTML)
+        const PRICING_MATRIX = {
+            '6,000': { '1-15': 10.50, '16-31': 7.50, '32-63': 6.25, '64-127': 5.75, '128+': 5.00 },
+            '7,000': { '1-15': 10.75, '16-31': 7.75, '32-63': 6.50, '64-127': 6.00, '128+': 5.25 },
+            '8,000': { '1-15': 11.00, '16-31': 8.00, '32-63': 6.75, '64-127': 6.25, '128+': 5.50 },
+            '9,000': { '1-15': 11.25, '16-31': 8.25, '32-63': 7.00, '64-127': 6.50, '128+': 5.75 },
+            '10,000': { '1-15': 11.50, '16-31': 8.50, '32-63': 7.25, '64-127': 6.75, '128+': 6.00 },
+            '11,000': { '1-15': 11.75, '16-31': 8.75, '32-63': 7.50, '64-127': 7.00, '128+': 6.25 },
+            '12,000': { '1-15': 12.00, '16-31': 9.00, '32-63': 7.75, '64-127': 7.25, '128+': 6.50 },
+            '13,000': { '1-15': 12.25, '16-31': 9.25, '32-63': 8.00, '64-127': 7.50, '128+': 6.75 },
+            '14,000': { '1-15': 12.50, '16-31': 9.50, '32-63': 8.25, '64-127': 7.75, '128+': 7.00 },
+            '15,000': { '1-15': 12.75, '16-31': 9.75, '32-63': 8.50, '64-127': 8.00, '128+': 7.25 },
+            '16,000': { '1-15': 13.00, '16-31': 10.00, '32-63': 8.75, '64-127': 8.25, '128+': 7.50 },
+            '17,000': { '1-15': 13.25, '16-31': 10.25, '32-63': 9.00, '64-127': 8.50, '128+': 7.75 },
+            '18,000': { '1-15': 13.50, '16-31': 10.50, '32-63': 9.25, '64-127': 8.75, '128+': 8.00 },
+            '19,000': { '1-15': 13.75, '16-31': 10.75, '32-63': 9.50, '64-127': 9.00, '128+': 8.25 },
+            '20,000': { '1-15': 14.00, '16-31': 11.00, '32-63': 9.75, '64-127': 9.25, '128+': 8.50 },
+            '21,000': { '1-15': 14.25, '16-31': 11.25, '32-63': 10.00, '64-127': 9.50, '128+': 8.75 },
+            '22,000': { '1-15': 14.50, '16-31': 11.50, '32-63': 10.25, '64-127': 9.75, '128+': 9.00 },
+            '23,000': { '1-15': 14.75, '16-31': 11.75, '32-63': 10.50, '64-127': 10.00, '128+': 9.25 },
+            '24,000': { '1-15': 15.00, '16-31': 12.00, '32-63': 10.75, '64-127': 10.25, '128+': 9.50 },
+            '25,000': { '1-15': 15.25, '16-31': 12.25, '32-63': 11.00, '64-127': 10.50, '128+': 9.75 }
+        };
+
+        class EmbroideryCalculator {
+            constructor() {
+                this.currentQuote = null;
+                this.quoteService = new EmbroideryQuoteService();
+                
+                // Initialize EmailJS
+                emailjs.init(CALCULATOR_CONFIG.emailPublicKey);
+                
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                // Form elements
+                this.form = document.getElementById('calculatorForm');
+                this.customerNameInput = document.getElementById('customerName');
+                this.projectNameInput = document.getElementById('projectName');
+                this.productTypeSelect = document.getElementById('productType');
+                this.stitchCountSelect = document.getElementById('stitchCount');
+                this.quantityInput = document.getElementById('quantity');
+                this.threadColorsInput = document.getElementById('threadColors');
+                
+                // Results elements
+                this.emptyState = document.getElementById('emptyState');
+                this.resultsDisplay = document.getElementById('resultsDisplay');
+                
+                // Modal elements
+                this.modal = document.getElementById('quoteModal');
+                this.modalClose = document.getElementById('modalClose');
+                this.quoteForm = document.getElementById('quoteForm');
+                this.quoteCustomerName = document.getElementById('quoteCustomerName');
+                this.customerEmail = document.getElementById('customerEmail');
+                this.customerPhone = document.getElementById('customerPhone');
+                this.companyName = document.getElementById('companyName');
+                this.salesRep = document.getElementById('salesRep');
+                this.saveToDatabase = document.getElementById('saveToDatabase');
+                this.quotePreview = document.getElementById('quotePreview');
+                this.successMessage = document.getElementById('successMessage');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.errorText = document.getElementById('errorText');
+            }
+
+            bindEvents() {
+                this.form.addEventListener('submit', (e) => this.handleCalculate(e));
+                this.modalClose.addEventListener('click', () => this.closeModal());
+                this.modal.addEventListener('click', (e) => {
+                    if (e.target === this.modal) this.closeModal();
+                });
+                this.quoteForm.addEventListener('submit', (e) => this.handleQuoteSubmit(e));
+                
+                // Sync customer name between forms
+                this.customerNameInput.addEventListener('input', () => {
+                    this.quoteCustomerName.value = this.customerNameInput.value;
+                });
+            }
+
+            getPricingTier(quantity) {
+                if (quantity <= 15) return '1-15';
+                if (quantity <= 31) return '16-31';
+                if (quantity <= 63) return '32-63';
+                if (quantity <= 127) return '64-127';
+                return '128+';
+            }
+
+            calculatePrice(stitchCount, quantity) {
+                const tier = this.getPricingTier(quantity);
+                return PRICING_MATRIX[stitchCount][tier] || 0;
+            }
+
+            handleCalculate(e) {
+                e.preventDefault();
+                
+                // Clear previous results
+                this.currentQuote = null;
+                
+                // Get form values
+                const customerName = this.customerNameInput.value.trim();
+                const projectName = this.projectNameInput.value.trim();
+                const productType = this.productTypeSelect.value;
+                const stitchCount = this.stitchCountSelect.value;
+                const quantity = parseInt(this.quantityInput.value);
+                const threadColors = parseInt(this.threadColorsInput.value);
+                
+                // Validate
+                if (!productType || !stitchCount || !quantity || !threadColors) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // Calculate pricing
+                const unitPrice = this.calculatePrice(stitchCount, quantity);
+                const baseTotal = unitPrice * quantity;
+                
+                // Calculate extra color charges ($1 per color over 4, per item)
+                const extraColors = Math.max(0, threadColors - 4);
+                const extraColorCharge = extraColors * quantity * 1.00;
+                
+                // Apply LTM fee if quantity < 16
+                const hasLTM = quantity < 16;
+                const ltmFee = hasLTM ? 50 : 0;
+                
+                // Calculate grand total
+                const grandTotal = baseTotal + extraColorCharge + ltmFee;
+                
+                // Store quote data
+                this.currentQuote = {
+                    customerName,
+                    projectName,
+                    productType,
+                    stitchCount,
+                    quantity,
+                    threadColors,
+                    extraColors,
+                    unitPrice,
+                    baseTotal,
+                    extraColorCharge,
+                    hasLTM,
+                    ltmFee,
+                    ltmPerPiece: ltmFee / quantity,
+                    grandTotal,
+                    finalUnitPrice: grandTotal / quantity
+                };
+                
+                // Display results
+                this.displayResults();
+            }
+
+            displayResults() {
+                if (!this.currentQuote) return;
+                
+                let resultsHtml = `
+                    <h2 class="section-title">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        Quote Summary
+                    </h2>
+                    
+                    <div class="quote-summary">
+                        <div class="summary-row">
+                            <span class="summary-label">Product Type:</span>
+                            <span class="summary-value">${this.currentQuote.productType}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Stitch Count:</span>
+                            <span class="summary-value">${this.currentQuote.stitchCount}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Quantity:</span>
+                            <span class="summary-value">${this.currentQuote.quantity} items</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Thread Colors:</span>
+                            <span class="summary-value">${this.currentQuote.threadColors} colors</span>
+                        </div>
+                    </div>
+                    
+                    <table class="quote-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-right">Unit Price</th>
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${this.currentQuote.productType} - ${this.currentQuote.stitchCount} stitches</td>
+                                <td class="text-center">${this.currentQuote.quantity}</td>
+                                <td class="text-right">$${this.currentQuote.unitPrice.toFixed(2)}</td>
+                                <td class="text-right">$${this.currentQuote.baseTotal.toFixed(2)}</td>
+                            </tr>
+                `;
+                
+                // Add extra color charges if applicable
+                if (this.currentQuote.extraColors > 0) {
+                    const colorText = this.currentQuote.extraColors === 1 ? 'color' : 'colors';
+                    resultsHtml += `
+                            <tr>
+                                <td>Extra Thread Color${this.currentQuote.extraColors > 1 ? 's' : ''} (${this.currentQuote.extraColors} ${colorText} beyond 4 included)</td>
+                                <td class="text-center">${this.currentQuote.quantity}</td>
+                                <td class="text-right">$${this.currentQuote.extraColors.toFixed(2)}</td>
+                                <td class="text-right">$${this.currentQuote.extraColorCharge.toFixed(2)}</td>
+                            </tr>
+                    `;
+                }
+                
+                // Add subtotal row
+                const subtotal = this.currentQuote.baseTotal + this.currentQuote.extraColorCharge;
+                resultsHtml += `
+                            <tr style="border-top: 2px solid var(--border-color);">
+                                <td colspan="3" class="text-right" style="font-weight: 600;">Subtotal:</td>
+                                <td class="text-right" style="font-weight: 600;">$${subtotal.toFixed(2)}</td>
+                            </tr>
+                `;
+                
+                // Add LTM fee as line item if applicable
+                if (this.currentQuote.hasLTM) {
+                    resultsHtml += `
+                            <tr>
+                                <td colspan="3" class="text-right">Less Than Minimum Fee:</td>
+                                <td class="text-right">$${this.currentQuote.ltmFee.toFixed(2)}</td>
+                            </tr>
+                    `;
+                }
+                
+                resultsHtml += `
+                        </tbody>
+                    </table>
+                `;
+                
+                // Add LTM note and pricing comparison if applicable
+                if (this.currentQuote.hasLTM) {
+                    const regularPerPiece = (this.currentQuote.baseTotal + this.currentQuote.extraColorCharge) / this.currentQuote.quantity;
+                    const ltmPerPiece = this.currentQuote.grandTotal / this.currentQuote.quantity;
+                    
+                    const extraColorPerItem = this.currentQuote.extraColorCharge / this.currentQuote.quantity;
+                    
+                    resultsHtml += `
+                        <div class="pricing-comparison" style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <h4 style="margin: 0 0 0.75rem 0; color: #1976d2; font-size: 1rem;">Price Per Item Breakdown:</h4>
+                            <div style="font-family: monospace; font-size: 0.875rem;">
+                                <div class="summary-row">
+                                    <span class="summary-label">Base Embroidery:</span>
+                                    <span class="summary-value" style="text-align: right; min-width: 80px; display: inline-block;">$${this.currentQuote.unitPrice.toFixed(2)}</span>
+                                </div>
+                    `;
+                    
+                    if (this.currentQuote.extraColors > 0) {
+                        resultsHtml += `
+                                <div class="summary-row">
+                                    <span class="summary-label">Extra Color Charge:</span>
+                                    <span class="summary-value" style="text-align: right; min-width: 80px; display: inline-block;">+ $${extraColorPerItem.toFixed(2)}</span>
+                                </div>
+                        `;
+                    }
+                    
+                    resultsHtml += `
+                                <div class="summary-row" style="border-top: 1px solid #90caf9; padding-top: 0.5rem; margin-top: 0.5rem;">
+                                    <span class="summary-label">Regular Price:</span>
+                                    <span class="summary-value" style="text-align: right; min-width: 80px; display: inline-block;">$${regularPerPiece.toFixed(2)}</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-label">LTM Impact:</span>
+                                    <span class="summary-value" style="text-align: right; min-width: 80px; display: inline-block;">+ $${this.currentQuote.ltmPerPiece.toFixed(2)}</span>
+                                </div>
+                                <div class="summary-row" style="border-top: 2px solid #1976d2; padding-top: 0.5rem; margin-top: 0.5rem; font-weight: bold;">
+                                    <span class="summary-label">Your Price Per Item:</span>
+                                    <span class="summary-value" style="text-align: right; min-width: 80px; display: inline-block; color: #1976d2;">$${ltmPerPiece.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                resultsHtml += `
+                    <div class="total-section">
+                        <div class="total-row">
+                            <span class="total-label">Total:</span>
+                            <span class="total-amount">$${this.currentQuote.grandTotal.toFixed(2)}</span>
+                        </div>
+                        
+                        <div class="button-container" style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button type="button" class="btn btn-secondary" onclick="window.print()">
+                                <i class="fas fa-print"></i>
+                                Print Quote
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="embroideryCalculator.openModal()">
+                                <i class="fas fa-paper-plane"></i>
+                                Send Quote
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Update display
+                this.resultsDisplay.innerHTML = resultsHtml;
+                this.resultsDisplay.classList.remove('hidden');
+                this.emptyState.classList.add('hidden');
+            }
+
+            openModal() {
+                // Pre-fill customer name
+                this.quoteCustomerName.value = this.customerNameInput.value;
+                
+                // Show quote preview
+                this.updateQuotePreview();
+                
+                // Reset messages
+                this.successMessage.classList.add('hidden');
+                this.errorMessage.classList.add('hidden');
+                
+                // Show modal
+                this.modal.classList.add('active');
+                
+                // Focus appropriate field
+                if (this.quoteCustomerName.value) {
+                    this.customerEmail.focus();
+                } else {
+                    this.quoteCustomerName.focus();
+                }
+            }
+
+            closeModal() {
+                this.modal.classList.remove('active');
+            }
+
+            updateQuotePreview() {
+                if (!this.currentQuote) return;
+                
+                let previewHtml = `
+                    <div class="summary-row">
+                        <span class="summary-label">Product:</span>
+                        <span class="summary-value">${this.currentQuote.productType}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Stitch Count:</span>
+                        <span class="summary-value">${this.currentQuote.stitchCount}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Quantity:</span>
+                        <span class="summary-value">${this.currentQuote.quantity} items</span>
+                    </div>
+                `;
+                
+                if (this.currentQuote.extraColorCharge > 0) {
+                    previewHtml += `
+                        <div class="summary-row">
+                            <span class="summary-label">Color Charges:</span>
+                            <span class="summary-value">$${this.currentQuote.extraColorCharge.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+                
+                if (this.currentQuote.hasLTM) {
+                    previewHtml += `
+                        <div class="summary-row">
+                            <span class="summary-label">LTM Fee:</span>
+                            <span class="summary-value">$${this.currentQuote.ltmFee.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+                
+                previewHtml += `
+                    <div class="summary-row" style="font-weight: bold; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color);">
+                        <span class="summary-label">Total:</span>
+                        <span class="summary-value">$${this.currentQuote.grandTotal.toFixed(2)}</span>
+                    </div>
+                `;
+                
+                this.quotePreview.innerHTML = previewHtml;
+            }
+
+            async handleQuoteSubmit(e) {
+                e.preventDefault();
+                
+                if (!this.currentQuote) return;
+                
+                // Show loading state
+                const submitBtn = this.quoteForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
+                submitBtn.disabled = true;
+                
+                try {
+                    // Get selected sales rep
+                    const selectedRep = this.salesRep.value;
+                    if (!selectedRep) {
+                        throw new Error('Please select a sales representative');
+                    }
+                    
+                    // Map sales rep emails to names
+                    const salesRepNames = {
+                        'ruth@nwcustomapparel.com': 'Ruth',
+                        'taylar@nwcustomapparel.com': 'Taylar',
+                        'nika@nwcustomapparel.com': 'Nika',
+                        'erik@nwcustomapparel.com': 'Erik',
+                        'adriyella@nwcustomapparel.com': 'Adriyella',
+                        'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
+                    };
+                    
+                    // Prepare quote data
+                    const quoteData = {
+                        ...this.currentQuote,
+                        customerEmail: this.customerEmail.value,
+                        customerName: this.quoteCustomerName.value,
+                        customerPhone: this.customerPhone.value,
+                        companyName: this.companyName.value,
+                        salesRepEmail: selectedRep,
+                        salesRepName: salesRepNames[selectedRep]
+                    };
+                    
+                    // Save to database if checked
+                    let saveResult = null;
+                    if (this.saveToDatabase.checked) {
+                        saveResult = await this.quoteService.saveQuote(quoteData);
+                        if (!saveResult.success) {
+                            console.error('Database save failed:', saveResult.error);
+                        }
+                    }
+                    
+                    // Build color charge row for email
+                    let colorChargeRow = '';
+                    if (this.currentQuote.extraColors > 0) {
+                        const colorText = this.currentQuote.extraColors === 1 ? 'color' : 'colors';
+                        colorChargeRow = `
+                            <tr>
+                                <td>Extra Thread Color${this.currentQuote.extraColors > 1 ? 's' : ''} (${this.currentQuote.extraColors} ${colorText} beyond 4 included)</td>
+                                <td class="text-center">${this.currentQuote.quantity}</td>
+                                <td class="text-right">$${this.currentQuote.extraColors.toFixed(2)}</td>
+                                <td class="text-right">$${this.currentQuote.extraColorCharge.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }
+                    
+                    // Build LTM row for email
+                    let ltmRow = '';
+                    if (this.currentQuote.hasLTM) {
+                        ltmRow = `
+                            <tr>
+                                <td colspan="3" class="text-right">Less Than Minimum Fee:</td>
+                                <td class="text-right">$${this.currentQuote.ltmFee.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }
+                    
+                    // Build price breakdown HTML
+                    let priceBreakdownHtml = '';
+                    if (this.currentQuote.hasLTM) {
+                        const regularPerPiece = (this.currentQuote.baseTotal + this.currentQuote.extraColorCharge) / this.currentQuote.quantity;
+                        const ltmPerPiece = this.currentQuote.grandTotal / this.currentQuote.quantity;
+                        const extraColorPerItem = this.currentQuote.extraColorCharge / this.currentQuote.quantity;
+                        
+                        priceBreakdownHtml = `
+                            <div class="price-breakdown">
+                                <h3>Price Per Item Breakdown:</h3>
+                                <div class="price-line">
+                                    <span>Base Embroidery:</span>
+                                    <span>$${this.currentQuote.unitPrice.toFixed(2)}</span>
+                                </div>
+                                ${this.currentQuote.extraColors > 0 ? `
+                                <div class="price-line">
+                                    <span>Extra Color Charge:</span>
+                                    <span>+ $${extraColorPerItem.toFixed(2)}</span>
+                                </div>
+                                ` : ''}
+                                <div class="price-separator"></div>
+                                <div class="price-line">
+                                    <span>Regular Price:</span>
+                                    <span>$${regularPerPiece.toFixed(2)}</span>
+                                </div>
+                                <div class="price-line">
+                                    <span>LTM Impact:</span>
+                                    <span>+ $${this.currentQuote.ltmPerPiece.toFixed(2)}</span>
+                                </div>
+                                <div class="price-line price-total">
+                                    <span>Your Price Per Item:</span>
+                                    <span>$${ltmPerPiece.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    const subtotal = this.currentQuote.baseTotal + this.currentQuote.extraColorCharge;
+                    
+                    // Prepare email data
+                    const emailData = {
+                        to_email: this.customerEmail.value,
+                        reply_to: quoteData.salesRepEmail,
+                        customer_name: this.quoteCustomerName.value,
+                        project_name: this.currentQuote.projectName || 'Contract Embroidery Quote',
+                        quote_id: saveResult?.quoteID || `TEMP-${Date.now()}`,
+                        quote_date: new Date().toLocaleDateString(),
+                        product_type: this.currentQuote.productType,
+                        stitch_count: this.currentQuote.stitchCount,
+                        quantity: this.currentQuote.quantity,
+                        thread_colors: `${this.currentQuote.threadColors} colors`,
+                        unit_price: `$${this.currentQuote.unitPrice.toFixed(2)}`,
+                        base_total: `$${this.currentQuote.baseTotal.toFixed(2)}`,
+                        color_charge_desc: colorChargeRow,
+                        subtotal: `$${subtotal.toFixed(2)}`,
+                        ltm_fee: ltmRow,
+                        price_breakdown_html: priceBreakdownHtml,
+                        grand_total: `$${this.currentQuote.grandTotal.toFixed(2)}`,
+                        sales_rep_name: quoteData.salesRepName,
+                        sales_rep_email: quoteData.salesRepEmail,
+                        sales_rep_phone: '253-922-5793',
+                        company_year: '1977'
+                    };
+                    
+                    // Send email
+                    await emailjs.send(
+                        CALCULATOR_CONFIG.emailServiceId,
+                        CALCULATOR_CONFIG.emailTemplateId,
+                        emailData
+                    );
+                    
+                    // Show success
+                    this.successMessage.classList.remove('hidden');
+                    this.errorMessage.classList.add('hidden');
+                    
+                    // Reset form after delay
+                    setTimeout(() => {
+                        this.closeModal();
+                        this.quoteForm.reset();
+                        this.saveToDatabase.checked = true;
+                        this.salesRep.value = 'ruthie@nwcustomapparel.com';
+                    }, 2000);
+                    
+                } catch (error) {
+                    console.error('Error sending quote:', error);
+                    this.errorText.textContent = error.message || 'Failed to send quote. Please try again.';
+                    this.errorMessage.classList.remove('hidden');
+                    this.successMessage.classList.add('hidden');
+                } finally {
+                    // Restore button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }
+        }
+
+        // Initialize calculator when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize EmailJS globally (for both calculator and email guide)
+            emailjs.init(CALCULATOR_CONFIG.emailPublicKey);
+            
+            window.embroideryCalculator = new EmbroideryCalculator();
+        });
+
+        // Print functionality
+        window.addEventListener('beforeprint', () => {
+            if (!window.embroideryCalculator?.currentQuote) return;
+            
+            const quote = window.embroideryCalculator.currentQuote;
+            const printContent = document.getElementById('printContent');
+            
+            let colorChargeRow = '';
+            if (quote.extraColors > 0) {
+                const colorText = quote.extraColors === 1 ? 'color' : 'colors';
+                colorChargeRow = `
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">Extra Thread Color${quote.extraColors > 1 ? 's' : ''} (${quote.extraColors} ${colorText} beyond 4 included)</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${quote.quantity}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${quote.extraColors.toFixed(2)}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${quote.extraColorCharge.toFixed(2)}</td>
+                    </tr>
+                `;
+            }
+            
+            const subtotal = quote.baseTotal + quote.extraColorCharge;
+            let subtotalRow = `
+                <tr style="border-top: 2px solid #333;">
+                    <td colspan="3" style="padding: 8px; text-align: right; font-weight: bold;">Subtotal:</td>
+                    <td style="padding: 8px; text-align: right; font-weight: bold;">$${subtotal.toFixed(2)}</td>
+                </tr>
+            `;
+            
+            let ltmRow = '';
+            if (quote.hasLTM) {
+                ltmRow = `
+                    <tr>
+                        <td colspan="3" style="padding: 8px; text-align: right;">Less Than Minimum Fee:</td>
+                        <td style="padding: 8px; text-align: right;">$${quote.ltmFee.toFixed(2)}</td>
+                    </tr>
+                `;
+            }
+            
+            let ltmNote = '';
+            if (quote.hasLTM) {
+                const regularPerPiece = (quote.baseTotal + quote.extraColorCharge) / quote.quantity;
+                const ltmPerPiece = quote.grandTotal / quote.quantity;
+                
+                const extraColorPerItem = quote.extraColorCharge / quote.quantity;
+                
+                ltmNote = `
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                        <h4 style="margin: 0 0 10px 0; color: #1976d2;">Price Per Item Breakdown:</h4>
+                        <div style="font-family: monospace; font-size: 14px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>Base Embroidery:</span>
+                                <span>$${quote.unitPrice.toFixed(2)}</span>
+                            </div>
+                            ${quote.extraColors > 0 ? `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>Extra Color Charge:</span>
+                                <span>+ $${extraColorPerItem.toFixed(2)}</span>
+                            </div>
+                            ` : ''}
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; padding-top: 5px; border-top: 1px solid #90caf9;">
+                                <span>Regular Price:</span>
+                                <span>$${regularPerPiece.toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>LTM Impact:</span>
+                                <span>+ $${quote.ltmPerPiece.toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding-top: 5px; border-top: 2px solid #1976d2; font-weight: bold;">
+                                <span>Your Price Per Item:</span>
+                                <span style="color: #1976d2;">$${ltmPerPiece.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            printContent.innerHTML = `
+                <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="margin: 0; color: #4A5568;">Northwest Custom Apparel</h1>
+                        <p style="margin: 5px 0;">Contract Embroidery Quote</p>
+                        <p style="margin: 5px 0;">Date: ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h3>Customer Information</h3>
+                        <p><strong>Customer:</strong> ${quote.customerName || 'Not Provided'}</p>
+                        <p><strong>Project:</strong> ${quote.projectName || 'Contract Embroidery'}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h3>Quote Details</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Description</th>
+                                    <th style="padding: 8px; text-align: center; border-bottom: 2px solid #ddd;">Qty</th>
+                                    <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ddd;">Unit Price</th>
+                                    <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ddd;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${quote.productType} - ${quote.stitchCount} stitches</td>
+                                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${quote.quantity}</td>
+                                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${quote.unitPrice.toFixed(2)}</td>
+                                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${quote.baseTotal.toFixed(2)}</td>
+                                </tr>
+                                ${colorChargeRow}
+                                ${subtotalRow}
+                                ${ltmRow}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    ${ltmNote}
+                    
+                    <div style="text-align: right; margin-top: 30px; padding-top: 20px; border-top: 2px solid #ddd;">
+                        <h2 style="color: #4A5568;">Total: $${quote.grandTotal.toFixed(2)}</h2>
+                    </div>
+                    
+                    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
+                        <p><strong>Northwest Custom Apparel</strong></p>
+                        <p>Phone: 253-922-5793 | Email: sales@nwcustomapparel.com</p>
+                        <p>Proudly serving since 1977</p>
+                    </div>
+                </div>
+            `;
+            
+            printContent.style.display = 'block';
+        });
+
+        window.addEventListener('afterprint', () => {
+            document.getElementById('printContent').style.display = 'none';
+        });
+
+        // Buyer's Guide Functions
+        function openBuyersGuide() {
+            document.getElementById('buyersGuideModal').classList.add('active');
+        }
+
+        function closeBuyersGuide() {
+            document.getElementById('buyersGuideModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('buyersGuideModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeBuyersGuide();
+            }
+        });
+
+        function showGuideSection(section) {
+            // Update tabs
+            document.querySelectorAll('.guide-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.guide-section').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(section).classList.add('active');
+        }
+
+        // Email Guide Functions
+        function openEmailGuideModal() {
+            document.getElementById('emailGuideModal').classList.add('active');
+            // Reset form
+            document.getElementById('emailGuideForm').reset();
+            document.getElementById('guideSuccessMessage').classList.add('hidden');
+            document.getElementById('guideErrorMessage').classList.add('hidden');
+        }
+
+        function closeEmailGuideModal() {
+            document.getElementById('emailGuideModal').classList.remove('active');
+        }
+
+        // Close modal on outside click
+        document.getElementById('emailGuideModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEmailGuideModal();
+            }
+        });
+
+        // Handle email guide form submission
+        document.getElementById('emailGuideForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form values
+            const recipientEmail = document.getElementById('guideRecipientEmail').value;
+            const recipientName = document.getElementById('guideRecipientName').value;
+            const personalMessage = document.getElementById('guidePersonalMessage').value;
+            const salesRepEmail = document.getElementById('guideSalesRep').value;
+            
+            // Map sales rep emails to names
+            const salesRepNames = {
+                'ruth@nwcustomapparel.com': 'Ruth Nhong',
+                'taylar@nwcustomapparel.com': 'Taylar',
+                'nika@nwcustomapparel.com': 'Nika',
+                'erik@nwcustomapparel.com': 'Erik',
+                'adriyella@nwcustomapparel.com': 'Adriyella'
+            };
+            
+            // Prepare email data
+            const emailData = {
+                to_email: recipientEmail,
+                recipient_name: recipientName,
+                personal_message: personalMessage || '',  // Ensure it's never undefined
+                sales_rep_name: salesRepNames[salesRepEmail],
+                sales_rep_email: salesRepEmail,
+                sales_rep_phone: '253-922-5793'
+            };
+            
+            // Log the data being sent for debugging
+            console.log('Sending email with data:', emailData);
+            
+            // Show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Send email via EmailJS
+                await emailjs.send(
+                    'service_1c4k67j',  // Standard NWCA service
+                    'template_wna04vr',  // Template ID
+                    emailData
+                );
+                
+                // Show success
+                document.getElementById('guideSuccessMessage').classList.remove('hidden');
+                document.getElementById('guideErrorMessage').classList.add('hidden');
+                
+                // Close modal after delay
+                setTimeout(() => {
+                    closeEmailGuideModal();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error sending guide:', error);
+                console.error('Template ID used:', 'template_wna04vr');
+                console.error('Service ID used:', 'service_1c4k67j');
+                
+                let errorMessage = 'Failed to send guide. Please try again.';
+                if (error.status === 400 && error.text.includes('template ID not found')) {
+                    errorMessage = 'Template configuration error. Please contact support.';
+                    console.error('Please check your EmailJS dashboard for the correct template ID at: https://dashboard.emailjs.com/admin/templates');
+                }
+                
+                document.getElementById('guideErrorText').textContent = errorMessage;
+                document.getElementById('guideErrorMessage').classList.remove('hidden');
+                document.getElementById('guideSuccessMessage').classList.add('hidden');
+            } finally {
+                // Restore button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
