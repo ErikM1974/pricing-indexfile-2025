@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Contract DTG Pricing Calculator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Root variables matching dashboard theme */
+        :root {
+            --primary-green: #3a7c52;
+            --primary-dark: #1a472a;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+        }
+
+        .user-welcome {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Page Title */
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* Calculator Grid */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Input Section Card */
+        .input-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary-green);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: var(--focus-shadow);
+        }
+
+        .form-input:invalid {
+            border-color: #ef4444;
+        }
+
+        /* Tier Progress Bar */
+        .tier-progress {
+            margin-top: 0.5rem;
+            background: var(--hover-bg);
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tier-bar {
+            height: 100%;
+            background: var(--primary-green);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .tier-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Print Locations Grid */
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .location-card {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .location-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.1);
+        }
+
+        .location-card.selected {
+            border-color: var(--primary-green);
+            background-color: #f0fdf4;
+        }
+
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .location-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .location-size {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .location-checkbox {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .location-toggle {
+            width: 2.5rem;
+            height: 1.5rem;
+            background: #e5e7eb;
+            border-radius: 1rem;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .location-toggle::before {
+            content: '';
+            position: absolute;
+            width: 1.25rem;
+            height: 1.25rem;
+            background: white;
+            border-radius: 50%;
+            top: 0.125rem;
+            left: 0.125rem;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .location-checkbox:checked ~ .location-toggle {
+            background: var(--primary-green);
+        }
+
+        .location-checkbox:checked ~ .location-toggle::before {
+            transform: translateX(1rem);
+        }
+
+        /* Options Section */
+        .option-card {
+            background: var(--warning-bg);
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-label {
+            font-weight: 500;
+            color: var(--warning-text);
+        }
+
+        /* Results Card */
+        .results-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 100px;
+        }
+
+        .results-header {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .results-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-indicator {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .tier-popular {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .tier-best {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        /* Price Breakdown */
+        .price-breakdown {
+            margin-bottom: 1.5rem;
+        }
+
+        .price-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .price-line.total {
+            border-top: 2px solid var(--primary-green);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Order Summary */
+        .order-summary {
+            background: #f0fdf4;
+            border: 2px solid var(--primary-green);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .order-total-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .order-total-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.2);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+            border-color: var(--primary-green);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #e5e7eb;
+            margin-bottom: 1rem;
+        }
+
+        /* Contact Card */
+        .contact-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-top: 2rem;
+            border: 2px solid var(--primary-green);
+        }
+
+        .contact-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .contact-header i {
+            font-size: 2rem;
+            color: var(--primary-green);
+        }
+
+        .contact-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .contact-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .contact-detail i {
+            color: var(--primary-green);
+            width: 20px;
+        }
+
+        .contact-detail a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .contact-detail a:hover {
+            text-decoration: underline;
+        }
+
+        .quote-requirements {
+            background: #f0fdf4;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .quote-requirements h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .requirements-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .requirements-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .requirements-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        .important-note {
+            background: var(--warning-bg);
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .important-note i {
+            color: var(--warning-text);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .important-note-text {
+            color: var(--warning-text);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-card {
+                position: static;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .header-left {
+                flex-direction: column;
+            }
+
+            .main-container {
+                padding: 0 1rem;
+            }
+
+            .input-section, .results-card, .contact-card {
+                padding: 1.5rem;
+            }
+
+            .locations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .logo {
+                height: 35px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .header, .action-buttons {
+                display: none;
+            }
+
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-card {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" 
+                     class="logo">
+                <nav class="breadcrumb">
+                    <a href="../staff-dashboard.html">
+                        <i class="fas fa-arrow-left"></i> Dashboard
+                    </a>
+                    <span>/</span>
+                    <span>Contract DTG Calculator</span>
+                </nav>
+            </div>
+            <div class="user-welcome" id="userWelcome">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <h1 class="page-title">Contract DTG Pricing Calculator</h1>
+        <p class="page-subtitle">Calculate pricing for Direct-to-Garment printing on customer-supplied items</p>
+
+        <div class="calculator-grid">
+            <!-- Input Section -->
+            <div class="input-section">
+                <!-- Quantity Input -->
+                <h2 class="section-title">
+                    <i class="fas fa-hashtag"></i>
+                    Quantity & Locations
+                </h2>
+
+                <div class="form-group">
+                    <label class="form-label" for="quantity">Number of Items</label>
+                    <input 
+                        type="number" 
+                        id="quantity" 
+                        class="form-input" 
+                        placeholder="Enter quantity (minimum 1)"
+                        min="1"
+                        step="1"
+                        required
+                    >
+                    <div class="tier-progress">
+                        <div class="tier-bar" id="tierBar"></div>
+                    </div>
+                    <div class="tier-labels">
+                        <span>1</span>
+                        <span>24</span>
+                        <span>48</span>
+                        <span>72+</span>
+                    </div>
+                </div>
+
+                <!-- Print Locations -->
+                <div class="form-group">
+                    <label class="form-label">Select Print Locations</label>
+                    <div class="locations-grid">
+                        <label class="location-card" data-location="LC">
+                            <input type="checkbox" class="location-checkbox" data-location="LC" data-name="Left Chest">
+                            <div class="location-header">
+                                <div>
+                                    <div class="location-name">Left Chest</div>
+                                    <div class="location-size">4" × 4"</div>
+                                </div>
+                                <div class="location-toggle"></div>
+                            </div>
+                        </label>
+
+                        <label class="location-card" data-location="FF">
+                            <input type="checkbox" class="location-checkbox" data-location="FF" data-name="Full Front">
+                            <div class="location-header">
+                                <div>
+                                    <div class="location-name">Full Front</div>
+                                    <div class="location-size">12" × 16"</div>
+                                </div>
+                                <div class="location-toggle"></div>
+                            </div>
+                        </label>
+
+                        <label class="location-card" data-location="FB">
+                            <input type="checkbox" class="location-checkbox" data-location="FB" data-name="Full Back">
+                            <div class="location-header">
+                                <div>
+                                    <div class="location-name">Full Back</div>
+                                    <div class="location-size">12" × 16"</div>
+                                </div>
+                                <div class="location-toggle"></div>
+                            </div>
+                        </label>
+
+                        <label class="location-card" data-location="JF">
+                            <input type="checkbox" class="location-checkbox" data-location="JF" data-name="Jumbo Front">
+                            <div class="location-header">
+                                <div>
+                                    <div class="location-name">Jumbo Front</div>
+                                    <div class="location-size">16" × 20"</div>
+                                </div>
+                                <div class="location-toggle"></div>
+                            </div>
+                        </label>
+
+                        <label class="location-card" data-location="JB">
+                            <input type="checkbox" class="location-checkbox" data-location="JB" data-name="Jumbo Back">
+                            <div class="location-header">
+                                <div>
+                                    <div class="location-name">Jumbo Back</div>
+                                    <div class="location-size">16" × 20"</div>
+                                </div>
+                                <div class="location-toggle"></div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <h2 class="section-title">
+                    <i class="fas fa-cog"></i>
+                    Options
+                </h2>
+
+                <div class="option-card">
+                    <label class="option-label" for="isHeavyweight">
+                        Heavyweight Garment? (Add $2.00 per item)
+                    </label>
+                    <label class="location-card" style="border: none; padding: 0; margin: 0;">
+                        <input type="checkbox" class="location-checkbox" id="isHeavyweight">
+                        <div class="location-toggle"></div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-card">
+                <div class="results-header">
+                    <h2 class="results-title">Quote Summary</h2>
+                    <div id="tierIndicator"></div>
+                </div>
+
+                <div id="resultsContent">
+                    <div class="empty-state">
+                        <i class="fas fa-calculator"></i>
+                        <p>Enter quantity and select print locations to see pricing</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <i class="fas fa-redo"></i>
+                        Reset
+                    </button>
+                    <button class="btn btn-primary" id="sendQuoteBtn" disabled>
+                        <i class="fas fa-envelope"></i>
+                        Send Quote
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information Card -->
+        <div class="contact-card">
+            <div class="contact-header">
+                <i class="fas fa-user-tie"></i>
+                <div>
+                    <h2 class="contact-title">Ready to Place Your Order?</h2>
+                    <p class="contact-subtitle">Contact our Production Manager for custom quotes and orders</p>
+                </div>
+            </div>
+
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Ruthie Nhoung</h3>
+                    <div class="contact-detail">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Production Manager</span>
+                    </div>
+                    <div class="contact-detail">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:ruth@nwcustomapparel.com">ruth@nwcustomapparel.com</a>
+                    </div>
+                    <div class="contact-detail">
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:253-922-5793">253-922-5793</a>
+                    </div>
+                </div>
+
+                <div class="quote-requirements">
+                    <h4>When requesting a quote, please include:</h4>
+                    <ul class="requirements-list">
+                        <li>Quantity of items</li>
+                        <li>Type of garment (t-shirt or sweatshirt)</li>
+                        <li>Fabric content (must be 100% cotton)</li>
+                        <li>Garment color(s)</li>
+                        <li>Logo or artwork details</li>
+                        <li>Desired print locations</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="important-note">
+                <i class="fas fa-exclamation-circle"></i>
+                <div class="important-note-text">
+                    <strong>Important DTG Requirements:</strong> We can only accept 100% cotton garments for DTG printing. 
+                    T-shirts and sweatshirts only. Sweatshirts incur an additional $2.00 heavyweight garment fee.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // DTG Contract Pricing Calculator
+        class DTGCalculator {
+            constructor() {
+                // Pricing Constants
+                this.LTM_FEE = 50.00;
+                this.HEAVYWEIGHT_SURCHARGE = 2.00;
+                this.PRICING = {
+                    LC: [8.00, 7.50, 6.00, 5.50],
+                    FF: [11.00, 10.00, 8.75, 8.25],
+                    FB: [11.00, 10.00, 8.75, 8.25],
+                    JF: [12.75, 10.50, 9.75, 9.00],
+                    JB: [12.75, 10.50, 9.75, 9.00]
+                };
+
+                // Elements
+                this.elements = {
+                    quantity: document.getElementById('quantity'),
+                    tierBar: document.getElementById('tierBar'),
+                    locationCheckboxes: document.querySelectorAll('.location-checkbox[data-location]'),
+                    locationCards: document.querySelectorAll('.location-card[data-location]'),
+                    isHeavyweight: document.getElementById('isHeavyweight'),
+                    resultsContent: document.getElementById('resultsContent'),
+                    tierIndicator: document.getElementById('tierIndicator'),
+                    resetBtn: document.getElementById('resetBtn'),
+                    sendQuoteBtn: document.getElementById('sendQuoteBtn'),
+                    userWelcome: document.getElementById('userWelcome')
+                };
+
+                this.init();
+            }
+
+            init() {
+                // Display user name
+                this.displayUserName();
+
+                // Event listeners
+                this.elements.quantity.addEventListener('input', () => this.calculate());
+                this.elements.locationCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        this.updateLocationCard(e.target);
+                        this.calculate();
+                    });
+                });
+                this.elements.isHeavyweight.addEventListener('change', () => this.calculate());
+                this.elements.resetBtn.addEventListener('click', () => this.reset());
+
+                // Restore saved state
+                this.restoreState();
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.key === 's') {
+                        e.preventDefault();
+                        if (!this.elements.sendQuoteBtn.disabled) {
+                            this.sendQuote();
+                        }
+                    }
+                });
+            }
+
+            displayUserName() {
+                const firstName = sessionStorage.getItem('nwca_user_firstname') || '';
+                if (firstName) {
+                    this.elements.userWelcome.textContent = `Welcome, ${firstName}`;
+                }
+            }
+
+            updateLocationCard(checkbox) {
+                const card = checkbox.closest('.location-card');
+                if (card) {
+                    card.classList.toggle('selected', checkbox.checked);
+                }
+            }
+
+            getTierIndex(quantity) {
+                if (quantity >= 72) return 3;
+                if (quantity >= 48) return 2;
+                if (quantity >= 24) return 1;
+                return 0;
+            }
+
+            updateTierProgress(quantity) {
+                let width = 0;
+                if (quantity >= 72) width = 100;
+                else if (quantity >= 48) width = 75;
+                else if (quantity >= 24) width = 50;
+                else if (quantity >= 1) width = (quantity / 24) * 50;
+                
+                this.elements.tierBar.style.width = `${width}%`;
+            }
+
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD'
+                }).format(amount);
+            }
+
+            calculate() {
+                const quantity = parseInt(this.elements.quantity.value) || 0;
+                const activeLocations = Array.from(this.elements.locationCheckboxes)
+                    .filter(cb => cb.checked && cb.dataset.location);
+                const isHeavyweight = this.elements.isHeavyweight.checked;
+
+                // Update tier progress
+                this.updateTierProgress(quantity);
+
+                // Save state
+                this.saveState();
+
+                // Check if we can calculate
+                if (quantity < 1 || activeLocations.length === 0) {
+                    this.showEmptyState();
+                    return;
+                }
+
+                // Calculate pricing
+                const tierIndex = this.getTierIndex(quantity);
+                const ltmFeePerPiece = quantity < 24 ? this.LTM_FEE / quantity : 0;
+                
+                let totalPrintCost = 0;
+                const locationBreakdown = [];
+
+                activeLocations.forEach(checkbox => {
+                    const locationCode = checkbox.dataset.location;
+                    const locationName = checkbox.dataset.name;
+                    const printCost = this.PRICING[locationCode][tierIndex];
+                    totalPrintCost += printCost;
+                    locationBreakdown.push({
+                        name: locationName,
+                        cost: printCost
+                    });
+                });
+
+                const heavyweightSurcharge = isHeavyweight ? this.HEAVYWEIGHT_SURCHARGE : 0;
+                const pricePerPiece = totalPrintCost + ltmFeePerPiece + heavyweightSurcharge;
+                const totalCost = pricePerPiece * quantity;
+
+                // Display results
+                this.displayResults({
+                    quantity,
+                    tierIndex,
+                    locationBreakdown,
+                    ltmFeePerPiece,
+                    heavyweightSurcharge,
+                    pricePerPiece,
+                    totalCost
+                });
+
+                // Enable send quote button
+                this.elements.sendQuoteBtn.disabled = false;
+            }
+
+            displayResults(data) {
+                // Update tier indicator
+                let tierHTML = '';
+                if (data.tierIndex === 1) {
+                    tierHTML = '<span class="tier-indicator tier-popular">POPULAR TIER</span>';
+                } else if (data.tierIndex === 3) {
+                    tierHTML = '<span class="tier-indicator tier-best">BEST VALUE</span>';
+                }
+                this.elements.tierIndicator.innerHTML = tierHTML;
+
+                // Build price breakdown
+                let breakdownHTML = '<div class="price-breakdown">';
+                
+                data.locationBreakdown.forEach(location => {
+                    breakdownHTML += `
+                        <div class="price-line">
+                            <span>${location.name}:</span>
+                            <span>${this.formatCurrency(location.cost)}</span>
+                        </div>
+                    `;
+                });
+
+                if (data.heavyweightSurcharge > 0) {
+                    breakdownHTML += `
+                        <div class="price-line">
+                            <span>Heavyweight Fee:</span>
+                            <span>+${this.formatCurrency(data.heavyweightSurcharge)}</span>
+                        </div>
+                    `;
+                }
+
+                if (data.ltmFeePerPiece > 0) {
+                    breakdownHTML += `
+                        <div class="price-line">
+                            <span>LTM Fee (under 24 pcs):</span>
+                            <span>+${this.formatCurrency(data.ltmFeePerPiece)}</span>
+                        </div>
+                    `;
+                }
+
+                breakdownHTML += `
+                    <div class="price-line total">
+                        <span>Price per Item:</span>
+                        <span>${this.formatCurrency(data.pricePerPiece)}</span>
+                    </div>
+                </div>
+                `;
+
+                // Order summary
+                const summaryHTML = `
+                    <div class="order-summary">
+                        <div class="order-total-label">Total Order Cost</div>
+                        <div class="order-total-amount">${this.formatCurrency(data.totalCost)}</div>
+                        <div class="order-total-label" style="margin-top: 0.5rem;">
+                            ${data.quantity} items × ${this.formatCurrency(data.pricePerPiece)}
+                        </div>
+                    </div>
+                `;
+
+                this.elements.resultsContent.innerHTML = breakdownHTML + summaryHTML;
+            }
+
+            showEmptyState() {
+                this.elements.resultsContent.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calculator"></i>
+                        <p>Enter quantity and select print locations to see pricing</p>
+                    </div>
+                `;
+                this.elements.tierIndicator.innerHTML = '';
+                this.elements.sendQuoteBtn.disabled = true;
+            }
+
+            reset() {
+                this.elements.quantity.value = '';
+                this.elements.tierBar.style.width = '0%';
+                this.elements.locationCheckboxes.forEach(cb => {
+                    cb.checked = false;
+                    this.updateLocationCard(cb);
+                });
+                this.elements.isHeavyweight.checked = false;
+                this.showEmptyState();
+                this.clearState();
+            }
+
+            saveState() {
+                const state = {
+                    quantity: this.elements.quantity.value,
+                    locations: Array.from(this.elements.locationCheckboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.dataset.location),
+                    isHeavyweight: this.elements.isHeavyweight.checked
+                };
+                sessionStorage.setItem('dtg_calculator_state', JSON.stringify(state));
+            }
+
+            restoreState() {
+                try {
+                    const state = JSON.parse(sessionStorage.getItem('dtg_calculator_state') || '{}');
+                    
+                    if (state.quantity) {
+                        this.elements.quantity.value = state.quantity;
+                    }
+                    
+                    if (state.locations) {
+                        state.locations.forEach(location => {
+                            const checkbox = document.querySelector(`.location-checkbox[data-location="${location}"]`);
+                            if (checkbox) {
+                                checkbox.checked = true;
+                                this.updateLocationCard(checkbox);
+                            }
+                        });
+                    }
+                    
+                    if (state.isHeavyweight) {
+                        this.elements.isHeavyweight.checked = true;
+                    }
+                    
+                    // Recalculate if we restored any data
+                    if (state.quantity || state.locations) {
+                        this.calculate();
+                    }
+                } catch (e) {
+                    console.error('Failed to restore state:', e);
+                }
+            }
+
+            clearState() {
+                sessionStorage.removeItem('dtg_calculator_state');
+            }
+
+            sendQuote() {
+                // This will be implemented when we add EmailJS
+                console.log('Send quote functionality will be added next');
+                alert('Quote sending will be implemented in the next phase');
+            }
+        }
+
+        // Initialize calculator when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new DTGCalculator();
+        });
+    </script>
+</body>
+</html>
