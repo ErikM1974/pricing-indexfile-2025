@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal - Layout 1 (Sidebar Navigation)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #3a7c52;
+            --primary-dark: #1a472a;
+            --accent-sales: #27ae60;
+            --accent-forms: #805AD5;
+            --accent-resources: #4A5568;
+            --accent-company: #DD6B20;
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Layout Container */
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-green);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .sidebar-search {
+            position: relative;
+        }
+
+        .sidebar-search input {
+            width: 100%;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        .sidebar-search i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .nav-section {
+            padding: 1rem 0;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-primary);
+            color: var(--primary-green);
+        }
+
+        .nav-item.active {
+            background: #f0fdf4;
+            color: var(--primary-green);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary-green);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Area */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        /* Info Row */
+        .info-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Announcements Widget */
+        .widget {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .widget-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .widget-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .announcement-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .announcement-item:last-child {
+            border-bottom: none;
+        }
+
+        .announcement-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .icon-pricing { background: #d1fae5; color: #065f46; }
+        .icon-company { background: #dbeafe; color: #1e40af; }
+        .icon-urgent { background: #fee2e2; color: #991b1b; }
+
+        /* Production Schedule */
+        .schedule-item {
+            display: grid;
+            grid-template-columns: 140px 1fr auto;
+            align-items: center;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .schedule-item.rush {
+            background: #fef3c7;
+        }
+
+        .schedule-method {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .schedule-date {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        /* Tool Cards Grid */
+        .tools-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .tool-card.sales::before { background: var(--accent-sales); }
+        .tool-card.forms::before { background: var(--accent-forms); }
+        .tool-card.resources::before { background: var(--accent-resources); }
+        .tool-card.company::before { background: var(--accent-company); }
+
+        .tool-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .tool-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-card.sales .tool-icon { background: #d1fae5; color: #065f46; }
+        .tool-card.forms .tool-icon { background: #e9d8fd; color: #553c9a; }
+        .tool-card.resources .tool-icon { background: #e2e8f0; color: #334155; }
+        .tool-card.company .tool-icon { background: #fed7aa; color: #92400e; }
+
+        .tool-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .new-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #dc2626;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100%;
+                z-index: 100;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .info-row {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo">NW</div>
+                    <div>
+                        <h3 style="font-weight: 600; margin: 0;">NWCA Portal</h3>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Staff Dashboard</p>
+                    </div>
+                </div>
+                <div class="sidebar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="search" placeholder="Search tools...">
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Pricing Tools</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-tshirt"></i>
+                    <span>Contract DTG</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-hat-cowboy"></i>
+                    <span>Contract Embroidery</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-print"></i>
+                    <span>Screen Print</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-fire"></i>
+                    <span>Laser Engraving</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Forms & Orders</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-fire-flame-curved"></i>
+                    <span>Hot Tickets</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Lead Forms</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-concierge-bell"></i>
+                    <span>À La Carte Orders</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Resources</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-book"></i>
+                    <span>Task Guide</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Skills Guide</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>HR Resources</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <button style="background: none; border: none; cursor: pointer; font-size: 1.25rem; color: var(--text-secondary);">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="user-info">
+                        <div class="user-avatar">EM</div>
+                        <div>
+                            <div style="font-weight: 600;">Erik Mickelson</div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Info Row -->
+                <div class="info-row">
+                    <!-- Announcements Widget -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <i class="fas fa-bullhorn" style="color: var(--primary-green);"></i>
+                            <h2>Announcements</h2>
+                        </div>
+                        <div class="announcements-list">
+                            <div class="announcement-item">
+                                <div class="announcement-icon icon-pricing">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Pricing Update</div>
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                        The new 2025 Contract DTG and Customer Supplied Goods calculators are now live on the dashboard.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="announcement-item">
+                                <div class="announcement-icon icon-company">
+                                    <i class="fas fa-birthday-cake"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Company Update</div>
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                        June is Birthday Month. Who is up for a BBQ at the end of the month to celebrate?
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="announcement-item">
+                                <div class="announcement-icon icon-urgent">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Hot Ticket Process</div>
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                        To ensure WOW orders are handled with urgency, they are now internally called "Hot Tickets."
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Production Schedule Widget -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <i class="fas fa-calendar-alt" style="color: var(--primary-green);"></i>
+                            <h2>Production Schedule</h2>
+                        </div>
+                        <div class="schedule-list">
+                            <div class="schedule-item">
+                                <span class="schedule-method">DTG</span>
+                                <span class="schedule-date">Available after July 16</span>
+                                <span class="status-dot"></span>
+                            </div>
+                            <div class="schedule-item rush">
+                                <span class="schedule-method">DTG Rush</span>
+                                <span class="schedule-date">Available after July 9</span>
+                                <span class="status-dot" style="background: #f59e0b;"></span>
+                            </div>
+                            <div class="schedule-item">
+                                <span class="schedule-method">Embroidery</span>
+                                <span class="schedule-date">Available after July 8</span>
+                                <span class="status-dot"></span>
+                            </div>
+                            <div class="schedule-item">
+                                <span class="schedule-method">Screen Print</span>
+                                <span class="schedule-date">Available after July 12</span>
+                                <span class="status-dot"></span>
+                            </div>
+                            <div style="margin-top: 1rem; padding: 0.75rem; background: #fef3c7; border-radius: 8px;">
+                                <div style="font-weight: 600; color: #92400e; margin-bottom: 0.25rem;">Capacity Status</div>
+                                <div style="font-size: 0.875rem; color: #92400e;">100-200 Prints - Ask for rushes</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Access Tools -->
+                <section class="tools-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Quick Access Tools</h2>
+                        <a href="#" style="color: var(--primary-green); text-decoration: none; font-size: 0.875rem;">View all →</a>
+                    </div>
+                    <div class="tool-grid">
+                        <a href="#" class="tool-card sales">
+                            <span class="new-badge">NEW</span>
+                            <div class="tool-icon">
+                                <i class="fas fa-tshirt"></i>
+                            </div>
+                            <div class="tool-title">Contract DTG Calculator</div>
+                            <div class="tool-description">For contract direct-to-garment pricing with 2025 rates</div>
+                        </a>
+
+                        <a href="#" class="tool-card sales">
+                            <div class="tool-icon">
+                                <i class="fas fa-hat-cowboy"></i>
+                            </div>
+                            <div class="tool-title">Contract Embroidery</div>
+                            <div class="tool-description">Contract pricing for flats and caps</div>
+                        </a>
+
+                        <a href="#" class="tool-card forms">
+                            <div class="tool-icon">
+                                <i class="fas fa-fire-flame-curved"></i>
+                            </div>
+                            <div class="tool-title">New Hot Ticket</div>
+                            <div class="tool-description">Create a new priority order</div>
+                        </a>
+
+                        <a href="#" class="tool-card resources">
+                            <div class="tool-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="tool-title">Task Guide</div>
+                            <div class="tool-description">Sales support responsibilities and procedures</div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- All Tools Section -->
+                <section class="tools-section">
+                    <div class="section-header">
+                        <h2 class="section-title">All Pricing Calculators</h2>
+                    </div>
+                    <div class="tool-grid">
+                        <a href="#" class="tool-card sales">
+                            <div class="tool-icon">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="tool-title">Screen Print Calculator</div>
+                            <div class="tool-description">Retail pricing for customer supplied garments</div>
+                        </a>
+
+                        <a href="#" class="tool-card sales">
+                            <span class="new-badge">TARIFF</span>
+                            <div class="tool-icon">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                            <div class="tool-title">Leatherette Patches</div>
+                            <div class="tool-description">Richardson 112 Collection with new tariff pricing</div>
+                        </a>
+
+                        <a href="#" class="tool-card sales">
+                            <span class="new-badge">TARIFF</span>
+                            <div class="tool-icon">
+                                <i class="fas fa-mug-hot"></i>
+                            </div>
+                            <div class="tool-title">Laser Engraved Tumblers</div>
+                            <div class="tool-description">16oz Polar Camel pricing with tariff updates</div>
+                        </a>
+
+                        <a href="#" class="tool-card company">
+                            <div class="tool-icon">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <div class="tool-title">Company Webstores</div>
+                            <div class="tool-description">Branded ordering portal information</div>
+                        </a>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar on mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('menuToggle');
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
