@@ -638,6 +638,177 @@ Created a modernized Richardson cap pricing calculator with multi-style quote bu
 6. Calculate quote
 7. Send via email with optional database save
 
+## Contract Calculator Best Practices (2025-01-27)
+
+### 1. LTM (Less Than Minimum) Fee Display Standards
+
+**Problem**: Customers were confused about how LTM fees affected their per-item pricing.
+
+**Solution**: Implement clear, transparent pricing breakdowns:
+
+#### Quote Table Structure
+```
+Description                                  Qty    Unit Price    Total
+Flat Embroidery - 6,000 stitches           12     $10.50        $126.00
+Extra Thread Color (1 color beyond 4)        12     $1.00         $12.00
+────────────────────────────────────────────────────────────────────────
+Subtotal:                                                        $138.00
+Less Than Minimum Fee:                                           $50.00
+════════════════════════════════════════════════════════════════════════
+TOTAL:                                                          $188.00
+```
+
+#### Price Per Item Breakdown (Blue Info Box)
+```
+Price Per Item Breakdown:
+Base Embroidery:         $10.50
+Extra Color Charge:    + $1.00
+─────────────────────────────
+Regular Price:          $11.50
+LTM Impact:           + $4.17
+═════════════════════════════
+Your Price Per Item:    $15.67
+```
+
+**Key Points**:
+- Show subtotal before LTM
+- Display LTM as a line item, not just a note
+- Calculate and show per-item impact
+- Use visual separators for clarity
+- Help customers understand both regular and adjusted pricing
+
+### 2. EmailJS HTML Rendering Rules
+
+**Problem**: HTML code appearing as plain text in emails.
+
+**Solution**: Use proper brace notation in EmailJS templates:
+
+- **Double braces** `{{variable}}` - For plain text values
+- **Triple braces** `{{{variable}}}` - For HTML content
+
+**Common HTML Variables**:
+```javascript
+// In EmailJS template:
+{{{quote_items_html}}}      // HTML table rows
+{{{color_charge_desc}}}     // Extra charges as table rows
+{{{ltm_fee}}}              // LTM fee table row
+{{{price_breakdown_html}}}  // Complete pricing breakdown
+```
+
+**Example Implementation**:
+```javascript
+// Build HTML content in calculator
+let colorChargeRow = `
+    <tr>
+        <td>Extra Thread Colors...</td>
+        <td class="text-center">${quantity}</td>
+        <td class="text-right">$${price}</td>
+    </tr>
+`;
+
+// Send to EmailJS
+emailData = {
+    color_charge_desc: colorChargeRow,  // Will use {{{color_charge_desc}}}
+    customer_name: 'John Doe',          // Will use {{customer_name}}
+};
+```
+
+### 3. Grammar and Formatting Standards
+
+**Problem**: Incorrect pluralization and confusing descriptions.
+
+**Solution**: Implement proper grammar handling:
+
+```javascript
+// Singular/plural handling
+const colorText = extraColors === 1 ? 'color' : 'colors';
+const description = `Extra Thread Color${extraColors > 1 ? 's' : ''} (${extraColors} ${colorText} beyond 4 included)`;
+
+// Results in:
+// "Extra Thread Color (1 color beyond 4 included)"
+// "Extra Thread Colors (2 colors beyond 4 included)"
+```
+
+### 4. Contact Information Standards
+
+**Phone Number**: Always use **253-922-5793**
+- Format: XXX-XXX-XXXX (with hyphens)
+- Consistent across all templates and calculators
+- Update any instances of old numbers
+
+### 5. Sales Rep Integration
+
+**Pattern for Contract Calculators**:
+```javascript
+// Sales rep dropdown with default
+<select id="salesRep" required>
+    <option value="">Select a sales rep...</option>
+    <option value="ruthie@nwcustomapparel.com" selected>Ruthie</option>
+    <option value="taylar@nwcustomapparel.com">Taylar</option>
+    <option value="nika@nwcustomapparel.com">Nika</option>
+    <option value="erik@nwcustomapparel.com">Erik</option>
+    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+    <option value="sales@nwcustomapparel.com">General Sales</option>
+</select>
+
+// Map emails to display names
+const salesRepNames = {
+    'ruthie@nwcustomapparel.com': 'Ruthie',
+    'taylar@nwcustomapparel.com': 'Taylar',
+    // etc.
+};
+```
+
+### 6. Print Functionality
+
+**Standard Print Support**:
+- Include print CSS media queries
+- Hide navigation and non-essential elements
+- Show pricing breakdown in print version
+- Use `window.print()` for PDF generation
+
+```javascript
+// Print button
+<button onclick="window.print()">
+    <i class="fas fa-print"></i> Print Quote
+</button>
+
+// Print styles
+@media print {
+    .no-print { display: none !important; }
+    /* Additional print-specific styles */
+}
+```
+
+### 7. Theme Colors by Service Type
+
+**Consistent Color Coding**:
+- **DTG**: Green theme (#3a7c52)
+- **Embroidery**: Slate blue (#4A5568)
+- **Screen Print**: Orange theme (TBD)
+- **Richardson**: Green theme (#3a7c52)
+
+### 8. Error Prevention
+
+**Common Issues to Avoid**:
+1. **Missing HTML escaping**: Always escape user input in HTML
+2. **Incorrect date formats**: Use `toISOString()` for Caspio
+3. **Missing required fields**: Validate before submission
+4. **Cross-origin issues**: Test auth features on production
+
+### 9. Testing Checklist for Contract Calculators
+
+- [ ] LTM fee displays correctly with per-item breakdown
+- [ ] Grammar is correct for singular/plural items
+- [ ] EmailJS renders HTML properly (no raw code)
+- [ ] Phone number is 253-922-5793
+- [ ] Sales rep dropdown works with default selection
+- [ ] Print functionality generates clean PDF
+- [ ] Quote saves to database with correct prefix
+- [ ] All calculations match expected values
+- [ ] Error messages are user-friendly
+- [ ] Mobile responsive design works
+
 ## Final Tips
 
 1. **Read the console logs** - They tell you exactly what's happening
