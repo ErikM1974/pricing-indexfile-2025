@@ -1170,6 +1170,70 @@
                         }
                     }
                     
+                    // Build color charge row for email
+                    let colorChargeRow = '';
+                    if (this.currentQuote.extraColors > 0) {
+                        const colorText = this.currentQuote.extraColors === 1 ? 'color' : 'colors';
+                        colorChargeRow = `
+                            <tr>
+                                <td>Extra Thread Color${this.currentQuote.extraColors > 1 ? 's' : ''} (${this.currentQuote.extraColors} ${colorText} beyond 4 included)</td>
+                                <td class="text-center">${this.currentQuote.quantity}</td>
+                                <td class="text-right">$${this.currentQuote.extraColors.toFixed(2)}</td>
+                                <td class="text-right">$${this.currentQuote.extraColorCharge.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }
+                    
+                    // Build LTM row for email
+                    let ltmRow = '';
+                    if (this.currentQuote.hasLTM) {
+                        ltmRow = `
+                            <tr>
+                                <td colspan="3" class="text-right">Less Than Minimum Fee:</td>
+                                <td class="text-right">$${this.currentQuote.ltmFee.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }
+                    
+                    // Build price breakdown HTML
+                    let priceBreakdownHtml = '';
+                    if (this.currentQuote.hasLTM) {
+                        const regularPerPiece = (this.currentQuote.baseTotal + this.currentQuote.extraColorCharge) / this.currentQuote.quantity;
+                        const ltmPerPiece = this.currentQuote.grandTotal / this.currentQuote.quantity;
+                        const extraColorPerItem = this.currentQuote.extraColorCharge / this.currentQuote.quantity;
+                        
+                        priceBreakdownHtml = `
+                            <div class="price-breakdown">
+                                <h3>Price Per Item Breakdown:</h3>
+                                <div class="price-line">
+                                    <span>Base Embroidery:</span>
+                                    <span>$${this.currentQuote.unitPrice.toFixed(2)}</span>
+                                </div>
+                                ${this.currentQuote.extraColors > 0 ? `
+                                <div class="price-line">
+                                    <span>Extra Color Charge:</span>
+                                    <span>+ $${extraColorPerItem.toFixed(2)}</span>
+                                </div>
+                                ` : ''}
+                                <div class="price-separator"></div>
+                                <div class="price-line">
+                                    <span>Regular Price:</span>
+                                    <span>$${regularPerPiece.toFixed(2)}</span>
+                                </div>
+                                <div class="price-line">
+                                    <span>LTM Impact:</span>
+                                    <span>+ $${this.currentQuote.ltmPerPiece.toFixed(2)}</span>
+                                </div>
+                                <div class="price-line price-total">
+                                    <span>Your Price Per Item:</span>
+                                    <span>$${ltmPerPiece.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    const subtotal = this.currentQuote.baseTotal + this.currentQuote.extraColorCharge;
+                    
                     // Prepare email data
                     const emailData = {
                         to_email: this.customerEmail.value,
@@ -1181,14 +1245,13 @@
                         product_type: this.currentQuote.productType,
                         stitch_count: this.currentQuote.stitchCount,
                         quantity: this.currentQuote.quantity,
-                        thread_colors: this.currentQuote.threadColors,
+                        thread_colors: `${this.currentQuote.threadColors} colors`,
                         unit_price: `$${this.currentQuote.unitPrice.toFixed(2)}`,
                         base_total: `$${this.currentQuote.baseTotal.toFixed(2)}`,
-                        color_charge_desc: this.currentQuote.extraColors > 0 ? 
-                            `Additional Thread Colors (${this.currentQuote.extraColors} colors × ${this.currentQuote.quantity} items)` : '',
-                        color_charge_amount: this.currentQuote.extraColorCharge > 0 ? 
-                            `$${this.currentQuote.extraColorCharge.toFixed(2)}` : '',
-                        ltm_fee: this.currentQuote.hasLTM ? `$${this.currentQuote.ltmFee.toFixed(2)}` : '',
+                        color_charge_desc: colorChargeRow,
+                        subtotal: `$${subtotal.toFixed(2)}`,
+                        ltm_fee: ltmRow,
+                        price_breakdown_html: priceBreakdownHtml,
                         grand_total: `$${this.currentQuote.grandTotal.toFixed(2)}`,
                         sales_rep_name: quoteData.salesRepName,
                         sales_rep_email: quoteData.salesRepEmail,
