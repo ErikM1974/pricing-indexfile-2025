@@ -499,6 +499,145 @@ try {
 4. **Quote ID Conflicts**: Each calculator type needs unique prefix and storage key
 5. **Email Not Sending**: Verify EmailJS service limits and template ID
 
+## Calculator Template System (2025-01-27)
+
+### Overview
+Created a reusable template system to streamline adding new pricing calculators. New calculators can now be implemented in 30-60 minutes instead of hours.
+
+### Template Files Created
+
+1. **`/templates/calculator-template.html`**
+   - Base HTML structure with placeholders
+   - Standard UI components and styling
+   - EmailJS integration ready
+   - Responsive design included
+
+2. **`/templates/quote-service-template.js`**
+   - Database integration boilerplate
+   - Quote ID generation pattern
+   - Standard save/retrieve methods
+   - Configurable for single or multi-item quotes
+
+3. **`/templates/calculator-config-template.json`**
+   - Configuration structure for new calculators
+   - All placeholder values documented
+   - Pricing logic patterns
+
+4. **`/templates/email-template.html`**
+   - Professional email layout
+   - Works for both single and multi-item quotes
+   - All standard variables documented
+
+5. **`/templates/NEW_CALCULATOR_CHECKLIST.md`**
+   - Step-by-step implementation guide
+   - Time estimates for each step
+   - Common issues and solutions
+   - Testing checklist
+
+### How to Use the Template System
+
+1. **Start with the checklist**: Open `/templates/NEW_CALCULATOR_CHECKLIST.md`
+2. **Copy templates** to your working directory
+3. **Replace placeholders** using the configuration file as a guide
+4. **Implement calculator-specific logic**
+5. **Test thoroughly** using the checklist
+6. **Document** in this file
+
+### Key Patterns
+
+#### Quote ID Format
+```
+{{PREFIX}}{{MMDD}}-{{sequence}}
+Examples: DTG0126-1, RICH0126-2, EMB0126-3
+```
+
+#### Standard Margin Calculation
+```javascript
+const markedUpPrice = basePrice / 0.6;
+```
+
+#### LTM (Less Than Minimum) Pattern
+```javascript
+if (quantity < 24) {
+    ltmFee = 50.00;
+    ltmPerUnit = ltmFee / quantity;
+    finalPrice = basePrice + ltmPerUnit;
+}
+```
+
+### Benefits of Template System
+- **Consistency**: All calculators follow the same patterns
+- **Speed**: 30-60 minute implementation time
+- **Maintainability**: Updates to templates benefit all calculators
+- **Fewer Bugs**: Proven patterns reduce errors
+- **Easy Onboarding**: New developers can quickly add calculators
+
+### Quick Implementation Example
+
+For a new "Screen Print" calculator:
+1. Copy templates to `/calculators/`
+2. Configure:
+   - Name: "Screen Print"
+   - Prefix: "SP"
+   - Type: "screenprint"
+   - Icon: "fa-print"
+3. Replace all placeholders
+4. Add pricing logic for color counts
+5. Create EmailJS template
+6. Add to dashboard
+7. Test and deploy
+
+Total time: ~45 minutes
+
+## Richardson Calculator Implementation (2025-01-27)
+
+### Overview
+Created a modernized Richardson cap pricing calculator with multi-style quote building, following the same patterns as the DTG calculator.
+
+### Key Features
+1. **Multi-Style Quote Builder**
+   - Autocomplete style selection from 100+ Richardson cap styles
+   - Dynamic add/remove line items
+   - Real-time pricing calculations
+
+2. **Pricing Logic**
+   - 60% margin calculation (price / 0.6)
+   - Embroidery tier pricing based on total quantity
+   - LTM surcharge ($50 for orders under 24 pieces)
+
+3. **Database Integration**
+   - Quote ID format: `RICH{MMDD}-{sequence}`
+   - Saves to quote_sessions and quote_items tables
+   - Stores cap details in SizeBreakdown field
+
+4. **EmailJS Integration**
+   - Uses same template as DTG (template_ug8o3ug)
+   - Ruthie Nhoung as default sender
+   - Professional multi-item quote format
+
+### Files Created
+- `/calculators/richardson-2025.html` - Main calculator page
+- `/calculators/richardson-quote-service.js` - Quote service for database
+- `/calculators/test-richardson.html` - Test suite
+
+### Implementation Notes
+1. **Cap Data**: Maintained all 100+ Richardson styles with accurate pricing
+2. **Embroidery Tiers**: 
+   - 5,000 stitches: $9.75-$6.75
+   - 8,000 stitches: $12.00-$8.50
+   - 10,000 stitches: $13.50-$11.00
+3. **Quote Structure**: Supports multiple line items in single quote
+4. **Print Support**: Generates clean print-friendly quotes
+
+### Usage
+1. Navigate to `/calculators/richardson-2025.html`
+2. Enter customer and project names
+3. Select embroidery stitch count
+4. Add cap styles using autocomplete
+5. Enter quantities
+6. Calculate quote
+7. Send via email with optional database save
+
 ## Final Tips
 
 1. **Read the console logs** - They tell you exactly what's happening

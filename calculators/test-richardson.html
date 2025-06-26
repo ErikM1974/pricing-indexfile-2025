@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Richardson Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #3a7c52;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #2d5f3f;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Richardson Calculator Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>Pricing Calculations Test</h2>
+        <button class="test-button" onclick="testPricingCalculations()">Run Pricing Tests</button>
+        <div id="pricingResults" class="results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Quote Service Test</h2>
+        <button class="test-button" onclick="testQuoteService()">Test Quote Service</button>
+        <div id="serviceResults" class="results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Live Calculator</h2>
+        <p>Click below to open the actual Richardson calculator:</p>
+        <button class="test-button" onclick="window.open('richardson-2025.html', '_blank')">Open Calculator</button>
+    </div>
+
+    <script src="richardson-quote-service.js"></script>
+    <script>
+        // Test data
+        const testCapData = [
+            { style: '112', description: 'Trucker Mesh Back', price: 6.50 },
+            { style: '110', description: 'R-Flex Trucker', price: 7.65 },
+            { style: '256', description: 'Umpqua Gramps Cap', price: 9.25 }
+        ];
+        
+        const embroideryCosts = {
+            '5000': { '1-23': 9.75, '24-47': 8.75, '48-71': 7.75, '72-99999': 6.75 },
+            '8000': { '1-23': 12.00, '24-47': 10.00, '48-71': 10.00, '72-99999': 8.50 },
+            '10000': { '1-23': 13.50, '24-47': 12.50, '48-71': 11.50, '72-99999': 11.00 }
+        };
+        
+        function getEmbroideryCost(stitchCount, quantity) {
+            const tiers = embroideryCosts[stitchCount];
+            for (const tier in tiers) {
+                const [min, max] = tier.split('-').map(Number);
+                if (quantity >= min && quantity <= max) {
+                    return tiers[tier];
+                }
+            }
+            return tiers['72-99999'];
+        }
+        
+        function testPricingCalculations() {
+            const results = document.getElementById('pricingResults');
+            let output = 'Testing Pricing Calculations...\n\n';
+            
+            // Test 1: Single item, small quantity (should have LTM)
+            output += 'Test 1: Single Style (112), Qty 12, 8000 stitches\n';
+            const cap1 = testCapData[0];
+            const qty1 = 12;
+            const stitches1 = '8000';
+            const embCost1 = getEmbroideryCost(stitches1, qty1);
+            const markedUp1 = cap1.price / 0.6;
+            const decorated1 = markedUp1 + embCost1;
+            const base1 = Math.ceil(decorated1);
+            const ltmPerUnit1 = 50.00 / qty1;
+            const final1 = base1 + ltmPerUnit1;
+            const total1 = final1 * qty1;
+            
+            output += `  Cap base price: $${cap1.price}\n`;
+            output += `  Marked up (÷0.6): $${markedUp1.toFixed(2)}\n`;
+            output += `  Embroidery cost: $${embCost1}\n`;
+            output += `  Base decorated: $${base1}\n`;
+            output += `  LTM per unit: $${ltmPerUnit1.toFixed(2)}\n`;
+            output += `  Final per piece: $${final1.toFixed(2)}\n`;
+            output += `  Line total: $${total1.toFixed(2)}\n\n`;
+            
+            // Test 2: Multiple items, larger quantity (no LTM)
+            output += 'Test 2: Three Styles, Total Qty 48, 5000 stitches\n';
+            const items = [
+                { cap: testCapData[0], qty: 24 },
+                { cap: testCapData[1], qty: 12 },
+                { cap: testCapData[2], qty: 12 }
+            ];
+            const totalQty2 = 48;
+            const stitches2 = '5000';
+            const embCost2 = getEmbroideryCost(stitches2, totalQty2);
+            let grandTotal2 = 0;
+            
+            items.forEach((item, i) => {
+                const markedUp = item.cap.price / 0.6;
+                const decorated = markedUp + embCost2;
+                const base = Math.ceil(decorated);
+                const lineTotal = base * item.qty;
+                grandTotal2 += lineTotal;
+                
+                output += `  Style ${item.cap.style}: ${item.qty} @ $${base}/ea = $${lineTotal.toFixed(2)}\n`;
+            });
+            
+            output += `  Grand Total: $${grandTotal2.toFixed(2)}\n\n`;
+            
+            // Test 3: Tier boundary test
+            output += 'Test 3: Pricing Tier Boundaries\n';
+            const testQtys = [23, 24, 47, 48, 71, 72];
+            testQtys.forEach(q => {
+                const cost = getEmbroideryCost('8000', q);
+                output += `  Qty ${q}: $${cost}/piece embroidery\n`;
+            });
+            
+            results.textContent = output;
+        }
+        
+        async function testQuoteService() {
+            const results = document.getElementById('serviceResults');
+            let output = 'Testing Quote Service...\n\n';
+            
+            try {
+                // Initialize service
+                const service = new RichardsonQuoteService();
+                output += '✓ Service initialized\n';
+                
+                // Test quote ID generation
+                const quoteId = service.generateQuoteID();
+                output += `✓ Generated Quote ID: ${quoteId}\n`;
+                
+                // Test pricing tier
+                output += '\nTesting pricing tiers:\n';
+                [12, 24, 48, 72].forEach(qty => {
+                    const tier = service.getPricingTier(qty);
+                    output += `  Qty ${qty}: Tier "${tier}"\n`;
+                });
+                
+                // Test quote data structure
+                const testQuoteData = {
+                    customerName: 'Test Customer',
+                    customerEmail: 'test@example.com',
+                    customerPhone: '(555) 123-4567',
+                    companyName: 'Test Company',
+                    projectName: 'Test Richardson Quote',
+                    stitchCount: '8000',
+                    items: [
+                        {
+                            styleNumber: '112',
+                            description: 'Trucker Mesh Back',
+                            capPrice: 6.50,
+                            quantity: 24,
+                            embroideryPrice: 10.00,
+                            pricePerPiece: 28.00,
+                            lineTotal: 672.00,
+                            ltmPerUnit: 0
+                        }
+                    ],
+                    ltmFeeTotal: 0
+                };
+                
+                output += '\n✓ Quote data structure created\n';
+                output += `  Customer: ${testQuoteData.customerName}\n`;
+                output += `  Items: ${testQuoteData.items.length}\n`;
+                output += `  Total Quantity: ${testQuoteData.items[0].quantity}\n`;
+                
+                // Note: Actual API call would go here
+                output += '\n[API calls disabled in test mode]\n';
+                
+            } catch (error) {
+                output += `\n❌ Error: ${error.message}\n`;
+            }
+            
+            results.textContent = output;
+        }
+    </script>
+</body>
+</html>
