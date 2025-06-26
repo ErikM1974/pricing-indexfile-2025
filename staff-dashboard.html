@@ -529,6 +529,7 @@
         <div class="loading-spinner"></div>
     </div>
 
+
     <!-- Hidden Caspio Authentication Container -->
     <div class="caspio-hidden-container">
         <!-- Caspio Authentication DataPage -->
@@ -750,16 +751,34 @@
     <script>
         // Wait for page and Caspio to load
         window.addEventListener('load', function() {
-            // Give Caspio time to render and insert auth data
-            setTimeout(function() {
-                initializePortal();
-            }, 1500);
+            // Try to initialize portal with retry mechanism
+            let retryCount = 0;
+            const maxRetries = 10;
+            
+            function attemptInitialization() {
+                // Check if Caspio has loaded the data
+                const caspioData = document.querySelector('.cbResultSetData');
+                
+                if (caspioData && caspioData.textContent.trim()) {
+                    initializePortal();
+                } else if (retryCount < maxRetries) {
+                    retryCount++;
+                    setTimeout(attemptInitialization, 500);
+                } else {
+                    // Fallback to generic welcome
+                    initializePortal();
+                }
+            }
+            
+            // Start checking after initial delay
+            setTimeout(attemptInitialization, 1000);
         });
 
         function initializePortal() {
             // Try to get authenticated user data from Caspio
-            // Caspio should populate spans with IDs like auth-firstname
-            const firstName = document.getElementById('auth-firstname')?.textContent?.trim() || 
+            // Caspio outputs the first name in a dd element with class cbResultSetData
+            const firstName = document.querySelector('.cbResultSetData')?.textContent?.trim() || 
+                            document.getElementById('auth-firstname')?.textContent?.trim() || 
                             document.querySelector('[id*="firstname"]')?.textContent?.trim() || 
                             'Team Member';
             const lastName = document.getElementById('auth-lastname')?.textContent?.trim() || 
@@ -849,13 +868,7 @@
             }
         }
 
-        // Fallback if Caspio doesn't load or user data not found
-        setTimeout(function() {
-            if (!document.getElementById('mainContent').classList.contains('show')) {
-                console.warn('Caspio data not loaded, showing default view');
-                initializePortal();
-            }
-        }, 3000);
+        // Remove old fallback - we have a better retry mechanism now
     </script>
 </body>
 </html>
