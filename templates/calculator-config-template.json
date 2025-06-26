@@ -1,0 +1,86 @@
+{
+  "calculatorInfo": {
+    "name": "{{CALCULATOR_NAME}}",
+    "title": "{{CALCULATOR_TITLE}}",
+    "subtitle": "{{CALCULATOR_SUBTITLE}}",
+    "urlPath": "{{URL_PATH}}",
+    "type": "{{CALCULATOR_TYPE}}",
+    "className": "{{CALCULATOR_CLASS_NAME}}",
+    "scriptName": "{{SCRIPT_NAME}}",
+    "variableName": "{{VARIABLE_NAME}}"
+  },
+  
+  "dashboard": {
+    "icon": "fa-{{ICON_NAME}}",
+    "label": "{{DASHBOARD_LABEL}}",
+    "badge": "NEW 2025",
+    "section": "Contract Pricing | Customer Supplied | Specialty Items"
+  },
+  
+  "quoteSettings": {
+    "prefix": "{{QUOTE_PREFIX}}",
+    "storageKey": "{{STORAGE_KEY}}",
+    "sessionPrefix": "{{SESSION_PREFIX}}",
+    "embellishmentType": "{{EMBELLISHMENT_TYPE}}"
+  },
+  
+  "emailSettings": {
+    "templateId": "{{EMAIL_TEMPLATE_ID}}",
+    "templateName": "{{EMAIL_TEMPLATE_NAME}}",
+    "serviceId": "service_1c4k67j",
+    "publicKey": "4qSbDO-SQs19TbP80"
+  },
+  
+  "pricingLogic": {
+    "type": "tiered | flat | custom",
+    "ltmThreshold": 24,
+    "ltmFee": 50.00,
+    "marginFormula": "price / 0.6",
+    "tiers": {
+      "example": {
+        "1-23": 10.00,
+        "24-47": 8.00,
+        "48-71": 6.00,
+        "72+": 5.00
+      }
+    }
+  },
+  
+  "formFields": [
+    {
+      "id": "customerName",
+      "label": "Customer Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter customer name"
+    },
+    {
+      "id": "projectName",
+      "label": "Project Name",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter project name"
+    }
+  ],
+  
+  "placeholders": {
+    "{{CALCULATOR_NAME}}": "Example: Richardson Caps",
+    "{{CALCULATOR_TITLE}}": "Example: Richardson Cap Pricing Calculator",
+    "{{CALCULATOR_SUBTITLE}}": "Example: Build multi-style cap quotes with embroidery pricing",
+    "{{URL_PATH}}": "Example: richardson-2025",
+    "{{CALCULATOR_TYPE}}": "Example: Richardson",
+    "{{CALCULATOR_CLASS_NAME}}": "Example: RichardsonCalculator",
+    "{{SCRIPT_NAME}}": "Example: richardson-2025",
+    "{{VARIABLE_NAME}}": "Example: richardsonCalculator",
+    "{{ICON_NAME}}": "Example: baseball-cap",
+    "{{DASHBOARD_LABEL}}": "Example: Richardson Caps",
+    "{{QUOTE_PREFIX}}": "Example: RICH",
+    "{{STORAGE_KEY}}": "Example: richardson",
+    "{{SESSION_PREFIX}}": "Example: rich",
+    "{{EMBELLISHMENT_TYPE}}": "Example: cap-embroidery",
+    "{{EMAIL_TEMPLATE_ID}}": "Example: Richardson_Template",
+    "{{EMAIL_TEMPLATE_NAME}}": "Example: Richardson Cap Quote",
+    "{{EMPTY_STATE_MESSAGE}}": "Example: Add cap styles and quantities to get started",
+    "{{SECONDARY_LOGO}}": "Optional: <img src='logo-url' alt='Brand' class='secondary-logo'>"
+  }
+}

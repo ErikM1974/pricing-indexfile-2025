@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{{CALCULATOR_TITLE}} - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- {{CALCULATOR_TYPE}} Quote Service -->
+    <script src="{{CALCULATOR_SCRIPT}}-quote-service.js"></script>
+    
+    <style>
+        /* Root variables matching dashboard theme */
+        :root {
+            --primary-green: #3a7c52;
+            --primary-dark: #1a472a;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Standard Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Page Header (optional secondary logo placement) */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            gap: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* Calculator Grid */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary-green);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: var(--focus-shadow);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-fullwidth {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #d1d5db;
+        }
+
+        /* Quote Summary */
+        .quote-summary {
+            background: var(--hover-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .summary-label {
+            color: var(--text-secondary);
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Quote Table */
+        .quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .quote-table th {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .quote-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Total Section */
+        .total-section {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-label {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        .total-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-backdrop.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: var(--primary-green);
+        }
+
+        /* Messages */
+        .success-message {
+            background: var(--success-bg);
+            color: var(--success-text);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Loading */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-green);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .total-amount {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            #printContent, #printContent * {
+                visibility: visible;
+            }
+            
+            #printContent {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+
+        /* ========================================
+           CALCULATOR-SPECIFIC STYLES
+           Add any unique styles for this calculator below
+           ======================================== */
+        
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NW%20Custom%20Logo%20Official%20White%20Outline.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>{{CALCULATOR_NAME}}</span>
+                </nav>
+            </div>
+            <div class="user-welcome">
+                {{CALCULATOR_NAME}} Calculator
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Optional: Add secondary logo here -->
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1 class="page-title">{{CALCULATOR_TITLE}}</h1>
+                <p class="page-subtitle">{{CALCULATOR_SUBTITLE}}</p>
+            </div>
+            <!-- {{SECONDARY_LOGO}} -->
+        </div>
+
+        <div class="calculator-grid">
+            <!-- Input Section -->
+            <div class="input-section">
+                <h2 class="section-title">
+                    <i class="fas fa-calculator"></i>
+                    Build Your Quote
+                </h2>
+
+                <form id="calculatorForm">
+                    <!-- ==================================
+                         CALCULATOR-SPECIFIC FORM FIELDS
+                         Replace this section with your calculator's specific inputs
+                         ================================== -->
+                    
+                    <!-- Example: Customer Info -->
+                    <div class="form-group">
+                        <label class="form-label" for="customerName">Customer Name</label>
+                        <input type="text" id="customerName" class="form-input" placeholder="Enter customer name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="projectName">Project Name</label>
+                        <input type="text" id="projectName" class="form-input" placeholder="Enter project name">
+                    </div>
+
+                    <!-- Add more calculator-specific fields here -->
+                    
+                    <!-- Calculate Button -->
+                    <button type="submit" class="btn btn-primary btn-fullwidth">
+                        <i class="fas fa-calculator"></i>
+                        Calculate Quote
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <div id="emptyState" class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>Your quote will appear here</h3>
+                    <p>{{EMPTY_STATE_MESSAGE}}</p>
+                </div>
+
+                <div id="resultsDisplay" class="hidden">
+                    <!-- Quote results will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Quote Modal -->
+    <div id="quoteModal" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Send Quote</h2>
+                <button type="button" class="modal-close" id="modalClose">&times;</button>
+            </div>
+
+            <!-- Sales Rep Selection (if needed) -->
+            <div class="form-group">
+                <label class="form-label" for="salesRep">Sales Representative</label>
+                <select id="salesRep" class="form-select" required>
+                    <option value="">Select a sales rep...</option>
+                    <option value="taylar@nwcustomapparel.com">Taylar</option>
+                    <option value="nika@nwcustomapparel.com">Nika</option>
+                    <option value="erik@nwcustomapparel.com">Erik</option>
+                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                    <option value="sales@nwcustomapparel.com">General Sales</option>
+                </select>
+            </div>
+
+            <form id="quoteForm">
+                <div class="form-group">
+                    <label class="form-label" for="quoteCustomerName">Customer Name</label>
+                    <input type="text" id="quoteCustomerName" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="customerEmail">Customer Email</label>
+                    <input type="email" id="customerEmail" class="form-input" required placeholder="customer@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="customerPhone">Phone Number (optional)</label>
+                    <input type="tel" id="customerPhone" class="form-input" placeholder="(555) 123-4567">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="companyName">Company Name (optional)</label>
+                    <input type="text" id="companyName" class="form-input">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="saveToDatabase" checked>
+                    <label for="saveToDatabase">Save quote to database</label>
+                </div>
+
+                <div id="quotePreview" class="quote-summary">
+                    <!-- Quote preview will be shown here -->
+                </div>
+
+                <button type="submit" class="btn btn-success btn-fullwidth">
+                    <i class="fas fa-paper-plane"></i>
+                    Send Quote
+                </button>
+            </form>
+
+            <div id="successMessage" class="success-message hidden">
+                <i class="fas fa-check-circle"></i>
+                <span>Quote sent successfully!</span>
+            </div>
+
+            <div id="errorMessage" class="error-message hidden">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorText">An error occurred. Please try again.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden print content -->
+    <div id="printContent" style="display: none;"></div>
+
+    <script>
+        /* ==========================================
+           {{CALCULATOR_TYPE}} CALCULATOR
+           
+           CONFIGURATION SECTION
+           Update these values for your specific calculator
+           ========================================== */
+        
+        const CALCULATOR_CONFIG = {
+            name: '{{CALCULATOR_NAME}}',
+            quotePrefix: '{{QUOTE_PREFIX}}', // e.g., 'DTG', 'RICH', 'EMB'
+            emailTemplateId: '{{EMAIL_TEMPLATE_ID}}',
+            emailServiceId: 'service_1c4k67j', // Standard NWCA service
+            emailPublicKey: '4qSbDO-SQs19TbP80' // Standard NWCA key
+        };
+
+        /* ==========================================
+           CALCULATOR CLASS
+           
+           Customize the methods below for your specific pricing logic
+           ========================================== */
+        
+        class {{CALCULATOR_CLASS_NAME}} {
+            constructor() {
+                this.currentQuote = null;
+                this.quoteService = new {{CALCULATOR_TYPE}}QuoteService();
+                
+                // Initialize EmailJS
+                emailjs.init(CALCULATOR_CONFIG.emailPublicKey);
+                
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                // Form elements
+                this.form = document.getElementById('calculatorForm');
+                this.customerNameInput = document.getElementById('customerName');
+                this.projectNameInput = document.getElementById('projectName');
+                
+                // Results elements
+                this.emptyState = document.getElementById('emptyState');
+                this.resultsDisplay = document.getElementById('resultsDisplay');
+                
+                // Modal elements
+                this.modal = document.getElementById('quoteModal');
+                this.modalClose = document.getElementById('modalClose');
+                this.quoteForm = document.getElementById('quoteForm');
+                this.quoteCustomerName = document.getElementById('quoteCustomerName');
+                this.customerEmail = document.getElementById('customerEmail');
+                this.customerPhone = document.getElementById('customerPhone');
+                this.companyName = document.getElementById('companyName');
+                this.salesRep = document.getElementById('salesRep');
+                this.saveToDatabase = document.getElementById('saveToDatabase');
+                this.quotePreview = document.getElementById('quotePreview');
+                this.successMessage = document.getElementById('successMessage');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.errorText = document.getElementById('errorText');
+                
+                // Add any calculator-specific element references here
+            }
+
+            bindEvents() {
+                this.form.addEventListener('submit', (e) => this.handleCalculate(e));
+                this.modalClose.addEventListener('click', () => this.closeModal());
+                this.modal.addEventListener('click', (e) => {
+                    if (e.target === this.modal) this.closeModal();
+                });
+                this.quoteForm.addEventListener('submit', (e) => this.handleQuoteSubmit(e));
+                
+                // Sync customer name between forms
+                this.customerNameInput.addEventListener('input', () => {
+                    this.quoteCustomerName.value = this.customerNameInput.value;
+                });
+                
+                // Add any calculator-specific event bindings here
+            }
+
+            handleCalculate(e) {
+                e.preventDefault();
+                
+                // Clear previous results
+                this.currentQuote = null;
+                
+                /* ==================================
+                   CALCULATOR-SPECIFIC LOGIC
+                   
+                   Implement your pricing calculations here
+                   Example structure:
+                   
+                   1. Get form values
+                   2. Validate inputs
+                   3. Calculate pricing
+                   4. Store quote data
+                   5. Display results
+                   ================================== */
+                
+                // Example: Get form values
+                const customerName = this.customerNameInput.value.trim();
+                const projectName = this.projectNameInput.value.trim();
+                
+                // TODO: Add your calculation logic here
+                
+                // Example quote structure
+                this.currentQuote = {
+                    customerName,
+                    projectName,
+                    // Add your calculated values here
+                    totalQuantity: 0,
+                    grandTotal: 0
+                };
+                
+                // Display results
+                this.displayResults();
+            }
+
+            displayResults() {
+                if (!this.currentQuote) return;
+                
+                /* ==================================
+                   RESULTS DISPLAY
+                   
+                   Customize how results are shown
+                   ================================== */
+                
+                let resultsHtml = `
+                    <h2 class="section-title">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        Quote Summary
+                    </h2>
+                    
+                    <!-- Add your results display here -->
+                    
+                    <div class="total-section">
+                        <div class="total-row">
+                            <span class="total-label">Total:</span>
+                            <span class="total-amount">$${this.currentQuote.grandTotal.toFixed(2)}</span>
+                        </div>
+                        
+                        <div class="button-container" style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button type="button" class="btn btn-secondary" onclick="window.print()">
+                                <i class="fas fa-print"></i>
+                                Print Quote
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="{{CALCULATOR_VAR}}.openModal()">
+                                <i class="fas fa-paper-plane"></i>
+                                Send Quote
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Update display
+                this.resultsDisplay.innerHTML = resultsHtml;
+                this.resultsDisplay.classList.remove('hidden');
+                this.emptyState.classList.add('hidden');
+            }
+
+            openModal() {
+                // Pre-fill customer name
+                this.quoteCustomerName.value = this.customerNameInput.value;
+                
+                // Show quote preview
+                this.updateQuotePreview();
+                
+                // Reset messages
+                this.successMessage.classList.add('hidden');
+                this.errorMessage.classList.add('hidden');
+                
+                // Show modal
+                this.modal.classList.add('active');
+                
+                // Focus appropriate field
+                if (this.quoteCustomerName.value) {
+                    this.customerEmail.focus();
+                } else {
+                    this.quoteCustomerName.focus();
+                }
+            }
+
+            closeModal() {
+                this.modal.classList.remove('active');
+            }
+
+            updateQuotePreview() {
+                if (!this.currentQuote) return;
+                
+                /* ==================================
+                   QUOTE PREVIEW
+                   
+                   Customize the preview shown in modal
+                   ================================== */
+                
+                this.quotePreview.innerHTML = `
+                    <div class="summary-row">
+                        <span class="summary-label">Total:</span>
+                        <span class="summary-value">$${this.currentQuote.grandTotal.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+
+            async handleQuoteSubmit(e) {
+                e.preventDefault();
+                
+                if (!this.currentQuote) return;
+                
+                // Show loading state
+                const submitBtn = this.quoteForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
+                submitBtn.disabled = true;
+                
+                try {
+                    // Get selected sales rep
+                    const selectedRep = this.salesRep.value;
+                    if (!selectedRep) {
+                        throw new Error('Please select a sales representative');
+                    }
+                    
+                    // Map sales rep emails to names
+                    const salesRepNames = {
+                        'taylar@nwcustomapparel.com': 'Taylar',
+                        'nika@nwcustomapparel.com': 'Nika',
+                        'erik@nwcustomapparel.com': 'Erik',
+                        'adriyella@nwcustomapparel.com': 'Adriyella',
+                        'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
+                    };
+                    
+                    // Prepare quote data
+                    const quoteData = {
+                        ...this.currentQuote,
+                        customerEmail: this.customerEmail.value,
+                        customerName: this.quoteCustomerName.value,
+                        customerPhone: this.customerPhone.value,
+                        companyName: this.companyName.value,
+                        salesRepEmail: selectedRep,
+                        salesRepName: salesRepNames[selectedRep]
+                    };
+                    
+                    // Save to database if checked
+                    let saveResult = null;
+                    if (this.saveToDatabase.checked) {
+                        saveResult = await this.quoteService.saveQuote(quoteData);
+                        if (!saveResult.success) {
+                            console.error('Database save failed:', saveResult.error);
+                        }
+                    }
+                    
+                    /* ==================================
+                       EMAIL DATA PREPARATION
+                       
+                       Customize email data for your template
+                       ================================== */
+                    
+                    const emailData = {
+                        to_email: this.customerEmail.value,
+                        reply_to: quoteData.salesRepEmail,
+                        customer_name: this.quoteCustomerName.value,
+                        project_name: this.currentQuote.projectName || CALCULATOR_CONFIG.name,
+                        quote_id: saveResult?.quoteID || `TEMP-${Date.now()}`,
+                        quote_date: new Date().toLocaleDateString(),
+                        // Add more email template variables here
+                        grand_total: `$${this.currentQuote.grandTotal.toFixed(2)}`,
+                        sales_rep_name: quoteData.salesRepName,
+                        sales_rep_email: quoteData.salesRepEmail,
+                        sales_rep_phone: '(253) 987-4339',
+                        company_year: '1977'
+                    };
+                    
+                    // Send email
+                    await emailjs.send(
+                        CALCULATOR_CONFIG.emailServiceId,
+                        CALCULATOR_CONFIG.emailTemplateId,
+                        emailData
+                    );
+                    
+                    // Show success
+                    this.successMessage.classList.remove('hidden');
+                    this.errorMessage.classList.add('hidden');
+                    
+                    // Reset form after delay
+                    setTimeout(() => {
+                        this.closeModal();
+                        this.quoteForm.reset();
+                        this.saveToDatabase.checked = true;
+                    }, 2000);
+                    
+                } catch (error) {
+                    console.error('Error sending quote:', error);
+                    this.errorText.textContent = 'Failed to send quote. Please try again.';
+                    this.errorMessage.classList.remove('hidden');
+                    this.successMessage.classList.add('hidden');
+                } finally {
+                    // Restore button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }
+        }
+
+        // Initialize calculator when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.{{CALCULATOR_VAR}} = new {{CALCULATOR_CLASS_NAME}}();
+        });
+
+        // Print functionality
+        window.addEventListener('beforeprint', () => {
+            if (!window.{{CALCULATOR_VAR}}?.currentQuote) return;
+            
+            const quote = window.{{CALCULATOR_VAR}}.currentQuote;
+            const printContent = document.getElementById('printContent');
+            
+            /* ==================================
+               PRINT TEMPLATE
+               
+               Customize the print layout
+               ================================== */
+            
+            printContent.innerHTML = `
+                <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="margin: 0;">Northwest Custom Apparel</h1>
+                        <p style="margin: 5px 0;">${CALCULATOR_CONFIG.name}</p>
+                        <p style="margin: 5px 0;">Date: ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    
+                    <!-- Add your print content here -->
+                    
+                    <div style="text-align: right; margin-top: 30px;">
+                        <h3>Total: $${quote.grandTotal.toFixed(2)}</h3>
+                    </div>
+                </div>
+            `;
+            
+            printContent.style.display = 'block';
+        });
+
+        window.addEventListener('afterprint', () => {
+            document.getElementById('printContent').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
