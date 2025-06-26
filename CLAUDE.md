@@ -251,6 +251,254 @@ git push origin branch-name
 - **FILES AFFECTED**: `staff-dashboard.html`
 - **KEY LEARNING**: Always test authentication features on production, not just localhost
 
+## Quote System Implementation Guide (2025-01-26)
+
+### Overview
+This guide documents how to implement quote functionality with EmailJS and Caspio database integration. This pattern is used across all calculator types (DTG, Embroidery, Screen Print, etc.).
+
+### 1. EmailJS Template Setup
+
+#### A. Create Template in EmailJS Dashboard
+1. Log into EmailJS.com
+2. Go to Email Templates → Create New Template
+3. Set up template variables and HTML structure
+
+#### B. Required Template Variables
+```
+{{to_email}}         - Customer's email address
+{{from_name}}        - Sales rep name (sender)
+{{reply_to}}         - Reply-to email address
+{{cc_email}}         - CC recipients (optional)
+{{customer_name}}    - Customer's full name
+{{company_name}}     - Company name
+{{customer_phone}}   - Phone number
+{{quote_id}}         - Unique quote identifier
+{{decoration_method}} - Type of decoration/service
+{{products_html}}    - HTML table with pricing details
+{{notes}}            - Additional notes/instructions
+```
+
+#### C. EmailJS Configuration Settings
+- **To Email**: `{{to_email}}`
+- **From Name**: `{{from_name}}`
+- **From Email**: Use Default Email Address ✓
+- **Reply To**: `{{reply_to}}`
+- **CC**: `{{cc_email}}`
+- **Subject**: `Contract DTG Quote {{quote_id}} - {{customer_name}}`
+
+#### D. HTML Email Template Structure
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: white; }
+        .header { background-color: #2f661e; padding: 20px; text-align: center; }
+        .header h1 { color: white; margin: 0; font-size: 24px; }
+        .content { padding: 30px; }
+        .info-section { background: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        /* Add more styles as needed */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NORTHWEST CUSTOM APPAREL</h1>
+            <p>Quote - {{quote_id}}</p>
+        </div>
+        <div class="content">
+            <!-- Customer info section -->
+            <!-- Pricing table: {{{products_html}}} -->
+            <!-- Contact information -->
+        </div>
+    </div>
+</body>
+</html>
+```
+
+### 2. Caspio Database Structure
+
+#### A. Quote Sessions Table (quote_sessions)
+Stores main quote information:
+```
+QuoteID         - STRING (Primary Key) - Format: DTG0126-1, EMB0126-2, etc.
+SessionID       - STRING - Unique session identifier
+CustomerEmail   - STRING - Customer's email
+CustomerName    - STRING - Customer name
+CompanyName     - STRING - Company name (optional)
+Phone           - STRING - Phone number (optional)
+TotalQuantity   - NUMBER - Total items quantity
+SubtotalAmount  - NUMBER - Subtotal before fees
+LTMFeeTotal     - NUMBER - Less Than Minimum fees
+TotalAmount     - NUMBER - Grand total
+Status          - STRING - Quote status (Open/Closed)
+ExpiresAt       - DATETIME - Expiration date (30 days)
+Notes           - TEXT - Additional notes
+CreatedAt       - DATETIME - Creation timestamp
+```
+
+#### B. Quote Items Table (quote_items)
+Stores individual line items:
+```
+QuoteID             - STRING (Foreign Key) - Links to quote_sessions
+LineNumber          - NUMBER - Sequential line number
+StyleNumber         - STRING - Product style or "CUSTOMER-SUPPLIED"
+ProductName         - STRING - Product/service name
+Color               - STRING - Color or garment type
+ColorCode           - STRING - Color code (optional)
+EmbellishmentType   - STRING - dtg/embroidery/screenprint
+PrintLocation       - STRING - Location(s) for decoration
+PrintLocationName   - STRING - Human-readable location
+Quantity            - NUMBER - Item quantity
+HasLTM              - STRING - "Yes"/"No"
+BaseUnitPrice       - NUMBER - Price per item
+LTMPerUnit          - NUMBER - LTM fee per unit
+FinalUnitPrice      - NUMBER - Final price per item
+LineTotal           - NUMBER - Total for line
+SizeBreakdown       - STRING - JSON with size distribution
+PricingTier         - STRING - "1-23", "24-47", etc.
+ImageURL            - STRING - Product image (optional)
+AddedAt             - DATETIME - Timestamp
+```
+
+### 3. API Configuration
+
+#### A. Proxy Server Endpoint
+```
+Base URL: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
+```
+
+#### B. API Endpoints
+```
+POST /api/quote_sessions - Create new quote session
+POST /api/quote_items    - Add items to quote
+GET  /api/quote_sessions?quoteID={id} - Retrieve quote session
+GET  /api/quote_items?quoteID={id}    - Retrieve quote items
+```
+
+### 4. Implementation Pattern
+
+#### A. Quote Service Template
+Create a service file for each calculator type:
+```javascript
+class [Type]QuoteService {
+    constructor() {
+        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    }
+
+    generateQuoteID() {
+        const now = new Date();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const dateKey = `${month}${day}`;
+        
+        // Use specific prefix for each type: DTG, EMB, SP, etc.
+        const storageKey = `[type]_quote_sequence_${dateKey}`;
+        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
+        sessionStorage.setItem(storageKey, sequence.toString());
+        
+        return `[PREFIX]${dateKey}-${sequence}`;
+    }
+
+    async saveQuote(quoteData) {
+        // 1. Create session
+        // 2. Add items
+        // 3. Return result
+    }
+}
+```
+
+#### B. Integration with Calculator
+```javascript
+// In calculator class
+constructor() {
+    this.quoteService = new [Type]QuoteService();
+    this.emailConfig = {
+        publicKey: '4qSbDO-SQs19TbP80',
+        serviceId: 'service_1c4k67j',
+        templateId: 'template_[specific_id]'
+    };
+}
+
+async handleQuoteSubmit(e) {
+    // 1. Validate form
+    // 2. Save to database (if checkbox checked)
+    // 3. Send email
+    // 4. Show success message
+}
+```
+
+#### C. Modal Form Structure
+```html
+<div class="modal-backdrop" id="quoteModal">
+    <div class="modal">
+        <form id="quoteForm">
+            <!-- Customer info fields -->
+            <input type="text" id="customerName" required>
+            <input type="email" id="customerEmail" required>
+            
+            <!-- Quote preview -->
+            <div class="quote-preview" id="quotePreview"></div>
+            
+            <!-- Save option -->
+            <label>
+                <input type="checkbox" id="saveToDatabase" checked>
+                Save quote to database
+            </label>
+            
+            <!-- Submit buttons -->
+            <button type="submit">Send Quote</button>
+        </form>
+    </div>
+</div>
+```
+
+### 5. Quote ID Patterns
+
+Different prefixes for different calculator types:
+- **DTG**: `DTG{MMDD}-{sequence}` (e.g., DTG0126-1)
+- **Embroidery**: `EMB{MMDD}-{sequence}`
+- **Screen Print**: `SP{MMDD}-{sequence}`
+- **Product Quotes**: `Q{MMDD}-{sequence}`
+
+### 6. Error Handling
+
+Always implement graceful error handling:
+```javascript
+try {
+    const saveResult = await this.quoteService.saveQuote(data);
+    if (!saveResult.success) {
+        console.error('Save failed:', saveResult.error);
+        // Continue with email send
+    }
+} catch (error) {
+    console.error('Error:', error);
+    // Show user-friendly message
+}
+```
+
+### 7. Testing Checklist
+
+- [ ] EmailJS template created and configured
+- [ ] Template variables match code implementation
+- [ ] Quote saves to both database tables
+- [ ] Quote ID generates correctly
+- [ ] Email sends with proper formatting
+- [ ] Success/error messages display
+- [ ] Form validation works
+- [ ] Database checkbox functions
+- [ ] Reply-to email set correctly
+- [ ] CC recipients receive email
+
+### 8. Common Issues and Solutions
+
+1. **CORS Errors**: Ensure proxy server is running and accessible
+2. **Missing Fields**: Check that all required Caspio fields are included
+3. **Date Formatting**: Use ISO format for Caspio: `date.toISOString().replace(/\.\d{3}Z$/, '')`
+4. **Quote ID Conflicts**: Each calculator type needs unique prefix and storage key
+5. **Email Not Sending**: Verify EmailJS service limits and template ID
+
 ## Final Tips
 
 1. **Read the console logs** - They tell you exactly what's happening

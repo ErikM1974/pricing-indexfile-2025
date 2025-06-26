@@ -9,6 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- DTG Quote Service -->
+    <script src="dtg-quote-service.js"></script>
+    
     <style>
         /* Root variables matching dashboard theme */
         :root {
@@ -574,6 +580,196 @@
             font-size: 0.875rem;
         }
 
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-backdrop.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
+        }
+
+        .form-input.error {
+            border-color: #ef4444;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .quote-preview {
+            background: var(--hover-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .quote-preview h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .preview-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+        }
+
+        .preview-line.strong {
+            font-weight: 600;
+            color: var(--text-primary);
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Success/Error Messages */
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid #86efac;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading State */
+        .btn.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top-color: white;
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .calculator-grid {
@@ -850,6 +1046,83 @@
         </div>
     </main>
 
+    <!-- Quote Modal -->
+    <div class="modal-backdrop" id="quoteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Send DTG Quote</h3>
+                <button class="modal-close" id="closeModal" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="modalMessage"></div>
+
+            <form id="quoteForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="customerName">Customer Name *</label>
+                        <input type="text" id="customerName" class="form-input" required>
+                        <div class="error-message">Please enter customer name</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="companyName">Company Name</label>
+                        <input type="text" id="companyName" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="customerEmail">Customer Email *</label>
+                        <input type="email" id="customerEmail" class="form-input" required>
+                        <div class="error-message">Please enter a valid email</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="customerPhone">Phone Number</label>
+                        <input type="tel" id="customerPhone" class="form-input" placeholder="(253) 555-0123">
+                    </div>
+                </div>
+
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label class="form-label" for="senderName">Your Name *</label>
+                        <input type="text" id="senderName" class="form-input" required>
+                        <div class="error-message">Please enter your name</div>
+                    </div>
+                </div>
+
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label class="form-label" for="notes">Additional Notes</label>
+                        <textarea id="notes" class="form-input" rows="3" 
+                                  placeholder="Any special instructions or details..."></textarea>
+                    </div>
+                </div>
+
+                <div class="quote-preview" id="quotePreview">
+                    <!-- Preview will be populated by JavaScript -->
+                </div>
+
+                <div class="form-row single" style="margin-top: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="saveToDatabase" checked style="width: auto; margin: 0;">
+                        <span style="font-weight: 500; color: var(--text-primary);">Save quote to database for future reference</span>
+                    </label>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitQuoteBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Quote
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // DTG Contract Pricing Calculator
         class DTGCalculator {
@@ -865,6 +1138,16 @@
                     JB: [12.75, 10.50, 9.75, 9.00]
                 };
 
+                // EmailJS Configuration
+                this.emailConfig = {
+                    publicKey: '4qSbDO-SQs19TbP80',
+                    serviceId: 'service_1c4k67j',
+                    templateId: 'template_ug8o3ug' // DTG-specific template
+                };
+
+                // Current calculation data
+                this.currentQuoteData = null;
+
                 // Elements
                 this.elements = {
                     quantity: document.getElementById('quantity'),
@@ -876,13 +1159,35 @@
                     tierIndicator: document.getElementById('tierIndicator'),
                     resetBtn: document.getElementById('resetBtn'),
                     sendQuoteBtn: document.getElementById('sendQuoteBtn'),
-                    userWelcome: document.getElementById('userWelcome')
+                    userWelcome: document.getElementById('userWelcome'),
+                    // Modal elements
+                    quoteModal: document.getElementById('quoteModal'),
+                    quoteForm: document.getElementById('quoteForm'),
+                    closeModal: document.getElementById('closeModal'),
+                    cancelBtn: document.getElementById('cancelBtn'),
+                    modalMessage: document.getElementById('modalMessage'),
+                    quotePreview: document.getElementById('quotePreview'),
+                    // Form fields
+                    customerName: document.getElementById('customerName'),
+                    companyName: document.getElementById('companyName'),
+                    customerEmail: document.getElementById('customerEmail'),
+                    customerPhone: document.getElementById('customerPhone'),
+                    senderName: document.getElementById('senderName'),
+                    notes: document.getElementById('notes'),
+                    submitQuoteBtn: document.getElementById('submitQuoteBtn'),
+                    saveToDatabase: document.getElementById('saveToDatabase')
                 };
+
+                // Initialize quote service
+                this.quoteService = new DTGQuoteService();
 
                 this.init();
             }
 
             init() {
+                // Initialize EmailJS
+                emailjs.init(this.emailConfig.publicKey);
+
                 // Display user name
                 this.displayUserName();
 
@@ -896,6 +1201,28 @@
                 });
                 this.elements.isHeavyweight.addEventListener('change', () => this.calculate());
                 this.elements.resetBtn.addEventListener('click', () => this.reset());
+                this.elements.sendQuoteBtn.addEventListener('click', () => this.openQuoteModal());
+
+                // Modal event listeners
+                this.elements.closeModal.addEventListener('click', () => this.closeModal());
+                this.elements.cancelBtn.addEventListener('click', () => this.closeModal());
+                this.elements.quoteModal.addEventListener('click', (e) => {
+                    if (e.target === this.elements.quoteModal) {
+                        this.closeModal();
+                    }
+                });
+                this.elements.quoteForm.addEventListener('submit', (e) => this.handleQuoteSubmit(e));
+
+                // Form input listeners for preview update
+                ['customerName', 'companyName', 'customerEmail', 'customerPhone', 'notes'].forEach(field => {
+                    this.elements[field].addEventListener('input', () => this.updateQuotePreview());
+                });
+
+                // Load saved sender name - default to Ruthie
+                const savedSenderName = localStorage.getItem('nwca_sender_name') || 
+                                      sessionStorage.getItem('nwca_user_firstname') || 
+                                      'Ruthie Nhoung';
+                this.elements.senderName.value = savedSenderName;
 
                 // Restore saved state
                 this.restoreState();
@@ -905,8 +1232,11 @@
                     if (e.ctrlKey && e.key === 's') {
                         e.preventDefault();
                         if (!this.elements.sendQuoteBtn.disabled) {
-                            this.sendQuote();
+                            this.openQuoteModal();
                         }
+                    }
+                    if (e.key === 'Escape' && this.elements.quoteModal.classList.contains('active')) {
+                        this.closeModal();
                     }
                 });
             }
@@ -989,16 +1319,24 @@
                 const pricePerPiece = totalPrintCost + ltmFeePerPiece + heavyweightSurcharge;
                 const totalCost = pricePerPiece * quantity;
 
-                // Display results
-                this.displayResults({
+                // Store current quote data
+                this.currentQuoteData = {
                     quantity,
                     tierIndex,
                     locationBreakdown,
                     ltmFeePerPiece,
                     heavyweightSurcharge,
                     pricePerPiece,
-                    totalCost
-                });
+                    totalCost,
+                    activeLocations: activeLocations.map(cb => ({
+                        code: cb.dataset.location,
+                        name: cb.dataset.name
+                    })),
+                    isHeavyweight
+                };
+
+                // Display results
+                this.displayResults(this.currentQuoteData);
 
                 // Enable send quote button
                 this.elements.sendQuoteBtn.disabled = false;
@@ -1135,10 +1473,342 @@
                 sessionStorage.removeItem('dtg_calculator_state');
             }
 
-            sendQuote() {
-                // This will be implemented when we add EmailJS
-                console.log('Send quote functionality will be added next');
-                alert('Quote sending will be implemented in the next phase');
+            openQuoteModal() {
+                if (!this.currentQuoteData) return;
+                
+                // Clear any previous messages
+                this.elements.modalMessage.innerHTML = '';
+                
+                // Update preview
+                this.updateQuotePreview();
+                
+                // Show modal
+                this.elements.quoteModal.classList.add('active');
+                
+                // Focus first field
+                this.elements.customerName.focus();
+            }
+
+            closeModal() {
+                this.elements.quoteModal.classList.remove('active');
+                this.clearFormErrors();
+            }
+
+            updateQuotePreview() {
+                if (!this.currentQuoteData) return;
+
+                const previewHTML = `
+                    <h4>Quote Summary</h4>
+                    <div class="preview-line">
+                        <span>Quantity:</span>
+                        <span>${this.currentQuoteData.quantity} items</span>
+                    </div>
+                    ${this.currentQuoteData.locationBreakdown.map(loc => `
+                        <div class="preview-line">
+                            <span>${loc.name}:</span>
+                            <span>${this.formatCurrency(loc.cost)}</span>
+                        </div>
+                    `).join('')}
+                    ${this.currentQuoteData.heavyweightSurcharge > 0 ? `
+                        <div class="preview-line">
+                            <span>Heavyweight Fee:</span>
+                            <span>+${this.formatCurrency(this.currentQuoteData.heavyweightSurcharge)}</span>
+                        </div>
+                    ` : ''}
+                    ${this.currentQuoteData.ltmFeePerPiece > 0 ? `
+                        <div class="preview-line">
+                            <span>LTM Fee:</span>
+                            <span>+${this.formatCurrency(this.currentQuoteData.ltmFeePerPiece)}</span>
+                        </div>
+                    ` : ''}
+                    <div class="preview-line strong">
+                        <span>Total Order:</span>
+                        <span>${this.formatCurrency(this.currentQuoteData.totalCost)}</span>
+                    </div>
+                `;
+
+                this.elements.quotePreview.innerHTML = previewHTML;
+            }
+
+            validateForm() {
+                let isValid = true;
+                this.clearFormErrors();
+
+                // Validate required fields
+                const requiredFields = [
+                    { element: this.elements.customerName, message: 'Please enter customer name' },
+                    { element: this.elements.customerEmail, message: 'Please enter a valid email' },
+                    { element: this.elements.senderName, message: 'Please enter your name' }
+                ];
+
+                requiredFields.forEach(field => {
+                    if (!field.element.value.trim()) {
+                        this.showFieldError(field.element, field.message);
+                        isValid = false;
+                    }
+                });
+
+                // Validate email format
+                if (this.elements.customerEmail.value && !this.isValidEmail(this.elements.customerEmail.value)) {
+                    this.showFieldError(this.elements.customerEmail, 'Please enter a valid email address');
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            showFieldError(element, message) {
+                element.classList.add('error');
+                const errorEl = element.nextElementSibling;
+                if (errorEl && errorEl.classList.contains('error-message')) {
+                    errorEl.textContent = message;
+                    errorEl.classList.add('show');
+                }
+            }
+
+            clearFormErrors() {
+                document.querySelectorAll('.form-input').forEach(input => {
+                    input.classList.remove('error');
+                });
+                document.querySelectorAll('.error-message').forEach(error => {
+                    error.classList.remove('show');
+                });
+            }
+
+            isValidEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+
+            async handleQuoteSubmit(e) {
+                e.preventDefault();
+
+                if (!this.validateForm()) return;
+
+                // Show loading state
+                this.elements.submitQuoteBtn.classList.add('loading');
+                this.elements.submitQuoteBtn.disabled = true;
+
+                try {
+                    // Generate quote ID using the service
+                    const quoteId = this.quoteService.generateQuoteID();
+
+                    // Build locations string
+                    const locationsStr = this.currentQuoteData.activeLocations
+                        .map(loc => loc.name)
+                        .join(', ');
+
+                    // Prepare email parameters matching the template structure
+                    const templateParams = {
+                        // Email routing
+                        to_email: this.elements.customerEmail.value,
+                        cc_email: '', // No CC needed since Ruthie is the sender
+                        
+                        // Customer info
+                        customer_name: this.elements.customerName.value,
+                        customer_phone: this.elements.customerPhone.value || 'Not provided',
+                        company_name: this.elements.companyName.value || 'Not provided',
+                        quote_id: quoteId,
+                        
+                        // Decoration details
+                        decoration_method: 'Direct-to-Garment (DTG) - Contract Printing',
+                        
+                        // Quote content
+                        products_html: this.generateDTGQuoteHTML(),
+                        
+                        // Notes
+                        notes: this.elements.notes.value || 'Customer to supply 100% cotton garments',
+                        
+                        // Sender info
+                        from_name: this.elements.senderName.value,
+                        reply_to: 'ruth@nwcustomapparel.com' // Changed from sender_email to reply_to
+                    };
+
+                    // Save to database if checkbox is checked
+                    let saveResult = null;
+                    if (this.elements.saveToDatabase.checked) {
+                        // Prepare quote data for saving
+                        const quoteDataForSave = {
+                            customerEmail: this.elements.customerEmail.value,
+                            customerName: this.elements.customerName.value,
+                            companyName: this.elements.companyName.value || '',
+                            customerPhone: this.elements.customerPhone.value || '',
+                            notes: this.elements.notes.value || '',
+                            quantity: this.currentQuoteData.quantity,
+                            locations: this.currentQuoteData.activeLocations.map(loc => loc.name),
+                            isHeavyweight: this.currentQuoteData.isHeavyweight,
+                            pricePerPiece: this.currentQuoteData.pricePerPiece,
+                            totalCost: this.currentQuoteData.totalCost,
+                            ltmFeePerPiece: this.currentQuoteData.ltmFeePerPiece,
+                            ltmFeeTotal: this.currentQuoteData.ltmFeePerPiece ? 
+                                this.currentQuoteData.ltmFeePerPiece * this.currentQuoteData.quantity : 0
+                        };
+
+                        console.log('[DTG Calculator] Saving quote to database...');
+                        saveResult = await this.quoteService.saveQuote(quoteDataForSave);
+                        
+                        if (!saveResult.success) {
+                            console.error('[DTG Calculator] Failed to save quote:', saveResult.error);
+                            // Don't stop the email send if database save fails
+                        } else {
+                            console.log('[DTG Calculator] Quote saved successfully with ID:', quoteId);
+                        }
+                    }
+
+                    // Send email
+                    await emailjs.send(
+                        this.emailConfig.serviceId,
+                        this.emailConfig.templateId,
+                        templateParams
+                    );
+
+                    // Save sender name
+                    localStorage.setItem('nwca_sender_name', this.elements.senderName.value);
+
+                    // Show success message
+                    let successMessage = 'Quote sent successfully!';
+                    if (saveResult && saveResult.success) {
+                        successMessage += ` Quote ID: ${quoteId}`;
+                    }
+                    this.showMessage('success', successMessage);
+                    
+                    // Close modal after delay
+                    setTimeout(() => {
+                        this.closeModal();
+                        this.elements.quoteForm.reset();
+                        // Reset checkbox to default checked state
+                        this.elements.saveToDatabase.checked = true;
+                    }, 2500);
+
+                } catch (error) {
+                    console.error('Failed to send quote:', error);
+                    this.showMessage('error', 'Failed to send quote. Please try again or contact support.');
+                } finally {
+                    this.elements.submitQuoteBtn.classList.remove('loading');
+                    this.elements.submitQuoteBtn.disabled = false;
+                }
+            }
+
+            generateDTGQuoteHTML() {
+                const data = this.currentQuoteData;
+                
+                let html = `
+                    <!-- Order Details -->
+                    <div style="background: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="margin: 0 0 15px 0; color: #2f661e; font-size: 18px;">Order Details</h3>
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="padding: 5px 0; width: 150px; font-weight: bold; color: #333;">Service:</td>
+                                <td style="padding: 5px 0;">Contract DTG Printing</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #333;">Quantity:</td>
+                                <td style="padding: 5px 0;">${data.quantity} items</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #333;">Garment Type:</td>
+                                <td style="padding: 5px 0;">${data.isHeavyweight ? 'Heavyweight (Sweatshirt)' : 'Standard Weight'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #333;">Print Locations:</td>
+                                <td style="padding: 5px 0;">${data.activeLocations.map(loc => loc.name).join(', ')}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Pricing Breakdown -->
+                    <div style="background: white; border: 2px solid #2f661e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="margin: 0 0 15px 0; color: #2f661e; font-size: 18px;">Pricing Breakdown</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                `;
+                
+                // Add print locations
+                data.locationBreakdown.forEach(location => {
+                    html += `
+                        <tr>
+                            <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;">
+                                ${location.name}
+                            </td>
+                            <td style="padding: 8px 0; text-align: right; border-bottom: 1px solid #e0e0e0;">
+                                $${this.formatPrice(location.cost)}
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                // Add fees if applicable
+                if (data.heavyweightSurcharge > 0) {
+                    html += `
+                        <tr>
+                            <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;">
+                                Heavyweight Garment Fee
+                            </td>
+                            <td style="padding: 8px 0; text-align: right; border-bottom: 1px solid #e0e0e0;">
+                                +$${this.formatPrice(data.heavyweightSurcharge)}
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                if (data.ltmFeePerPiece > 0) {
+                    html += `
+                        <tr>
+                            <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;">
+                                Less Than Minimum Fee
+                            </td>
+                            <td style="padding: 8px 0; text-align: right; border-bottom: 1px solid #e0e0e0;">
+                                +$${this.formatPrice(data.ltmFeePerPiece)}
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                html += `
+                            <tr style="border-top: 2px solid #2f661e;">
+                                <td style="padding: 12px 0 8px 0; font-weight: bold;">
+                                    Price per Item:
+                                </td>
+                                <td style="padding: 12px 0 8px 0; text-align: right; font-weight: bold;">
+                                    $${this.formatPrice(data.pricePerPiece)}
+                                </td>
+                            </tr>
+                            <tr style="background: #e8f5e9;">
+                                <td style="padding: 12px; font-size: 18px; font-weight: bold; color: #2f661e;">
+                                    TOTAL ORDER COST:
+                                </td>
+                                <td style="padding: 12px; text-align: right; font-size: 18px; font-weight: bold; color: #2f661e;">
+                                    $${this.formatPrice(data.totalCost)}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                        
+                    <!-- Important Requirements -->
+                    <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin-top: 20px;">
+                        <strong style="color: #856404;">Important DTG Requirements:</strong>
+                        <ul style="margin: 10px 0 0 20px; color: #856404; font-size: 14px;">
+                            <li>Customer must supply 100% cotton garments</li>
+                            <li>T-shirts and sweatshirts only</li>
+                            <li>Sweatshirts incur additional $2.00 heavyweight fee</li>
+                            <li>Artwork must be print-ready (300 DPI preferred)</li>
+                        </ul>
+                    </div>
+                `;
+                
+                return html;
+            }
+
+            formatPrice(amount) {
+                return parseFloat(amount || 0).toFixed(2);
+            }
+
+            showMessage(type, text) {
+                const messageHTML = `
+                    <div class="message ${type}">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                        <span>${text}</span>
+                    </div>
+                `;
+                this.elements.modalMessage.innerHTML = messageHTML;
             }
         }
 
