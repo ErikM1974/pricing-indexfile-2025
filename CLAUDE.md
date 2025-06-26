@@ -42,6 +42,11 @@ The system uses a "Master Bundle" pattern where:
 https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
 ```
 
+### Company Logo URL
+```
+https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1
+```
+
 ### Namespace
 All custom code should respect the `window.NWCA` namespace structure.
 
@@ -713,7 +718,51 @@ emailData = {
 };
 ```
 
-### 3. Grammar and Formatting Standards
+### 3. EmailJS Template Variable Best Practices
+
+**Problem**: "One or more dynamic variables are corrupted" error in EmailJS.
+
+**Common Causes & Solutions**:
+
+1. **Conditional Logic Issues**:
+   - **AVOID**: `{{#if personal_message}}...{{/if}}` - Can cause corruption with empty/undefined values
+   - **USE**: Direct variable placement `{{personal_message}}` - Shows nothing if empty
+   
+2. **Undefined Variables**:
+   ```javascript
+   // Always ensure variables have a value (even empty string)
+   const emailData = {
+       personal_message: personalMessage || '',  // Never undefined
+       optional_field: optionalValue || ''
+   };
+   ```
+
+3. **Template ID vs Template Name**:
+   - Template Name: What you call it (e.g., "Buyer Guide 2025")
+   - Template ID: What EmailJS uses (e.g., "template_wna04vr")
+   - Always use the Template ID in code, found at: https://dashboard.emailjs.com/admin/templates
+
+4. **Variable Naming**:
+   - Use consistent snake_case or camelCase
+   - Avoid special characters in variable names
+   - Match exactly between template and code
+
+**Debugging Template Issues**:
+```javascript
+// Always log data before sending
+console.log('Sending email with data:', emailData);
+
+// Better error handling
+try {
+    await emailjs.send(serviceId, templateId, emailData);
+} catch (error) {
+    console.error('EmailJS Error:', error);
+    console.error('Template ID:', templateId);
+    console.error('Data sent:', emailData);
+}
+```
+
+### 4. Grammar and Formatting Standards
 
 **Problem**: Incorrect pluralization and confusing descriptions.
 
@@ -729,14 +778,14 @@ const description = `Extra Thread Color${extraColors > 1 ? 's' : ''} (${extraCol
 // "Extra Thread Colors (2 colors beyond 4 included)"
 ```
 
-### 4. Contact Information Standards
+### 5. Contact Information Standards
 
 **Phone Number**: Always use **253-922-5793**
 - Format: XXX-XXX-XXXX (with hyphens)
 - Consistent across all templates and calculators
 - Update any instances of old numbers
 
-### 5. Sales Rep Integration
+### 6. Sales Rep Integration
 
 **Pattern for Contract Calculators**:
 ```javascript
@@ -759,7 +808,7 @@ const salesRepNames = {
 };
 ```
 
-### 6. Print Functionality
+### 7. Print Functionality
 
 **Standard Print Support**:
 - Include print CSS media queries
@@ -780,7 +829,7 @@ const salesRepNames = {
 }
 ```
 
-### 7. Theme Colors by Service Type
+### 8. Theme Colors by Service Type
 
 **Consistent Color Coding**:
 - **DTG**: Green theme (#3a7c52)
@@ -788,7 +837,7 @@ const salesRepNames = {
 - **Screen Print**: Orange theme (TBD)
 - **Richardson**: Green theme (#3a7c52)
 
-### 8. Error Prevention
+### 9. Error Prevention
 
 **Common Issues to Avoid**:
 1. **Missing HTML escaping**: Always escape user input in HTML
@@ -796,7 +845,7 @@ const salesRepNames = {
 3. **Missing required fields**: Validate before submission
 4. **Cross-origin issues**: Test auth features on production
 
-### 9. Testing Checklist for Contract Calculators
+### 10. Testing Checklist for Contract Calculators
 
 - [ ] LTM fee displays correctly with per-item breakdown
 - [ ] Grammar is correct for singular/plural items
