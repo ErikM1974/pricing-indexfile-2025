@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Laser Engraved Polar Camel Tumblers - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Laser Tumbler Quote Service -->
+    <script src="laser-tumbler-quote-service.js"></script>
+    
+    <style>
+        /* Root variables matching dashboard theme */
+        :root {
+            --primary-green: #3a7c52;
+            --primary-dark: #1a472a;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
+            --amber-bg: #fef3c7;
+            --amber-text: #92400e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+        }
+
+        .user-welcome {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Page Title */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Two Column Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Product Image */
+        .product-image {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: var(--hover-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-text {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Pricing Table */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .pricing-table th {
+            background: var(--primary-green);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .pricing-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pricing-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pricing-table .highlight {
+            background: var(--success-bg);
+        }
+
+        .quantity-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .quantity-sublabel {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .old-price {
+            color: #9ca3af;
+            text-decoration: line-through;
+            font-size: 0.875rem;
+        }
+
+        .new-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .price-unit {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .badge-amber {
+            background: var(--amber-bg);
+            color: var(--amber-text);
+        }
+
+        /* Notice Box */
+        .notice-box {
+            background: var(--warning-bg);
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .notice-box-blue {
+            background: #dbeafe;
+            border-color: #60a5fa;
+        }
+
+        .notice-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .notice-content {
+            flex: 1;
+        }
+
+        .notice-title {
+            font-weight: 600;
+            color: var(--warning-text);
+            margin-bottom: 0.25rem;
+        }
+
+        .notice-box-blue .notice-title {
+            color: #1e40af;
+        }
+
+        .notice-text {
+            font-size: 0.875rem;
+            color: #b45309;
+        }
+
+        .notice-box-blue .notice-text {
+            color: #2563eb;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: var(--focus-shadow);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-fullwidth {
+            width: 100%;
+        }
+
+        /* Quote Display */
+        .quote-display {
+            background: var(--hover-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .quote-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .quote-label {
+            color: var(--text-secondary);
+        }
+
+        .quote-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .quote-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .quote-total-label {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        .quote-total-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        /* Color Grid */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .color-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .color-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-swatch {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin: 0 auto 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .color-code {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Specifications Grid */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .spec-card {
+            background: var(--hover-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .spec-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .spec-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .spec-list li {
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+        }
+
+        .spec-list li::before {
+            content: '✓';
+            color: var(--primary-green);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-backdrop.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* Messages */
+        .success-message, .error-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .success-message {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+        }
+
+        /* Loading State */
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-green);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            #printContent, #printContent * {
+                visibility: visible;
+            }
+            
+            #printContent {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>Laser Tumblers</span>
+                </nav>
+            </div>
+            <div class="user-welcome">
+                Polar Camel 16 oz. Pint Calculator
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">Laser Engraved Polar Camel Tumblers</h1>
+            <p class="page-subtitle">Premium Quality • Custom Designs • Fast Turnaround</p>
+        </div>
+
+        <div class="content-grid">
+            <!-- Left Column - Product Info -->
+            <div>
+                <!-- Product Card -->
+                <div class="card">
+                    <h2 class="card-title">
+                        Polar Camel 16 oz. Pint
+                        <span class="badge badge-amber">Premium</span>
+                    </h2>
+                    
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Tumbler%20from%20JDS%20Mountain%20Top%20Propane.JPG?ver=1" 
+                         alt="Polar Camel Tumbler" 
+                         class="product-image">
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🔥</div>
+                            <div class="feature-text">Keeps Hot<br>8+ Hours</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">❄️</div>
+                            <div class="feature-text">Keeps Cold<br>24+ Hours</div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing Table -->
+                    <h3 style="margin-bottom: 1rem;">Pricing <span class="badge badge-amber">Tariff Updated</span></h3>
+                    
+                    <div style="background: var(--success-bg); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <p style="font-size: 0.875rem; font-weight: 500; color: var(--success-text); margin: 0;">
+                            ✨ All prices include 1-Sided Laser Engraving (approx. 2.5" x 3")
+                        </p>
+                    </div>
+
+                    <table class="pricing-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th style="text-align: center;">Regular Price</th>
+                                <th style="text-align: center;">Current Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="quantity-label">24 Tumblers</span>
+                                    <span class="quantity-sublabel">1 Case</span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="old-price">$14.50</span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="new-price">$16.68</span>
+                                    <span class="price-unit">per unit</span>
+                                </td>
+                            </tr>
+                            <tr class="highlight">
+                                <td>
+                                    <span class="quantity-label">120 Tumblers</span>
+                                    <span class="quantity-sublabel">5 Cases</span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="old-price">$14.00</span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="new-price">$16.10</span>
+                                    <span class="price-unit">per unit</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="quantity-label">240 Tumblers</span>
+                                    <span class="quantity-sublabel">10 Cases</span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="old-price">$13.50</span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="new-price">$15.53</span>
+                                    <span class="price-unit">per unit</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); text-align: center; font-style: italic; margin-bottom: 1.5rem;">
+                        * Pricing updated due to new U.S. tariffs on imported goods
+                    </p>
+
+                    <!-- Additional Fees -->
+                    <div class="notice-box">
+                        <div class="notice-icon">🎨</div>
+                        <div class="notice-content">
+                            <div class="notice-title">One-Time Setup Fee: $75.00</div>
+                            <div class="notice-text">Includes professional mockup for approval</div>
+                        </div>
+                    </div>
+
+                    <div class="notice-box notice-box-blue">
+                        <div class="notice-icon">➕</div>
+                        <div class="notice-content">
+                            <div class="notice-title">Add a Second Logo</div>
+                            <div class="notice-text">
+                                Only <span style="text-decoration: line-through;">$2.75</span> 
+                                <span style="font-size: 1.125rem; font-weight: 700;">$3.16</span> per tumbler
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Quote Builder -->
+            <div>
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-calculator" style="color: var(--primary-green);"></i>
+                        Build Your Quote
+                    </h2>
+
+                    <form id="quoteForm">
+                        <div class="form-group">
+                            <label class="form-label" for="customerName">Customer Name</label>
+                            <input type="text" id="customerName" class="form-input" placeholder="e.g., John Smith" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="projectName">Project Name</label>
+                            <input type="text" id="projectName" class="form-input" placeholder="e.g., Company Event Tumblers">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="quantity">Quantity</label>
+                            <select id="quantity" class="form-select" required>
+                                <option value="24">24 Tumblers (1 Case)</option>
+                                <option value="48">48 Tumblers (2 Cases)</option>
+                                <option value="72">72 Tumblers (3 Cases)</option>
+                                <option value="96">96 Tumblers (4 Cases)</option>
+                                <option value="120" selected>120 Tumblers (5 Cases)</option>
+                                <option value="144">144 Tumblers (6 Cases)</option>
+                                <option value="168">168 Tumblers (7 Cases)</option>
+                                <option value="192">192 Tumblers (8 Cases)</option>
+                                <option value="216">216 Tumblers (9 Cases)</option>
+                                <option value="240">240 Tumblers (10 Cases)</option>
+                                <option value="custom">Custom Quantity...</option>
+                            </select>
+                            <input type="number" id="customQuantity" class="form-input hidden" 
+                                   placeholder="Enter custom quantity" min="24" step="1" style="margin-top: 0.5rem;">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="secondLogo">
+                                <input type="checkbox" id="secondLogo" style="margin-right: 0.5rem;">
+                                Add Second Logo (+$3.16 per tumbler)
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-fullwidth">
+                            <i class="fas fa-calculator"></i>
+                            Calculate Quote
+                        </button>
+                    </form>
+
+                    <!-- Quote Display -->
+                    <div id="quoteDisplay" class="quote-display hidden">
+                        <h3 style="margin-bottom: 1rem;">Quote Summary</h3>
+                        <div class="quote-row">
+                            <span class="quote-label">Quantity:</span>
+                            <span class="quote-value" id="displayQuantity">-</span>
+                        </div>
+                        <div class="quote-row">
+                            <span class="quote-label">Price per Tumbler:</span>
+                            <span class="quote-value" id="displayUnitPrice">-</span>
+                        </div>
+                        <div class="quote-row">
+                            <span class="quote-label">Subtotal:</span>
+                            <span class="quote-value" id="displaySubtotal">-</span>
+                        </div>
+                        <div class="quote-row">
+                            <span class="quote-label">Setup Fee:</span>
+                            <span class="quote-value">$75.00</span>
+                        </div>
+                        <div class="quote-row hidden" id="secondLogoRow">
+                            <span class="quote-label">Second Logo:</span>
+                            <span class="quote-value" id="displaySecondLogo">-</span>
+                        </div>
+                        <div class="quote-total">
+                            <span class="quote-total-label">Total:</span>
+                            <span class="quote-total-amount" id="displayTotal">-</span>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+                            <button type="button" class="btn btn-secondary" onclick="window.print()">
+                                <i class="fas fa-print"></i>
+                                Print Quote
+                            </button>
+                            <button type="button" class="btn btn-primary" id="emailQuoteBtn">
+                                <i class="fas fa-paper-plane"></i>
+                                Email Quote
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Specifications Section -->
+        <div class="card">
+            <h2 class="card-title">Product Details & Specifications</h2>
+            
+            <div class="specs-grid">
+                <div class="spec-card">
+                    <h3 class="spec-title">
+                        <i class="fas fa-info-circle" style="color: var(--primary-green);"></i>
+                        Product Specs
+                    </h3>
+                    <ul class="spec-list">
+                        <li>Capacity: 16 oz.</li>
+                        <li>18/8 stainless steel (Type 304)</li>
+                        <li>Double-wall vacuum insulation</li>
+                        <li>Clear slider lid included</li>
+                        <li>2X heat and cold resistant</li>
+                        <li>Premium matte finish</li>
+                        <li>Gift box included</li>
+                    </ul>
+                </div>
+                
+                <div class="spec-card">
+                    <h3 class="spec-title">
+                        <i class="fas fa-ruler" style="color: var(--primary-green);"></i>
+                        Dimensions
+                    </h3>
+                    <ul class="spec-list">
+                        <li>Size: 3 3/8" (L) x 6" (H)</li>
+                        <li>Base: 2 5/8" diameter</li>
+                        <li>Circumference: 10.25"</li>
+                        <li>Silver laser engraving</li>
+                        <li>Rotary attachment compatible</li>
+                        <li>Engraving area: 2.5" x 3"</li>
+                    </ul>
+                </div>
+                
+                <div class="spec-card">
+                    <h3 class="spec-title">
+                        <i class="fas fa-hand-sparkles" style="color: var(--primary-green);"></i>
+                        Care & Info
+                    </h3>
+                    <ul class="spec-list">
+                        <li>Hand wash only</li>
+                        <li style="color: var(--amber-text);">⚠ Not dishwasher/microwave safe</li>
+                        <li>Indoor/outdoor use</li>
+                        <li>BPA-free lid</li>
+                        <li>Seamless construction</li>
+                        <li>Replacement lids: LTM20L, LTMR20</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Colors Section -->
+        <div class="card">
+            <h2 class="card-title">Available Colors</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Choose from 18 vibrant colors to match your brand
+            </p>
+            
+            <div class="color-grid" id="colorGrid">
+                <!-- Colors will be generated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Email Quote Modal -->
+    <div id="emailModal" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Email Quote</h2>
+                <button type="button" class="modal-close" id="modalClose">&times;</button>
+            </div>
+
+            <!-- Sales Rep Selection -->
+            <div class="form-group">
+                <label class="form-label" for="salesRep">Sales Representative</label>
+                <select id="salesRep" class="form-select" required>
+                    <option value="">Select a sales rep...</option>
+                    <option value="taylar@nwcustomapparel.com">Taylar</option>
+                    <option value="nika@nwcustomapparel.com">Nika</option>
+                    <option value="erik@nwcustomapparel.com">Erik</option>
+                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                    <option value="sales@nwcustomapparel.com">General Sales</option>
+                </select>
+            </div>
+
+            <form id="emailForm">
+                <div class="form-group">
+                    <label class="form-label" for="emailCustomerName">Customer Name</label>
+                    <input type="text" id="emailCustomerName" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="customerEmail">Customer Email</label>
+                    <input type="email" id="customerEmail" class="form-input" required placeholder="customer@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="customerPhone">Phone Number (optional)</label>
+                    <input type="tel" id="customerPhone" class="form-input" placeholder="(555) 123-4567">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="companyName">Company Name (optional)</label>
+                    <input type="text" id="companyName" class="form-input">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-fullwidth">
+                    <i class="fas fa-paper-plane"></i>
+                    Send Quote
+                </button>
+            </form>
+
+            <div id="successMessage" class="success-message hidden">
+                <i class="fas fa-check-circle"></i>
+                <span>Quote sent successfully!</span>
+            </div>
+
+            <div id="errorMessage" class="error-message hidden">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorText">An error occurred. Please try again.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden print content -->
+    <div id="printContent" style="display: none;"></div>
+
+    <script>
+        // Tumbler color data
+        const tumblerColors = [
+            { name: 'Stainless Steel', model: 'LTM751', hex: '#C0C0C0' },
+            { name: 'Black', model: 'LTM752', hex: '#000000' },
+            { name: 'Red', model: 'LTM753', hex: '#D32F2F' },
+            { name: 'Royal Blue', model: 'LTM754', hex: '#1976D2' },
+            { name: 'Pink', model: 'LTM755', hex: '#F06292' },
+            { name: 'Teal', model: 'LTM756', hex: '#009688' },
+            { name: 'Light Blue', model: 'LTM757', hex: '#90CAF9' },
+            { name: 'Light Purple', model: 'LTM758', hex: '#CE93D8' },
+            { name: 'Purple', model: 'LTM759', hex: '#7B1FA2' },
+            { name: 'Dark Gray', model: 'LTM760', hex: '#616161' },
+            { name: 'Navy Blue', model: 'LTM761', hex: '#0D47A1' },
+            { name: 'Orange', model: 'LTM762', hex: '#FF9800' },
+            { name: 'Maroon', model: 'LTM763', hex: '#880E4F' },
+            { name: 'White', model: 'LTM764', hex: '#FFFFFF' },
+            { name: 'Green', model: 'LTM765', hex: '#2E7D32' },
+            { name: 'Yellow', model: 'LTM766', hex: '#FFEB3B' },
+            { name: 'Coral', model: 'LTM767', hex: '#FF7043' },
+            { name: 'Olive Green', model: 'LTM768', hex: '#556B2F' }
+        ];
+
+        // Pricing tiers (with tariff)
+        const pricingTiers = {
+            '1-23': 16.68,
+            '24-119': 16.68,
+            '120-239': 16.10,
+            '240+': 15.53
+        };
+
+        // Laser Tumbler Calculator Class
+        class LaserTumblerCalculator {
+            constructor() {
+                this.currentQuote = null;
+                this.setupFee = 75.00;
+                this.secondLogoPrice = 3.16;
+                
+                // Initialize EmailJS
+                emailjs.init('4qSbDO-SQs19TbP80');
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.renderColors();
+            }
+
+            initializeElements() {
+                // Form elements
+                this.form = document.getElementById('quoteForm');
+                this.customerNameInput = document.getElementById('customerName');
+                this.projectNameInput = document.getElementById('projectName');
+                this.quantitySelect = document.getElementById('quantity');
+                this.customQuantityInput = document.getElementById('customQuantity');
+                this.secondLogoCheckbox = document.getElementById('secondLogo');
+                
+                // Quote display elements
+                this.quoteDisplay = document.getElementById('quoteDisplay');
+                this.displayQuantity = document.getElementById('displayQuantity');
+                this.displayUnitPrice = document.getElementById('displayUnitPrice');
+                this.displaySubtotal = document.getElementById('displaySubtotal');
+                this.displaySecondLogo = document.getElementById('displaySecondLogo');
+                this.displayTotal = document.getElementById('displayTotal');
+                this.secondLogoRow = document.getElementById('secondLogoRow');
+                this.emailQuoteBtn = document.getElementById('emailQuoteBtn');
+                
+                // Modal elements
+                this.modal = document.getElementById('emailModal');
+                this.modalClose = document.getElementById('modalClose');
+                this.emailForm = document.getElementById('emailForm');
+                this.emailCustomerName = document.getElementById('emailCustomerName');
+                this.customerEmail = document.getElementById('customerEmail');
+                this.customerPhone = document.getElementById('customerPhone');
+                this.companyName = document.getElementById('companyName');
+                this.salesRep = document.getElementById('salesRep');
+                this.successMessage = document.getElementById('successMessage');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.errorText = document.getElementById('errorText');
+            }
+
+            bindEvents() {
+                // Form submission
+                this.form.addEventListener('submit', (e) => this.handleCalculate(e));
+                
+                // Quantity change
+                this.quantitySelect.addEventListener('change', () => {
+                    if (this.quantitySelect.value === 'custom') {
+                        this.customQuantityInput.classList.remove('hidden');
+                        this.customQuantityInput.required = true;
+                        this.customQuantityInput.focus();
+                    } else {
+                        this.customQuantityInput.classList.add('hidden');
+                        this.customQuantityInput.required = false;
+                        this.customQuantityInput.value = '';
+                    }
+                });
+                
+                // Email quote button
+                this.emailQuoteBtn.addEventListener('click', () => this.openModal());
+                
+                // Modal events
+                this.modalClose.addEventListener('click', () => this.closeModal());
+                this.modal.addEventListener('click', (e) => {
+                    if (e.target === this.modal) this.closeModal();
+                });
+                this.emailForm.addEventListener('submit', (e) => this.handleEmailSubmit(e));
+                
+                // Update email form customer name when main form changes
+                this.customerNameInput.addEventListener('input', () => {
+                    this.emailCustomerName.value = this.customerNameInput.value;
+                });
+            }
+
+            renderColors() {
+                const colorGrid = document.getElementById('colorGrid');
+                
+                tumblerColors.forEach(color => {
+                    const colorItem = document.createElement('div');
+                    colorItem.className = 'color-item';
+                    
+                    const swatch = document.createElement('div');
+                    swatch.className = 'color-swatch';
+                    swatch.style.backgroundColor = color.hex;
+                    if (color.hex === '#FFFFFF' || color.hex === '#FFEB3B') {
+                        swatch.style.border = '2px solid #e5e7eb';
+                    }
+                    
+                    const name = document.createElement('div');
+                    name.className = 'color-name';
+                    name.textContent = color.name;
+                    
+                    const code = document.createElement('div');
+                    code.className = 'color-code';
+                    code.textContent = color.model;
+                    
+                    colorItem.appendChild(swatch);
+                    colorItem.appendChild(name);
+                    colorItem.appendChild(code);
+                    colorGrid.appendChild(colorItem);
+                });
+            }
+
+            getUnitPrice(quantity) {
+                if (quantity < 24) return pricingTiers['1-23'];
+                if (quantity < 120) return pricingTiers['24-119'];
+                if (quantity < 240) return pricingTiers['120-239'];
+                return pricingTiers['240+'];
+            }
+
+            handleCalculate(e) {
+                e.preventDefault();
+                
+                // Get quantity
+                let quantity;
+                if (this.quantitySelect.value === 'custom') {
+                    quantity = parseInt(this.customQuantityInput.value);
+                } else {
+                    quantity = parseInt(this.quantitySelect.value);
+                }
+                
+                // Validate minimum quantity
+                if (quantity < 24) {
+                    alert('Minimum order quantity is 24 tumblers.');
+                    return;
+                }
+                
+                // Calculate pricing
+                const unitPrice = this.getUnitPrice(quantity);
+                const subtotal = unitPrice * quantity;
+                const secondLogoTotal = this.secondLogoCheckbox.checked ? (this.secondLogoPrice * quantity) : 0;
+                const total = subtotal + this.setupFee + secondLogoTotal;
+                
+                // Store quote data
+                this.currentQuote = {
+                    customerName: this.customerNameInput.value,
+                    projectName: this.projectNameInput.value,
+                    quantity: quantity,
+                    unitPrice: unitPrice,
+                    subtotal: subtotal,
+                    setupFee: this.setupFee,
+                    hasSecondLogo: this.secondLogoCheckbox.checked,
+                    secondLogoTotal: secondLogoTotal,
+                    total: total
+                };
+                
+                // Display quote
+                this.displayQuote();
+            }
+
+            displayQuote() {
+                if (!this.currentQuote) return;
+                
+                const quote = this.currentQuote;
+                
+                // Update display values
+                this.displayQuantity.textContent = `${quote.quantity} tumblers`;
+                this.displayUnitPrice.textContent = `$${quote.unitPrice.toFixed(2)}`;
+                this.displaySubtotal.textContent = `$${quote.subtotal.toFixed(2)}`;
+                this.displayTotal.textContent = `$${quote.total.toFixed(2)}`;
+                
+                // Handle second logo display
+                if (quote.hasSecondLogo) {
+                    this.secondLogoRow.classList.remove('hidden');
+                    this.displaySecondLogo.textContent = `$${quote.secondLogoTotal.toFixed(2)}`;
+                } else {
+                    this.secondLogoRow.classList.add('hidden');
+                }
+                
+                // Show quote display
+                this.quoteDisplay.classList.remove('hidden');
+                
+                // Scroll to quote
+                this.quoteDisplay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            openModal() {
+                if (!this.currentQuote) return;
+                
+                // Pre-fill customer name
+                this.emailCustomerName.value = this.customerNameInput.value;
+                
+                // Reset messages
+                this.successMessage.classList.add('hidden');
+                this.errorMessage.classList.add('hidden');
+                
+                // Show modal
+                this.modal.classList.add('active');
+                
+                // Focus on appropriate field
+                if (this.emailCustomerName.value) {
+                    this.customerEmail.focus();
+                } else {
+                    this.emailCustomerName.focus();
+                }
+            }
+
+            closeModal() {
+                this.modal.classList.remove('active');
+            }
+
+            async handleEmailSubmit(e) {
+                e.preventDefault();
+                
+                if (!this.currentQuote) return;
+                
+                // Show loading state
+                const submitBtn = this.emailForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
+                submitBtn.disabled = true;
+                
+                try {
+                    // Get selected sales rep
+                    const selectedRep = this.salesRep.value;
+                    if (!selectedRep) {
+                        throw new Error('Please select a sales representative');
+                    }
+                    
+                    // Map sales rep emails to names
+                    const salesRepNames = {
+                        'taylar@nwcustomapparel.com': 'Taylar',
+                        'nika@nwcustomapparel.com': 'Nika',
+                        'erik@nwcustomapparel.com': 'Erik',
+                        'adriyella@nwcustomapparel.com': 'Adriyella',
+                        'ruth@nwcustomapparel.com': 'Ruth Nhong',
+                        'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
+                    };
+                    
+                    const quote = this.currentQuote;
+                    
+                    // Prepare email data
+                    const emailData = {
+                        to_email: this.customerEmail.value,
+                        reply_to: selectedRep,
+                        customer_name: this.emailCustomerName.value,
+                        project_name: quote.projectName || 'Polar Camel Tumbler Quote',
+                        quote_id: `LT${new Date().toISOString().slice(2,10).replace(/-/g,'')}-${Math.floor(Math.random() * 100)}`,
+                        quote_date: new Date().toLocaleDateString(),
+                        service_type: 'Polar Camel 16 oz. Pint - Laser Engraved',
+                        quantity: quote.quantity.toString(),
+                        locations: '1-Sided Laser Engraving (approx. 2.5" x 3")',
+                        price_per_piece: `$${quote.unitPrice.toFixed(2)}`,
+                        subtotal: `$${quote.subtotal.toFixed(2)}`,
+                        special_note: quote.hasSecondLogo ? 
+                            `Includes second logo (+$${quote.secondLogoTotal.toFixed(2)}) and one-time setup fee ($${quote.setupFee.toFixed(2)})` :
+                            `Includes one-time setup fee ($${quote.setupFee.toFixed(2)})`,
+                        grand_total: `$${quote.total.toFixed(2)}`,
+                        sales_rep_name: salesRepNames[selectedRep],
+                        sales_rep_email: selectedRep,
+                        sales_rep_phone: '253-922-5793',
+                        company_year: '1977'
+                    };
+                    
+                    // Send email
+                    await emailjs.send(
+                        'service_1c4k67j',
+                        'Laser_Tumbler_Template',
+                        emailData
+                    );
+                    
+                    // Show success
+                    this.successMessage.classList.remove('hidden');
+                    this.errorMessage.classList.add('hidden');
+                    
+                    // Reset form after delay
+                    setTimeout(() => {
+                        this.closeModal();
+                        this.emailForm.reset();
+                    }, 2000);
+                    
+                } catch (error) {
+                    console.error('Error sending quote:', error);
+                    this.errorText.textContent = error.message || 'Failed to send quote. Please try again.';
+                    this.errorMessage.classList.remove('hidden');
+                    this.successMessage.classList.add('hidden');
+                } finally {
+                    // Restore button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }
+        }
+
+        // Initialize calculator when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.laserTumblerCalculator = new LaserTumblerCalculator();
+        });
+
+        // Print functionality
+        window.addEventListener('beforeprint', () => {
+            const calc = window.laserTumblerCalculator;
+            if (!calc?.currentQuote) return;
+            
+            const quote = calc.currentQuote;
+            const printContent = document.getElementById('printContent');
+            
+            printContent.innerHTML = `
+                <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="margin: 0;">Northwest Custom Apparel</h1>
+                        <p style="margin: 5px 0;">Laser Engraved Tumbler Quote</p>
+                        <p style="margin: 5px 0;">Date: ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h3>Quote For:</h3>
+                        <p><strong>${quote.customerName || 'Customer'}</strong></p>
+                        ${quote.projectName ? `<p>Project: ${quote.projectName}</p>` : ''}
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h3>Product Details:</h3>
+                        <p><strong>Polar Camel 16 oz. Pint</strong></p>
+                        <p>Premium stainless steel tumbler with laser engraving</p>
+                        <p>Quantity: ${quote.quantity} tumblers</p>
+                        <p>Price per unit: $${quote.unitPrice.toFixed(2)}</p>
+                    </div>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">Subtotal</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${quote.subtotal.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">Setup Fee</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${quote.setupFee.toFixed(2)}</td>
+                        </tr>
+                        ${quote.hasSecondLogo ? `
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">Second Logo</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${quote.secondLogoTotal.toFixed(2)}</td>
+                        </tr>
+                        ` : ''}
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold; font-size: 1.2em;">Total</td>
+                            <td style="padding: 8px; text-align: right; font-weight: bold; font-size: 1.2em;">$${quote.total.toFixed(2)}</td>
+                        </tr>
+                    </table>
+                    
+                    <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #666;">
+                        <p>Thank you for your business!</p>
+                        <p>Prices valid for 30 days</p>
+                        <p>Contact: 253-922-5793 | sales@nwcustomapparel.com</p>
+                    </div>
+                </div>
+            `;
+            
+            printContent.style.display = 'block';
+        });
+
+        window.addEventListener('afterprint', () => {
+            document.getElementById('printContent').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
