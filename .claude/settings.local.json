@@ -39,7 +39,8 @@
       "Bash(cat:*)",
       "WebFetch(domain:cdn.caspio.com)",
       "Bash(npx http-server:*)",
-      "Bash(git switch:*)"
+      "Bash(git switch:*)",
+      "WebFetch(domain:www.emailjs.com)"
     ],
     "deny": []
   }

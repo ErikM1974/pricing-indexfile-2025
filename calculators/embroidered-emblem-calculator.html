@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Embroidered Emblem Pricing Calculator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Emblem Quote Service -->
+    <script src="emblem-quote-service.js"></script>
+
+    <style>
+        /* --- GLOBAL STYLES --- */
+        :root {
+            --primary-color: #4cb354;
+            --primary-hover: #409a47;
+            --bg-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --muted-text-color: #6c757d;
+            --font-family: 'Inter', sans-serif;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            margin: -20px -20px 20px -20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--muted-text-color);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-hover);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .header-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .header-btn:hover {
+            background: var(--bg-color);
+            border-color: var(--primary-color);
+        }
+
+        .header-btn.primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .header-btn.primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        #emblem-app {
+            max-width: 1000px;
+            margin: 20px auto;
+        }
+
+        .section {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        /* --- CALCULATOR UI --- */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 800px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .input-group div {
+            flex: 1;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 16px;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+        }
+
+        .addon-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+        .addon-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .addon-item label {
+            margin: 0;
+        }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* --- RESULTS DISPLAY --- */
+        .results-section {
+            background-color: #f7fdf8;
+            border: 1px solid #d4edda;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .results-section h3 {
+            margin-top: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .price-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 1rem 0;
+            word-wrap: break-word;
+            transition: color 0.3s;
+        }
+        .price-display.prompt {
+            font-size: 18px;
+            color: var(--muted-text-color);
+            font-weight: 500;
+        }
+        .price-display-label {
+            font-size: 14px;
+            color: var(--muted-text-color);
+            margin-top: -1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .order-summary {
+            text-align: left;
+            font-size: 14px;
+            transition: opacity 0.3s;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        .summary-item strong {
+            font-weight: 600;
+        }
+
+        .info-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--muted-text-color);
+            color: white;
+            font-size: 12px;
+            font-style: italic;
+            font-weight: bold;
+            line-height: 16px;
+            cursor: help;
+            position: relative;
+        }
+        [data-tooltip] { position: relative; }
+        [data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            background: #333; color: #fff;
+            padding: 10px 15px; border-radius: 6px;
+            font-size: 13px;
+            bottom: 150%; left: 50%;
+            transform: translateX(-50%);
+            white-space: pre;
+            opacity: 1; visibility: visible;
+            z-index: 10;
+            transition: opacity 0.2s, visibility 0.2s;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-family);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.2);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* --- REFERENCE GRID & INFO --- */
+        .pricing-container {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #fff;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .pricing-header {
+            background: var(--primary-color);
+            padding: 1rem 1.5rem;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        
+        .pricing-header:hover {
+            background: var(--primary-hover);
+        }
+        
+        .pricing-header h3 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .pricing-toggle {
+            transition: transform 0.3s;
+            color: white;
+        }
+        
+        .pricing-toggle.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .pricing-content {
+            display: block;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .pricing-content.show {
+            max-height: 1500px;
+            transition: max-height 0.5s ease-in;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        th, td {
+            text-align: center;
+            padding: 12px 8px;
+            font-size: 0.9em;
+            vertical-align: middle;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        thead th {
+            background: var(--primary-color);
+            color: #fff;
+            font-weight: bold;
+        }
+        tbody tr:nth-child(even) { background: #f9f9f9; }
+        .note {
+            font-size:14px;  
+            color:#333;  
+            padding:15px;  
+            background:#f4f4f4;
+            border-top: 1px solid var(--border-color);
+        }
+        .highlighted-cell {
+            background-color: #d4edda !important;
+            border: 2px solid var(--primary-color);
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--muted-text-color);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: var(--font-family);
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .quote-preview {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .quote-preview h4 {
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+
+        .quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .quote-table th,
+        .quote-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .quote-table th {
+            font-weight: 600;
+            background: var(--bg-color);
+        }
+
+        .quote-table .text-right {
+            text-align: right;
+        }
+
+        .quote-table .text-center {
+            text-align: center;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Success/Error Messages */
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .message.show {
+            display: flex;
+        }
+
+        .message-success {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid #34d399;
+        }
+
+        .message-error {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid #f87171;
+        }
+
+        .message i {
+            font-size: 1.25rem;
+        }
+
+        .quote-id-display {
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* Print Header - Only visible when printing */
+        .print-header {
+            display: none;
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+        
+        .print-header img {
+            height: 60px;
+            margin-bottom: 1rem;
+        }
+        
+        .print-company-info {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .print-contact-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .print-quote-info {
+            display: none;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        
+        .print-quote-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .print-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .print-info-item {
+            font-size: 0.875rem;
+        }
+        
+        .print-info-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .print-footer {
+            display: none;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            
+            /* Hide elements not needed for print */
+            .header,
+            .action-buttons,
+            .modal-backdrop,
+            .pricing-container,  /* Hide the pricing matrix */
+            .message,
+            .breadcrumb,
+            .header-btn,
+            .info-icon,
+            .no-print {
+                display: none !important;
+            }
+            
+            /* Show print-only elements */
+            .print-header,
+            .print-quote-info,
+            .print-footer {
+                display: block !important;
+            }
+            
+            /* Adjust main app container */
+            #emblem-app {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            /* Clean up section styling */
+            .section {
+                box-shadow: none;
+                border: none;
+                padding: 1rem;
+                page-break-inside: avoid;
+                margin-bottom: 0;
+            }
+            
+            .section h2 {
+                font-size: 1.5rem;
+                text-align: center;
+                margin-bottom: 2rem;
+                color: var(--primary-color);
+            }
+            
+            /* Adjust calculator grid for print */
+            .calculator-grid {
+                display: block;
+            }
+            
+            /* Style input section for print */
+            .input-section {
+                margin-bottom: 2rem;
+                padding: 1rem;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+            }
+            
+            .input-section h3 {
+                display: none;
+            }
+            
+            /* Style results section for print */
+            .results-section {
+                background: var(--bg-color);
+                border: 2px solid var(--primary-color);
+                padding: 1.5rem;
+                margin-top: 2rem;
+            }
+            
+            .results-section h3 {
+                text-align: center;
+                color: var(--primary-color);
+                margin-bottom: 1.5rem;
+            }
+            
+            .price-display {
+                font-size: 36px;
+                text-align: center;
+                margin: 1rem 0;
+            }
+            
+            .price-display-label {
+                text-align: center;
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            /* Clean up order summary for print */
+            .order-summary {
+                border-top: 2px solid var(--border-color);
+                padding-top: 1rem;
+            }
+            
+            .summary-item {
+                font-size: 1rem;
+                padding: 0.5rem 0;
+            }
+            
+            /* Ensure options are clearly visible */
+            .addon-section {
+                margin-top: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid var(--border-color);
+            }
+            
+            .addon-item {
+                margin-bottom: 0.5rem;
+            }
+            
+            /* Hide switches and show checkbox state */
+            .switch {
+                display: none;
+            }
+            
+            .addon-item input[type="checkbox"]:checked + label:after {
+                content: " ✓";
+                color: var(--primary-color);
+                font-weight: bold;
+            }
+            
+            /* Format input fields for print */
+            input[type="number"] {
+                border: none;
+                background: none;
+                font-weight: 600;
+                padding: 0;
+            }
+            
+            input[type="number"]::after {
+                content: attr(value);
+            }
+            
+            /* Page break control */
+            .section {
+                page-break-after: auto;
+            }
+            
+            /* Ensure color accuracy */
+            * {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ShopWorks Guide Styles */
+        .shopworks-guide-container {
+            margin: 2rem 0;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .guide-header {
+            background: #f7f7f7;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        
+        .guide-header:hover {
+            background: #f0f0f0;
+        }
+        
+        .guide-header h3 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+        
+        .internal-badge {
+            background: #ff6b6b;
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+            font-weight: normal;
+        }
+        
+        .guide-toggle {
+            transition: transform 0.3s;
+            color: var(--muted-text-color);
+        }
+        
+        .guide-toggle.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .guide-content {
+            display: none;
+            padding: 1.5rem;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .guide-content.show {
+            display: block;
+        }
+        
+        .guide-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .guide-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .guide-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .vendor-info ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .vendor-info li {
+            padding: 0.25rem 0;
+        }
+        
+        .part-numbers-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .part-numbers-table th {
+            background: #f7f7f7;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .part-numbers-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .part-numbers-table tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .part-numbers-table code {
+            background: #f3f3f3;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--muted-text-color);
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .important-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .important-note i {
+            color: #f39c12;
+        }
+        
+        .step-card {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-content h5 {
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+        }
+        
+        .step-content pre {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            margin: 0.5rem 0;
+        }
+        
+        .step-options {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .option {
+            padding: 0.75rem;
+            border-radius: 6px;
+        }
+        
+        .option.yes {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+        }
+        
+        .option.no {
+            background: #fce4ec;
+            border: 1px solid #f8bbd0;
+        }
+        
+        .backing-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .backing-option {
+            background: white;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+        
+        .example-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .example-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .example-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .tip {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tip i {
+            color: #2196f3;
+            font-size: 1.2rem;
+        }
+        
+        .faq-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .faq-item h5 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .faq-item ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .faq-item p {
+            margin: 0.5rem 0;
+        }
+        
+        .remember-section {
+            background: #fef5e7;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #fad7a0;
+        }
+        
+        .remember-section ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .remember-section li {
+            padding: 0.25rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .backing-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .step-card {
+                flex-direction: column;
+            }
+            
+            .guide-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>Embroidered Emblems</span>
+                </nav>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    <span>Print</span>
+                </button>
+                <a href="/staff-dashboard.html" class="header-btn primary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div id="emblem-app">
+        <!-- Print Header (Only visible when printing) -->
+        <div class="print-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                 alt="Northwest Custom Apparel">
+            <div class="print-company-info">
+                <strong>NORTHWEST CUSTOM APPAREL</strong><br>
+                Professional Embroidery & Custom Apparel Since 1977
+            </div>
+            <div class="print-contact-info">
+                Milton, Washington | Phone: 253-922-5793<br>
+                sales@nwcustomapparel.com | www.nwcustomapparel.com
+            </div>
+        </div>
+        
+        <!-- Print Quote Information (Only visible when printing) -->
+        <div class="print-quote-info">
+            <h3>Embroidered Emblem Quote</h3>
+            <div class="print-info-grid">
+                <div class="print-info-item">
+                    <span class="print-info-label">Date:</span> <span id="printDate"></span>
+                </div>
+                <div class="print-info-item">
+                    <span class="print-info-label">Quote ID:</span> <span id="printQuoteId">Pending</span>
+                </div>
+                <div class="print-info-item">
+                    <span class="print-info-label">Valid For:</span> 30 Days
+                </div>
+                <div class="print-info-item">
+                    <span class="print-info-label">Contact:</span> Jim Mickelson
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div id="successMessage" class="message message-success">
+            <i class="fas fa-check-circle"></i>
+            <span>Quote sent successfully!</span>
+            <span id="quoteIdDisplay" class="quote-id-display"></span>
+        </div>
+        
+        <div id="errorMessage" class="message message-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="errorText">An error occurred. Please try again.</span>
+        </div>
+
+        <div class="section">
+            <h2>Embroidered Emblem Calculator</h2>
+            <div class="calculator-grid">
+                <div class="input-section">
+                    <div class="input-group">
+                        <div>
+                            <label for="emblemWidth">Width (in)</label>
+                            <input type="number" id="emblemWidth" step="0.1" placeholder="e.g., 3.5">
+                        </div>
+                        <div>
+                            <label for="emblemHeight">Height (in)</label>
+                            <input type="number" id="emblemHeight" step="0.1" placeholder="e.g., 2.5">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" placeholder="Minimum 25">
+                    </div>
+                    <div class="addon-section">
+                        <h3>Options</h3>
+                        <div class="addon-item">
+                            <label for="metallicThread">Metallic Thread (add 25%)</label>
+                            <label class="switch"><input type="checkbox" id="metallicThread"><span class="slider"></span></label>
+                        </div>
+                        <div class="addon-item">
+                            <label for="velcroBacking">Velcro Backing (add 25%)</label>
+                            <label class="switch"><input type="checkbox" id="velcroBacking"><span class="slider"></span></label>
+                        </div>
+                        <div class="addon-item">
+                            <label for="extraColors">Extra Colors (add 10% each)</label>
+                            <input type="number" id="extraColors" value="0" min="0" style="width: 80px;">
+                        </div>
+                        <div class="addon-item">
+                            <label for="digitizingFee">New Design? (Add $100 Fee)</label>
+                            <label class="switch"><input type="checkbox" id="digitizingFee"><span class="slider"></span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-section" id="results">
+                    <h3>Your Quote</h3>
+                    <div class="price-display prompt" id="priceDisplay">Enter dimensions & quantity</div>
+                    <div class="price-display-label">
+                        Price per Emblem
+                        <span class="info-icon" id="price-breakdown-icon" data-tooltip="Fill out the form to see the cost breakdown.">i</span>
+                    </div>
+                    <hr style="border:none; border-top:1px solid var(--border-color); margin: 1.5rem 0;">
+                    <div class="order-summary">
+                        <div class="summary-item">
+                            <span>Order Subtotal</span>
+                            <strong id="subtotalDisplay">$0.00</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>One-Time Fees</span>
+                            <strong id="feesDisplay">$0.00</strong>
+                        </div>
+                        <div class="summary-item" style="font-size: 18px;">
+                            <strong>Estimated Total</strong>
+                            <strong id="totalDisplay">$0.00</strong>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="emailQuoteBtn" disabled>
+                            <i class="fas fa-envelope"></i>
+                            Email Quote
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.print()">
+                            <i class="fas fa-print"></i>
+                            Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pricing-container">
+            <div class="pricing-header" onclick="togglePricingGrid()">
+                <h3>
+                    <i class="fas fa-table"></i>
+                    2025 Embroidered Emblem Pricing Grid (Reference)
+                </h3>
+                <i class="fas fa-chevron-down pricing-toggle" id="pricingToggle"></i>
+            </div>
+            <div class="pricing-content" id="pricingContent">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Size</th><th>25-49</th><th>50-99</th><th>100-199</th><th>200-299</th><th>300-499</th><th>500-999</th><th>1000-1999</th><th>2000-4999</th><th>5000-9999</th><th>10000+</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-size-tier="1.00"><td>Up to 1"</td><td data-qty-index="0">$2.20</td><td data-qty-index="1">$1.91</td><td data-qty-index="2">$1.41</td><td data-qty-index="3">$1.01</td><td data-qty-index="4">$0.86</td><td data-qty-index="5">$0.74</td><td data-qty-index="6">$0.65</td><td data-qty-index="7">$0.59</td><td data-qty-index="8">$0.54</td><td data-qty-index="9">$0.49</td></tr>
+                    <tr data-size-tier="1.50"><td>1.01-1.50"</td><td data-qty-index="0">$2.77</td><td data-qty-index="1">$2.41</td><td data-qty-index="2">$1.78</td><td data-qty-index="3">$1.27</td><td data-qty-index="4">$1.09</td><td data-qty-index="5">$0.93</td><td data-qty-index="6">$0.82</td><td data-qty-index="7">$0.74</td><td data-qty-index="8">$0.68</td><td data-qty-index="9">$0.61</td></tr>
+                    <tr data-size-tier="2.00"><td>1.51-2.00"</td><td data-qty-index="0">$3.87</td><td data-qty-index="1">$3.37</td><td data-qty-index="2">$2.49</td><td data-qty-index="3">$1.78</td><td data-qty-index="4">$1.52</td><td data-qty-index="5">$1.30</td><td data-qty-index="6">$1.14</td><td data-qty-index="7">$1.03</td><td data-qty-index="8">$0.95</td><td data-qty-index="9">$0.86</td></tr>
+                    <tr data-size-tier="2.50"><td>2.01-2.50"</td><td data-qty-index="0">$4.97</td><td data-qty-index="1">$4.32</td><td data-qty-index="2">$3.19</td><td data-qty-index="3">$2.29</td><td data-qty-index="4">$1.95</td><td data-qty-index="5">$1.67</td><td data-qty-index="6">$1.47</td><td data-qty-index="7">$1.33</td><td data-qty-index="8">$1.21</td><td data-qty-index="9">$1.10</td></tr>
+                    <tr data-size-tier="3.00"><td>2.51-3.00"</td><td data-qty-index="0">$6.07</td><td data-qty-index="1">$5.28</td><td data-qty-index="2">$3.90</td><td data-qty-index="3">$2.79</td><td data-qty-index="4">$2.38</td><td data-qty-index="5">$2.03</td><td data-qty-index="6">$1.79</td><td data-qty-index="7">$1.62</td><td data-qty-index="8">$1.48</td><td data-qty-index="9">$1.34</td></tr>
+                    <tr data-size-tier="3.50"><td>3.01-3.5"</td><td data-qty-index="0">$7.17</td><td data-qty-index="1">$6.23</td><td data-qty-index="2">$4.60</td><td data-qty-index="3">$3.30</td><td data-qty-index="4">$2.81</td><td data-qty-index="5">$2.40</td><td data-qty-index="6">$2.12</td><td data-qty-index="7">$1.91</td><td data-qty-index="8">$1.75</td><td data-qty-index="9">$1.59</td></tr>
+                    <tr data-size-tier="4.00"><td>3.51-4.00"</td><td data-qty-index="0">$8.28</td><td data-qty-index="1">$7.19</td><td data-qty-index="2">$5.31</td><td data-qty-index="3">$3.81</td><td data-qty-index="4">$3.24</td><td data-qty-index="5">$2.77</td><td data-qty-index="6">$2.44</td><td data-qty-index="7">$2.21</td><td data-qty-index="8">$2.02</td><td data-qty-index="9">$1.83</td></tr>
+                    <tr data-size-tier="4.50"><td>4.01-4.50"</td><td data-qty-index="0">$9.38</td><td data-qty-index="1">$8.15</td><td data-qty-index="2">$6.02</td><td data-qty-index="3">$4.31</td><td data-qty-index="4">$3.67</td><td data-qty-index="5">$3.14</td><td data-qty-index="6">$2.77</td><td data-qty-index="7">$2.50</td><td data-qty-index="8">$2.29</td><td data-qty-index="9">$2.08</td></tr>
+                    <tr data-size-tier="5.00"><td>4.51-5.00''</td><td data-qty-index="0">$10.48</td><td data-qty-index="1">$9.10</td><td data-qty-index="2">$6.72</td><td data-qty-index="3">$4.82</td><td data-qty-index="4">$4.10</td><td data-qty-index="5">$3.51</td><td data-qty-index="6">$3.09</td><td data-qty-index="7">$2.80</td><td data-qty-index="8">$2.56</td><td data-qty-index="9">$2.32</td></tr>
+                    <tr data-size-tier="6.00"><td>5.01-6.00"</td><td data-qty-index="0">$12.13</td><td data-qty-index="1">$10.54</td><td data-qty-index="2">$7.78</td><td data-qty-index="3">$5.58</td><td data-qty-index="4">$4.75</td><td data-qty-index="5">$4.06</td><td data-qty-index="6">$3.58</td><td data-qty-index="7">$3.24</td><td data-qty-index="8">$2.96</td><td data-qty-index="9">$2.69</td></tr>
+                    <tr data-size-tier="7.00"><td>6.01-7.00"</td><td data-qty-index="0">$14.33</td><td data-qty-index="1">$12.45</td><td data-qty-index="2">$9.19</td><td data-qty-index="3">$6.59</td><td data-qty-index="4">$5.61</td><td data-qty-index="5">$4.80</td><td data-qty-index="6">$4.23</td><td data-qty-index="7">$3.82</td><td data-qty-index="8">$3.50</td><td data-qty-index="9">$3.17</td></tr>
+                    <tr data-size-tier="8.00"><td>7.01-8.00"</td><td data-qty-index="0">$16.53</td><td data-qty-index="1">$14.36</td><td data-qty-index="2">$10.61</td><td data-qty-index="3">$7.60</td><td data-qty-index="4">$6.48</td><td data-qty-index="5">$5.54</td><td data-qty-index="6">$4.88</td><td data-qty-index="7">$4.41</td><td data-qty-index="8">$4.04</td><td data-qty-index="9">$3.66</td></tr>
+                    <tr data-size-tier="9.00"><td>8.01-9.00"</td><td data-qty-index="0">$18.73</td><td data-qty-index="1">$16.27</td><td data-qty-index="2">$12.02</td><td data-qty-index="3">$8.62</td><td data-qty-index="4">$7.34</td><td data-qty-index="5">$6.28</td><td data-qty-index="6">$5.53</td><td data-qty-index="7">$5.00</td><td data-qty-index="8">$4.57</td><td data-qty-index="9">$4.15</td></tr>
+                    <tr data-size-tier="10.00"><td>9.01-10.00"</td><td data-qty-index="0">$20.93</td><td data-qty-index="1">$18.19</td><td data-qty-index="2">$13.43</td><td data-qty-index="3">$9.63</td><td data-qty-index="4">$8.20</td><td data-qty-index="5">$7.01</td><td data-qty-index="6">$6.18</td><td data-qty-index="7">$5.59</td><td data-qty-index="8">$5.11</td><td data-qty-index="9">$4.64</td></tr>
+                    <tr data-size-tier="11.00"><td>10.01-11.00''</td><td data-qty-index="0">$23.13</td><td data-qty-index="1">$20.10</td><td data-qty-index="2">$14.84</td><td data-qty-index="3">$10.64</td><td data-qty-index="4">$9.06</td><td data-qty-index="5">$7.75</td><td data-qty-index="6">$6.83</td><td data-qty-index="7">$6.17</td><td data-qty-index="8">$5.65</td><td data-qty-index="9">$5.12</td></tr>
+                    <tr data-size-tier="12.00"><td>11.01-12.00"</td><td data-qty-index="0">$25.34</td><td data-qty-index="1">$22.01</td><td data-qty-index="2">$16.26</td><td data-qty-index="3">$11.65</td><td data-qty-index="4">$9.93</td><td data-qty-index="5">$8.49</td><td data-qty-index="6">$7.48</td><td data-qty-index="7">$6.76</td><td data-qty-index="8">$6.19</td><td data-qty-index="9">$5.61</td></tr>
+                </tbody>
+            </table>
+            <p class="note">A one-time $100.00 digitizing fee applies per new design. For quantities under 200, a $50.00 LTM fee also applies (this is added to the per-emblem price).</p>
+            </div>
+        </div>
+        
+        <!-- Print Footer (Only visible when printing) -->
+        <div class="print-footer">
+            <p><strong>Terms & Conditions:</strong></p>
+            <p>This quote is valid for 30 days from the date above. Prices subject to change after expiration.<br>
+            Production time: 10-14 business days from art approval. Rush service available upon request.</p>
+            <p style="margin-top: 1rem;">
+                <strong>Northwest Custom Apparel</strong> | Milton, WA | 253-922-5793 | sales@nwcustomapparel.com
+            </p>
+        </div>
+        
+        <!-- ShopWorks Order Entry Guide (Internal Use Only) -->
+        <div class="shopworks-guide-container no-print">
+            <div class="guide-header" onclick="toggleGuide()">
+                <h3>
+                    <i class="fas fa-book-open"></i>
+                    ShopWorks Order Entry Guide
+                    <span class="internal-badge">Internal Use Only</span>
+                </h3>
+                <i class="fas fa-chevron-down guide-toggle" id="guideToggle"></i>
+            </div>
+            
+            <div class="guide-content" id="guideContent">
+                <!-- Vendor Info Section -->
+                <div class="guide-section">
+                    <h4><i class="fas fa-building"></i> Vendor Information</h4>
+                    <div class="vendor-info">
+                        <p><strong>All emblems come from:</strong></p>
+                        <ul>
+                            <li><strong>Vendor:</strong> Yung Ming-UMDesign Technology (Vendor #1503)</li>
+                            <li><strong>Email orders to:</strong> <a href="mailto:sales@ymg.com.tw">sales@ymg.com.tw</a></li>
+                            <li><strong>Production time:</strong> 30-45 days from approval</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Standard Part Numbers -->
+                <div class="guide-section">
+                    <h4><i class="fas fa-tags"></i> Standard Part Numbers</h4>
+                    <table class="part-numbers-table">
+                        <thead>
+                            <tr>
+                                <th>Part Number</th>
+                                <th>Use For</th>
+                                <th>Price</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>DD</code></td>
+                                <td>New design setup/digitizing</td>
+                                <td>$100.00</td>
+                                <td><button class="copy-btn" onclick="copyToClipboard('DD')" title="Copy"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td><code>Backpatch</code></td>
+                                <td>Setup for 8-13" patches</td>
+                                <td>$250.00</td>
+                                <td><button class="copy-btn" onclick="copyToClipboard('Backpatch')" title="Copy"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td><code>emblems</code></td>
+                                <td>All patches, badges, emblems</td>
+                                <td>Use pricing calculator</td>
+                                <td><button class="copy-btn" onclick="copyToClipboard('emblems')" title="Copy"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td><code>heat seal</code></td>
+                                <td>Iron-on backing</td>
+                                <td>$0.30 each</td>
+                                <td><button class="copy-btn" onclick="copyToClipboard('heat seal')" title="Copy"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td><code>velcro</code></td>
+                                <td>Velcro backing</td>
+                                <td>$0.75 each</td>
+                                <td><button class="copy-btn" onclick="copyToClipboard('velcro')" title="Copy"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td><code>SEC</code></td>
+                                <td>Sew emblems to caps/garments</td>
+                                <td>$5.00 each</td>
+                                <td><button class="copy-btn" onclick="copyToClipboard('SEC')" title="Copy"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td><code>Art</code></td>
+                                <td>Custom artwork</td>
+                                <td>$75.00/hour</td>
+                                <td><button class="copy-btn" onclick="copyToClipboard('Art')" title="Copy"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td><code>Art Edit</code></td>
+                                <td>Minor design changes</td>
+                                <td>$50.00 flat</td>
+                                <td><button class="copy-btn" onclick="copyToClipboard('Art Edit')" title="Copy"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td><code>RUSH</code></td>
+                                <td>Expedited orders</td>
+                                <td>Contact Yung Ming</td>
+                                <td><button class="copy-btn" onclick="copyToClipboard('RUSH')" title="Copy"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td><code>Freight</code></td>
+                                <td>Shipping charges</td>
+                                <td>Actual cost</td>
+                                <td><button class="copy-btn" onclick="copyToClipboard('Freight')" title="Copy"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="important-note">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>IMPORTANT:</strong> Always use lowercase for emblems, heat seal, and velcro
+                    </div>
+                </div>
+
+                <!-- Quick Order Entry Steps -->
+                <div class="guide-section">
+                    <h4><i class="fas fa-list-ol"></i> Quick Order Entry Steps</h4>
+                    
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h5>CHECK: Is this a NEW design?</h5>
+                            <div class="step-options">
+                                <div class="option yes">
+                                    <strong>YES →</strong> Start with DD line:
+                                    <pre>Part Number: DD
+Description: [Design name] Setup Digitizing
+Quantity: 1
+Price: $100.00</pre>
+                                </div>
+                                <div class="option no">
+                                    <strong>NO (repeat order) →</strong> Skip to step 2
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h5>ADD THE EMBLEMS:</h5>
+                            <pre>Part Number: emblems
+Description: [Design name] Embroidered Emblems
+Quantity: [customer quantity]
+Price: [use pricing calculator]</pre>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h5>ADD BACKING IF NEEDED:</h5>
+                            <div class="backing-options">
+                                <div class="backing-option">
+                                    <strong>Heat Seal:</strong>
+                                    <pre>Part Number: heat seal
+Description: Heat seal backing
+Quantity: [same as emblems]
+Price: $0.30 each</pre>
+                                </div>
+                                <div class="backing-option">
+                                    <strong>Velcro:</strong>
+                                    <pre>Part Number: velcro
+Description: Velcro backing
+Quantity: [same as emblems]
+Price: $0.75 each</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description Examples -->
+                <div class="guide-section">
+                    <h4><i class="fas fa-pencil-alt"></i> Description Examples</h4>
+                    <p><strong>Good descriptions include all info from invoice:</strong></p>
+                    <ul class="example-list">
+                        <li>"C1243 Embroidered Emblems (ME4195)"</li>
+                        <li>"306th Bomb Group (ZD5459) Triangle Black"</li>
+                        <li>"Milton Police Shoulder Patch (WD2249)"</li>
+                        <li>"10 inch backpatch Washington Blues"</li>
+                    </ul>
+                    <div class="tip">
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>TIP:</strong> If you see codes in parentheses, INCLUDE THEM!
+                    </div>
+                </div>
+
+                <!-- Common Questions -->
+                <div class="guide-section">
+                    <h4><i class="fas fa-question-circle"></i> Common Questions</h4>
+                    
+                    <div class="faq-item">
+                        <h5>Q: How do I know if it's a new design?</h5>
+                        <ul>
+                            <li>Check if design has been done before in ShopWorks</li>
+                            <li>Look for existing design numbers</li>
+                            <li>Ask supervisor if unsure</li>
+                            <li>If NEW → Add DD for $100</li>
+                            <li>If REPEAT → No DD needed</li>
+                        </ul>
+                    </div>
+
+                    <div class="faq-item">
+                        <h5>Q: What price do I use for emblems?</h5>
+                        <p>Use the pricing calculator above. Enter quantity to get correct price.</p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h5>Q: Customer wants velcro AND heat seal?</h5>
+                        <p>Add BOTH as separate lines. Charge for each service.</p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h5>Q: How do I know the design codes?</h5>
+                        <p>Copy EXACTLY what's on the invoice. Include ALL codes you see.</p>
+                    </div>
+                </div>
+
+                <!-- Remember Section -->
+                <div class="guide-section remember-section">
+                    <h4><i class="fas fa-exclamation-circle"></i> Remember</h4>
+                    <ol>
+                        <li><strong>Every new design</strong> needs DD ($100)</li>
+                        <li><strong>Part numbers</strong> must be lowercase</li>
+                        <li><strong>Descriptions</strong> copy exactly from invoice</li>
+                        <li><strong>Add backing</strong> as separate line items</li>
+                        <li><strong>30-45 days</strong> production time</li>
+                    </ol>
+                </div>
+
+                <!-- Contact Help -->
+                <div class="guide-section">
+                    <h4><i class="fas fa-phone"></i> Need Help?</h4>
+                    <p><strong>Contact Yung Ming for:</strong></p>
+                    <ul>
+                        <li>Rush pricing</li>
+                        <li>Special materials</li>
+                        <li>Quantity pricing</li>
+                        <li>Design questions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Print Footer (Only visible when printing) -->
+        <div class="print-footer">
+            <h4>Terms & Conditions</h4>
+            <p>
+                • This quote is valid for 30 days from the date above<br>
+                • Pricing is based on current material costs and may be subject to change<br>
+                • Standard production time is 10-14 business days after artwork approval<br>
+                • Rush service available for an additional charge<br>
+                • Minimum order quantity applies as shown above<br>
+                • All custom emblems include merrowed edge finish
+            </p>
+            <div style="margin-top: 20px;">
+                <strong>Northwest Custom Apparel</strong><br>
+                Professional Embroidery & Custom Apparel Since 1977<br>
+                Phone: 253-922-5793 | Email: sales@nwcustomapparel.com
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Quote Modal -->
+    <div class="modal-backdrop" id="quoteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Send Quote</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <form id="quoteForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="customerName">Customer Name *</label>
+                        <input type="text" class="form-control" id="customerName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" class="form-control" id="companyName">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customerEmail">Customer Email *</label>
+                        <input type="email" class="form-control" id="customerEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customerPhone">Phone Number</label>
+                        <input type="tel" class="form-control" id="customerPhone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectName">Project/Order Name</label>
+                        <input type="text" class="form-control" id="projectName" placeholder="e.g., Police Department Badges">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="salesRep">Sales Representative *</label>
+                        <select class="form-control" id="salesRep" required>
+                            <option value="">Select a sales rep...</option>
+                            <option value="jim@nwcustomapparel.com" selected>Jim Mickelson</option>
+                            <option value="erik@nwcustomapparel.com">Erik</option>
+                            <option value="nika@nwcustomapparel.com">Nika</option>
+                            <option value="taylar@nwcustomapparel.com">Taylar</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                            <option value="bradley@nwcustomapparel.com">Bradley</option>
+                            <option value="art@nwcustomapparel.com">Steve (Artist)</option>
+                            <option value="sales@nwcustomapparel.com">General Sales</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea class="form-control" id="notes" placeholder="Special instructions or additional information..."></textarea>
+                    </div>
+                    
+                    <div class="quote-preview">
+                        <h4>Quote Preview</h4>
+                        <div id="quotePreview"></div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="saveToDatabase" checked>
+                        <label for="saveToDatabase">Save quote to database</label>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="sendQuoteBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Quote
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Emblem Calculator Class
+        class EmblemCalculator {
+            constructor() {
+                // Initialize EmailJS
+                emailjs.init('4qSbDO-SQs19TbP80');
+                
+                // Initialize quote service
+                this.quoteService = new EmblemQuoteService();
+                
+                // Current quote data
+                this.currentQuote = null;
+                
+                // Constants
+                this.LTM_FEE = 50.00;
+                this.DIGITIZING_FEE = 100.00;
+                this.PRICING_GRID = {
+                    "1.00":[2.2,1.91,1.41,1.01,0.86,0.74,0.65,0.59,0.54,0.49],
+                    "1.50":[2.77,2.41,1.78,1.27,1.09,0.93,0.82,0.74,0.68,0.61],
+                    "2.00":[3.87,3.37,2.49,1.78,1.52,1.3,1.14,1.03,0.95,0.86],
+                    "2.50":[4.97,4.32,3.19,2.29,1.95,1.67,1.47,1.33,1.21,1.1],
+                    "3.00":[6.07,5.28,3.9,2.79,2.38,2.03,1.79,1.62,1.48,1.34],
+                    "3.50":[7.17,6.23,4.6,3.3,2.81,2.4,2.12,1.91,1.75,1.59],
+                    "4.00":[8.28,7.19,5.31,3.81,3.24,2.77,2.44,2.21,2.02,1.83],
+                    "4.50":[9.38,8.15,6.02,4.31,3.67,3.14,2.77,2.5,2.29,2.08],
+                    "5.00":[10.48,9.1,6.72,4.82,4.1,3.51,3.09,2.8,2.56,2.32],
+                    "6.00":[12.13,10.54,7.78,5.58,4.75,4.06,3.58,3.24,2.96,2.69],
+                    "7.00":[14.33,12.45,9.19,6.59,5.61,4.8,4.23,3.82,3.5,3.17],
+                    "8.00":[16.53,14.36,10.61,7.6,6.48,5.54,4.88,4.41,4.04,3.66],
+                    "9.00":[18.73,16.27,12.02,8.62,7.34,6.28,5.53,5,4.57,4.15],
+                    "10.00":[20.93,18.19,13.43,9.63,8.2,7.01,6.18,5.59,5.11,4.64],
+                    "11.00":[23.13,20.1,14.84,10.64,9.06,7.75,6.83,6.17,5.65,5.12],
+                    "12.00":[25.34,22.01,16.26,11.65,9.93,8.49,7.48,6.76,6.19,5.61]
+                };
+                
+                // Sales rep mapping
+                this.salesRepNames = {
+                    'jim@nwcustomapparel.com': 'Jim Mickelson',
+                    'erik@nwcustomapparel.com': 'Erik',
+                    'nika@nwcustomapparel.com': 'Nika',
+                    'taylar@nwcustomapparel.com': 'Taylar',
+                    'adriyella@nwcustomapparel.com': 'Adriyella',
+                    'ruth@nwcustomapparel.com': 'Ruth Nhong',
+                    'bradley@nwcustomapparel.com': 'Bradley',
+                    'art@nwcustomapparel.com': 'Steve (Artist)',
+                    'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
+                };
+                
+                // Initialize elements
+                this.initializeElements();
+                
+                // Bind events
+                this.bindEvents();
+            }
+            
+            initializeElements() {
+                this.elements = {
+                    // Inputs
+                    width: document.getElementById('emblemWidth'),
+                    height: document.getElementById('emblemHeight'),
+                    quantity: document.getElementById('quantity'),
+                    metallicThread: document.getElementById('metallicThread'),
+                    velcroBacking: document.getElementById('velcroBacking'),
+                    extraColors: document.getElementById('extraColors'),
+                    digitizingFee: document.getElementById('digitizingFee'),
+                    
+                    // Display elements
+                    priceDisplay: document.getElementById('priceDisplay'),
+                    subtotalDisplay: document.getElementById('subtotalDisplay'),
+                    feesDisplay: document.getElementById('feesDisplay'),
+                    totalDisplay: document.getElementById('totalDisplay'),
+                    breakdownIcon: document.getElementById('price-breakdown-icon'),
+                    emailQuoteBtn: document.getElementById('emailQuoteBtn'),
+                    
+                    // Modal elements
+                    modal: document.getElementById('quoteModal'),
+                    quoteForm: document.getElementById('quoteForm'),
+                    quotePreview: document.getElementById('quotePreview'),
+                    sendQuoteBtn: document.getElementById('sendQuoteBtn'),
+                    
+                    // Message elements
+                    successMessage: document.getElementById('successMessage'),
+                    errorMessage: document.getElementById('errorMessage'),
+                    errorText: document.getElementById('errorText'),
+                    quoteIdDisplay: document.getElementById('quoteIdDisplay')
+                };
+                
+                // Get all inputs for event binding
+                this.inputs = [
+                    this.elements.width,
+                    this.elements.height,
+                    this.elements.quantity,
+                    this.elements.metallicThread,
+                    this.elements.velcroBacking,
+                    this.elements.extraColors,
+                    this.elements.digitizingFee
+                ];
+            }
+            
+            bindEvents() {
+                // Bind input events
+                this.inputs.forEach(input => {
+                    input.addEventListener('input', () => this.calculatePrice());
+                    input.addEventListener('change', () => this.calculatePrice());
+                });
+                
+                // Email quote button
+                this.elements.emailQuoteBtn.addEventListener('click', () => this.openModal());
+                
+                // Form submission
+                this.elements.quoteForm.addEventListener('submit', (e) => this.handleQuoteSubmit(e));
+                
+                // Close modal on backdrop click
+                this.elements.modal.addEventListener('click', (e) => {
+                    if (e.target === this.elements.modal) {
+                        this.closeModal();
+                    }
+                });
+            }
+            
+            clearHighlight() {
+                const highlighted = document.querySelector('.highlighted-cell');
+                if (highlighted) {
+                    highlighted.classList.remove('highlighted-cell');
+                }
+            }
+            
+            highlightCell(sizeKey, qtyIndex) {
+                this.clearHighlight();
+                const selector = `tr[data-size-tier="${sizeKey}"] td[data-qty-index="${qtyIndex}"]`;
+                const cell = document.querySelector(selector);
+                if (cell) {
+                    cell.classList.add('highlighted-cell');
+                }
+            }
+            
+            calculatePrice() {
+                const width = parseFloat(this.elements.width.value) || 0;
+                const height = parseFloat(this.elements.height.value) || 0;
+                const quantity = parseInt(this.elements.quantity.value) || 0;
+                const isNewDesign = this.elements.digitizingFee.checked;
+                
+                if (width <= 0 || height <= 0) {
+                    this.resetDisplay("Enter dimensions");
+                    return;
+                }
+                if (quantity < 25) {
+                    this.resetDisplay(quantity === 0 ? "Enter quantity" : "Min quantity is 25");
+                    return;
+                }
+                
+                // Enable email button
+                this.elements.emailQuoteBtn.disabled = false;
+                this.elements.priceDisplay.classList.remove('prompt');
+                
+                // Calculate size tier
+                const size = (width + height) / 2;
+                const sizeKeys = Object.keys(this.PRICING_GRID).map(parseFloat).sort((a,b) => a-b);
+                const sizeTier = sizeKeys.find(key => size <= key) || sizeKeys[sizeKeys.length - 1];
+                
+                // Calculate quantity tier
+                let qtyIndex = -1;
+                if (quantity >= 10000) qtyIndex = 9;
+                else if (quantity >= 5000) qtyIndex = 8;
+                else if (quantity >= 2000) qtyIndex = 7;
+                else if (quantity >= 1000) qtyIndex = 6;
+                else if (quantity >= 500) qtyIndex = 5;
+                else if (quantity >= 300) qtyIndex = 4;
+                else if (quantity >= 200) qtyIndex = 3;
+                else if (quantity >= 100) qtyIndex = 2;
+                else if (quantity >= 50) qtyIndex = 1;
+                else if (quantity >= 25) qtyIndex = 0;
+                
+                if (qtyIndex === -1) return;
+                
+                // Get base price
+                let basePrice = this.PRICING_GRID[sizeTier.toFixed(2)][qtyIndex];
+                
+                // Calculate add-ons
+                let addOnCost = 0;
+                let addOnPercentage = 0;
+                if (this.elements.metallicThread.checked) addOnPercentage += 0.25;
+                if (this.elements.velcroBacking.checked) addOnPercentage += 0.25;
+                const extraColors = parseInt(this.elements.extraColors.value) || 0;
+                if (extraColors > 0) addOnPercentage += (extraColors * 0.10);
+                
+                if (addOnPercentage > 0) {
+                    addOnCost = basePrice * addOnPercentage;
+                }
+                
+                // LTM fee is part of per-emblem price
+                const ltmChargePerPatch = (quantity < 200) ? (this.LTM_FEE / quantity) : 0;
+                const pricePerPatch = basePrice + addOnCost + ltmChargePerPatch;
+                const totalOneTimeFees = isNewDesign ? this.DIGITIZING_FEE : 0;
+                const orderSubtotal = pricePerPatch * quantity;
+                const estimatedTotal = orderSubtotal + totalOneTimeFees;
+                
+                // Update display
+                this.elements.priceDisplay.textContent = `$${pricePerPatch.toFixed(2)}`;
+                this.elements.subtotalDisplay.textContent = `$${orderSubtotal.toFixed(2)}`;
+                this.elements.feesDisplay.textContent = `$${totalOneTimeFees.toFixed(2)}`;
+                this.elements.totalDisplay.textContent = `$${estimatedTotal.toFixed(2)}`;
+                
+                // Update breakdown tooltip
+                let breakdownText = `Base Price: $${basePrice.toFixed(2)}`;
+                if (addOnCost > 0) breakdownText += `\nAdd-ons: +$${addOnCost.toFixed(2)}`;
+                if (ltmChargePerPatch > 0) breakdownText += `\nLTM Fee: +$${ltmChargePerPatch.toFixed(2)}`;
+                this.elements.breakdownIcon.setAttribute('data-tooltip', breakdownText);
+                
+                // Highlight cell
+                this.highlightCell(sizeTier.toFixed(2), qtyIndex);
+                
+                // Store current quote data
+                this.currentQuote = {
+                    width,
+                    height,
+                    size,
+                    sizeTier,
+                    quantity,
+                    qtyIndex,
+                    basePrice,
+                    addOnCost,
+                    addOnPercentage,
+                    metallicThread: this.elements.metallicThread.checked,
+                    velcroBacking: this.elements.velcroBacking.checked,
+                    extraColors,
+                    ltmChargePerPatch,
+                    pricePerPatch,
+                    isNewDesign,
+                    totalOneTimeFees,
+                    orderSubtotal,
+                    estimatedTotal
+                };
+            }
+            
+            resetDisplay(promptText) {
+                this.elements.priceDisplay.textContent = promptText;
+                this.elements.priceDisplay.classList.add('prompt');
+                this.elements.subtotalDisplay.textContent = "$0.00";
+                this.elements.feesDisplay.textContent = "$0.00";
+                this.elements.totalDisplay.textContent = "$0.00";
+                this.elements.breakdownIcon.setAttribute('data-tooltip', 'Fill out the form to see the cost breakdown.');
+                this.elements.emailQuoteBtn.disabled = true;
+                this.clearHighlight();
+                this.currentQuote = null;
+            }
+            
+            openModal() {
+                if (!this.currentQuote) return;
+                
+                // Update preview
+                this.updateQuotePreview();
+                
+                // Show modal
+                this.elements.modal.classList.add('show');
+                
+                // Focus first input
+                document.getElementById('customerName').focus();
+            }
+            
+            closeModal() {
+                this.elements.modal.classList.remove('show');
+                this.elements.quoteForm.reset();
+                // Keep Jim as default
+                document.getElementById('salesRep').value = 'jim@nwcustomapparel.com';
+            }
+            
+            updateQuotePreview() {
+                if (!this.currentQuote) return;
+                
+                const { width, height, quantity, pricePerPatch, orderSubtotal, totalOneTimeFees, estimatedTotal } = this.currentQuote;
+                
+                let optionsText = [];
+                if (this.currentQuote.metallicThread) optionsText.push('Metallic Thread');
+                if (this.currentQuote.velcroBacking) optionsText.push('Velcro Backing');
+                if (this.currentQuote.extraColors > 0) optionsText.push(`${this.currentQuote.extraColors} Extra Color${this.currentQuote.extraColors > 1 ? 's' : ''}`);
+                
+                let html = `
+                    <table class="quote-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-right">Unit Price</th>
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    Embroidered Emblem (${width}" × ${height}")
+                                    ${optionsText.length > 0 ? '<br><small>' + optionsText.join(', ') + '</small>' : ''}
+                                </td>
+                                <td class="text-center">${quantity}</td>
+                                <td class="text-right">$${pricePerPatch.toFixed(2)}</td>
+                                <td class="text-right">$${orderSubtotal.toFixed(2)}</td>
+                            </tr>
+                `;
+                
+                if (totalOneTimeFees > 0) {
+                    html += `
+                            <tr>
+                                <td colspan="3">Digitizing Fee (one-time)</td>
+                                <td class="text-right">$${totalOneTimeFees.toFixed(2)}</td>
+                            </tr>
+                    `;
+                }
+                
+                html += `
+                            <tr style="font-weight: 600;">
+                                <td colspan="3">Total</td>
+                                <td class="text-right">$${estimatedTotal.toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+                
+                if (quantity < 200) {
+                    html += `<p style="margin-top: 1rem; font-size: 0.875rem; color: var(--muted-text-color);">
+                        Note: LTM fee of $${this.LTM_FEE.toFixed(2)} is included in the per-emblem price.
+                    </p>`;
+                }
+                
+                this.elements.quotePreview.innerHTML = html;
+            }
+            
+            async handleQuoteSubmit(e) {
+                e.preventDefault();
+                
+                if (!this.currentQuote) return;
+                
+                // Show loading state
+                this.setLoadingState(true);
+                
+                try {
+                    // Get form data
+                    const customerName = document.getElementById('customerName').value.trim();
+                    const companyName = document.getElementById('companyName').value.trim();
+                    const customerEmail = document.getElementById('customerEmail').value.trim();
+                    const customerPhone = document.getElementById('customerPhone').value.trim();
+                    const projectName = document.getElementById('projectName').value.trim();
+                    const salesRepEmail = document.getElementById('salesRep').value;
+                    const notes = document.getElementById('notes').value.trim();
+                    const saveToDatabase = document.getElementById('saveToDatabase').checked;
+                    
+                    const salesRepName = this.salesRepNames[salesRepEmail] || 'Sales Team';
+                    
+                    // Generate quote ID
+                    const quoteId = this.quoteService.generateQuoteID();
+                    
+                    // Save to database if requested
+                    let saveResult = { success: false };
+                    if (saveToDatabase) {
+                        const quoteData = {
+                            ...this.currentQuote,
+                            quoteId,
+                            customerName,
+                            companyName,
+                            customerEmail,
+                            customerPhone,
+                            projectName,
+                            notes,
+                            salesRepEmail,
+                            salesRepName
+                        };
+                        
+                        saveResult = await this.quoteService.saveQuote(quoteData);
+                        if (!saveResult.success) {
+                            console.error('Failed to save quote:', saveResult.error);
+                        }
+                    }
+                    
+                    // Prepare email data
+                    const emailData = {
+                        // System fields
+                        to_email: customerEmail,
+                        reply_to: salesRepEmail,
+                        from_name: 'Northwest Custom Apparel',
+                        
+                        // Quote identification
+                        quote_type: 'Embroidered Emblem',
+                        quote_id: quoteId,
+                        quote_date: new Date().toLocaleDateString(),
+                        
+                        // Customer info
+                        customer_name: customerName,
+                        company_name: companyName || '',
+                        project_name: projectName || '',
+                        
+                        // Quote details
+                        emblem_size: `${this.currentQuote.width}" × ${this.currentQuote.height}"`,
+                        quantity: this.currentQuote.quantity.toString(),
+                        unit_price: `$${this.currentQuote.pricePerPatch.toFixed(2)}`,
+                        subtotal: `$${this.currentQuote.orderSubtotal.toFixed(2)}`,
+                        setup_fee: this.currentQuote.totalOneTimeFees > 0 ? `$${this.currentQuote.totalOneTimeFees.toFixed(2)}` : '$0.00',
+                        grand_total: `$${this.currentQuote.estimatedTotal.toFixed(2)}`,
+                        
+                        // Options
+                        options_text: this.buildOptionsText(),
+                        special_note: this.currentQuote.quantity < 200 ? `LTM fee of $${this.LTM_FEE.toFixed(2)} is included in the per-emblem price` : '',
+                        
+                        // Sales rep info
+                        sales_rep_name: salesRepName,
+                        sales_rep_email: salesRepEmail,
+                        sales_rep_phone: '253-922-5793',
+                        
+                        // Company info
+                        company_year: '1977',
+                        
+                        // Notes
+                        notes: notes || 'No special notes for this order'
+                    };
+                    
+                    console.log('Sending email with data:', emailData);
+                    
+                    // Send email
+                    const emailResult = await emailjs.send(
+                        'service_1c4k67j',
+                        'template_vpou6va',
+                        emailData
+                    );
+                    
+                    console.log('Email sent successfully:', emailResult);
+                    
+                    // Show success message
+                    this.showSuccess(quoteId);
+                    this.closeModal();
+                    
+                } catch (error) {
+                    console.error('Error sending quote:', error);
+                    this.showError('Failed to send quote. Please try again.');
+                } finally {
+                    this.setLoadingState(false);
+                }
+            }
+            
+            buildOptionsText() {
+                let options = [];
+                if (this.currentQuote.metallicThread) options.push('Metallic Thread (+25%)');
+                if (this.currentQuote.velcroBacking) options.push('Velcro Backing (+25%)');
+                if (this.currentQuote.extraColors > 0) {
+                    options.push(`${this.currentQuote.extraColors} Extra Color${this.currentQuote.extraColors > 1 ? 's' : ''} (+${this.currentQuote.extraColors * 10}%)`);
+                }
+                return options.length > 0 ? options.join(', ') : 'Standard embroidery';
+            }
+            
+            setLoadingState(loading) {
+                this.elements.sendQuoteBtn.disabled = loading;
+                if (loading) {
+                    this.elements.sendQuoteBtn.innerHTML = '<i class="spinner"></i> Sending...';
+                } else {
+                    this.elements.sendQuoteBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Quote';
+                }
+            }
+            
+            showSuccess(quoteId) {
+                this.elements.quoteIdDisplay.textContent = `Quote ID: ${quoteId}`;
+                
+                // Also update print quote ID
+                const printQuoteId = document.getElementById('printQuoteId');
+                if (printQuoteId) {
+                    printQuoteId.textContent = quoteId;
+                }
+                this.elements.successMessage.classList.add('show');
+                this.elements.errorMessage.classList.remove('show');
+                
+                // Hide after 10 seconds
+                setTimeout(() => {
+                    this.elements.successMessage.classList.remove('show');
+                }, 10000);
+            }
+            
+            showError(message) {
+                this.elements.errorText.textContent = message;
+                this.elements.errorMessage.classList.add('show');
+                this.elements.successMessage.classList.remove('show');
+                
+                // Hide after 5 seconds
+                setTimeout(() => {
+                    this.elements.errorMessage.classList.remove('show');
+                }, 5000);
+            }
+        }
+        
+        // Helper function to close modal
+        window.closeModal = function() {
+            const calculator = window.emblemCalculator;
+            if (calculator) {
+                calculator.closeModal();
+            }
+        };
+        
+        // ShopWorks Guide Functions
+        function toggleGuide() {
+            const guideContent = document.getElementById('guideContent');
+            const guideToggle = document.getElementById('guideToggle');
+            
+            guideContent.classList.toggle('show');
+            guideToggle.classList.toggle('expanded');
+        }
+        
+        // Pricing Grid Toggle Function
+        function togglePricingGrid() {
+            const pricingContent = document.getElementById('pricingContent');
+            const pricingToggle = document.getElementById('pricingToggle');
+            
+            pricingContent.classList.toggle('show');
+            pricingToggle.classList.toggle('expanded');
+        }
+        
+        function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    // Show feedback
+                    event.target.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        event.target.innerHTML = '<i class="fas fa-copy"></i>';
+                    }, 1500);
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                event.target.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    event.target.innerHTML = '<i class="fas fa-copy"></i>';
+                }, 1500);
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        // Initialize calculator when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.emblemCalculator = new EmblemCalculator();
+            
+            // Set print date
+            const printDateEl = document.getElementById('printDate');
+            if (printDateEl) {
+                printDateEl.textContent = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            
+            // Set default sales rep
+            document.getElementById('salesRep').value = 'jim@nwcustomapparel.com';
+            
+            // Show pricing grid by default
+            const pricingContent = document.getElementById('pricingContent');
+            const pricingToggle = document.getElementById('pricingToggle');
+            if (pricingContent && pricingToggle) {
+                pricingContent.classList.add('show');
+                pricingToggle.classList.add('expanded');
+            }
+        });
+    </script>
+</body>
+</html>

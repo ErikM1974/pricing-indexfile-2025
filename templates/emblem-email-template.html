@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #4cb354;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header img {
+            max-width: 200px;
+            margin-bottom: 15px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .quote-details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .detail-row {
+            margin-bottom: 10px;
+        }
+        .detail-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+        }
+        .product-section {
+            background-color: #f0f9f4;
+            border: 2px solid #4cb354;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .product-title {
+            color: #4cb354;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .emblem-specs {
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .specs-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .specs-item:last-child {
+            border-bottom: none;
+        }
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+        }
+        .pricing-table th {
+            background-color: #4cb354;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        .pricing-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        .totals {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        .grand-total {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4cb354;
+            border-top: 2px solid #4cb354;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+        .notes-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .notes-section h3 {
+            margin-top: 0;
+            color: #4cb354;
+        }
+        .footer {
+            background-color: #333;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .footer a {
+            color: #4db8ff;
+            text-decoration: none;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .highlight-box {
+            background-color: #d4f1d7;
+            border: 1px solid #4cb354;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        .options-list li {
+            padding: 5px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        .options-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4cb354;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel Logo">
+            <h1>{{quote_type}} Quote</h1>
+            <p>Northwest Custom Apparel - Since {{company_year}}</p>
+        </div>
+
+        <div class="content">
+            <div class="quote-details">
+                <h2 style="margin-top: 0; color: #4cb354;">Quote Details</h2>
+                <div class="detail-row">
+                    <span class="detail-label">Quote ID:</span>
+                    <span>{{quote_id}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span>{{quote_date}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Customer:</span>
+                    <span>{{customer_name}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Company:</span>
+                    <span>{{company_name}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Project:</span>
+                    <span>{{project_name}}</span>
+                </div>
+            </div>
+
+            <div class="product-section">
+                <div class="product-title">Custom Embroidered Emblem</div>
+
+                <div class="emblem-specs">
+                    <h4 style="margin: 0 0 10px 0;">Emblem Specifications:</h4>
+                    <div class="specs-item">
+                        <strong>Size:</strong> {{emblem_size}}
+                    </div>
+                    <div class="specs-item">
+                        <strong>Quantity:</strong> {{quantity}} emblems
+                    </div>
+                    <div class="specs-item">
+                        <strong>Options:</strong> {{options_text}}
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    ✨ Premium embroidered emblems with merrowed edge finish
+                </div>
+            </div>
+
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th style="text-align: center;">Quantity</th>
+                        <th style="text-align: right;">Unit Price</th>
+                        <th style="text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            Embroidered Emblem ({{emblem_size}})<br>
+                            <small style="color: #666;">{{options_text}}</small>
+                        </td>
+                        <td style="text-align: center;">{{quantity}}</td>
+                        <td style="text-align: right;">{{unit_price}}</td>
+                        <td style="text-align: right;">{{subtotal}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="totals">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span>{{subtotal}}</span>
+                </div>
+                <div class="total-row">
+                    <span>Digitizing/Setup Fee:</span>
+                    <span>{{setup_fee}}</span>
+                </div>
+
+                <div class="total-row grand-total">
+                    <span>Total:</span>
+                    <span>{{grand_total}}</span>
+                </div>
+
+                <div style="text-align: center; margin-top: 15px; color: #e67e22; font-style: italic;">
+                    {{special_note}}
+                </div>
+            </div>
+
+            <div class="notes-section">
+                <h3>Notes</h3>
+                <p style="margin: 0;">{{notes}}</p>
+            </div>
+
+            <div class="warning">
+                <strong>This quote is valid for 30 days from the date above.</strong>
+            </div>
+
+            <div style="background-color: #f0f9f4; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                <h3 style="margin-top: 0; color: #4cb354;">Production Information</h3>
+                <ul class="options-list">
+                    <li>Professional embroidered patches with merrowed edge</li>
+                    <li>Heat-seal or sew-on backing available</li>
+                    <li>Standard production time: 10-14 business days</li>
+                    <li>Rush service available upon request</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <h3 style="margin-top: 0;">{{sales_rep_name}}</h3>
+            <p>Sales Representative</p>
+            <p>Email: <a href="mailto:{{sales_rep_email}}">{{sales_rep_email}}</a></p>
+            <p>Phone: {{sales_rep_phone}}</p>
+            <p style="margin-top: 20px;">Northwest Custom Apparel | Milton, Washington</p>
+            <p>Thank you for your business!</p>
+        </div>
+    </div>
+</body>
+</html>
