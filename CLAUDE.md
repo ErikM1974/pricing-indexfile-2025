@@ -1620,10 +1620,15 @@ Track all implemented calculators here for reference:
 ### Richardson Caps (RICH)
 - **File**: /calculators/richardson-2025.html
 - **Added**: 2025-01-27
+- **Updated**: 2025-01-27 - Added leatherette patch option
 - **Contact**: Vendor pricing
-- **EmailJS Template**: template_ug8o3ug
+- **EmailJS Template**: template_ug8o3ug (Richardson_Template)
 - **Quote Format**: RICH{MMDD}-{sequence}
 - **Database**: quote_sessions + quote_items
+- **Special Features**: 
+  - Dual embellishment type (Embroidery or Leatherette Patch)
+  - Pricing reference table below calculator
+  - Stitch count selector only shows for embroidery
 
 ### Contract Embroidery (EMB)
 - **File**: /calculators/embroidery-contract.html

@@ -46,6 +46,141 @@
             line-height: 1.6;
         }
 
+        /* Embellishment Radio Buttons */
+        .embellishment-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+
+        .radio-option:hover {
+            border-color: var(--primary-green);
+            background: var(--hover-bg);
+        }
+
+        .radio-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .radio-option input[type="radio"]:checked + span {
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+
+        .radio-option:has(input:checked) {
+            border-color: var(--primary-green);
+            background: var(--success-bg);
+        }
+
+        /* Pricing Reference Section */
+        .pricing-reference {
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .reference-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .reference-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .reference-note {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .reference-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .reference-table {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .reference-table h4 {
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .reference-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reference-table th {
+            background: var(--hover-bg);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .reference-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .reference-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .reference-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .reference-table td.text-right {
+            text-align: right;
+        }
+
+        .reference-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .reference-footer p {
+            margin: 0.5rem 0;
+        }
+
+        .reference-footer i {
+            color: var(--primary-green);
+            margin-right: 0.25rem;
+        }
+
         /* Header */
         .header {
             background: var(--card-bg);
@@ -644,6 +779,15 @@
             .total-amount {
                 font-size: 1.5rem;
             }
+
+            .reference-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .embellishment-options {
+                flex-direction: column;
+            }
         }
 
         /* Print Styles */
@@ -688,7 +832,7 @@
         <div class="page-header">
             <div class="page-header-left">
                 <h1 class="page-title">Richardson Cap Pricing Calculator</h1>
-                <p class="page-subtitle">Build multi-style cap quotes with embroidery pricing</p>
+                <p class="page-subtitle">Build multi-style cap quotes with embroidery or leatherette patch</p>
             </div>
             <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/richardson-sports-logo-vector.png?ver=1" alt="Richardson Headwear" class="richardson-logo">
         </div>
@@ -713,8 +857,23 @@
                         <input type="text" id="projectName" class="form-input" placeholder="e.g., Milton Wildcats Caps">
                     </div>
 
-                    <!-- Stitch Count -->
+                    <!-- Embellishment Type -->
                     <div class="form-group">
+                        <label class="form-label">Embellishment Type</label>
+                        <div class="embellishment-options">
+                            <label class="radio-option">
+                                <input type="radio" name="embellishment" value="embroidery" checked>
+                                <span>Embroidery</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="embellishment" value="leatherette">
+                                <span>Leatherette Patch</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Stitch Count -->
+                    <div class="form-group" id="stitchCountGroup">
                         <label class="form-label" for="stitchCount">Embroidery Stitch Count (for all styles)</label>
                         <select id="stitchCount" class="form-select">
                             <option value="5000">Up to 5,000 stitches</option>
@@ -756,6 +915,92 @@
                 <div id="resultsDisplay" class="hidden">
                     <!-- Quote results will be displayed here -->
                 </div>
+            </div>
+        </div>
+        <!-- Pricing Reference Table -->
+        <div class="pricing-reference">
+            <div class="reference-header">
+                <h3 class="reference-title">Embellishment Pricing Reference</h3>
+                <p class="reference-note">Base decoration costs only - cap price additional</p>
+            </div>
+            
+            <div class="reference-grid">
+                <!-- Embroidery Table -->
+                <div class="reference-table">
+                    <h4><i class="fas fa-thread"></i> Embroidery (8,000 stitches)</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1-23</td>
+                                <td>$12.00</td>
+                            </tr>
+                            <tr>
+                                <td>24-47</td>
+                                <td>$11.00</td>
+                            </tr>
+                            <tr>
+                                <td>48-71</td>
+                                <td>$10.00</td>
+                            </tr>
+                            <tr>
+                                <td>72+</td>
+                                <td>$8.50</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Leatherette Table -->
+                <div class="reference-table">
+                    <h4><i class="fas fa-tag"></i> Leatherette Patch</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Patch</th>
+                                <th>Labor</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1-23</td>
+                                <td class="text-right">$8.40</td>
+                                <td class="text-right">$4.00</td>
+                                <td>$12.40</td>
+                            </tr>
+                            <tr>
+                                <td>24-47</td>
+                                <td class="text-right">$7.34</td>
+                                <td class="text-right">$4.00</td>
+                                <td>$11.34</td>
+                            </tr>
+                            <tr>
+                                <td>48-71</td>
+                                <td class="text-right">$7.34</td>
+                                <td class="text-right">$3.00</td>
+                                <td>$10.34</td>
+                            </tr>
+                            <tr>
+                                <td>72+</td>
+                                <td class="text-right">$6.03</td>
+                                <td class="text-right">$2.75</td>
+                                <td>$8.78</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="reference-footer">
+                <p><i class="fas fa-info-circle"></i> Orders under 24 pieces incur a $50 Less Than Minimum fee</p>
+                <p><i class="fas fa-calculator"></i> Final price = (Cap Price ÷ 0.6) + Embellishment + Round Up</p>
             </div>
         </div>
     </main>
@@ -802,6 +1047,11 @@
                     <input type="text" id="companyName" class="form-input">
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label" for="notes">Notes (optional)</label>
+                    <textarea id="notes" class="form-input" rows="3" placeholder="Any special instructions or notes..."></textarea>
+                </div>
+
                 <div class="checkbox-group">
                     <input type="checkbox" id="saveToDatabase" checked>
                     <label for="saveToDatabase">Save quote to database</label>
@@ -820,6 +1070,7 @@
             <div id="successMessage" class="success-message hidden">
                 <i class="fas fa-check-circle"></i>
                 <span>Quote sent successfully!</span>
+                <span id="quoteIdDisplay" style="display: block; font-weight: bold; margin-top: 0.5rem;"></span>
             </div>
 
             <div id="errorMessage" class="error-message hidden">
@@ -991,11 +1242,27 @@
             { style: '943', description: 'Summit Pack', price: 11.50 }
         ];
 
-        // Embroidery pricing tiers
+        // Embroidery pricing by stitch count
         const embroideryCosts = {
-            '5000': { '1-23': 9.75, '24-47': 8.75, '48-71': 7.75, '72-99999': 6.75 },
-            '8000': { '1-23': 12.00, '24-47': 10.00, '48-71': 10.00, '72-99999': 8.50 },
-            '10000': { '1-23': 13.50, '24-47': 12.50, '48-71': 11.50, '72-99999': 11.00 }
+            '5000': { '1-23': 9.75, '24-47': 8.75, '48-71': 7.75, '72+': 6.75 },
+            '8000': { '1-23': 12.00, '24-47': 11.00, '48-71': 10.00, '72+': 8.50 },
+            '10000': { '1-23': 13.50, '24-47': 12.50, '48-71': 11.50, '72+': 11.00 }
+        };
+
+        // Leatherette patch pricing (flat rate)
+        const leatherettePricing = {
+            '1-23': 8.40,
+            '24-47': 7.34,
+            '48-71': 7.34,
+            '72+': 6.03
+        };
+
+        // Leatherette labor costs (tiered by quantity)
+        const leatheretteLabor = {
+            '1-23': 4.00,
+            '24-47': 4.00,
+            '48-71': 3.00,
+            '72+': 2.75
         };
 
         // Richardson Calculator Class
@@ -1019,8 +1286,10 @@
                 this.customerNameInput = document.getElementById('customerName');
                 this.projectNameInput = document.getElementById('projectName');
                 this.stitchCountSelect = document.getElementById('stitchCount');
+                this.stitchCountGroup = document.getElementById('stitchCountGroup');
                 this.lineItemsContainer = document.getElementById('lineItemsContainer');
                 this.addStyleBtn = document.getElementById('addStyleBtn');
+                this.embellishmentRadios = document.querySelectorAll('input[name="embellishment"]');
                 
                 // Results elements
                 this.emptyState = document.getElementById('emptyState');
@@ -1035,6 +1304,7 @@
                 this.customerPhone = document.getElementById('customerPhone');
                 this.companyName = document.getElementById('companyName');
                 this.salesRep = document.getElementById('salesRep');
+                this.notes = document.getElementById('notes');
                 this.saveToDatabase = document.getElementById('saveToDatabase');
                 this.quotePreview = document.getElementById('quotePreview');
                 this.successMessage = document.getElementById('successMessage');
@@ -1054,6 +1324,14 @@
                 // Update customer name in modal when main form changes
                 this.customerNameInput.addEventListener('input', () => {
                     this.quoteCustomerName.value = this.customerNameInput.value;
+                });
+
+                // Handle embellishment type change
+                this.embellishmentRadios.forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        const isEmbroidery = this.getSelectedEmbellishment() === 'embroidery';
+                        this.stitchCountGroup.style.display = isEmbroidery ? 'block' : 'none';
+                    });
                 });
             }
 
@@ -1161,15 +1439,31 @@
                 });
             }
 
-            getEmbroideryCost(stitchCount, quantity) {
-                const tiers = embroideryCosts[stitchCount];
-                for (const tier in tiers) {
-                    const [min, max] = tier.split('-').map(Number);
-                    if (quantity >= min && quantity <= max) {
-                        return tiers[tier];
-                    }
+            getSelectedEmbellishment() {
+                const selected = document.querySelector('input[name="embellishment"]:checked');
+                return selected ? selected.value : 'embroidery';
+            }
+
+            getEmbellishmentCost(quantity) {
+                const embellishmentType = this.getSelectedEmbellishment();
+                
+                if (embellishmentType === 'embroidery') {
+                    // Get stitch count and corresponding pricing
+                    const stitchCount = this.stitchCountSelect.value;
+                    const tiers = embroideryCosts[stitchCount];
+                    
+                    // Find the appropriate tier
+                    if (quantity <= 23) return tiers['1-23'];
+                    if (quantity <= 47) return tiers['24-47'];
+                    if (quantity <= 71) return tiers['48-71'];
+                    return tiers['72+'];
+                } else {
+                    // Leatherette pricing (patch + labor)
+                    if (quantity <= 23) return leatherettePricing['1-23'] + leatheretteLabor['1-23'];
+                    if (quantity <= 47) return leatherettePricing['24-47'] + leatheretteLabor['24-47'];
+                    if (quantity <= 71) return leatherettePricing['48-71'] + leatheretteLabor['48-71'];
+                    return leatherettePricing['72+'] + leatheretteLabor['72+'];
                 }
-                return tiers['72-99999']; // Default to highest tier
             }
 
             handleCalculate(e) {
@@ -1226,8 +1520,9 @@
                     return;
                 }
                 
-                // Get embroidery cost based on total quantity
-                const embroideryPrice = this.getEmbroideryCost(stitchCount, totalQuantity);
+                // Get embellishment cost based on total quantity
+                const embellishmentType = this.getSelectedEmbellishment();
+                const embellishmentPrice = this.getEmbellishmentCost(totalQuantity);
                 
                 // Calculate LTM fee
                 let ltmFeeTotal = 0;
@@ -1243,12 +1538,12 @@
                 
                 lineItems.forEach(item => {
                     const markedUpGarment = item.capPrice / marginDenominator;
-                    const decoratedPrice = markedUpGarment + embroideryPrice;
+                    const decoratedPrice = markedUpGarment + embellishmentPrice;
                     const basePricePerCap = Math.ceil(decoratedPrice);
                     const finalPricePerCap = basePricePerCap + ltmPerUnit;
                     const lineTotal = finalPricePerCap * item.quantity;
                     
-                    item.embroideryPrice = embroideryPrice;
+                    item.embellishmentPrice = embellishmentPrice;
                     item.pricePerPiece = finalPricePerCap;
                     item.lineTotal = lineTotal;
                     item.ltmPerUnit = ltmPerUnit;
@@ -1262,6 +1557,7 @@
                     projectName,
                     stitchCount,
                     stitchCountText,
+                    embellishmentType,
                     items: lineItems,
                     totalQuantity,
                     ltmFeeTotal,
@@ -1275,7 +1571,7 @@
             displayResults() {
                 if (!this.currentQuote) return;
                 
-                const { items, totalQuantity, stitchCountText, ltmFeeTotal, grandTotal } = this.currentQuote;
+                const { items, totalQuantity, stitchCountText, embellishmentType, ltmFeeTotal, grandTotal } = this.currentQuote;
                 
                 // Build items table
                 let itemsHtml = '';
@@ -1293,6 +1589,14 @@
                     `;
                 });
                 
+                // Build embellishment display text
+                let embellishmentDisplay = '';
+                if (embellishmentType === 'embroidery') {
+                    embellishmentDisplay = `Embroidery: ${stitchCountText}`;
+                } else {
+                    embellishmentDisplay = 'Leatherette Patch: 4" x 2.5"';
+                }
+                
                 // Build complete results HTML
                 let resultsHtml = `
                     <h2 class="section-title">
@@ -1306,8 +1610,8 @@
                             <span class="summary-value">${totalQuantity} pieces</span>
                         </div>
                         <div class="summary-row">
-                            <span class="summary-label">Embroidery:</span>
-                            <span class="summary-value">${stitchCountText}</span>
+                            <span class="summary-label">Embellishment:</span>
+                            <span class="summary-value">${embellishmentDisplay}</span>
                         </div>
                     </div>
                 `;
@@ -1451,6 +1755,7 @@
                         customerName: this.quoteCustomerName.value,
                         customerPhone: this.customerPhone.value,
                         companyName: this.companyName.value,
+                        notes: this.notes.value,
                         salesRepEmail: selectedRep,
                         salesRepName: salesRepNames[selectedRep]
                     };
@@ -1480,6 +1785,14 @@
                         `;
                     });
                     
+                    // Build embellishment summary for email
+                    let embellishmentSummary = '';
+                    if (this.currentQuote.embellishmentType === 'embroidery') {
+                        embellishmentSummary = `${this.currentQuote.totalQuantity} pieces with ${this.currentQuote.stitchCountText.toLowerCase()}`;
+                    } else {
+                        embellishmentSummary = `${this.currentQuote.totalQuantity} pieces with leatherette patch`;
+                    }
+                    
                     // Prepare email data
                     const emailData = {
                         to_email: this.customerEmail.value,
@@ -1488,7 +1801,9 @@
                         project_name: this.currentQuote.projectName || 'Richardson Cap Quote',
                         quote_id: saveResult?.quoteID || `TEMP-${Date.now()}`,
                         quote_date: new Date().toLocaleDateString(),
-                        quote_summary: `${this.currentQuote.totalQuantity} pieces with ${this.currentQuote.stitchCountText.toLowerCase()}`,
+                        quote_type: 'Richardson Caps',
+                        embellishment_type: this.currentQuote.embellishmentType === 'embroidery' ? 'Embroidery' : 'Leatherette Patch',
+                        quote_summary: embellishmentSummary,
                         quote_items_html: itemsHtml,
                         subtotal: `$${this.currentQuote.grandTotal.toFixed(2)}`,
                         ltm_note: this.currentQuote.ltmFeeTotal > 0 ? `*Includes less than minimum charge of $${this.currentQuote.ltmFeeTotal.toFixed(2)} ($${(this.currentQuote.ltmFeeTotal/this.currentQuote.totalQuantity).toFixed(2)}/piece)` : '',
@@ -1496,7 +1811,8 @@
                         sales_rep_name: quoteData.salesRepName,
                         sales_rep_email: quoteData.salesRepEmail,
                         sales_rep_phone: '253-922-5793',
-                        company_year: '1977'
+                        company_year: '1977',
+                        notes: this.notes.value || 'No special notes for this order'
                     };
                     
                     // Send email
@@ -1510,12 +1826,19 @@
                     this.successMessage.classList.remove('hidden');
                     this.errorMessage.classList.add('hidden');
                     
+                    // Display quote ID if available
+                    const quoteIdDisplay = document.getElementById('quoteIdDisplay');
+                    if (quoteIdDisplay && saveResult?.quoteID) {
+                        quoteIdDisplay.textContent = `Quote ID: ${saveResult.quoteID}`;
+                        quoteIdDisplay.style.display = 'block';
+                    }
+                    
                     // Reset form after delay
                     setTimeout(() => {
                         this.closeModal();
                         this.quoteForm.reset();
                         this.saveToDatabase.checked = true;
-                    }, 2000);
+                    }, 3000);
                     
                 } catch (error) {
                     console.error('Error sending quote:', error);
@@ -1587,7 +1910,7 @@
                     </table>
                     
                     <div style="text-align: right; margin-bottom: 20px;">
-                        <p>Embroidery: ${quote.stitchCountText}</p>
+                        <p>Embellishment: ${quote.embellishmentType === 'embroidery' ? `Embroidery - ${quote.stitchCountText}` : 'Leatherette Patch - 4" x 2.5"'}</p>
                         <p>Total Quantity: ${quote.totalQuantity} pieces</p>
                         ${quote.ltmFeeTotal > 0 ? `<p>Less Than Minimum Fee: $${quote.ltmFeeTotal.toFixed(2)}</p>` : ''}
                         <h3>Total: $${quote.grandTotal.toFixed(2)}</h3>
@@ -1608,10 +1931,6 @@
             document.getElementById('printContent').style.display = 'none';
         });
 
-        // Store calculator instance globally for print access
-        document.addEventListener('DOMContentLoaded', () => {
-            window.richardsonCalculator = new RichardsonCalculator();
-        });
     </script>
 </body>
 </html>

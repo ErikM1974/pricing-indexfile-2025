@@ -93,11 +93,7 @@ class RichardsonQuoteService {
                 TotalAmount: parseFloat(totalAmount.toFixed(2)),
                 Status: 'Open',
                 ExpiresAt: formattedExpiresAt,
-                Notes: JSON.stringify({
-                    projectName: quoteData.projectName || '',
-                    stitchCount: quoteData.stitchCount,
-                    embellishmentType: 'cap-embroidery'
-                })
+                Notes: quoteData.notes || ''
             };
 
             console.log('[RichardsonQuoteService] Session data:', sessionData);
@@ -148,7 +144,7 @@ class RichardsonQuoteService {
                     ProductName: item.description,
                     Color: '', // Richardson doesn't specify colors in this calculator
                     ColorCode: '',
-                    EmbellishmentType: 'cap-embroidery',
+                    EmbellishmentType: quoteData.embellishmentType || 'embroidery',
                     PrintLocation: 'Cap Front',
                     PrintLocationName: 'Cap Front',
                     Quantity: parseInt(item.quantity),
@@ -162,7 +158,8 @@ class RichardsonQuoteService {
                         capDetails: {
                             stitchCount: quoteData.stitchCount,
                             capBasePrice: item.capPrice,
-                            embroideryPrice: item.embroideryPrice
+                            embellishmentPrice: item.embellishmentPrice,
+                            embellishmentType: quoteData.embellishmentType
                         }
                     }),
                     PricingTier: this.getPricingTier(totalQuantity),
