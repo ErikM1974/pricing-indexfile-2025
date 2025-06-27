@@ -2,507 +2,860 @@
 
 ## Project Overview
 
-This is the Northwest Custom Apparel (NWCA) pricing system, a complex web application that handles custom pricing for various decoration methods (embroidery, screen print, DTG, etc.) on apparel products.
+This is the Northwest Custom Apparel (NWCA) pricing system, a web application that provides pricing calculators for various decoration methods (embroidery, DTG, laser engraving, etc.) on apparel and promotional products.
 
-## Key Concepts to Understand
+## Calculator Development Guide
 
-### 1. Master Bundle Architecture
-The system uses a "Master Bundle" pattern where:
-- **Caspio DataPages** handle all calculations and return complete JSON data
-- **Web pages** receive this data via postMessage and render the UI
-- Each decoration type has its own API endpoint and pricing logic
+### Calculator Architecture
 
-### 2. Common Pitfalls
+Each pricing calculator follows a consistent pattern:
 
-**The #1 Issue**: Component conflicts between UniversalPricingGrid and page-specific implementations
-- Never load both on the same page
-- Always check which system is being used before making changes
+1. **HTML Page** - Self-contained calculator with embedded JavaScript class
+2. **Quote Service** - Handles database integration and quote persistence  
+3. **EmailJS Integration** - Sends professional quotes to customers
+4. **Consistent UI/UX** - Follows established design patterns
 
-**The #2 Issue**: Missing HTML containers
-- Always verify required containers exist before debugging "not found" errors
-- Check the console for specific container IDs
-
-### 3. File Organization
+### File Structure
 
 ```
-/shared_components/js/
-├── universal-*.js          # Generic UI components
-├── embroidery-*.js         # Embroidery-specific code
-├── pricing-*.js            # Core pricing infrastructure
-├── dp5-helper.js           # UI utilities and helpers
-└── *-integration.js        # Master bundle integrations
+/calculators/
+├── [name]-calculator.html     # Main calculator page
+├── [name]-quote-service.js    # Database integration
+└── test-[name].html          # Optional test page
 
-/[page-name]-pricing.html   # Main page files
+/staff-dashboard.html         # Central navigation hub
 ```
 
-## Critical Information
+## Creating a New Calculator
 
-### API Proxy URL
-```
-https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
-```
+### Step 1: Information Gathering
 
-### Company Logo URL
-```
-https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1
-```
+Before writing any code, gather the following information:
 
-### Namespace
-All custom code should respect the `window.NWCA` namespace structure.
+```markdown
+CALCULATOR REQUIREMENTS:
+1. Calculator Name: ________________________________
+2. Quote Prefix (2-4 letters): ____________________  
+3. Primary Contact Person: _________________________
+4. Decoration Type: ________________________________
+5. Pricing Structure:
+   □ Tiered by quantity
+   □ Flat rate  
+   □ Custom calculation
+6. Minimum Order Quantity: _________________________
+7. Setup Fees: ____________________________________
+8. LTM (Less Than Minimum) Fee: ___________________
 
-### Event Flow
-1. Page loads → Caspio iframe loads
-2. Caspio sends postMessage with master bundle
-3. Integration script receives and transforms data
-4. `pricingDataLoaded` event dispatched
-5. UI components render the data
+EMAILJS REQUIREMENTS:
+1. Template ID (not name): ________________________
+2. Special email variables: _______________________
 
-## Common Tasks
-
-### Adding a New Decoration Type
-1. Create Caspio DataPage using templates in PRICING_IMPLEMENTATION_GUIDE.md
-2. Create integration script (e.g., `screenprint-master-bundle-integration.js`)
-3. Create HTML page following embroidery-pricing.html pattern
-4. Choose either UniversalPricingGrid OR custom implementation
-5. Test with console.log(window.nwcaMasterBundleData)
-
-### Debugging Pricing Issues
-1. Check console for "container not found" errors
-2. Verify master bundle data: `console.log(window.nwcaMasterBundleData)`
-3. Check for component conflicts (multiple initializations)
-4. Verify event flow in Network tab (postMessage)
-
-### Modifying Pricing Logic
-- **Simple changes**: Update the pricing-v3.js file
-- **Complex changes**: May need to update Caspio DataPage calculations
-- **Always test**: With different products, sizes, and quantities
-
-## Code Patterns
-
-### Checking for Master Bundle Data
-```javascript
-if (window.nwcaMasterBundleData) {
-    // Data is available
-    const pricing = window.nwcaMasterBundleData.pricing;
-}
+DATABASE REQUIREMENTS:
+1. Save quotes to database? □ Yes □ No
+2. Default Sales Rep: _____________________________
 ```
 
-### Listening for Pricing Data
-```javascript
-document.addEventListener('pricingDataLoaded', function(event) {
-    const data = event.detail;
-    // Handle the data
-});
-```
+### Step 2: Create HTML Calculator Page
 
-### Container Pattern
-```javascript
-const container = document.getElementById('container-id');
-if (!container) {
-    console.error('[COMPONENT] Container not found');
-    return;
-}
-```
+Use this template structure:
 
-## Testing Approach
-
-1. **Unit Testing**: Use test HTML files (test-*.html) for isolated testing
-2. **Console Testing**: Liberal use of console.log for debugging
-3. **Data Validation**: Always check data structure matches expectations
-
-## Style Guidelines
-
-### Console Logging
-Use prefixed logs for easy filtering:
-```javascript
-console.log('[COMPONENT-NAME] Message here');
-```
-
-### Error Handling
-Always provide helpful error messages:
-```javascript
-if (!data) {
-    console.error('[COMPONENT] No data provided. Expected structure: {...}');
-    return;
-}
-```
-
-### Comments
-- Document WHY, not WHAT
-- Include examples for complex data structures
-- Mark TODO items clearly
-
-## Integration Points
-
-### With Caspio
-- DataPages send data via postMessage
-- Use specific event names: `caspio[TYPE]MasterBundleReady`
-
-### With UI Components
-- Transform data to match UI expectations
-- Dispatch standardized events
-- Store data in global variables for debugging
-
-## Performance Considerations
-
-1. **Caching**: API responses are cached in sessionStorage
-2. **Event Debouncing**: Quantity changes are debounced
-3. **Lazy Loading**: Components initialize only when needed
-
-## Security Notes
-
-- Never expose API keys in client-side code
-- Use the proxy server for all API calls
-- Validate all data from postMessage events
-
-## Helpful Commands
-
-### Git Workflow
-```bash
-git add -A
-git commit -m "type: Description"
-git push origin branch-name
-```
-
-### Common Commit Types
-- `fix:` Bug fixes
-- `feat:` New features
-- `docs:` Documentation updates
-- `refactor:` Code refactoring
-- `test:` Test additions/updates
-
-## Resources
-
-- See `PRICING_IMPLEMENTATION_GUIDE.md` for detailed implementation steps
-- Check test-*.html files for working examples
-- Console logs are your friend - the system logs extensively
-
-## Recently Discovered Issues (2025-01-20)
-
-### Cap Pricing Implementation Issues (2025-01-20)
-- **PROBLEM 1**: dp5-helper overwrites custom pricing tables when `pricingDataLoaded` event fires
-  - **CAUSE**: dp5-helper listens to this event and rebuilds tables with `innerHTML = ''`
-  - **SOLUTION**: Don't dispatch legacy `pricingDataLoaded` event from master bundle integrations
-  - **ALTERNATIVE**: Set `window.directFixApplied = true` after creating table
-  - **FILES AFFECTED**: `cap-master-bundle-integration.js` (removed event dispatch)
-  
-- **PROBLEM 2**: Table headers showing as white text on white background
-  - **CAUSE**: CSS inheritance/specificity issues
-  - **SOLUTION**: Force colors with `!important` in decoration-specific CSS
-  - **EXAMPLE**: `.pricing-grid th { color: #586069 !important; }`
-  
-- **PROBLEM 3**: Console errors from shared scripts on specialized pages
-  - **CAUSE**: Scripts looking for functions/elements that don't exist on pricing pages
-  - **SOLUTION**: Add page-specific checks before initialization
-  - **EXAMPLE**: 
-    ```javascript
-    if (window.location.pathname.includes('cap-embroidery')) {
-        console.log('Skipping - page handles its own parameters');
-        return;
-    }
-    ```
-
-### Master Bundle Integration Best Practices
-- **PATTERN**: Follow `cap-master-bundle-integration.js` as template
-- **DATA FLOW**: Caspio iframe → postMessage → integration script → custom event → UI component
-- **EVENT NAMING**: Use specific events like `capMasterBundleLoaded` not generic `pricingDataLoaded`
-- **DEBUGGING**: Store data globally: `window.nwca[Type]MasterBundleData`
-- **TABLE STRUCTURE**: 
-  - Use single-row headers for CSS compatibility
-  - Match embroidery table HTML structure exactly
-  - Avoid IDs that dp5-helper searches for (`pricing-grid-container-table`)
-- **CSS REQUIREMENTS**:
-  - Always include `modern-pricing-table.css` first
-  - Add decoration-specific CSS after (e.g., `screenprint-pricing-enhancements.css`)
-  - Use green theme consistently (#3a7c52)
-
-### Pricing Table Width Issues with Many Sizes
-- **PROBLEM**: Tables with 9 size columns (S-6XL) get cramped and hard to read
-- **SOLUTION**: Created `modern-pricing-table.css` with:
-  - Responsive wrapper with horizontal scroll
-  - Minimum column widths (80px) 
-  - Card-based mobile layout
-  - Sticky first column on tablet
-- **REMOVED**: "POPULAR" and "BEST VALUE" badges (unnecessary clutter)
-- **FILE**: `/shared_components/css/modern-pricing-table.css`
-
-### Double Header and Layout Issues
-- **PROBLEM**: Two headers (universal + enhanced), misaligned columns, excessive spacing
-- **SOLUTION**: Created `embroidery-layout-fix.css` with:
-  - Hide duplicate universal-header-container
-  - Reduce body padding from 200px to 140px
-  - CSS Grid for perfect column alignment
-  - Professional card design for both columns
-  - Optimized spacing throughout
-- **IMPACT**: 30% header height reduction, perfect alignment, cleaner layout
-- **FILE**: `/shared_components/css/embroidery-layout-fix.css`
-
-### Caspio Authentication and Personalization (2025-01-26)
-- **PROBLEM**: Displaying authenticated user's first name from Caspio DataPage
-- **DISCOVERY**: Caspio outputs user data in `<dd class="cbResultSetData">Erik</dd>` elements
-- **AUTHENTICATION DIFFERENCES**:
-  - **Localhost**: Authentication cookies don't work due to cross-origin restrictions
-  - **Production (Heroku)**: Works perfectly with proper domain and HTTPS
-- **SOLUTION**: 
-  ```javascript
-  // Wait for Caspio to load with retry mechanism
-  const caspioData = document.querySelector('.cbResultSetData');
-  const firstName = caspioData?.textContent?.trim() || 'Team Member';
-  ```
-- **IMPLEMENTATION**: 
-  - Added retry mechanism (checks every 500ms up to 10 times)
-  - Personalized greetings: "Good morning/afternoon/evening, [Name]!"
-  - Graceful fallback when not authenticated
-- **FILES AFFECTED**: `staff-dashboard.html`
-- **KEY LEARNING**: Always test authentication features on production, not just localhost
-
-## Quote System Implementation Guide (2025-01-26)
-
-### Overview
-This guide documents how to implement quote functionality with EmailJS and Caspio database integration. This pattern is used across all calculator types (DTG, Embroidery, Screen Print, etc.).
-
-### 1. EmailJS Template Setup
-
-#### A. Create Template in EmailJS Dashboard
-1. Log into EmailJS.com
-2. Go to Email Templates → Create New Template
-3. Set up template variables and HTML structure
-
-#### B. Required Template Variables
-```
-{{to_email}}         - Customer's email address
-{{from_name}}        - Sales rep name (sender)
-{{reply_to}}         - Reply-to email address
-{{cc_email}}         - CC recipients (optional)
-{{customer_name}}    - Customer's full name
-{{company_name}}     - Company name
-{{customer_phone}}   - Phone number
-{{quote_id}}         - Unique quote identifier
-{{decoration_method}} - Type of decoration/service
-{{products_html}}    - HTML table with pricing details
-{{notes}}            - Additional notes/instructions
-```
-
-#### C. EmailJS Configuration Settings
-- **To Email**: `{{to_email}}`
-- **From Name**: `{{from_name}}`
-- **From Email**: Use Default Email Address ✓
-- **Reply To**: `{{reply_to}}`
-- **CC**: `{{cc_email}}`
-- **Subject**: `Contract DTG Quote {{quote_id}} - {{customer_name}}`
-
-#### D. HTML Email Template Structure
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>[Calculator Name] - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Quote Service -->
+    <script src="[name]-quote-service.js"></script>
+    
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
-        .container { max-width: 600px; margin: 0 auto; background-color: white; }
-        .header { background-color: #2f661e; padding: 20px; text-align: center; }
-        .header h1 { color: white; margin: 0; font-size: 24px; }
-        .content { padding: 30px; }
-        .info-section { background: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-        /* Add more styles as needed */
+        /* Use consistent root variables */
+        :root {
+            --primary-green: #3a7c52;
+            --primary-dark: #1a472a;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>NORTHWEST CUSTOM APPAREL</h1>
-            <p>Quote - {{quote_id}}</p>
-        </div>
-        <div class="content">
-            <!-- Customer info section -->
-            <!-- Pricing table: {{{products_html}}} -->
-            <!-- Contact information -->
-        </div>
-    </div>
+    <!-- Standard header with navigation -->
+    <!-- Calculator form and results display -->
+    <!-- Quote modal for email sending -->
 </body>
 </html>
 ```
 
-### 2. Caspio Database Structure
+### Step 3: Implement JavaScript Calculator Class
 
-#### A. Quote Sessions Table (quote_sessions)
-Stores main quote information:
-```
-QuoteID         - STRING (Primary Key) - Format: DTG0126-1, EMB0126-2, etc.
-SessionID       - STRING - Unique session identifier
-CustomerEmail   - STRING - Customer's email
-CustomerName    - STRING - Customer name
-CompanyName     - STRING - Company name (optional)
-Phone           - STRING - Phone number (optional)
-TotalQuantity   - NUMBER - Total items quantity
-SubtotalAmount  - NUMBER - Subtotal before fees
-LTMFeeTotal     - NUMBER - Less Than Minimum fees
-TotalAmount     - NUMBER - Grand total
-Status          - STRING - Quote status (Open/Closed)
-ExpiresAt       - DATETIME - Expiration date (30 days)
-Notes           - TEXT - Additional notes
-CreatedAt       - DATETIME - Creation timestamp
-```
-
-#### B. Quote Items Table (quote_items)
-Stores individual line items:
-```
-QuoteID             - STRING (Foreign Key) - Links to quote_sessions
-LineNumber          - NUMBER - Sequential line number
-StyleNumber         - STRING - Product style or "CUSTOMER-SUPPLIED"
-ProductName         - STRING - Product/service name
-Color               - STRING - Color or garment type
-ColorCode           - STRING - Color code (optional)
-EmbellishmentType   - STRING - dtg/embroidery/screenprint
-PrintLocation       - STRING - Location(s) for decoration
-PrintLocationName   - STRING - Human-readable location
-Quantity            - NUMBER - Item quantity
-HasLTM              - STRING - "Yes"/"No"
-BaseUnitPrice       - NUMBER - Price per item
-LTMPerUnit          - NUMBER - LTM fee per unit
-FinalUnitPrice      - NUMBER - Final price per item
-LineTotal           - NUMBER - Total for line
-SizeBreakdown       - STRING - JSON with size distribution
-PricingTier         - STRING - "1-23", "24-47", etc.
-ImageURL            - STRING - Product image (optional)
-AddedAt             - DATETIME - Timestamp
-```
-
-### 3. API Configuration
-
-#### A. Proxy Server Endpoint
-```
-Base URL: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
-```
-
-#### B. API Endpoints
-```
-POST /api/quote_sessions - Create new quote session
-POST /api/quote_items    - Add items to quote
-GET  /api/quote_sessions?quoteID={id} - Retrieve quote session
-GET  /api/quote_items?quoteID={id}    - Retrieve quote items
-```
-
-### 4. Implementation Pattern
-
-#### A. Quote Service Template
-Create a service file for each calculator type:
 ```javascript
-class [Type]QuoteService {
+class [Name]Calculator {
+    constructor() {
+        // Initialize EmailJS
+        emailjs.init('4qSbDO-SQs19TbP80');
+        
+        // Initialize quote service
+        this.quoteService = new [Name]QuoteService();
+        
+        // Store current quote data
+        this.currentQuote = null;
+        
+        // EmailJS configuration
+        this.emailConfig = {
+            publicKey: '4qSbDO-SQs19TbP80',
+            serviceId: 'service_1c4k67j',
+            templateId: 'template_[specific_id]' // Get from user
+        };
+        
+        this.initializeElements();
+        this.bindEvents();
+    }
+    
+    calculate() {
+        // Implement pricing logic
+        // Store results in this.currentQuote
+    }
+    
+    async handleQuoteSubmit(e) {
+        e.preventDefault();
+        
+        // 1. Validate form
+        // 2. Generate quote ID
+        // 3. Save to database (if enabled)
+        // 4. Send email
+        // 5. Show success with quote ID
+    }
+}
+```
+
+## Critical Resources
+
+### API & URLs
+```
+API Proxy: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
+Company Logo: https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1
+Company Phone: 253-922-5793
+```
+
+### EmailJS Credentials
+```
+Public Key: 4qSbDO-SQs19TbP80
+Service ID: service_1c4k67j
+```
+
+## Caspio Database Integration
+
+### Overview
+
+All quotes are saved to a standardized two-table structure in Caspio:
+- **quote_sessions** - Master quote information
+- **quote_items** - Individual line items for each quote
+
+### Database Schema
+
+#### quote_sessions Table
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| QuoteID | STRING | Primary Key, Format: [PREFIX][MMDD]-[sequence] | "DTG0127-1" |
+| SessionID | STRING | Unique session identifier | "dtg_sess_1706372145_x9k2m" |
+| CustomerEmail | STRING | Customer's email address | "john@company.com" |
+| CustomerName | STRING | Customer's full name | "John Smith" |
+| CompanyName | STRING | Company name (optional) | "ABC Company" |
+| Phone | STRING | Phone number (optional) | "253-555-1234" |
+| TotalQuantity | NUMBER | Sum of all line items | 48 |
+| SubtotalAmount | NUMBER | Subtotal before fees | 500.00 |
+| LTMFeeTotal | NUMBER | Less Than Minimum fee total | 50.00 |
+| TotalAmount | NUMBER | Grand total including all fees | 550.00 |
+| Status | STRING | Quote status | "Open" or "Closed" |
+| ExpiresAt | DATETIME | Expiration date (30 days) | "2025-02-26T12:00:00" |
+| Notes | TEXT | Customer notes/instructions | "Rush order needed" |
+| CreatedAt | DATETIME | Auto-populated by Caspio | "2025-01-27T10:30:00" |
+
+#### quote_items Table
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| QuoteID | STRING | Foreign Key to quote_sessions | "DTG0127-1" |
+| LineNumber | NUMBER | Sequential line number | 1 |
+| StyleNumber | STRING | Product style code | "PC54" or "CUSTOMER-SUPPLIED" |
+| ProductName | STRING | Product description | "Cotton T-Shirt" |
+| Color | STRING | Color name(s) | "Black" |
+| ColorCode | STRING | Color code(s) | "BLK" |
+| EmbellishmentType | STRING | Decoration method | "dtg", "embroidery", "laser", "screenprint" |
+| PrintLocation | STRING | Location identifier | "Full Front" |
+| PrintLocationName | STRING | Location display name | "Full Front - 12x16" |
+| Quantity | NUMBER | Item quantity | 48 |
+| HasLTM | STRING | Less than minimum flag | "Yes" or "No" |
+| BaseUnitPrice | NUMBER | Base price per unit | 10.50 |
+| LTMPerUnit | NUMBER | LTM fee per unit | 1.04 |
+| FinalUnitPrice | NUMBER | Final price per unit | 11.54 |
+| LineTotal | NUMBER | Quantity × FinalUnitPrice | 554.00 |
+| SizeBreakdown | STRING | JSON with size/color details | '{"S":12,"M":12,"L":12,"XL":12}' |
+| PricingTier | STRING | Quantity tier | "48-71" |
+| ImageURL | STRING | Product image URL (optional) | "" |
+| AddedAt | DATETIME | Timestamp | "2025-01-27T10:30:00" |
+
+### Implementation Pattern
+
+#### Step 1: Create Quote Service Class
+
+```javascript
+class [Name]QuoteService {
     constructor() {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     }
-
+    
     generateQuoteID() {
         const now = new Date();
         const month = (now.getMonth() + 1).toString().padStart(2, '0');
         const day = now.getDate().toString().padStart(2, '0');
         const dateKey = `${month}${day}`;
         
-        // Use specific prefix for each type: DTG, EMB, SP, etc.
-        const storageKey = `[type]_quote_sequence_${dateKey}`;
+        // Daily sequence reset using sessionStorage
+        const storageKey = `[prefix]_quote_sequence_${dateKey}`;
         let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
         sessionStorage.setItem(storageKey, sequence.toString());
         
+        // Clean up old sequences
+        this.cleanupOldSequences(dateKey);
+        
         return `[PREFIX]${dateKey}-${sequence}`;
     }
-
-    async saveQuote(quoteData) {
-        // 1. Create session
-        // 2. Add items
-        // 3. Return result
+    
+    generateSessionID() {
+        return `[prefix]_sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
 }
 ```
 
-#### B. Integration with Calculator
-```javascript
-// In calculator class
-constructor() {
-    this.quoteService = new [Type]QuoteService();
-    this.emailConfig = {
-        publicKey: '4qSbDO-SQs19TbP80',
-        serviceId: 'service_1c4k67j',
-        templateId: 'template_[specific_id]'
-    };
-}
+#### Step 2: Save Quote Session
 
+```javascript
+async saveQuote(quoteData) {
+    try {
+        const quoteID = this.generateQuoteID();
+        const sessionID = this.generateSessionID();
+        
+        // Format dates for Caspio (remove milliseconds)
+        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .replace(/\.\d{3}Z$/, '');
+        
+        const sessionData = {
+            QuoteID: quoteID,
+            SessionID: sessionID,
+            CustomerEmail: quoteData.customerEmail,
+            CustomerName: quoteData.customerName || 'Guest',
+            CompanyName: quoteData.companyName || 'Not Provided',
+            Phone: quoteData.customerPhone || '',
+            TotalQuantity: quoteData.totalQuantity,
+            SubtotalAmount: parseFloat(quoteData.subtotal.toFixed(2)),
+            LTMFeeTotal: quoteData.ltmFeeTotal || 0,
+            TotalAmount: parseFloat(quoteData.total.toFixed(2)),
+            Status: 'Open',
+            ExpiresAt: expiresAt,
+            Notes: quoteData.notes || ''
+        };
+        
+        const response = await fetch(`${this.baseURL}/api/quote_sessions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sessionData)
+        });
+        
+        // Always get response text first for debugging
+        const responseText = await response.text();
+        console.log('[QuoteService] Session response:', response.status, responseText);
+        
+        if (!response.ok) {
+            throw new Error(`Session creation failed: ${responseText}`);
+        }
+```
+
+#### Step 3: Save Quote Items
+
+```javascript
+        // Add items to quote
+        const itemPromises = quoteData.items.map(async (item, index) => {
+            const addedAt = new Date().toISOString().replace(/\.\d{3}Z$/, '');
+            
+            const itemData = {
+                QuoteID: quoteID,
+                LineNumber: index + 1,
+                StyleNumber: item.styleNumber || 'CUSTOM',
+                ProductName: item.productName,
+                Color: item.color || '',
+                ColorCode: item.colorCode || '',
+                EmbellishmentType: quoteData.embellishmentType,
+                PrintLocation: item.location || '',
+                PrintLocationName: item.locationDisplay || '',
+                Quantity: parseInt(item.quantity),
+                HasLTM: quoteData.totalQuantity < 24 ? 'Yes' : 'No',
+                BaseUnitPrice: parseFloat(item.basePrice || 0),
+                LTMPerUnit: parseFloat(item.ltmPerUnit || 0),
+                FinalUnitPrice: parseFloat(item.finalPrice),
+                LineTotal: parseFloat(item.lineTotal),
+                SizeBreakdown: JSON.stringify(item.sizes || {}),
+                PricingTier: this.getPricingTier(quoteData.totalQuantity),
+                ImageURL: item.imageUrl || '',
+                AddedAt: addedAt
+            };
+            
+            const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(itemData)
+            });
+            
+            if (!itemResponse.ok) {
+                const errorText = await itemResponse.text();
+                console.error('Item save failed:', errorText);
+                // Don't throw - allow partial success
+            }
+            
+            return itemResponse.ok;
+        });
+        
+        await Promise.all(itemPromises);
+        
+        return {
+            success: true,
+            quoteID: quoteID
+        };
+        
+    } catch (error) {
+        console.error('[QuoteService] Error:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+}
+```
+
+### Important Implementation Notes
+
+1. **Date Formatting**: Always use `.replace(/\.\d{3}Z$/, '')` to remove milliseconds from ISO dates
+2. **Number Fields**: Always use `parseFloat()` and `.toFixed(2)` for currency amounts
+3. **Quote ID Pattern**: Must follow `[PREFIX][MMDD]-[sequence]` format
+4. **Error Handling**: Log detailed responses but don't stop email send on database failure
+5. **SizeBreakdown Field**: Can store any JSON data - use for size distributions, color breakdowns, or custom details
+
+### Common Patterns by Calculator Type
+
+- **DTG Contract**: Single item with combined print locations
+- **Richardson Caps**: Multiple items (different styles) in one quote
+- **Embroidery**: Items with stitch count stored in SizeBreakdown
+- **Laser Tumbler**: Color/case breakdown in SizeBreakdown
+
+## EmailJS Integration
+
+### Overview
+
+EmailJS enables sending professional quotes directly from the browser without backend infrastructure. All calculators use the same EmailJS account with calculator-specific templates.
+
+### Configuration
+
+```javascript
+// Initialize EmailJS (in constructor)
+emailjs.init('4qSbDO-SQs19TbP80');
+
+// Configuration object
+this.emailConfig = {
+    publicKey: '4qSbDO-SQs19TbP80',
+    serviceId: 'service_1c4k67j',
+    templateId: 'template_xxxxxx'  // Get specific ID from user
+};
+```
+
+### Required Template Variables
+
+Every calculator must provide ALL of these variables to avoid corruption errors:
+
+```javascript
+const emailData = {
+    // Email Routing (Required)
+    to_email: customerEmail,              // Customer's email
+    reply_to: salesRepEmail,              // Sales rep's email
+    from_name: 'Northwest Custom Apparel', // Always this value
+    
+    // Quote Identification (Required)
+    quote_type: 'Embroidered Emblems',    // Calculator name
+    quote_id: 'EMB0127-1',               // Generated quote ID
+    quote_date: new Date().toLocaleDateString(),
+    
+    // Customer Info (Required)
+    customer_name: 'John Smith',
+    project_name: projectName || '',      // Can be empty string
+    
+    // Pricing (Required)
+    grand_total: '$554.00',              // Formatted total
+    
+    // Sales Rep (Required)
+    sales_rep_name: 'Ruth Nhong',
+    sales_rep_email: 'ruth@nwcustomapparel.com',
+    sales_rep_phone: '253-922-5793',
+    
+    // Company (Required)
+    company_year: '1977',
+    
+    // Optional Fields (Always provide with defaults)
+    company_name: companyName || '',
+    customer_phone: phone || '',
+    notes: notes || 'No special notes for this order',
+    special_note: '',                    // Additional note if needed
+    
+    // Quote Content (HTML for complex layouts)
+    products_html: this.generateQuoteHTML(),
+    quote_summary: summaryText || ''
+};
+```
+
+### Sending Emails
+
+```javascript
 async handleQuoteSubmit(e) {
-    // 1. Validate form
-    // 2. Save to database (if checkbox checked)
-    // 3. Send email
-    // 4. Show success message
-}
-```
-
-#### C. Modal Form Structure
-```html
-<div class="modal-backdrop" id="quoteModal">
-    <div class="modal">
-        <form id="quoteForm">
-            <!-- Customer info fields -->
-            <input type="text" id="customerName" required>
-            <input type="email" id="customerEmail" required>
-            
-            <!-- Quote preview -->
-            <div class="quote-preview" id="quotePreview"></div>
-            
-            <!-- Save option -->
-            <label>
-                <input type="checkbox" id="saveToDatabase" checked>
-                Save quote to database
-            </label>
-            
-            <!-- Submit buttons -->
-            <button type="submit">Send Quote</button>
-        </form>
-    </div>
-</div>
-```
-
-### 5. Quote ID Patterns
-
-Different prefixes for different calculator types:
-- **DTG**: `DTG{MMDD}-{sequence}` (e.g., DTG0126-1)
-- **Embroidery**: `EMB{MMDD}-{sequence}`
-- **Screen Print**: `SP{MMDD}-{sequence}`
-- **Product Quotes**: `Q{MMDD}-{sequence}`
-
-### 6. Error Handling
-
-Always implement graceful error handling:
-```javascript
-try {
-    const saveResult = await this.quoteService.saveQuote(data);
-    if (!saveResult.success) {
-        console.error('Save failed:', saveResult.error);
-        // Continue with email send
+    e.preventDefault();
+    
+    try {
+        // 1. Generate quote ID
+        const quoteId = this.quoteService.generateQuoteID();
+        
+        // 2. Build email data (ALL variables required!)
+        const emailData = {
+            // ... all required fields
+        };
+        
+        // 3. Save to database if enabled
+        if (this.saveToDatabase.checked) {
+            const saveResult = await this.quoteService.saveQuote(quoteData);
+            if (!saveResult.success) {
+                console.error('Database save failed:', saveResult.error);
+                // Continue with email send
+            }
+        }
+        
+        // 4. Send email
+        await emailjs.send(
+            this.emailConfig.serviceId,
+            this.emailConfig.templateId,
+            emailData
+        );
+        
+        // 5. Show success with quote ID
+        this.showSuccess(`Quote sent successfully! Quote ID: ${quoteId}`);
+        
+    } catch (error) {
+        console.error('EmailJS Error:', error);
+        this.showError('Failed to send quote. Please try again.');
     }
-} catch (error) {
-    console.error('Error:', error);
-    // Show user-friendly message
 }
 ```
 
-### 7. Testing Checklist
+### Common EmailJS Errors and Solutions
 
-- [ ] EmailJS template created and configured
-- [ ] Template variables match code implementation
-- [ ] Quote saves to both database tables
-- [ ] Quote ID generates correctly
-- [ ] Email sends with proper formatting
-- [ ] Success/error messages display
+#### "One or more dynamic variables are corrupted"
+- **Cause**: Missing or undefined template variables
+- **Solution**: Ensure ALL variables have values (use `|| ''` for optional fields)
+
+#### "Template not found"
+- **Cause**: Using template name instead of template ID
+- **Solution**: Always use template ID (e.g., "template_6bie1il")
+
+#### Undefined Variables
+```javascript
+// ❌ Wrong - causes corruption
+emailData.notes = undefined;
+emailData.company = null;
+
+// ✅ Correct - always provide value
+emailData.notes = notes || '';
+emailData.company = company || 'Not Provided';
+```
+
+### HTML Content in Templates
+
+For complex quote layouts, use HTML:
+
+```javascript
+generateQuoteHTML() {
+    return `
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f3f4f6;">
+                    <th style="padding: 8px; text-align: left;">Item</th>
+                    <th style="padding: 8px; text-align: center;">Qty</th>
+                    <th style="padding: 8px; text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${this.items.map(item => `
+                    <tr>
+                        <td style="padding: 8px;">${item.name}</td>
+                        <td style="padding: 8px; text-align: center;">${item.qty}</td>
+                        <td style="padding: 8px; text-align: right;">$${item.total}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+```
+
+In EmailJS template, use triple braces for HTML:
+```
+{{{products_html}}}  <!-- Renders HTML -->
+{{customer_name}}    <!-- Renders plain text -->
+```
+
+### Staff Email Directory
+
+```javascript
+const salesReps = {
+    'ruth@nwcustomapparel.com': 'Ruth Nhong',
+    'taylar@nwcustomapparel.com': 'Taylar',
+    'nika@nwcustomapparel.com': 'Nika',
+    'erik@nwcustomapparel.com': 'Erik',
+    'adriyella@nwcustomapparel.com': 'Adriyella',
+    'bradley@nwcustomapparel.com': 'Bradley',
+    'jim@nwcustomapparel.com': 'Jim',
+    'art@nwcustomapparel.com': 'Steve (Artist)',
+    'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
+};
+```
+
+## Complete Calculator Implementation Workflow
+
+### Phase 1: Planning (15 minutes)
+
+1. **Gather Requirements** using the checklist from Step 1
+2. **Validate Information**:
+   - Confirm quote prefix is unique
+   - Ensure you have the correct EmailJS template ID
+   - Understand the complete pricing logic
+
+3. **Create Files**:
+   ```bash
+   /calculators/
+     ├── [name]-calculator.html
+     └── [name]-quote-service.js
+   ```
+
+### Phase 2: Development (45 minutes)
+
+#### 2.1 HTML Structure
+- Copy template from Step 2
+- Add calculator-specific form fields
+- Include quote display section
+- Add email modal
+
+#### 2.2 Quote Service Implementation
+```javascript
+// [name]-quote-service.js
+class [Name]QuoteService {
+    constructor() {
+        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    }
+    
+    // Required methods:
+    // - generateQuoteID()
+    // - generateSessionID()
+    // - getPricingTier(quantity)
+    // - saveQuote(quoteData)
+}
+```
+
+#### 2.3 Calculator Class
+```javascript
+// In HTML file
+class [Name]Calculator {
+    constructor() {
+        emailjs.init('4qSbDO-SQs19TbP80');
+        this.quoteService = new [Name]QuoteService();
+        this.currentQuote = null;
+        // ... initialization
+    }
+    
+    // Required methods:
+    // - calculate()
+    // - displayResults()
+    // - handleQuoteSubmit()
+    // - generateQuoteHTML()
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    window.[name]Calculator = new [Name]Calculator();
+});
+```
+
+### Phase 3: Integration (15 minutes)
+
+#### 3.1 Add to Dashboard
+In `staff-dashboard.html`, add calculator card:
+```html
+<a href="/calculators/[name]-calculator.html" class="calculator-card"
+   title="[Description]. Contact: [Person]">
+    <i class="fas fa-[icon] calculator-icon"></i>
+    <span class="calculator-name">[Display Name]</span>
+    <span class="new-badge">NEW 2025</span>
+</a>
+```
+
+#### 3.2 Update Documentation
+Add entry to Active Calculators Registry in this file.
+
+### Phase 4: Testing (15 minutes)
+
+#### Console Testing Commands
+```javascript
+// Test initialization
+console.log(window.[name]Calculator);
+
+// Test quote ID generation
+console.log(window.[name]Calculator.quoteService.generateQuoteID());
+
+// Test current quote data
+console.log(window.[name]Calculator.currentQuote);
+
+// Check email data before send
+console.log('Email data:', emailData);
+```
+
+#### Functional Testing Checklist
+- [ ] Calculator loads without errors
 - [ ] Form validation works
-- [ ] Database checkbox functions
-- [ ] Reply-to email set correctly
-- [ ] CC recipients receive email
+- [ ] Calculations are correct
+- [ ] Quote displays properly
+- [ ] Email modal functions
+- [ ] Quote ID shows in success message
+- [ ] Email sends successfully
+- [ ] Database save works (check console)
+- [ ] Print functionality works
 
-### 8. Common Issues and Solutions
+### Common Implementation Patterns
 
-1. **CORS Errors**: Ensure proxy server is running and accessible
-2. **Missing Fields**: Check that all required Caspio fields are included
-3. **Date Formatting**: Use ISO format for Caspio: `date.toISOString().replace(/\.\d{3}Z$/, '')`
-4. **Quote ID Conflicts**: Each calculator type needs unique prefix and storage key
-5. **Email Not Sending**: Verify EmailJS service limits and template ID
+#### Single Item Calculator (e.g., DTG)
+```javascript
+// One line item with multiple options
+const itemData = {
+    StyleNumber: 'CUSTOMER-SUPPLIED',
+    ProductName: 'Contract DTG Printing',
+    PrintLocation: locations.join(', '),
+    Quantity: totalQuantity,
+    FinalUnitPrice: pricePerItem,
+    LineTotal: totalCost
+};
+```
+
+#### Multi-Item Calculator (e.g., Richardson)
+```javascript
+// Multiple line items in one quote
+quoteData.items.forEach((item, index) => {
+    const itemData = {
+        LineNumber: index + 1,
+        StyleNumber: item.style,
+        ProductName: item.description,
+        Quantity: item.quantity,
+        FinalUnitPrice: item.price,
+        LineTotal: item.total
+    };
+});
+```
+
+#### LTM Fee Handling
+```javascript
+if (quantity < 24) {
+    const ltmFee = 50.00;
+    const ltmPerUnit = ltmFee / quantity;
+    finalPrice = basePrice + ltmPerUnit;
+}
+```
+
+## Active Calculators Registry
+
+Track all implemented calculators for reference and maintenance.
+
+### DTG Contract (DTG)
+- **File**: `/calculators/dtg-contract.html`
+- **Service**: `/calculators/dtg-quote-service.js`
+- **Added**: 2025-01-26
+- **Contact**: Taylar
+- **EmailJS Template**: template_ug8o3ug
+- **Quote Format**: DTG{MMDD}-{sequence}
+- **Features**: 
+  - Multiple print locations (LC, FF, FB, JF, JB)
+  - Heavyweight garment surcharge
+  - LTM fee for orders under 24 pieces
+
+### Richardson Caps (RICH)
+- **File**: `/calculators/richardson-2025.html`
+- **Service**: `/calculators/richardson-quote-service.js`
+- **Added**: 2025-01-27
+- **Updated**: 2025-01-27 (Added leatherette patch option)
+- **Contact**: Vendor pricing
+- **EmailJS Template**: template_ug8o3ug
+- **Quote Format**: RICH{MMDD}-{sequence}
+- **Features**: 
+  - Dual embellishment type (Embroidery or Leatherette Patch)
+  - Multi-style quote builder with autocomplete
+  - Tiered pricing based on total quantity
+  - Pricing reference table on page
+
+### Contract Embroidery (EMB)
+- **File**: `/calculators/embroidery-contract.html`
+- **Service**: `/calculators/embroidery-quote-service.js`
+- **Added**: 2025-01-27
+- **Contact**: Ruth Nhong
+- **EmailJS Template**: template_wna04vr (Buyer's Guide)
+- **Quote Format**: EMB{MMDD}-{sequence}
+- **Features**:
+  - Stitch count selection (5k, 6k, 8k, 10k)
+  - Extra thread color charges
+  - Buyer's Guide modal with FAQs
+  - Per-item price breakdown display
+
+### Laser Tumbler Polar Camel (LT)
+- **File**: `/calculators/laser-tumbler-polarcamel.html`
+- **Service**: `/calculators/laser-tumbler-quote-service.js`
+- **Added**: 2025-01-27
+- **Contact**: Sales Team
+- **EmailJS Template**: template_6bie1il
+- **Quote Format**: LT{MMDD}-{sequence}
+- **Features**:
+  - Color selection by case (24/case)
+  - Second logo option
+  - Product specifications display
+  - Setup fee included
+
+### Embroidered Emblems (PATCH)
+- **File**: `/calculators/embroidered-emblem-calculator.html`
+- **Service**: `/calculators/emblem-quote-service.js`
+- **Added**: 2025-01-27
+- **Contact**: Jim Mickelson
+- **EmailJS Template**: template_vpou6va
+- **Quote Format**: PATCH{MMDD}-{sequence}
+- **Features**:
+  - Dynamic pricing based on dimensions (16 size tiers)
+  - 10 quantity tiers (25-49 through 10,000+)
+  - Add-on options: Metallic thread (+25%), Velcro backing (+25%), Extra colors (+10% each)
+  - LTM fee ($50 for orders under 200) included in per-emblem price
+  - Digitizing fee option ($100 one-time)
+  - Visual grid highlighting for current price tier
+
+## Quick Reference
+
+### Essential URLs & Credentials
+```
+API Proxy: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
+Company Logo: https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1
+Favicon: https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1
+EmailJS Public Key: 4qSbDO-SQs19TbP80
+EmailJS Service ID: service_1c4k67j
+Company Phone: 253-922-5793
+Company Year: 1977
+```
+
+### Quote ID Patterns
+```
+DTG{MMDD}-{sequence}    // DTG Contract
+RICH{MMDD}-{sequence}   // Richardson Caps
+EMB{MMDD}-{sequence}    // Embroidery Contract
+LT{MMDD}-{sequence}     // Laser Tumblers
+PATCH{MMDD}-{sequence}  // Embroidered Emblems
+```
+
+### Console Debug Commands
+```javascript
+// Check calculator initialization
+console.log(window.[name]Calculator);
+
+// Test quote ID generation
+console.log(new [Name]QuoteService().generateQuoteID());
+
+// View current quote data
+console.log(window.[name]Calculator.currentQuote);
+
+// Debug email data
+console.log('Email data:', emailData);
+```
+
+### Common Fixes
+
+#### EmailJS "Corrupted Variables" Error
+```javascript
+// Always provide ALL variables with defaults
+const emailData = {
+    notes: notes || '',                    // Never undefined
+    company_name: company || 'Not Provided', // Never null
+    quote_type: 'Calculator Name',         // Never placeholder
+};
+```
+
+#### Database Save Failing
+- Check API endpoint: `/api/quote_sessions` and `/api/quote_items`
+- Verify all required fields are present
+- Use `parseFloat()` for numbers, remove milliseconds from dates
+- Check console for detailed error messages
+
+#### Quote ID Not Showing
+```html
+<!-- In success message -->
+<span id="quoteIdDisplay"></span>
+
+<!-- In JavaScript -->
+document.getElementById('quoteIdDisplay').textContent = `Quote ID: ${quoteId}`;
+```
+
+### Git Workflow
+```bash
+git add -A
+git commit -m "feat: Add [name] calculator with quote system"
+git push origin [branch-name]
+```
+
+### Testing Checklist
+- [ ] Calculator loads without console errors
+- [ ] Pricing calculations are accurate
+- [ ] Quote displays correctly
+- [ ] Email sends with all variables
+- [ ] Database saves both tables
+- [ ] Quote ID shows in success message
+- [ ] Print functionality works
+
+## Key Takeaways
+
+1. **Follow Established Patterns**: All calculators use the same architecture - HTML page, quote service, EmailJS integration
+2. **Database Integration**: Always use the two-table structure (quote_sessions + quote_items)
+3. **EmailJS Variables**: Provide ALL template variables with defaults to avoid corruption
+4. **Quote IDs**: Use unique prefixes and daily sequence reset
+5. **Error Handling**: Log details but don't stop email send on database failure
+6. **Testing**: Always show quote ID in success message for user reference
+
+Remember: The existing calculators (DTG, Richardson, Embroidery, Laser Tumbler) serve as working examples. When in doubt, reference their implementation patterns.
 
 ## Calculator Template System (2025-01-27)
 
@@ -1647,6 +2000,15 @@ Track all implemented calculators here for reference:
 - **Database**: quote_sessions + quote_items
 - **Special**: Color selection by case (24/case)
 
+### Embroidered Emblems (PATCH)
+- **File**: /calculators/embroidered-emblem-calculator.html
+- **Added**: 2025-01-27
+- **Contact**: Jim Mickelson
+- **EmailJS Template**: template_vpou6va
+- **Quote Format**: PATCH{MMDD}-{sequence}
+- **Database**: quote_sessions + quote_items
+- **Special**: Dynamic size-based pricing with visual grid highlighting
+
 ## Lessons Learned - Laser Tumbler Implementation
 
 ### What Went Wrong & How We Fixed It
@@ -1780,5 +2142,160 @@ console.log(new [Name]QuoteService().generateQuoteID());
 - **Database not saving**: Check endpoint and field names
 - **Quote ID not showing**: Add display element in success message
 - **Wrong template**: Use template ID, not name
+
+### Common Calculation Patterns
+
+#### Standard Margin Calculation (60% margin)
+```javascript
+const markedUpPrice = basePrice / 0.6;
+```
+
+#### LTM (Less Than Minimum) Pattern
+```javascript
+if (quantity < 24) {
+    const ltmFee = 50.00;
+    const ltmPerUnit = ltmFee / quantity;
+    finalPrice = basePrice + ltmPerUnit;
+}
+```
+
+#### Tiered Pricing Structure
+```javascript
+const pricingTiers = {
+    embroidery: {
+        '1-23': 10.50,
+        '24-47': 9.50,
+        '48-71': 8.75,
+        '72+': 8.00
+    }
+};
+
+function getPrice(quantity, type) {
+    const tiers = pricingTiers[type];
+    if (quantity < 24) return tiers['1-23'];
+    if (quantity < 48) return tiers['24-47'];
+    if (quantity < 72) return tiers['48-71'];
+    return tiers['72+'];
+}
+```
+
+#### Quote Preview HTML Pattern
+```javascript
+function generateQuotePreview(items) {
+    let html = `
+        <table class="quote-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    items.forEach(item => {
+        html += `
+            <tr>
+                <td>${item.description}</td>
+                <td>${item.quantity}</td>
+                <td>$${item.unitPrice.toFixed(2)}</td>
+                <td>$${item.total.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+        </table>
+    `;
+    
+    return html;
+}
+```
+
+### Color Selection Patterns
+
+#### Tumbler Color Selection (by case)
+```javascript
+const colorsByCase = [
+    { name: 'Black', model: '16OZBLK', hex: '#000000' },
+    { name: 'White', model: '16OZWHT', hex: '#FFFFFF' },
+    { name: 'Navy', model: '16OZNVY', hex: '#000080' }
+];
+
+// Store as JSON in SizeBreakdown field
+const colorBreakdown = {
+    'Black': { model: '16OZBLK', quantity: 24, hex: '#000000' },
+    'White': { model: '16OZWHT', quantity: 48, hex: '#FFFFFF' }
+};
+```
+
+### Sales Rep Configuration
+```javascript
+const salesReps = [
+    { email: 'ruthie@nwcustomapparel.com', name: 'Ruthie', default: true },
+    { email: 'taylar@nwcustomapparel.com', name: 'Taylar' },
+    { email: 'nika@nwcustomapparel.com', name: 'Nika' },
+    { email: 'erik@nwcustomapparel.com', name: 'Erik' },
+    { email: 'adriyella@nwcustomapparel.com', name: 'Adriyella' },
+    { email: 'sales@nwcustomapparel.com', name: 'General Sales' }
+];
+```
+
+### Date Formatting for Caspio
+```javascript
+// Caspio requires ISO format without milliseconds
+const caspioDate = new Date().toISOString().replace(/\.\d{3}Z$/, '');
+```
+
+### Session Storage Patterns
+```javascript
+// Daily quote sequence
+const dateKey = `${month}${day}`;
+const storageKey = `${prefix}_quote_sequence_${dateKey}`;
+let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
+sessionStorage.setItem(storageKey, sequence.toString());
+
+// Cleanup old sequences
+Object.keys(sessionStorage).forEach(key => {
+    if (key.startsWith(`${prefix}_quote_sequence_`) && !key.endsWith(dateKey)) {
+        sessionStorage.removeItem(key);
+    }
+});
+```
+
+### Error Display Pattern
+```javascript
+function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.innerHTML = `
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    errorDiv.style.display = 'block';
+    setTimeout(() => {
+        errorDiv.style.display = 'none';
+    }, 5000);
+}
+```
+
+### Success Message with Quote ID
+```javascript
+function showSuccess(quoteId) {
+    const successDiv = document.getElementById('successMessage');
+    successDiv.innerHTML = `
+        <div class="success-message">
+            <i class="fas fa-check-circle"></i>
+            <span>Quote sent successfully!</span>
+            <strong>Quote ID: ${quoteId}</strong>
+        </div>
+    `;
+    successDiv.style.display = 'block';
+}
+```
 
 Remember: When in doubt, check this documentation first!
