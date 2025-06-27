@@ -1088,6 +1088,13 @@
                     <textarea id="emailNotes" class="form-input" rows="3" placeholder="Any special instructions or notes..."></textarea>
                 </div>
 
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="saveToDatabase" checked>
+                        <span>Save quote to database</span>
+                    </label>
+                </div>
+
                 <button type="submit" class="btn btn-primary btn-fullwidth">
                     <i class="fas fa-paper-plane"></i>
                     Send Quote
@@ -1096,7 +1103,10 @@
 
             <div id="successMessage" class="success-message hidden">
                 <i class="fas fa-check-circle"></i>
-                <span>Quote sent successfully!</span>
+                <div>
+                    <span style="display: block;">Quote sent successfully!</span>
+                    <span id="quoteIdDisplay" style="display: block; font-weight: bold; font-size: 1.1em; margin-top: 0.5rem;"></span>
+                </div>
             </div>
 
             <div id="errorMessage" class="error-message hidden">
@@ -1150,6 +1160,9 @@
                 // Initialize EmailJS
                 emailjs.init('4qSbDO-SQs19TbP80');
                 
+                // Initialize Quote Service
+                this.quoteService = new LaserTumblerQuoteService();
+                
                 this.initializeElements();
                 this.bindEvents();
                 this.renderColors();
@@ -1190,6 +1203,7 @@
                 this.companyName = document.getElementById('companyName');
                 this.emailNotes = document.getElementById('emailNotes');
                 this.salesRep = document.getElementById('salesRep');
+                this.saveToDatabase = document.getElementById('saveToDatabase');
                 this.successMessage = document.getElementById('successMessage');
                 this.errorMessage = document.getElementById('errorMessage');
                 this.errorText = document.getElementById('errorText');
@@ -1518,6 +1532,7 @@
                         project_name: quote.projectName || 'Polar Camel Tumbler Quote',
                         quote_id: `LT${new Date().toISOString().slice(2,10).replace(/-/g,'')}-${Math.floor(Math.random() * 100)}`,
                         quote_date: new Date().toLocaleDateString(),
+                        quote_type: 'Laser Tumbler',  // REQUIRED - was missing!
                         service_type: 'Polar Camel 16 oz. Pint - Laser Engraved',
                         quantity: quote.quantity.toString(),
                         locations: `1-Sided Laser Engraving | Colors: ${colorBreakdownText}`,
@@ -1528,11 +1543,49 @@
                             `Includes one-time setup fee ($${quote.setupFee.toFixed(2)})`,
                         grand_total: `$${quote.total.toFixed(2)}`,
                         notes: this.emailNotes.value || 'No special notes for this order',
+                        quote_summary: `${quote.quantity} Polar Camel tumblers with laser engraving`,
                         sales_rep_name: salesRepNames[selectedRep],
                         sales_rep_email: selectedRep,
                         sales_rep_phone: '253-922-5793',
                         company_year: '1977'
                     };
+                    
+                    // Save to database if checkbox is checked
+                    let quoteId = emailData.quote_id;
+                    if (this.saveToDatabase.checked) {
+                        try {
+                            const dbData = {
+                                customerName: this.emailCustomerName.value,
+                                customerEmail: this.customerEmail.value,
+                                customerPhone: this.customerPhone.value || '',
+                                companyName: this.companyName.value || '',
+                                projectName: quote.projectName || 'Polar Camel Tumbler Quote',
+                                quantity: quote.quantity,
+                                unitPrice: quote.unitPrice,
+                                subtotal: quote.subtotal,
+                                setupFee: quote.setupFee,
+                                hasSecondLogo: quote.hasSecondLogo,
+                                secondLogoTotal: quote.secondLogoTotal || 0,
+                                total: quote.total,
+                                salesRepName: salesRepNames[selectedRep],
+                                salesRepEmail: selectedRep,
+                                notes: this.emailNotes.value || '',
+                                colors: quote.colors // Pass color data
+                            };
+                            
+                            const saveResult = await this.quoteService.saveQuote(dbData);
+                            if (saveResult.success) {
+                                quoteId = saveResult.quoteID;
+                                emailData.quote_id = quoteId; // Update email with DB quote ID
+                                console.log('Quote saved to database:', quoteId);
+                            } else {
+                                console.error('Failed to save to database:', saveResult.error);
+                            }
+                        } catch (dbError) {
+                            console.error('Database save error:', dbError);
+                            // Continue with email even if DB save fails
+                        }
+                    }
                     
                     // Send email
                     await emailjs.send(
@@ -1541,15 +1594,22 @@
                         emailData
                     );
                     
-                    // Show success
+                    // Show success with quote ID
                     this.successMessage.classList.remove('hidden');
                     this.errorMessage.classList.add('hidden');
+                    
+                    // Display quote ID
+                    const quoteIdDisplay = document.getElementById('quoteIdDisplay');
+                    if (quoteIdDisplay) {
+                        quoteIdDisplay.textContent = `Quote ID: ${quoteId}`;
+                    }
                     
                     // Reset form after delay
                     setTimeout(() => {
                         this.closeModal();
                         this.emailForm.reset();
-                    }, 2000);
+                        this.saveToDatabase.checked = true; // Reset to checked
+                    }, 3000); // Increased to 3 seconds to give more time to see quote ID
                     
                 } catch (error) {
                     console.error('Error sending quote:', error);

@@ -49,11 +49,33 @@ class LaserTumblerQuoteService {
     /**
      * Generate quote ID
      */
-    generateQuoteId() {
-        const date = new Date();
-        const dateStr = date.toISOString().slice(2, 10).replace(/-/g, '');
-        const randomNum = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-        return `LT${dateStr}-${randomNum}`;
+    generateQuoteID() {
+        const now = new Date();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const dateKey = `${month}${day}`;
+        
+        // Get and increment sequence for today
+        const storageKey = `lt_quote_sequence_${dateKey}`;
+        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
+        sessionStorage.setItem(storageKey, sequence.toString());
+        
+        // Clean up old sequences
+        const currentDateKey = dateKey;
+        Object.keys(sessionStorage).forEach(key => {
+            if (key.startsWith('lt_quote_sequence_') && !key.endsWith(currentDateKey)) {
+                sessionStorage.removeItem(key);
+            }
+        });
+        
+        return `LT${dateKey}-${sequence}`;
+    }
+    
+    /**
+     * Generate session ID
+     */
+    generateSessionID() {
+        return `lt_sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
 
     /**
@@ -61,60 +83,112 @@ class LaserTumblerQuoteService {
      */
     async saveQuote(quoteData) {
         try {
-            console.log('[LaserTumblerQuoteService] Saving quote...', quoteData);
+            const quoteID = this.generateQuoteID();
+            const sessionID = this.generateSessionID();
             
-            // Get authentication token
-            const token = await this.getCaspioToken();
+            console.log('[LaserTumblerQuoteService] Saving quote with ID:', quoteID);
+
+            // Step 1: Create quote session
+            const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+            const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
             
-            // Generate quote ID
-            const quoteId = this.generateQuoteId();
+            // Calculate total with all fees
+            const subtotal = quoteData.subtotal;
+            const setupFee = quoteData.setupFee;
+            const secondLogoTotal = quoteData.secondLogoTotal || 0;
+            const totalAmount = subtotal + setupFee + secondLogoTotal;
             
-            // Prepare data for Caspio
-            const caspioData = {
-                Quote_ID: quoteId,
-                Quote_Date: new Date().toISOString(),
-                Customer_Name: quoteData.customerName || '',
-                Customer_Email: quoteData.customerEmail || '',
-                Customer_Phone: quoteData.customerPhone || '',
-                Company_Name: quoteData.companyName || '',
-                Project_Name: quoteData.projectName || 'Polar Camel Tumbler Quote',
-                Product_Type: 'Laser Tumbler',
-                Product_Details: `Polar Camel 16 oz. Pint - ${quoteData.quantity} units`,
-                Quantity: quoteData.quantity,
-                Unit_Price: quoteData.unitPrice,
-                Subtotal: quoteData.subtotal,
-                Setup_Fee: quoteData.setupFee,
-                Second_Logo: quoteData.hasSecondLogo ? 'Yes' : 'No',
-                Second_Logo_Total: quoteData.secondLogoTotal || 0,
-                Total_Price: quoteData.total,
-                Sales_Rep_Name: quoteData.salesRepName || '',
-                Sales_Rep_Email: quoteData.salesRepEmail || '',
-                Notes: quoteData.hasSecondLogo ? 
-                    `Includes second logo (+$${quoteData.secondLogoTotal.toFixed(2)})` : 
-                    'Single logo engraving',
-                Status: 'Sent'
+            const sessionData = {
+                QuoteID: quoteID,
+                SessionID: sessionID,
+                CustomerEmail: quoteData.customerEmail || '',
+                CustomerName: quoteData.customerName || 'Guest',
+                CompanyName: quoteData.companyName || '',
+                Phone: quoteData.customerPhone || '',
+                TotalQuantity: quoteData.quantity,
+                SubtotalAmount: parseFloat(subtotal.toFixed(2)),
+                LTMFeeTotal: 0, // No LTM for laser tumblers
+                TotalAmount: parseFloat(totalAmount.toFixed(2)),
+                Status: 'Open',
+                ExpiresAt: formattedExpiresAt,
+                Notes: quoteData.notes || ''
             };
 
-            // Save to Caspio
-            const response = await fetch(`${this.apiUrl}/tables/laser_tumbler_quotes/records`, {
+            console.log('[LaserTumblerQuoteService] Session data:', sessionData);
+
+            const sessionResponse = await fetch(`${this.apiUrl}/api/quote_sessions`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(caspioData)
+                body: JSON.stringify(sessionData)
             });
 
-            if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(`Failed to save quote: ${response.status} - ${errorData}`);
+            const responseText = await sessionResponse.text();
+            console.log('[LaserTumblerQuoteService] Session response:', sessionResponse.status, responseText);
+
+            if (!sessionResponse.ok) {
+                throw new Error(`Session creation failed: ${sessionResponse.status} - ${responseText}`);
             }
 
-            console.log('[LaserTumblerQuoteService] Quote saved successfully:', quoteId);
+            // Step 2: Create quote item
+            // Build color breakdown for storage
+            const colorBreakdown = {};
+            if (quoteData.colors && Array.isArray(quoteData.colors)) {
+                quoteData.colors.forEach(color => {
+                    colorBreakdown[color.name] = {
+                        model: color.model,
+                        quantity: color.quantity,
+                        hex: color.hex
+                    };
+                });
+            }
+            
+            const itemData = {
+                QuoteID: quoteID,
+                LineNumber: 1,
+                StyleNumber: 'POLAR-CAMEL-16OZ',
+                ProductName: 'Polar Camel 16 oz. Pint',
+                Color: quoteData.colors ? quoteData.colors.map(c => c.name).join(', ') : 'Various',
+                ColorCode: quoteData.colors ? quoteData.colors.map(c => c.model).join(', ') : '',
+                EmbellishmentType: 'laser',
+                PrintLocation: '1-Sided Laser Engraving',
+                PrintLocationName: 'Front - approx. 2.5" x 3"',
+                Quantity: quoteData.quantity,
+                HasLTM: 'No',
+                BaseUnitPrice: parseFloat(quoteData.unitPrice.toFixed(2)),
+                LTMPerUnit: 0,
+                FinalUnitPrice: parseFloat(quoteData.unitPrice.toFixed(2)),
+                LineTotal: parseFloat(subtotal.toFixed(2)),
+                SizeBreakdown: JSON.stringify(colorBreakdown),
+                PricingTier: this.getPricingTier(quoteData.quantity),
+                ImageURL: '',
+                AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+            };
+
+            console.log('[LaserTumblerQuoteService] Item data:', itemData);
+
+            const itemResponse = await fetch(`${this.apiUrl}/api/quote_items`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(itemData)
+            });
+
+            const itemResponseText = await itemResponse.text();
+            console.log('[LaserTumblerQuoteService] Item response:', itemResponse.status, itemResponseText);
+
+            if (!itemResponse.ok) {
+                console.error('Failed to save quote item:', itemResponseText);
+                // Don't throw - session was created successfully
+            }
+
+            console.log('[LaserTumblerQuoteService] Quote saved successfully:', quoteID);
             
             return {
                 success: true,
-                quoteID: quoteId,
+                quoteID: quoteID,
                 message: 'Quote saved successfully'
             };
 
@@ -128,6 +202,16 @@ class LaserTumblerQuoteService {
                 message: 'Quote could not be saved to database, but email will still be sent'
             };
         }
+    }
+    
+    /**
+     * Get pricing tier for quantity
+     */
+    getPricingTier(quantity) {
+        if (quantity < 24) return '1-23';
+        if (quantity < 120) return '24-119';
+        if (quantity < 240) return '120-239';
+        return '240+';
     }
 
     /**

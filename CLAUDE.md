@@ -964,3 +964,274 @@ Always test with:
 3. Special characters in names/notes
 4. Different sales reps selected
 5. Verify CC and BCC recipients
+
+## EmailJS Anti-Corruption Guide (2025-01-27)
+
+### Overview
+This guide prevents the dreaded "One or more dynamic variables are corrupted" error that can occur with EmailJS templates.
+
+### 1. Never Use Placeholder Variables
+**THE #1 CAUSE OF CORRUPTION**: Using placeholder text like `{{QUOTE_TYPE}}` in templates.
+
+**❌ BAD - Causes Corruption**:
+```html
+<h1>{{QUOTE_TYPE}} Quote</h1>  <!-- NEVER DO THIS -->
+```
+
+**✅ GOOD - Works Correctly**:
+```html
+<h1>{{quote_type}} Quote</h1>  <!-- Actual variable -->
+```
+
+**Why?** EmailJS expects every `{{variable}}` to exist in your data object. Placeholder text that's meant to be replaced will cause corruption.
+
+### 2. Always Provide ALL Variables
+Every variable referenced in your template MUST exist in the data object:
+
+```javascript
+// ✅ CORRECT - All variables provided
+const emailData = {
+    // Required fields
+    to_email: customerEmail,
+    customer_name: customerName,
+    quote_type: 'Laser Tumbler',  // NOT a placeholder!
+    quote_id: 'LT0127-1',
+    quote_date: new Date().toLocaleDateString(),
+    grand_total: '$450.00',
+    sales_rep_name: 'Ruth Nhong',
+    sales_rep_email: 'ruth@nwcustomapparel.com',
+    sales_rep_phone: '253-922-5793',
+    company_year: '1977',
+    
+    // Optional fields - ALWAYS provide with defaults
+    special_note: specialNote || '',
+    notes: customerNotes || 'No special notes for this order',
+    project_name: projectName || '',
+    quote_summary: summary || ''
+};
+
+// ❌ WRONG - Missing/undefined variables
+const emailData = {
+    to_email: customerEmail,
+    customer_name: customerName,
+    // Missing quote_type will cause corruption!
+    // undefined special_note will cause corruption!
+};
+```
+
+### 3. Pre-Send Validation Checklist
+Always validate before sending:
+
+```javascript
+// Required variables checklist
+const requiredVars = [
+    'to_email', 'reply_to', 'customer_name', 'quote_id', 
+    'quote_date', 'quote_type', 'grand_total', 'sales_rep_name', 
+    'sales_rep_email', 'sales_rep_phone', 'company_year'
+];
+
+// Optional variables that should have defaults
+const optionalVars = {
+    'special_note': '',
+    'notes': 'No special notes for this order',
+    'project_name': '',
+    'quote_summary': '',
+    'from_name': 'Northwest Custom Apparel'
+};
+
+// Validate required variables
+const missingVars = [];
+requiredVars.forEach(varName => {
+    if (!emailData[varName]) {
+        missingVars.push(varName);
+    }
+});
+
+if (missingVars.length > 0) {
+    console.error('Missing required variables:', missingVars);
+    throw new Error(`Missing required email variables: ${missingVars.join(', ')}`);
+}
+
+// Apply defaults for optional variables
+Object.keys(optionalVars).forEach(varName => {
+    if (emailData[varName] === undefined || emailData[varName] === null) {
+        emailData[varName] = optionalVars[varName];
+    }
+});
+
+// Log for debugging
+console.log('Email data validated:', emailData);
+```
+
+### 4. Common Corruption Triggers to Avoid
+
+#### ❌ Undefined or Null Values
+```javascript
+// WRONG
+emailData.notes = undefined;  // Causes corruption
+emailData.special_note = null;  // Causes corruption
+
+// CORRECT
+emailData.notes = notesValue || '';
+emailData.special_note = specialNote || '';
+```
+
+#### ❌ Conditional Logic in Templates
+```html
+<!-- AVOID in EmailJS templates -->
+{{#if personal_message}}
+    <p>{{personal_message}}</p>
+{{/if}}
+
+<!-- USE THIS INSTEAD -->
+<p>{{personal_message}}</p>  <!-- Just shows nothing if empty -->
+```
+
+#### ❌ Case Sensitivity Mistakes
+```javascript
+// Template has: {{customer_name}}
+emailData.Customer_Name = 'John';  // WRONG - case mismatch
+emailData.customer_name = 'John';  // CORRECT
+```
+
+#### ❌ Special Characters in Variable Names
+```javascript
+// WRONG
+emailData['customer-name'] = 'John';  // Hyphen not allowed
+emailData['customer.name'] = 'John';  // Dot not allowed
+
+// CORRECT
+emailData.customer_name = 'John';  // Use underscores
+```
+
+### 5. Implementation Template
+Use this template for all EmailJS implementations:
+
+```javascript
+async function sendQuoteEmail(quoteData) {
+    try {
+        // Build email data with ALL required fields
+        const emailData = {
+            // System fields
+            to_email: quoteData.customerEmail,
+            reply_to: quoteData.salesRepEmail,
+            from_name: 'Northwest Custom Apparel',
+            
+            // Quote identification
+            quote_type: 'Your Calculator Name Here',  // NEVER use {{PLACEHOLDER}}
+            quote_id: quoteData.quoteId,
+            quote_date: new Date().toLocaleDateString(),
+            
+            // Customer info
+            customer_name: quoteData.customerName,
+            project_name: quoteData.projectName || '',
+            
+            // Pricing
+            grand_total: `$${quoteData.total.toFixed(2)}`,
+            
+            // Optional fields with defaults
+            special_note: quoteData.specialNote || '',
+            notes: quoteData.notes || 'No special notes for this order',
+            quote_summary: quoteData.summary || '',
+            
+            // Sales rep info
+            sales_rep_name: quoteData.salesRepName,
+            sales_rep_email: quoteData.salesRepEmail,
+            sales_rep_phone: '253-922-5793',
+            
+            // Company info
+            company_year: '1977'
+        };
+        
+        // Validate before sending
+        console.log('Sending email with data:', emailData);
+        
+        // Send email
+        const response = await emailjs.send(
+            'service_1c4k67j',
+            'template_xxxxxx',  // Your actual template ID
+            emailData
+        );
+        
+        console.log('Email sent successfully:', response);
+        return { success: true };
+        
+    } catch (error) {
+        console.error('EmailJS Error:', error);
+        console.error('Failed email data:', emailData);
+        return { 
+            success: false, 
+            error: error.message || 'Failed to send email' 
+        };
+    }
+}
+```
+
+### 6. Debugging Corruption Errors
+
+When you get "One or more dynamic variables are corrupted":
+
+1. **Check the console** for the exact data being sent
+2. **Compare** template variables with your data object
+3. **Look for**:
+   - Undefined/null values
+   - Missing required variables
+   - Case mismatches
+   - Placeholder text like {{VARIABLE_NAME}}
+
+```javascript
+// Debug helper
+function debugEmailData(emailData, templateVars) {
+    console.group('EmailJS Debug');
+    
+    // Check for undefined/null
+    Object.keys(emailData).forEach(key => {
+        if (emailData[key] === undefined || emailData[key] === null) {
+            console.error(`❌ ${key} is ${emailData[key]}`);
+        }
+    });
+    
+    // Check for missing template vars
+    templateVars.forEach(varName => {
+        if (!(varName in emailData)) {
+            console.error(`❌ Missing template variable: ${varName}`);
+        }
+    });
+    
+    console.log('📧 Email data:', emailData);
+    console.groupEnd();
+}
+```
+
+### 7. Quick Reference - Variable Requirements
+
+| Variable | Required | Default Value | Notes |
+|----------|----------|---------------|-------|
+| to_email | ✅ | - | Customer's email |
+| reply_to | ✅ | - | Sales rep email |
+| quote_type | ✅ | - | e.g., "Laser Tumbler" |
+| quote_id | ✅ | - | e.g., "LT0127-1" |
+| customer_name | ✅ | - | Customer's full name |
+| grand_total | ✅ | - | Formatted total |
+| sales_rep_name | ✅ | - | Rep's display name |
+| sales_rep_email | ✅ | - | Rep's email |
+| sales_rep_phone | ✅ | - | "253-922-5793" |
+| company_year | ✅ | - | "1977" |
+| from_name | ✅ | "Northwest Custom Apparel" | Sender name |
+| quote_date | ✅ | - | Current date |
+| special_note | ❌ | "" | Optional note |
+| notes | ❌ | "No special notes..." | Customer notes |
+| project_name | ❌ | "" | Project description |
+| quote_summary | ❌ | "" | Brief summary |
+
+### 8. Testing Procedure
+
+Before going live, test these scenarios:
+
+1. **Full data test** - All fields populated
+2. **Minimal data test** - Only required fields
+3. **Empty optional fields** - Ensure defaults work
+4. **Special characters** - Test quotes, apostrophes in names
+5. **Console validation** - Check all data before sending
+
+Remember: The key to avoiding corruption is **consistency** - every variable in your template must exist in your data object with a valid value (never undefined or null).
