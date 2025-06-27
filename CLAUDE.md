@@ -867,3 +867,100 @@ const salesRepNames = {
 5. **When in doubt, check window.nwcaMasterBundleData** - It's the source of truth
 
 Remember: The most common issues are component conflicts and missing containers. Always check these first!
+
+## EmailJS Template Best Practices (2025-01-27)
+
+### 1. Always Ask for Template ID
+**IMPORTANT**: Never assume template names. Always ask for the specific template ID.
+- Template names are what users see (e.g., "Laser_Tumbler_Template")
+- Template IDs are what EmailJS uses (e.g., "template_6bie1il")
+- Find template IDs at: https://dashboard.emailjs.com/admin/templates
+
+### 2. Staff Email Directory
+Complete list of NWCA staff emails for sales rep dropdowns:
+```javascript
+const salesRepEmails = {
+    'erik@nwcustomapparel.com': 'Erik',
+    'nika@nwcustomapparel.com': 'Nika',
+    'taylar@nwcustomapparel.com': 'Taylar',
+    'adriyella@nwcustomapparel.com': 'Adriyella',
+    'ruth@nwcustomapparel.com': 'Ruth Nhong',
+    'bradley@nwcustomapparel.com': 'Bradley',
+    'jim@nwcustomapparel.com': 'Jim',
+    'art@nwcustomapparel.com': 'Steve (Artist)',
+    'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
+};
+```
+
+### 3. Email Routing Best Practices
+Standard EmailJS configuration for quote systems:
+```
+To Email: {{to_email}}           // Customer's email
+From Name: {{from_name}}         // "Northwest Custom Apparel"
+From Email: Use Default          // Your EmailJS sender
+Reply To: {{reply_to}}           // Sales rep's email
+CC: {{reply_to}}                 // Sales rep gets a copy
+BCC: erik@nwcustomapparel.com   // Erik always gets a copy
+```
+
+This ensures:
+- Customer receives the quote
+- Sales rep gets a copy (visible in CC)
+- Erik tracks all quotes (hidden in BCC)
+- Customer replies go to the sales rep
+
+### 4. Notes Field Implementation
+Always include a notes field in quote forms:
+```javascript
+// In email data
+const emailData = {
+    // ... other fields
+    notes: this.notesTextarea.value || 'No special notes for this order',
+    // ... other fields
+};
+```
+
+In EmailJS template, always show notes section:
+```html
+<div class="notes-section">
+    <h4>Notes:</h4>
+    <p>{{notes}}</p>
+</div>
+```
+
+### 5. Required Template Variables
+Standard variables for all quote templates:
+- `{{to_email}}` - Customer's email
+- `{{from_name}}` - Always "Northwest Custom Apparel"
+- `{{reply_to}}` - Sales rep's email
+- `{{customer_name}}` - Customer name
+- `{{project_name}}` - Project/order name
+- `{{quote_id}}` - Unique identifier
+- `{{quote_date}}` - Current date
+- `{{notes}}` - Special instructions
+- `{{sales_rep_name}}` - Rep's display name
+- `{{sales_rep_email}}` - Rep's email
+- `{{sales_rep_phone}}` - Always "253-922-5793"
+- `{{company_year}}` - Always "1977"
+
+### 6. Common EmailJS Errors and Solutions
+
+#### "Template not found"
+- **Cause**: Using template name instead of ID
+- **Solution**: Use the template ID (e.g., "template_6bie1il")
+
+#### "One or more dynamic variables are corrupted"
+- **Cause**: Undefined variables or conditional logic issues
+- **Solution**: Ensure all variables have values (use `|| ''`)
+
+#### "Service not found"
+- **Cause**: Wrong service ID
+- **Solution**: Use 'service_1c4k67j' for NWCA
+
+### 7. Testing Email Templates
+Always test with:
+1. All fields filled
+2. Optional fields empty
+3. Special characters in names/notes
+4. Different sales reps selected
+5. Verify CC and BCC recipients

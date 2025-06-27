@@ -1050,11 +1050,14 @@
                 <label class="form-label" for="salesRep">Sales Representative</label>
                 <select id="salesRep" class="form-select" required>
                     <option value="">Select a sales rep...</option>
-                    <option value="taylar@nwcustomapparel.com">Taylar</option>
-                    <option value="nika@nwcustomapparel.com">Nika</option>
                     <option value="erik@nwcustomapparel.com">Erik</option>
+                    <option value="nika@nwcustomapparel.com">Nika</option>
+                    <option value="taylar@nwcustomapparel.com">Taylar</option>
                     <option value="adriyella@nwcustomapparel.com">Adriyella</option>
                     <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                    <option value="bradley@nwcustomapparel.com">Bradley</option>
+                    <option value="jim@nwcustomapparel.com">Jim</option>
+                    <option value="art@nwcustomapparel.com">Steve (Artist)</option>
                     <option value="sales@nwcustomapparel.com">General Sales</option>
                 </select>
             </div>
@@ -1488,11 +1491,14 @@
                     
                     // Map sales rep emails to names
                     const salesRepNames = {
-                        'taylar@nwcustomapparel.com': 'Taylar',
-                        'nika@nwcustomapparel.com': 'Nika',
                         'erik@nwcustomapparel.com': 'Erik',
+                        'nika@nwcustomapparel.com': 'Nika',
+                        'taylar@nwcustomapparel.com': 'Taylar',
                         'adriyella@nwcustomapparel.com': 'Adriyella',
                         'ruth@nwcustomapparel.com': 'Ruth Nhong',
+                        'bradley@nwcustomapparel.com': 'Bradley',
+                        'jim@nwcustomapparel.com': 'Jim',
+                        'art@nwcustomapparel.com': 'Steve',
                         'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
                     };
                     
@@ -1521,7 +1527,7 @@
                             `Includes second logo (+$${quote.secondLogoTotal.toFixed(2)}) and one-time setup fee ($${quote.setupFee.toFixed(2)})` :
                             `Includes one-time setup fee ($${quote.setupFee.toFixed(2)})`,
                         grand_total: `$${quote.total.toFixed(2)}`,
-                        notes: this.emailNotes.value || '',
+                        notes: this.emailNotes.value || 'No special notes for this order',
                         sales_rep_name: salesRepNames[selectedRep],
                         sales_rep_email: selectedRep,
                         sales_rep_phone: '253-922-5793',
@@ -1531,7 +1537,7 @@
                     // Send email
                     await emailjs.send(
                         'service_1c4k67j',
-                        'Laser_Tumbler_Template',
+                        'template_6bie1il',
                         emailData
                     );
                     
