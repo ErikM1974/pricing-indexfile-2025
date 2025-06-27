@@ -344,6 +344,11 @@
             border-color: var(--primary-green);
             box-shadow: var(--focus-shadow);
         }
+        
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
 
         /* Buttons */
         .btn {
@@ -621,6 +626,89 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Case Selection */
+        .case-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            padding: 1rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .case-number {
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 60px;
+        }
+
+        .color-select-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .color-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-left: 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: white;
+            appearance: none;
+            transition: all 0.2s;
+        }
+
+        .color-select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: var(--focus-shadow);
+        }
+
+        .selected-color-swatch {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .case-remove {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .case-remove:hover {
+            background: #dc2626;
+        }
+
+        /* Custom dropdown arrow */
+        .color-select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
         /* Hidden */
         .hidden {
             display: none !important;
@@ -701,7 +789,6 @@
                 <div class="card">
                     <h2 class="card-title">
                         Polar Camel 16 oz. Pint
-                        <span class="badge badge-amber">Premium</span>
                     </h2>
                     
                     <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Tumbler%20from%20JDS%20Mountain%20Top%20Propane.JPG?ver=1" 
@@ -720,7 +807,7 @@
                     </div>
 
                     <!-- Pricing Table -->
-                    <h3 style="margin-bottom: 1rem;">Pricing <span class="badge badge-amber">Tariff Updated</span></h3>
+                    <h3 style="margin-bottom: 1rem;">Pricing</h3>
                     
                     <div style="background: var(--success-bg); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
                         <p style="font-size: 0.875rem; font-weight: 500; color: var(--success-text); margin: 0;">
@@ -732,8 +819,7 @@
                         <thead>
                             <tr>
                                 <th>Quantity</th>
-                                <th style="text-align: center;">Regular Price</th>
-                                <th style="text-align: center;">Current Price</th>
+                                <th style="text-align: center;">Price per Unit</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -741,9 +827,6 @@
                                 <td>
                                     <span class="quantity-label">24 Tumblers</span>
                                     <span class="quantity-sublabel">1 Case</span>
-                                </td>
-                                <td style="text-align: center;">
-                                    <span class="old-price">$14.50</span>
                                 </td>
                                 <td style="text-align: center;">
                                     <span class="new-price">$16.68</span>
@@ -756,9 +839,6 @@
                                     <span class="quantity-sublabel">5 Cases</span>
                                 </td>
                                 <td style="text-align: center;">
-                                    <span class="old-price">$14.00</span>
-                                </td>
-                                <td style="text-align: center;">
                                     <span class="new-price">$16.10</span>
                                     <span class="price-unit">per unit</span>
                                 </td>
@@ -769,19 +849,12 @@
                                     <span class="quantity-sublabel">10 Cases</span>
                                 </td>
                                 <td style="text-align: center;">
-                                    <span class="old-price">$13.50</span>
-                                </td>
-                                <td style="text-align: center;">
                                     <span class="new-price">$15.53</span>
                                     <span class="price-unit">per unit</span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); text-align: center; font-style: italic; margin-bottom: 1.5rem;">
-                        * Pricing updated due to new U.S. tariffs on imported goods
-                    </p>
 
                     <!-- Additional Fees -->
                     <div class="notice-box">
@@ -797,8 +870,7 @@
                         <div class="notice-content">
                             <div class="notice-title">Add a Second Logo</div>
                             <div class="notice-text">
-                                Only <span style="text-decoration: line-through;">$2.75</span> 
-                                <span style="font-size: 1.125rem; font-weight: 700;">$3.16</span> per tumbler
+                                Only <span style="font-size: 1.125rem; font-weight: 700;">$3.16</span> per tumbler
                             </div>
                         </div>
                     </div>
@@ -825,22 +897,19 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" for="quantity">Quantity</label>
-                            <select id="quantity" class="form-select" required>
-                                <option value="24">24 Tumblers (1 Case)</option>
-                                <option value="48">48 Tumblers (2 Cases)</option>
-                                <option value="72">72 Tumblers (3 Cases)</option>
-                                <option value="96">96 Tumblers (4 Cases)</option>
-                                <option value="120" selected>120 Tumblers (5 Cases)</option>
-                                <option value="144">144 Tumblers (6 Cases)</option>
-                                <option value="168">168 Tumblers (7 Cases)</option>
-                                <option value="192">192 Tumblers (8 Cases)</option>
-                                <option value="216">216 Tumblers (9 Cases)</option>
-                                <option value="240">240 Tumblers (10 Cases)</option>
-                                <option value="custom">Custom Quantity...</option>
-                            </select>
-                            <input type="number" id="customQuantity" class="form-input hidden" 
-                                   placeholder="Enter custom quantity" min="24" step="1" style="margin-top: 0.5rem;">
+                            <label class="form-label">Select Colors (24 tumblers per case)</label>
+                            <div id="casesContainer" style="margin-bottom: 1rem;">
+                                <!-- Color cases will be added here -->
+                            </div>
+                            <button type="button" id="addCaseBtn" class="btn btn-secondary btn-fullwidth">
+                                <i class="fas fa-plus"></i>
+                                Add Case (24 tumblers)
+                            </button>
+                            <div style="margin-top: 1rem; padding: 0.75rem; background: var(--hover-bg); border-radius: 8px; text-align: center;">
+                                <span style="font-weight: 600;">Total: </span>
+                                <span id="caseCount">0</span> cases • 
+                                <span id="totalQuantity">0</span> tumblers
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -862,6 +931,9 @@
                         <div class="quote-row">
                             <span class="quote-label">Quantity:</span>
                             <span class="quote-value" id="displayQuantity">-</span>
+                        </div>
+                        <div id="colorBreakdown" style="margin: 0.75rem 0; padding: 0.75rem; background: white; border-radius: 6px;">
+                            <!-- Color breakdown will be inserted here -->
                         </div>
                         <div class="quote-row">
                             <span class="quote-label">Price per Tumbler:</span>
@@ -1008,6 +1080,11 @@
                     <input type="text" id="companyName" class="form-input">
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label" for="emailNotes">Notes (optional)</label>
+                    <textarea id="emailNotes" class="form-input" rows="3" placeholder="Any special instructions or notes..."></textarea>
+                </div>
+
                 <button type="submit" class="btn btn-primary btn-fullwidth">
                     <i class="fas fa-paper-plane"></i>
                     Send Quote
@@ -1052,7 +1129,7 @@
             { name: 'Olive Green', model: 'LTM768', hex: '#556B2F' }
         ];
 
-        // Pricing tiers (with tariff)
+        // Pricing tiers
         const pricingTiers = {
             '1-23': 16.68,
             '24-119': 16.68,
@@ -1080,9 +1157,15 @@
                 this.form = document.getElementById('quoteForm');
                 this.customerNameInput = document.getElementById('customerName');
                 this.projectNameInput = document.getElementById('projectName');
-                this.quantitySelect = document.getElementById('quantity');
-                this.customQuantityInput = document.getElementById('customQuantity');
+                this.casesContainer = document.getElementById('casesContainer');
+                this.addCaseBtn = document.getElementById('addCaseBtn');
+                this.caseCount = document.getElementById('caseCount');
+                this.totalQuantityDisplay = document.getElementById('totalQuantity');
                 this.secondLogoCheckbox = document.getElementById('secondLogo');
+                
+                // Track cases
+                this.cases = [];
+                this.caseIdCounter = 0;
                 
                 // Quote display elements
                 this.quoteDisplay = document.getElementById('quoteDisplay');
@@ -1102,6 +1185,7 @@
                 this.customerEmail = document.getElementById('customerEmail');
                 this.customerPhone = document.getElementById('customerPhone');
                 this.companyName = document.getElementById('companyName');
+                this.emailNotes = document.getElementById('emailNotes');
                 this.salesRep = document.getElementById('salesRep');
                 this.successMessage = document.getElementById('successMessage');
                 this.errorMessage = document.getElementById('errorMessage');
@@ -1112,18 +1196,8 @@
                 // Form submission
                 this.form.addEventListener('submit', (e) => this.handleCalculate(e));
                 
-                // Quantity change
-                this.quantitySelect.addEventListener('change', () => {
-                    if (this.quantitySelect.value === 'custom') {
-                        this.customQuantityInput.classList.remove('hidden');
-                        this.customQuantityInput.required = true;
-                        this.customQuantityInput.focus();
-                    } else {
-                        this.customQuantityInput.classList.add('hidden');
-                        this.customQuantityInput.required = false;
-                        this.customQuantityInput.value = '';
-                    }
-                });
+                // Add case button
+                this.addCaseBtn.addEventListener('click', () => this.addCase());
                 
                 // Email quote button
                 this.emailQuoteBtn.addEventListener('click', () => this.openModal());
@@ -1168,6 +1242,103 @@
                     colorItem.appendChild(code);
                     colorGrid.appendChild(colorItem);
                 });
+                
+                // Add initial case
+                this.addCase();
+            }
+            
+            addCase() {
+                const caseId = this.caseIdCounter++;
+                const caseNumber = this.cases.length + 1;
+                
+                const caseRow = document.createElement('div');
+                caseRow.className = 'case-row';
+                caseRow.id = `case-${caseId}`;
+                
+                caseRow.innerHTML = `
+                    <div class="case-number">Case ${caseNumber}:</div>
+                    <div class="color-select-wrapper">
+                        <div class="selected-color-swatch" id="swatch-${caseId}" style="background: #ccc;"></div>
+                        <select class="color-select" id="color-${caseId}" required>
+                            <option value="">Select a color...</option>
+                            ${tumblerColors.map(color => 
+                                `<option value="${color.model}" data-hex="${color.hex}">${color.name} (${color.model})</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <button type="button" class="case-remove" onclick="window.laserTumblerCalculator.removeCase(${caseId})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                this.casesContainer.appendChild(caseRow);
+                
+                // Add color change listener
+                const colorSelect = document.getElementById(`color-${caseId}`);
+                const colorSwatch = document.getElementById(`swatch-${caseId}`);
+                
+                colorSelect.addEventListener('change', (e) => {
+                    const selectedOption = e.target.options[e.target.selectedIndex];
+                    const hex = selectedOption.dataset.hex;
+                    if (hex) {
+                        colorSwatch.style.backgroundColor = hex;
+                        if (hex === '#FFFFFF' || hex === '#FFEB3B') {
+                            colorSwatch.style.border = '2px solid #e5e7eb';
+                        } else {
+                            colorSwatch.style.border = 'none';
+                        }
+                    }
+                    this.updateTotals();
+                });
+                
+                // Track case
+                this.cases.push({
+                    id: caseId,
+                    colorSelect: colorSelect
+                });
+                
+                this.updateTotals();
+                
+                // Focus on new color select
+                colorSelect.focus();
+            }
+            
+            removeCase(caseId) {
+                if (this.cases.length <= 1) {
+                    alert('You must have at least one case.');
+                    return;
+                }
+                
+                // Remove from DOM
+                const caseRow = document.getElementById(`case-${caseId}`);
+                if (caseRow) {
+                    caseRow.remove();
+                }
+                
+                // Remove from tracking
+                this.cases = this.cases.filter(c => c.id !== caseId);
+                
+                // Renumber remaining cases
+                this.renumberCases();
+                this.updateTotals();
+            }
+            
+            renumberCases() {
+                const caseRows = this.casesContainer.querySelectorAll('.case-row');
+                caseRows.forEach((row, index) => {
+                    const caseNumber = row.querySelector('.case-number');
+                    if (caseNumber) {
+                        caseNumber.textContent = `Case ${index + 1}:`;
+                    }
+                });
+            }
+            
+            updateTotals() {
+                const caseCount = this.cases.length;
+                const totalQuantity = caseCount * 24;
+                
+                this.caseCount.textContent = caseCount;
+                this.totalQuantityDisplay.textContent = totalQuantity;
             }
 
             getUnitPrice(quantity) {
@@ -1180,19 +1351,33 @@
             handleCalculate(e) {
                 e.preventDefault();
                 
-                // Get quantity
-                let quantity;
-                if (this.quantitySelect.value === 'custom') {
-                    quantity = parseInt(this.customQuantityInput.value);
-                } else {
-                    quantity = parseInt(this.quantitySelect.value);
-                }
+                // Validate colors selected
+                const selectedColors = [];
+                let hasError = false;
                 
-                // Validate minimum quantity
-                if (quantity < 24) {
-                    alert('Minimum order quantity is 24 tumblers.');
-                    return;
-                }
+                this.cases.forEach((caseData, index) => {
+                    const colorValue = caseData.colorSelect.value;
+                    if (!colorValue) {
+                        alert(`Please select a color for Case ${index + 1}`);
+                        hasError = true;
+                        return;
+                    }
+                    
+                    const selectedOption = caseData.colorSelect.options[caseData.colorSelect.selectedIndex];
+                    const colorInfo = tumblerColors.find(c => c.model === colorValue);
+                    
+                    selectedColors.push({
+                        model: colorValue,
+                        name: colorInfo.name,
+                        hex: colorInfo.hex,
+                        quantity: 24
+                    });
+                });
+                
+                if (hasError) return;
+                
+                // Get total quantity
+                const quantity = this.cases.length * 24;
                 
                 // Calculate pricing
                 const unitPrice = this.getUnitPrice(quantity);
@@ -1205,6 +1390,8 @@
                     customerName: this.customerNameInput.value,
                     projectName: this.projectNameInput.value,
                     quantity: quantity,
+                    caseCount: this.cases.length,
+                    colors: selectedColors,
                     unitPrice: unitPrice,
                     subtotal: subtotal,
                     setupFee: this.setupFee,
@@ -1223,10 +1410,23 @@
                 const quote = this.currentQuote;
                 
                 // Update display values
-                this.displayQuantity.textContent = `${quote.quantity} tumblers`;
+                this.displayQuantity.textContent = `${quote.quantity} tumblers (${quote.caseCount} ${quote.caseCount === 1 ? 'case' : 'cases'})`;
                 this.displayUnitPrice.textContent = `$${quote.unitPrice.toFixed(2)}`;
                 this.displaySubtotal.textContent = `$${quote.subtotal.toFixed(2)}`;
                 this.displayTotal.textContent = `$${quote.total.toFixed(2)}`;
+                
+                // Display color breakdown
+                const colorBreakdown = document.getElementById('colorBreakdown');
+                let colorHtml = '<div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Color Breakdown:</div>';
+                quote.colors.forEach(color => {
+                    colorHtml += `
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                            <div style="width: 20px; height: 20px; border-radius: 50%; background: ${color.hex}; box-shadow: 0 2px 4px rgba(0,0,0,0.2); ${color.hex === '#FFFFFF' || color.hex === '#FFEB3B' ? 'border: 1px solid #e5e7eb;' : ''}"></div>
+                            <span style="font-size: 0.875rem;">${color.name} (${color.model}) - ${color.quantity} units</span>
+                        </div>
+                    `;
+                });
+                colorBreakdown.innerHTML = colorHtml;
                 
                 // Handle second logo display
                 if (quote.hasSecondLogo) {
@@ -1298,23 +1498,30 @@
                     
                     const quote = this.currentQuote;
                     
+                    // Build color breakdown for email
+                    let colorBreakdownText = quote.colors.map(color => 
+                        `${color.name} (${color.model}) - ${color.quantity} units`
+                    ).join(', ');
+                    
                     // Prepare email data
                     const emailData = {
                         to_email: this.customerEmail.value,
                         reply_to: selectedRep,
+                        from_name: 'Northwest Custom Apparel',
                         customer_name: this.emailCustomerName.value,
                         project_name: quote.projectName || 'Polar Camel Tumbler Quote',
                         quote_id: `LT${new Date().toISOString().slice(2,10).replace(/-/g,'')}-${Math.floor(Math.random() * 100)}`,
                         quote_date: new Date().toLocaleDateString(),
                         service_type: 'Polar Camel 16 oz. Pint - Laser Engraved',
                         quantity: quote.quantity.toString(),
-                        locations: '1-Sided Laser Engraving (approx. 2.5" x 3")',
+                        locations: `1-Sided Laser Engraving | Colors: ${colorBreakdownText}`,
                         price_per_piece: `$${quote.unitPrice.toFixed(2)}`,
                         subtotal: `$${quote.subtotal.toFixed(2)}`,
                         special_note: quote.hasSecondLogo ? 
                             `Includes second logo (+$${quote.secondLogoTotal.toFixed(2)}) and one-time setup fee ($${quote.setupFee.toFixed(2)})` :
                             `Includes one-time setup fee ($${quote.setupFee.toFixed(2)})`,
                         grand_total: `$${quote.total.toFixed(2)}`,
+                        notes: this.emailNotes.value || '',
                         sales_rep_name: salesRepNames[selectedRep],
                         sales_rep_email: selectedRep,
                         sales_rep_phone: '253-922-5793',
@@ -1382,8 +1589,15 @@
                         <h3>Product Details:</h3>
                         <p><strong>Polar Camel 16 oz. Pint</strong></p>
                         <p>Premium stainless steel tumbler with laser engraving</p>
-                        <p>Quantity: ${quote.quantity} tumblers</p>
+                        <p>Quantity: ${quote.quantity} tumblers (${quote.caseCount} ${quote.caseCount === 1 ? 'case' : 'cases'})</p>
                         <p>Price per unit: $${quote.unitPrice.toFixed(2)}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h4>Color Breakdown:</h4>
+                        ${quote.colors.map(color => 
+                            `<p style="margin: 5px 0;">• ${color.name} (${color.model}) - ${color.quantity} units</p>`
+                        ).join('')}
                     </div>
                     
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
