@@ -1181,6 +1181,173 @@
                 padding: 1rem;
             }
         }
+
+        /* FAQ Section Styles */
+        .faq-section {
+            margin: 3rem auto;
+            max-width: 1000px;
+            padding: 0 20px;
+        }
+
+        .faq-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .faq-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        .faq-item {
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-question {
+            padding: 1.25rem;
+            background: var(--hover-bg);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: #e5e7eb;
+        }
+
+        .faq-item.expanded .faq-question {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .faq-question::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+            color: inherit;
+        }
+
+        .faq-item.expanded .faq-question::after {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 1.25rem;
+            background: white;
+        }
+
+        .faq-item.expanded .faq-answer {
+            max-height: none;
+            padding: 1.25rem;
+        }
+
+        .faq-answer p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .faq-answer p:last-child {
+            margin-bottom: 0;
+        }
+
+        .faq-answer ul {
+            margin: 0.5rem 0 1rem 1.5rem;
+            line-height: 1.8;
+        }
+
+        .faq-answer li {
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .faq-tip {
+            background: var(--success-bg);
+            color: var(--success-text);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+        }
+
+        .faq-tip-icon {
+            flex-shrink: 0;
+            font-size: 1.25rem;
+            margin-top: 0.1rem;
+        }
+
+        .faq-warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+        }
+
+        .faq-warning-icon {
+            flex-shrink: 0;
+            font-size: 1.25rem;
+            margin-top: 0.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .faq-section {
+                margin: 2rem auto;
+            }
+
+            .faq-container {
+                padding: 1.5rem;
+            }
+
+            .faq-title {
+                font-size: 1.75rem;
+            }
+
+            .faq-question {
+                padding: 1rem;
+                font-size: 0.95rem;
+            }
+
+            .faq-answer {
+                font-size: 0.95rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1255,129 +1422,6 @@
             <span id="errorText">An error occurred. Please try again.</span>
         </div>
 
-        <div class="section">
-            <h2>Embroidered Emblem Calculator</h2>
-            <div class="calculator-grid">
-                <div class="input-section">
-                    <div class="input-group">
-                        <div>
-                            <label for="emblemWidth">Width (in)</label>
-                            <input type="number" id="emblemWidth" step="0.1" placeholder="e.g., 3.5">
-                        </div>
-                        <div>
-                            <label for="emblemHeight">Height (in)</label>
-                            <input type="number" id="emblemHeight" step="0.1" placeholder="e.g., 2.5">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="quantity">Quantity</label>
-                        <input type="number" id="quantity" placeholder="Minimum 25">
-                    </div>
-                    <div class="addon-section">
-                        <h3>Options</h3>
-                        <div class="addon-item">
-                            <label for="metallicThread">Metallic Thread (add 25%)</label>
-                            <label class="switch"><input type="checkbox" id="metallicThread"><span class="slider"></span></label>
-                        </div>
-                        <div class="addon-item">
-                            <label for="velcroBacking">Velcro Backing (add 25%)</label>
-                            <label class="switch"><input type="checkbox" id="velcroBacking"><span class="slider"></span></label>
-                        </div>
-                        <div class="addon-item">
-                            <label for="extraColors">Extra Colors (add 10% each)</label>
-                            <input type="number" id="extraColors" value="0" min="0" style="width: 80px;">
-                        </div>
-                        <div class="addon-item">
-                            <label for="digitizingFee">New Design? (Add $100 Fee)</label>
-                            <label class="switch"><input type="checkbox" id="digitizingFee"><span class="slider"></span></label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="results-section" id="results">
-                    <h3>Your Quote</h3>
-                    <div class="price-display prompt" id="priceDisplay">Enter dimensions & quantity</div>
-                    <div class="price-display-label">
-                        Price per Emblem
-                        <span class="info-icon" id="price-breakdown-icon" data-tooltip="Fill out the form to see the cost breakdown.">i</span>
-                    </div>
-                    <hr style="border:none; border-top:1px solid var(--border-color); margin: 1.5rem 0;">
-                    <div class="order-summary">
-                        <div class="summary-item">
-                            <span>Order Subtotal</span>
-                            <strong id="subtotalDisplay">$0.00</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>One-Time Fees</span>
-                            <strong id="feesDisplay">$0.00</strong>
-                        </div>
-                        <div class="summary-item" style="font-size: 18px;">
-                            <strong>Estimated Total</strong>
-                            <strong id="totalDisplay">$0.00</strong>
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-primary" id="emailQuoteBtn" disabled>
-                            <i class="fas fa-envelope"></i>
-                            Email Quote
-                        </button>
-                        <button class="btn btn-secondary" onclick="window.print()">
-                            <i class="fas fa-print"></i>
-                            Print
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="pricing-container">
-            <div class="pricing-header" onclick="togglePricingGrid()">
-                <h3>
-                    <i class="fas fa-table"></i>
-                    2025 Embroidered Emblem Pricing Grid (Reference)
-                </h3>
-                <i class="fas fa-chevron-down pricing-toggle" id="pricingToggle"></i>
-            </div>
-            <div class="pricing-content" id="pricingContent">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Size</th><th>25-49</th><th>50-99</th><th>100-199</th><th>200-299</th><th>300-499</th><th>500-999</th><th>1000-1999</th><th>2000-4999</th><th>5000-9999</th><th>10000+</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr data-size-tier="1.00"><td>Up to 1"</td><td data-qty-index="0">$2.20</td><td data-qty-index="1">$1.91</td><td data-qty-index="2">$1.41</td><td data-qty-index="3">$1.01</td><td data-qty-index="4">$0.86</td><td data-qty-index="5">$0.74</td><td data-qty-index="6">$0.65</td><td data-qty-index="7">$0.59</td><td data-qty-index="8">$0.54</td><td data-qty-index="9">$0.49</td></tr>
-                    <tr data-size-tier="1.50"><td>1.01-1.50"</td><td data-qty-index="0">$2.77</td><td data-qty-index="1">$2.41</td><td data-qty-index="2">$1.78</td><td data-qty-index="3">$1.27</td><td data-qty-index="4">$1.09</td><td data-qty-index="5">$0.93</td><td data-qty-index="6">$0.82</td><td data-qty-index="7">$0.74</td><td data-qty-index="8">$0.68</td><td data-qty-index="9">$0.61</td></tr>
-                    <tr data-size-tier="2.00"><td>1.51-2.00"</td><td data-qty-index="0">$3.87</td><td data-qty-index="1">$3.37</td><td data-qty-index="2">$2.49</td><td data-qty-index="3">$1.78</td><td data-qty-index="4">$1.52</td><td data-qty-index="5">$1.30</td><td data-qty-index="6">$1.14</td><td data-qty-index="7">$1.03</td><td data-qty-index="8">$0.95</td><td data-qty-index="9">$0.86</td></tr>
-                    <tr data-size-tier="2.50"><td>2.01-2.50"</td><td data-qty-index="0">$4.97</td><td data-qty-index="1">$4.32</td><td data-qty-index="2">$3.19</td><td data-qty-index="3">$2.29</td><td data-qty-index="4">$1.95</td><td data-qty-index="5">$1.67</td><td data-qty-index="6">$1.47</td><td data-qty-index="7">$1.33</td><td data-qty-index="8">$1.21</td><td data-qty-index="9">$1.10</td></tr>
-                    <tr data-size-tier="3.00"><td>2.51-3.00"</td><td data-qty-index="0">$6.07</td><td data-qty-index="1">$5.28</td><td data-qty-index="2">$3.90</td><td data-qty-index="3">$2.79</td><td data-qty-index="4">$2.38</td><td data-qty-index="5">$2.03</td><td data-qty-index="6">$1.79</td><td data-qty-index="7">$1.62</td><td data-qty-index="8">$1.48</td><td data-qty-index="9">$1.34</td></tr>
-                    <tr data-size-tier="3.50"><td>3.01-3.5"</td><td data-qty-index="0">$7.17</td><td data-qty-index="1">$6.23</td><td data-qty-index="2">$4.60</td><td data-qty-index="3">$3.30</td><td data-qty-index="4">$2.81</td><td data-qty-index="5">$2.40</td><td data-qty-index="6">$2.12</td><td data-qty-index="7">$1.91</td><td data-qty-index="8">$1.75</td><td data-qty-index="9">$1.59</td></tr>
-                    <tr data-size-tier="4.00"><td>3.51-4.00"</td><td data-qty-index="0">$8.28</td><td data-qty-index="1">$7.19</td><td data-qty-index="2">$5.31</td><td data-qty-index="3">$3.81</td><td data-qty-index="4">$3.24</td><td data-qty-index="5">$2.77</td><td data-qty-index="6">$2.44</td><td data-qty-index="7">$2.21</td><td data-qty-index="8">$2.02</td><td data-qty-index="9">$1.83</td></tr>
-                    <tr data-size-tier="4.50"><td>4.01-4.50"</td><td data-qty-index="0">$9.38</td><td data-qty-index="1">$8.15</td><td data-qty-index="2">$6.02</td><td data-qty-index="3">$4.31</td><td data-qty-index="4">$3.67</td><td data-qty-index="5">$3.14</td><td data-qty-index="6">$2.77</td><td data-qty-index="7">$2.50</td><td data-qty-index="8">$2.29</td><td data-qty-index="9">$2.08</td></tr>
-                    <tr data-size-tier="5.00"><td>4.51-5.00''</td><td data-qty-index="0">$10.48</td><td data-qty-index="1">$9.10</td><td data-qty-index="2">$6.72</td><td data-qty-index="3">$4.82</td><td data-qty-index="4">$4.10</td><td data-qty-index="5">$3.51</td><td data-qty-index="6">$3.09</td><td data-qty-index="7">$2.80</td><td data-qty-index="8">$2.56</td><td data-qty-index="9">$2.32</td></tr>
-                    <tr data-size-tier="6.00"><td>5.01-6.00"</td><td data-qty-index="0">$12.13</td><td data-qty-index="1">$10.54</td><td data-qty-index="2">$7.78</td><td data-qty-index="3">$5.58</td><td data-qty-index="4">$4.75</td><td data-qty-index="5">$4.06</td><td data-qty-index="6">$3.58</td><td data-qty-index="7">$3.24</td><td data-qty-index="8">$2.96</td><td data-qty-index="9">$2.69</td></tr>
-                    <tr data-size-tier="7.00"><td>6.01-7.00"</td><td data-qty-index="0">$14.33</td><td data-qty-index="1">$12.45</td><td data-qty-index="2">$9.19</td><td data-qty-index="3">$6.59</td><td data-qty-index="4">$5.61</td><td data-qty-index="5">$4.80</td><td data-qty-index="6">$4.23</td><td data-qty-index="7">$3.82</td><td data-qty-index="8">$3.50</td><td data-qty-index="9">$3.17</td></tr>
-                    <tr data-size-tier="8.00"><td>7.01-8.00"</td><td data-qty-index="0">$16.53</td><td data-qty-index="1">$14.36</td><td data-qty-index="2">$10.61</td><td data-qty-index="3">$7.60</td><td data-qty-index="4">$6.48</td><td data-qty-index="5">$5.54</td><td data-qty-index="6">$4.88</td><td data-qty-index="7">$4.41</td><td data-qty-index="8">$4.04</td><td data-qty-index="9">$3.66</td></tr>
-                    <tr data-size-tier="9.00"><td>8.01-9.00"</td><td data-qty-index="0">$18.73</td><td data-qty-index="1">$16.27</td><td data-qty-index="2">$12.02</td><td data-qty-index="3">$8.62</td><td data-qty-index="4">$7.34</td><td data-qty-index="5">$6.28</td><td data-qty-index="6">$5.53</td><td data-qty-index="7">$5.00</td><td data-qty-index="8">$4.57</td><td data-qty-index="9">$4.15</td></tr>
-                    <tr data-size-tier="10.00"><td>9.01-10.00"</td><td data-qty-index="0">$20.93</td><td data-qty-index="1">$18.19</td><td data-qty-index="2">$13.43</td><td data-qty-index="3">$9.63</td><td data-qty-index="4">$8.20</td><td data-qty-index="5">$7.01</td><td data-qty-index="6">$6.18</td><td data-qty-index="7">$5.59</td><td data-qty-index="8">$5.11</td><td data-qty-index="9">$4.64</td></tr>
-                    <tr data-size-tier="11.00"><td>10.01-11.00''</td><td data-qty-index="0">$23.13</td><td data-qty-index="1">$20.10</td><td data-qty-index="2">$14.84</td><td data-qty-index="3">$10.64</td><td data-qty-index="4">$9.06</td><td data-qty-index="5">$7.75</td><td data-qty-index="6">$6.83</td><td data-qty-index="7">$6.17</td><td data-qty-index="8">$5.65</td><td data-qty-index="9">$5.12</td></tr>
-                    <tr data-size-tier="12.00"><td>11.01-12.00"</td><td data-qty-index="0">$25.34</td><td data-qty-index="1">$22.01</td><td data-qty-index="2">$16.26</td><td data-qty-index="3">$11.65</td><td data-qty-index="4">$9.93</td><td data-qty-index="5">$8.49</td><td data-qty-index="6">$7.48</td><td data-qty-index="7">$6.76</td><td data-qty-index="8">$6.19</td><td data-qty-index="9">$5.61</td></tr>
-                </tbody>
-            </table>
-            <p class="note">A one-time $100.00 digitizing fee applies per new design. For quantities under 200, a $50.00 LTM fee also applies (this is added to the per-emblem price).</p>
-            </div>
-        </div>
-        
-        <!-- Print Footer (Only visible when printing) -->
-        <div class="print-footer">
-            <p><strong>Terms & Conditions:</strong></p>
-            <p>This quote is valid for 30 days from the date above. Prices subject to change after expiration.<br>
-            Production time: 10-14 business days from art approval. Rush service available upon request.</p>
-            <p style="margin-top: 1rem;">
-                <strong>Northwest Custom Apparel</strong> | Milton, WA | 253-922-5793 | sales@nwcustomapparel.com
-            </p>
-        </div>
-        
         <!-- ShopWorks Order Entry Guide (Internal Use Only) -->
         <div class="shopworks-guide-container no-print">
             <div class="guide-header" onclick="toggleGuide()">
@@ -1575,7 +1619,7 @@ Price: $0.75 each</pre>
 
                     <div class="faq-item">
                         <h5>Q: What price do I use for emblems?</h5>
-                        <p>Use the pricing calculator above. Enter quantity to get correct price.</p>
+                        <p>Use the pricing calculator below. Enter quantity to get correct price.</p>
                     </div>
 
                     <div class="faq-item">
@@ -1613,6 +1657,218 @@ Price: $0.75 each</pre>
                     </ul>
                 </div>
             </div>
+        </div>
+
+        <div class="section">
+            <h2>Embroidered Emblem Calculator</h2>
+            <div class="calculator-grid">
+                <div class="input-section">
+                    <div class="input-group">
+                        <div>
+                            <label for="emblemWidth">Width (in)</label>
+                            <input type="number" id="emblemWidth" step="0.1" placeholder="e.g., 3.5">
+                        </div>
+                        <div>
+                            <label for="emblemHeight">Height (in)</label>
+                            <input type="number" id="emblemHeight" step="0.1" placeholder="e.g., 2.5">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" placeholder="Minimum 25">
+                    </div>
+                    <div class="addon-section">
+                        <h3>Options</h3>
+                        <div class="addon-item">
+                            <label for="metallicThread">Metallic Thread (add 25%)</label>
+                            <label class="switch"><input type="checkbox" id="metallicThread"><span class="slider"></span></label>
+                        </div>
+                        <div class="addon-item">
+                            <label for="velcroBacking">Velcro Backing (add 25%)</label>
+                            <label class="switch"><input type="checkbox" id="velcroBacking"><span class="slider"></span></label>
+                        </div>
+                        <div class="addon-item">
+                            <label for="extraColors">Extra Colors (add 10% each)</label>
+                            <input type="number" id="extraColors" value="0" min="0" style="width: 80px;">
+                        </div>
+                        <div class="addon-item">
+                            <label for="digitizingFee">New Design? (Add $100 Fee)</label>
+                            <label class="switch"><input type="checkbox" id="digitizingFee"><span class="slider"></span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-section" id="results">
+                    <h3>Your Quote</h3>
+                    <div class="price-display prompt" id="priceDisplay">Enter dimensions & quantity</div>
+                    <div class="price-display-label">
+                        Price per Emblem
+                        <span class="info-icon" id="price-breakdown-icon" data-tooltip="Fill out the form to see the cost breakdown.">i</span>
+                    </div>
+                    <hr style="border:none; border-top:1px solid var(--border-color); margin: 1.5rem 0;">
+                    <div class="order-summary">
+                        <div class="summary-item">
+                            <span>Order Subtotal</span>
+                            <strong id="subtotalDisplay">$0.00</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>One-Time Fees</span>
+                            <strong id="feesDisplay">$0.00</strong>
+                        </div>
+                        <div class="summary-item" style="font-size: 18px;">
+                            <strong>Estimated Total</strong>
+                            <strong id="totalDisplay">$0.00</strong>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="emailQuoteBtn" disabled>
+                            <i class="fas fa-envelope"></i>
+                            Email Quote
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.print()">
+                            <i class="fas fa-print"></i>
+                            Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pricing-container">
+            <div class="pricing-header" onclick="togglePricingGrid()">
+                <h3>
+                    <i class="fas fa-table"></i>
+                    2025 Embroidered Emblem Pricing Grid (Reference)
+                </h3>
+                <i class="fas fa-chevron-down pricing-toggle" id="pricingToggle"></i>
+            </div>
+            <div class="pricing-content" id="pricingContent">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Size</th><th>25-49</th><th>50-99</th><th>100-199</th><th>200-299</th><th>300-499</th><th>500-999</th><th>1000-1999</th><th>2000-4999</th><th>5000-9999</th><th>10000+</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-size-tier="1.00"><td>Up to 1"</td><td data-qty-index="0">$2.20</td><td data-qty-index="1">$1.91</td><td data-qty-index="2">$1.41</td><td data-qty-index="3">$1.01</td><td data-qty-index="4">$0.86</td><td data-qty-index="5">$0.74</td><td data-qty-index="6">$0.65</td><td data-qty-index="7">$0.59</td><td data-qty-index="8">$0.54</td><td data-qty-index="9">$0.49</td></tr>
+                    <tr data-size-tier="1.50"><td>1.01-1.50"</td><td data-qty-index="0">$2.77</td><td data-qty-index="1">$2.41</td><td data-qty-index="2">$1.78</td><td data-qty-index="3">$1.27</td><td data-qty-index="4">$1.09</td><td data-qty-index="5">$0.93</td><td data-qty-index="6">$0.82</td><td data-qty-index="7">$0.74</td><td data-qty-index="8">$0.68</td><td data-qty-index="9">$0.61</td></tr>
+                    <tr data-size-tier="2.00"><td>1.51-2.00"</td><td data-qty-index="0">$3.87</td><td data-qty-index="1">$3.37</td><td data-qty-index="2">$2.49</td><td data-qty-index="3">$1.78</td><td data-qty-index="4">$1.52</td><td data-qty-index="5">$1.30</td><td data-qty-index="6">$1.14</td><td data-qty-index="7">$1.03</td><td data-qty-index="8">$0.95</td><td data-qty-index="9">$0.86</td></tr>
+                    <tr data-size-tier="2.50"><td>2.01-2.50"</td><td data-qty-index="0">$4.97</td><td data-qty-index="1">$4.32</td><td data-qty-index="2">$3.19</td><td data-qty-index="3">$2.29</td><td data-qty-index="4">$1.95</td><td data-qty-index="5">$1.67</td><td data-qty-index="6">$1.47</td><td data-qty-index="7">$1.33</td><td data-qty-index="8">$1.21</td><td data-qty-index="9">$1.10</td></tr>
+                    <tr data-size-tier="3.00"><td>2.51-3.00"</td><td data-qty-index="0">$6.07</td><td data-qty-index="1">$5.28</td><td data-qty-index="2">$3.90</td><td data-qty-index="3">$2.79</td><td data-qty-index="4">$2.38</td><td data-qty-index="5">$2.03</td><td data-qty-index="6">$1.79</td><td data-qty-index="7">$1.62</td><td data-qty-index="8">$1.48</td><td data-qty-index="9">$1.34</td></tr>
+                    <tr data-size-tier="3.50"><td>3.01-3.5"</td><td data-qty-index="0">$7.17</td><td data-qty-index="1">$6.23</td><td data-qty-index="2">$4.60</td><td data-qty-index="3">$3.30</td><td data-qty-index="4">$2.81</td><td data-qty-index="5">$2.40</td><td data-qty-index="6">$2.12</td><td data-qty-index="7">$1.91</td><td data-qty-index="8">$1.75</td><td data-qty-index="9">$1.59</td></tr>
+                    <tr data-size-tier="4.00"><td>3.51-4.00"</td><td data-qty-index="0">$8.28</td><td data-qty-index="1">$7.19</td><td data-qty-index="2">$5.31</td><td data-qty-index="3">$3.81</td><td data-qty-index="4">$3.24</td><td data-qty-index="5">$2.77</td><td data-qty-index="6">$2.44</td><td data-qty-index="7">$2.21</td><td data-qty-index="8">$2.02</td><td data-qty-index="9">$1.83</td></tr>
+                    <tr data-size-tier="4.50"><td>4.01-4.50"</td><td data-qty-index="0">$9.38</td><td data-qty-index="1">$8.15</td><td data-qty-index="2">$6.02</td><td data-qty-index="3">$4.31</td><td data-qty-index="4">$3.67</td><td data-qty-index="5">$3.14</td><td data-qty-index="6">$2.77</td><td data-qty-index="7">$2.50</td><td data-qty-index="8">$2.29</td><td data-qty-index="9">$2.08</td></tr>
+                    <tr data-size-tier="5.00"><td>4.51-5.00''</td><td data-qty-index="0">$10.48</td><td data-qty-index="1">$9.10</td><td data-qty-index="2">$6.72</td><td data-qty-index="3">$4.82</td><td data-qty-index="4">$4.10</td><td data-qty-index="5">$3.51</td><td data-qty-index="6">$3.09</td><td data-qty-index="7">$2.80</td><td data-qty-index="8">$2.56</td><td data-qty-index="9">$2.32</td></tr>
+                    <tr data-size-tier="6.00"><td>5.01-6.00"</td><td data-qty-index="0">$12.13</td><td data-qty-index="1">$10.54</td><td data-qty-index="2">$7.78</td><td data-qty-index="3">$5.58</td><td data-qty-index="4">$4.75</td><td data-qty-index="5">$4.06</td><td data-qty-index="6">$3.58</td><td data-qty-index="7">$3.24</td><td data-qty-index="8">$2.96</td><td data-qty-index="9">$2.69</td></tr>
+                    <tr data-size-tier="7.00"><td>6.01-7.00"</td><td data-qty-index="0">$14.33</td><td data-qty-index="1">$12.45</td><td data-qty-index="2">$9.19</td><td data-qty-index="3">$6.59</td><td data-qty-index="4">$5.61</td><td data-qty-index="5">$4.80</td><td data-qty-index="6">$4.23</td><td data-qty-index="7">$3.82</td><td data-qty-index="8">$3.50</td><td data-qty-index="9">$3.17</td></tr>
+                    <tr data-size-tier="8.00"><td>7.01-8.00"</td><td data-qty-index="0">$16.53</td><td data-qty-index="1">$14.36</td><td data-qty-index="2">$10.61</td><td data-qty-index="3">$7.60</td><td data-qty-index="4">$6.48</td><td data-qty-index="5">$5.54</td><td data-qty-index="6">$4.88</td><td data-qty-index="7">$4.41</td><td data-qty-index="8">$4.04</td><td data-qty-index="9">$3.66</td></tr>
+                    <tr data-size-tier="9.00"><td>8.01-9.00"</td><td data-qty-index="0">$18.73</td><td data-qty-index="1">$16.27</td><td data-qty-index="2">$12.02</td><td data-qty-index="3">$8.62</td><td data-qty-index="4">$7.34</td><td data-qty-index="5">$6.28</td><td data-qty-index="6">$5.53</td><td data-qty-index="7">$5.00</td><td data-qty-index="8">$4.57</td><td data-qty-index="9">$4.15</td></tr>
+                    <tr data-size-tier="10.00"><td>9.01-10.00"</td><td data-qty-index="0">$20.93</td><td data-qty-index="1">$18.19</td><td data-qty-index="2">$13.43</td><td data-qty-index="3">$9.63</td><td data-qty-index="4">$8.20</td><td data-qty-index="5">$7.01</td><td data-qty-index="6">$6.18</td><td data-qty-index="7">$5.59</td><td data-qty-index="8">$5.11</td><td data-qty-index="9">$4.64</td></tr>
+                    <tr data-size-tier="11.00"><td>10.01-11.00''</td><td data-qty-index="0">$23.13</td><td data-qty-index="1">$20.10</td><td data-qty-index="2">$14.84</td><td data-qty-index="3">$10.64</td><td data-qty-index="4">$9.06</td><td data-qty-index="5">$7.75</td><td data-qty-index="6">$6.83</td><td data-qty-index="7">$6.17</td><td data-qty-index="8">$5.65</td><td data-qty-index="9">$5.12</td></tr>
+                    <tr data-size-tier="12.00"><td>11.01-12.00"</td><td data-qty-index="0">$25.34</td><td data-qty-index="1">$22.01</td><td data-qty-index="2">$16.26</td><td data-qty-index="3">$11.65</td><td data-qty-index="4">$9.93</td><td data-qty-index="5">$8.49</td><td data-qty-index="6">$7.48</td><td data-qty-index="7">$6.76</td><td data-qty-index="8">$6.19</td><td data-qty-index="9">$5.61</td></tr>
+                </tbody>
+            </table>
+            <p class="note">A one-time $100.00 digitizing fee applies per new design. For quantities under 200, a $50.00 LTM fee also applies (this is added to the per-emblem price).</p>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <div class="faq-container">
+                <div class="faq-header">
+                    <h2 class="faq-title">
+                        <i class="fas fa-question-circle"></i>
+                        Frequently Asked Questions
+                    </h2>
+                    <p class="faq-subtitle">Everything you need to know about embroidered emblems</p>
+                </div>
+                
+                <div class="faq-grid">
+                <div class="faq-item">
+                    <h3 class="faq-question">What exactly is an embroidered emblem?</h3>
+                    <div class="faq-answer">
+                        <p>An embroidered emblem (also called a patch or badge) is a piece of artwork created by stitching colored threads onto a fabric backing. Unlike direct embroidery on garments, emblems are created separately and then attached to clothing or accessories. They have a raised, three-dimensional texture that gives designs a premium, professional appearance.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">How do I use the pricing calculator?</h3>
+                    <div class="faq-answer">
+                        <p>Simply enter your emblem's width and height in inches, then input your desired quantity (minimum 25). The calculator automatically determines the size category by averaging width and height. Select any additional options like metallic thread or velcro backing, and the price will update instantly. Click "Email Quote" to send yourself or a customer the pricing details.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">What's the difference between embroidered emblems and other patch types?</h3>
+                    <div class="faq-answer">
+                        <p><strong>Embroidered emblems</strong> use thick threads for a classic, textured 3D look - perfect for bold logos and high-contrast designs. <strong>Woven patches</strong> use thinner threads for finer detail but are flatter. <strong>Printed patches</strong> can reproduce photos and gradients but have no texture. Choose embroidered for traditional, professional applications where the raised texture adds value.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">What size should I make my emblem?</h3>
+                    <div class="faq-answer">
+                        <p>Common sizes include 2-3" for chest logos, 3-4" for sleeve patches, and 8-12" for back patches. Remember: embroidery thread has physical thickness, so very small details may not reproduce well. If your design has fine details or small text, consider making the emblem larger or simplifying the design. Text should be at least 1/8" tall to be legible.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">What affects the price of my emblems?</h3>
+                    <div class="faq-answer">
+                        <p>Price is primarily determined by size and quantity. Larger emblems require more materials and machine time. Higher quantities reduce the per-unit cost significantly. Additional options like metallic thread (+25%), velcro backing (+25%), or extra colors (+10% each) increase the price. New designs require a one-time $100 digitizing fee.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">What's the minimum order and turnaround time?</h3>
+                    <div class="faq-answer">
+                        <p>Minimum order is 25 emblems. Standard production time is 10-14 business days after art approval. For orders under 200 pieces, a $50 Less Than Minimum (LTM) fee applies, which is built into the per-emblem price shown in the calculator. Rush service may be available - contact us for details.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">What file format should I provide for my design?</h3>
+                    <div class="faq-answer">
+                        <p>Vector files (AI, EPS, SVG) are best because they can be scaled without quality loss. High-resolution raster files (JPG, PNG) at 300 DPI are also acceptable. Avoid complex gradients or photographic images - these don't translate well to embroidery. Bold, high-contrast designs with clear separations between colors work best.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">What's the difference between merrowed and hot-cut borders?</h3>
+                    <div class="faq-answer">
+                        <p><strong>Merrowed borders</strong> have a raised, overlocked edge that wraps around the patch - it's the classic patch look but only works on simple shapes (circles, squares, ovals). <strong>Hot-cut borders</strong> are laser-cut for a flat edge and allow for complex custom shapes. Your design's shape will determine which border type is appropriate.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">How are emblems attached to garments?</h3>
+                    <div class="faq-answer">
+                        <p>Standard emblems are sewn on. We also offer iron-on backing (heat seal) or velcro backing for removable applications. Sewing provides the most permanent attachment. Iron-on works well for personal use but may not withstand commercial washing. Velcro is perfect when emblems need to be removed or changed regularly.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">What's included in the digitizing fee?</h3>
+                    <div class="faq-answer">
+                        <p>The $100 digitizing fee covers converting your artwork into a stitch file that embroidery machines can read. This includes determining stitch types, directions, and densities to best reproduce your design. Once digitized, you own the file and can reorder without this fee. Minor future edits may incur a $50 art edit charge.</p>
+                    </div>
+                </div>
+                </div>
+
+                <div class="faq-cta">
+                    <p><i class="fas fa-info-circle"></i> <strong>Still have questions?</strong> Contact Jim Mickelson at <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a> or call 253-922-5793 for expert guidance on your embroidered emblem project.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Print Footer (Only visible when printing) -->
+        <div class="print-footer">
+            <p><strong>Terms & Conditions:</strong></p>
+            <p>This quote is valid for 30 days from the date above. Prices subject to change after expiration.<br>
+            Production time: 10-14 business days from art approval. Rush service available upon request.</p>
+            <p style="margin-top: 1rem;">
+                <strong>Northwest Custom Apparel</strong> | Milton, WA | 253-922-5793 | sales@nwcustomapparel.com
+            </p>
         </div>
         
         <!-- Print Footer (Only visible when printing) -->
@@ -2260,6 +2516,29 @@ Price: $0.75 each</pre>
             document.body.removeChild(textArea);
         }
         
+        // FAQ Toggle Functions
+        function initializeFAQ() {
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const faqItem = this.closest('.faq-item');
+                    const answer = faqItem.querySelector('.faq-answer');
+                    const isExpanded = faqItem.classList.contains('expanded');
+                    
+                    // Toggle current item
+                    if (isExpanded) {
+                        faqItem.classList.remove('expanded');
+                        answer.style.maxHeight = '0';
+                    } else {
+                        faqItem.classList.add('expanded');
+                        // Calculate actual height needed
+                        answer.style.maxHeight = answer.scrollHeight + 'px';
+                    }
+                });
+            });
+        }
+        
         // Initialize calculator when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             window.emblemCalculator = new EmblemCalculator();
@@ -2277,13 +2556,8 @@ Price: $0.75 each</pre>
             // Set default sales rep
             document.getElementById('salesRep').value = 'jim@nwcustomapparel.com';
             
-            // Show pricing grid by default
-            const pricingContent = document.getElementById('pricingContent');
-            const pricingToggle = document.getElementById('pricingToggle');
-            if (pricingContent && pricingToggle) {
-                pricingContent.classList.add('show');
-                pricingToggle.classList.add('expanded');
-            }
+            // Initialize FAQ accordion
+            initializeFAQ();
         });
     </script>
 </body>
