@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Customer Supplied Embroidery Calculator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Customer Embroidery Quote Service -->
+    <script src="embroidery-customer-quote-service.js"></script>
+    
+    <style>
+        /* Root variables matching dashboard theme with embroidery accent */
+        :root {
+            --primary-color: #0d6efd; /* Bootstrap Blue for customer theme */
+            --primary-dark: #0b5ed7;
+            --primary-light: #4a90e2;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .help-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .help-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .calculator-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Calculator Grid */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 968px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Component */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: var(--focus-shadow);
+        }
+
+        /* Item Type Selector */
+        .selector-group {
+            display: flex;
+            gap: 0.5rem;
+            background-color: var(--bg-color);
+            padding: 0.25rem;
+            border-radius: 0.5rem;
+        }
+
+        .selector-btn {
+            flex: 1;
+            padding: 0.625rem 1rem;
+            border: none;
+            background-color: transparent;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .selector-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Switch Container */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f6f9ff;
+            padding: 0.875rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .switch-container.hidden {
+            display: none;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Results Section */
+        .results-section {
+            background-color: #f6f9ff;
+            border: 1px solid #bee3f8;
+            border-radius: 0.75rem;
+            padding: 2rem;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .price-display {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+        }
+
+        .price-display.prompt {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .price-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Summary Section */
+        .summary-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            font-size: 0.875rem;
+        }
+
+        .summary-item.total {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .ltm-warning {
+            background-color: var(--warning-bg);
+            color: var(--warning-text);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.813rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Notice Section */
+        .notice-section {
+            background-color: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .notice-section h2 {
+            color: #92400e;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notice-section p {
+            color: #b45309;
+            line-height: 1.6;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .notice-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Email Form */
+        .email-form-container {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .email-form-container.show {
+            display: block;
+        }
+
+        .email-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .email-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .email-action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Success/Error Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background-color: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .alert-error {
+            background-color: #fee;
+            color: #c53030;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Add-on Order Section */
+        .addon-section {
+            background-color: #e8f5ff;
+            border: 1px solid #90caf9;
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .addon-section.hidden {
+            display: none;
+        }
+
+        .addon-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f0f9ff;
+            padding: 0.875rem 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid #bfdbfe;
+        }
+
+        .addon-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .addon-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .discount-indicator {
+            background-color: #10b981;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .discount-indicator.bronze {
+            background-color: #cd7f32;
+        }
+
+        .discount-indicator.silver {
+            background-color: #c0c0c0;
+            color: #1f2937;
+        }
+
+        .discount-indicator.gold {
+            background-color: #ffd700;
+            color: #1f2937;
+        }
+
+        .addon-summary {
+            background-color: white;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            font-size: 0.813rem;
+        }
+
+        .addon-summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+        }
+
+        /* Program Account Section */
+        .program-account-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f3e8ff;
+            padding: 0.875rem 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            border: 1px solid #d8b4fe;
+        }
+
+        .program-badge {
+            background-color: #7c3aed;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 1rem;
+            }
+            
+            .main-container {
+                padding: 0 1rem;
+            }
+            
+            .breadcrumb {
+                display: none;
+            }
+            
+            .calculator-title {
+                font-size: 1.5rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .header, .help-btn, .btn, .email-form-container {
+                display: none !important;
+            }
+            
+            body {
+                background: white;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+            
+            .notice-section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>Customer Supplied Embroidery</span>
+                </nav>
+            </div>
+            <div class="header-right">
+                <button class="help-btn" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    Print Quote
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <h1 class="calculator-title">
+            <i class="fas fa-hand-holding"></i>
+            Customer Supplied Embroidery Calculator
+        </h1>
+
+        <div class="calculator-grid">
+            <!-- Input Section -->
+            <div class="card">
+                <h2 class="card-title">Quote Details</h2>
+                
+                <div class="form-group">
+                    <label>1. Select Item Type</label>
+                    <div class="selector-group">
+                        <button class="selector-btn active" data-item-type="flats">Flats (Jackets, etc.)</button>
+                        <button class="selector-btn" data-item-type="caps">Caps (-20% Price)</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">2. Enter Quantity</label>
+                    <input type="number" 
+                           id="quantity" 
+                           class="form-control" 
+                           placeholder="Enter quantity"
+                           min="1">
+                </div>
+
+                <div class="switch-container" id="heavyweight-container">
+                    <label for="isHeavyweight">Heavy/Difficult Item? (Add $10.00)</label>
+                    <label class="switch">
+                        <input type="checkbox" id="isHeavyweight">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Add-on Order Toggle -->
+                <div class="addon-toggle-container">
+                    <label for="isAddon" style="font-weight: 600; color: var(--primary-color);">
+                        <i class="fas fa-plus-circle"></i>
+                        This is an add-on to an existing order
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="isAddon">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Add-on Order Details -->
+                <div class="addon-section hidden" id="addonSection">
+                    <h4 style="margin-top: 0; margin-bottom: 1rem; color: var(--primary-color);">
+                        <i class="fas fa-info-circle"></i>
+                        Main Order Details
+                    </h4>
+                    
+                    <div class="addon-grid">
+                        <div class="form-group">
+                            <label for="mainOrderQty">Items purchasing from us</label>
+                            <input type="number" 
+                                   id="mainOrderQty" 
+                                   class="form-control" 
+                                   placeholder="e.g. 24"
+                                   min="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="mainOrderValue">Main order value ($)</label>
+                            <input type="number" 
+                                   id="mainOrderValue" 
+                                   class="form-control" 
+                                   placeholder="e.g. 1200.00"
+                                   min="0"
+                                   step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="addon-summary">
+                        <div class="addon-summary-item">
+                            <span>Items from NWCA:</span>
+                            <span id="summaryMainQty">0</span>
+                        </div>
+                        <div class="addon-summary-item">
+                            <span>Customer supplied:</span>
+                            <span id="summaryAddonQty">0</span>
+                        </div>
+                        <div class="addon-summary-item" style="font-weight: 600; border-top: 1px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.25rem;">
+                            <span>Total quantity:</span>
+                            <span id="summaryTotalQty">0</span>
+                        </div>
+                    </div>
+                    
+                    <div id="discountIndicator" class="discount-indicator" style="display: none;">
+                        <i class="fas fa-tag"></i>
+                        <span id="discountText">Calculating discount...</span>
+                    </div>
+                </div>
+
+                <!-- Program Account Toggle -->
+                <div class="program-account-container">
+                    <label for="isProgramAccount" style="font-weight: 600; color: #7c3aed;">
+                        <i class="fas fa-shield-alt"></i>
+                        Program Account (Police, Fire, Schools)
+                        <span class="program-badge" id="programBadge" style="display: none;">
+                            <i class="fas fa-check"></i>
+                            25% Discount Applied
+                        </span>
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="isProgramAccount">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Email Form -->
+                <div class="email-form-container" id="emailFormContainer">
+                    <h3 class="card-title">Send Quote</h3>
+                    
+                    <div class="email-grid">
+                        <div class="form-group">
+                            <label for="customerName">Customer Name *</label>
+                            <input type="text" id="customerName" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerEmail">Customer Email *</label>
+                            <input type="email" id="customerEmail" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="companyName">Company Name</label>
+                            <input type="text" id="companyName" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input type="tel" id="customerPhone" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectName">Project Name</label>
+                        <input type="text" id="projectName" class="form-control">
+                    </div>
+                    
+                    <div class="email-action-buttons">
+                        <button type="button" class="btn btn-primary" id="sendEmailBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Quote
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="cancelEmailBtn">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card">
+                <div class="results-section">
+                    <div class="results-header">
+                        <h3 class="card-title">Your Quote</h3>
+                        <div class="price-display prompt" id="priceDisplay">Enter Quantity</div>
+                        <div class="price-label">Price per Item</div>
+                    </div>
+                    
+                    <div class="summary-section">
+                        <div id="ltmWarning" class="ltm-warning" style="display: none;">
+                            <i class="fas fa-info-circle"></i>
+                            <span id="ltmMessage"></span>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <span>Base Price:</span>
+                            <span id="basePrice">$0.00</span>
+                        </div>
+                        
+                        <div class="summary-item" id="capDiscountRow" style="display: none;">
+                            <span>Cap Discount (20%):</span>
+                            <span id="capDiscount">-$0.00</span>
+                        </div>
+                        
+                        <div class="summary-item" id="heavyweightRow" style="display: none;">
+                            <span>Heavyweight Surcharge:</span>
+                            <span id="heavyweightCharge">+$10.00</span>
+                        </div>
+                        
+                        <div class="summary-item" id="ltmRow" style="display: none;">
+                            <span>Less Than Minimum Fee:</span>
+                            <span id="ltmCharge">+$0.00</span>
+                        </div>
+                        
+                        <div class="summary-item" id="addonDiscountRow" style="display: none;">
+                            <span id="addonDiscountLabel">Add-on Discount:</span>
+                            <span id="addonDiscount">-$0.00</span>
+                        </div>
+                        
+                        <div class="summary-item" id="programDiscountRow" style="display: none;">
+                            <span>Program Account Discount (25%):</span>
+                            <span id="programDiscount">-$0.00</span>
+                        </div>
+                        
+                        <div class="summary-item total">
+                            <span>Total Order Cost:</span>
+                            <span id="totalDisplay">$0.00</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="emailQuoteBtn" style="width: 100%; margin-top: 1.5rem; display: none;">
+                        <i class="fas fa-envelope"></i>
+                        Email This Quote
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notice Section -->
+        <div class="notice-section">
+            <h2>
+                <i class="fas fa-exclamation-triangle"></i>
+                Important Notice: Customer Supplied Garments
+            </h2>
+            <p>
+                Northwest Custom Apparel is not responsible for the damage of ANY customer supplied garments during 
+                the production process in either our screening or embroidery departments. Should one or all of your 
+                items be damaged while in our facility, Northwest Custom Apparel WILL NOT reimburse you for the value 
+                of the garments or replace them.
+            </p>
+            <p>
+                Please note that we try very hard to take extreme care when dealing with customer supplied goods. 
+                It is a very rare occurrence that goods are damaged in our facility. Due to the nature of the high 
+                end equipment used in production there is a chance for machine or human error.
+            </p>
+        </div>
+    </main>
+
+    <script>
+        // Configuration
+        const CALCULATOR_CONFIG = {
+            emailPublicKey: '4qSbDO-SQs19TbP80',
+            emailServiceId: 'service_1c4k67j',
+            emailTemplateId: 'template_embroidery_customer' // Will need to be created
+        };
+
+        // Pricing configuration
+        const PRICING_CONFIG = {
+            heavyweight_surcharge: 10.00,
+            cap_discount_percent: 0.20,
+            ltm_threshold: 24,
+            ltm_fee: 50.00,
+            tiers: {
+                "1-2": 45.00,
+                "3-5": 40.00,
+                "6-11": 38.00,
+                "12-23": 32.00,
+                "24-71": 30.00,
+                "72-143": 25.00,
+                "144+": 15.00
+            }
+        };
+
+        class CustomerEmbroideryCalculator {
+            constructor() {
+                this.state = {
+                    itemType: 'flats',
+                    quantity: 0,
+                    isHeavyweight: false,
+                    isAddon: false,
+                    mainOrderQty: 0,
+                    mainOrderValue: 0,
+                    isProgramAccount: false
+                };
+                
+                this.currentQuote = null;
+                this.quoteService = new CustomerEmbroideryQuoteService();
+                
+                // Initialize EmailJS
+                emailjs.init(CALCULATOR_CONFIG.emailPublicKey);
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.updateUI();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    // Item type buttons
+                    itemTypeBtns: document.querySelectorAll('[data-item-type]'),
+                    // Input fields
+                    quantity: document.getElementById('quantity'),
+                    isHeavyweight: document.getElementById('isHeavyweight'),
+                    heavyweightContainer: document.getElementById('heavyweight-container'),
+                    // Display elements
+                    priceDisplay: document.getElementById('priceDisplay'),
+                    totalDisplay: document.getElementById('totalDisplay'),
+                    basePrice: document.getElementById('basePrice'),
+                    capDiscount: document.getElementById('capDiscount'),
+                    capDiscountRow: document.getElementById('capDiscountRow'),
+                    heavyweightCharge: document.getElementById('heavyweightCharge'),
+                    heavyweightRow: document.getElementById('heavyweightRow'),
+                    ltmCharge: document.getElementById('ltmCharge'),
+                    ltmRow: document.getElementById('ltmRow'),
+                    ltmWarning: document.getElementById('ltmWarning'),
+                    ltmMessage: document.getElementById('ltmMessage'),
+                    // Add-on elements
+                    isAddon: document.getElementById('isAddon'),
+                    addonSection: document.getElementById('addonSection'),
+                    mainOrderQty: document.getElementById('mainOrderQty'),
+                    mainOrderValue: document.getElementById('mainOrderValue'),
+                    summaryMainQty: document.getElementById('summaryMainQty'),
+                    summaryAddonQty: document.getElementById('summaryAddonQty'),
+                    summaryTotalQty: document.getElementById('summaryTotalQty'),
+                    discountIndicator: document.getElementById('discountIndicator'),
+                    discountText: document.getElementById('discountText'),
+                    addonDiscountRow: document.getElementById('addonDiscountRow'),
+                    addonDiscountLabel: document.getElementById('addonDiscountLabel'),
+                    addonDiscount: document.getElementById('addonDiscount'),
+                    // Program account elements
+                    isProgramAccount: document.getElementById('isProgramAccount'),
+                    programBadge: document.getElementById('programBadge'),
+                    programDiscountRow: document.getElementById('programDiscountRow'),
+                    programDiscount: document.getElementById('programDiscount'),
+                    // Email form
+                    emailQuoteBtn: document.getElementById('emailQuoteBtn'),
+                    emailFormContainer: document.getElementById('emailFormContainer'),
+                    customerName: document.getElementById('customerName'),
+                    customerEmail: document.getElementById('customerEmail'),
+                    companyName: document.getElementById('companyName'),
+                    customerPhone: document.getElementById('customerPhone'),
+                    projectName: document.getElementById('projectName'),
+                    sendEmailBtn: document.getElementById('sendEmailBtn'),
+                    cancelEmailBtn: document.getElementById('cancelEmailBtn')
+                };
+            }
+
+            bindEvents() {
+                // Item type selection
+                this.elements.itemTypeBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.state.itemType = btn.dataset.itemType;
+                        this.updateUI();
+                    });
+                });
+
+                // Quantity input
+                this.elements.quantity.addEventListener('input', () => {
+                    this.state.quantity = parseInt(this.elements.quantity.value) || 0;
+                    this.calculatePrice();
+                });
+
+                // Heavyweight toggle
+                this.elements.isHeavyweight.addEventListener('change', () => {
+                    this.state.isHeavyweight = this.elements.isHeavyweight.checked;
+                    this.calculatePrice();
+                });
+
+                // Add-on toggle
+                this.elements.isAddon.addEventListener('change', () => {
+                    this.state.isAddon = this.elements.isAddon.checked;
+                    this.elements.addonSection.classList.toggle('hidden', !this.state.isAddon);
+                    if (!this.state.isAddon) {
+                        // Reset add-on values
+                        this.elements.mainOrderQty.value = '';
+                        this.elements.mainOrderValue.value = '';
+                        this.state.mainOrderQty = 0;
+                        this.state.mainOrderValue = 0;
+                    }
+                    this.updateAddonSummary();
+                    this.calculatePrice();
+                });
+
+                // Main order inputs
+                this.elements.mainOrderQty.addEventListener('input', () => {
+                    this.state.mainOrderQty = parseInt(this.elements.mainOrderQty.value) || 0;
+                    this.updateAddonSummary();
+                    this.calculatePrice();
+                });
+
+                this.elements.mainOrderValue.addEventListener('input', () => {
+                    this.state.mainOrderValue = parseFloat(this.elements.mainOrderValue.value) || 0;
+                    this.updateAddonSummary();
+                    this.calculatePrice();
+                });
+
+                // Program account toggle
+                this.elements.isProgramAccount.addEventListener('change', () => {
+                    this.state.isProgramAccount = this.elements.isProgramAccount.checked;
+                    this.elements.programBadge.style.display = this.state.isProgramAccount ? 'inline-flex' : 'none';
+                    this.calculatePrice();
+                });
+
+                // Email form
+                this.elements.emailQuoteBtn.addEventListener('click', () => {
+                    this.showEmailForm();
+                });
+
+                this.elements.cancelEmailBtn.addEventListener('click', () => {
+                    this.hideEmailForm();
+                });
+
+                this.elements.sendEmailBtn.addEventListener('click', () => {
+                    this.sendQuote();
+                });
+            }
+
+            updateUI() {
+                // Update item type buttons
+                this.elements.itemTypeBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.itemType === this.state.itemType);
+                });
+
+                // Show/hide heavyweight option for flats only
+                const isFlats = this.state.itemType === 'flats';
+                this.elements.heavyweightContainer.style.display = isFlats ? 'flex' : 'none';
+                if (!isFlats) {
+                    this.elements.isHeavyweight.checked = false;
+                    this.state.isHeavyweight = false;
+                }
+
+                this.calculatePrice();
+            }
+
+            getAddonDiscount() {
+                const value = this.state.mainOrderValue;
+                const qty = this.state.mainOrderQty;
+                
+                // Base discount from order value
+                let baseDiscount = 0;
+                if (value >= 2000) baseDiscount = 20;
+                else if (value >= 1000) baseDiscount = 15;
+                else if (value >= 500) baseDiscount = 10;
+                
+                // Volume bonus from quantity
+                let volumeBonus = 0;
+                if (qty >= 96) volumeBonus = 15;
+                else if (qty >= 48) volumeBonus = 10;
+                else if (qty >= 24) volumeBonus = 5;
+                
+                // Total discount capped at 35%
+                return Math.min(35, baseDiscount + volumeBonus);
+            }
+
+            updateAddonSummary() {
+                if (!this.state.isAddon) return;
+                
+                // Update summary quantities
+                this.elements.summaryMainQty.textContent = this.state.mainOrderQty;
+                this.elements.summaryAddonQty.textContent = this.state.quantity;
+                this.elements.summaryTotalQty.textContent = this.state.mainOrderQty + this.state.quantity;
+                
+                // Update discount indicator
+                if (this.state.mainOrderValue > 0) {
+                    const discount = this.getAddonDiscount();
+                    this.elements.discountIndicator.style.display = 'flex';
+                    this.elements.discountText.textContent = `${discount}% Add-on Discount Applied`;
+                    
+                    // Set color based on discount level
+                    this.elements.discountIndicator.className = 'discount-indicator';
+                    if (discount >= 30) {
+                        this.elements.discountIndicator.classList.add('gold');
+                    } else if (discount >= 20) {
+                        this.elements.discountIndicator.classList.add('silver');
+                    } else if (discount >= 10) {
+                        this.elements.discountIndicator.classList.add('bronze');
+                    }
+                } else {
+                    this.elements.discountIndicator.style.display = 'none';
+                }
+            }
+
+            calculatePrice() {
+                const quantity = this.state.quantity;
+
+                if (quantity < 1) {
+                    this.resetDisplay("Enter Quantity");
+                    return;
+                }
+
+                // Get base price from tier
+                let basePrice = 0;
+                if (quantity >= 144) basePrice = PRICING_CONFIG.tiers["144+"];
+                else if (quantity >= 72) basePrice = PRICING_CONFIG.tiers["72-143"];
+                else if (quantity >= 24) basePrice = PRICING_CONFIG.tiers["24-71"];
+                else if (quantity >= 12) basePrice = PRICING_CONFIG.tiers["12-23"];
+                else if (quantity >= 6) basePrice = PRICING_CONFIG.tiers["6-11"];
+                else if (quantity >= 3) basePrice = PRICING_CONFIG.tiers["3-5"];
+                else basePrice = PRICING_CONFIG.tiers["1-2"];
+
+                // Calculate cap discount
+                let priceAfterDiscount = basePrice;
+                let capDiscountAmount = 0;
+                if (this.state.itemType === 'caps') {
+                    capDiscountAmount = basePrice * PRICING_CONFIG.cap_discount_percent;
+                    priceAfterDiscount = basePrice - capDiscountAmount;
+                }
+
+                // Add heavyweight surcharge (flats only)
+                const heavyweightSurcharge = (this.state.isHeavyweight && this.state.itemType === 'flats') 
+                    ? PRICING_CONFIG.heavyweight_surcharge : 0;
+
+                // Calculate LTM fee (only if NOT an add-on order AND NOT a program account)
+                let ltmFeeTotal = 0;
+                let ltmPerUnit = 0;
+                if (!this.state.isAddon && !this.state.isProgramAccount && quantity < PRICING_CONFIG.ltm_threshold) {
+                    ltmFeeTotal = PRICING_CONFIG.ltm_fee;
+                    ltmPerUnit = ltmFeeTotal / quantity;
+                }
+
+                // Calculate add-on discount
+                let addonDiscountAmount = 0;
+                let addonDiscountPercent = 0;
+                if (this.state.isAddon && this.state.mainOrderValue > 0) {
+                    addonDiscountPercent = this.getAddonDiscount();
+                    addonDiscountAmount = (priceAfterDiscount + heavyweightSurcharge) * (addonDiscountPercent / 100);
+                }
+
+                // Calculate program account discount (25% off everything except LTM)
+                let programDiscountAmount = 0;
+                if (this.state.isProgramAccount) {
+                    // Apply program discount to base price after other discounts
+                    const priceBeforeProgramDiscount = priceAfterDiscount + heavyweightSurcharge - addonDiscountAmount;
+                    programDiscountAmount = priceBeforeProgramDiscount * 0.25;
+                }
+
+                // Final calculations
+                const finalPricePerPiece = priceAfterDiscount + heavyweightSurcharge + ltmPerUnit - addonDiscountAmount - programDiscountAmount;
+                const totalCost = finalPricePerPiece * quantity;
+
+                // Update display
+                this.elements.priceDisplay.classList.remove('prompt');
+                this.elements.priceDisplay.textContent = `$${finalPricePerPiece.toFixed(2)}`;
+                
+                // Update summary
+                this.elements.basePrice.textContent = `$${basePrice.toFixed(2)}`;
+                
+                // Cap discount
+                if (this.state.itemType === 'caps') {
+                    this.elements.capDiscountRow.style.display = 'flex';
+                    this.elements.capDiscount.textContent = `-$${capDiscountAmount.toFixed(2)}`;
+                } else {
+                    this.elements.capDiscountRow.style.display = 'none';
+                }
+
+                // Heavyweight surcharge
+                if (heavyweightSurcharge > 0) {
+                    this.elements.heavyweightRow.style.display = 'flex';
+                    this.elements.heavyweightCharge.textContent = `+$${heavyweightSurcharge.toFixed(2)}`;
+                } else {
+                    this.elements.heavyweightRow.style.display = 'none';
+                }
+
+                // LTM fee
+                if (ltmFeeTotal > 0) {
+                    this.elements.ltmRow.style.display = 'flex';
+                    this.elements.ltmCharge.textContent = `+$${ltmPerUnit.toFixed(2)}`;
+                    this.elements.ltmWarning.style.display = 'flex';
+                    this.elements.ltmMessage.textContent = 
+                        `Less than minimum charge of $${ltmFeeTotal.toFixed(2)} has been applied ($${ltmPerUnit.toFixed(2)}/piece)`;
+                } else {
+                    this.elements.ltmRow.style.display = 'none';
+                    this.elements.ltmWarning.style.display = 'none';
+                }
+
+                // Add-on discount
+                if (addonDiscountAmount > 0) {
+                    this.elements.addonDiscountRow.style.display = 'flex';
+                    this.elements.addonDiscountLabel.textContent = `Add-on Discount (${addonDiscountPercent}%):`;
+                    this.elements.addonDiscount.textContent = `-$${addonDiscountAmount.toFixed(2)}`;
+                } else {
+                    this.elements.addonDiscountRow.style.display = 'none';
+                }
+
+                // Program discount
+                if (programDiscountAmount > 0) {
+                    this.elements.programDiscountRow.style.display = 'flex';
+                    this.elements.programDiscount.textContent = `-$${programDiscountAmount.toFixed(2)}`;
+                } else {
+                    this.elements.programDiscountRow.style.display = 'none';
+                }
+
+                this.elements.totalDisplay.textContent = `$${totalCost.toFixed(2)}`;
+                this.elements.emailQuoteBtn.style.display = 'block';
+
+                // Update add-on summary
+                if (this.state.isAddon) {
+                    this.updateAddonSummary();
+                }
+
+                // Store current quote data
+                this.currentQuote = {
+                    itemType: this.state.itemType,
+                    quantity: quantity,
+                    isHeavyweight: this.state.isHeavyweight,
+                    basePrice: basePrice,
+                    capDiscountAmount: capDiscountAmount,
+                    priceAfterDiscount: priceAfterDiscount,
+                    heavyweightSurcharge: heavyweightSurcharge,
+                    ltmFeeTotal: ltmFeeTotal,
+                    ltmPerUnit: ltmPerUnit,
+                    unitPrice: finalPricePerPiece,
+                    totalCost: totalCost,
+                    // Add-on specific data
+                    isAddon: this.state.isAddon,
+                    mainOrderQty: this.state.mainOrderQty,
+                    mainOrderValue: this.state.mainOrderValue,
+                    addonDiscountPercent: addonDiscountPercent,
+                    addonDiscountAmount: addonDiscountAmount,
+                    // Program account data
+                    isProgramAccount: this.state.isProgramAccount,
+                    programDiscountAmount: programDiscountAmount
+                };
+            }
+
+            resetDisplay(promptText) {
+                this.elements.priceDisplay.textContent = promptText;
+                this.elements.priceDisplay.classList.add('prompt');
+                this.elements.totalDisplay.textContent = "$0.00";
+                this.elements.basePrice.textContent = "$0.00";
+                this.elements.emailQuoteBtn.style.display = 'none';
+                this.elements.capDiscountRow.style.display = 'none';
+                this.elements.heavyweightRow.style.display = 'none';
+                this.elements.ltmRow.style.display = 'none';
+                this.elements.ltmWarning.style.display = 'none';
+                this.elements.addonDiscountRow.style.display = 'none';
+                this.elements.programDiscountRow.style.display = 'none';
+                this.currentQuote = null;
+            }
+
+            showEmailForm() {
+                this.elements.emailFormContainer.classList.add('show');
+                this.elements.customerName.focus();
+            }
+
+            hideEmailForm() {
+                this.elements.emailFormContainer.classList.remove('show');
+                // Clear form
+                this.elements.customerName.value = '';
+                this.elements.customerEmail.value = '';
+                this.elements.companyName.value = '';
+                this.elements.customerPhone.value = '';
+                this.elements.projectName.value = '';
+            }
+
+            async sendQuote() {
+                // Validate required fields
+                if (!this.elements.customerName.value || !this.elements.customerEmail.value) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                if (!this.currentQuote) {
+                    alert('Please calculate a quote first');
+                    return;
+                }
+
+                const submitBtn = this.elements.sendEmailBtn;
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
+                submitBtn.disabled = true;
+
+                try {
+                    // Prepare quote data
+                    const quoteData = {
+                        ...this.currentQuote,
+                        customerName: this.elements.customerName.value,
+                        customerEmail: this.elements.customerEmail.value,
+                        companyName: this.elements.companyName.value || 'Not Provided',
+                        customerPhone: this.elements.customerPhone.value || '',
+                        projectName: this.elements.projectName.value || '',
+                        salesRepName: 'Ruthie' // Default for embroidery
+                    };
+
+                    // Save to database
+                    const result = await this.quoteService.saveQuote(quoteData);
+                    const quoteID = result.quoteID;
+
+                    // Prepare email data
+                    const emailData = {
+                        to_email: quoteData.customerEmail,
+                        to_name: quoteData.customerName,
+                        from_name: 'Northwest Custom Apparel',
+                        reply_to: 'sales@teamnwca.com',
+                        
+                        // Quote details
+                        quote_id: quoteID,
+                        quote_date: new Date().toLocaleDateString(),
+                        expires_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                        
+                        // Customer info
+                        customer_name: quoteData.customerName,
+                        company_name: quoteData.companyName,
+                        customer_email: quoteData.customerEmail,
+                        customer_phone: quoteData.customerPhone || 'Not provided',
+                        project_name: quoteData.projectName || 'Not specified',
+                        
+                        // Item details
+                        item_type: quoteData.itemType === 'caps' ? 'Caps' : 'Flats (Jackets, etc.)',
+                        quantity: quoteData.quantity.toString(),
+                        heavyweight: quoteData.isHeavyweight ? 'Yes' : 'No',
+                        
+                        // Pricing breakdown
+                        base_price: `$${quoteData.basePrice.toFixed(2)}`,
+                        cap_discount: quoteData.capDiscountAmount > 0 ? `-$${quoteData.capDiscountAmount.toFixed(2)}` : 'N/A',
+                        heavyweight_charge: quoteData.heavyweightSurcharge > 0 ? `+$${quoteData.heavyweightSurcharge.toFixed(2)}` : 'N/A',
+                        ltm_fee: quoteData.ltmFeeTotal > 0 ? `$${quoteData.ltmFeeTotal.toFixed(2)} ($${quoteData.ltmPerUnit.toFixed(2)}/piece)` : 'N/A',
+                        addon_discount: quoteData.addonDiscountAmount > 0 ? `-$${quoteData.addonDiscountAmount.toFixed(2)} (${quoteData.addonDiscountPercent}%)` : 'N/A',
+                        program_discount: quoteData.programDiscountAmount > 0 ? `-$${quoteData.programDiscountAmount.toFixed(2)} (25%)` : 'N/A',
+                        unit_price: `$${quoteData.unitPrice.toFixed(2)}`,
+                        total_price: `$${quoteData.totalCost.toFixed(2)}`,
+                        
+                        // Add-on order details
+                        is_addon: quoteData.isAddon ? 'Yes' : 'No',
+                        main_order_qty: quoteData.mainOrderQty ? quoteData.mainOrderQty.toString() : 'N/A',
+                        main_order_value: quoteData.mainOrderValue > 0 ? `$${quoteData.mainOrderValue.toFixed(2)}` : 'N/A',
+                        total_combined_qty: quoteData.isAddon ? (quoteData.mainOrderQty + quoteData.quantity).toString() : quoteData.quantity.toString(),
+                        
+                        // Program account
+                        is_program_account: quoteData.isProgramAccount ? 'Yes' : 'No',
+                        
+                        // Sales rep info
+                        sales_rep_name: 'Ruthie',
+                        sales_rep_email: 'ruthie@teamnwca.com',
+                        sales_rep_phone: '253-922-5793',
+                        
+                        // Company info
+                        company_logo: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1',
+                        company_year: '1977',
+                        
+                        // Special notice for customer supplied
+                        special_notice: 'IMPORTANT: Northwest Custom Apparel is not responsible for damage to customer supplied garments during production.'
+                    };
+
+                    // Send email
+                    await emailjs.send(
+                        CALCULATOR_CONFIG.emailServiceId,
+                        CALCULATOR_CONFIG.emailTemplateId,
+                        emailData
+                    );
+
+                    // Show success
+                    this.showSuccessMessage(`Quote sent successfully! Quote ID: ${quoteID}`);
+                    this.hideEmailForm();
+
+                } catch (error) {
+                    console.error('Error sending quote:', error);
+                    alert('Error sending quote. Please try again or contact support.');
+                } finally {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }
+
+            showSuccessMessage(message) {
+                // Remove any existing alerts
+                const existingAlert = document.querySelector('.alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success';
+                alert.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    ${message}
+                `;
+                
+                this.elements.emailFormContainer.parentElement.insertBefore(alert, this.elements.emailFormContainer);
+                
+                setTimeout(() => {
+                    alert.remove();
+                }, 5000);
+            }
+        }
+
+        // Initialize calculator when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.customerEmbroideryCalculator = new CustomerEmbroideryCalculator();
+        });
+
+        // Print functionality
+        window.addEventListener('beforeprint', () => {
+            // Add any print-specific adjustments here
+        });
+    </script>
+</body>
+</html>
