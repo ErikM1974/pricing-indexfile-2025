@@ -32,6 +32,13 @@ Service ID: service_1c4k67j
 ### Database Patterns
 @memory/DATABASE_PATTERNS.md
 
+### API Documentation
+@memory/API_DOCUMENTATION.md
+- Comprehensive Caspio Pricing Proxy API reference
+- All endpoints for Cart, Pricing, Products, Orders, Quotes
+- Includes curl examples for every endpoint
+- Base URL: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api
+
 ### Troubleshooting
 @memory/TROUBLESHOOTING.md
 
