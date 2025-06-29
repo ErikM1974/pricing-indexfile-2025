@@ -4,6 +4,8 @@
 
 EmailJS enables sending professional quotes directly from the browser without backend infrastructure. All calculators use the same EmailJS account with calculator-specific templates.
 
+**Key Learning from Customer Supplied Embroidery Calculator**: The implementation pattern developed for this calculator serves as the gold standard for all future calculators, featuring proper error handling, success modals, print functionality, and database integration.
+
 ## Configuration
 
 ```javascript
@@ -162,7 +164,7 @@ In EmailJS template, use triple braces for HTML:
 
 ```javascript
 const salesReps = {
-    'ruth@nwcustomapparel.com': 'Ruth Nhong',
+    'ruth@nwcustomapparel.com': 'Ruth',
     'taylar@nwcustomapparel.com': 'Taylar',
     'nika@nwcustomapparel.com': 'Nika',
     'erik@nwcustomapparel.com': 'Erik',
@@ -569,38 +571,130 @@ try {
     console.error('Data sent:', emailData);
 }
 ```
-**Remove all conditional syntax ({{#if}} statements) - EmailJS doesn't support these**
-**Sales Rep Emails**
-Erik Mickelson: erik@nwcustomapparel.com
-Adriyella: adriyella@nwcustomapparel.com
-Taylar Hanson: taylar@nwcustomapparel.com
-Nika Lao: nika@nwcustomapparel.com
-Ruth Nhong: ruth@nwcustomapparel.com 
-General Sales: sales@nwcustomapparel.com
-Jim Mickelson: jim@nwcustomapparel.com
-Bradley Wright: bradley@nwcustomapparel.com
-Steve Deland: art@nwcustomapparel.com
-**Northwest Custom Apparel Contact Information**
-You can call or text Northwest Custom Apparel at 253-922-5793   
-**Phone Number**
-253-922-5793 Toll Free: 1-800-851-3671
-**Email Address**
-sales@nwcustomapparel.com
-**Website**
-https://www.nwcustomapparel.com
-**Hours of Operation**
-Monday - Friday: 9:00 AM - 5:00 PM
-**Address**
-2025 Freeman Road East Milton, WA 98354 
-Year Established: 1977      
-Family Owned and Operated since 1977
-Erik Mickelson: Operations Manager
-Adriyella: Office Assistant
-Taylar Hanson: Account Executive
-Nika Lao: Account Executive
-Ruth Nhong: Production Manager
-Steve Deland: Art Director
-Bradley Wright: Accountant
-Jim Mickelson: CEO & Owner/Founder
+## Important EmailJS Notes
+
+- **Remove all conditional syntax** ({{#if}} statements) - EmailJS doesn't support these
+- **Always provide default values** for optional variables to prevent corruption
+- **Use triple braces {{{variable}}}** for HTML content, double braces {{variable}} for plain text
+
+## Success Modal Implementation
+
+Based on the successful Customer Supplied Embroidery Calculator pattern:
+
+```javascript
+// Show success modal instead of temporary alert
+showSuccessModal(quoteId, quoteData) {
+    // Update modal content
+    document.getElementById('modalQuoteId').textContent = quoteId;
+    document.getElementById('modalCustomerName').textContent = quoteData.customerName;
+    document.getElementById('modalCustomerEmail').textContent = quoteData.customerEmail;
+    document.getElementById('modalTotalAmount').textContent = `$${quoteData.totalCost.toFixed(2)}`;
+    
+    // Store data for print functionality
+    this.lastQuoteData = quoteData;
+    this.lastQuoteData.quoteId = quoteId;
+    
+    // Show modal
+    document.getElementById('successModal').classList.add('active');
+}
+```
+
+### Success Modal HTML Structure
+```html
+<div class="modal-overlay" id="successModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success-text);"></i>
+            <h2 style="color: var(--success-text); margin-top: 1rem;">Quote Sent Successfully!</h2>
+        </div>
+        <div class="modal-body">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                    Your quote has been sent to:
+                </p>
+                <p style="font-weight: 600;" id="modalCustomerName"></p>
+                <p style="color: var(--text-secondary);" id="modalCustomerEmail"></p>
+            </div>
+            
+            <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 6px; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="font-weight: 600;">Quote ID:</span>
+                    <span style="font-family: monospace; font-size: 1.125rem;" id="modalQuoteId"></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 600;">Total Amount:</span>
+                    <span style="font-size: 1.25rem; color: var(--primary-color); font-weight: 600;" id="modalTotalAmount"></span>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button type="button" class="btn btn-secondary" onclick="copyQuoteId()">
+                    <i class="fas fa-copy"></i>
+                    Copy Quote ID
+                </button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="printQuote()">
+                <i class="fas fa-print"></i>
+                Print Quote
+            </button>
+            <button type="button" class="btn btn-primary" onclick="closeModal()">
+                <i class="fas fa-check"></i>
+                Done
+            </button>
+        </div>
+    </div>
+</div>
+```
+
+## Print Functionality Pattern
+
+```javascript
+printQuote() {
+    if (!this.lastQuoteData) return;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Quote ${this.lastQuoteData.quoteId}</title>
+            <style>
+                @media print {
+                    body { margin: 0; }
+                    .no-print { display: none; }
+                }
+                body {
+                    font-family: Arial, sans-serif;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+                /* Professional print styles */
+            </style>
+        </head>
+        <body>
+            ${this.generatePrintHTML(this.lastQuoteData)}
+            <script>
+                window.onload = () => {
+                    window.print();
+                    setTimeout(() => window.close(), 500);
+                };
+            </script>
+        </body>
+        </html>
+    `);
+}
+```
+
+## Company Contact Information
+
+- **Phone**: 253-922-5793 (Toll Free: 1-800-851-3671)
+- **Email**: sales@nwcustomapparel.com
+- **Website**: https://www.nwcustomapparel.com
+- **Address**: 2025 Freeman Road East, Milton, WA 98354
+- **Hours**: Monday - Friday, 9:00 AM - 5:00 PM
+- **Established**: 1977 (Family Owned and Operated)
 
 

@@ -100,23 +100,7 @@ class CustomerEmbroideryQuoteService {
                 TotalAmount: parseFloat((quoteData.totalCost || 0).toFixed(2)),
                 Status: 'Open',
                 ExpiresAt: formattedExpiresAt,
-                Notes: JSON.stringify({
-                    projectName: quoteData.projectName || '',
-                    calculatorType: 'Customer Supplied Embroidery',
-                    itemType: quoteData.itemType,
-                    isHeavyweight: quoteData.isHeavyweight,
-                    capDiscount: quoteData.capDiscountAmount || 0,
-                    heavyweightSurcharge: quoteData.heavyweightSurcharge || 0,
-                    salesRep: quoteData.salesRepName || 'Ruthie',
-                    customerSupplied: true,
-                    isAddon: quoteData.isAddon || false,
-                    mainOrderQty: quoteData.mainOrderQty || 0,
-                    mainOrderValue: quoteData.mainOrderValue || 0,
-                    addonDiscountPercent: quoteData.addonDiscountPercent || 0,
-                    addonDiscountAmount: quoteData.addonDiscountAmount || 0,
-                    isProgramAccount: quoteData.isProgramAccount || false,
-                    programDiscountAmount: quoteData.programDiscountAmount || 0
-                })
+                Notes: quoteData.notes || ''
             };
 
             console.log('[CustomerEmbroideryQuoteService] Session data:', sessionData);
@@ -188,20 +172,7 @@ class CustomerEmbroideryQuoteService {
                 LTMPerUnit: parseFloat((quoteData.ltmPerUnit || 0).toFixed(2)),
                 FinalUnitPrice: parseFloat((quoteData.unitPrice || 0).toFixed(2)),
                 LineTotal: parseFloat((quoteData.totalCost || 0).toFixed(2)),
-                SizeBreakdown: JSON.stringify({
-                    itemType: quoteData.itemType,
-                    basePrice: quoteData.basePrice,
-                    capDiscount: quoteData.capDiscountAmount || 0,
-                    heavyweightSurcharge: quoteData.heavyweightSurcharge || 0,
-                    ltmFee: quoteData.ltmFeeTotal || 0,
-                    isAddon: quoteData.isAddon || false,
-                    addonDiscountPercent: quoteData.addonDiscountPercent || 0,
-                    addonDiscountAmount: quoteData.addonDiscountAmount || 0,
-                    mainOrderValue: quoteData.mainOrderValue || 0,
-                    mainOrderQty: quoteData.mainOrderQty || 0,
-                    isProgramAccount: quoteData.isProgramAccount || false,
-                    programDiscountAmount: quoteData.programDiscountAmount || 0
-                }),
+                SizeBreakdown: '{}',
                 PricingTier: this.getPricingTier(quoteData.quantity || 0),
                 ImageURL: '',
                 AddedAt: addedAt

@@ -1028,6 +1028,50 @@
         </div>
     </div>
 
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header" style="background: #10b981;">
+                <h3 class="modal-title">Quote Sent Successfully!</h3>
+                <button class="modal-close" onclick="closeSuccessModal()">×</button>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 2.5rem;">
+                <div style="margin-bottom: 2rem;">
+                    <i class="fas fa-check-circle" style="font-size: 4rem; color: #10b981; margin-bottom: 1rem; display: block;"></i>
+                    <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        Your quote has been sent successfully!
+                    </p>
+                </div>
+                
+                <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem;">
+                    <p style="margin: 0 0 0.5rem 0; color: var(--text-secondary); font-size: 0.875rem;">Your Quote ID:</p>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                        <h2 id="successQuoteID" style="margin: 0; font-size: 2rem; color: var(--primary-color); letter-spacing: 0.05em;">EMBC-0000-0</h2>
+                        <button class="btn btn-secondary" onclick="copyQuoteID()" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-copy"></i>
+                            Copy
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="background: #e8f4fd; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; font-size: 0.875rem; color: #1e40af;">
+                    <i class="fas fa-info-circle"></i>
+                    Please save this Quote ID for your records. You'll need it to reference this quote.
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button class="btn btn-primary" onclick="printQuote()">
+                        <i class="fas fa-print"></i>
+                        Print Quote
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeSuccessModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Configuration
         const CALCULATOR_CONFIG = {
@@ -1490,7 +1534,8 @@
                         to_email: quoteData.customerEmail,
                         to_name: quoteData.customerName,
                         from_name: 'Northwest Custom Apparel',
-                        reply_to: 'sales@teamnwca.com',
+                        reply_to: salesRepEmail,
+                        quote_type: 'Customer Supplied Embroidery',
                         
                         // Quote details
                         quote_id: quoteID,
@@ -1539,7 +1584,13 @@
                         company_year: '1977',
                         
                         // Special notice for customer supplied
-                        special_notice: 'IMPORTANT: Northwest Custom Apparel is not responsible for damage to customer supplied garments during production.'
+                        special_notice: 'IMPORTANT: Northwest Custom Apparel is not responsible for damage to customer supplied garments during production.',
+                        
+                        // Required grand_total variable
+                        grand_total: `$${quoteData.totalCost.toFixed(2)}`,
+                        
+                        // Generate HTML for products section
+                        products_html: this.generateQuoteHTML(quoteData)
                     };
 
                     // Send email
@@ -1550,7 +1601,7 @@
                     );
 
                     // Show success
-                    this.showSuccessMessage(`Quote sent successfully! Quote ID: ${quoteID}`);
+                    this.showSuccessModal(quoteID);
                     this.hideEmailForm();
 
                 } catch (error) {
@@ -1562,25 +1613,71 @@
                 }
             }
 
-            showSuccessMessage(message) {
-                // Remove any existing alerts
-                const existingAlert = document.querySelector('.alert');
-                if (existingAlert) {
-                    existingAlert.remove();
-                }
-
-                const alert = document.createElement('div');
-                alert.className = 'alert alert-success';
-                alert.innerHTML = `
-                    <i class="fas fa-check-circle"></i>
-                    ${message}
+            generateQuoteHTML(quoteData) {
+                let html = `
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <thead>
+                            <tr style="background-color: #f3f4f6;">
+                                <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Description</th>
+                                <th style="padding: 12px; text-align: center; border: 1px solid #e5e7eb;">Qty</th>
+                                <th style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">Unit Price</th>
+                                <th style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e5e7eb;">
+                                    Customer Supplied ${quoteData.itemType === 'caps' ? 'Caps' : 'Garments'} - Embroidery
+                                    ${quoteData.isHeavyweight ? '<br><small>(Heavyweight Item)</small>' : ''}
+                                    ${quoteData.isAddon ? '<br><small style="color: #4cb354;">Add-on Order</small>' : ''}
+                                    ${quoteData.isProgramAccount ? '<br><small style="color: #7c3aed;">Program Account</small>' : ''}
+                                </td>
+                                <td style="padding: 12px; text-align: center; border: 1px solid #e5e7eb;">${quoteData.quantity}</td>
+                                <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">$${quoteData.unitPrice.toFixed(2)}</td>
+                                <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">$${quoteData.totalCost.toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                        <h4 style="margin: 0 0 10px 0; color: #333;">Price Breakdown:</h4>
+                        <table style="width: 100%;">
+                            <tr><td style="padding: 4px 0;">Base Price:</td><td style="text-align: right;">$${quoteData.basePrice.toFixed(2)}</td></tr>
+                            ${quoteData.capDiscountAmount > 0 ? `<tr><td style="padding: 4px 0;">Cap Discount (20%):</td><td style="text-align: right; color: #10b981;">-$${quoteData.capDiscountAmount.toFixed(2)}</td></tr>` : ''}
+                            ${quoteData.heavyweightSurcharge > 0 ? `<tr><td style="padding: 4px 0;">Heavyweight Surcharge:</td><td style="text-align: right;">+$${quoteData.heavyweightSurcharge.toFixed(2)}</td></tr>` : ''}
+                            ${quoteData.ltmFeeTotal > 0 ? `<tr><td style="padding: 4px 0;">Less Than Minimum Fee:</td><td style="text-align: right;">+$${quoteData.ltmPerUnit.toFixed(2)}/pc</td></tr>` : ''}
+                            ${quoteData.addonDiscountAmount > 0 ? `<tr><td style="padding: 4px 0;">Add-on Discount (${quoteData.addonDiscountPercent}%):</td><td style="text-align: right; color: #10b981;">-$${quoteData.addonDiscountAmount.toFixed(2)}</td></tr>` : ''}
+                            ${quoteData.programDiscountAmount > 0 ? `<tr><td style="padding: 4px 0;">Program Account Discount (25%):</td><td style="text-align: right; color: #10b981;">-$${quoteData.programDiscountAmount.toFixed(2)}</td></tr>` : ''}
+                            <tr style="border-top: 2px solid #e5e7eb; font-weight: bold;">
+                                <td style="padding: 8px 0;">Final Unit Price:</td>
+                                <td style="text-align: right;">$${quoteData.unitPrice.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    ${quoteData.isAddon ? `
+                    <div style="background-color: #e8f9ea; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                        <h4 style="margin: 0 0 10px 0; color: #4cb354;">Add-on Order Details:</h4>
+                        <p style="margin: 5px 0;">Main Order Quantity: ${quoteData.mainOrderQty} items</p>
+                        <p style="margin: 5px 0;">Main Order Value: $${quoteData.mainOrderValue.toFixed(2)}</p>
+                        <p style="margin: 5px 0;">Customer Supplied: ${quoteData.quantity} items</p>
+                        <p style="margin: 5px 0; font-weight: bold;">Total Combined Quantity: ${quoteData.mainOrderQty + quoteData.quantity} items</p>
+                    </div>
+                    ` : ''}
                 `;
                 
-                this.elements.emailFormContainer.parentElement.insertBefore(alert, this.elements.emailFormContainer);
+                return html;
+            }
+
+            showSuccessModal(quoteID) {
+                // Store the quote ID and data for printing
+                this.lastQuoteID = quoteID;
                 
-                setTimeout(() => {
-                    alert.remove();
-                }, 5000);
+                // Update the quote ID in the success modal
+                document.getElementById('successQuoteID').textContent = quoteID;
+                
+                // Show the success modal
+                document.getElementById('successModal').classList.add('active');
             }
         }
 
@@ -1602,10 +1699,187 @@
             document.getElementById('quotePreview').innerHTML = '';
         }
 
-        // Print functionality
-        window.addEventListener('beforeprint', () => {
-            // Add any print-specific adjustments here
-        });
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        // Copy quote ID to clipboard
+        function copyQuoteID() {
+            const quoteID = document.getElementById('successQuoteID').textContent;
+            navigator.clipboard.writeText(quoteID).then(() => {
+                // Change button text temporarily
+                const copyBtn = event.target.closest('button');
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+
+        // Print quote functionality
+        function printQuote() {
+            const calculator = window.customerEmbroideryCalculator;
+            if (!calculator || !calculator.currentQuote || !calculator.lastQuoteID) {
+                alert('No quote data available to print.');
+                return;
+            }
+
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank');
+            const quote = calculator.currentQuote;
+            const quoteID = calculator.lastQuoteID;
+            
+            // Build the print HTML
+            const printHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Quote ${quoteID} - Northwest Custom Apparel</title>
+                    <style>
+                        @page { margin: 0.5in; }
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            line-height: 1.6; 
+                            color: #333;
+                            margin: 0;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 2rem;
+                            padding-bottom: 1rem;
+                            border-bottom: 2px solid #4cb354;
+                        }
+                        .logo {
+                            max-width: 200px;
+                            height: auto;
+                            margin-bottom: 1rem;
+                        }
+                        .quote-info {
+                            background: #f8f9fa;
+                            padding: 1rem;
+                            border-radius: 8px;
+                            margin-bottom: 1.5rem;
+                        }
+                        .quote-info h2 {
+                            color: #4cb354;
+                            margin: 0 0 0.5rem 0;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 1rem 0;
+                        }
+                        th, td {
+                            padding: 0.75rem;
+                            text-align: left;
+                            border: 1px solid #ddd;
+                        }
+                        th {
+                            background: #f3f4f6;
+                            font-weight: 600;
+                        }
+                        .total-row {
+                            font-weight: bold;
+                            background: #f8f9fa;
+                        }
+                        .footer {
+                            margin-top: 2rem;
+                            padding-top: 1rem;
+                            border-top: 1px solid #ddd;
+                            text-align: center;
+                            font-size: 0.875rem;
+                            color: #666;
+                        }
+                        .notice {
+                            background: #fffbeb;
+                            border: 1px solid #fde68a;
+                            padding: 1rem;
+                            border-radius: 8px;
+                            margin: 1rem 0;
+                        }
+                        .notice h3 {
+                            color: #92400e;
+                            margin: 0 0 0.5rem 0;
+                        }
+                        @media print {
+                            body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" class="logo">
+                        <h1 style="margin: 0; color: #333;">Customer Supplied Embroidery Quote</h1>
+                    </div>
+                    
+                    <div class="quote-info">
+                        <h2>Quote ID: ${quoteID}</h2>
+                        <p style="margin: 0;">Date: ${new Date().toLocaleDateString()}</p>
+                        <p style="margin: 0;">Valid for 30 days</p>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th style="text-align: center;">Quantity</th>
+                                <th style="text-align: right;">Unit Price</th>
+                                <th style="text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    Customer Supplied ${quote.itemType === 'caps' ? 'Caps' : 'Garments'} - Embroidery
+                                    ${quote.isHeavyweight ? '<br><small>(Heavyweight Item)</small>' : ''}
+                                    ${quote.isAddon ? '<br><small style="color: #4cb354;">Add-on Order</small>' : ''}
+                                    ${quote.isProgramAccount ? '<br><small style="color: #7c3aed;">Program Account</small>' : ''}
+                                </td>
+                                <td style="text-align: center;">${quote.quantity}</td>
+                                <td style="text-align: right;">$${quote.unitPrice.toFixed(2)}</td>
+                                <td style="text-align: right;">$${quote.totalCost.toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td colspan="3" style="text-align: right;">TOTAL:</td>
+                                <td style="text-align: right;">$${quote.totalCost.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    <div class="notice">
+                        <h3>Important Notice: Customer Supplied Garments</h3>
+                        <p style="margin: 0;">Northwest Custom Apparel is not responsible for the damage of ANY customer supplied garments during the production process. Should items be damaged while in our facility, Northwest Custom Apparel WILL NOT reimburse you for the value of the garments or replace them.</p>
+                    </div>
+                    
+                    <div class="footer">
+                        <p><strong>Northwest Custom Apparel</strong></p>
+                        <p>2025 Freeman Road East, Milton, WA 98354</p>
+                        <p>Phone: 253-922-5793 | Email: sales@nwcustomapparel.com</p>
+                        <p>www.nwcustomapparel.com</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(printHTML);
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                printWindow.print();
+                // Close the window after printing (optional)
+                printWindow.onafterprint = function() {
+                    printWindow.close();
+                };
+            };
+        }
     </script>
 </body>
 </html>

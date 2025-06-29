@@ -9,6 +9,13 @@ Each pricing calculator follows a consistent pattern:
 3. **EmailJS Integration** - Sends professional quotes to customers
 4. **Consistent UI/UX** - Follows established design patterns
 
+**Gold Standard Implementation**: The Customer Supplied Embroidery Calculator (`/calculators/embroidery-customer.html`) serves as the reference implementation for all new calculators, featuring:
+- Persistent success modal with quote ID display
+- Professional print functionality
+- Robust error handling
+- Complete EmailJS integration
+- Database save with fallback
+
 ### File Structure
 
 ```
@@ -51,52 +58,31 @@ DATABASE REQUIREMENTS:
 
 ### Step 2: Create HTML Calculator Page
 
-Use this template structure:
+**IMPORTANT**: Use the complete template from @memory/CALCULATOR_TEMPLATES.md which includes:
+- Full HTML structure with success modal
+- JavaScript calculator class implementation
+- Quote service template
+- Print functionality
+- All required styling
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>[Calculator Name] - Northwest Custom Apparel</title>
-    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
-    <!-- Quote Service -->
-    <script src="[name]-quote-service.js"></script>
-    
-    <style>
-        /* Use consistent root variables */
-        :root {
-            --primary-green: #3a7c52;
-            --primary-dark: #1a472a;
-            --bg-color: #f5f7fa;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --hover-bg: #f3f4f6;
-            --success-bg: #d1fae5;
-            --success-text: #065f46;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
-        }
-    </style>
-</head>
-<body>
-    <!-- Standard header with navigation -->
-    <!-- Calculator form and results display -->
-    <!-- Quote modal for email sending -->
-</body>
-</html>
-```
+Root variables to use (NWCA Green Theme):
+```css
+:root {
+    --primary-color: #4cb354; /* NWCA Green */
+    --primary-dark: #409a47;
+    --primary-light: #5bc85f;
+    --bg-color: #f5f7fa;
+    --card-bg: #ffffff;
+    --border-color: #e5e7eb;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --hover-bg: #f3f4f6;
+    --success-bg: #d1fae5;
+    --success-text: #065f46;
+    --warning-bg: #fef3c7;
+    --warning-text: #92400e;
+    --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+}
 
 ### Step 3: Implement JavaScript Calculator Class
 
@@ -339,64 +325,21 @@ if (quantity < 24) {
 }
 ```
 
-## Calculator Template System (2025-01-27)
+## Implementation Best Practices
 
-### Overview
-Created a reusable template system to streamline adding new pricing calculators. New calculators can now be implemented in 30-60 minutes instead of hours.
-
-### Template Files Created
-
-1. **`/templates/calculator-template.html`**
-   - Base HTML structure with placeholders
-   - Standard UI components and styling
-   - EmailJS integration ready
-   - Responsive design included
-
-2. **`/templates/quote-service-template.js`**
-   - Database integration boilerplate
-   - Quote ID generation pattern
-   - Standard save/retrieve methods
-   - Configurable for single or multi-item quotes
-
-3. **`/templates/calculator-config-template.json`**
-   - Configuration structure for new calculators
-   - All placeholder values documented
-   - Pricing logic patterns
-
-4. **`/templates/email-template.html`**
-   - Professional email layout
-   - Works for both single and multi-item quotes
-   - All standard variables documented
-
-5. **`/templates/NEW_CALCULATOR_CHECKLIST.md`**
-   - Step-by-step implementation guide
-   - Time estimates for each step
-   - Common issues and solutions
-   - Testing checklist
-
-### How to Use the Template System
-
-1. **Start with the checklist**: Open `/templates/NEW_CALCULATOR_CHECKLIST.md`
-2. **Copy templates** to your working directory
-3. **Replace placeholders** using the configuration file as a guide
-4. **Implement calculator-specific logic**
-5. **Test thoroughly** using the checklist
-6. **Document** in this file
-
-### Key Patterns
-
-#### Quote ID Format
+### Quote ID Format
+All quote IDs follow this standard format:
 ```
-{{PREFIX}}{{MMDD}}-{{sequence}}
-Examples: DTG0126-1, RICH0126-2, EMB0126-3
+{PREFIX}{MMDD}-{sequence}
+Examples: DTG0126-1, RICH0126-2, EMB0126-3, EMBC0126-4
 ```
 
-#### Standard Margin Calculation
+### Standard Margin Calculation
 ```javascript
-const markedUpPrice = basePrice / 0.6;
+const markedUpPrice = basePrice / 0.6;  // 60% margin
 ```
 
-#### LTM (Less Than Minimum) Pattern
+### LTM (Less Than Minimum) Pattern
 ```javascript
 if (quantity < 24) {
     ltmFee = 50.00;
@@ -404,30 +347,6 @@ if (quantity < 24) {
     finalPrice = basePrice + ltmPerUnit;
 }
 ```
-
-### Benefits of Template System
-- **Consistency**: All calculators follow the same patterns
-- **Speed**: 30-60 minute implementation time
-- **Maintainability**: Updates to templates benefit all calculators
-- **Fewer Bugs**: Proven patterns reduce errors
-- **Easy Onboarding**: New developers can quickly add calculators
-
-### Quick Implementation Example
-
-For a new "Screen Print" calculator:
-1. Copy templates to `/calculators/`
-2. Configure:
-   - Name: "Screen Print"
-   - Prefix: "SP"
-   - Type: "screenprint"
-   - Icon: "fa-print"
-3. Replace all placeholders
-4. Add pricing logic for color counts
-5. Create EmailJS template
-6. Add to dashboard
-7. Test and deploy
-
-Total time: ~45 minutes
 
 ## Common Calculation Patterns
 
@@ -519,14 +438,20 @@ const colorBreakdown = {
 ```
 
 ### Sales Rep Configuration
+
+**IMPORTANT**: Always reference @memory/STAFF_DIRECTORY.md for the authoritative list of staff emails and names.
+
 ```javascript
 const salesReps = [
-    { email: 'ruthie@nwcustomapparel.com', name: 'Ruthie', default: true },
-    { email: 'taylar@nwcustomapparel.com', name: 'Taylar' },
-    { email: 'nika@nwcustomapparel.com', name: 'Nika' },
-    { email: 'erik@nwcustomapparel.com', name: 'Erik' },
+    { email: 'sales@nwcustomapparel.com', name: 'General Sales', default: true },
+    { email: 'ruth@nwcustomapparel.com', name: 'Ruth Nhong' },
+    { email: 'taylar@nwcustomapparel.com', name: 'Taylar Hanson' },
+    { email: 'nika@nwcustomapparel.com', name: 'Nika Lao' },
+    { email: 'erik@nwcustomapparel.com', name: 'Erik Mickelson' },
     { email: 'adriyella@nwcustomapparel.com', name: 'Adriyella' },
-    { email: 'sales@nwcustomapparel.com', name: 'General Sales' }
+    { email: 'bradley@nwcustomapparel.com', name: 'Bradley Wright' },
+    { email: 'jim@nwcustomapparel.com', name: 'Jim Mickelson' },
+    { email: 'art@nwcustomapparel.com', name: 'Steve Deland' }
 ];
 ```
 
@@ -569,18 +494,34 @@ function showError(message) {
 }
 ```
 
-### Success Message with Quote ID
+### Success Modal with Quote ID (Preferred Pattern)
 ```javascript
-function showSuccess(quoteId) {
-    const successDiv = document.getElementById('successMessage');
-    successDiv.innerHTML = `
-        <div class="success-message">
-            <i class="fas fa-check-circle"></i>
-            <span>Quote sent successfully!</span>
-            <strong>Quote ID: ${quoteId}</strong>
-        </div>
-    `;
-    successDiv.style.display = 'block';
+// Show persistent modal instead of temporary message
+showSuccessModal(quoteId, quoteData) {
+    // Update modal content
+    document.getElementById('modalQuoteId').textContent = quoteId;
+    document.getElementById('modalCustomerName').textContent = quoteData.customerName;
+    document.getElementById('modalCustomerEmail').textContent = quoteData.customerEmail;
+    document.getElementById('modalTotalAmount').textContent = `$${quoteData.totalCost.toFixed(2)}`;
+    
+    // Store data for print functionality
+    this.lastQuoteData = quoteData;
+    this.lastQuoteData.quoteId = quoteId;
+    
+    // Show modal
+    document.getElementById('successModal').classList.add('active');
+}
+
+// Supporting functions
+function copyQuoteId() {
+    const quoteId = document.getElementById('modalQuoteId').textContent;
+    navigator.clipboard.writeText(quoteId).then(() => {
+        alert('Quote ID copied to clipboard!');
+    });
+}
+
+function printQuote() {
+    // See CALCULATOR_TEMPLATES.md for complete print implementation
 }
 ```
 
