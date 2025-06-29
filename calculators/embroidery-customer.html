@@ -16,11 +16,11 @@
     <script src="embroidery-customer-quote-service.js"></script>
     
     <style>
-        /* Root variables matching dashboard theme with embroidery accent */
+        /* Root variables matching dashboard theme with NWCA green */
         :root {
-            --primary-color: #0d6efd; /* Bootstrap Blue for customer theme */
-            --primary-dark: #0b5ed7;
-            --primary-light: #4a90e2;
+            --primary-color: #4cb354; /* NWCA Green */
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
             --bg-color: #f5f7fa;
             --card-bg: #ffffff;
             --border-color: #e5e7eb;
@@ -31,7 +31,7 @@
             --success-text: #065f46;
             --warning-bg: #fef3c7;
             --warning-text: #92400e;
-            --focus-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
         }
 
         * {
@@ -484,10 +484,114 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        .modal-container {
+            background: white;
+            max-width: 600px;
+            margin: 50px auto;
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .quote-preview {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.875rem;
+        }
+
+        .quote-preview h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+        }
+
         /* Add-on Order Section */
         .addon-section {
-            background-color: #e8f5ff;
-            border: 1px solid #90caf9;
+            background-color: #e8f9ea;
+            border: 1px solid #a7d8a9;
             border-radius: 0.5rem;
             padding: 1.25rem;
             margin-top: 1.5rem;
@@ -502,11 +606,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: #f0f9ff;
+            background-color: #f0faf1;
             padding: 0.875rem 1rem;
             border-radius: 0.5rem;
             margin-top: 1.5rem;
-            border: 1px solid #bfdbfe;
+            border: 1px solid #c3e6c5;
         }
 
         .addon-grid {
@@ -770,47 +874,6 @@
                     </label>
                 </div>
 
-                <!-- Email Form -->
-                <div class="email-form-container" id="emailFormContainer">
-                    <h3 class="card-title">Send Quote</h3>
-                    
-                    <div class="email-grid">
-                        <div class="form-group">
-                            <label for="customerName">Customer Name *</label>
-                            <input type="text" id="customerName" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="customerEmail">Customer Email *</label>
-                            <input type="email" id="customerEmail" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="companyName">Company Name</label>
-                            <input type="text" id="companyName" class="form-control">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="customerPhone">Phone Number</label>
-                            <input type="tel" id="customerPhone" class="form-control">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="projectName">Project Name</label>
-                        <input type="text" id="projectName" class="form-control">
-                    </div>
-                    
-                    <div class="email-action-buttons">
-                        <button type="button" class="btn btn-primary" id="sendEmailBtn">
-                            <i class="fas fa-paper-plane"></i>
-                            Send Quote
-                        </button>
-                        <button type="button" class="btn btn-secondary" id="cancelEmailBtn">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
             </div>
 
             <!-- Results Section -->
@@ -892,12 +955,85 @@
         </div>
     </main>
 
+    <!-- Email Modal -->
+    <div class="modal-overlay" id="emailModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">Send Quote</h3>
+                <button class="modal-close" onclick="closeEmailModal()">×</button>
+            </div>
+            <form id="quoteForm">
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="customerName">Customer Name *</label>
+                            <input type="text" class="form-control" id="customerName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="companyName">Company Name</label>
+                            <input type="text" class="form-control" id="companyName">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerEmail">Customer Email *</label>
+                            <input type="email" class="form-control" id="customerEmail" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input type="tel" class="form-control" id="customerPhone">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="projectName">Project/Order Name</label>
+                        <input type="text" class="form-control" id="projectName" placeholder="e.g., Police Department Uniforms">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="salesRep">Sales Representative *</label>
+                        <select class="form-control" id="salesRep" required>
+                            <option value="sales@nwcustomapparel.com" selected>General Sales</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                            <option value="taylar@nwcustomapparel.com">Taylar Hanson</option>
+                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                            <option value="art@nwcustomapparel.com">Steve Deland</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="notes">Notes</label>
+                        <textarea class="form-control" id="notes" rows="3" placeholder="Special instructions or additional information..."></textarea>
+                    </div>
+                    
+                    <div class="quote-preview">
+                        <h4>Quote Preview</h4>
+                        <div id="quotePreview"></div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEmailModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="sendEmailBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Quote
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Configuration
         const CALCULATOR_CONFIG = {
             emailPublicKey: '4qSbDO-SQs19TbP80',
             emailServiceId: 'service_1c4k67j',
-            emailTemplateId: 'template_embroidery_customer' // Will need to be created
+            emailTemplateId: 'template_yrrt52c' // Customer Supplied template
         };
 
         // Pricing configuration
@@ -980,14 +1116,17 @@
                     programDiscount: document.getElementById('programDiscount'),
                     // Email form
                     emailQuoteBtn: document.getElementById('emailQuoteBtn'),
-                    emailFormContainer: document.getElementById('emailFormContainer'),
+                    emailModal: document.getElementById('emailModal'),
+                    quoteForm: document.getElementById('quoteForm'),
                     customerName: document.getElementById('customerName'),
                     customerEmail: document.getElementById('customerEmail'),
                     companyName: document.getElementById('companyName'),
                     customerPhone: document.getElementById('customerPhone'),
                     projectName: document.getElementById('projectName'),
-                    sendEmailBtn: document.getElementById('sendEmailBtn'),
-                    cancelEmailBtn: document.getElementById('cancelEmailBtn')
+                    salesRep: document.getElementById('salesRep'),
+                    notes: document.getElementById('notes'),
+                    quotePreview: document.getElementById('quotePreview'),
+                    sendEmailBtn: document.getElementById('sendEmailBtn')
                 };
             }
 
@@ -1052,11 +1191,8 @@
                     this.showEmailForm();
                 });
 
-                this.elements.cancelEmailBtn.addEventListener('click', () => {
-                    this.hideEmailForm();
-                });
-
-                this.elements.sendEmailBtn.addEventListener('click', () => {
+                this.elements.quoteForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
                     this.sendQuote();
                 });
             }
@@ -1285,18 +1421,28 @@
             }
 
             showEmailForm() {
-                this.elements.emailFormContainer.classList.add('show');
-                this.elements.customerName.focus();
+                // Update quote preview
+                this.updateQuotePreview();
+                // Open modal
+                openEmailModal();
             }
 
             hideEmailForm() {
-                this.elements.emailFormContainer.classList.remove('show');
-                // Clear form
-                this.elements.customerName.value = '';
-                this.elements.customerEmail.value = '';
-                this.elements.companyName.value = '';
-                this.elements.customerPhone.value = '';
-                this.elements.projectName.value = '';
+                closeEmailModal();
+            }
+
+            updateQuotePreview() {
+                if (!this.currentQuote) return;
+                
+                const preview = `
+                    <p><strong>Item:</strong> ${this.currentQuote.itemType === 'caps' ? 'Caps' : 'Flats'} ${this.currentQuote.isHeavyweight ? '(Heavyweight)' : ''}</p>
+                    <p><strong>Quantity:</strong> ${this.currentQuote.quantity}</p>
+                    <p><strong>Unit Price:</strong> $${this.currentQuote.unitPrice.toFixed(2)}</p>
+                    <p><strong>Total:</strong> $${this.currentQuote.totalCost.toFixed(2)}</p>
+                    ${this.currentQuote.isAddon ? '<p><strong>Type:</strong> Add-on Order</p>' : ''}
+                    ${this.currentQuote.isProgramAccount ? '<p><strong>Type:</strong> Program Account</p>' : ''}
+                `;
+                this.elements.quotePreview.innerHTML = preview;
             }
 
             async sendQuote() {
@@ -1317,6 +1463,11 @@
                 submitBtn.disabled = true;
 
                 try {
+                    // Get sales rep info
+                    const salesRepEmail = this.elements.salesRep.value;
+                    const salesRepOption = this.elements.salesRep.options[this.elements.salesRep.selectedIndex];
+                    const salesRepName = salesRepOption.text.replace(' (Embroidery)', '');
+                    
                     // Prepare quote data
                     const quoteData = {
                         ...this.currentQuote,
@@ -1325,7 +1476,9 @@
                         companyName: this.elements.companyName.value || 'Not Provided',
                         customerPhone: this.elements.customerPhone.value || '',
                         projectName: this.elements.projectName.value || '',
-                        salesRepName: 'Ruthie' // Default for embroidery
+                        salesRepName: salesRepName,
+                        salesRepEmail: salesRepEmail,
+                        notes: this.elements.notes.value || ''
                     };
 
                     // Save to database
@@ -1354,7 +1507,8 @@
                         // Item details
                         item_type: quoteData.itemType === 'caps' ? 'Caps' : 'Flats (Jackets, etc.)',
                         quantity: quoteData.quantity.toString(),
-                        heavyweight: quoteData.isHeavyweight ? 'Yes' : 'No',
+                        heavyweight: quoteData.isHeavyweight ? '(Heavyweight)' : '',
+                        notes: quoteData.notes || 'None',
                         
                         // Pricing breakdown
                         base_price: `$${quoteData.basePrice.toFixed(2)}`,
@@ -1376,8 +1530,8 @@
                         is_program_account: quoteData.isProgramAccount ? 'Yes' : 'No',
                         
                         // Sales rep info
-                        sales_rep_name: 'Ruthie',
-                        sales_rep_email: 'ruthie@teamnwca.com',
+                        sales_rep_name: quoteData.salesRepName,
+                        sales_rep_email: quoteData.salesRepEmail,
                         sales_rep_phone: '253-922-5793',
                         
                         // Company info
@@ -1434,6 +1588,19 @@
         document.addEventListener('DOMContentLoaded', () => {
             window.customerEmbroideryCalculator = new CustomerEmbroideryCalculator();
         });
+
+        // Modal functions
+        function openEmailModal() {
+            document.getElementById('emailModal').classList.add('active');
+            document.getElementById('customerName').focus();
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').classList.remove('active');
+            // Clear form
+            document.getElementById('quoteForm').reset();
+            document.getElementById('quotePreview').innerHTML = '';
+        }
 
         // Print functionality
         window.addEventListener('beforeprint', () => {

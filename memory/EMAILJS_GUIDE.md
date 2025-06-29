@@ -569,3 +569,38 @@ try {
     console.error('Data sent:', emailData);
 }
 ```
+**Remove all conditional syntax ({{#if}} statements) - EmailJS doesn't support these**
+**Sales Rep Emails**
+Erik Mickelson: erik@nwcustomapparel.com
+Adriyella: adriyella@nwcustomapparel.com
+Taylar Hanson: taylar@nwcustomapparel.com
+Nika Lao: nika@nwcustomapparel.com
+Ruth Nhong: ruth@nwcustomapparel.com 
+General Sales: sales@nwcustomapparel.com
+Jim Mickelson: jim@nwcustomapparel.com
+Bradley Wright: bradley@nwcustomapparel.com
+Steve Deland: art@nwcustomapparel.com
+**Northwest Custom Apparel Contact Information**
+You can call or text Northwest Custom Apparel at 253-922-5793   
+**Phone Number**
+253-922-5793 Toll Free: 1-800-851-3671
+**Email Address**
+sales@nwcustomapparel.com
+**Website**
+https://www.nwcustomapparel.com
+**Hours of Operation**
+Monday - Friday: 9:00 AM - 5:00 PM
+**Address**
+2025 Freeman Road East Milton, WA 98354 
+Year Established: 1977      
+Family Owned and Operated since 1977
+Erik Mickelson: Operations Manager
+Adriyella: Office Assistant
+Taylar Hanson: Account Executive
+Nika Lao: Account Executive
+Ruth Nhong: Production Manager
+Steve Deland: Art Director
+Bradley Wright: Accountant
+Jim Mickelson: CEO & Owner/Founder
+
+

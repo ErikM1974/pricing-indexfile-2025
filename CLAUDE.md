@@ -19,7 +19,11 @@ Public Key: 4qSbDO-SQs19TbP80
 Service ID: service_1c4k67j
 ```
 
-```
+## Pricing Calculations
+
+### Minimum Fee Calculation
+- Less than minimum fee is calculated as a flat $50.00 when the total order value falls below the established minimum order threshold
+- This ensures a baseline revenue for small orders that do not meet the standard minimum pricing requirements
 
 ## Development Guides
 
@@ -100,10 +104,3 @@ Service ID: service_1c4k67j
 6. **Testing**: Always show quote ID in success message for user reference
 
 Remember: The existing calculators (DTG, Richardson, Embroidery, Laser Tumbler) serve as working examples. When in doubt, reference their implementation patterns.
-
-
-
-
-
-
-
