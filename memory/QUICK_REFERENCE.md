@@ -13,11 +13,14 @@ Company Year: 1977
 
 ## Quote ID Patterns
 ```
-DTG{MMDD}-{sequence}    // DTG Contract
-RICH{MMDD}-{sequence}   // Richardson Caps
-EMB{MMDD}-{sequence}    // Embroidery Contract
-LT{MMDD}-{sequence}     // Laser Tumblers
-PATCH{MMDD}-{sequence}  // Embroidered Emblems
+DTG{MMDD}-{sequence}     // DTG Contract
+RICH{MMDD}-{sequence}    // Richardson Caps
+EMB{MMDD}-{sequence}     // Embroidery Contract
+EMBC{MMDD}-{sequence}    // Customer Supplied Embroidery
+EMBC-AO{MMDD}-{sequence} // Customer Supplied Add-on Order
+EMBC-PA{MMDD}-{sequence} // Customer Supplied Program Account
+LT{MMDD}-{sequence}      // Laser Tumblers
+PATCH{MMDD}-{sequence}   // Embroidered Emblems
 ```
 
 ## Required Email Variables (EVERY Calculator)
@@ -49,18 +52,18 @@ PATCH{MMDD}-{sequence}  // Embroidered Emblems
 ```
 
 ## Staff Email Directory
+
 ```javascript
 const salesRepEmails = {
-    'erik@nwcustomapparel.com': 'Erik',
-    'nika@nwcustomapparel.com': 'Nika',
-    'taylar@nwcustomapparel.com': 'Taylar',
-    'adriyella@nwcustomapparel.com': 'Adriyella',
+    'sales@nwcustomapparel.com': 'General Sales',
     'ruth@nwcustomapparel.com': 'Ruth Nhong',
-    'ruthie@nwcustomapparel.com': 'Ruthie',
-    'bradley@nwcustomapparel.com': 'Bradley',
-    'jim@nwcustomapparel.com': 'Jim',
-    'art@nwcustomapparel.com': 'Steve (Artist)',
-    'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
+    'taylar@nwcustomapparel.com': 'Taylar Hanson',
+    'nika@nwcustomapparel.com': 'Nika Lao',
+    'erik@nwcustomapparel.com': 'Erik Mickelson',
+    'adriyella@nwcustomapparel.com': 'Adriyella',
+    'bradley@nwcustomapparel.com': 'Bradley Wright',
+    'jim@nwcustomapparel.com': 'Jim Mickelson',
+    'art@nwcustomapparel.com': 'Steve Deland'
 };
 ```
 

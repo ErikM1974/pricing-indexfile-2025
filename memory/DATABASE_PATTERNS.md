@@ -370,3 +370,464 @@ console.log('[Service] Quote saved successfully:', quoteId);
 - **Solution**: Always use `.replace(/\.\d{3}Z$/, '')`
 
 Remember: Database saves should never prevent email sending. Always handle errors gracefully and continue with the email send even if database save fails.
+
+## Complete CRUD Operations
+
+This section covers the full Create, Read, Update, and Delete operations for the quote system. For detailed endpoint documentation, see @memory/API_DOCUMENTATION.md.
+
+### Reading Quotes (GET Operations)
+
+#### Retrieve Quote Sessions
+
+```javascript
+// Get all quote sessions with filters
+async getQuoteSessions(filters = {}) {
+    try {
+        // Build query string from filters
+        const queryParams = new URLSearchParams();
+        if (filters.quoteID) queryParams.append('quoteID', filters.quoteID);
+        if (filters.customerEmail) queryParams.append('customerEmail', filters.customerEmail);
+        if (filters.status) queryParams.append('status', filters.status);
+        if (filters.sessionID) queryParams.append('sessionID', filters.sessionID);
+        
+        const response = await fetch(`${this.baseURL}/api/quote_sessions?${queryParams}`);
+        const data = await response.json();
+        
+        return data;
+    } catch (error) {
+        console.error('[QuoteService] Error fetching sessions:', error);
+        return [];
+    }
+}
+
+// Get specific quote session by ID
+async getQuoteSession(quoteID) {
+    try {
+        const response = await fetch(`${this.baseURL}/api/quote_sessions/${quoteID}`);
+        if (!response.ok) {
+            throw new Error(`Quote not found: ${quoteID}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('[QuoteService] Error fetching session:', error);
+        return null;
+    }
+}
+```
+
+#### Retrieve Quote Items
+
+```javascript
+// Get all items for a specific quote
+async getQuoteItems(quoteID) {
+    try {
+        const response = await fetch(`${this.baseURL}/api/quote_items?quoteID=${quoteID}`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('[QuoteService] Error fetching items:', error);
+        return [];
+    }
+}
+
+// Get specific item by ID
+async getQuoteItem(itemID) {
+    try {
+        const response = await fetch(`${this.baseURL}/api/quote_items/${itemID}`);
+        if (!response.ok) {
+            throw new Error(`Item not found: ${itemID}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('[QuoteService] Error fetching item:', error);
+        return null;
+    }
+}
+```
+
+### Updating Quotes (PUT Operations)
+
+#### Update Quote Session
+
+```javascript
+// Update quote session (e.g., change status, update totals)
+async updateQuoteSession(quoteID, updates) {
+    try {
+        const response = await fetch(`${this.baseURL}/api/quote_sessions/${quoteID}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updates)
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Update failed: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log('[QuoteService] Session updated:', quoteID);
+        return { success: true, data: result };
+        
+    } catch (error) {
+        console.error('[QuoteService] Error updating session:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Common update scenarios
+async markQuoteAsSent(quoteID) {
+    return this.updateQuoteSession(quoteID, {
+        Status: 'Sent',
+        SentAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+    });
+}
+
+async markQuoteAsConverted(quoteID, orderID) {
+    return this.updateQuoteSession(quoteID, {
+        Status: 'Converted',
+        OrderID: orderID,
+        ConvertedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+    });
+}
+
+async extendQuoteExpiration(quoteID, days = 30) {
+    const newExpiry = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+    return this.updateQuoteSession(quoteID, {
+        ExpiresAt: newExpiry.toISOString().replace(/\.\d{3}Z$/, '')
+    });
+}
+```
+
+#### Update Quote Items
+
+```javascript
+// Update quote item (e.g., change quantity, price)
+async updateQuoteItem(itemID, updates) {
+    try {
+        const response = await fetch(`${this.baseURL}/api/quote_items/${itemID}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updates)
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Update failed: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log('[QuoteService] Item updated:', itemID);
+        return { success: true, data: result };
+        
+    } catch (error) {
+        console.error('[QuoteService] Error updating item:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Update item quantity and recalculate
+async updateItemQuantity(itemID, newQuantity, unitPrice) {
+    return this.updateQuoteItem(itemID, {
+        Quantity: parseInt(newQuantity),
+        LineTotal: parseFloat((newQuantity * unitPrice).toFixed(2))
+    });
+}
+```
+
+### Deleting Quotes (DELETE Operations)
+
+#### Delete Quote Session
+
+```javascript
+// Delete entire quote (cascade deletes items)
+async deleteQuoteSession(quoteID) {
+    try {
+        // First, get all items for this quote
+        const items = await this.getQuoteItems(quoteID);
+        
+        // Delete all items first
+        for (const item of items) {
+            await this.deleteQuoteItem(item.ID);
+        }
+        
+        // Then delete the session
+        const response = await fetch(`${this.baseURL}/api/quote_sessions/${quoteID}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Delete failed: ${errorText}`);
+        }
+        
+        console.log('[QuoteService] Quote deleted:', quoteID);
+        return { success: true };
+        
+    } catch (error) {
+        console.error('[QuoteService] Error deleting quote:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Delete single item from quote
+async deleteQuoteItem(itemID) {
+    try {
+        const response = await fetch(`${this.baseURL}/api/quote_items/${itemID}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Delete failed: ${errorText}`);
+        }
+        
+        console.log('[QuoteService] Item deleted:', itemID);
+        return { success: true };
+        
+    } catch (error) {
+        console.error('[QuoteService] Error deleting item:', error);
+        return { success: false, error: error.message };
+    }
+}
+```
+
+### Real-World Use Cases
+
+#### 1. Customer Quote History
+
+```javascript
+// Get all quotes for a customer
+async getCustomerQuoteHistory(customerEmail) {
+    const sessions = await this.getQuoteSessions({ 
+        customerEmail: customerEmail 
+    });
+    
+    // Sort by date, newest first
+    return sessions.sort((a, b) => 
+        new Date(b.CreatedAt) - new Date(a.CreatedAt)
+    );
+}
+```
+
+#### 2. Quote Duplication
+
+```javascript
+// Duplicate an existing quote
+async duplicateQuote(originalQuoteID) {
+    try {
+        // Get original quote
+        const original = await this.getQuoteSession(originalQuoteID);
+        const items = await this.getQuoteItems(originalQuoteID);
+        
+        if (!original) {
+            throw new Error('Original quote not found');
+        }
+        
+        // Create new quote with same data
+        const newQuoteData = {
+            ...original,
+            QuoteID: this.generateQuoteID(),
+            SessionID: this.generateSessionID(),
+            Status: 'Draft',
+            CreatedAt: undefined, // Let database set this
+            ExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                .toISOString().replace(/\.\d{3}Z$/, '')
+        };
+        
+        // Save new quote
+        const result = await this.saveQuote({
+            ...newQuoteData,
+            items: items
+        });
+        
+        return result;
+        
+    } catch (error) {
+        console.error('[QuoteService] Error duplicating quote:', error);
+        return { success: false, error: error.message };
+    }
+}
+```
+
+#### 3. Expired Quote Cleanup
+
+```javascript
+// Find and clean up expired quotes
+async cleanupExpiredQuotes() {
+    try {
+        // Get all open quotes
+        const openQuotes = await this.getQuoteSessions({ status: 'Open' });
+        
+        const now = new Date();
+        const expiredQuotes = openQuotes.filter(quote => 
+            new Date(quote.ExpiresAt) < now
+        );
+        
+        // Update status to expired
+        for (const quote of expiredQuotes) {
+            await this.updateQuoteSession(quote.QuoteID, {
+                Status: 'Expired'
+            });
+        }
+        
+        console.log(`[QuoteService] Marked ${expiredQuotes.length} quotes as expired`);
+        return { success: true, count: expiredQuotes.length };
+        
+    } catch (error) {
+        console.error('[QuoteService] Error cleaning up quotes:', error);
+        return { success: false, error: error.message };
+    }
+}
+```
+
+#### 4. Quote Search
+
+```javascript
+// Search quotes by multiple criteria
+async searchQuotes(searchCriteria) {
+    try {
+        const { 
+            customerName, 
+            dateFrom, 
+            dateTo, 
+            minAmount, 
+            maxAmount,
+            status 
+        } = searchCriteria;
+        
+        // Get all quotes matching basic criteria
+        let quotes = await this.getQuoteSessions({ status });
+        
+        // Filter by customer name (partial match)
+        if (customerName) {
+            quotes = quotes.filter(q => 
+                q.CustomerName.toLowerCase().includes(customerName.toLowerCase())
+            );
+        }
+        
+        // Filter by date range
+        if (dateFrom || dateTo) {
+            quotes = quotes.filter(q => {
+                const quoteDate = new Date(q.CreatedAt);
+                if (dateFrom && quoteDate < new Date(dateFrom)) return false;
+                if (dateTo && quoteDate > new Date(dateTo)) return false;
+                return true;
+            });
+        }
+        
+        // Filter by amount range
+        if (minAmount || maxAmount) {
+            quotes = quotes.filter(q => {
+                if (minAmount && q.TotalAmount < minAmount) return false;
+                if (maxAmount && q.TotalAmount > maxAmount) return false;
+                return true;
+            });
+        }
+        
+        return quotes;
+        
+    } catch (error) {
+        console.error('[QuoteService] Error searching quotes:', error);
+        return [];
+    }
+}
+```
+
+### Error Handling Best Practices
+
+```javascript
+// Comprehensive error handling for all CRUD operations
+class QuoteServiceWithErrorHandling {
+    async executeWithRetry(operation, maxRetries = 3) {
+        let lastError;
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                return await operation();
+            } catch (error) {
+                lastError = error;
+                console.warn(`[QuoteService] Attempt ${attempt} failed:`, error.message);
+                
+                // Don't retry on client errors (4xx)
+                if (error.status && error.status >= 400 && error.status < 500) {
+                    break;
+                }
+                
+                // Wait before retry with exponential backoff
+                if (attempt < maxRetries) {
+                    await new Promise(resolve => 
+                        setTimeout(resolve, Math.pow(2, attempt) * 1000)
+                    );
+                }
+            }
+        }
+        
+        throw lastError;
+    }
+    
+    // Example usage
+    async getQuoteWithRetry(quoteID) {
+        return this.executeWithRetry(() => this.getQuoteSession(quoteID));
+    }
+}
+```
+
+### Batch Operations
+
+```javascript
+// Update multiple quotes at once
+async batchUpdateQuotes(quoteIDs, updates) {
+    const results = {
+        success: [],
+        failed: []
+    };
+    
+    for (const quoteID of quoteIDs) {
+        const result = await this.updateQuoteSession(quoteID, updates);
+        if (result.success) {
+            results.success.push(quoteID);
+        } else {
+            results.failed.push({ quoteID, error: result.error });
+        }
+    }
+    
+    return results;
+}
+
+// Delete multiple expired quotes
+async batchDeleteExpiredQuotes(daysOld = 90) {
+    const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
+    const expiredQuotes = await this.searchQuotes({
+        status: 'Expired',
+        dateTo: cutoffDate.toISOString()
+    });
+    
+    const results = {
+        success: 0,
+        failed: 0
+    };
+    
+    for (const quote of expiredQuotes) {
+        const result = await this.deleteQuoteSession(quote.QuoteID);
+        if (result.success) {
+            results.success++;
+        } else {
+            results.failed++;
+        }
+    }
+    
+    return results;
+}
+```
+
+### Complete Quote Service Class Example
+
+For a complete implementation example that includes all CRUD operations, see the implementation in existing calculators or create a new service extending the base patterns shown above.
+
+**Important**: Always test CRUD operations in a development environment before deploying to production.

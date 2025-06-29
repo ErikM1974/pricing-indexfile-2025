@@ -1,0 +1,16 @@
+{
+  "QuoteID": "TEST0629-1",
+  "SessionID": "test_sess_1751234567890_test123",
+  "CustomerEmail": "test@example.com",
+  "CustomerName": "Test Customer",
+  "CompanyName": "Test Company",
+  "Phone": "253-555-1234",
+  "TotalQuantity": 24,
+  "SubtotalAmount": 500.00,
+  "LTMFeeTotal": 0,
+  "TotalAmount": 500.00,
+  "Status": "Open",
+  "ExpiresAt": "2025-07-29T12:00:00",
+  "Notes": "Test quote for CRUD operations"
+}
+EOF < /dev/null
