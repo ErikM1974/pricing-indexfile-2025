@@ -713,6 +713,57 @@ Example for email templates:
 <span style="color: #4cb354; font-weight: bold;">
 ```
 
+## Multi-Purpose Templates
+
+### Service vs Product Quotes
+Service calculators (like webstores) need different email approaches:
+
+#### Handling Setup Costs vs Requirements
+```javascript
+// For services, separate one-time costs from ongoing requirements
+const emailData = {
+    // ... standard fields
+    setup_total: `$${setupCost.toFixed(2)}`, // What they pay now
+    annual_requirement: '$2,000', // Commitment, not a payment
+    // Use clear language in template:
+    // "Total Setup Cost: {{setup_total}}"
+    // "Annual Sales Requirement: {{annual_requirement}}"
+};
+```
+
+#### Including Next Steps
+Service quotes benefit from clear action items:
+```html
+<div style="background-color: #f8f9fa; padding: 20px;">
+    <h3>Next Steps:</h3>
+    <ol>
+        <li>Review and approve this quote</li>
+        <li>Send us your logo files</li>
+        <li>Select initial products</li>
+        <li>We'll have your store ready in 5-7 days!</li>
+    </ol>
+</div>
+```
+
+#### Linking to Information Pages
+Include educational links:
+```html
+<div style="text-align: center; padding: 20px;">
+    <p><strong>Learn More About Our {{service_name}}</strong></p>
+    <a href="{{info_page_url}}" style="color: #4cb354;">
+        View Complete Information →
+    </a>
+</div>
+```
+
+### Progressive Information Disclosure
+For complex services:
+1. **Email**: Core pricing and benefits
+2. **Info Page**: Detailed explanations
+3. **Follow-up**: Personal consultation
+
+This prevents overwhelming customers while ensuring they have access to all information.
+
 ## Company Contact Information
 
 - **Phone**: 253-922-5793 (Toll Free: 1-800-851-3671)

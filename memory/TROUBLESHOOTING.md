@@ -158,6 +158,51 @@ document.getElementById('quoteIdDisplay').textContent = `Quote ID: ${quoteId}`;
    - Include all template IDs
    - Document any special features
 
+## Service Quote Calculators
+
+### Special Considerations
+Service calculators (like webstores) differ from product calculators:
+
+**Requirements vs Costs**
+- Some items are commitments, not payments (e.g., annual minimums)
+- Display these separately from the total cost
+- Use warning boxes to highlight requirements
+- Be clear in emails about what's paid now vs ongoing commitments
+
+**Information Overload**
+- Service quotes often need extensive explanations
+- Use accordions to organize information
+- Keep the calculator focused on quoting
+- Link to detailed info pages for education
+
+**Customer-Facing Pages**
+When creating linked info pages:
+1. Place in root directory (not /calculators)
+2. Add to main navigation in index.html
+3. Use consistent branding and styling
+4. Include clear CTAs back to quote request
+5. Make mobile-responsive
+
+### Common Issues
+
+**Problem**: Customer confused about annual minimum
+**Solution**: Display as requirement, not cost:
+```javascript
+// DON'T add to total
+const total = setupFee + logoFee + minimumGuarantee; // ❌
+
+// DO show separately
+const total = setupFee + logoFee; // ✅
+// Then display minimum as a requirement note
+```
+
+**Problem**: Too much information in calculator
+**Solution**: Use progressive disclosure:
+- Basic quote form up front
+- Detailed info in accordions
+- Link to comprehensive guide page
+- Include "Next Steps" in email
+
 ## Testing Checklist
 
 ### Before Going Live
@@ -167,6 +212,13 @@ document.getElementById('quoteIdDisplay').textContent = `Quote ID: ${quoteId}`;
 - [ ] Email sends with all variables
 - [ ] Database saves both tables
 - [ ] Quote ID shows in success message
+
+### For Service Calculators Also Check
+- [ ] Requirements clearly separated from costs
+- [ ] Accordions function properly
+- [ ] Info page link works
+- [ ] Navigation updated (if public page added)
+- [ ] Mobile responsive on all pages
 - [ ] Print functionality works
 
 ### Functional Testing

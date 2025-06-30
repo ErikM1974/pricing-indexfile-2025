@@ -830,4 +830,57 @@ async batchDeleteExpiredQuotes(daysOld = 90) {
 
 For a complete implementation example that includes all CRUD operations, see the implementation in existing calculators or create a new service extending the base patterns shown above.
 
+## Service-Based Quote Patterns
+
+Service calculators (like webstores) have unique database patterns:
+
+### Storing Setup Fees
+```javascript
+// Service quotes typically have fewer line items
+const setupItem = {
+    QuoteID: quoteID,
+    LineNumber: 1,
+    StyleNumber: 'SERVICE-SETUP',
+    ProductName: 'Web Store Setup Fee',
+    EmbellishmentType: 'service', // Use 'service' type
+    Quantity: 1,
+    FinalUnitPrice: 300.00,
+    LineTotal: 300.00,
+    PricingTier: 'Standard'
+};
+```
+
+### Storing Configuration Without Inventory
+Use the SizeBreakdown field for service configuration:
+```javascript
+SizeBreakdown: JSON.stringify({
+    serviceType: 'On-Demand',
+    configuration: {
+        surchargePerItem: 10.00,
+        expectedVolume: 500,
+        features: ['24/7 Access', 'Individual Shipping']
+    },
+    requirements: {
+        annualMinimum: 2000,
+        setupTimeframe: '5-7 business days'
+    }
+})
+```
+
+### Using Notes for Requirements
+Include non-cost requirements in the Notes field:
+```javascript
+const sessionData = {
+    // ... other fields
+    Notes: `Service Type: ${serviceType}, Annual Minimum: $${minimum} in sales required`,
+    Status: 'Open' // Services often use different statuses
+};
+```
+
+### Key Differences from Product Quotes
+1. **No physical inventory** - Quantity fields may be 0 or represent service units
+2. **Different status workflow** - May use "Setup Pending", "Active", "Expired"
+3. **Configuration storage** - Heavy use of JSON in SizeBreakdown
+4. **Requirement tracking** - Use Notes field for commitments/requirements
+
 **Important**: Always test CRUD operations in a development environment before deploying to production.
