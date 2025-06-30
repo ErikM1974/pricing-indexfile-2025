@@ -521,6 +521,80 @@
             color: var(--error-text);
         }
 
+        /* Enhanced Status and Actions Styling */
+        .status-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .email-tracking, .payment-tracking {
+            font-size: 0.7rem;
+            line-height: 1.2;
+        }
+
+        .email-actions, .payment-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            min-width: 100px;
+        }
+
+        .paid-status, .partial-status {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            align-items: flex-start;
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.65rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .badge.bg-success {
+            background-color: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .badge.bg-warning {
+            background-color: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .badge.bg-info {
+            background-color: var(--info-bg);
+            color: var(--info-text);
+        }
+
+        /* Button size adjustments for new layout */
+        .btn-sm.compact {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+        }
+
+        .btn-sm.micro {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.3rem;
+        }
+
+        /* Table column widths */
+        #invoicesTable th:nth-child(1) { width: 8%; }  /* Invoice ID */
+        #invoicesTable th:nth-child(2) { width: 8%; }  /* Date */
+        #invoicesTable th:nth-child(3) { width: 15%; } /* Customer */
+        #invoicesTable th:nth-child(4) { width: 12%; } /* Project */
+        #invoicesTable th:nth-child(5) { width: 10%; } /* Sales Rep */
+        #invoicesTable th:nth-child(6) { width: 15%; } /* Status & Tracking */
+        #invoicesTable th:nth-child(7) { width: 8%; }  /* Amount */
+        #invoicesTable th:nth-child(8) { width: 8%; }  /* Balance */
+        #invoicesTable th:nth-child(9) { width: 8%; }  /* Email Actions */
+        #invoicesTable th:nth-child(10) { width: 8%; } /* Payment Actions */
+
         /* Responsive */
         @media (max-width: 768px) {
             .header-container {
@@ -550,7 +624,7 @@
                 overflow-x: scroll;
             }
 
-            .action-buttons {
+            .email-actions, .payment-actions {
                 flex-direction: column;
                 width: 100%;
             }
@@ -558,6 +632,14 @@
             .btn {
                 width: 100%;
                 justify-content: center;
+            }
+
+            /* Hide some columns on mobile */
+            #invoicesTable th:nth-child(4),
+            #invoicesTable td:nth-child(4),
+            #invoicesTable th:nth-child(5),
+            #invoicesTable td:nth-child(5) {
+                display: none;
             }
         }
     </style>
@@ -697,10 +779,11 @@
                             <th>Customer</th>
                             <th>Project</th>
                             <th>Sales Rep</th>
-                            <th>Status</th>
+                            <th>Status & Tracking</th>
                             <th>Amount</th>
                             <th>Balance</th>
-                            <th>Actions</th>
+                            <th>Email Actions</th>
+                            <th>Payment Actions</th>
                         </tr>
                     </thead>
                     <tbody id="invoicesTableBody">
@@ -930,50 +1013,119 @@
                         </td>
                         <td>${invoice.SalesRepName || 'Unknown'}</td>
                         <td>
-                            <span class="status-badge ${invoice.Status.toLowerCase().replace(' ', '-')}">
-                                ${getStatusIcon(invoice.Status)}
-                                ${invoice.Status}
-                            </span>
+                            <div class="status-info">
+                                <span class="status-badge ${invoice.Status.toLowerCase().replace(' ', '-')}">
+                                    ${getStatusIcon(invoice.Status)}
+                                    ${invoice.Status}
+                                </span>
+                                ${invoice.Status === 'Sent' || invoice.Status === 'Paid' || invoice.Status === 'Overdue' || invoice.Status === 'Partial' ? `
+                                    <div class="email-tracking" style="margin-top: 0.25rem;">
+                                        ${invoice.EmailSentDate ? `
+                                            <small class="text-success" style="font-size: 0.7rem;">
+                                                <i class="fas fa-envelope" title="Email sent"></i>
+                                                Sent ${formatDate(invoice.EmailSentDate)}
+                                                ${invoice.EmailSentTo ? `<br>to: ${invoice.EmailSentTo}` : ''}
+                                            </small>
+                                        ` : `
+                                            <small class="text-warning" style="font-size: 0.7rem;">
+                                                <i class="fas fa-exclamation-triangle" title="No email record"></i>
+                                                Email status unknown
+                                            </small>
+                                        `}
+                                    </div>
+                                ` : ''}
+                                ${invoice.Status === 'Paid' && invoice.PaymentDate ? `
+                                    <div class="payment-tracking" style="margin-top: 0.25rem;">
+                                        <small class="text-success" style="font-size: 0.7rem;">
+                                            <i class="fas fa-credit-card" title="Payment received"></i>
+                                            Paid ${formatDate(invoice.PaymentDate)}
+                                        </small>
+                                    </div>
+                                ` : ''}
+                            </div>
                         </td>
                         <td style="text-align: right; font-weight: 600;">$${grandTotal.toFixed(2)}</td>
                         <td style="text-align: right; ${isOverdue ? 'color: var(--error-text);' : ''}">
                             $${balanceDue.toFixed(2)}
                         </td>
                         <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-secondary btn-icon btn-sm" 
+                            <div class="email-actions" style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                <button class="btn btn-secondary btn-sm" 
                                         onclick="viewInvoice('${invoice.InvoiceID}')"
-                                        title="View">
+                                        title="View Details"
+                                        style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">
                                     <i class="fas fa-eye"></i>
+                                    View
                                 </button>
                                 ${invoice.Status === 'Draft' ? `
-                                    <button class="btn btn-primary btn-icon btn-sm" 
+                                    <button class="btn btn-success btn-sm" 
                                             onclick="sendInvoice('${invoice.InvoiceID}')"
-                                            title="Send">
+                                            title="Send Invoice"
+                                            style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">
                                         <i class="fas fa-paper-plane"></i>
+                                        Send
                                     </button>
                                 ` : ''}
+                                ${invoice.Status === 'Sent' || invoice.Status === 'Paid' || invoice.Status === 'Overdue' || invoice.Status === 'Partial' ? `
+                                    <button class="btn btn-info btn-sm" 
+                                            onclick="resendInvoice('${invoice.InvoiceID}')"
+                                            title="Resend Invoice"
+                                            style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">
+                                        <i class="fas fa-share"></i>
+                                        Resend
+                                    </button>
+                                ` : ''}
+                                ${invoice.Status === 'Overdue' ? `
+                                    <button class="btn btn-warning btn-sm" 
+                                            onclick="sendReminder('${invoice.InvoiceID}')"
+                                            title="Send Reminder"
+                                            style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">
+                                        <i class="fas fa-bell"></i>
+                                        Remind
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="payment-actions" style="display: flex; flex-direction: column; gap: 0.25rem;">
                                 ${(invoice.Status === 'Sent' || invoice.Status === 'Overdue' || invoice.Status === 'Partial') && balanceDue > 0 ? `
-                                    <button class="btn btn-primary btn-sm" 
+                                    <button class="btn btn-success btn-sm" 
                                             onclick="quickMarkPaid(${invoice.PK_ID}, '${invoice.InvoiceID}')"
                                             title="Mark as Paid"
-                                            style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+                                            style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">
                                         <i class="fas fa-check-circle"></i>
-                                        Paid
+                                        Mark Paid
                                     </button>
                                 ` : ''}
                                 ${invoice.Status === 'Paid' ? `
-                                    <span style="color: var(--success-text); font-size: 0.75rem;">
-                                        <i class="fas fa-check"></i>
-                                        ${invoice.PaymentDate ? `Paid ${formatDate(invoice.PaymentDate)}` : 'Paid'}
-                                    </span>
+                                    <div class="paid-status">
+                                        <span class="badge bg-success" style="font-size: 0.65rem;">
+                                            <i class="fas fa-check"></i> Paid
+                                        </span>
+                                        ${canUndoPayment(invoice.PaymentDate) ? `
+                                            <button class="btn btn-warning btn-sm mt-1" 
+                                                    onclick="undoPayment(${invoice.PK_ID}, '${invoice.InvoiceID}')"
+                                                    title="Undo Payment (same day only)"
+                                                    style="font-size: 0.65rem; padding: 0.15rem 0.3rem;">
+                                                <i class="fas fa-undo"></i>
+                                                Undo
+                                            </button>
+                                        ` : ''}
+                                    </div>
                                 ` : ''}
-                                ${invoice.Status === 'Overdue' ? `
-                                    <button class="btn btn-secondary btn-icon btn-sm" 
-                                            onclick="sendReminder('${invoice.InvoiceID}')"
-                                            title="Send Reminder">
-                                        <i class="fas fa-bell"></i>
-                                    </button>
+                                ${invoice.Status === 'Partial' ? `
+                                    <div class="partial-status">
+                                        <span class="badge bg-warning" style="font-size: 0.65rem;">
+                                            <i class="fas fa-coins"></i> Partial
+                                        </span>
+                                        <button class="btn btn-success btn-sm mt-1" 
+                                                onclick="recordPartialPayment(${invoice.PK_ID}, '${invoice.InvoiceID}')"
+                                                title="Record Additional Payment"
+                                                style="font-size: 0.65rem; padding: 0.15rem 0.3rem;">
+                                            <i class="fas fa-plus"></i>
+                                            Add Payment
+                                        </button>
+                                    </div>
                                 ` : ''}
                             </div>
                         </td>
@@ -1322,6 +1474,39 @@
             return icons[status] || '<i class="fas fa-circle"></i>';
         }
         
+        // Helper function to check if payment can be undone (same day only)
+        function canUndoPayment(paymentDate) {
+            if (!paymentDate) return false;
+            
+            try {
+                // Handle various date formats
+                const payment = new Date(paymentDate);
+                const today = new Date();
+                
+                // Debug logging for troubleshooting
+                console.log('[canUndoPayment] Payment date:', paymentDate, 'Parsed:', payment);
+                console.log('[canUndoPayment] Today:', today);
+                
+                // Check if payment date is valid
+                if (isNaN(payment.getTime())) {
+                    console.warn('[canUndoPayment] Invalid payment date:', paymentDate);
+                    return false;
+                }
+                
+                // Compare dates by setting time to midnight to avoid time zone issues
+                const paymentDateOnly = new Date(payment.getFullYear(), payment.getMonth(), payment.getDate());
+                const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                
+                const isSameDay = paymentDateOnly.getTime() === todayDateOnly.getTime();
+                console.log('[canUndoPayment] Same day check:', isSameDay, 'Payment:', paymentDateOnly, 'Today:', todayDateOnly);
+                
+                return isSameDay;
+            } catch (error) {
+                console.error('[canUndoPayment] Error parsing date:', error, paymentDate);
+                return false;
+            }
+        }
+        
         // Quick Mark as Paid function
         async function quickMarkPaid(pkId, invoiceId) {
             if (!confirm(`Mark invoice ${invoiceId} as paid?`)) {
@@ -1390,6 +1575,82 @@
             } catch (error) {
                 console.error('Error undoing payment:', error);
                 showError('Error undoing payment');
+            }
+        }
+        
+        // Resend invoice email
+        async function resendInvoice(invoiceId) {
+            if (!confirm(`Resend invoice ${invoiceId}?`)) {
+                return;
+            }
+            
+            try {
+                // For now, use same function as sendInvoice
+                // TODO: Implement proper resend tracking
+                await sendInvoice(invoiceId);
+                showSuccess(`Invoice ${invoiceId} resent successfully`);
+            } catch (error) {
+                console.error('Error resending invoice:', error);
+                showError('Error resending invoice');
+            }
+        }
+        
+        // Record partial payment
+        async function recordPartialPayment(pkId, invoiceId) {
+            // Get the invoice details to populate the modal
+            const invoice = allInvoices.find(inv => inv.PK_ID === pkId);
+            if (!invoice) {
+                showError('Invoice not found');
+                return;
+            }
+            
+            // Open the payment modal
+            openPaymentModal(invoice);
+        }
+        
+        // Send invoice function (placeholder for now)
+        async function sendInvoice(invoiceId) {
+            try {
+                // Mark invoice as sent
+                const result = await invoiceService.markInvoiceAsSent(invoiceId, 'customer@example.com');
+                
+                if (result.success) {
+                    showSuccess(`Invoice ${invoiceId} sent successfully`);
+                    loadInvoices();
+                } else {
+                    showError(result.error || 'Failed to send invoice');
+                }
+            } catch (error) {
+                console.error('Error sending invoice:', error);
+                showError('Error sending invoice');
+            }
+        }
+        
+        // Send reminder function
+        async function sendReminder(invoiceId) {
+            if (!confirm(`Send payment reminder for invoice ${invoiceId}?`)) {
+                return;
+            }
+            
+            try {
+                // Find the invoice PK_ID
+                const invoice = allInvoices.find(inv => inv.InvoiceID === invoiceId);
+                if (!invoice) {
+                    showError('Invoice not found');
+                    return;
+                }
+                
+                const result = await invoiceService.sendReminder(invoice.PK_ID);
+                
+                if (result.success) {
+                    showSuccess(`Reminder sent for invoice ${invoiceId}`);
+                    loadInvoices();
+                } else {
+                    showError(result.error || 'Failed to send reminder');
+                }
+            } catch (error) {
+                console.error('Error sending reminder:', error);
+                showError('Error sending reminder');
             }
         }
     </script>
