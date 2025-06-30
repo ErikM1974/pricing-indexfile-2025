@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Art Invoices Dashboard - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- Art Invoice Service -->
+    <script src="calculators/art-invoice-service.js"></script>
+    
+    <style>
+        /* Root variables - NWCA Green Theme */
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --info-bg: #dbeafe;
+            --info-text: #1e40af;
+            --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+        }
+
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-title h1 {
+            font-size: 1.875rem;
+            color: var(--text-primary);
+        }
+
+        .page-title .icon {
+            width: 48px;
+            height: 48px;
+            background: var(--success-bg);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card.draft {
+            border-left: 4px solid var(--text-secondary);
+        }
+
+        .stat-card.sent {
+            border-left: 4px solid var(--info-text);
+        }
+
+        .stat-card.paid {
+            border-left: 4px solid var(--success-text);
+        }
+
+        .stat-card.overdue {
+            border-left: 4px solid var(--error-text);
+        }
+
+        .stat-card.total {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-amount {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Filters and Actions */
+        .controls-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: var(--focus-shadow);
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-color);
+        }
+
+        th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.draft {
+            background: var(--hover-bg);
+            color: var(--text-secondary);
+        }
+
+        .status-badge.sent {
+            background: var(--info-bg);
+            color: var(--info-text);
+        }
+
+        .status-badge.paid {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .status-badge.partial {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .status-badge.overdue {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        /* Action Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(76, 179, 84, 0.2);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--border-color);
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Payment Form */
+        .payment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .alert-error {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-row {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .table-wrapper {
+                overflow-x: scroll;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Staff Dashboard</a>
+                    <span>/</span>
+                    <span>Art Invoices</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <div class="icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h1>Art Invoices</h1>
+            </div>
+            <a href="/calculators/art-invoice-creator.html" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Create Invoice
+            </a>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card draft">
+                <div class="stat-label">Draft</div>
+                <div class="stat-value" id="statDraft">0</div>
+            </div>
+            <div class="stat-card sent">
+                <div class="stat-label">Sent</div>
+                <div class="stat-value" id="statSent">0</div>
+                <div class="stat-amount" id="statSentAmount">$0.00</div>
+            </div>
+            <div class="stat-card paid">
+                <div class="stat-label">Paid</div>
+                <div class="stat-value" id="statPaid">0</div>
+                <div class="stat-amount" id="statPaidAmount">$0.00</div>
+            </div>
+            <div class="stat-card overdue">
+                <div class="stat-label">Overdue</div>
+                <div class="stat-value" id="statOverdue">0</div>
+                <div class="stat-amount" id="statOverdueAmount">$0.00</div>
+            </div>
+            <div class="stat-card total">
+                <div class="stat-label">Total Outstanding</div>
+                <div class="stat-value" id="statTotalDue">$0.00</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="controls-section">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="searchInput">Search</label>
+                    <input type="text" 
+                           id="searchInput" 
+                           placeholder="Invoice ID, customer, project..."
+                           style="width: 250px;">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="statusFilter">Status</label>
+                    <select id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="Draft">Draft</option>
+                        <option value="Sent">Sent</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Partial">Partial Payment</option>
+                        <option value="Overdue">Overdue</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="dateFrom">Date From</label>
+                    <input type="date" id="dateFrom">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="dateTo">Date To</label>
+                    <input type="date" id="dateTo">
+                </div>
+                
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-secondary" onclick="applyFilters()">
+                        <i class="fas fa-filter"></i>
+                        Apply Filters
+                    </button>
+                </div>
+                
+                <div class="filter-group" style="margin-left: auto;">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-secondary" onclick="exportInvoices()">
+                        <i class="fas fa-download"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoices Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">All Invoices</h2>
+                <button class="btn btn-secondary btn-sm" onclick="refreshInvoices()">
+                    <i class="fas fa-sync"></i>
+                    Refresh
+                </button>
+            </div>
+            
+            <div class="table-wrapper">
+                <table id="invoicesTable">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Project</th>
+                            <th>Sales Rep</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                            <th>Balance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoicesTableBody">
+                        <!-- Invoices will be loaded here -->
+                    </tbody>
+                </table>
+                
+                <div id="loadingState" class="loading-container" style="display: none;">
+                    <div class="loading"></div>
+                </div>
+                
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-file-invoice"></i>
+                    <p>No invoices found</p>
+                    <p style="margin-top: 1rem;">
+                        <a href="/calculators/art-invoice-creator.html" class="btn btn-primary">
+                            Create Your First Invoice
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Record Payment</h2>
+                <button class="modal-close" onclick="closePaymentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="paymentAlert"></div>
+                
+                <div class="payment-form">
+                    <div class="form-group">
+                        <label>Invoice ID</label>
+                        <input type="text" id="paymentInvoiceId" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Total Amount Due</label>
+                        <input type="text" id="paymentAmountDue" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Payment Amount</label>
+                        <input type="number" 
+                               id="paymentAmount" 
+                               step="0.01" 
+                               min="0.01" 
+                               placeholder="Enter payment amount">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <select id="paymentMethod">
+                            <option value="">Select method...</option>
+                            <option value="Check">Check</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="ACH">ACH Transfer</option>
+                            <option value="Internal Transfer">Internal Transfer</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Reference Number</label>
+                        <input type="text" 
+                               id="paymentReference" 
+                               placeholder="Check number, transaction ID, etc.">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePaymentModal()">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" onclick="recordPayment()">
+                    <i class="fas fa-check"></i>
+                    Record Payment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize
+        let invoiceService;
+        let allInvoices = [];
+        let currentInvoiceId = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            invoiceService = new ArtInvoiceService();
+            
+            // Set default date range (last 30 days)
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+            document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+            document.getElementById('dateFrom').value = thirtyDaysAgo.toISOString().split('T')[0];
+            
+            // Load invoices
+            loadInvoices();
+            
+            // Auto-refresh every 5 minutes
+            setInterval(loadInvoices, 5 * 60 * 1000);
+            
+            // Check for overdue invoices
+            checkOverdueInvoices();
+        });
+        
+        // Load Invoices
+        async function loadInvoices() {
+            showLoading(true);
+            
+            try {
+                // Get current user email (in real app, this would come from session)
+                const currentUserEmail = localStorage.getItem('userEmail') || '';
+                const isSteve = currentUserEmail === 'art@nwcustomapparel.com';
+                
+                // Fetch invoices
+                const filters = isSteve ? {} : { salesRepEmail: currentUserEmail };
+                allInvoices = await invoiceService.getInvoices(filters);
+                
+                // Apply filters and display
+                applyFilters();
+                
+                // Update stats
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error loading invoices:', error);
+                showError('Error loading invoices');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Apply Filters
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            
+            let filteredInvoices = allInvoices;
+            
+            // Search filter
+            if (searchTerm) {
+                filteredInvoices = filteredInvoices.filter(invoice => 
+                    invoice.InvoiceID.toLowerCase().includes(searchTerm) ||
+                    (invoice.CustomerName && invoice.CustomerName.toLowerCase().includes(searchTerm)) ||
+                    (invoice.ProjectName && invoice.ProjectName.toLowerCase().includes(searchTerm)) ||
+                    (invoice.CustomerCompany && invoice.CustomerCompany.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            // Status filter
+            if (statusFilter) {
+                filteredInvoices = filteredInvoices.filter(invoice => invoice.Status === statusFilter);
+            }
+            
+            // Date filters
+            if (dateFrom) {
+                filteredInvoices = filteredInvoices.filter(invoice => 
+                    new Date(invoice.InvoiceDate) >= new Date(dateFrom)
+                );
+            }
+            
+            if (dateTo) {
+                const endDate = new Date(dateTo);
+                endDate.setHours(23, 59, 59, 999);
+                filteredInvoices = filteredInvoices.filter(invoice => 
+                    new Date(invoice.InvoiceDate) <= endDate
+                );
+            }
+            
+            // Sort by date (newest first)
+            filteredInvoices.sort((a, b) => new Date(b.InvoiceDate) - new Date(a.InvoiceDate));
+            
+            // Display invoices
+            displayInvoices(filteredInvoices);
+        }
+        
+        // Display Invoices
+        function displayInvoices(invoices) {
+            const tbody = document.getElementById('invoicesTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const table = document.getElementById('invoicesTable');
+            
+            if (invoices.length === 0) {
+                tbody.innerHTML = '';
+                table.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            table.style.display = 'table';
+            emptyState.style.display = 'none';
+            
+            tbody.innerHTML = invoices.map(invoice => {
+                const grandTotal = parseFloat(invoice.GrandTotal || 0);
+                const balanceDue = parseFloat(invoice.BalanceDue || 0);
+                const isOverdue = invoice.Status === 'Overdue';
+                
+                return `
+                    <tr>
+                        <td><strong>${invoice.InvoiceID}</strong></td>
+                        <td>${formatDate(invoice.InvoiceDate)}</td>
+                        <td>
+                            <div>${invoice.CustomerName || 'Unknown'}</div>
+                            ${invoice.CustomerCompany ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">${invoice.CustomerCompany}</div>` : ''}
+                        </td>
+                        <td>
+                            <div>${invoice.ProjectName}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">${invoice.ProjectType}</div>
+                        </td>
+                        <td>${invoice.SalesRepName || 'Unknown'}</td>
+                        <td>
+                            <span class="status-badge ${invoice.Status.toLowerCase().replace(' ', '-')}">
+                                ${getStatusIcon(invoice.Status)}
+                                ${invoice.Status}
+                            </span>
+                        </td>
+                        <td style="text-align: right; font-weight: 600;">$${grandTotal.toFixed(2)}</td>
+                        <td style="text-align: right; ${isOverdue ? 'color: var(--error-text);' : ''}">
+                            $${balanceDue.toFixed(2)}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary btn-icon btn-sm" 
+                                        onclick="viewInvoice('${invoice.InvoiceID}')"
+                                        title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ${invoice.Status === 'Draft' ? `
+                                    <button class="btn btn-primary btn-icon btn-sm" 
+                                            onclick="sendInvoice('${invoice.InvoiceID}')"
+                                            title="Send">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                ` : ''}
+                                ${(invoice.Status === 'Sent' || invoice.Status === 'Overdue' || invoice.Status === 'Partial') && balanceDue > 0 ? `
+                                    <button class="btn btn-secondary btn-icon btn-sm" 
+                                            onclick="openPaymentModal('${invoice.InvoiceID}', ${balanceDue})"
+                                            title="Record Payment">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </button>
+                                ` : ''}
+                                ${invoice.Status === 'Overdue' ? `
+                                    <button class="btn btn-secondary btn-icon btn-sm" 
+                                            onclick="sendReminder('${invoice.InvoiceID}')"
+                                            title="Send Reminder">
+                                        <i class="fas fa-bell"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Update Statistics
+        function updateStats() {
+            const stats = {
+                draft: 0,
+                sent: 0,
+                paid: 0,
+                overdue: 0,
+                partial: 0,
+                totalAmount: 0,
+                totalPaid: 0,
+                totalDue: 0
+            };
+            
+            allInvoices.forEach(invoice => {
+                const status = invoice.Status.toLowerCase().replace(' ', '');
+                if (stats[status] !== undefined) {
+                    stats[status]++;
+                }
+                
+                const grandTotal = parseFloat(invoice.GrandTotal || 0);
+                const paymentAmount = parseFloat(invoice.PaymentAmount || 0);
+                const balanceDue = parseFloat(invoice.BalanceDue || 0);
+                
+                stats.totalAmount += grandTotal;
+                stats.totalPaid += paymentAmount;
+                stats.totalDue += balanceDue;
+            });
+            
+            // Update UI
+            document.getElementById('statDraft').textContent = stats.draft;
+            document.getElementById('statSent').textContent = stats.sent;
+            document.getElementById('statPaid').textContent = stats.paid;
+            document.getElementById('statOverdue').textContent = stats.overdue;
+            
+            // Calculate sent amount (sent + overdue + partial)
+            const sentAmount = allInvoices
+                .filter(inv => ['Sent', 'Overdue', 'Partial'].includes(inv.Status))
+                .reduce((sum, inv) => sum + parseFloat(inv.GrandTotal || 0), 0);
+            
+            document.getElementById('statSentAmount').textContent = `$${sentAmount.toFixed(2)}`;
+            document.getElementById('statPaidAmount').textContent = `$${stats.totalPaid.toFixed(2)}`;
+            document.getElementById('statOverdueAmount').textContent = `$${
+                allInvoices
+                    .filter(inv => inv.Status === 'Overdue')
+                    .reduce((sum, inv) => sum + parseFloat(inv.BalanceDue || 0), 0)
+                    .toFixed(2)
+            }`;
+            document.getElementById('statTotalDue').textContent = `$${stats.totalDue.toFixed(2)}`;
+        }
+        
+        // Check for Overdue Invoices
+        async function checkOverdueInvoices() {
+            try {
+                const result = await invoiceService.updateOverdueStatuses();
+                if (result.success && result.count > 0) {
+                    console.log(`Updated ${result.count} invoices to overdue status`);
+                    loadInvoices(); // Reload to show updated statuses
+                }
+            } catch (error) {
+                console.error('Error checking overdue invoices:', error);
+            }
+        }
+        
+        // View Invoice
+        function viewInvoice(invoiceId) {
+            // In a real app, this would open a detailed view
+            window.open(`/art-invoice-view.html?id=${invoiceId}`, '_blank');
+        }
+        
+        // Send Invoice
+        async function sendInvoice(invoiceId) {
+            if (!confirm('Send this invoice to the sales representative?')) {
+                return;
+            }
+            
+            try {
+                // In a real app, this would trigger the email send
+                const result = await invoiceService.markInvoiceAsSent(invoiceId, 'sales rep email');
+                if (result.success) {
+                    showSuccess('Invoice sent successfully!');
+                    loadInvoices();
+                } else {
+                    showError('Failed to send invoice');
+                }
+            } catch (error) {
+                console.error('Error sending invoice:', error);
+                showError('Error sending invoice');
+            }
+        }
+        
+        // Open Payment Modal
+        function openPaymentModal(invoiceId, balanceDue) {
+            currentInvoiceId = invoiceId;
+            document.getElementById('paymentInvoiceId').value = invoiceId;
+            document.getElementById('paymentAmountDue').value = `$${balanceDue.toFixed(2)}`;
+            document.getElementById('paymentAmount').value = balanceDue.toFixed(2);
+            document.getElementById('paymentAmount').max = balanceDue;
+            
+            // Reset form
+            document.getElementById('paymentMethod').value = '';
+            document.getElementById('paymentReference').value = '';
+            document.getElementById('paymentAlert').innerHTML = '';
+            
+            document.getElementById('paymentModal').classList.add('active');
+        }
+        
+        // Close Payment Modal
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+            currentInvoiceId = null;
+        }
+        
+        // Record Payment
+        async function recordPayment() {
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+            const method = document.getElementById('paymentMethod').value;
+            const reference = document.getElementById('paymentReference').value;
+            
+            if (!amount || amount <= 0) {
+                showPaymentAlert('Please enter a valid payment amount', 'error');
+                return;
+            }
+            
+            if (!method) {
+                showPaymentAlert('Please select a payment method', 'error');
+                return;
+            }
+            
+            try {
+                const result = await invoiceService.recordPayment(currentInvoiceId, {
+                    amount: amount,
+                    method: method,
+                    reference: reference
+                });
+                
+                if (result.success) {
+                    showSuccess('Payment recorded successfully!');
+                    closePaymentModal();
+                    loadInvoices();
+                } else {
+                    showPaymentAlert('Failed to record payment', 'error');
+                }
+            } catch (error) {
+                console.error('Error recording payment:', error);
+                showPaymentAlert('Error recording payment', 'error');
+            }
+        }
+        
+        // Send Reminder
+        async function sendReminder(invoiceId) {
+            if (!confirm('Send a payment reminder for this invoice?')) {
+                return;
+            }
+            
+            try {
+                const result = await invoiceService.sendReminder(invoiceId);
+                if (result.success) {
+                    showSuccess('Reminder sent successfully!');
+                    loadInvoices();
+                } else {
+                    showError('Failed to send reminder');
+                }
+            } catch (error) {
+                console.error('Error sending reminder:', error);
+                showError('Error sending reminder');
+            }
+        }
+        
+        // Export Invoices
+        function exportInvoices() {
+            // Apply current filters
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            
+            let exportData = allInvoices;
+            
+            // Apply same filters as display
+            if (searchTerm) {
+                exportData = exportData.filter(invoice => 
+                    invoice.InvoiceID.toLowerCase().includes(searchTerm) ||
+                    (invoice.CustomerName && invoice.CustomerName.toLowerCase().includes(searchTerm)) ||
+                    (invoice.ProjectName && invoice.ProjectName.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            if (statusFilter) {
+                exportData = exportData.filter(invoice => invoice.Status === statusFilter);
+            }
+            
+            // Create CSV
+            const headers = ['Invoice ID', 'Date', 'Customer', 'Company', 'Project', 'Type', 'Sales Rep', 'Status', 'Hours', 'Amount', 'Paid', 'Balance'];
+            const rows = exportData.map(invoice => [
+                invoice.InvoiceID,
+                formatDate(invoice.InvoiceDate),
+                invoice.CustomerName || '',
+                invoice.CustomerCompany || '',
+                invoice.ProjectName,
+                invoice.ProjectType,
+                invoice.SalesRepName || '',
+                invoice.Status,
+                invoice.TimeSpent || 0,
+                parseFloat(invoice.GrandTotal || 0).toFixed(2),
+                parseFloat(invoice.PaymentAmount || 0).toFixed(2),
+                parseFloat(invoice.BalanceDue || 0).toFixed(2)
+            ]);
+            
+            const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `art_invoices_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Refresh Invoices
+        function refreshInvoices() {
+            loadInvoices();
+            checkOverdueInvoices();
+        }
+        
+        // Utility Functions
+        function showLoading(show) {
+            document.getElementById('loadingState').style.display = show ? 'flex' : 'none';
+        }
+        
+        function showSuccess(message) {
+            // In a real app, this would show a toast notification
+            alert(message);
+        }
+        
+        function showError(message) {
+            // In a real app, this would show a toast notification
+            alert('Error: ' + message);
+        }
+        
+        function showPaymentAlert(message, type) {
+            const alertDiv = document.getElementById('paymentAlert');
+            alertDiv.innerHTML = `
+                <div class="alert alert-${type}">
+                    <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>
+                    ${message}
+                </div>
+            `;
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+        
+        function getStatusIcon(status) {
+            const icons = {
+                'Draft': '<i class="fas fa-file"></i>',
+                'Sent': '<i class="fas fa-paper-plane"></i>',
+                'Paid': '<i class="fas fa-check-circle"></i>',
+                'Partial': '<i class="fas fa-coins"></i>',
+                'Overdue': '<i class="fas fa-exclamation-triangle"></i>'
+            };
+            return icons[status] || '<i class="fas fa-circle"></i>';
+        }
+    </script>
+</body>
+</html>

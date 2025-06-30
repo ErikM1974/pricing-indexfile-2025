@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Art Invoice Creator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Art Invoice Service -->
+    <script src="art-invoice-service.js"></script>
+    
+    <style>
+        /* Root variables - NWCA Green Theme */
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+        }
+
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            font-size: 1.875rem;
+            color: var(--text-primary);
+        }
+
+        .page-title .icon {
+            width: 48px;
+            height: 48px;
+            background: var(--success-bg);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        label .required {
+            color: var(--error-text);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: var(--focus-shadow);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Search Request Section */
+        .search-section {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+        }
+
+        /* Request Results */
+        .request-results {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+        }
+
+        .request-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .request-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .request-item.selected {
+            background: var(--success-bg);
+            border-color: var(--primary-color);
+        }
+
+        .request-item:last-child {
+            border-bottom: none;
+        }
+
+        .request-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .request-details h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .request-details p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .request-date {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Time and Fees Section */
+        .calculation-section {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .fee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .fee-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fee-item input {
+            margin-top: 0.5rem;
+        }
+
+        /* Summary Box */
+        .summary-box {
+            background: var(--success-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.75rem;
+        }
+
+        .summary-item {
+            display: contents;
+        }
+
+        .summary-label {
+            color: var(--text-secondary);
+        }
+
+        .summary-value {
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .summary-total {
+            padding-top: 0.75rem;
+            border-top: 2px solid var(--primary-color);
+            margin-top: 0.75rem;
+        }
+
+        .summary-total .summary-value {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(76, 179, 84, 0.2);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #fca5a5;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .action-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Preview Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Invoice Preview Styles */
+        .invoice-preview {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .invoice-logo {
+            height: 60px;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .invoice-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .invoice-section p {
+            margin: 0.25rem 0;
+            font-size: 0.875rem;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+
+        .invoice-table th {
+            background: var(--bg-color);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .invoice-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .invoice-table .text-right {
+            text-align: right;
+        }
+
+        .invoice-totals {
+            margin-left: auto;
+            width: 300px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .total-row.grand-total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            border-top: 2px solid var(--border-color);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .alert-error {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        .alert-warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-controls {
+                flex-direction: column;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .action-group {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Staff Dashboard</a>
+                    <span>/</span>
+                    <span>Art Invoice Creator</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="page-title">
+            <div class="icon">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+            <h1>Create Art Invoice</h1>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Art Request Selection -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Select Art Request</h2>
+            </div>
+            
+            <div class="search-section">
+                <div class="search-controls">
+                    <input type="text" 
+                           id="searchInput" 
+                           class="search-input" 
+                           placeholder="Search by request ID, customer name, or project...">
+                    <button type="button" class="btn btn-secondary" onclick="searchArtRequests()">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                </div>
+                
+                <div id="requestResults" class="request-results" style="display: none;">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+
+            <div id="selectedRequest" style="display: none;">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Selected Request:</strong>
+                        <span id="selectedRequestInfo"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Form -->
+        <form id="invoiceForm" style="display: none;">
+            <!-- Project Details -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Project Details</h2>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="projectName">Project Name <span class="required">*</span></label>
+                        <input type="text" id="projectName" name="projectName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectType">Project Type <span class="required">*</span></label>
+                        <select id="projectType" name="projectType" required>
+                            <option value="">Select type...</option>
+                            <option value="Design">New Design</option>
+                            <option value="Revision">Revision</option>
+                            <option value="Digitization">Digitization</option>
+                            <option value="Vectorization">Vectorization</option>
+                            <option value="Mockup">Mockup</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="completionDate">Completion Date</label>
+                        <input type="date" id="completionDate" name="completionDate">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="complexity">Complexity</label>
+                        <select id="complexity" name="complexity">
+                            <option value="Simple">Simple</option>
+                            <option value="Standard" selected>Standard</option>
+                            <option value="Complex">Complex</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="artworkDescription">Artwork Description</label>
+                        <textarea id="artworkDescription" name="artworkDescription" rows="3"
+                                  placeholder="Describe the artwork created..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time and Billing -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Billing</h2>
+                </div>
+                
+                <div class="form-grid" style="display: none;">
+                    <div class="form-group">
+                        <label for="timeSpent">Time Spent (hours) <span class="required">*</span></label>
+                        <input type="number" 
+                               id="timeSpent" 
+                               name="timeSpent" 
+                               step="0.25" 
+                               min="0.25" 
+                               required
+                               onchange="calculateTotals()">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hourlyRate">Hourly Rate ($)</label>
+                        <input type="number" 
+                               id="hourlyRate" 
+                               name="hourlyRate" 
+                               value="75.00" 
+                               step="0.01" 
+                               min="0"
+                               onchange="calculateTotals()">
+                    </div>
+                </div>
+                
+                <div class="calculation-section">
+                    <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+                        <i class="fas fa-info-circle"></i>
+                        Art service amount is automatically pulled from the billing system
+                    </p>
+                    <h3 style="margin-bottom: 1rem;">Additional Fees</h3>
+                    <div class="fee-grid">
+                        <div class="fee-item">
+                            <label for="rushFee">Rush Fee ($)</label>
+                            <input type="number" 
+                                   id="rushFee" 
+                                   name="rushFee" 
+                                   value="0" 
+                                   step="0.01" 
+                                   min="0"
+                                   onchange="calculateTotals()">
+                        </div>
+                        
+                        <div class="fee-item">
+                            <label for="revisionFee">Revision Fee ($)</label>
+                            <input type="number" 
+                                   id="revisionFee" 
+                                   name="revisionFee" 
+                                   value="0" 
+                                   step="0.01" 
+                                   min="0"
+                                   onchange="calculateTotals()">
+                        </div>
+                        
+                        <div class="fee-item">
+                            <label for="otherFees">Other Fees ($)</label>
+                            <input type="number" 
+                                   id="otherFees" 
+                                   name="otherFees" 
+                                   value="0" 
+                                   step="0.01" 
+                                   min="0"
+                                   onchange="calculateTotals()">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-box">
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-label">Art Services:</span>
+                            <span class="summary-value" id="subtotalDisplay">$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Rush Fee:</span>
+                            <span class="summary-value" id="rushFeeDisplay">$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Revision Fee:</span>
+                            <span class="summary-value" id="revisionFeeDisplay">$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Other Fees:</span>
+                            <span class="summary-value" id="otherFeesDisplay">$0.00</span>
+                        </div>
+                        <div class="summary-item summary-total">
+                            <span class="summary-label">Grand Total:</span>
+                            <span class="summary-value" id="grandTotalDisplay">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Notes</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerNotes">Customer Notes</label>
+                    <textarea id="customerNotes" 
+                              name="customerNotes" 
+                              rows="3"
+                              placeholder="Notes that will be visible on the invoice..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="internalNotes">Internal Notes</label>
+                    <textarea id="internalNotes" 
+                              name="internalNotes" 
+                              rows="3"
+                              placeholder="Internal notes (not shown on invoice)..."></textarea>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <div class="action-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                        <input type="checkbox" id="saveAsDraft" checked>
+                        Save as Draft
+                    </label>
+                </div>
+                
+                <div class="action-group">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/staff-dashboard.html'">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="previewInvoice()">
+                        <i class="fas fa-eye"></i>
+                        Preview
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                        Create & Send Invoice
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Invoice Preview</h2>
+                <button class="modal-close" onclick="closePreview()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="previewContent">
+                <!-- Preview content will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePreview()">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Edit
+                </button>
+                <button class="btn btn-primary" onclick="submitInvoice()">
+                    <i class="fas fa-paper-plane"></i>
+                    Send Invoice
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize
+        let invoiceService;
+        let selectedRequest = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            invoiceService = new ArtInvoiceService();
+            
+            // Initialize EmailJS
+            emailjs.init('4qSbDO-SQs19TbP80');
+            
+            // Set default completion date to today
+            document.getElementById('completionDate').value = new Date().toISOString().split('T')[0];
+            
+            // Load initial art requests
+            searchArtRequests();
+            
+            // Form submit handler
+            document.getElementById('invoiceForm').addEventListener('submit', handleSubmit);
+        });
+        
+        // Search Art Requests
+        async function searchArtRequests() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const resultsDiv = document.getElementById('requestResults');
+            
+            // Show loading
+            resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center;"><div class="loading"></div></div>';
+            resultsDiv.style.display = 'block';
+            
+            try {
+                // Fetch art requests
+                const requests = await invoiceService.getArtRequests();
+                console.log(`[Art Invoice] Total requests fetched: ${requests.length}`);
+                console.log(`[Art Invoice] Completed requests: ${requests.filter(r => r.Status === 'Completed ✅').length}`);
+                
+                // Check what status values exist in the data
+                const statusCounts = {};
+                requests.forEach(req => {
+                    const status = req.Status || 'undefined';
+                    statusCounts[status] = (statusCounts[status] || 0) + 1;
+                });
+                console.log('[Art Invoice] Status values found:', statusCounts);
+                
+                // Check first few requests to see field structure
+                if (requests.length > 0) {
+                    console.log('[Art Invoice] Sample request fields:', Object.keys(requests[0]));
+                    console.log('[Art Invoice] First request:', requests[0]);
+                }
+                
+                // Filter for completed requests from June 15, 2025 forward
+                // Set cutoff to June 15, 2025 at midnight UTC to avoid timezone issues
+                const cutoffDate = new Date('2025-06-15T00:00:00Z');
+                console.log('[Art Invoice] Filtering requests after:', cutoffDate.toISOString());
+                
+                let filteredRequests = requests.filter(req => {
+                    // Check status is Completed (with checkmark emoji)
+                    if (req.Status !== 'Completed ✅') return false;
+                    
+                    // Check date is after June 15, 2025
+                    if (!req.Date_Created) {
+                        console.log('[Art Invoice] Request missing Date_Created:', req.ID_Design);
+                        return false;
+                    }
+                    
+                    try {
+                        const requestDate = new Date(req.Date_Created);
+                        if (isNaN(requestDate.getTime())) {
+                            console.log('[Art Invoice] Invalid date for request:', req.ID_Design, req.Date_Created);
+                            return false;
+                        }
+                        
+                        // Log first few dates for debugging
+                        if (requests.indexOf(req) < 5) {
+                            console.log(`[Art Invoice] Request ${req.ID_Design} date: ${requestDate.toISOString()} (${req.Date_Created})`);
+                        }
+                        
+                        // Compare using getTime() for reliable comparison
+                        return requestDate.getTime() >= cutoffDate.getTime();
+                    } catch (e) {
+                        console.error('[Art Invoice] Date parsing error for request:', req.ID_Design, req.Date_Created, e);
+                        return false;
+                    }
+                });
+                
+                // Further filter based on search term
+                if (searchTerm) {
+                    const term = searchTerm.toLowerCase();
+                    filteredRequests = filteredRequests.filter(req => 
+                        (req.ID_Design && req.ID_Design.toString().includes(term)) ||
+                        (req.CompanyName && req.CompanyName.toLowerCase().includes(term)) ||
+                        (req.NOTES && req.NOTES.toLowerCase().includes(term)) ||
+                        (req.Note_Mockup && req.Note_Mockup.toLowerCase().includes(term)) ||
+                        (req.Full_Name_Contact && req.Full_Name_Contact.toLowerCase().includes(term)) ||
+                        (req.shopwork_customer_number && req.shopwork_customer_number.toString().includes(term))
+                    );
+                }
+                
+                // Remove duplicates based on ID_Design
+                const uniqueRequests = [];
+                const seenIds = new Set();
+                filteredRequests.forEach(req => {
+                    if (!seenIds.has(req.ID_Design)) {
+                        seenIds.add(req.ID_Design);
+                        uniqueRequests.push(req);
+                    }
+                });
+                
+                console.log(`[Art Invoice] Filtered results: ${filteredRequests.length} requests, ${uniqueRequests.length} unique after removing duplicates`);
+                
+                // Sort by date, newest first
+                uniqueRequests.sort((a, b) => new Date(b.Date_Created) - new Date(a.Date_Created));
+                
+                // Display results
+                if (uniqueRequests.length === 0) {
+                    resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No completed art requests found after June 15, 2025. Make sure requests have status "Completed ✅" and were created after this date.</div>';
+                } else {
+                    resultsDiv.innerHTML = uniqueRequests.map(req => `
+                        <div class="request-item" onclick="selectRequest('${req.ID_Design}')">
+                            <div class="request-info">
+                                <div class="request-details">
+                                    <h4>${req.NOTES || req.Note_Mockup || 'Untitled Project'}</h4>
+                                    <p>${req.CompanyName || 'Unknown Company'} ${req.Full_Name_Contact ? `- ${req.Full_Name_Contact}` : ''}</p>
+                                    <p>Sales Rep: ${req.CustomerServiceRep || 'Unknown'} | Type: ${req.Order_Type_1 || req.Order_Type || 'N/A'}</p>
+                                    ${req.shopwork_customer_number ? `<p style="font-size: 0.875rem; color: var(--text-secondary);">SW Customer #${req.shopwork_customer_number}</p>` : ''}
+                                </div>
+                                <div>
+                                    <div class="request-date">ID: ${req.ID_Design}</div>
+                                    <div class="request-date">${formatDate(req.Date_Created)}</div>
+                                    ${req.Art_Minutes || req.Amount_Art_Billed ? `<div class="request-date" style="color: var(--primary-color); font-weight: 500;">${req.Art_Minutes ? (req.Art_Minutes / 60).toFixed(2) + ' hrs' : ''} ${req.Amount_Art_Billed ? '- $' + parseFloat(req.Amount_Art_Billed).toFixed(2) : ''}</div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error searching requests:', error);
+                resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--error-text);">Error loading requests</div>';
+            }
+        }
+        
+        // Helper function to get sales rep email from name
+        function getSalesRepEmail(repName) {
+            const repEmails = {
+                'Nika Lao': 'nika@nwcustomapparel.com',
+                'Taylar': 'taylar@nwcustomapparel.com',
+                'Taylar Hanson': 'taylar@nwcustomapparel.com',
+                'Ruth Nhong': 'ruth@nwcustomapparel.com',
+                'Ruth': 'ruth@nwcustomapparel.com',
+                'Erik Mickelson': 'erik@nwcustomapparel.com',
+                'Erik': 'erik@nwcustomapparel.com',
+                'Adriyella': 'adriyella@nwcustomapparel.com',
+                'Bradley Wright': 'bradley@nwcustomapparel.com',
+                'Bradley': 'bradley@nwcustomapparel.com',
+                'Jim Mickelson': 'jim@nwcustomapparel.com',
+                'Jim': 'jim@nwcustomapparel.com',
+                'Steve Deland': 'art@nwcustomapparel.com',
+                'Steve': 'art@nwcustomapparel.com'
+            };
+            return repEmails[repName] || 'sales@nwcustomapparel.com';
+        }
+        
+        // Select Art Request
+        async function selectRequest(requestId) {
+            try {
+                // Get the request from the already fetched data
+                const allRequests = await invoiceService.getArtRequests();
+                selectedRequest = allRequests.find(req => req.ID_Design == requestId);
+                
+                if (!selectedRequest) {
+                    showAlert('Request not found', 'error');
+                    return;
+                }
+                
+                // Update UI
+                document.getElementById('selectedRequest').style.display = 'block';
+                document.getElementById('selectedRequestInfo').textContent = 
+                    `#${selectedRequest.ID_Design} - ${selectedRequest.NOTES || selectedRequest.Note_Mockup || 'Untitled'} - ${selectedRequest.CompanyName || 'Unknown'}`;
+                
+                // Populate form fields
+                document.getElementById('projectName').value = selectedRequest.NOTES || selectedRequest.Note_Mockup || '';
+                document.getElementById('artworkDescription').value = selectedRequest.NOTES || selectedRequest.Note_Mockup || '';
+                
+                // Pre-fill billing amount from database
+                if (selectedRequest.Amount_Art_Billed) {
+                    // Use the Amount_Art_Billed as the source of truth
+                    const billedAmount = parseFloat(selectedRequest.Amount_Art_Billed);
+                    // Calculate implied hours for internal tracking (not shown on invoice)
+                    const impliedHours = (billedAmount / 75).toFixed(2);
+                    document.getElementById('timeSpent').value = impliedHours;
+                    document.getElementById('hourlyRate').value = '75.00';
+                } else if (selectedRequest.Art_Minutes) {
+                    // Fallback to minutes if no billed amount
+                    const hours = (selectedRequest.Art_Minutes / 60).toFixed(2);
+                    document.getElementById('timeSpent').value = hours;
+                    document.getElementById('hourlyRate').value = '75.00';
+                } else {
+                    document.getElementById('timeSpent').value = '1.00';
+                    document.getElementById('hourlyRate').value = '75.00';
+                }
+                
+                // Trigger calculation
+                calculateTotals();
+                
+                // Show form
+                document.getElementById('invoiceForm').style.display = 'block';
+                
+                // Hide search results
+                document.getElementById('requestResults').style.display = 'none';
+                
+                // Mark selected item
+                document.querySelectorAll('.request-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                const selectedItem = document.querySelector(`.request-item[onclick="selectRequest('${requestId}')"]`);
+                if (selectedItem) {
+                    selectedItem.classList.add('selected');
+                }
+                
+            } catch (error) {
+                console.error('Error selecting request:', error);
+                showAlert('Error selecting request', 'error');
+            }
+        }
+        
+        // Calculate Totals
+        function calculateTotals() {
+            const timeSpent = parseFloat(document.getElementById('timeSpent').value) || 0;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 75;
+            const rushFee = parseFloat(document.getElementById('rushFee').value) || 0;
+            const revisionFee = parseFloat(document.getElementById('revisionFee').value) || 0;
+            const otherFees = parseFloat(document.getElementById('otherFees').value) || 0;
+            
+            const subtotal = timeSpent * hourlyRate;
+            const grandTotal = subtotal + rushFee + revisionFee + otherFees;
+            
+            // Update display
+            document.getElementById('subtotalDisplay').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('rushFeeDisplay').textContent = `$${rushFee.toFixed(2)}`;
+            document.getElementById('revisionFeeDisplay').textContent = `$${revisionFee.toFixed(2)}`;
+            document.getElementById('otherFeesDisplay').textContent = `$${otherFees.toFixed(2)}`;
+            document.getElementById('grandTotalDisplay').textContent = `$${grandTotal.toFixed(2)}`;
+        }
+        
+        // Preview Invoice
+        function previewInvoice() {
+            if (!selectedRequest) {
+                showAlert('Please select an art request first', 'warning');
+                return;
+            }
+            
+            const formData = new FormData(document.getElementById('invoiceForm'));
+            const invoiceData = Object.fromEntries(formData);
+            
+            // Calculate totals
+            const timeSpent = parseFloat(invoiceData.timeSpent) || 0;
+            const hourlyRate = parseFloat(invoiceData.hourlyRate) || 75;
+            const rushFee = parseFloat(invoiceData.rushFee) || 0;
+            const revisionFee = parseFloat(invoiceData.revisionFee) || 0;
+            const otherFees = parseFloat(invoiceData.otherFees) || 0;
+            const subtotal = timeSpent * hourlyRate;
+            const grandTotal = subtotal + rushFee + revisionFee + otherFees;
+            
+            // Generate preview HTML
+            const previewHTML = `
+                <div class="invoice-preview">
+                    <div class="invoice-header">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" class="invoice-logo">
+                        <div class="invoice-title">
+                            <h1>ART INVOICE</h1>
+                            <p>Invoice ID: ${invoiceService.generateInvoiceID()}</p>
+                            <p>Date: ${new Date().toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-details">
+                        <div class="invoice-section">
+                            <h3>Bill To:</h3>
+                            <p><strong>${selectedRequest.CustomerServiceRep || 'Sales Representative'}</strong></p>
+                            <p>${getSalesRepEmail(selectedRequest.CustomerServiceRep || '')}</p>
+                            <p>Northwest Custom Apparel</p>
+                        </div>
+                        
+                        <div class="invoice-section">
+                            <h3>Customer:</h3>
+                            <p><strong>${selectedRequest.Full_Name_Contact || selectedRequest.First_name + ' ' + selectedRequest.Last_name || 'Unknown Customer'}</strong></p>
+                            <p>${selectedRequest.CompanyName || ''}</p>
+                            <p>${selectedRequest.Email_Contact || ''}</p>
+                            ${selectedRequest.Phone ? `<p>Phone: ${selectedRequest.Phone}</p>` : ''}
+                        </div>
+                    </div>
+                    
+                    ${(selectedRequest.shopwork_customer_number || selectedRequest.Design_Num_SW || selectedRequest.Order_Num_SW) ? `
+                    <div class="invoice-section" style="background: var(--bg-color); padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <h3 style="font-size: 0.875rem; margin-bottom: 0.5rem;">ShopWorks Reference:</h3>
+                        <div style="display: flex; gap: 2rem; font-size: 0.875rem;">
+                            ${selectedRequest.shopwork_customer_number ? `<span><strong>Customer #:</strong> ${selectedRequest.shopwork_customer_number}</span>` : ''}
+                            ${selectedRequest.Design_Num_SW ? `<span><strong>Design #:</strong> ${selectedRequest.Design_Num_SW}</span>` : ''}
+                            ${selectedRequest.Order_Num_SW ? `<span><strong>Order #:</strong> ${selectedRequest.Order_Num_SW}</span>` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="invoice-section">
+                        <h3>Project Details:</h3>
+                        <p><strong>Project:</strong> ${invoiceData.projectName}</p>
+                        <p><strong>Type:</strong> ${invoiceData.projectType}</p>
+                        <p><strong>Embellishment Type:</strong> ${selectedRequest.Order_Type_1 || selectedRequest.Order_Type || 'N/A'}</p>
+                        <p><strong>Complexity:</strong> ${invoiceData.complexity}</p>
+                        ${invoiceData.artworkDescription ? `<p><strong>Description:</strong> ${invoiceData.artworkDescription}</p>` : ''}
+                    </div>
+                    
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Art Services - ${invoiceData.projectName} - ${selectedRequest.Order_Type_1 || selectedRequest.Order_Type || 'General'}</td>
+                                <td class="text-right">$${subtotal.toFixed(2)}</td>
+                            </tr>
+                            ${rushFee > 0 ? `
+                            <tr>
+                                <td>Rush Fee</td>
+                                <td class="text-right">$${rushFee.toFixed(2)}</td>
+                            </tr>
+                            ` : ''}
+                            ${revisionFee > 0 ? `
+                            <tr>
+                                <td>Revision Fee</td>
+                                <td class="text-right">$${revisionFee.toFixed(2)}</td>
+                            </tr>
+                            ` : ''}
+                            ${otherFees > 0 ? `
+                            <tr>
+                                <td>Additional Fees</td>
+                                <td class="text-right">$${otherFees.toFixed(2)}</td>
+                            </tr>
+                            ` : ''}
+                        </tbody>
+                    </table>
+                    
+                    <div class="invoice-totals">
+                        <div class="total-row">
+                            <span>Subtotal:</span>
+                            <span>$${subtotal.toFixed(2)}</span>
+                        </div>
+                        ${(rushFee + revisionFee + otherFees) > 0 ? `
+                        <div class="total-row">
+                            <span>Additional Fees:</span>
+                            <span>$${(rushFee + revisionFee + otherFees).toFixed(2)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="total-row grand-total">
+                            <span>Total Due:</span>
+                            <span>$${grandTotal.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    
+                    ${invoiceData.customerNotes ? `
+                    <div class="invoice-section" style="margin-top: 2rem;">
+                        <h3>Notes:</h3>
+                        <p>${invoiceData.customerNotes}</p>
+                    </div>
+                    ` : ''}
+                    
+                    <div style="margin-top: 3rem; text-align: center; color: var(--text-secondary); font-size: 0.875rem;">
+                        <p>Payment due within 30 days</p>
+                        <p>Please reference Invoice ID: ${invoiceService.generateInvoiceID()} with payment</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('previewContent').innerHTML = previewHTML;
+            document.getElementById('previewModal').classList.add('active');
+        }
+        
+        // Close Preview
+        function closePreview() {
+            document.getElementById('previewModal').classList.remove('active');
+        }
+        
+        // Handle Form Submit
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            if (!selectedRequest) {
+                showAlert('Please select an art request first', 'warning');
+                return;
+            }
+            
+            const saveAsDraft = document.getElementById('saveAsDraft').checked;
+            if (saveAsDraft) {
+                await saveInvoice(true);
+            } else {
+                await submitInvoice();
+            }
+        }
+        
+        // Save Invoice
+        async function saveInvoice(asDraft = false) {
+            const formData = new FormData(document.getElementById('invoiceForm'));
+            const invoiceData = Object.fromEntries(formData);
+            
+            // Build customer name from available fields
+            let customerName = selectedRequest.Full_Name_Contact || '';
+            if (!customerName && (selectedRequest.First_name || selectedRequest.Last_name)) {
+                customerName = `${selectedRequest.First_name || ''} ${selectedRequest.Last_name || ''}`.trim();
+            }
+            
+            // Store ShopWorks references and other data in notes/file references
+            const shopWorksRefs = [];
+            if (selectedRequest.shopwork_customer_number) shopWorksRefs.push(`SW Customer #${selectedRequest.shopwork_customer_number}`);
+            if (selectedRequest.Design_Num_SW) shopWorksRefs.push(`SW Design #${selectedRequest.Design_Num_SW}`);
+            if (selectedRequest.Order_Num_SW) shopWorksRefs.push(`SW Order #${selectedRequest.Order_Num_SW}`);
+            
+            // Prepare invoice data
+            const invoice = {
+                artRequestID: selectedRequest.ID_Design,
+                artistName: 'Steve Deland',
+                artistEmail: 'art@nwcustomapparel.com',
+                salesRepName: selectedRequest.CustomerServiceRep || '',
+                salesRepEmail: getSalesRepEmail(selectedRequest.CustomerServiceRep || ''),
+                customerName: customerName || '',
+                customerCompany: selectedRequest.CompanyName || '',
+                customerEmail: selectedRequest.Email_Contact || '',
+                projectName: invoiceData.projectName,
+                projectType: invoiceData.projectType,
+                originalRequestDate: selectedRequest.Date_Created,
+                completionDate: invoiceData.completionDate,
+                timeSpent: parseFloat(invoiceData.timeSpent) || 0,
+                hourlyRate: parseFloat(invoiceData.hourlyRate) || 75,
+                rushFee: parseFloat(invoiceData.rushFee) || 0,
+                revisionFee: parseFloat(invoiceData.revisionFee) || 0,
+                otherFees: parseFloat(invoiceData.otherFees) || 0,
+                notes: invoiceData.internalNotes || '',
+                customerNotes: invoiceData.customerNotes || '',
+                artworkDescription: invoiceData.artworkDescription || '',
+                complexity: invoiceData.complexity,
+                ccEmails: 'erik@nwcustomapparel.com',
+                fileReferences: shopWorksRefs.join(' | ') || '',
+                priority: selectedRequest.Order_Type || 'Normal'
+            };
+            
+            // Show loading
+            showAlert('Saving invoice...', 'info');
+            
+            try {
+                const result = await invoiceService.createInvoice(invoice);
+                
+                if (result.success) {
+                    if (asDraft) {
+                        showAlert(`Invoice saved as draft! Invoice ID: ${result.invoiceID}`, 'success');
+                        setTimeout(() => {
+                            window.location.href = '/art-invoices-dashboard.html';
+                        }, 2000);
+                    } else {
+                        // Continue to send email
+                        await sendInvoiceEmail(result.invoiceID, result.data);
+                    }
+                } else {
+                    showAlert('Error saving invoice: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error saving invoice:', error);
+                showAlert('Error saving invoice', 'error');
+            }
+        }
+        
+        // Submit Invoice (Save and Send)
+        async function submitInvoice() {
+            closePreview();
+            await saveInvoice(false);
+        }
+        
+        // Send Invoice Email
+        async function sendInvoiceEmail(invoiceID, invoiceData) {
+            // Calculate totals for email
+            const subtotal = invoiceData.SubtotalAmount;
+            const grandTotal = invoiceData.GrandTotal;
+            
+            // Prepare email data
+            const emailData = {
+                // System fields
+                to_email: invoiceData.SalesRepEmail,
+                reply_to: invoiceData.ArtistEmail,
+                from_name: 'Northwest Custom Apparel Art Department',
+                
+                // Invoice details
+                invoice_id: invoiceID,
+                invoice_date: new Date().toLocaleDateString(),
+                due_date: new Date(invoiceData.DueDate).toLocaleDateString(),
+                
+                // Recipient info
+                sales_rep_name: invoiceData.SalesRepName,
+                sales_rep_email: invoiceData.SalesRepEmail,
+                
+                // Customer info
+                customer_name: invoiceData.CustomerName,
+                customer_company: invoiceData.CustomerCompany || 'Not Provided',
+                
+                // Project details
+                project_name: invoiceData.ProjectName,
+                project_type: invoiceData.ProjectType,
+                artwork_description: invoiceData.ArtworkDescription || 'See attached invoice for details',
+                
+                // Time and billing
+                time_spent: invoiceData.TimeSpent.toFixed(2),
+                hourly_rate: invoiceData.HourlyRate.toFixed(2),
+                subtotal: subtotal.toFixed(2),
+                
+                // Additional fees
+                rush_fee: invoiceData.RushFee.toFixed(2),
+                revision_fee: invoiceData.RevisionFee.toFixed(2),
+                other_fees: invoiceData.OtherFees.toFixed(2),
+                
+                // Totals
+                grand_total: grandTotal.toFixed(2),
+                
+                // Notes
+                notes: invoiceData.CustomerNotes || 'No additional notes',
+                
+                // Company info
+                company_phone: '253-922-5793',
+                company_year: '1977'
+            };
+            
+            try {
+                // Send email using EmailJS
+                await emailjs.send(
+                    'service_1c4k67j',
+                    'art_invoice',
+                    emailData
+                );
+                
+                // Update invoice status
+                await invoiceService.markInvoiceAsSent(invoiceID, invoiceData.SalesRepEmail);
+                
+                showAlert(`Invoice sent successfully! Invoice ID: ${invoiceID}`, 'success');
+                setTimeout(() => {
+                    window.location.href = '/art-invoices-dashboard.html';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error sending email:', error);
+                showAlert('Invoice saved but email failed to send. Please try again from the dashboard.', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/art-invoices-dashboard.html';
+                }, 3000);
+            }
+        }
+        
+        // Show Alert
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            
+            const icon = type === 'success' ? 'check-circle' : 
+                        type === 'error' ? 'exclamation-circle' : 
+                        type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+            
+            alertDiv.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        // Format Date
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+    </script>
+</body>
+</html>
