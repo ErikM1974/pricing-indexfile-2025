@@ -4,6 +4,8 @@
 
 This blueprint is based on the successful Customer Supplied Embroidery Calculator and provides a complete template for building professional pricing calculators with quote functionality, database integration, email capabilities, and print features.
 
+**Note**: While this blueprint focuses on pricing calculators, the same architecture can be used for non-pricing tools like the Safety Stripe Creator - a visual design tool that uses the quote system for tracking and communication without calculating prices.
+
 ## Table of Contents
 
 1. [File Structure](#file-structure)

@@ -657,3 +657,56 @@ const description = `Extra Thread Color${extraColors > 1 ? 's' : ''} (${extraCol
 - [ ] All calculations match expected values
 - [ ] Error messages are user-friendly
 - [ ] Mobile responsive design works
+
+## Active Calculators Registry
+
+### Pricing Calculators
+- **DTG Contract** (DTG)
+  - File: /calculators/dtg-contract.html
+  - Contact: Taylar Hanson
+  - Type: Contract pricing for blank apparel
+  
+- **Richardson Caps** (RICH)
+  - File: /calculators/richardson-2025.html
+  - Contact: General Sales
+  - Type: Cap pricing from Richardson vendor
+  
+- **Embroidery Contract** (EMB)
+  - File: /calculators/embroidery-contract.html
+  - Contact: Ruthie
+  - Type: Flat & cap embroidery pricing
+  
+- **Customer Supplied Embroidery** (EMBC)
+  - File: /calculators/embroidery-customer.html
+  - Contact: General Sales
+  - Type: Embroidery for customer-supplied garments
+  
+- **Laser Tumblers** (LT)
+  - File: /calculators/laser-tumbler-polarcamel.html
+  - Contact: General Sales
+  - Type: Polar Camel 16 oz laser engraved tumblers
+  
+- **Embroidered Emblems** (PATCH)
+  - File: /calculators/embroidered-emblem-calculator.html
+  - Contact: Jim Mickelson
+  - Type: Custom embroidered emblem and patch pricing
+  
+- **Customer Screen Print** (SPC)
+  - File: /calculators/screenprint-customer.html
+  - Contact: General Sales
+  - Type: Screen printing for customer-supplied items
+
+### Design Tools (Non-Pricing)
+- **Safety Stripe Creator** (SSC)
+  - File: /calculators/safety-stripe-creator.html
+  - Service: /calculators/safety-stripe-creator-service.js
+  - Contact: General Sales
+  - Type: Visual design tool for safety stripe layouts
+  - Added: January 2025
+  - Special Features:
+    - No pricing calculations
+    - Visual stripe selection (4 styles)
+    - Front and back placement options
+    - EmailJS integration for sending designs
+    - Database tracking of sent designs
+    - Orange safety theme (#ff6b35)
