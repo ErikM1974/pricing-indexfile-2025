@@ -12,8 +12,8 @@
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
-    <!-- Art Invoice Service -->
-    <script src="calculators/art-invoice-service.js"></script>
+    <!-- Art Invoice Service V2 -->
+    <script src="calculators/art-invoice-service-v2.js"></script>
     
     <style>
         /* Root variables - NWCA Green Theme */
@@ -630,7 +630,7 @@
         let invoiceId = null;
         
         document.addEventListener('DOMContentLoaded', async function() {
-            invoiceService = new ArtInvoiceService();
+            invoiceService = new ArtInvoiceServiceV2();
             
             // Initialize EmailJS
             emailjs.init('4qSbDO-SQs19TbP80');

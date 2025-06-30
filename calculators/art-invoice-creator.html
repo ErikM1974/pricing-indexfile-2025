@@ -12,8 +12,8 @@
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
-    <!-- Art Invoice Service -->
-    <script src="art-invoice-service.js"></script>
+    <!-- Art Invoice Service V2 - Using dedicated API endpoints -->
+    <script src="art-invoice-service-v2.js"></script>
     
     <style>
         /* Root variables - NWCA Green Theme */
@@ -330,6 +330,85 @@
 
         .summary-total .summary-value {
             font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+
+        /* Tax Section */
+        .tax-section {
+            background: var(--warning-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            border: 2px solid #f59e0b;
+        }
+
+        .tax-section h3 {
+            color: var(--warning-text);
+            margin-bottom: 1rem;
+        }
+
+        .tax-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tax-checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+        }
+
+        .checkbox-text {
+            color: var(--warning-text);
+        }
+
+        .reseller-permit-section {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .field-help {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        .tax-amount-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 6px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .tax-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tax-value {
+            font-size: 1.125rem;
+            font-weight: 700;
             color: var(--primary-color);
         }
 
@@ -802,6 +881,40 @@
                     </div>
                 </div>
                 
+                <!-- Sales Tax Section -->
+                <div class="tax-section">
+                    <h3 style="margin-bottom: 1rem;">Sales Tax (WA State 10.20%)</h3>
+                    <div class="tax-controls">
+                        <div class="tax-checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" 
+                                       id="applyTax" 
+                                       name="applyTax" 
+                                       checked
+                                       onchange="handleTaxToggle()">
+                                <span class="checkbox-text">Apply Washington State Sales Tax (10.20%)</span>
+                            </label>
+                        </div>
+                        
+                        <div class="reseller-permit-section" id="resellerPermitSection" style="display: none;">
+                            <div class="form-group">
+                                <label for="resellerPermit">WA State Reseller Permit Number <span class="required">*</span></label>
+                                <input type="text" 
+                                       id="resellerPermit" 
+                                       name="resellerPermit" 
+                                       placeholder="Enter valid WA State reseller permit number"
+                                       onchange="validateResellerPermit()">
+                                <div class="field-help">Tax exemption requires a valid Washington State reseller permit</div>
+                            </div>
+                        </div>
+                        
+                        <div class="tax-amount-display">
+                            <span class="tax-label">Tax Amount:</span>
+                            <span class="tax-value" id="taxAmountDisplay">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="summary-box">
                     <div class="summary-grid">
                         <div class="summary-item">
@@ -819,6 +932,10 @@
                         <div class="summary-item">
                             <span class="summary-label">Other Fees:</span>
                             <span class="summary-value" id="otherFeesDisplay">$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Tax Amount:</span>
+                            <span class="summary-value" id="taxDisplay">$0.00</span>
                         </div>
                         <div class="summary-item summary-total">
                             <span class="summary-label">Grand Total:</span>
@@ -909,7 +1026,7 @@
         let selectedRequest = null;
         
         document.addEventListener('DOMContentLoaded', function() {
-            invoiceService = new ArtInvoiceService();
+            invoiceService = new ArtInvoiceServiceV2();
             
             // Initialize EmailJS
             emailjs.init('4qSbDO-SQs19TbP80');
@@ -923,6 +1040,37 @@
             // Form submit handler
             document.getElementById('invoiceForm').addEventListener('submit', handleSubmit);
         });
+        
+        // Helper function to extract order type
+        function getOrderType(request) {
+            if (!request) return 'General';
+            
+            // Check if Order_Type_1 or Order_Type is an object
+            let orderType = '';
+            
+            if (request.Order_Type_1) {
+                if (typeof request.Order_Type_1 === 'object') {
+                    // If it's an object, try to get a meaningful value
+                    orderType = request.Order_Type_1.value || request.Order_Type_1.name || request.Order_Type_1.text || JSON.stringify(request.Order_Type_1);
+                } else {
+                    orderType = request.Order_Type_1;
+                }
+            } else if (request.Order_Type) {
+                if (typeof request.Order_Type === 'object') {
+                    // If it's an object, try to get a meaningful value
+                    orderType = request.Order_Type.value || request.Order_Type.name || request.Order_Type.text || JSON.stringify(request.Order_Type);
+                } else {
+                    orderType = request.Order_Type;
+                }
+            }
+            
+            // Clean up the result
+            if (orderType && orderType !== '[object Object]') {
+                return orderType;
+            }
+            
+            return 'General';
+        }
         
         // Search Art Requests
         async function searchArtRequests() {
@@ -1026,7 +1174,7 @@
                                 <div class="request-details">
                                     <h4>${req.NOTES || req.Note_Mockup || 'Untitled Project'}</h4>
                                     <p>${req.CompanyName || 'Unknown Company'} ${req.Full_Name_Contact ? `- ${req.Full_Name_Contact}` : ''}</p>
-                                    <p>Sales Rep: ${req.CustomerServiceRep || 'Unknown'} | Type: ${req.Order_Type_1 || req.Order_Type || 'N/A'}</p>
+                                    <p>Sales Rep: ${req.CustomerServiceRep || 'Unknown'} | Type: ${getOrderType(req)}</p>
                                     ${req.shopwork_customer_number ? `<p style="font-size: 0.875rem; color: var(--text-secondary);">SW Customer #${req.shopwork_customer_number}</p>` : ''}
                                 </div>
                                 <div>
@@ -1137,14 +1285,63 @@
             const otherFees = parseFloat(document.getElementById('otherFees').value) || 0;
             
             const subtotal = timeSpent * hourlyRate;
-            const grandTotal = subtotal + rushFee + revisionFee + otherFees;
+            const totalBeforeTax = subtotal + rushFee + revisionFee + otherFees;
+            
+            // Calculate tax
+            const applyTax = document.getElementById('applyTax').checked;
+            const taxRate = 0.1020; // 10.20% WA state sales tax
+            const taxAmount = applyTax ? totalBeforeTax * taxRate : 0;
+            const grandTotal = totalBeforeTax + taxAmount;
             
             // Update display
             document.getElementById('subtotalDisplay').textContent = `$${subtotal.toFixed(2)}`;
             document.getElementById('rushFeeDisplay').textContent = `$${rushFee.toFixed(2)}`;
             document.getElementById('revisionFeeDisplay').textContent = `$${revisionFee.toFixed(2)}`;
             document.getElementById('otherFeesDisplay').textContent = `$${otherFees.toFixed(2)}`;
+            document.getElementById('taxDisplay').textContent = `$${taxAmount.toFixed(2)}`;
+            document.getElementById('taxAmountDisplay').textContent = `$${taxAmount.toFixed(2)}`;
             document.getElementById('grandTotalDisplay').textContent = `$${grandTotal.toFixed(2)}`;
+        }
+        
+        // Handle tax checkbox toggle
+        function handleTaxToggle() {
+            const applyTax = document.getElementById('applyTax').checked;
+            const resellerSection = document.getElementById('resellerPermitSection');
+            const resellerInput = document.getElementById('resellerPermit');
+            
+            if (!applyTax) {
+                // Show reseller permit field when tax is unchecked
+                resellerSection.style.display = 'block';
+                resellerInput.required = true;
+            } else {
+                // Hide reseller permit field when tax is checked
+                resellerSection.style.display = 'none';
+                resellerInput.required = false;
+                resellerInput.value = '';
+            }
+            
+            // Recalculate totals
+            calculateTotals();
+        }
+        
+        // Validate reseller permit number
+        function validateResellerPermit() {
+            const permitInput = document.getElementById('resellerPermit');
+            const permitNumber = permitInput.value.trim();
+            
+            if (!permitNumber) {
+                permitInput.setCustomValidity('Reseller permit number is required for tax exemption');
+                return false;
+            }
+            
+            // Basic validation - WA state reseller permits are typically 8-9 digits
+            if (!/^\d{8,9}$/.test(permitNumber)) {
+                permitInput.setCustomValidity('Please enter a valid WA State reseller permit number (8-9 digits)');
+                return false;
+            }
+            
+            permitInput.setCustomValidity('');
+            return true;
         }
         
         // Preview Invoice
@@ -1157,14 +1354,20 @@
             const formData = new FormData(document.getElementById('invoiceForm'));
             const invoiceData = Object.fromEntries(formData);
             
-            // Calculate totals
+            // Calculate totals with tax
             const timeSpent = parseFloat(invoiceData.timeSpent) || 0;
             const hourlyRate = parseFloat(invoiceData.hourlyRate) || 75;
             const rushFee = parseFloat(invoiceData.rushFee) || 0;
             const revisionFee = parseFloat(invoiceData.revisionFee) || 0;
             const otherFees = parseFloat(invoiceData.otherFees) || 0;
             const subtotal = timeSpent * hourlyRate;
-            const grandTotal = subtotal + rushFee + revisionFee + otherFees;
+            const totalBeforeTax = subtotal + rushFee + revisionFee + otherFees;
+            
+            // Tax calculation
+            const applyTax = document.getElementById('applyTax').checked;
+            const taxRate = 0.1020; // 10.20% WA state sales tax
+            const taxAmount = applyTax ? totalBeforeTax * taxRate : 0;
+            const grandTotal = totalBeforeTax + taxAmount;
             
             // Generate preview HTML
             const previewHTML = `
@@ -1174,7 +1377,7 @@
                              alt="Northwest Custom Apparel" class="invoice-logo">
                         <div class="invoice-title">
                             <h1>ART INVOICE</h1>
-                            <p>Invoice ID: ${invoiceService.generateInvoiceID()}</p>
+                            <p>Invoice ID: ART-${selectedRequest.ID_Design}</p>
                             <p>Date: ${new Date().toLocaleDateString()}</p>
                         </div>
                     </div>
@@ -1211,7 +1414,7 @@
                         <h3>Project Details:</h3>
                         <p><strong>Project:</strong> ${invoiceData.projectName}</p>
                         <p><strong>Type:</strong> ${invoiceData.projectType}</p>
-                        <p><strong>Embellishment Type:</strong> ${selectedRequest.Order_Type_1 || selectedRequest.Order_Type || 'N/A'}</p>
+                        <p><strong>Embellishment Type:</strong> ${getOrderType(selectedRequest)}</p>
                         <p><strong>Complexity:</strong> ${invoiceData.complexity}</p>
                         ${invoiceData.artworkDescription ? `<p><strong>Description:</strong> ${invoiceData.artworkDescription}</p>` : ''}
                     </div>
@@ -1225,7 +1428,7 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Art Services - ${invoiceData.projectName} - ${selectedRequest.Order_Type_1 || selectedRequest.Order_Type || 'General'}</td>
+                                <td>Art Services - ${invoiceData.projectName} - ${getOrderType(selectedRequest)}</td>
                                 <td class="text-right">$${subtotal.toFixed(2)}</td>
                             </tr>
                             ${rushFee > 0 ? `
@@ -1260,6 +1463,17 @@
                             <span>$${(rushFee + revisionFee + otherFees).toFixed(2)}</span>
                         </div>
                         ` : ''}
+                        ${taxAmount > 0 ? `
+                        <div class="total-row">
+                            <span>WA State Sales Tax (10.20%):</span>
+                            <span>$${taxAmount.toFixed(2)}</span>
+                        </div>
+                        ` : `
+                        <div class="total-row">
+                            <span>Sales Tax:</span>
+                            <span>Tax Exempt</span>
+                        </div>
+                        `}
                         <div class="total-row grand-total">
                             <span>Total Due:</span>
                             <span>$${grandTotal.toFixed(2)}</span>
@@ -1275,7 +1489,7 @@
                     
                     <div style="margin-top: 3rem; text-align: center; color: var(--text-secondary); font-size: 0.875rem;">
                         <p>Payment due within 30 days</p>
-                        <p>Please reference Invoice ID: ${invoiceService.generateInvoiceID()} with payment</p>
+                        <p>Please reference Invoice ID: ART-${selectedRequest.ID_Design} with payment</p>
                     </div>
                 </div>
             `;
@@ -1296,6 +1510,15 @@
             if (!selectedRequest) {
                 showAlert('Please select an art request first', 'warning');
                 return;
+            }
+            
+            // Validate tax exemption if tax is not applied
+            const applyTax = document.getElementById('applyTax').checked;
+            if (!applyTax) {
+                if (!validateResellerPermit()) {
+                    showAlert('Valid Washington State reseller permit is required for tax exemption', 'error');
+                    return;
+                }
             }
             
             const saveAsDraft = document.getElementById('saveAsDraft').checked;
@@ -1325,6 +1548,7 @@
             
             // Prepare invoice data
             const invoice = {
+                idDesign: selectedRequest.ID_Design,  // This is the key field for linking
                 artRequestID: selectedRequest.ID_Design,
                 artistName: 'Steve Deland',
                 artistEmail: 'art@nwcustomapparel.com',
@@ -1342,13 +1566,18 @@
                 rushFee: parseFloat(invoiceData.rushFee) || 0,
                 revisionFee: parseFloat(invoiceData.revisionFee) || 0,
                 otherFees: parseFloat(invoiceData.otherFees) || 0,
+                taxAmount: parseFloat(invoiceData.applyTax === 'on' ? 
+                    (parseFloat(invoiceData.timeSpent || 0) * parseFloat(invoiceData.hourlyRate || 75) + 
+                     parseFloat(invoiceData.rushFee || 0) + parseFloat(invoiceData.revisionFee || 0) + 
+                     parseFloat(invoiceData.otherFees || 0)) * 0.1020 : 0),
+                resellerPermit: invoiceData.applyTax === 'on' ? '' : (invoiceData.resellerPermit || ''),
                 notes: invoiceData.internalNotes || '',
                 customerNotes: invoiceData.customerNotes || '',
                 artworkDescription: invoiceData.artworkDescription || '',
                 complexity: invoiceData.complexity,
                 ccEmails: 'erik@nwcustomapparel.com',
                 fileReferences: shopWorksRefs.join(' | ') || '',
-                priority: selectedRequest.Order_Type || 'Normal'
+                priority: getOrderType(selectedRequest) || 'Normal'
             };
             
             // Show loading
@@ -1388,7 +1617,19 @@
             const subtotal = invoiceData.SubtotalAmount;
             const grandTotal = invoiceData.GrandTotal;
             
-            // Prepare email data
+            // Get ShopWorks references from selected request
+            let shopworksRefs = '';
+            if (selectedRequest.shopwork_customer_number) {
+                shopworksRefs += `Customer #${selectedRequest.shopwork_customer_number} `;
+            }
+            if (selectedRequest.Design_Num_SW) {
+                shopworksRefs += `Design #${selectedRequest.Design_Num_SW} `;
+            }
+            if (selectedRequest.Order_Num_SW) {
+                shopworksRefs += `Order #${selectedRequest.Order_Num_SW}`;
+            }
+            
+            // Prepare email data matching the template variables
             const emailData = {
                 // System fields
                 to_email: invoiceData.SalesRepEmail,
@@ -1400,6 +1641,9 @@
                 invoice_date: new Date().toLocaleDateString(),
                 due_date: new Date(invoiceData.DueDate).toLocaleDateString(),
                 
+                // Design reference
+                id_design: selectedRequest.ID_Design,
+                
                 // Recipient info
                 sales_rep_name: invoiceData.SalesRepName,
                 sales_rep_email: invoiceData.SalesRepEmail,
@@ -1407,13 +1651,19 @@
                 // Customer info
                 customer_name: invoiceData.CustomerName,
                 customer_company: invoiceData.CustomerCompany || 'Not Provided',
+                customer_email: invoiceData.CustomerEmail || selectedRequest.Email_Contact || '',
+                customer_phone: selectedRequest.Phone || '',
                 
                 // Project details
                 project_name: invoiceData.ProjectName,
                 project_type: invoiceData.ProjectType,
+                order_type: getOrderType(selectedRequest),
                 artwork_description: invoiceData.ArtworkDescription || 'See attached invoice for details',
                 
-                // Time and billing
+                // Art service amount (from database)
+                amount_art_billed: invoiceData.SubtotalAmount.toFixed(2),
+                
+                // Time and billing (for internal reference in email)
                 time_spent: invoiceData.TimeSpent.toFixed(2),
                 hourly_rate: invoiceData.HourlyRate.toFixed(2),
                 subtotal: subtotal.toFixed(2),
@@ -1425,13 +1675,21 @@
                 
                 // Totals
                 grand_total: grandTotal.toFixed(2),
+                total_amount: grandTotal.toFixed(2), // Duplicate for template compatibility
+                
+                // ShopWorks references
+                shopworks_references: shopworksRefs.trim() || 'N/A',
                 
                 // Notes
                 notes: invoiceData.CustomerNotes || 'No additional notes',
                 
                 // Company info
                 company_phone: '253-922-5793',
-                company_year: '1977'
+                company_year: '1977',
+                
+                // Additional fields that might be in template
+                complexity: invoiceData.Complexity || 'Standard',
+                completion_date: invoiceData.CompletionDate ? new Date(invoiceData.CompletionDate).toLocaleDateString() : new Date().toLocaleDateString()
             };
             
             try {
