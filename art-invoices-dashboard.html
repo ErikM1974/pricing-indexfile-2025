@@ -9,8 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
-    <!-- Art Invoice Service -->
-    <script src="calculators/art-invoice-service.js"></script>
+    <!-- Art Invoice Service V2 - Using dedicated API endpoints -->
+    <script src="calculators/art-invoice-service-v2.js"></script>
     
     <style>
         /* Root variables - NWCA Green Theme */
@@ -588,10 +588,16 @@
                 </div>
                 <h1>Art Invoices</h1>
             </div>
-            <a href="/calculators/art-invoice-creator.html" class="btn btn-primary">
-                <i class="fas fa-plus"></i>
-                Create Invoice
-            </a>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="refreshInvoices()" title="Refresh invoice list">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+                <a href="/calculators/art-invoice-creator.html" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Create Invoice
+                </a>
+            </div>
         </div>
 
         <!-- Stats Cards -->
@@ -790,7 +796,7 @@
         let currentInvoiceId = null;
         
         document.addEventListener('DOMContentLoaded', function() {
-            invoiceService = new ArtInvoiceService();
+            invoiceService = new ArtInvoiceServiceV2();
             
             // Set default date range (last 30 days)
             const today = new Date();
@@ -813,6 +819,8 @@
             showLoading(true);
             
             try {
+                console.log('[Art Invoices] Loading invoices...');
+                
                 // Get current user email (in real app, this would come from session)
                 const currentUserEmail = localStorage.getItem('userEmail') || '';
                 const isSteve = currentUserEmail === 'art@nwcustomapparel.com';
@@ -820,6 +828,8 @@
                 // Fetch invoices
                 const filters = isSteve ? {} : { salesRepEmail: currentUserEmail };
                 allInvoices = await invoiceService.getInvoices(filters);
+                
+                console.log(`[Art Invoices] Loaded ${allInvoices.length} invoices`);
                 
                 // Apply filters and display
                 applyFilters();
@@ -830,6 +840,7 @@
             } catch (error) {
                 console.error('Error loading invoices:', error);
                 showError('Error loading invoices');
+                throw error; // Re-throw for refresh function to catch
             } finally {
                 showLoading(false);
             }
@@ -848,6 +859,7 @@
             if (searchTerm) {
                 filteredInvoices = filteredInvoices.filter(invoice => 
                     invoice.InvoiceID.toLowerCase().includes(searchTerm) ||
+                    (invoice.ArtRequestID && invoice.ArtRequestID.toString().includes(searchTerm)) ||
                     (invoice.CustomerName && invoice.CustomerName.toLowerCase().includes(searchTerm)) ||
                     (invoice.ProjectName && invoice.ProjectName.toLowerCase().includes(searchTerm)) ||
                     (invoice.CustomerCompany && invoice.CustomerCompany.toLowerCase().includes(searchTerm))
@@ -886,6 +898,8 @@
             const tbody = document.getElementById('invoicesTableBody');
             const emptyState = document.getElementById('emptyState');
             const table = document.getElementById('invoicesTable');
+            
+            console.log(`[Art Invoices] Displaying ${invoices.length} invoices`);
             
             if (invoices.length === 0) {
                 tbody.innerHTML = '';
@@ -940,11 +954,19 @@
                                     </button>
                                 ` : ''}
                                 ${(invoice.Status === 'Sent' || invoice.Status === 'Overdue' || invoice.Status === 'Partial') && balanceDue > 0 ? `
-                                    <button class="btn btn-secondary btn-icon btn-sm" 
-                                            onclick="openPaymentModal('${invoice.InvoiceID}', ${balanceDue})"
-                                            title="Record Payment">
-                                        <i class="fas fa-dollar-sign"></i>
+                                    <button class="btn btn-primary btn-sm" 
+                                            onclick="quickMarkPaid(${invoice.PK_ID}, '${invoice.InvoiceID}')"
+                                            title="Mark as Paid"
+                                            style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+                                        <i class="fas fa-check-circle"></i>
+                                        Paid
                                     </button>
+                                ` : ''}
+                                ${invoice.Status === 'Paid' ? `
+                                    <span style="color: var(--success-text); font-size: 0.75rem;">
+                                        <i class="fas fa-check"></i>
+                                        ${invoice.PaymentDate ? `Paid ${formatDate(invoice.PaymentDate)}` : 'Paid'}
+                                    </span>
                                 ` : ''}
                                 ${invoice.Status === 'Overdue' ? `
                                     <button class="btn btn-secondary btn-icon btn-sm" 
@@ -1181,9 +1203,55 @@
         }
         
         // Refresh Invoices
-        function refreshInvoices() {
-            loadInvoices();
-            checkOverdueInvoices();
+        async function refreshInvoices() {
+            // Update button to show loading state
+            const refreshButtons = document.querySelectorAll('button[onclick="refreshInvoices()"]');
+            refreshButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Refreshing...';
+            });
+            
+            try {
+                await loadInvoices();
+                await checkOverdueInvoices();
+                
+                // Show success feedback
+                const timestamp = new Date().toLocaleTimeString();
+                console.log(`[Art Invoices] Refreshed at ${timestamp}`);
+                
+                // Optional: Show a temporary success message
+                const tempMsg = document.createElement('div');
+                tempMsg.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--success-bg);
+                    color: var(--success-text);
+                    padding: 12px 20px;
+                    border-radius: 6px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    z-index: 9999;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                `;
+                tempMsg.innerHTML = '<i class="fas fa-check-circle"></i> Invoices refreshed successfully';
+                document.body.appendChild(tempMsg);
+                
+                setTimeout(() => {
+                    tempMsg.remove();
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Error refreshing invoices:', error);
+                showError('Failed to refresh invoices. Please try again.');
+            } finally {
+                // Restore button state
+                refreshButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                });
+            }
         }
         
         // Utility Functions
@@ -1226,6 +1294,77 @@
                 'Overdue': '<i class="fas fa-exclamation-triangle"></i>'
             };
             return icons[status] || '<i class="fas fa-circle"></i>';
+        }
+        
+        // Quick Mark as Paid function
+        async function quickMarkPaid(pkId, invoiceId) {
+            if (!confirm(`Mark invoice ${invoiceId} as paid?`)) {
+                return;
+            }
+            
+            try {
+                // Get current user (Bradley or whoever is logged in)
+                const modifiedBy = localStorage.getItem('userName') || 'Bradley';
+                
+                // Mark as paid using the service
+                const result = await invoiceService.quickMarkPaid(pkId, modifiedBy);
+                
+                if (result.success) {
+                    showSuccess(`Invoice ${invoiceId} marked as paid`);
+                    // Reload the invoices to show updated status
+                    loadInvoices();
+                } else {
+                    showError(result.error || 'Failed to mark invoice as paid');
+                }
+            } catch (error) {
+                console.error('Error marking invoice as paid:', error);
+                showError('Error marking invoice as paid');
+            }
+        }
+        
+        // Bulk payment actions
+        async function markSelectedAsPaid() {
+            const selectedInvoices = getSelectedInvoices();
+            if (selectedInvoices.length === 0) {
+                showError('Please select invoices to mark as paid');
+                return;
+            }
+            
+            if (!confirm(`Mark ${selectedInvoices.length} invoice(s) as paid?`)) {
+                return;
+            }
+            
+            const modifiedBy = localStorage.getItem('userName') || 'Bradley';
+            const results = await invoiceService.markMultiplePaid(selectedInvoices, modifiedBy);
+            
+            showSuccess(`Marked ${results.success.length} invoice(s) as paid`);
+            if (results.failed.length > 0) {
+                showError(`Failed to mark ${results.failed.length} invoice(s)`);
+            }
+            
+            loadInvoices();
+        }
+        
+        // Undo payment (same day only)
+        async function undoPayment(pkId, invoiceId) {
+            if (!confirm(`Undo payment for invoice ${invoiceId}? (Only allowed for same-day payments)`)) {
+                return;
+            }
+            
+            try {
+                const modifiedBy = localStorage.getItem('userName') || 'Bradley';
+                const result = await invoiceService.undoPayment(pkId, modifiedBy);
+                
+                if (result.success) {
+                    showSuccess(`Payment undone for invoice ${invoiceId}`);
+                    loadInvoices();
+                } else {
+                    showError(result.error || 'Failed to undo payment');
+                }
+            } catch (error) {
+                console.error('Error undoing payment:', error);
+                showError('Error undoing payment');
+            }
         }
     </script>
 </body>
