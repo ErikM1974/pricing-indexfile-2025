@@ -3,6 +3,82 @@ class ArtInvoiceServiceV2 {
     constructor() {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.hourlyRate = 75.00; // Default hourly rate
+        
+        // Service codes definition
+        this.serviceCodes = {
+            'GRT-25': {
+                code: 'GRT-25',
+                name: 'Quick Review',
+                description: 'Quick design consultation and file review for print readiness',
+                amount: 25.00,
+                minMinutes: 0,
+                maxMinutes: 15
+            },
+            'GRT-50': {
+                code: 'GRT-50',
+                name: 'Logo Mockup',
+                description: 'Logo mockup on ordered products with print readiness check for clarity and sizing (includes up to 2 revisions)',
+                amount: 50.00,
+                minMinutes: 16,
+                maxMinutes: 45
+            },
+            'GRT-75': {
+                code: 'GRT-75',
+                name: 'Custom Design',
+                description: 'Custom artwork creation with revisions included and print-ready files',
+                amount: 75.00,
+                minMinutes: 46,
+                maxMinutes: 75
+            },
+            'GRT-100': {
+                code: 'GRT-100',
+                name: 'Extended Design',
+                description: 'Extended design work for complex projects',
+                amount: 100.00,
+                minMinutes: 76,
+                maxMinutes: 105
+            },
+            'GRT-150': {
+                code: 'GRT-150',
+                name: 'Complex Project',
+                description: 'Comprehensive design services for complex multi-element projects',
+                amount: 150.00,
+                minMinutes: 106,
+                maxMinutes: 150
+            },
+            // Additional service codes
+            'GRT-ADD25': {
+                code: 'GRT-ADD25',
+                name: 'Additional Design Time',
+                description: 'Additional design time beyond included revisions',
+                amount: 25.00,
+                isAdditional: true
+            },
+            'GRT-ADD50': {
+                code: 'GRT-ADD50',
+                name: 'Extended Design Work',
+                description: 'Extended design work for major changes',
+                amount: 50.00,
+                isAdditional: true
+            },
+            'GRT-REV3': {
+                code: 'GRT-REV3',
+                name: 'Excessive Revisions',
+                description: 'Additional charge for 3+ revision rounds',
+                amount: 50.00,
+                isAdditional: true
+            },
+            'GRT-REDO': {
+                code: 'GRT-REDO',
+                name: 'Complete Design Redo',
+                description: 'Complete redesign from scratch',
+                amount: 75.00,
+                isAdditional: true
+            }
+        };
+        
+        // Rush service multiplier
+        this.rushMultiplier = 1.25; // 25% upcharge
     }
     
     // Generate invoice ID using ID_Design format: ART-{ID_Design}
@@ -41,6 +117,22 @@ class ArtInvoiceServiceV2 {
         if (!date) return null;
         const d = new Date(date);
         return d.toISOString().replace(/\.\d{3}Z$/, '');
+    }
+    
+    // Build notes field with service items data
+    buildNotesWithServiceItems(invoiceData) {
+        let notes = invoiceData.notes || '';
+        
+        // Add service items data if available
+        if (invoiceData.serviceItems) {
+            const serviceData = {
+                items: invoiceData.serviceItems,
+                summary: invoiceData.serviceSummary
+            };
+            notes += (notes ? '\n\n' : '') + '--- Service Items ---\n' + JSON.stringify(serviceData);
+        }
+        
+        return notes;
     }
     
     // ========== ART REQUESTS API METHODS ==========
@@ -135,6 +227,95 @@ class ArtInvoiceServiceV2 {
         });
     }
     
+    // Mark art request as invoiced with service code details
+    async markArtRequestAsInvoicedWithDetails(artRequestId, invoiceId, serviceCode, actualAmount, invoicedAmount) {
+        const note = `Invoiced: ${serviceCode} ($${invoicedAmount.toFixed(2)}) vs Actual: $${actualAmount.toFixed(2)}`;
+        return this.updateArtRequest(artRequestId, {
+            Invoiced: true,
+            Invoiced_Date: this.formatDateForCaspio(new Date()),
+            Invoice_Updated_Date: this.formatDateForCaspio(new Date()),
+            Note_Mockup: note
+        });
+    }
+    
+    // Suggest service code based on time spent
+    suggestServiceCode(minutes) {
+        // For standard services, find the appropriate tier
+        for (const [code, service] of Object.entries(this.serviceCodes)) {
+            if (!service.isAdditional && 
+                minutes >= service.minMinutes && 
+                minutes <= service.maxMinutes) {
+                return code;
+            }
+        }
+        
+        // If over 150 minutes, return custom
+        if (minutes > 150) {
+            return 'CUSTOM';
+        }
+        
+        // Default to GRT-25 for very small jobs
+        return 'GRT-25';
+    }
+    
+    // Get service code with rush if applicable
+    getServiceCodeWithRush(baseCode, isRush) {
+        if (!isRush || !baseCode || baseCode === 'CUSTOM') {
+            return baseCode;
+        }
+        return `${baseCode}-R`;
+    }
+    
+    // Calculate rush price
+    calculateRushPrice(baseAmount) {
+        return baseAmount * this.rushMultiplier;
+    }
+    
+    // Get all available service codes
+    getAllServiceCodes(includeRush = true) {
+        const codes = [];
+        
+        // Add standard and additional codes
+        Object.values(this.serviceCodes).forEach(service => {
+            codes.push(service);
+            
+            // Add rush versions for non-additional services
+            if (includeRush && !service.isAdditional) {
+                codes.push({
+                    ...service,
+                    code: `${service.code}-R`,
+                    name: `RUSH ${service.name}`,
+                    description: `${service.description} (Rush Service - 25% upcharge)`,
+                    amount: this.calculateRushPrice(service.amount),
+                    isRush: true
+                });
+            }
+        });
+        
+        return codes;
+    }
+    
+    // Get service details by code
+    getServiceByCode(code) {
+        // Check if it's a rush code
+        if (code.endsWith('-R')) {
+            const baseCode = code.substring(0, code.length - 2);
+            const baseService = this.serviceCodes[baseCode];
+            if (baseService) {
+                return {
+                    ...baseService,
+                    code: code,
+                    name: `RUSH ${baseService.name}`,
+                    description: `${baseService.description} (Rush Service - 25% upcharge)`,
+                    amount: this.calculateRushPrice(baseService.amount),
+                    isRush: true
+                };
+            }
+        }
+        
+        return this.serviceCodes[code] || null;
+    }
+    
     // ========== ART INVOICES API METHODS ==========
     
     // Create new invoice using dedicated API
@@ -158,10 +339,15 @@ class ArtInvoiceServiceV2 {
             const invoiceDate = new Date();
             const dueDate = new Date(invoiceDate.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
             
-            // Calculate amounts
+            // Calculate amounts - now supporting both service codes and hourly billing
             const timeSpent = parseFloat(invoiceData.timeSpent || 0);
             const hourlyRate = parseFloat(invoiceData.hourlyRate || this.hourlyRate);
-            const subtotal = parseFloat((timeSpent * hourlyRate).toFixed(2));
+            
+            // If subtotalAmount is provided (from service codes), use it directly
+            const subtotal = invoiceData.subtotalAmount !== undefined ? 
+                parseFloat(invoiceData.subtotalAmount) : 
+                parseFloat((timeSpent * hourlyRate).toFixed(2));
+            
             const rushFee = parseFloat(invoiceData.rushFee || 0);
             const revisionFee = parseFloat(invoiceData.revisionFee || 0);
             const otherFees = parseFloat(invoiceData.otherFees || 0);
@@ -209,13 +395,17 @@ class ArtInvoiceServiceV2 {
                 BalanceDue: grandTotal,
                 
                 // Additional details
-                Notes: invoiceData.notes || '',
+                Notes: this.buildNotesWithServiceItems(invoiceData),
                 CustomerNotes: invoiceData.customerNotes || '',
                 ArtworkDescription: invoiceData.artworkDescription || '',
                 FileReferences: invoiceData.fileReferences || '',
                 Complexity: invoiceData.complexity || 'Standard',
                 Priority: invoiceData.priority || 'Normal',
                 CCEmails: invoiceData.ccEmails || 'erik@nwcustomapparel.com',
+                
+                // Store service items data in Notes field (JSON format)
+                // ServiceItems and ServiceSummary fields might not exist in Caspio
+                // So we'll store this info in the Notes field instead
                 
                 // System fields
                 CreatedBy: invoiceData.createdBy || 'Steve',

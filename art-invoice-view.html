@@ -13,7 +13,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <!-- Art Invoice Service V2 -->
-    <script src="calculators/art-invoice-service-v2.js"></script>
+    <script src="calculators/art-invoice-service-v2.js?v=2.1"></script>
     
     <style>
         /* Root variables - NWCA Green Theme */
@@ -330,6 +330,17 @@
             background: var(--border-color);
         }
 
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+        }
+
         /* Payment Section */
         .payment-section {
             background: var(--success-bg);
@@ -497,6 +508,10 @@
                     <i class="fas fa-paper-plane"></i>
                     Send Email
                 </button>
+                <button id="voidBtn" class="btn btn-danger" onclick="voidCurrentInvoice()" style="display: none;">
+                    <i class="fas fa-ban"></i>
+                    Void Invoice
+                </button>
             </div>
         </div>
 
@@ -556,9 +571,9 @@
                 </div>
 
                 <!-- Invoice Table -->
-                <table class="invoice-table">
+                <table class="invoice-table" id="invoiceTable">
                     <thead>
-                        <tr>
+                        <tr id="tableHeader">
                             <th>Description</th>
                             <th class="text-right">Hours/Qty</th>
                             <th class="text-right">Rate</th>
@@ -579,6 +594,14 @@
                     <div id="additionalFeesRow" class="total-row" style="display: none;">
                         <span>Additional Fees:</span>
                         <span id="additionalFeesAmount">$0.00</span>
+                    </div>
+                    <div id="taxRow" class="total-row" style="display: none;">
+                        <span>WA State Sales Tax (10.20%):</span>
+                        <span id="taxAmount">$0.00</span>
+                    </div>
+                    <div id="taxExemptRow" class="total-row" style="display: none;">
+                        <span>Sales Tax:</span>
+                        <span>Tax Exempt</span>
                     </div>
                     <div class="total-row grand-total">
                         <span>Total Due:</span>
@@ -718,67 +741,120 @@
             
             // Build invoice table
             const tbody = document.getElementById('invoiceTableBody');
+            const tableHeader = document.getElementById('tableHeader');
             tbody.innerHTML = '';
             
-            // Main service row
-            const timeSpent = parseFloat(currentInvoice.TimeSpent || 0);
-            const hourlyRate = parseFloat(currentInvoice.HourlyRate || 0);
-            const subtotal = parseFloat(currentInvoice.SubtotalAmount || 0);
-            
-            tbody.innerHTML += `
-                <tr>
-                    <td>Art Services - ${currentInvoice.ProjectType || 'Design'}</td>
-                    <td class="text-right">${timeSpent.toFixed(2)} hours</td>
-                    <td class="text-right">$${hourlyRate.toFixed(2)}</td>
-                    <td class="text-right">$${subtotal.toFixed(2)}</td>
-                </tr>
-            `;
-            
-            // Additional fees
-            const rushFee = parseFloat(currentInvoice.RushFee || 0);
-            const revisionFee = parseFloat(currentInvoice.RevisionFee || 0);
-            const otherFees = parseFloat(currentInvoice.OtherFees || 0);
-            
-            if (rushFee > 0) {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>Rush Fee</td>
-                        <td class="text-right">1</td>
-                        <td class="text-right">$${rushFee.toFixed(2)}</td>
-                        <td class="text-right">$${rushFee.toFixed(2)}</td>
-                    </tr>
-                `;
+            // Check if this invoice uses service codes
+            if (currentInvoice.ServiceItems) {
+                try {
+                    // Parse service items from JSON
+                    const serviceItems = JSON.parse(currentInvoice.ServiceItems);
+                    
+                    // Update table headers for service code display
+                    tableHeader.innerHTML = `
+                        <th>Description</th>
+                        <th class="text-right">Service Code</th>
+                        <th class="text-right">-</th>
+                        <th class="text-right">Amount</th>
+                    `;
+                    
+                    // Display each service item
+                    serviceItems.forEach(item => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${item.description}</td>
+                                <td class="text-right">${item.code}</td>
+                                <td class="text-right">-</td>
+                                <td class="text-right">$${item.amount.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+                } catch (e) {
+                    console.error('Error parsing service items:', e);
+                    // Fall back to hourly display
+                    displayHourlyBilling();
+                }
+            } else {
+                // Use traditional hourly billing display
+                displayHourlyBilling();
             }
             
-            if (revisionFee > 0) {
+            function displayHourlyBilling() {
+                // Main service row
+                const timeSpent = parseFloat(currentInvoice.TimeSpent || 0);
+                const hourlyRate = parseFloat(currentInvoice.HourlyRate || 0);
+                const subtotal = parseFloat(currentInvoice.SubtotalAmount || 0);
+                
                 tbody.innerHTML += `
                     <tr>
-                        <td>Revision Fee</td>
-                        <td class="text-right">1</td>
-                        <td class="text-right">$${revisionFee.toFixed(2)}</td>
-                        <td class="text-right">$${revisionFee.toFixed(2)}</td>
+                        <td>Art Services - ${currentInvoice.ProjectType || 'Design'}</td>
+                        <td class="text-right">${timeSpent.toFixed(2)} hours</td>
+                        <td class="text-right">$${hourlyRate.toFixed(2)}</td>
+                        <td class="text-right">$${subtotal.toFixed(2)}</td>
                     </tr>
                 `;
-            }
-            
-            if (otherFees > 0) {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>Additional Fees</td>
-                        <td class="text-right">1</td>
-                        <td class="text-right">$${otherFees.toFixed(2)}</td>
-                        <td class="text-right">$${otherFees.toFixed(2)}</td>
-                    </tr>
-                `;
+                
+                // Additional fees
+                const rushFee = parseFloat(currentInvoice.RushFee || 0);
+                const revisionFee = parseFloat(currentInvoice.RevisionFee || 0);
+                const otherFees = parseFloat(currentInvoice.OtherFees || 0);
+                
+                if (rushFee > 0) {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>Rush Fee</td>
+                            <td class="text-right">1</td>
+                            <td class="text-right">$${rushFee.toFixed(2)}</td>
+                            <td class="text-right">$${rushFee.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }
+                
+                if (revisionFee > 0) {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>Revision Fee</td>
+                            <td class="text-right">1</td>
+                            <td class="text-right">$${revisionFee.toFixed(2)}</td>
+                            <td class="text-right">$${revisionFee.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }
+                
+                if (otherFees > 0) {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>Additional Fees</td>
+                            <td class="text-right">1</td>
+                            <td class="text-right">$${otherFees.toFixed(2)}</td>
+                            <td class="text-right">$${otherFees.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }
             }
             
             // Totals
+            const subtotal = parseFloat(currentInvoice.SubtotalAmount || 0);
             document.getElementById('subtotalAmount').textContent = `$${subtotal.toFixed(2)}`;
             
+            const rushFee = parseFloat(currentInvoice.RushFee || 0);
+            const revisionFee = parseFloat(currentInvoice.RevisionFee || 0);
+            const otherFees = parseFloat(currentInvoice.OtherFees || 0);
             const additionalFees = rushFee + revisionFee + otherFees;
             if (additionalFees > 0) {
                 document.getElementById('additionalFeesRow').style.display = 'flex';
                 document.getElementById('additionalFeesAmount').textContent = `$${additionalFees.toFixed(2)}`;
+            }
+            
+            // Sales tax display
+            const taxAmount = parseFloat(currentInvoice.TaxAmount || 0);
+            if (taxAmount > 0) {
+                document.getElementById('taxRow').style.display = 'flex';
+                document.getElementById('taxAmount').textContent = `$${taxAmount.toFixed(2)}`;
+                document.getElementById('taxExemptRow').style.display = 'none';
+            } else {
+                document.getElementById('taxRow').style.display = 'none';
+                document.getElementById('taxExemptRow').style.display = 'flex';
             }
             
             const grandTotal = parseFloat(currentInvoice.GrandTotal || 0);
@@ -805,6 +881,19 @@
                 document.getElementById('emailBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Send Invoice';
             } else {
                 document.getElementById('emailBtn').innerHTML = '<i class="fas fa-envelope"></i> Resend Invoice';
+            }
+            
+            // Update void button visibility - only show for appropriate statuses
+            const voidBtn = document.getElementById('voidBtn');
+            const canVoid = currentInvoice.Status && 
+                           currentInvoice.Status !== 'Voided' && 
+                           currentInvoice.Status !== 'Cancelled' &&
+                           !currentInvoice.IsDeleted;
+            
+            if (canVoid) {
+                voidBtn.style.display = 'inline-flex';
+            } else {
+                voidBtn.style.display = 'none';
             }
         }
         
@@ -841,10 +930,13 @@
                 project_type: currentInvoice.ProjectType || 'N/A',
                 artwork_description: currentInvoice.ArtworkDescription || 'See attached invoice for details',
                 
-                // Time and billing
+                // Time and billing - handle both service codes and hourly
                 time_spent: (currentInvoice.TimeSpent || 0).toFixed(2),
                 hourly_rate: (currentInvoice.HourlyRate || 0).toFixed(2),
                 subtotal: (currentInvoice.SubtotalAmount || 0).toFixed(2),
+                
+                // Service items for new billing method
+                service_items_html: '',
                 
                 // Additional fees
                 rush_fee: (currentInvoice.RushFee || 0).toFixed(2),
@@ -861,6 +953,43 @@
                 company_phone: '253-922-5793',
                 company_year: '1977'
             };
+            
+            // Build service items HTML if using service codes
+            if (currentInvoice.ServiceItems) {
+                try {
+                    const serviceItems = JSON.parse(currentInvoice.ServiceItems);
+                    let itemsHtml = `
+                        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Description</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Service Code</th>
+                                    <th style="padding: 10px; text-align: right; border: 1px solid #e5e7eb;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    serviceItems.forEach(item => {
+                        itemsHtml += `
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #e5e7eb;">${item.description}</td>
+                                <td style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">${item.code}</td>
+                                <td style="padding: 10px; text-align: right; border: 1px solid #e5e7eb;">$${item.amount.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    itemsHtml += `
+                            </tbody>
+                        </table>
+                    `;
+                    
+                    emailData.service_items_html = itemsHtml;
+                } catch (e) {
+                    console.error('Error building service items HTML:', e);
+                }
+            }
             
             try {
                 // Show loading
@@ -926,9 +1055,57 @@
                 'Sent': '<i class="fas fa-paper-plane"></i>',
                 'Paid': '<i class="fas fa-check-circle"></i>',
                 'Partial': '<i class="fas fa-coins"></i>',
-                'Overdue': '<i class="fas fa-exclamation-triangle"></i>'
+                'Overdue': '<i class="fas fa-exclamation-triangle"></i>',
+                'Voided': '<i class="fas fa-ban"></i>'
             };
             return icons[status] || '<i class="fas fa-circle"></i>';
+        }
+        
+        // Void Current Invoice
+        async function voidCurrentInvoice() {
+            if (!currentInvoice) {
+                alert('No invoice loaded to void.');
+                return;
+            }
+            
+            // Confirm the action
+            const confirmMessage = `Are you sure you want to void invoice ${currentInvoice.InvoiceID}?\n\nThis action cannot be undone and will:\n- Mark the invoice as voided\n- Allow a new invoice to be created for the same art request\n- Update the art request status\n\nClick OK to proceed or Cancel to abort.`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            // Prompt for reason
+            const reason = prompt('Please provide a reason for voiding this invoice (optional):') || 'No reason provided';
+            
+            try {
+                // Show loading state
+                const voidBtn = document.getElementById('voidBtn');
+                const originalText = voidBtn.innerHTML;
+                voidBtn.disabled = true;
+                voidBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Voiding...';
+                
+                // Call the void function from the service
+                const result = await invoiceService.voidInvoice(currentInvoice.PK_ID, 'User', reason);
+                
+                if (result.success) {
+                    alert(`Invoice ${currentInvoice.InvoiceID} has been successfully voided.`);
+                    
+                    // Redirect back to dashboard or reload to show voided status
+                    window.location.href = '/art-invoices-dashboard.html';
+                } else {
+                    throw new Error(result.error || 'Failed to void invoice');
+                }
+                
+            } catch (error) {
+                console.error('Error voiding invoice:', error);
+                alert('Failed to void invoice: ' + error.message);
+                
+                // Reset button
+                const voidBtn = document.getElementById('voidBtn');
+                voidBtn.disabled = false;
+                voidBtn.innerHTML = '<i class="fas fa-ban"></i> Void Invoice';
+            }
         }
     </script>
 </body>

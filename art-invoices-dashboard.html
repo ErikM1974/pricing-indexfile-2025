@@ -10,7 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
     <!-- Art Invoice Service V2 - Using dedicated API endpoints -->
-    <script src="calculators/art-invoice-service-v2.js"></script>
+    <script src="calculators/art-invoice-service-v2.js?v=2.1"></script>
     
     <style>
         /* Root variables - NWCA Green Theme */
@@ -798,11 +798,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             invoiceService = new ArtInvoiceServiceV2();
             
-            // Set default date range (last 30 days)
+            // Don't set default date range - show all invoices by default
+            // Users can filter by date if needed
             const today = new Date();
-            const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-            document.getElementById('dateTo').value = today.toISOString().split('T')[0];
-            document.getElementById('dateFrom').value = thirtyDaysAgo.toISOString().split('T')[0];
+            document.getElementById('dateTo').value = '';
+            document.getElementById('dateFrom').value = '';
             
             // Load invoices
             loadInvoices();
@@ -996,9 +996,35 @@
             };
             
             allInvoices.forEach(invoice => {
-                const status = invoice.Status.toLowerCase().replace(' ', '');
-                if (stats[status] !== undefined) {
-                    stats[status]++;
+                // Normalize status for counting
+                const normalizedStatus = invoice.Status.toLowerCase().trim();
+                let statKey;
+                
+                if (normalizedStatus === 'draft') {
+                    statKey = 'draft';
+                } else if (normalizedStatus === 'sent') {
+                    statKey = 'sent';
+                } else if (normalizedStatus === 'paid') {
+                    statKey = 'paid';
+                } else if (normalizedStatus === 'overdue') {
+                    statKey = 'overdue';
+                } else if (normalizedStatus === 'partial' || normalizedStatus === 'partial payment') {
+                    statKey = 'partial';
+                } else {
+                    // For any other status, try to map it
+                    if (normalizedStatus.includes('paid')) {
+                        statKey = 'paid';
+                    } else if (normalizedStatus.includes('sent')) {
+                        statKey = 'sent';
+                    } else if (normalizedStatus.includes('overdue')) {
+                        statKey = 'overdue';
+                    } else {
+                        statKey = 'draft'; // Default fallback
+                    }
+                }
+                
+                if (stats[statKey] !== undefined) {
+                    stats[statKey]++;
                 }
                 
                 const grandTotal = parseFloat(invoice.GrandTotal || 0);

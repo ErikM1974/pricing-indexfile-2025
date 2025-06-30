@@ -13,27 +13,26 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <!-- Art Invoice Service V2 - Using dedicated API endpoints -->
-    <script src="art-invoice-service-v2.js"></script>
+    <script src="art-invoice-service-v2.js?v=2.1"></script>
     
     <style>
-        /* Root variables - NWCA Green Theme */
+        /* Root variables - Professional Invoice Theme */
         :root {
-            --primary-color: #4cb354;
-            --primary-dark: #409a47;
-            --primary-light: #5bc85f;
-            --bg-color: #f5f7fa;
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --bg-color: #ecf0f1;
             --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --hover-bg: #f3f4f6;
-            --success-bg: #d1fae5;
-            --success-text: #065f46;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-            --error-bg: #fee2e2;
-            --error-text: #991b1b;
-            --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+            --border-color: #bdc3c7;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --hover-bg: #f8f9fa;
+            --invoice-header-bg: #34495e;
+            --invoice-accent: #3498db;
+            --table-header-bg: #ecf0f1;
+            --table-border: #ddd;
         }
 
         /* Base styles */
@@ -52,15 +51,16 @@
 
         /* Header */
         .header {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: var(--invoice-header-bg);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .header-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem 2rem;
+            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -74,18 +74,19 @@
 
         .logo {
             height: 40px;
+            filter: brightness(0) invert(1);
         }
 
         .breadcrumb {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: var(--text-secondary);
+            color: rgba(255,255,255,0.8);
             font-size: 0.875rem;
         }
 
         .breadcrumb a {
-            color: var(--primary-color);
+            color: var(--invoice-accent);
             text-decoration: none;
         }
 
@@ -95,118 +96,323 @@
 
         /* Main Container */
         .main-container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 2rem auto;
             padding: 0 2rem;
         }
 
-        .page-title {
+        /* Invoice Document Style */
+        .invoice-document {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .invoice-header-section {
+            background: var(--invoice-header-bg);
+            color: white;
+            padding: 2rem;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 1rem;
+        }
+
+        .invoice-title h1 {
+            font-size: 2rem;
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .invoice-number {
+            text-align: right;
+        }
+
+        .invoice-number h2 {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
+        .invoice-number .number {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Invoice Body */
+        .invoice-body {
+            padding: 2rem;
+        }
+
+        /* Two Column Layout */
+        .invoice-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
             margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .page-title h1 {
-            font-size: 1.875rem;
-            color: var(--text-primary);
+        .detail-section h3 {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
-        .page-title .icon {
-            width: 48px;
-            height: 48px;
-            background: var(--success-bg);
-            border-radius: 8px;
+        .detail-field {
+            margin-bottom: 0.75rem;
+        }
+
+        .detail-field label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-field input,
+        .detail-field select,
+        .detail-field textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        .detail-field input:focus,
+        .detail-field select:focus,
+        .detail-field textarea:focus {
+            outline: none;
+            border-color: var(--invoice-accent);
+        }
+
+        /* Service Table */
+        .service-table {
+            width: 100%;
+            margin: 2rem 0;
+            border-collapse: collapse;
+        }
+
+        .service-table th {
+            background: var(--table-header-bg);
+            padding: 0.75rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-bottom: 2px solid var(--table-border);
+        }
+
+        .service-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--table-border);
+        }
+
+        .service-table .text-right {
+            text-align: right;
+        }
+
+        .service-table .text-center {
+            text-align: center;
+        }
+
+        /* Service Line Item */
+        .service-line-item {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr auto;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .service-select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            font-size: 0.875rem;
+        }
+
+        .quantity-input {
+            width: 80px;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .line-total {
+            font-weight: 600;
+            text-align: right;
+            min-width: 80px;
+        }
+
+        .remove-line-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .remove-line-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Add Service Button */
+        .add-service-btn {
+            background: none;
+            border: 2px dashed var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.75rem 1rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary-color);
-            font-size: 1.5rem;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            margin-top: 1rem;
         }
 
-        /* Cards */
-        .card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        .add-service-btn:hover {
+            border-color: var(--invoice-accent);
+            color: var(--invoice-accent);
+            background: var(--hover-bg);
+        }
+
+        /* Invoice Totals */
+        .invoice-totals {
+            margin-left: auto;
+            width: 350px;
+            margin-top: 2rem;
+        }
+
+        .total-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .total-line.subtotal {
+            border-top: 1px solid var(--table-border);
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+        }
+
+        .total-line.grand-total {
+            border-top: 2px solid var(--text-primary);
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Tax Section */
+        .tax-notice {
+            background: #fff8dc;
+            border: 1px solid #ffd700;
+            padding: 1rem;
+            border-radius: 3px;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .tax-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Notes Section */
+        .notes-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .notes-section h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 2rem;
+            background: var(--table-header-bg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 3px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--invoice-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Art Request Search */
+        .search-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             margin-bottom: 2rem;
         }
 
-        .card-header {
+        .search-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
 
-        .card-title {
+        .search-header h2 {
             font-size: 1.25rem;
-            font-weight: 600;
             color: var(--text-primary);
-        }
-
-        /* Form Styles */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            font-size: 0.875rem;
-        }
-
-        label .required {
-            color: var(--error-text);
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="number"],
-        input[type="date"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: var(--focus-shadow);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        /* Search Request Section */
-        .search-section {
-            background: var(--bg-color);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
         }
 
         .search-controls {
@@ -217,15 +423,19 @@
 
         .search-input {
             flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            font-size: 0.875rem;
         }
 
         /* Request Results */
         .request-results {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--card-bg);
+            border-radius: 3px;
+            background: white;
         }
 
         .request-item {
@@ -240,425 +450,41 @@
         }
 
         .request-item.selected {
-            background: var(--success-bg);
-            border-color: var(--primary-color);
-        }
-
-        .request-item:last-child {
-            border-bottom: none;
-        }
-
-        .request-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-        }
-
-        .request-details h4 {
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .request-details p {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin: 0;
-        }
-
-        .request-date {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        /* Time and Fees Section */
-        .calculation-section {
-            background: var(--bg-color);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-top: 2rem;
-        }
-
-        .fee-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .fee-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .fee-item input {
-            margin-top: 0.5rem;
-        }
-
-        /* Summary Box */
-        .summary-box {
-            background: var(--success-bg);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-top: 2rem;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 0.75rem;
-        }
-
-        .summary-item {
-            display: contents;
-        }
-
-        .summary-label {
-            color: var(--text-secondary);
-        }
-
-        .summary-value {
-            text-align: right;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .summary-total {
-            padding-top: 0.75rem;
-            border-top: 2px solid var(--primary-color);
-            margin-top: 0.75rem;
-        }
-
-        .summary-total .summary-value {
-            font-size: 1.25rem;
-            color: var(--primary-color);
-        }
-
-        /* Tax Section */
-        .tax-section {
-            background: var(--warning-bg);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-top: 2rem;
-            border: 2px solid #f59e0b;
-        }
-
-        .tax-section h3 {
-            color: var(--warning-text);
-            margin-bottom: 1rem;
-        }
-
-        .tax-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .tax-checkbox-group {
-            display: flex;
-            align-items: center;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            cursor: pointer;
-            margin: 0;
-            font-weight: 500;
-        }
-
-        .checkbox-label input[type="checkbox"] {
-            width: 1.25rem;
-            height: 1.25rem;
-            cursor: pointer;
-        }
-
-        .checkbox-text {
-            color: var(--warning-text);
-        }
-
-        .reseller-permit-section {
-            background: var(--card-bg);
-            padding: 1rem;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-        }
-
-        .field-help {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
-            font-style: italic;
-        }
-
-        .tax-amount-display {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background: var(--card-bg);
-            border-radius: 6px;
-            border: 2px solid var(--primary-color);
-        }
-
-        .tax-label {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .tax-value {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(76, 179, 84, 0.2);
-        }
-
-        .btn-secondary {
-            background: var(--hover-bg);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-            background: var(--border-color);
-        }
-
-        .btn-danger {
-            background: var(--error-bg);
-            color: var(--error-text);
-        }
-
-        .btn-danger:hover:not(:disabled) {
-            background: #fca5a5;
-        }
-
-        /* Form Actions */
-        .form-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .action-group {
-            display: flex;
-            gap: 1rem;
-        }
-
-        /* Preview Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            border-radius: 12px;
-            max-width: 800px;
-            width: 90%;
-            max-height: 90vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h2 {
-            font-size: 1.5rem;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-        }
-
-        /* Invoice Preview Styles */
-        .invoice-preview {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-        }
-
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-        }
-
-        .invoice-logo {
-            height: 60px;
-        }
-
-        .invoice-title {
-            text-align: right;
-        }
-
-        .invoice-title h1 {
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .invoice-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .invoice-section h3 {
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-        }
-
-        .invoice-section p {
-            margin: 0.25rem 0;
-            font-size: 0.875rem;
-        }
-
-        .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 2rem 0;
-        }
-
-        .invoice-table th {
-            background: var(--bg-color);
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .invoice-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .invoice-table .text-right {
-            text-align: right;
-        }
-
-        .invoice-totals {
-            margin-left: auto;
-            width: 300px;
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-        }
-
-        .total-row.grand-total {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            border-top: 2px solid var(--border-color);
-            padding-top: 1rem;
-            margin-top: 0.5rem;
+            background: #e3f2fd;
+            border-left: 3px solid var(--invoice-accent);
         }
 
         /* Alert Messages */
         .alert {
-            padding: 1rem 1.5rem;
-            border-radius: 6px;
+            padding: 1rem;
+            border-radius: 3px;
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            font-size: 0.875rem;
         }
 
         .alert-success {
-            background: var(--success-bg);
-            color: var(--success-text);
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
         .alert-error {
-            background: var(--error-bg);
-            color: var(--error-text);
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
 
-        .alert-warning {
-            background: var(--warning-bg);
-            color: var(--warning-text);
-        }
-
-        /* Loading States */
+        /* Loading */
         .loading {
             display: inline-block;
             width: 20px;
             height: 20px;
             border: 3px solid var(--border-color);
             border-radius: 50%;
-            border-top-color: var(--primary-color);
+            border-top-color: var(--invoice-accent);
             animation: spin 1s ease-in-out infinite;
         }
 
@@ -666,34 +492,43 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .header,
+            .search-section,
+            .action-buttons,
+            .add-service-btn,
+            .remove-line-btn {
+                display: none !important;
+            }
+            
+            .invoice-document {
+                box-shadow: none;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
-            .form-grid {
+            .invoice-details-grid {
                 grid-template-columns: 1fr;
             }
-
-            .header-container {
+            
+            .action-buttons {
                 flex-direction: column;
                 gap: 1rem;
             }
-
-            .search-controls {
-                flex-direction: column;
-            }
-
-            .form-actions {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .action-group {
-                width: 100%;
-                justify-content: center;
-            }
-
+            
             .btn {
                 width: 100%;
                 justify-content: center;
+            }
+            
+            .invoice-totals {
+                width: 100%;
             }
         }
     </style>
@@ -708,7 +543,7 @@
                 <nav class="breadcrumb">
                     <a href="/staff-dashboard.html">Staff Dashboard</a>
                     <span>/</span>
-                    <span>Art Invoice Creator</span>
+                    <span>Create Art Invoice</span>
                 </nav>
             </div>
         </div>
@@ -716,314 +551,199 @@
 
     <!-- Main Content -->
     <main class="main-container">
-        <div class="page-title">
-            <div class="icon">
-                <i class="fas fa-file-invoice"></i>
-            </div>
-            <h1>Create Art Invoice</h1>
-        </div>
-
         <!-- Alert Container -->
         <div id="alertContainer"></div>
 
         <!-- Art Request Selection -->
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title">Select Art Request</h2>
+        <div class="search-section" id="searchSection">
+            <div class="search-header">
+                <h2>Select Art Request</h2>
+                <div id="selectedIndicator" style="display: none;">
+                    <span style="color: var(--success-color); font-size: 0.875rem;">
+                        <i class="fas fa-check-circle"></i> Request Selected
+                    </span>
+                </div>
             </div>
             
-            <div class="search-section">
-                <div class="search-controls">
-                    <input type="text" 
-                           id="searchInput" 
-                           class="search-input" 
-                           placeholder="Search by request ID, customer name, or project...">
-                    <button type="button" class="btn btn-secondary" onclick="searchArtRequests()">
-                        <i class="fas fa-search"></i>
-                        Search
-                    </button>
-                </div>
-                
-                <div id="requestResults" class="request-results" style="display: none;">
-                    <!-- Results will be populated here -->
-                </div>
+            <div class="search-controls">
+                <input type="text" 
+                       id="searchInput" 
+                       class="search-input" 
+                       placeholder="Search by request ID, customer name, or project...">
+                <button type="button" class="btn btn-secondary" onclick="searchArtRequests()">
+                    <i class="fas fa-search"></i>
+                    Search
+                </button>
             </div>
-
-            <div id="selectedRequest" style="display: none;">
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <strong>Selected Request:</strong>
-                        <span id="selectedRequestInfo"></span>
-                    </div>
-                </div>
+            
+            <div id="requestResults" class="request-results" style="display: none;">
+                <!-- Results will be populated here -->
             </div>
         </div>
 
         <!-- Invoice Form -->
         <form id="invoiceForm" style="display: none;">
-            <!-- Project Details -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Project Details</h2>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="projectName">Project Name <span class="required">*</span></label>
-                        <input type="text" id="projectName" name="projectName" required>
+            <div class="invoice-document">
+                <!-- Invoice Header -->
+                <div class="invoice-header-section">
+                    <div class="invoice-title">
+                        <h1>ART INVOICE</h1>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="projectType">Project Type <span class="required">*</span></label>
-                        <select id="projectType" name="projectType" required>
-                            <option value="">Select type...</option>
-                            <option value="Design">New Design</option>
-                            <option value="Revision">Revision</option>
-                            <option value="Digitization">Digitization</option>
-                            <option value="Vectorization">Vectorization</option>
-                            <option value="Mockup">Mockup</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="completionDate">Completion Date</label>
-                        <input type="date" id="completionDate" name="completionDate">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="complexity">Complexity</label>
-                        <select id="complexity" name="complexity">
-                            <option value="Simple">Simple</option>
-                            <option value="Standard" selected>Standard</option>
-                            <option value="Complex">Complex</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group full-width">
-                        <label for="artworkDescription">Artwork Description</label>
-                        <textarea id="artworkDescription" name="artworkDescription" rows="3"
-                                  placeholder="Describe the artwork created..."></textarea>
+                    <div class="invoice-number">
+                        <h2>INVOICE NUMBER</h2>
+                        <div class="number" id="invoiceNumberDisplay">DRAFT</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Time and Billing -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Billing</h2>
-                </div>
-                
-                <div class="form-grid" style="display: none;">
-                    <div class="form-group">
-                        <label for="timeSpent">Time Spent (hours) <span class="required">*</span></label>
-                        <input type="number" 
-                               id="timeSpent" 
-                               name="timeSpent" 
-                               step="0.25" 
-                               min="0.25" 
-                               required
-                               onchange="calculateTotals()">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="hourlyRate">Hourly Rate ($)</label>
-                        <input type="number" 
-                               id="hourlyRate" 
-                               name="hourlyRate" 
-                               value="75.00" 
-                               step="0.01" 
-                               min="0"
-                               onchange="calculateTotals()">
-                    </div>
-                </div>
-                
-                <div class="calculation-section">
-                    <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
-                        <i class="fas fa-info-circle"></i>
-                        Art service amount is automatically pulled from the billing system
-                    </p>
-                    <h3 style="margin-bottom: 1rem;">Additional Fees</h3>
-                    <div class="fee-grid">
-                        <div class="fee-item">
-                            <label for="rushFee">Rush Fee ($)</label>
-                            <input type="number" 
-                                   id="rushFee" 
-                                   name="rushFee" 
-                                   value="0" 
-                                   step="0.01" 
-                                   min="0"
-                                   onchange="calculateTotals()">
+                <!-- Invoice Body -->
+                <div class="invoice-body">
+                    <!-- Invoice Details Grid -->
+                    <div class="invoice-details-grid">
+                        <!-- Bill To Section -->
+                        <div class="detail-section">
+                            <h3>Bill To</h3>
+                            <div class="detail-field">
+                                <label>Customer Name</label>
+                                <input type="text" id="customerName" readonly>
+                            </div>
+                            <div class="detail-field">
+                                <label>Company</label>
+                                <input type="text" id="customerCompany" readonly>
+                            </div>
+                            <div class="detail-field">
+                                <label>Email</label>
+                                <input type="email" id="customerEmail" readonly>
+                            </div>
+                            <div class="detail-field">
+                                <label>Sales Rep</label>
+                                <input type="text" id="salesRepDisplay" readonly>
+                            </div>
                         </div>
-                        
-                        <div class="fee-item">
-                            <label for="revisionFee">Revision Fee ($)</label>
-                            <input type="number" 
-                                   id="revisionFee" 
-                                   name="revisionFee" 
-                                   value="0" 
-                                   step="0.01" 
-                                   min="0"
-                                   onchange="calculateTotals()">
-                        </div>
-                        
-                        <div class="fee-item">
-                            <label for="otherFees">Other Fees ($)</label>
-                            <input type="number" 
-                                   id="otherFees" 
-                                   name="otherFees" 
-                                   value="0" 
-                                   step="0.01" 
-                                   min="0"
-                                   onchange="calculateTotals()">
+
+                        <!-- Invoice Details -->
+                        <div class="detail-section">
+                            <h3>Invoice Details</h3>
+                            <div class="detail-field">
+                                <label>Invoice Date</label>
+                                <input type="date" id="invoiceDate" value="" readonly>
+                            </div>
+                            <div class="detail-field">
+                                <label>Due Date</label>
+                                <input type="date" id="dueDate" value="" readonly>
+                            </div>
+                            <div class="detail-field">
+                                <label>Project Name</label>
+                                <input type="text" id="projectName" required>
+                            </div>
+                            <div class="detail-field">
+                                <label>Art Request ID</label>
+                                <input type="text" id="artRequestId" readonly>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Sales Tax Section -->
-                <div class="tax-section">
-                    <h3 style="margin-bottom: 1rem;">Sales Tax (WA State 10.20%)</h3>
-                    <div class="tax-controls">
-                        <div class="tax-checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" 
-                                       id="applyTax" 
-                                       name="applyTax" 
-                                       checked
-                                       onchange="handleTaxToggle()">
-                                <span class="checkbox-text">Apply Washington State Sales Tax (10.20%)</span>
-                            </label>
+
+                    <!-- Services Section -->
+                    <h3 style="margin: 2rem 0 1rem 0; font-size: 1rem; text-transform: uppercase; color: var(--text-secondary);">
+                        Art Services
+                    </h3>
+
+                    <table class="service-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60%">Description</th>
+                                <th class="text-center" style="width: 10%">Qty</th>
+                                <th class="text-right" style="width: 15%">Rate</th>
+                                <th class="text-right" style="width: 15%">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="serviceTableBody">
+                            <!-- Service lines will be added here -->
+                        </tbody>
+                    </table>
+
+                    <!-- Add Service Button -->
+                    <button type="button" class="add-service-btn" onclick="addServiceLineItem()">
+                        <i class="fas fa-plus-circle"></i>
+                        Add Service Line
+                    </button>
+
+                    <!-- Totals Section -->
+                    <div class="invoice-totals">
+                        <div class="total-line">
+                            <span>Subtotal:</span>
+                            <span id="subtotalDisplay">$0.00</span>
                         </div>
                         
-                        <div class="reseller-permit-section" id="resellerPermitSection" style="display: none;">
-                            <div class="form-group">
-                                <label for="resellerPermit">WA State Reseller Permit Number <span class="required">*</span></label>
-                                <input type="text" 
-                                       id="resellerPermit" 
-                                       name="resellerPermit" 
-                                       placeholder="Enter valid WA State reseller permit number"
-                                       onchange="validateResellerPermit()">
-                                <div class="field-help">Tax exemption requires a valid Washington State reseller permit</div>
+                        <!-- Tax Notice -->
+                        <div class="tax-notice">
+                            <div class="tax-checkbox">
+                                <input type="checkbox" id="applyTax" checked onchange="handleTaxToggle()">
+                                <label for="applyTax">Apply WA State Sales Tax (10.20%)</label>
+                            </div>
+                            <div id="resellerSection" style="display: none;">
+                                <input type="text" id="resellerPermit" placeholder="Enter WA reseller permit #" 
+                                       style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 3px; margin-top: 0.5rem;">
                             </div>
                         </div>
                         
-                        <div class="tax-amount-display">
-                            <span class="tax-label">Tax Amount:</span>
-                            <span class="tax-value" id="taxAmountDisplay">$0.00</span>
+                        <div class="total-line">
+                            <span>Tax (10.20%):</span>
+                            <span id="taxDisplay">$0.00</span>
+                        </div>
+                        
+                        <div class="total-line grand-total">
+                            <span>TOTAL DUE:</span>
+                            <span id="grandTotalDisplay">$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Notes Section -->
+                    <div class="notes-section">
+                        <h3>Notes</h3>
+                        <div class="detail-field">
+                            <label>Customer Notes (visible on invoice)</label>
+                            <textarea id="customerNotes" rows="3" 
+                                      placeholder="Enter any notes that should appear on the invoice..."></textarea>
+                        </div>
+                        <div class="detail-field">
+                            <label>Internal Notes (not shown on invoice)</label>
+                            <textarea id="internalNotes" rows="3" 
+                                      placeholder="Internal notes for reference only..."></textarea>
                         </div>
                     </div>
                 </div>
-                
-                <div class="summary-box">
-                    <div class="summary-grid">
-                        <div class="summary-item">
-                            <span class="summary-label">Art Services:</span>
-                            <span class="summary-value" id="subtotalDisplay">$0.00</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Rush Fee:</span>
-                            <span class="summary-value" id="rushFeeDisplay">$0.00</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Revision Fee:</span>
-                            <span class="summary-value" id="revisionFeeDisplay">$0.00</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Other Fees:</span>
-                            <span class="summary-value" id="otherFeesDisplay">$0.00</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Tax Amount:</span>
-                            <span class="summary-value" id="taxDisplay">$0.00</span>
-                        </div>
-                        <div class="summary-item summary-total">
-                            <span class="summary-label">Grand Total:</span>
-                            <span class="summary-value" id="grandTotalDisplay">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Notes -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Notes</h2>
-                </div>
-                
-                <div class="form-group">
-                    <label for="customerNotes">Customer Notes</label>
-                    <textarea id="customerNotes" 
-                              name="customerNotes" 
-                              rows="3"
-                              placeholder="Notes that will be visible on the invoice..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="internalNotes">Internal Notes</label>
-                    <textarea id="internalNotes" 
-                              name="internalNotes" 
-                              rows="3"
-                              placeholder="Internal notes (not shown on invoice)..."></textarea>
-                </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="form-actions">
-                <div class="action-group">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
                         <input type="checkbox" id="saveAsDraft" checked>
-                        Save as Draft
-                    </label>
-                </div>
-                
-                <div class="action-group">
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/staff-dashboard.html'">
-                        <i class="fas fa-times"></i>
-                        Cancel
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="previewInvoice()">
-                        <i class="fas fa-eye"></i>
-                        Preview
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i>
-                        Create & Send Invoice
-                    </button>
+                        <label for="saveAsDraft" style="margin: 0;">Save as Draft</label>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href='/art-invoices-dashboard.html'">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="window.print()">
+                            <i class="fas fa-print"></i>
+                            Print
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Create Invoice
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>
     </main>
 
-    <!-- Preview Modal -->
-    <div class="modal-overlay" id="previewModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Invoice Preview</h2>
-                <button class="modal-close" onclick="closePreview()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body" id="previewContent">
-                <!-- Preview content will be inserted here -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closePreview()">
-                    <i class="fas fa-arrow-left"></i>
-                    Back to Edit
-                </button>
-                <button class="btn btn-primary" onclick="submitInvoice()">
-                    <i class="fas fa-paper-plane"></i>
-                    Send Invoice
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Initialize
         let invoiceService;
         let selectedRequest = null;
+        let serviceLineCount = 0;
         
         document.addEventListener('DOMContentLoaded', function() {
             invoiceService = new ArtInvoiceServiceV2();
@@ -1031,40 +751,54 @@
             // Initialize EmailJS
             emailjs.init('4qSbDO-SQs19TbP80');
             
-            // Set default completion date to today
-            document.getElementById('completionDate').value = new Date().toISOString().split('T')[0];
+            // Set default dates
+            const today = new Date();
+            const dueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
+            
+            document.getElementById('invoiceDate').value = today.toISOString().split('T')[0];
+            document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
             
             // Load initial art requests
             searchArtRequests();
             
             // Form submit handler
             document.getElementById('invoiceForm').addEventListener('submit', handleSubmit);
+            
+            // Add initial service line
+            addServiceLineItem();
         });
+        
+        // Helper function to format date
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
         
         // Helper function to extract order type
         function getOrderType(request) {
             if (!request) return 'General';
             
-            // Check if Order_Type_1 or Order_Type is an object
             let orderType = '';
             
             if (request.Order_Type_1) {
                 if (typeof request.Order_Type_1 === 'object') {
-                    // If it's an object, try to get a meaningful value
                     orderType = request.Order_Type_1.value || request.Order_Type_1.name || request.Order_Type_1.text || JSON.stringify(request.Order_Type_1);
                 } else {
                     orderType = request.Order_Type_1;
                 }
             } else if (request.Order_Type) {
                 if (typeof request.Order_Type === 'object') {
-                    // If it's an object, try to get a meaningful value
                     orderType = request.Order_Type.value || request.Order_Type.name || request.Order_Type.text || JSON.stringify(request.Order_Type);
                 } else {
                     orderType = request.Order_Type;
                 }
             }
             
-            // Clean up the result
             if (orderType && orderType !== '[object Object]') {
                 return orderType;
             }
@@ -1084,54 +818,22 @@
             try {
                 // Fetch art requests
                 const requests = await invoiceService.getArtRequests();
-                console.log(`[Art Invoice] Total requests fetched: ${requests.length}`);
-                console.log(`[Art Invoice] Completed requests: ${requests.filter(r => r.Status === 'Completed ✅').length}`);
-                
-                // Check what status values exist in the data
-                const statusCounts = {};
-                requests.forEach(req => {
-                    const status = req.Status || 'undefined';
-                    statusCounts[status] = (statusCounts[status] || 0) + 1;
-                });
-                console.log('[Art Invoice] Status values found:', statusCounts);
-                
-                // Check first few requests to see field structure
-                if (requests.length > 0) {
-                    console.log('[Art Invoice] Sample request fields:', Object.keys(requests[0]));
-                    console.log('[Art Invoice] First request:', requests[0]);
-                }
                 
                 // Filter for completed requests from June 15, 2025 forward
-                // Set cutoff to June 15, 2025 at midnight UTC to avoid timezone issues
                 const cutoffDate = new Date('2025-06-15T00:00:00Z');
-                console.log('[Art Invoice] Filtering requests after:', cutoffDate.toISOString());
                 
                 let filteredRequests = requests.filter(req => {
                     // Check status is Completed (with checkmark emoji)
                     if (req.Status !== 'Completed ✅') return false;
                     
                     // Check date is after June 15, 2025
-                    if (!req.Date_Created) {
-                        console.log('[Art Invoice] Request missing Date_Created:', req.ID_Design);
-                        return false;
-                    }
+                    if (!req.Date_Created) return false;
                     
                     try {
                         const requestDate = new Date(req.Date_Created);
-                        if (isNaN(requestDate.getTime())) {
-                            console.log('[Art Invoice] Invalid date for request:', req.ID_Design, req.Date_Created);
-                            return false;
-                        }
-                        
-                        // Log first few dates for debugging
-                        if (requests.indexOf(req) < 5) {
-                            console.log(`[Art Invoice] Request ${req.ID_Design} date: ${requestDate.toISOString()} (${req.Date_Created})`);
-                        }
-                        
-                        // Compare using getTime() for reliable comparison
+                        if (isNaN(requestDate.getTime())) return false;
                         return requestDate.getTime() >= cutoffDate.getTime();
                     } catch (e) {
-                        console.error('[Art Invoice] Date parsing error for request:', req.ID_Design, req.Date_Created, e);
                         return false;
                     }
                 });
@@ -1144,8 +846,7 @@
                         (req.CompanyName && req.CompanyName.toLowerCase().includes(term)) ||
                         (req.NOTES && req.NOTES.toLowerCase().includes(term)) ||
                         (req.Note_Mockup && req.Note_Mockup.toLowerCase().includes(term)) ||
-                        (req.Full_Name_Contact && req.Full_Name_Contact.toLowerCase().includes(term)) ||
-                        (req.shopwork_customer_number && req.shopwork_customer_number.toString().includes(term))
+                        (req.Full_Name_Contact && req.Full_Name_Contact.toLowerCase().includes(term))
                     );
                 }
                 
@@ -1159,28 +860,28 @@
                     }
                 });
                 
-                console.log(`[Art Invoice] Filtered results: ${filteredRequests.length} requests, ${uniqueRequests.length} unique after removing duplicates`);
-                
                 // Sort by date, newest first
                 uniqueRequests.sort((a, b) => new Date(b.Date_Created) - new Date(a.Date_Created));
                 
                 // Display results
                 if (uniqueRequests.length === 0) {
-                    resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No completed art requests found after June 15, 2025. Make sure requests have status "Completed ✅" and were created after this date.</div>';
+                    resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No completed art requests found after June 15, 2025.</div>';
                 } else {
                     resultsDiv.innerHTML = uniqueRequests.map(req => `
-                        <div class="request-item" onclick="selectRequest('${req.ID_Design}')">
+                        <div class="request-item${selectedRequest && selectedRequest.ID_Design === req.ID_Design ? ' selected' : ''}" onclick="selectRequest('${req.ID_Design}', event)">
                             <div class="request-info">
                                 <div class="request-details">
                                     <h4>${req.NOTES || req.Note_Mockup || 'Untitled Project'}</h4>
                                     <p>${req.CompanyName || 'Unknown Company'} ${req.Full_Name_Contact ? `- ${req.Full_Name_Contact}` : ''}</p>
-                                    <p>Sales Rep: ${req.CustomerServiceRep || 'Unknown'} | Type: ${getOrderType(req)}</p>
-                                    ${req.shopwork_customer_number ? `<p style="font-size: 0.875rem; color: var(--text-secondary);">SW Customer #${req.shopwork_customer_number}</p>` : ''}
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">
+                                        Sales Rep: ${req.CustomerServiceRep || 'Unknown'} | 
+                                        Type: ${getOrderType(req)} | 
+                                        ID: ${req.ID_Design}
+                                    </p>
                                 </div>
-                                <div>
-                                    <div class="request-date">ID: ${req.ID_Design}</div>
-                                    <div class="request-date">${formatDate(req.Date_Created)}</div>
-                                    ${req.Art_Minutes || req.Amount_Art_Billed ? `<div class="request-date" style="color: var(--primary-color); font-weight: 500;">${req.Art_Minutes ? (req.Art_Minutes / 60).toFixed(2) + ' hrs' : ''} ${req.Amount_Art_Billed ? '- $' + parseFloat(req.Amount_Art_Billed).toFixed(2) : ''}</div>` : ''}
+                                <div style="text-align: right;">
+                                    <div style="font-size: 0.75rem; color: var(--text-secondary);">${formatDate(req.Date_Created)}</div>
+                                    ${req.Art_Minutes ? `<div style="font-size: 0.875rem; color: var(--accent-color); font-weight: 500;">${(req.Art_Minutes / 60).toFixed(2)} hrs</div>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -1188,18 +889,107 @@
                 }
             } catch (error) {
                 console.error('Error searching requests:', error);
-                resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--error-text);">Error loading requests</div>';
+                resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--danger-color);">Error loading requests</div>';
             }
+        }
+        
+        // Select Art Request
+        async function selectRequest(idDesign, event) {
+            try {
+                // Fetch the specific request
+                const requests = await invoiceService.getArtRequests({ id_design: idDesign });
+                const request = requests.find(r => r.ID_Design == idDesign);
+                
+                if (!request) {
+                    showAlert('Request not found', 'error');
+                    return;
+                }
+                
+                // Check if invoice already exists
+                const existingInvoice = await invoiceService.checkExistingInvoice(idDesign);
+                if (existingInvoice) {
+                    showAlert(`An invoice already exists for this request (${existingInvoice.InvoiceID}). Please void it first.`, 'error');
+                    return;
+                }
+                
+                selectedRequest = request;
+                
+                // Update UI to show selection
+                document.querySelectorAll('.request-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                event.target.closest('.request-item').classList.add('selected');
+                
+                // Show selected indicator
+                document.getElementById('selectedIndicator').style.display = 'block';
+                
+                // Fill in the invoice form
+                document.getElementById('customerName').value = request.Full_Name_Contact || '';
+                document.getElementById('customerCompany').value = request.CompanyName || '';
+                document.getElementById('customerEmail').value = request.Email_Contact || request.Email || '';
+                document.getElementById('artRequestId').value = request.ID_Design || '';
+                document.getElementById('projectName').value = request.NOTES || request.Note_Mockup || '';
+                
+                // Get and display sales rep
+                const salesRepEmail = request.User_Email || getSalesRepEmail(request.CustomerServiceRep || '');
+                const salesRepName = getSalesRepName(salesRepEmail);
+                document.getElementById('salesRepDisplay').value = `${salesRepName} (${salesRepEmail})`;
+                
+                // Show invoice number
+                const invoiceId = invoiceService.generateInvoiceID(idDesign);
+                document.getElementById('invoiceNumberDisplay').textContent = invoiceId;
+                
+                // Suggest service code based on time spent
+                if (request.Art_Minutes) {
+                    const suggestedCode = invoiceService.suggestServiceCode(request.Art_Minutes);
+                    if (suggestedCode && suggestedCode !== 'CUSTOM') {
+                        // Update the first service line with suggestion
+                        const firstSelect = document.querySelector('.service-select');
+                        if (firstSelect) {
+                            firstSelect.value = suggestedCode;
+                            updateServiceLine(firstSelect);
+                        }
+                    }
+                }
+                
+                // Show the invoice form
+                document.getElementById('invoiceForm').style.display = 'block';
+                
+                // Scroll to invoice
+                document.getElementById('invoiceForm').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Error selecting request:', error);
+                showAlert('Error loading request details', 'error');
+            }
+        }
+        
+        // Helper function to get sales rep name from email
+        function getSalesRepName(repEmail) {
+            const repNames = {
+                'nika@nwcustomapparel.com': 'Nika Lao',
+                'taylar@nwcustomapparel.com': 'Taylar Hanson',
+                'ruth@nwcustomapparel.com': 'Ruth Nhong',
+                'erik@nwcustomapparel.com': 'Erik Mickelson',
+                'adriyella@nwcustomapparel.com': 'Adriyella',
+                'bradley@nwcustomapparel.com': 'Bradley Wright',
+                'jim@nwcustomapparel.com': 'Jim Mickelson',
+                'art@nwcustomapparel.com': 'Steve Deland',
+                'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
+            };
+            return repNames[repEmail] || 'Northwest Custom Apparel Sales Team';
         }
         
         // Helper function to get sales rep email from name
         function getSalesRepEmail(repName) {
             const repEmails = {
                 'Nika Lao': 'nika@nwcustomapparel.com',
+                'Nika': 'nika@nwcustomapparel.com',
                 'Taylar': 'taylar@nwcustomapparel.com',
                 'Taylar Hanson': 'taylar@nwcustomapparel.com',
                 'Ruth Nhong': 'ruth@nwcustomapparel.com',
                 'Ruth': 'ruth@nwcustomapparel.com',
+                'Ruthie': 'ruth@nwcustomapparel.com',
                 'Erik Mickelson': 'erik@nwcustomapparel.com',
                 'Erik': 'erik@nwcustomapparel.com',
                 'Adriyella': 'adriyella@nwcustomapparel.com',
@@ -1213,294 +1003,164 @@
             return repEmails[repName] || 'sales@nwcustomapparel.com';
         }
         
-        // Select Art Request
-        async function selectRequest(requestId) {
-            try {
-                // Get the request from the already fetched data
-                const allRequests = await invoiceService.getArtRequests();
-                selectedRequest = allRequests.find(req => req.ID_Design == requestId);
+        // Add Service Line Item
+        function addServiceLineItem() {
+            serviceLineCount++;
+            const tbody = document.getElementById('serviceTableBody');
+            
+            // Get all available service codes
+            const serviceCodes = invoiceService.getAllServiceCodes(false); // Don't include rush versions in dropdown
+            
+            const row = document.createElement('tr');
+            row.className = 'service-line';
+            row.innerHTML = `
+                <td>
+                    <select class="service-select" onchange="updateServiceLine(this)" style="width: 100%;">
+                        <option value="">-- Select Service --</option>
+                        ${serviceCodes.filter(s => !s.isAdditional).map(service => 
+                            `<option value="${service.code}" data-amount="${service.amount}">${service.code} - ${service.name} ($${service.amount})</option>`
+                        ).join('')}
+                        <optgroup label="Additional Services">
+                            ${serviceCodes.filter(s => s.isAdditional).map(service => 
+                                `<option value="${service.code}" data-amount="${service.amount}">${service.code} - ${service.name} ($${service.amount})</option>`
+                            ).join('')}
+                        </optgroup>
+                        <option value="CUSTOM">Custom Service (Enter Amount)</option>
+                    </select>
+                    <input type="text" class="service-description" placeholder="Enter description..." 
+                           style="width: 100%; margin-top: 0.5rem; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 3px; font-size: 0.875rem; display: none;">
+                </td>
+                <td class="text-center">
+                    <input type="number" class="quantity-input" value="1" min="1" onchange="updateServiceLine(this)">
+                </td>
+                <td class="text-right">
+                    <span class="rate-display">$0.00</span>
+                    <input type="number" class="custom-rate" placeholder="0.00" step="0.01" min="0" 
+                           style="width: 80px; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 3px; font-size: 0.875rem; text-align: right; display: none;"
+                           onchange="updateServiceLine(this)">
+                </td>
+                <td class="text-right">
+                    <span class="line-total">$0.00</span>
+                    ${serviceLineCount > 1 ? '<button type="button" class="remove-line-btn" onclick="removeServiceLine(this)" style="margin-left: 1rem;"><i class="fas fa-trash"></i></button>' : ''}
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+        }
+        
+        // Update Service Line
+        function updateServiceLine(element) {
+            const row = element.closest('tr');
+            const serviceSelect = row.querySelector('.service-select');
+            const descriptionInput = row.querySelector('.service-description');
+            const quantityInput = row.querySelector('.quantity-input');
+            const rateDisplay = row.querySelector('.rate-display');
+            const customRateInput = row.querySelector('.custom-rate');
+            const lineTotalSpan = row.querySelector('.line-total');
+            
+            const selectedCode = serviceSelect.value;
+            const quantity = parseInt(quantityInput.value) || 1;
+            
+            if (selectedCode === 'CUSTOM') {
+                // Show custom inputs
+                descriptionInput.style.display = 'block';
+                rateDisplay.style.display = 'none';
+                customRateInput.style.display = 'inline-block';
                 
-                if (!selectedRequest) {
-                    showAlert('Request not found', 'error');
-                    return;
+                const customRate = parseFloat(customRateInput.value) || 0;
+                const total = customRate * quantity;
+                lineTotalSpan.textContent = `$${total.toFixed(2)}`;
+                
+            } else if (selectedCode) {
+                // Get service details
+                const service = invoiceService.getServiceByCode(selectedCode);
+                if (service) {
+                    descriptionInput.style.display = 'block';
+                    descriptionInput.value = service.description;
+                    rateDisplay.style.display = 'inline';
+                    customRateInput.style.display = 'none';
+                    
+                    const rate = service.amount;
+                    rateDisplay.textContent = `$${rate.toFixed(2)}`;
+                    
+                    const total = rate * quantity;
+                    lineTotalSpan.textContent = `$${total.toFixed(2)}`;
                 }
-                
-                // Update UI
-                document.getElementById('selectedRequest').style.display = 'block';
-                document.getElementById('selectedRequestInfo').textContent = 
-                    `#${selectedRequest.ID_Design} - ${selectedRequest.NOTES || selectedRequest.Note_Mockup || 'Untitled'} - ${selectedRequest.CompanyName || 'Unknown'}`;
-                
-                // Populate form fields
-                document.getElementById('projectName').value = selectedRequest.NOTES || selectedRequest.Note_Mockup || '';
-                document.getElementById('artworkDescription').value = selectedRequest.NOTES || selectedRequest.Note_Mockup || '';
-                
-                // Pre-fill billing amount from database
-                if (selectedRequest.Amount_Art_Billed) {
-                    // Use the Amount_Art_Billed as the source of truth
-                    const billedAmount = parseFloat(selectedRequest.Amount_Art_Billed);
-                    // Calculate implied hours for internal tracking (not shown on invoice)
-                    const impliedHours = (billedAmount / 75).toFixed(2);
-                    document.getElementById('timeSpent').value = impliedHours;
-                    document.getElementById('hourlyRate').value = '75.00';
-                } else if (selectedRequest.Art_Minutes) {
-                    // Fallback to minutes if no billed amount
-                    const hours = (selectedRequest.Art_Minutes / 60).toFixed(2);
-                    document.getElementById('timeSpent').value = hours;
-                    document.getElementById('hourlyRate').value = '75.00';
-                } else {
-                    document.getElementById('timeSpent').value = '1.00';
-                    document.getElementById('hourlyRate').value = '75.00';
-                }
-                
-                // Trigger calculation
-                calculateTotals();
-                
-                // Show form
-                document.getElementById('invoiceForm').style.display = 'block';
-                
-                // Hide search results
-                document.getElementById('requestResults').style.display = 'none';
-                
-                // Mark selected item
-                document.querySelectorAll('.request-item').forEach(item => {
-                    item.classList.remove('selected');
-                });
-                const selectedItem = document.querySelector(`.request-item[onclick="selectRequest('${requestId}')"]`);
-                if (selectedItem) {
-                    selectedItem.classList.add('selected');
-                }
-                
-            } catch (error) {
-                console.error('Error selecting request:', error);
-                showAlert('Error selecting request', 'error');
+            } else {
+                // No service selected
+                descriptionInput.style.display = 'none';
+                rateDisplay.style.display = 'inline';
+                customRateInput.style.display = 'none';
+                rateDisplay.textContent = '$0.00';
+                lineTotalSpan.textContent = '$0.00';
             }
+            
+            // Update totals
+            calculateTotals();
+        }
+        
+        // Remove Service Line
+        function removeServiceLine(button) {
+            const row = button.closest('tr');
+            row.remove();
+            serviceLineCount--;
+            calculateTotals();
         }
         
         // Calculate Totals
         function calculateTotals() {
-            const timeSpent = parseFloat(document.getElementById('timeSpent').value) || 0;
-            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 75;
-            const rushFee = parseFloat(document.getElementById('rushFee').value) || 0;
-            const revisionFee = parseFloat(document.getElementById('revisionFee').value) || 0;
-            const otherFees = parseFloat(document.getElementById('otherFees').value) || 0;
+            let subtotal = 0;
             
-            const subtotal = timeSpent * hourlyRate;
-            const totalBeforeTax = subtotal + rushFee + revisionFee + otherFees;
+            // Calculate service lines total
+            document.querySelectorAll('.service-line').forEach(row => {
+                const totalText = row.querySelector('.line-total').textContent;
+                const total = parseFloat(totalText.replace('$', '')) || 0;
+                subtotal += total;
+            });
             
             // Calculate tax
             const applyTax = document.getElementById('applyTax').checked;
-            const taxRate = 0.1020; // 10.20% WA state sales tax
-            const taxAmount = applyTax ? totalBeforeTax * taxRate : 0;
-            const grandTotal = totalBeforeTax + taxAmount;
+            const taxRate = 0.102; // 10.20%
+            const taxAmount = applyTax ? subtotal * taxRate : 0;
+            const grandTotal = subtotal + taxAmount;
             
-            // Update display
+            // Update displays
             document.getElementById('subtotalDisplay').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('rushFeeDisplay').textContent = `$${rushFee.toFixed(2)}`;
-            document.getElementById('revisionFeeDisplay').textContent = `$${revisionFee.toFixed(2)}`;
-            document.getElementById('otherFeesDisplay').textContent = `$${otherFees.toFixed(2)}`;
             document.getElementById('taxDisplay').textContent = `$${taxAmount.toFixed(2)}`;
-            document.getElementById('taxAmountDisplay').textContent = `$${taxAmount.toFixed(2)}`;
             document.getElementById('grandTotalDisplay').textContent = `$${grandTotal.toFixed(2)}`;
         }
         
-        // Handle tax checkbox toggle
+        // Handle Tax Toggle
         function handleTaxToggle() {
             const applyTax = document.getElementById('applyTax').checked;
-            const resellerSection = document.getElementById('resellerPermitSection');
-            const resellerInput = document.getElementById('resellerPermit');
+            const resellerSection = document.getElementById('resellerSection');
             
             if (!applyTax) {
-                // Show reseller permit field when tax is unchecked
                 resellerSection.style.display = 'block';
-                resellerInput.required = true;
             } else {
-                // Hide reseller permit field when tax is checked
                 resellerSection.style.display = 'none';
-                resellerInput.required = false;
-                resellerInput.value = '';
+                document.getElementById('resellerPermit').value = '';
             }
             
-            // Recalculate totals
             calculateTotals();
         }
         
-        // Validate reseller permit number
-        function validateResellerPermit() {
-            const permitInput = document.getElementById('resellerPermit');
-            const permitNumber = permitInput.value.trim();
-            
-            if (!permitNumber) {
-                permitInput.setCustomValidity('Reseller permit number is required for tax exemption');
-                return false;
-            }
-            
-            // Basic validation - WA state reseller permits are typically 8-9 digits
-            if (!/^\d{8,9}$/.test(permitNumber)) {
-                permitInput.setCustomValidity('Please enter a valid WA State reseller permit number (8-9 digits)');
-                return false;
-            }
-            
-            permitInput.setCustomValidity('');
-            return true;
-        }
-        
-        // Preview Invoice
-        function previewInvoice() {
-            if (!selectedRequest) {
-                showAlert('Please select an art request first', 'warning');
-                return;
-            }
-            
-            const formData = new FormData(document.getElementById('invoiceForm'));
-            const invoiceData = Object.fromEntries(formData);
-            
-            // Calculate totals with tax
-            const timeSpent = parseFloat(invoiceData.timeSpent) || 0;
-            const hourlyRate = parseFloat(invoiceData.hourlyRate) || 75;
-            const rushFee = parseFloat(invoiceData.rushFee) || 0;
-            const revisionFee = parseFloat(invoiceData.revisionFee) || 0;
-            const otherFees = parseFloat(invoiceData.otherFees) || 0;
-            const subtotal = timeSpent * hourlyRate;
-            const totalBeforeTax = subtotal + rushFee + revisionFee + otherFees;
-            
-            // Tax calculation
-            const applyTax = document.getElementById('applyTax').checked;
-            const taxRate = 0.1020; // 10.20% WA state sales tax
-            const taxAmount = applyTax ? totalBeforeTax * taxRate : 0;
-            const grandTotal = totalBeforeTax + taxAmount;
-            
-            // Generate preview HTML
-            const previewHTML = `
-                <div class="invoice-preview">
-                    <div class="invoice-header">
-                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                             alt="Northwest Custom Apparel" class="invoice-logo">
-                        <div class="invoice-title">
-                            <h1>ART INVOICE</h1>
-                            <p>Invoice ID: ART-${selectedRequest.ID_Design}</p>
-                            <p>Date: ${new Date().toLocaleDateString()}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="invoice-details">
-                        <div class="invoice-section">
-                            <h3>Bill To:</h3>
-                            <p><strong>${selectedRequest.CustomerServiceRep || 'Sales Representative'}</strong></p>
-                            <p>${getSalesRepEmail(selectedRequest.CustomerServiceRep || '')}</p>
-                            <p>Northwest Custom Apparel</p>
-                        </div>
-                        
-                        <div class="invoice-section">
-                            <h3>Customer:</h3>
-                            <p><strong>${selectedRequest.Full_Name_Contact || selectedRequest.First_name + ' ' + selectedRequest.Last_name || 'Unknown Customer'}</strong></p>
-                            <p>${selectedRequest.CompanyName || ''}</p>
-                            <p>${selectedRequest.Email_Contact || ''}</p>
-                            ${selectedRequest.Phone ? `<p>Phone: ${selectedRequest.Phone}</p>` : ''}
-                        </div>
-                    </div>
-                    
-                    ${(selectedRequest.shopwork_customer_number || selectedRequest.Design_Num_SW || selectedRequest.Order_Num_SW) ? `
-                    <div class="invoice-section" style="background: var(--bg-color); padding: 1rem; border-radius: 6px; margin: 1rem 0;">
-                        <h3 style="font-size: 0.875rem; margin-bottom: 0.5rem;">ShopWorks Reference:</h3>
-                        <div style="display: flex; gap: 2rem; font-size: 0.875rem;">
-                            ${selectedRequest.shopwork_customer_number ? `<span><strong>Customer #:</strong> ${selectedRequest.shopwork_customer_number}</span>` : ''}
-                            ${selectedRequest.Design_Num_SW ? `<span><strong>Design #:</strong> ${selectedRequest.Design_Num_SW}</span>` : ''}
-                            ${selectedRequest.Order_Num_SW ? `<span><strong>Order #:</strong> ${selectedRequest.Order_Num_SW}</span>` : ''}
-                        </div>
-                    </div>
-                    ` : ''}
-                    
-                    <div class="invoice-section">
-                        <h3>Project Details:</h3>
-                        <p><strong>Project:</strong> ${invoiceData.projectName}</p>
-                        <p><strong>Type:</strong> ${invoiceData.projectType}</p>
-                        <p><strong>Embellishment Type:</strong> ${getOrderType(selectedRequest)}</p>
-                        <p><strong>Complexity:</strong> ${invoiceData.complexity}</p>
-                        ${invoiceData.artworkDescription ? `<p><strong>Description:</strong> ${invoiceData.artworkDescription}</p>` : ''}
-                    </div>
-                    
-                    <table class="invoice-table">
-                        <thead>
-                            <tr>
-                                <th>Description</th>
-                                <th class="text-right">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Art Services - ${invoiceData.projectName} - ${getOrderType(selectedRequest)}</td>
-                                <td class="text-right">$${subtotal.toFixed(2)}</td>
-                            </tr>
-                            ${rushFee > 0 ? `
-                            <tr>
-                                <td>Rush Fee</td>
-                                <td class="text-right">$${rushFee.toFixed(2)}</td>
-                            </tr>
-                            ` : ''}
-                            ${revisionFee > 0 ? `
-                            <tr>
-                                <td>Revision Fee</td>
-                                <td class="text-right">$${revisionFee.toFixed(2)}</td>
-                            </tr>
-                            ` : ''}
-                            ${otherFees > 0 ? `
-                            <tr>
-                                <td>Additional Fees</td>
-                                <td class="text-right">$${otherFees.toFixed(2)}</td>
-                            </tr>
-                            ` : ''}
-                        </tbody>
-                    </table>
-                    
-                    <div class="invoice-totals">
-                        <div class="total-row">
-                            <span>Subtotal:</span>
-                            <span>$${subtotal.toFixed(2)}</span>
-                        </div>
-                        ${(rushFee + revisionFee + otherFees) > 0 ? `
-                        <div class="total-row">
-                            <span>Additional Fees:</span>
-                            <span>$${(rushFee + revisionFee + otherFees).toFixed(2)}</span>
-                        </div>
-                        ` : ''}
-                        ${taxAmount > 0 ? `
-                        <div class="total-row">
-                            <span>WA State Sales Tax (10.20%):</span>
-                            <span>$${taxAmount.toFixed(2)}</span>
-                        </div>
-                        ` : `
-                        <div class="total-row">
-                            <span>Sales Tax:</span>
-                            <span>Tax Exempt</span>
-                        </div>
-                        `}
-                        <div class="total-row grand-total">
-                            <span>Total Due:</span>
-                            <span>$${grandTotal.toFixed(2)}</span>
-                        </div>
-                    </div>
-                    
-                    ${invoiceData.customerNotes ? `
-                    <div class="invoice-section" style="margin-top: 2rem;">
-                        <h3>Notes:</h3>
-                        <p>${invoiceData.customerNotes}</p>
-                    </div>
-                    ` : ''}
-                    
-                    <div style="margin-top: 3rem; text-align: center; color: var(--text-secondary); font-size: 0.875rem;">
-                        <p>Payment due within 30 days</p>
-                        <p>Please reference Invoice ID: ART-${selectedRequest.ID_Design} with payment</p>
-                    </div>
-                </div>
+        // Show Alert
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
             `;
             
-            document.getElementById('previewContent').innerHTML = previewHTML;
-            document.getElementById('previewModal').classList.add('active');
-        }
-        
-        // Close Preview
-        function closePreview() {
-            document.getElementById('previewModal').classList.remove('active');
+            alertContainer.appendChild(alert);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
         }
         
         // Handle Form Submit
@@ -1508,244 +1168,152 @@
             e.preventDefault();
             
             if (!selectedRequest) {
-                showAlert('Please select an art request first', 'warning');
+                showAlert('Please select an art request first', 'error');
                 return;
             }
             
-            // Validate tax exemption if tax is not applied
-            const applyTax = document.getElementById('applyTax').checked;
-            if (!applyTax) {
-                if (!validateResellerPermit()) {
-                    showAlert('Valid Washington State reseller permit is required for tax exemption', 'error');
+            // Validate reseller permit if tax exempt
+            if (!document.getElementById('applyTax').checked) {
+                const permit = document.getElementById('resellerPermit').value.trim();
+                if (!permit) {
+                    showAlert('Reseller permit number is required for tax exemption', 'error');
                     return;
                 }
             }
             
-            const saveAsDraft = document.getElementById('saveAsDraft').checked;
-            if (saveAsDraft) {
-                await saveInvoice(true);
-            } else {
-                await submitInvoice();
-            }
-        }
-        
-        // Save Invoice
-        async function saveInvoice(asDraft = false) {
-            const formData = new FormData(document.getElementById('invoiceForm'));
-            const invoiceData = Object.fromEntries(formData);
+            // Gather service items
+            const serviceItems = [];
+            let hasValidService = false;
             
-            // Build customer name from available fields
-            let customerName = selectedRequest.Full_Name_Contact || '';
-            if (!customerName && (selectedRequest.First_name || selectedRequest.Last_name)) {
-                customerName = `${selectedRequest.First_name || ''} ${selectedRequest.Last_name || ''}`.trim();
+            document.querySelectorAll('.service-line').forEach(row => {
+                const serviceSelect = row.querySelector('.service-select');
+                const descriptionInput = row.querySelector('.service-description');
+                const quantityInput = row.querySelector('.quantity-input');
+                const customRateInput = row.querySelector('.custom-rate');
+                const lineTotalText = row.querySelector('.line-total').textContent;
+                
+                const code = serviceSelect.value;
+                if (code) {
+                    hasValidService = true;
+                    const quantity = parseInt(quantityInput.value) || 1;
+                    const total = parseFloat(lineTotalText.replace('$', '')) || 0;
+                    
+                    if (code === 'CUSTOM') {
+                        serviceItems.push({
+                            code: 'CUSTOM',
+                            description: descriptionInput.value || 'Custom Art Service',
+                            quantity: quantity,
+                            rate: parseFloat(customRateInput.value) || 0,
+                            amount: total
+                        });
+                    } else {
+                        const service = invoiceService.getServiceByCode(code);
+                        serviceItems.push({
+                            code: code,
+                            description: descriptionInput.value || service.description,
+                            quantity: quantity,
+                            rate: service.amount,
+                            amount: total
+                        });
+                    }
+                }
+            });
+            
+            if (!hasValidService) {
+                showAlert('Please add at least one service', 'error');
+                return;
             }
             
-            // Store ShopWorks references and other data in notes/file references
-            const shopWorksRefs = [];
-            if (selectedRequest.shopwork_customer_number) shopWorksRefs.push(`SW Customer #${selectedRequest.shopwork_customer_number}`);
-            if (selectedRequest.Design_Num_SW) shopWorksRefs.push(`SW Design #${selectedRequest.Design_Num_SW}`);
-            if (selectedRequest.Order_Num_SW) shopWorksRefs.push(`SW Order #${selectedRequest.Order_Num_SW}`);
+            // Calculate totals
+            const subtotal = serviceItems.reduce((sum, item) => sum + item.amount, 0);
+            const applyTax = document.getElementById('applyTax').checked;
+            const taxAmount = applyTax ? subtotal * 0.102 : 0;
+            const grandTotal = subtotal + taxAmount;
+            
+            // Get sales rep info
+            const salesRepEmail = selectedRequest.User_Email || getSalesRepEmail(selectedRequest.CustomerServiceRep || '');
+            const salesRepName = getSalesRepName(salesRepEmail);
             
             // Prepare invoice data
-            const invoice = {
-                idDesign: selectedRequest.ID_Design,  // This is the key field for linking
-                artRequestID: selectedRequest.ID_Design,
-                artistName: 'Steve Deland',
-                artistEmail: 'art@nwcustomapparel.com',
-                salesRepName: selectedRequest.CustomerServiceRep || '',
-                salesRepEmail: getSalesRepEmail(selectedRequest.CustomerServiceRep || ''),
-                customerName: customerName || '',
-                customerCompany: selectedRequest.CompanyName || '',
-                customerEmail: selectedRequest.Email_Contact || '',
-                projectName: invoiceData.projectName,
-                projectType: invoiceData.projectType,
-                originalRequestDate: selectedRequest.Date_Created,
-                completionDate: invoiceData.completionDate,
-                timeSpent: parseFloat(invoiceData.timeSpent) || 0,
-                hourlyRate: parseFloat(invoiceData.hourlyRate) || 75,
-                rushFee: parseFloat(invoiceData.rushFee) || 0,
-                revisionFee: parseFloat(invoiceData.revisionFee) || 0,
-                otherFees: parseFloat(invoiceData.otherFees) || 0,
-                taxAmount: parseFloat(invoiceData.applyTax === 'on' ? 
-                    (parseFloat(invoiceData.timeSpent || 0) * parseFloat(invoiceData.hourlyRate || 75) + 
-                     parseFloat(invoiceData.rushFee || 0) + parseFloat(invoiceData.revisionFee || 0) + 
-                     parseFloat(invoiceData.otherFees || 0)) * 0.1020 : 0),
-                resellerPermit: invoiceData.applyTax === 'on' ? '' : (invoiceData.resellerPermit || ''),
-                notes: invoiceData.internalNotes || '',
-                customerNotes: invoiceData.customerNotes || '',
-                artworkDescription: invoiceData.artworkDescription || '',
-                complexity: invoiceData.complexity,
-                ccEmails: 'erik@nwcustomapparel.com',
-                fileReferences: shopWorksRefs.join(' | ') || '',
-                priority: getOrderType(selectedRequest) || 'Normal'
-            };
-            
-            // Show loading
-            showAlert('Saving invoice...', 'info');
-            
-            try {
-                const result = await invoiceService.createInvoice(invoice);
-                
-                if (result.success) {
-                    if (asDraft) {
-                        showAlert(`Invoice saved as draft! Invoice ID: ${result.invoiceID}`, 'success');
-                        setTimeout(() => {
-                            window.location.href = '/art-invoices-dashboard.html';
-                        }, 2000);
-                    } else {
-                        // Continue to send email
-                        await sendInvoiceEmail(result.invoiceID, result.data);
-                    }
-                } else {
-                    showAlert('Error saving invoice: ' + result.error, 'error');
-                }
-            } catch (error) {
-                console.error('Error saving invoice:', error);
-                showAlert('Error saving invoice', 'error');
-            }
-        }
-        
-        // Submit Invoice (Save and Send)
-        async function submitInvoice() {
-            closePreview();
-            await saveInvoice(false);
-        }
-        
-        // Send Invoice Email
-        async function sendInvoiceEmail(invoiceID, invoiceData) {
-            // Calculate totals for email
-            const subtotal = invoiceData.SubtotalAmount;
-            const grandTotal = invoiceData.GrandTotal;
-            
-            // Get ShopWorks references from selected request
-            let shopworksRefs = '';
-            if (selectedRequest.shopwork_customer_number) {
-                shopworksRefs += `Customer #${selectedRequest.shopwork_customer_number} `;
-            }
-            if (selectedRequest.Design_Num_SW) {
-                shopworksRefs += `Design #${selectedRequest.Design_Num_SW} `;
-            }
-            if (selectedRequest.Order_Num_SW) {
-                shopworksRefs += `Order #${selectedRequest.Order_Num_SW}`;
-            }
-            
-            // Prepare email data matching the template variables
-            const emailData = {
-                // System fields
-                to_email: invoiceData.SalesRepEmail,
-                reply_to: invoiceData.ArtistEmail,
-                from_name: 'Northwest Custom Apparel Art Department',
-                
-                // Invoice details
-                invoice_id: invoiceID,
-                invoice_date: new Date().toLocaleDateString(),
-                due_date: new Date(invoiceData.DueDate).toLocaleDateString(),
-                
-                // Design reference
-                id_design: selectedRequest.ID_Design,
-                
-                // Recipient info
-                sales_rep_name: invoiceData.SalesRepName,
-                sales_rep_email: invoiceData.SalesRepEmail,
+            const invoiceData = {
+                idDesign: selectedRequest.ID_Design,
                 
                 // Customer info
-                customer_name: invoiceData.CustomerName,
-                customer_company: invoiceData.CustomerCompany || 'Not Provided',
-                customer_email: invoiceData.CustomerEmail || selectedRequest.Email_Contact || '',
-                customer_phone: selectedRequest.Phone || '',
+                customerName: document.getElementById('customerName').value,
+                customerCompany: document.getElementById('customerCompany').value,
+                customerEmail: document.getElementById('customerEmail').value,
                 
-                // Project details
-                project_name: invoiceData.ProjectName,
-                project_type: invoiceData.ProjectType,
-                order_type: getOrderType(selectedRequest),
-                artwork_description: invoiceData.ArtworkDescription || 'See attached invoice for details',
+                // Sales rep info
+                salesRepName: salesRepName,
+                salesRepEmail: salesRepEmail,
                 
-                // Art service amount (from database)
-                amount_art_billed: invoiceData.SubtotalAmount.toFixed(2),
+                // Project info
+                projectName: document.getElementById('projectName').value,
+                originalRequestDate: selectedRequest.Date_Created,
+                completionDate: new Date(),
                 
-                // Time and billing (for internal reference in email)
-                time_spent: invoiceData.TimeSpent.toFixed(2),
-                hourly_rate: invoiceData.HourlyRate.toFixed(2),
-                subtotal: subtotal.toFixed(2),
+                // Service items (as JSON)
+                serviceItems: JSON.stringify(serviceItems),
+                serviceSummary: serviceItems.map(item => `${item.code}: ${item.description}`).join('; '),
                 
-                // Additional fees
-                rush_fee: invoiceData.RushFee.toFixed(2),
-                revision_fee: invoiceData.RevisionFee.toFixed(2),
-                other_fees: invoiceData.OtherFees.toFixed(2),
-                
-                // Totals
-                grand_total: grandTotal.toFixed(2),
-                total_amount: grandTotal.toFixed(2), // Duplicate for template compatibility
-                
-                // ShopWorks references
-                shopworks_references: shopworksRefs.trim() || 'N/A',
+                // Amounts
+                subtotalAmount: subtotal,
+                rushFee: 0, // Not used in service code model
+                revisionFee: 0, // Not used in service code model
+                otherFees: 0, // Not used in service code model
+                taxAmount: taxAmount,
+                totalCost: grandTotal,
                 
                 // Notes
-                notes: invoiceData.CustomerNotes || 'No additional notes',
+                customerNotes: document.getElementById('customerNotes').value,
+                notes: document.getElementById('internalNotes').value,
                 
-                // Company info
-                company_phone: '253-922-5793',
-                company_year: '1977',
+                // Status
+                status: document.getElementById('saveAsDraft').checked ? 'Draft' : 'Sent',
                 
-                // Additional fields that might be in template
-                complexity: invoiceData.Complexity || 'Standard',
-                completion_date: invoiceData.CompletionDate ? new Date(invoiceData.CompletionDate).toLocaleDateString() : new Date().toLocaleDateString()
+                // Additional fields
+                artistName: 'Steve Deland',
+                artistEmail: 'art@nwcustomapparel.com',
+                ccEmails: 'erik@nwcustomapparel.com',
+                createdBy: salesRepName
             };
             
+            // Get submit button reference
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
             try {
-                // Send email using EmailJS
-                await emailjs.send(
-                    'service_1c4k67j',
-                    'art_invoice',
-                    emailData
-                );
+                // Show loading
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+                submitBtn.disabled = true;
                 
-                // Update invoice status
-                await invoiceService.markInvoiceAsSent(invoiceID, invoiceData.SalesRepEmail);
+                // Log the invoice data for debugging
+                console.log('Invoice data being sent:', invoiceData);
                 
-                showAlert(`Invoice sent successfully! Invoice ID: ${invoiceID}`, 'success');
-                setTimeout(() => {
-                    window.location.href = '/art-invoices-dashboard.html';
-                }, 2000);
+                // Create invoice
+                const result = await invoiceService.createInvoice(invoiceData);
+                
+                if (result.success) {
+                    showAlert(`Invoice ${result.invoiceID} created successfully!`, 'success');
+                    
+                    // Redirect to invoice view
+                    setTimeout(() => {
+                        window.location.href = `/art-invoice-view.html?id=${result.invoiceID}`;
+                    }, 1500);
+                } else {
+                    throw new Error(result.error || 'Failed to create invoice');
+                }
                 
             } catch (error) {
-                console.error('Error sending email:', error);
-                showAlert('Invoice saved but email failed to send. Please try again from the dashboard.', 'warning');
-                setTimeout(() => {
-                    window.location.href = '/art-invoices-dashboard.html';
-                }, 3000);
+                console.error('Error creating invoice:', error);
+                showAlert(error.message || 'Failed to create invoice', 'error');
+                
+                // Restore button
+                if (submitBtn) {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
             }
-        }
-        
-        // Show Alert
-        function showAlert(message, type = 'info') {
-            const alertContainer = document.getElementById('alertContainer');
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            
-            const icon = type === 'success' ? 'check-circle' : 
-                        type === 'error' ? 'exclamation-circle' : 
-                        type === 'warning' ? 'exclamation-triangle' : 'info-circle';
-            
-            alertDiv.innerHTML = `
-                <i class="fas fa-${icon}"></i>
-                <span>${message}</span>
-            `;
-            
-            alertContainer.innerHTML = '';
-            alertContainer.appendChild(alertDiv);
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 5000);
-        }
-        
-        // Format Date
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            const date = new Date(dateString);
-            return date.toLocaleDateString();
         }
     </script>
 </body>
