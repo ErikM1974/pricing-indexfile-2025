@@ -710,3 +710,18 @@ const description = `Extra Thread Color${extraColors > 1 ? 's' : ''} (${extraCol
     - EmailJS integration for sending designs
     - Database tracking of sent designs
     - Orange safety theme (#ff6b35)
+  
+- **Webstores** (WEB)
+  - File: /calculators/webstores.html
+  - Service: /calculators/webstores-quote-service.js
+  - Customer Page: /webstore-info.html
+  - Contact: General Sales
+  - Type: Webstore setup quote calculator
+  - Added: January 2025
+  - Special Features:
+    - Store type selection (Open/Close vs On-Demand)
+    - Logo digitization calculator
+    - Annual minimum guarantee
+    - Customer-facing info page
+    - Database integration
+    - Professional accordion-style guide

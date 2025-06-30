@@ -4,6 +4,12 @@
 
 This file contains complete, copy-paste ready templates for building new calculators. Based on the proven Customer Supplied Embroidery Calculator pattern.
 
+**Note on Service Calculators**: Some calculators quote services rather than products (e.g., webstore setup). These may need to:
+- Display setup fees rather than per-item pricing
+- Show requirements (like annual minimums) separately from costs
+- Include extensive information sections using accordions
+- Link to customer-facing information pages
+
 ## Complete HTML Calculator Template
 
 ```html
@@ -1433,3 +1439,102 @@ When saving to database with multiple components:
 - Use descriptive ProductName and PrintLocation fields
 - Maintain proper LineNumber sequence
 - See `buildLineItemsForDatabase()` example above
+
+## Accordion Information Sections
+
+For calculators with extensive information (like webstores), use accordions:
+
+### HTML Structure
+```html
+<div class="accordion">
+    <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this.parentElement)">
+            <h3>Section Title</h3>
+            <i class="fas fa-chevron-down accordion-icon"></i>
+        </div>
+        <div class="accordion-content">
+            <div class="accordion-body">
+                <!-- Content here -->
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+### CSS for Accordions
+```css
+.accordion-item {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.accordion-header {
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.accordion-icon {
+    transition: transform 0.3s;
+}
+
+.accordion-item.active .accordion-icon {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.accordion-item.active .accordion-content {
+    max-height: 1000px;
+}
+```
+
+### JavaScript Toggle Function
+```javascript
+function toggleAccordion(item) {
+    item.classList.toggle('active');
+}
+```
+
+## Service Calculator Patterns
+
+For service-based calculators (setup fees, not products):
+
+### Displaying Requirements vs Costs
+```html
+<!-- Actual costs -->
+<div class="price-breakdown">
+    <div class="price-item">
+        <span>Setup Fee</span>
+        <span>$300.00</span>
+    </div>
+    <div class="price-item">
+        <span><strong>Total Cost</strong></span>
+        <span><strong>$300.00</strong></span>
+    </div>
+</div>
+
+<!-- Requirements (not part of total) -->
+<div style="margin-top: 1.5rem; padding: 1rem; background: var(--warning-bg); border-radius: 8px;">
+    <p style="margin: 0; font-size: 0.875rem; color: var(--warning-text);">
+        <i class="fas fa-info-circle"></i>
+        <strong>Annual Requirement:</strong> $2,000 minimum in sales
+    </p>
+</div>
+```
+
+### Linking to Public Info Pages
+Include in email templates:
+```html
+<div style="background-color: #f0f7f1; padding: 20px; text-align: center;">
+    <p><strong>Learn More About Our Services</strong></p>
+    <a href="https://yourdomain.com/service-info.html" style="color: #4cb354;">
+        View Complete Information →
+    </a>
+</div>
+```

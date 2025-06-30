@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simplify your company apparel program with Northwest Custom Apparel's online webstores. Perfect for employee uniforms, team gear, and company merchandise.">
+    <title>Company Webstores - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Root variables - NWCA Theme */
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+        }
+
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .contact-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .contact-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(76, 179, 84, 0.2);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .btn-white:hover {
+            background: var(--bg-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        /* Benefits Section */
+        .benefits {
+            padding: 5rem 2rem;
+            background: var(--card-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .benefit-card {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 12px;
+            background: var(--bg-color);
+            transition: transform 0.2s;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .benefit-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .benefit-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .benefit-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Store Types Section */
+        .store-types {
+            padding: 5rem 2rem;
+            background: var(--bg-color);
+        }
+
+        .store-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .store-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .store-card.featured {
+            border: 2px solid var(--primary-color);
+        }
+
+        .store-card.featured::before {
+            content: "MOST POPULAR";
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 3rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+
+        .store-card h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .store-features {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .store-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .store-features li:last-child {
+            border-bottom: none;
+        }
+
+        .store-features i {
+            color: var(--primary-color);
+        }
+
+        .surcharge-badge {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 5rem 2rem;
+            background: var(--card-bg);
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.03);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .pricing-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .pricing-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 1rem 0;
+        }
+
+        .pricing-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Sample Store Section */
+        .sample-store {
+            padding: 5rem 2rem;
+            background: var(--bg-color);
+        }
+
+        .sample-showcase {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .sample-image {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .sample-image:hover {
+            transform: scale(1.02);
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: 5rem 2rem;
+            background: var(--card-bg);
+        }
+
+        .faq-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: background 0.2s;
+        }
+
+        .faq-question:hover {
+            background: var(--hover-bg);
+        }
+
+        .faq-icon {
+            color: var(--text-secondary);
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-answer-content {
+            padding: 0 1.5rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-primary);
+            color: white;
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            height: 50px;
+            margin-bottom: 2rem;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-info {
+            margin-bottom: 2rem;
+        }
+
+        .footer-info p {
+            margin: 0.5rem 0;
+            opacity: 0.9;
+        }
+
+        .footer-info a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer-info a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            opacity: 0.7;
+            font-size: 0.875rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            cursor: pointer;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            cursor: default;
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .store-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+            </a>
+            <nav class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/marketing.html" class="nav-link">Marketing</a>
+                <a href="/resources.html" class="nav-link">Resources</a>
+                <a href="mailto:sales@nwcustomapparel.com" class="contact-btn">
+                    <i class="fas fa-envelope"></i>
+                    Contact Sales
+                </a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Simplify Your Company Apparel Program</h1>
+            <p>Create a custom online store for your team's branded apparel and merchandise. 
+               Save time, reduce hassle, and maintain brand consistency.</p>
+            <div class="cta-buttons">
+                <a href="#request-quote" class="btn btn-white">
+                    <i class="fas fa-file-invoice"></i>
+                    Request a Quote
+                </a>
+                <a href="#learn-more" class="btn btn-outline">
+                    <i class="fas fa-info-circle"></i>
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits" id="learn-more">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Choose a Company Webstore?</h2>
+                <p>Streamline your apparel program and empower your team with 24/7 access to company-approved merchandise.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Save Time</h3>
+                    <p>Eliminate manual order processing and reduce administrative overhead by up to 80%.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Employee Satisfaction</h3>
+                    <p>Give your team easy access to company gear whenever they need it, improving morale and pride.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Brand Consistency</h3>
+                    <p>Ensure all team members wear approved designs with correct logos and colors.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Real-Time Reporting</h3>
+                    <p>Track orders, popular items, and spending patterns with comprehensive analytics.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <h3>No Inventory</h3>
+                    <p>We handle all inventory management - you never have to store or distribute items.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h3>Flexible Payment</h3>
+                    <p>Choose employee direct purchase or company billing with customizable approval workflows.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Store Types Section -->
+    <section class="store-types">
+        <div class="container">
+            <div class="section-header">
+                <h2>Choose Your Store Type</h2>
+                <p>We offer two flexible store options to match your company's needs and ordering patterns.</p>
+            </div>
+            <div class="store-comparison">
+                <div class="store-card">
+                    <h3>Open/Close Store</h3>
+                    <p>Perfect for seasonal ordering and bulk purchases</p>
+                    <ul class="store-features">
+                        <li><i class="fas fa-check"></i> Store open for set periods (2-4 weeks)</li>
+                        <li><i class="fas fa-check"></i> Ideal for new hire orientations</li>
+                        <li><i class="fas fa-check"></i> Consolidated shipping saves costs</li>
+                        <li><i class="fas fa-check"></i> Net 10 billing available</li>
+                        <li><i class="fas fa-check"></i> Bulk order discounts</li>
+                    </ul>
+                    <div class="surcharge-badge">
+                        $2.00 per item surcharge
+                    </div>
+                </div>
+                <div class="store-card featured">
+                    <h3>On-Demand Store</h3>
+                    <p>24/7 availability for immediate needs</p>
+                    <ul class="store-features">
+                        <li><i class="fas fa-check"></i> Always open for ordering</li>
+                        <li><i class="fas fa-check"></i> Perfect for frequent new hires</li>
+                        <li><i class="fas fa-check"></i> Individual shipping available</li>
+                        <li><i class="fas fa-check"></i> No minimum quantities</li>
+                        <li><i class="fas fa-check"></i> Immediate fulfillment</li>
+                    </ul>
+                    <div class="surcharge-badge">
+                        $10.00 per item surcharge
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2>Transparent Pricing</h2>
+                <p>Simple, straightforward pricing with no hidden fees.</p>
+            </div>
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <i class="fas fa-cog pricing-icon"></i>
+                    <h3>Store Setup</h3>
+                    <div class="price">$300</div>
+                    <p>One-time fee to create and configure your custom store</p>
+                </div>
+                <div class="pricing-card">
+                    <i class="fas fa-image pricing-icon"></i>
+                    <h3>Logo Digitization</h3>
+                    <div class="price">$100</div>
+                    <p>Per logo setup for embroidery and decoration</p>
+                </div>
+                <div class="pricing-card">
+                    <i class="fas fa-shopping-cart pricing-icon"></i>
+                    <h3>Annual Minimum</h3>
+                    <div class="price">$2,000</div>
+                    <p>Ensures your store meets volume requirements</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sample Store Section -->
+    <section class="sample-store">
+        <div class="container">
+            <div class="section-header">
+                <h2>See a Sample Store</h2>
+                <p>Here's an example of what your custom company store could look like.</p>
+            </div>
+            <div class="sample-showcase">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/arrow%20lumber%20store.jpg?ver=1" 
+                     alt="Sample company webstore" 
+                     class="sample-image"
+                     onclick="openModal()">
+                <p style="margin-top: 1rem; color: var(--text-secondary);">
+                    <i class="fas fa-search-plus"></i> Click to enlarge
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>How long does it take to set up a store?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Typically, we can have your store up and running within 5-7 business days after receiving your logo files and product selections.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Can we control who has access to order?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Yes! We can set up password protection, user groups, and approval workflows to ensure only authorized employees can place orders.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>What happens if we don't meet the annual minimum?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            The $2,000 annual minimum ensures we can maintain your store and provide quality service. If your orders don't reach this amount, we'll invoice the difference at year-end.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Can we add new products later?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Absolutely! We can add new products, update designs, or make seasonal changes to your store at any time. Just contact your sales representative.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Do you handle returns and exchanges?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Yes, we handle all returns and exchanges through your designated point of contact. We'll work quickly to resolve any sizing or quality issues.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="request-quote">
+        <div class="container">
+            <h2>Ready to Simplify Your Apparel Program?</h2>
+            <p>Let's create a custom webstore that works for your team.</p>
+            <div class="cta-buttons">
+                <a href="mailto:sales@nwcustomapparel.com?subject=Webstore%20Quote%20Request" class="btn btn-white">
+                    <i class="fas fa-envelope"></i>
+                    Request a Quote
+                </a>
+                <a href="tel:253-922-5793" class="btn btn-outline">
+                    <i class="fas fa-phone"></i>
+                    Call 253-922-5793
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                 alt="Northwest Custom Apparel" class="footer-logo">
+            <div class="footer-info">
+                <p><strong>Northwest Custom Apparel</strong></p>
+                <p>2025 Freeman Road East, Milton, WA 98354</p>
+                <p>Phone: <a href="tel:253-922-5793">253-922-5793</a> | Toll Free: <a href="tel:1-800-851-3671">1-800-851-3671</a></p>
+                <p>Email: <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></p>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Northwest Custom Apparel. Family Owned & Operated Since 1977.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal" id="imageModal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/arrow%20lumber%20store.jpg?ver=1" 
+                 alt="Sample webstore enlarged">
+        </div>
+    </div>
+
+    <script>
+        // FAQ Toggle
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            faqItem.classList.toggle('active');
+        }
+
+        // Modal functions
+        function openModal() {
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Mobile menu toggle (basic implementation)
+        document.querySelector('.mobile-menu-btn')?.addEventListener('click', function() {
+            alert('Mobile menu would open here. Full implementation needed.');
+        });
+    </script>
+</body>
+</html>
