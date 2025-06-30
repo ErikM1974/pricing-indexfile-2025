@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Supplied Screen Print Quote</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <table role="presentation" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header with Teal Theme -->
+                    <tr>
+                        <td style="background-color: #0d9488; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" style="max-width: 200px; height: auto;">
+                        </td>
+                    </tr>
+
+                    <!-- Quote Title -->
+                    <tr>
+                        <td style="padding: 30px 30px 20px 30px; text-align: center;">
+                            <h1 style="margin: 0; color: #333333; font-size: 28px; font-weight: bold;">Customer Supplied Screen Print Quote</h1>
+                            <p style="margin: 10px 0 0 0; color: #666666; font-size: 16px;">Quote ID: {{quote_id}}</p>
+                        </td>
+                    </tr>
+
+                    <!-- Customer Information -->
+                    <tr>
+                        <td style="padding: 0 30px 20px 30px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #f0fdfa; padding: 20px; border-radius: 6px;">
+                                <tr>
+                                    <td>
+                                        <h2 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">Customer Information</h2>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Name:</strong> {{customer_name}}</p>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Company:</strong> {{company_name}}</p>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Email:</strong> {{to_email}}</p>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Phone:</strong> {{customer_phone}}</p>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Project:</strong> {{project_name}}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Quote Details -->
+                    <tr>
+                        <td style="padding: 0 30px 20px 30px;">
+                            <h2 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">Quote Details</h2>
+                            <div style="background-color: #ffffff; border: 2px solid #0d9488; border-radius: 6px; overflow: hidden;">
+                                {{{products_html}}}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Total -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #0d9488; color: white; padding: 20px; border-radius: 6px;">
+                                <tr>
+                                    <td align="center">
+                                        <h2 style="margin: 0; font-size: 24px;">Grand Total: ${{grand_total}}</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Notes Section -->
+                    <tr>
+                        <td style="padding: 0 30px 20px 30px;">
+                            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px;">
+                                <h3 style="margin: 0 0 10px 0; color: #856404; font-size: 16px;">
+                                    <strong>Notes & Special Instructions:</strong>
+                                </h3>
+                                <p style="margin: 0; color: #856404;">{{notes}}</p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Screen Print Specific Information -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <div style="background-color: #f0fdfa; border-radius: 6px; padding: 20px;">
+                                <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 16px;">Important Screen Print Information:</h3>
+                                <ul style="margin: 0; padding-left: 20px; color: #666666; line-height: 1.6;">
+                                    <li>This quote is valid for 30 days from {{quote_date}}</li>
+                                    <li>Screen setup fees are $30 per color</li>
+                                    <li>Minimum order quantity: 24 pieces</li>
+                                    <li>Less than minimum fee applies to orders under 72 pieces</li>
+                                    <li>Dark garments require a white base layer (included in price)</li>
+                                    <li>Customer-supplied garments must be clean and ready for printing</li>
+                                    <li>Production time begins after artwork approval</li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Customer Supplied Garment Notice -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <div style="background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 6px; padding: 20px;">
+                                <h3 style="margin: 0 0 10px 0; color: #92400e; font-size: 16px;">
+                                    <strong>Important Notice: Customer Supplied Garments</strong>
+                                </h3>
+                                <p style="margin: 0; color: #92400e; line-height: 1.6;">
+                                    Northwest Custom Apparel is not responsible for the damage of ANY customer supplied garments. 
+                                    Should items be damaged while in our facility, we will NOT reimburse you for their value or replace them. 
+                                    Please sign our garment waiver form upon drop-off.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Sales Rep Contact -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #f0fdfa; padding: 20px; border-radius: 6px;">
+                                <tr>
+                                    <td align="center">
+                                        <h3 style="margin: 0 0 10px 0; color: #333333; font-size: 16px;">Questions? Contact Your Sales Representative</h3>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>{{sales_rep_name}}</strong></p>
+                                        <p style="margin: 5px 0; color: #666666;">Email: <a href="mailto:{{sales_rep_email}}" style="color: #0d9488;">{{sales_rep_email}}</a></p>
+                                        <p style="margin: 5px 0; color: #666666;">Phone: {{sales_rep_phone}}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #333333; padding: 30px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 14px;">
+                                <strong>Northwest Custom Apparel</strong><br>
+                                Family Owned & Operated Since {{company_year}}
+                            </p>
+                            <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 14px;">
+                                2025 Freeman Road East, Milton, WA 98354<br>
+                                Phone: 253-922-5793 | Toll Free: 1-800-851-3671
+                            </p>
+                            <p style="margin: 0; color: #ffffff; font-size: 14px;">
+                                <a href="https://www.nwcustomapparel.com" style="color: #0d9488; text-decoration: none;">www.nwcustomapparel.com</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

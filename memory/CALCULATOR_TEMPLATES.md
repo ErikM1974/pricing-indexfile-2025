@@ -702,10 +702,11 @@ This file contains complete, copy-paste ready templates for building new calcula
             }
 
             generateQuoteHTML(quoteData) {
+                // Basic single-item example
                 return `
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
-                            <tr style="background: #f3f4f6;">
+                            <tr style="background: #4cb354; color: white;">
                                 <th style="padding: 12px; text-align: left;">Item</th>
                                 <th style="padding: 12px; text-align: center;">Quantity</th>
                                 <th style="padding: 12px; text-align: right;">Price</th>
@@ -721,13 +722,131 @@ This file contains complete, copy-paste ready templates for building new calcula
                             </tr>
                         </tbody>
                         <tfoot>
-                            <tr style="border-top: 2px solid #e5e7eb;">
+                            <tr style="border-top: 2px solid #4cb354;">
                                 <td colspan="3" style="padding: 12px; text-align: right; font-weight: bold;">Total:</td>
                                 <td style="padding: 12px; text-align: right; font-weight: bold;">$${quoteData.totalCost.toFixed(2)}</td>
                             </tr>
                         </tfoot>
                     </table>
                 `;
+            }
+
+            // Advanced example with detailed pricing breakdown (e.g., Screen Print)
+            generateDetailedQuoteHTML(quoteData) {
+                let html = `
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #4cb354; color: white;">
+                                <th style="padding: 12px; text-align: left;">Description</th>
+                                <th style="padding: 12px; text-align: center;">Quantity</th>
+                                <th style="padding: 12px; text-align: right;">Unit Price</th>
+                                <th style="padding: 12px; text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                
+                // Example: Screen print with multiple locations
+                if (quoteData.frontColors > 0) {
+                    html += `
+                            <tr>
+                                <td style="padding: 12px; border-bottom: 1px solid #ddd;">
+                                    Screen Print - Front (${quoteData.frontColors} color${quoteData.frontColors > 1 ? 's' : ''})
+                                </td>
+                                <td style="padding: 12px; text-align: center; border-bottom: 1px solid #ddd;">${quoteData.quantity}</td>
+                                <td style="padding: 12px; text-align: right; border-bottom: 1px solid #ddd;">$${quoteData.frontUnitPrice.toFixed(2)}</td>
+                                <td style="padding: 12px; text-align: right; border-bottom: 1px solid #ddd;">$${quoteData.frontTotal.toFixed(2)}</td>
+                            </tr>`;
+                }
+                
+                if (quoteData.backColors > 0) {
+                    html += `
+                            <tr>
+                                <td style="padding: 12px; border-bottom: 1px solid #ddd;">
+                                    Screen Print - Back (${quoteData.backColors} color${quoteData.backColors > 1 ? 's' : ''})
+                                </td>
+                                <td style="padding: 12px; text-align: center; border-bottom: 1px solid #ddd;">${quoteData.quantity}</td>
+                                <td style="padding: 12px; text-align: right; border-bottom: 1px solid #ddd;">$${quoteData.backUnitPrice.toFixed(2)}</td>
+                                <td style="padding: 12px; text-align: right; border-bottom: 1px solid #ddd;">$${quoteData.backTotal.toFixed(2)}</td>
+                            </tr>`;
+                }
+                
+                // Setup fees by location
+                if (quoteData.frontSetupFee > 0) {
+                    html += `
+                            <tr>
+                                <td style="padding: 12px; border-bottom: 1px solid #ddd;" colspan="3">
+                                    Setup Fee - Front (${quoteData.frontColors} screen${quoteData.frontColors > 1 ? 's' : ''} × $30)
+                                </td>
+                                <td style="padding: 12px; text-align: right; border-bottom: 1px solid #ddd;">$${quoteData.frontSetupFee.toFixed(2)}</td>
+                            </tr>`;
+                }
+                
+                if (quoteData.backSetupFee > 0) {
+                    html += `
+                            <tr>
+                                <td style="padding: 12px; border-bottom: 1px solid #ddd;" colspan="3">
+                                    Setup Fee - Back (${quoteData.backColors} screen${quoteData.backColors > 1 ? 's' : ''} × $30)
+                                </td>
+                                <td style="padding: 12px; text-align: right; border-bottom: 1px solid #ddd;">$${quoteData.backSetupFee.toFixed(2)}</td>
+                            </tr>`;
+                }
+                
+                // Less than minimum fee
+                if (quoteData.ltmFee > 0) {
+                    html += `
+                            <tr>
+                                <td style="padding: 12px; border-bottom: 1px solid #ddd;" colspan="3">Less Than Minimum Fee (under 72 pcs)</td>
+                                <td style="padding: 12px; text-align: right; border-bottom: 1px solid #ddd;">$${quoteData.ltmFee.toFixed(2)}</td>
+                            </tr>`;
+                }
+                
+                html += `
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" style="padding: 12px; text-align: right;">Subtotal:</td>
+                                <td style="padding: 12px; text-align: right;">$${quoteData.subtotal.toFixed(2)}</td>
+                            </tr>
+                            <tr style="border-top: 2px solid #4cb354;">
+                                <td colspan="3" style="padding: 12px; text-align: right; font-weight: bold;">Total:</td>
+                                <td style="padding: 12px; text-align: right; font-weight: bold;">$${quoteData.totalCost.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                `;
+                
+                return html;
+            }
+
+            // Example: Building line items for database storage
+            buildLineItemsForDatabase(quoteData) {
+                const lineItems = [];
+                let lineNumber = 1;
+                
+                // Add item for each print location
+                if (quoteData.frontColors > 0) {
+                    lineItems.push({
+                        LineNumber: lineNumber++,
+                        ProductName: `Screen Print - Front`,
+                        PrintLocation: `Front - ${quoteData.frontColors} color${quoteData.frontColors > 1 ? 's' : ''}`,
+                        Quantity: quoteData.quantity,
+                        BaseUnitPrice: quoteData.frontUnitPrice,
+                        LineTotal: quoteData.frontTotal
+                    });
+                }
+                
+                if (quoteData.backColors > 0) {
+                    lineItems.push({
+                        LineNumber: lineNumber++,
+                        ProductName: `Screen Print - Back`,
+                        PrintLocation: `Back - ${quoteData.backColors} color${quoteData.backColors > 1 ? 's' : ''}`,
+                        Quantity: quoteData.quantity,
+                        BaseUnitPrice: quoteData.backUnitPrice,
+                        LineTotal: quoteData.backTotal
+                    });
+                }
+                
+                return lineItems;
             }
 
             validateForm() {
@@ -918,7 +1037,7 @@ This file contains complete, copy-paste ready templates for building new calcula
                             window.print();
                             setTimeout(() => window.close(), 500);
                         };
-                    </script>
+                    <\/script>
                 </body>
                 </html>
             `);
@@ -1270,3 +1389,47 @@ colors.forEach(color => {
 ```
 
 This template system provides everything needed to quickly create new calculators with consistent functionality and styling.
+
+## Important Notes & Common Pitfalls
+
+### Script Tag Escaping in Template Literals
+When including `<script>` tags inside JavaScript template literals (backticks), you MUST escape the closing tag:
+
+```javascript
+// ❌ WRONG - Will cause "Unexpected end of input" error
+const html = `
+    <script>
+        window.print();
+    </script>
+`;
+
+// ✅ CORRECT - Escape the closing tag
+const html = `
+    <script>
+        window.print();
+    <\/script>
+`;
+```
+
+This is because the browser's HTML parser sees the `</script>` inside the string and thinks the script block has ended.
+
+### Color Theme Consistency
+Always use NWCA green colors (#4cb354) throughout:
+- Primary: `#4cb354` (NWCA Green)
+- Primary Dark: `#409a47`
+- Primary Light: `#5bc85f`
+- Never use teal colors like `#0d9488`
+
+### Detailed Pricing Breakdowns
+For calculators with multiple pricing components (like screen print with front/back), show detailed breakdowns:
+- List each location/component separately
+- Show individual setup fees
+- Include subtotal before grand total
+- Use the `generateDetailedQuoteHTML()` pattern shown above
+
+### Database Line Items
+When saving to database with multiple components:
+- Create separate line items for each component
+- Use descriptive ProductName and PrintLocation fields
+- Maintain proper LineNumber sequence
+- See `buildLineItemsForDatabase()` example above

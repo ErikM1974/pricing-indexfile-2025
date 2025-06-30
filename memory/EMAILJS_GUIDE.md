@@ -688,6 +688,31 @@ printQuote() {
 }
 ```
 
+## Color Theme Consistency
+
+### IMPORTANT: Always Use NWCA Green Colors
+When designing email templates and calculators, maintain consistent branding with NWCA's green color scheme:
+
+- **Primary Green**: `#4cb354` (Main NWCA green)
+- **Dark Green**: `#409a47` (Hover states, emphasis)
+- **Light Green**: `#5bc85f` (Highlights)
+- **Success Background**: `#d1fae5` (Light green background)
+- **Success Text**: `#065f46` (Dark green text)
+
+**Never use teal colors** like `#0d9488` or `#14b8a6` - these don't match NWCA branding.
+
+Example for email templates:
+```html
+<!-- Header background -->
+<td style="background-color: #4cb354; padding: 30px;">
+
+<!-- Accent borders -->
+<div style="border: 2px solid #4cb354;">
+
+<!-- Total amount emphasis -->
+<span style="color: #4cb354; font-weight: bold;">
+```
+
 ## Company Contact Information
 
 - **Phone**: 253-922-5793 (Toll Free: 1-800-851-3671)

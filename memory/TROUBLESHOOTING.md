@@ -32,6 +32,31 @@ if (quoteIdDisplay) {
 **Problem**: Trying to use single table instead of two
 **Fix**: Always use quote_sessions + quote_items pattern
 
+### Script Tag Parsing Error
+**Problem**: "Uncaught SyntaxError: Unexpected end of input" in HTML generation
+**Cause**: Unescaped `</script>` tag inside JavaScript template literal
+**Fix**: Escape the closing script tag with backslash:
+```javascript
+// ❌ WRONG - Causes parser error
+const html = `
+    <script>
+        window.onload = () => {
+            window.print();
+        };
+    </script>
+`;
+
+// ✅ CORRECT - Properly escaped
+const html = `
+    <script>
+        window.onload = () => {
+            window.print();
+        };
+    <\/script>
+`;
+```
+**Why**: The browser's HTML parser sees `</script>` and thinks the script block has ended, even inside a string
+
 ## Console Debug Commands
 
 ```javascript
