@@ -1,0 +1,314 @@
+/**
+ * Safety Stripe Creator - Additional Styles
+ * Custom styling enhancements for the Safety Stripe Creator tool
+ */
+
+/* Enhanced stripe option hover effects */
+.stripe-option {
+    position: relative;
+    overflow: hidden;
+}
+
+.stripe-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 107, 53, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stripe-option:hover::before {
+    opacity: 1;
+}
+
+.stripe-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--safety-orange);
+    color: white;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Image loading states */
+.stripe-option img,
+.placement-option img,
+.shirt-preview img {
+    background: #f0f0f0;
+    position: relative;
+}
+
+.stripe-option img::before,
+.placement-option img::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Enhanced placement options */
+.placement-option {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.placement-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 107, 53, 0.15);
+}
+
+.placement-option.selected {
+    box-shadow: 0 0 0 2px var(--safety-orange);
+}
+
+/* Smooth transitions for previews */
+.shirt-preview img {
+    transition: all 0.3s ease;
+}
+
+.shirt-preview:hover img {
+    transform: scale(1.02);
+}
+
+/* Enhanced modal animations */
+.modal-overlay {
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Form focus effects */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    background: rgba(255, 107, 53, 0.02);
+}
+
+/* Success animation */
+.success-icon {
+    animation: checkmark 0.6s ease;
+}
+
+@keyframes checkmark {
+    0% {
+        transform: scale(0) rotate(-45deg);
+    }
+    50% {
+        transform: scale(1.2) rotate(-45deg);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}
+
+/* Copy button feedback */
+.copy-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.copy-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.copy-btn:active::after {
+    width: 100px;
+    height: 100px;
+}
+
+/* Responsive enhancements */
+@media (max-width: 1024px) {
+    .stripe-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .modal-content {
+        margin: 20px;
+        width: calc(100% - 40px);
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .placement-option img {
+        height: 60px;
+    }
+    
+    .placement-option span {
+        font-size: 0.7rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .header,
+    .stripe-selector,
+    .action-section,
+    .modal-overlay {
+        display: none !important;
+    }
+    
+    .design-area {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .shirt-section {
+        page-break-inside: avoid;
+        margin-bottom: 2rem;
+    }
+}
+
+/* Accessibility improvements */
+.stripe-option:focus-visible,
+.placement-option:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--safety-orange);
+    outline-offset: 2px;
+}
+
+/* Loading spinner enhancement */
+.loading {
+    border-color: rgba(255, 107, 53, 0.2);
+    border-top-color: var(--safety-orange);
+}
+
+/* Badge for new feature */
+.new-badge {
+    display: inline-block;
+    background: var(--safety-orange);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Error states */
+.form-group input.error,
+.form-group select.error {
+    border-color: var(--error-red);
+}
+
+.form-group .error-message {
+    color: var(--error-red);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Tooltip styles */
+.tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+}
+
+/* Custom scrollbar */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--safety-orange);
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--safety-orange-dark);
+}

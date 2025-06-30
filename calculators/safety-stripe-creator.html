@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Safety Stripe Creator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Quote Service -->
+    <script src="safety-stripe-creator-service.js"></script>
+    
+    <!-- Custom Styles -->
+    <link href="../assets/safety-stripe-creator.css" rel="stylesheet">
+    
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --safety-orange: #ff6b35;
+            --safety-orange-light: #ff8c42;
+            --safety-orange-dark: #e55a2b;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --success-green: #4cb354;
+            --error-red: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--safety-orange);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Title Section */
+        .title-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .title-section p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Stripe Style Selector */
+        .stripe-selector {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .stripe-selector h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .stripe-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stripe-option {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .stripe-option:hover {
+            border-color: var(--safety-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
+        }
+
+        .stripe-option.selected {
+            border-color: var(--safety-orange);
+            background: rgba(255, 107, 53, 0.05);
+        }
+
+        .stripe-option img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stripe-option h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Design Area */
+        .design-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .shirt-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .shirt-section h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .shirt-preview {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .shirt-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .placement-option {
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        .placement-option:hover {
+            border-color: var(--safety-orange);
+            background: rgba(255, 107, 53, 0.05);
+        }
+
+        .placement-option.selected {
+            border-color: var(--safety-orange);
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .placement-option.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background: var(--safety-orange);
+            color: white;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .placement-option img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .placement-option span {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        /* Action Button */
+        .action-section {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .send-button {
+            background: var(--safety-orange);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .send-button:hover {
+            background: var(--safety-orange-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--safety-orange);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .design-summary {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1.5rem;
+        }
+
+        .design-summary h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .design-summary p {
+            margin: 0.25rem 0;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .design-summary span {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-primary {
+            background: var(--safety-orange);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--safety-orange-dark);
+        }
+
+        /* Success Modal */
+        .success-content {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success-green);
+            margin-bottom: 1rem;
+        }
+
+        .success-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .quote-id-display {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .quote-id {
+            font-family: monospace;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--safety-orange);
+        }
+
+        .copy-btn {
+            background: var(--safety-orange);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--safety-orange-dark);
+        }
+
+        .success-note {
+            color: var(--text-secondary);
+            margin: 1rem 0;
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--safety-orange);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .design-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .stripe-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .option-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .placement-option span {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                 alt="Northwest Custom Apparel" class="logo">
+            <nav class="breadcrumb">
+                <a href="/staff-dashboard.html">Staff Dashboard</a>
+                <span>/</span>
+                <span>Safety Stripe Creator</span>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Title -->
+        <div class="title-section">
+            <h1>Safety Stripe Creator</h1>
+            <p>Design custom safety stripes and send mockups to customers</p>
+        </div>
+
+        <!-- Stripe Style Selector -->
+        <div class="stripe-selector">
+            <h2>Step 1: Choose Your Stripe Style</h2>
+            <div class="stripe-options">
+                <div class="stripe-option" data-style="Standard" onclick="selectStripeStyle('Standard')">
+                    <img src="https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib" alt="Standard">
+                    <h3>Standard</h3>
+                </div>
+                <div class="stripe-option" data-style="Warning" onclick="selectStripeStyle('Warning')">
+                    <img src="https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl" alt="Warning">
+                    <h3>Warning</h3>
+                </div>
+                <div class="stripe-option" data-style="DiamondPlate" onclick="selectStripeStyle('DiamondPlate')">
+                    <img src="https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw" alt="Diamond Plate">
+                    <h3>Diamond Plate</h3>
+                </div>
+                <div class="stripe-option" data-style="ConstructionZone" onclick="selectStripeStyle('ConstructionZone')">
+                    <img src="https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27" alt="Construction Zone">
+                    <h3>Construction Zone</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Design Area -->
+        <div class="design-area" id="designArea" style="display: none;">
+            <!-- Front Design -->
+            <div class="shirt-section">
+                <h3>Step 2: Select Front Design</h3>
+                <div class="shirt-preview">
+                    <img id="frontPreview" src="" alt="Front View">
+                </div>
+                <div class="option-grid" id="frontOptions">
+                    <!-- Options will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Back Design -->
+            <div class="shirt-section">
+                <h3>Step 3: Select Back Design</h3>
+                <div class="shirt-preview">
+                    <img id="backPreview" src="" alt="Back View">
+                </div>
+                <div class="option-grid" id="backOptions">
+                    <!-- Options will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Send Button -->
+        <div class="action-section" id="actionSection" style="display: none;">
+            <button class="send-button" onclick="openSendModal()">
+                <i class="fas fa-paper-plane"></i>
+                Send Design to Customer
+            </button>
+        </div>
+    </main>
+
+    <!-- Send Modal -->
+    <div class="modal-overlay" id="sendModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Send Design to Customer</h3>
+            </div>
+            <div class="modal-body">
+                <form id="sendForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Customer Name <span style="color: red;">*</span></label>
+                            <input type="text" id="customerName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Customer Email <span style="color: red;">*</span></label>
+                            <input type="email" id="customerEmail" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Phone (Optional)</label>
+                            <input type="tel" id="customerPhone" placeholder="(555) 123-4567">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Company (Optional)</label>
+                            <input type="text" id="companyName">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sales Representative <span style="color: red;">*</span></label>
+                        <select id="salesRep" required>
+                            <option value="">Select Sales Rep</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                            <option value="taylar@nwcustomapparel.com">Taylar</option>
+                            <option value="nika@nwcustomapparel.com">Nika</option>
+                            <option value="erik@nwcustomapparel.com">Erik</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                            <option value="bradley@nwcustomapparel.com">Bradley</option>
+                            <option value="jim@nwcustomapparel.com">Jim</option>
+                            <option value="art@nwcustomapparel.com">Steve (Artist)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Message (Optional)</label>
+                        <textarea id="customMessage" rows="3" placeholder="Add a personal note to the customer..."></textarea>
+                    </div>
+                    
+                    <div class="design-summary">
+                        <h4>Design Summary:</h4>
+                        <p>Style: <span id="summaryStyle"></span></p>
+                        <p>Front: <span id="summaryFront"></span></p>
+                        <p>Back: <span id="summaryBack"></span></p>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeSendModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="sendButton">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Design
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <div class="success-content">
+                <i class="fas fa-check-circle success-icon"></i>
+                <h3>Design Sent Successfully!</h3>
+                <p>The safety stripe design has been sent to the customer.</p>
+                
+                <div class="quote-id-display">
+                    <label>Reference ID:</label>
+                    <span class="quote-id" id="quoteIdDisplay"></span>
+                    <button onclick="copyQuoteId()" class="copy-btn">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                
+                <p class="success-note">
+                    This design has been saved and can be referenced 
+                    when the customer is ready to order.
+                </p>
+                
+                <div class="success-actions">
+                    <button class="btn btn-secondary" onclick="startNewDesign()">New Design</button>
+                    <button class="btn btn-primary" onclick="closeSuccessModal()">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Image mapping with all Box.com URLs
+        const STRIPE_IMAGES = {
+            Standard: {
+                front: {
+                    JustStripes: 'https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib',
+                    LeftChestLogo: 'https://northwestcustomapparel.box.com/shared/static/lvqvm0ucwz8zm2yvi4d4qbr3wayozmi0',
+                    FrontCenterLogo: 'https://northwestcustomapparel.box.com/shared/static/sl7bn6qpiqhotdpuoetcgbtg8256upq7',
+                    BuiltInImage: 'https://northwestcustomapparel.box.com/shared/static/hvwtwqsvh7yivu0kih95y1jxqo7ntgyz'
+                },
+                back: {
+                    JustStripes: 'https://northwestcustomapparel.box.com/shared/static/iv55adzxyl135c8qyw513v25sogquqzm',
+                    BackCenterLogo: 'https://northwestcustomapparel.box.com/shared/static/g5j4tv6o583m0c8dr5w39kp8b8ixbcqj',
+                    BackBetweenLinesText: 'https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo',
+                    BackBuiltInImage: 'https://northwestcustomapparel.box.com/shared/static/z48kfyvvhsmy5yz9pu2pmewzo13kwrct'
+                }
+            },
+            ConstructionZone: {
+                front: {
+                    JustStripes: 'https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27',
+                    LeftChestLogo: 'https://northwestcustomapparel.box.com/shared/static/aw40v2m8adw1l03anqqut9vlz5u6auo5',
+                    FrontCenterLogo: 'https://northwestcustomapparel.box.com/shared/static/rulbnpjt19jewoh482c33wosw9aciuc9',
+                    BuiltInImage: 'https://northwestcustomapparel.box.com/shared/static/4q39xizfwnl9cuwv93i5fnl1nqeh624d'
+                },
+                back: {
+                    JustStripes: 'https://northwestcustomapparel.box.com/shared/static/sfwsfi8h4k4o0mxx7mx5s873w912scff',
+                    BackCenterLogo: 'https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo',
+                    BackBetweenLinesText: 'https://northwestcustomapparel.box.com/shared/static/gariv0oxdxu7oren2xd3kk2hl3g2jl31',
+                    BackBuiltInImage: 'https://northwestcustomapparel.box.com/shared/static/vuh2p7hb6n16yz8xqs8vyg8u9rhihr05'
+                }
+            },
+            DiamondPlate: {
+                front: {
+                    JustStripes: 'https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw',
+                    LeftChestLogo: 'https://northwestcustomapparel.box.com/shared/static/kkxqv0vdv02tw4sxvj8jtq6igj2yov5f',
+                    FrontCenterLogo: 'https://northwestcustomapparel.box.com/shared/static/0npwfnjwyuew5wpv02gwrmshgqsf7v6k',
+                    BuiltInImage: 'https://northwestcustomapparel.box.com/shared/static/7atgrmzrcrbythr3sdw59tsju3lyutt1'
+                },
+                back: {
+                    JustStripes: 'https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1',
+                    BackCenterLogo: 'https://northwestcustomapparel.box.com/shared/static/eabctv2qani98vrthvu6jnhsbw5lu0zc',
+                    BackBetweenLinesText: 'https://northwestcustomapparel.box.com/shared/static/m4cpxfaflguu20a51dvxgzfqxooh0qyr',
+                    BackBuiltInImage: 'https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1'
+                }
+            },
+            Warning: {
+                front: {
+                    JustStripes: 'https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl',
+                    LeftChestLogo: 'https://northwestcustomapparel.box.com/shared/static/5yvwfnq6xlazpmivqymzatzaapokywpx',
+                    FrontCenterLogo: 'https://northwestcustomapparel.box.com/shared/static/lpgbp3ymgkykrl2zdydfoie4rda8o0ti',
+                    BuiltInImage: 'https://northwestcustomapparel.box.com/shared/static/ako9y6ae6rr66eaedklwaf5wplqnqb7o'
+                },
+                back: {
+                    JustStripes: 'https://northwestcustomapparel.box.com/shared/static/ewqxx67q137t94touo856itlh7m2idlc',
+                    BackCenterLogo: 'https://northwestcustomapparel.box.com/shared/static/u8nsbnrkq614tanwbn8conmtdadw90eq',
+                    BackBetweenLinesText: 'https://northwestcustomapparel.box.com/shared/static/zqhsu8x1jj5iza03t8ltj0xhp0pgvbgu',
+                    BackBuiltInImage: 'https://northwestcustomapparel.box.com/shared/static/gdwmhv9bt3oe5izy4720bj5x8k0g2v02'
+                }
+            }
+        };
+
+        // Current design state
+        let currentDesign = {
+            style: '',
+            front: '',
+            back: '',
+            frontImage: '',
+            backImage: ''
+        };
+
+        // Initialize EmailJS
+        emailjs.init('4qSbDO-SQs19TbP80');
+
+        // Initialize quote service
+        const quoteService = new SafetyStripeQuoteService();
+
+        // Format option name for display
+        function formatOptionName(option) {
+            return option.replace(/([A-Z])/g, ' $1').trim();
+        }
+
+        // Select stripe style
+        function selectStripeStyle(style) {
+            // Update selection state
+            document.querySelectorAll('.stripe-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector(`[data-style="${style}"]`).classList.add('selected');
+            
+            // Update current design
+            currentDesign.style = style;
+            currentDesign.front = 'JustStripes';
+            currentDesign.back = 'JustStripes';
+            
+            // Show design area
+            document.getElementById('designArea').style.display = 'grid';
+            document.getElementById('actionSection').style.display = 'block';
+            
+            // Load options for this style
+            loadOptions('front', style);
+            loadOptions('back', style);
+            
+            // Scroll to design area
+            document.getElementById('designArea').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Load placement options
+        function loadOptions(side, style) {
+            const container = document.getElementById(`${side}Options`);
+            const preview = document.getElementById(`${side}Preview`);
+            const options = STRIPE_IMAGES[style][side];
+            
+            container.innerHTML = '';
+            
+            Object.entries(options).forEach(([option, imageUrl]) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'placement-option';
+                optionEl.dataset.option = option;
+                optionEl.onclick = () => selectOption(side, option);
+                
+                optionEl.innerHTML = `
+                    <img src="${imageUrl}" alt="${formatOptionName(option)}">
+                    <span>${formatOptionName(option)}</span>
+                `;
+                
+                container.appendChild(optionEl);
+            });
+            
+            // Select first option by default
+            selectOption(side, 'JustStripes');
+        }
+
+        // Select placement option
+        function selectOption(side, option) {
+            const container = document.getElementById(`${side}Options`);
+            const preview = document.getElementById(`${side}Preview`);
+            
+            // Update selection state
+            container.querySelectorAll('.placement-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            container.querySelector(`[data-option="${option}"]`).classList.add('selected');
+            
+            // Update preview and state
+            const imageUrl = STRIPE_IMAGES[currentDesign.style][side][option];
+            preview.src = imageUrl;
+            currentDesign[side] = option;
+            currentDesign[`${side}Image`] = imageUrl;
+        }
+
+        // Open send modal
+        function openSendModal() {
+            if (!currentDesign.style) {
+                alert('Please select a stripe style first');
+                return;
+            }
+            
+            // Update summary
+            document.getElementById('summaryStyle').textContent = currentDesign.style;
+            document.getElementById('summaryFront').textContent = formatOptionName(currentDesign.front);
+            document.getElementById('summaryBack').textContent = formatOptionName(currentDesign.back);
+            
+            // Show modal
+            document.getElementById('sendModal').classList.add('show');
+        }
+
+        // Close send modal
+        function closeSendModal() {
+            document.getElementById('sendModal').classList.remove('show');
+            document.getElementById('sendForm').reset();
+        }
+
+        // Get sales rep name from email
+        function getSalesRepName(email) {
+            const reps = {
+                'ruth@nwcustomapparel.com': 'Ruth Nhong',
+                'taylar@nwcustomapparel.com': 'Taylar',
+                'nika@nwcustomapparel.com': 'Nika',
+                'erik@nwcustomapparel.com': 'Erik',
+                'adriyella@nwcustomapparel.com': 'Adriyella',
+                'bradley@nwcustomapparel.com': 'Bradley',
+                'jim@nwcustomapparel.com': 'Jim',
+                'art@nwcustomapparel.com': 'Steve (Artist)'
+            };
+            return reps[email] || 'Sales Team';
+        }
+
+        // Handle form submission
+        document.getElementById('sendForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const sendButton = document.getElementById('sendButton');
+            const originalContent = sendButton.innerHTML;
+            
+            try {
+                // Show loading state
+                sendButton.disabled = true;
+                sendButton.innerHTML = '<span class="loading"></span> Sending...';
+                
+                // Get form data
+                const designData = {
+                    customerName: document.getElementById('customerName').value.trim(),
+                    customerEmail: document.getElementById('customerEmail').value.trim(),
+                    customerPhone: document.getElementById('customerPhone').value.trim(),
+                    companyName: document.getElementById('companyName').value.trim(),
+                    salesRepEmail: document.getElementById('salesRep').value,
+                    message: document.getElementById('customMessage').value.trim(),
+                    
+                    // Design details
+                    stripeStyle: currentDesign.style,
+                    frontOption: currentDesign.front,
+                    backOption: currentDesign.back,
+                    frontImage: currentDesign.frontImage,
+                    backImage: currentDesign.backImage
+                };
+                
+                // Save to database
+                const saveResult = await quoteService.saveDesign(designData);
+                const quoteID = saveResult.quoteID;
+                
+                if (!saveResult.success) {
+                    console.error('Database save warning:', saveResult.error);
+                }
+                
+                // Send email - ALL variables must have values (never empty)
+                const emailData = {
+                    // Email routing
+                    to_email: designData.customerEmail,
+                    from_name: 'Northwest Custom Apparel',
+                    reply_to: designData.salesRepEmail,
+                    
+                    // Quote details
+                    quote_id: quoteID,
+                    quote_type: 'Safety Stripe Design',
+                    quote_date: new Date().toLocaleDateString(),
+                    
+                    // Customer info
+                    customer_name: designData.customerName,
+                    customer_email: designData.customerEmail,
+                    company_name: designData.companyName || 'Not Provided',
+                    customer_phone: designData.customerPhone || 'Not Provided',
+                    
+                    // Design details
+                    stripe_style: designData.stripeStyle,
+                    front_option: formatOptionName(designData.frontOption),
+                    back_option: formatOptionName(designData.backOption),
+                    
+                    // Image URLs
+                    front_image_url: designData.frontImage,
+                    back_image_url: designData.backImage,
+                    
+                    // Message - NEVER empty string to avoid EmailJS corruption
+                    custom_message: designData.message || 'Thank you for your interest in our safety stripe shirts! I look forward to helping you with your order.',
+                    
+                    // Sales rep
+                    sales_rep_email: designData.salesRepEmail,
+                    sales_rep_name: getSalesRepName(designData.salesRepEmail),
+                    sales_rep_phone: '253-922-5793',
+                    
+                    // Company
+                    company_year: '1977'
+                };
+                
+                console.log('Sending email with data:', emailData);
+                
+                await emailjs.send(
+                    'service_1c4k67j',
+                    'template_stripe',  // TODO: Replace with actual template ID
+                    emailData
+                );
+                
+                // Show success
+                showSuccess(quoteID);
+                closeSendModal();
+                
+            } catch (error) {
+                console.error('Error sending design:', error);
+                alert('Failed to send design. Please try again.');
+            } finally {
+                sendButton.disabled = false;
+                sendButton.innerHTML = originalContent;
+            }
+        });
+
+        // Show success modal
+        function showSuccess(quoteID) {
+            document.getElementById('quoteIdDisplay').textContent = quoteID;
+            document.getElementById('successModal').classList.add('show');
+        }
+
+        // Close success modal
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('show');
+        }
+
+        // Copy quote ID
+        function copyQuoteId() {
+            const quoteId = document.getElementById('quoteIdDisplay').textContent;
+            navigator.clipboard.writeText(quoteId).then(() => {
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        // Start new design
+        function startNewDesign() {
+            // Reset everything
+            currentDesign = {
+                style: '',
+                front: '',
+                back: '',
+                frontImage: '',
+                backImage: ''
+            };
+            
+            // Reset UI
+            document.querySelectorAll('.stripe-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.getElementById('designArea').style.display = 'none';
+            document.getElementById('actionSection').style.display = 'none';
+            
+            // Close modal and scroll to top
+            closeSuccessModal();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
