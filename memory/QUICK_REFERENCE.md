@@ -22,6 +22,7 @@ EMBC-PA{MMDD}-{sequence} // Customer Supplied Program Account
 LT{MMDD}-{sequence}      // Laser Tumblers
 PATCH{MMDD}-{sequence}   // Embroidered Emblems
 SPC{MMDD}-{sequence}     // Customer Supplied Screen Print
+SSC{MMDD}-{sequence}     // Safety Stripe Creator (Design Tool)
 ```
 
 ## Required Email Variables (EVERY Calculator)
@@ -162,5 +163,6 @@ BCC: erik@nwcustomapparel.com   // Erik always gets a copy
 | Laser Tumblers | laser-tumbler.html | LT | template_6bie1il | ✅ Active |
 | Embroidered Emblems | embroidered-emblems.html | PATCH | template_94rbfol | ✅ Active |
 | Customer Screen Print | screenprint-customer.html | SPC | template_igd6jtm | ✅ Active |
+| Safety Stripe Creator | safety-stripe-creator.html | SSC | template_xxxx | ✅ Active |
 
 Remember: When in doubt, check this documentation first!
