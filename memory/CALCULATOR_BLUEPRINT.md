@@ -1087,8 +1087,11 @@ generateQuoteHTML(quoteData) {
 3. **Log important actions for debugging**
 4. **Test with edge cases (0 quantity, large numbers)**
 5. **Keep the UI responsive during async operations**
-6. **Document any special business logic**
-7. **Use consistent naming conventions**
-8. **Follow the established patterns**
+6. **Escape script tags in template literals** - Use `<\/script>` to prevent parsing errors
+7. **Maintain consistent color theming** - Use NWCA green (#4cb354) across all calculators
+8. **Show detailed pricing breakdowns** - Break out costs by component for transparency
+9. **Document any special business logic**
+10. **Use consistent naming conventions**
+11. **Follow the established patterns**
 
 This blueprint provides everything needed to create a professional calculator with full quote functionality. Follow the patterns, customize for your specific needs, and test thoroughly before deployment.
