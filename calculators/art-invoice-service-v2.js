@@ -125,11 +125,33 @@ class ArtInvoiceServiceV2 {
         
         // Add service items data if available
         if (invoiceData.serviceItems) {
-            const serviceData = {
-                items: invoiceData.serviceItems,
-                summary: invoiceData.serviceSummary
-            };
-            notes += (notes ? '\n\n' : '') + '--- Service Items ---\n' + JSON.stringify(serviceData);
+            let serviceItemsText = '';
+            
+            // Check if serviceItems is a string (JSON) or array
+            let items = invoiceData.serviceItems;
+            if (typeof items === 'string') {
+                try {
+                    items = JSON.parse(items);
+                } catch (e) {
+                    console.warn('Failed to parse serviceItems JSON:', e);
+                    items = [];
+                }
+            }
+            
+            // Format service items as readable text
+            if (Array.isArray(items) && items.length > 0) {
+                serviceItemsText = '--- Service Items ---\n';
+                items.forEach((item, index) => {
+                    serviceItemsText += `${index + 1}. ${item.code || 'UNKNOWN'}: ${item.description || 'No description'}\n`;
+                    serviceItemsText += `   Quantity: ${item.quantity || 1}, Rate: $${(item.rate || 0).toFixed(2)}, Amount: $${(item.amount || 0).toFixed(2)}\n`;
+                });
+                
+                if (invoiceData.serviceSummary) {
+                    serviceItemsText += `\nSummary: ${invoiceData.serviceSummary}`;
+                }
+            }
+            
+            notes += (notes ? '\n\n' : '') + serviceItemsText;
         }
         
         return notes;

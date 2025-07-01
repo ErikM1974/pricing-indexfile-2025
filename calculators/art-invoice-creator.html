@@ -1252,8 +1252,8 @@
                 originalRequestDate: selectedRequest.Date_Created,
                 completionDate: new Date(),
                 
-                // Service items (as JSON)
-                serviceItems: JSON.stringify(serviceItems),
+                // Service items (as object for processing)
+                serviceItems: serviceItems,
                 serviceSummary: serviceItems.map(item => `${item.code}: ${item.description}`).join('; '),
                 
                 // Amounts
