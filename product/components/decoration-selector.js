@@ -18,7 +18,7 @@ export class DecorationSelector {
                 label: 'Embroidery',
                 tagline: 'Professional thread embroidery for logos and text',
                 feature: { icon: 'fas fa-star', text: 'Premium quality', color: '#ffa500' },
-                path: '/embroidery-pricing.html',
+                path: '/pricing/embroidery',
                 cta: 'View Embroidery Pricing'
             },
             'cap-embroidery': {
@@ -27,7 +27,7 @@ export class DecorationSelector {
                 label: 'Cap\nEmbroidery',
                 tagline: 'Specialized embroidery for headwear',
                 feature: { icon: 'fas fa-hat-cowboy', text: '3D puff available', color: '#2f661e' },
-                path: '/cap-embroidery-pricing-integrated.html',
+                path: '/pricing/cap-embroidery',
                 cta: 'View Cap Pricing'
             },
             'dtg': {
@@ -36,7 +36,7 @@ export class DecorationSelector {
                 label: 'DTG',
                 tagline: 'Full-color printing for complex designs',
                 feature: { icon: 'fas fa-palette', text: 'Unlimited colors', color: '#e91e63' },
-                path: '/dtg-pricing.html',
+                path: '/pricing/dtg',
                 cta: 'View DTG Pricing'
             },
             'screen-print': {
@@ -45,7 +45,7 @@ export class DecorationSelector {
                 label: 'Screen\nPrint',
                 tagline: 'Classic printing for bold graphics',
                 feature: { icon: 'fas fa-dollar-sign', text: 'Great for bulk', color: '#4caf50' },
-                path: '/screen-print-pricing.html',
+                path: '/pricing/screen-print',
                 cta: 'View Screen Print Pricing'
             },
             'dtf': {
@@ -54,7 +54,7 @@ export class DecorationSelector {
                 label: 'DTF',
                 tagline: 'Versatile heat transfer for any fabric',
                 feature: { icon: 'fas fa-tshirt', text: 'Works on all fabrics', color: '#2196f3' },
-                path: '/dtf-pricing.html',
+                path: '/pricing/dtf',
                 cta: 'View DTF Pricing'
             }
         };
