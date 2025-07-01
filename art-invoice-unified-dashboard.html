@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Art Invoicing System - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Art Invoice Service V2 -->
+    <script src="calculators/art-invoice-service-v2.js?v=2.1"></script>
+    
+    <style>
+        /* Root variables - Professional Blue/Gray Theme */
+        :root {
+            --primary-color: #2c3e50;
+            --primary-dark: #1a252f;
+            --primary-light: #34495e;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #2c3e50;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d4edda;
+            --success-text: #155724;
+            --warning-bg: #fff3cd;
+            --warning-text: #856404;
+            --error-bg: #f8d7da;
+            --error-text: #721c24;
+            --info-bg: #d1ecf1;
+            --info-text: #0c5460;
+            --shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --focus-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            height: 40px;
+            filter: brightness(0) invert(1);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-title h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: var(--focus-shadow);
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+            background: var(--hover-bg);
+        }
+
+        .tab.active {
+            color: var(--accent-color);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-color);
+        }
+
+        .tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 6px;
+            margin-left: 0.5rem;
+            background: var(--bg-color);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 12px;
+        }
+
+        .tab.active .tab-badge {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Data Table */
+        .data-table-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: var(--bg-color);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table tr:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            white-space: nowrap;
+        }
+
+        .status-badge.draft {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .status-badge.sent {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-badge.paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.overdue {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.voided {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .status-badge.needs-invoice {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Action Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8125rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .btn-icon:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* Quick Actions Menu */
+        .quick-actions {
+            position: relative;
+        }
+
+        .quick-actions-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 0.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-shadow: var(--shadow-lg);
+            z-index: 10;
+            min-width: 200px;
+            display: none;
+        }
+
+        .quick-actions-menu.show {
+            display: block;
+        }
+
+        .quick-actions-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .quick-actions-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .quick-actions-item i {
+            width: 20px;
+            color: var(--text-secondary);
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #f3f4f6;
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        .modal-container {
+            background: var(--card-bg);
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 0 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .data-table {
+                font-size: 0.875rem;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 0.75rem 0.5rem;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Staff Dashboard</a>
+                    <span>/</span>
+                    <span>Art Invoicing</span>
+                </nav>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    Print
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Art Invoicing System</h1>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-secondary" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <form class="search-form" onsubmit="handleSearch(event)">
+                <input type="text" 
+                       class="search-input" 
+                       id="searchInput"
+                       placeholder="Search by company name, ID Design, invoice ID, or customer name..."
+                       autocomplete="off">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                    Search
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="clearSearch()">
+                    Clear
+                </button>
+            </form>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tabs" id="tabsContainer">
+                <button class="tab active" onclick="switchTab('needs-invoice')">
+                    Needs Invoice
+                    <span class="tab-badge" id="needsInvoiceCount">0</span>
+                </button>
+                <button class="tab" onclick="switchTab('draft')">
+                    Draft
+                    <span class="tab-badge" id="draftCount">0</span>
+                </button>
+                <button class="tab" onclick="switchTab('sent')">
+                    Sent
+                    <span class="tab-badge" id="sentCount">0</span>
+                </button>
+                <button class="tab" onclick="switchTab('paid')">
+                    Paid
+                    <span class="tab-badge" id="paidCount">0</span>
+                </button>
+                <button class="tab" onclick="switchTab('overdue')">
+                    Overdue
+                    <span class="tab-badge" id="overdueCount">0</span>
+                </button>
+                <button class="tab" onclick="switchTab('all')">
+                    All
+                    <span class="tab-badge" id="allCount">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="data-table-container">
+            <div id="loadingContainer" class="loading-container" style="display: none;">
+                <div class="loading-spinner"></div>
+            </div>
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-state-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3>No items found</h3>
+                <p>Try adjusting your search or filters</p>
+            </div>
+            <table class="data-table" id="dataTable" style="display: none;">
+                <thead id="tableHeader">
+                    <!-- Dynamic headers based on tab -->
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Dynamic content -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Quick Invoice Modal -->
+    <div class="modal-overlay" id="quickInvoiceModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Create Invoice</h3>
+                <button class="modal-close" onclick="closeQuickInvoiceModal()">×</button>
+            </div>
+            <div class="modal-body" id="quickInvoiceBody">
+                <!-- Invoice form will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize
+        const invoiceService = new ArtInvoiceServiceV2();
+        let currentTab = 'needs-invoice';
+        let allArtRequests = [];
+        let allInvoices = [];
+        let filteredData = [];
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            emailjs.init('4qSbDO-SQs19TbP80');
+            loadData();
+        });
+
+        // Load all data
+        async function loadData() {
+            showLoading();
+            try {
+                // Fetch both art requests and invoices in parallel
+                const [requests, invoices] = await Promise.all([
+                    invoiceService.getArtRequests(),
+                    invoiceService.getInvoices()
+                ]);
+
+                allArtRequests = requests;
+                allInvoices = invoices;
+
+                // Process and display data
+                updateTabCounts();
+                displayCurrentTab();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError('Failed to load data');
+            }
+        }
+
+        // Update tab counts
+        function updateTabCounts() {
+            // Create a map of art requests by ID_Design for quick lookup
+            const invoiceMap = new Map();
+            allInvoices.forEach(inv => {
+                const artRequestId = inv.InvoiceID.replace('ART-', '');
+                invoiceMap.set(artRequestId, inv);
+            });
+
+            // Count items for each tab
+            const counts = {
+                'needs-invoice': 0,
+                'draft': 0,
+                'sent': 0,
+                'paid': 0,
+                'overdue': 0,
+                'all': allInvoices.length
+            };
+
+            // Count art requests that need invoices
+            allArtRequests.forEach(req => {
+                if (!invoiceMap.has(req.ID_Design)) {
+                    counts['needs-invoice']++;
+                }
+            });
+
+            // Count invoices by status
+            allInvoices.forEach(inv => {
+                const status = (inv.Status || '').toLowerCase();
+                if (status === 'draft') counts.draft++;
+                else if (status === 'sent' || status === 'pending') counts.sent++;
+                else if (status === 'paid' || status === 'completed') counts.paid++;
+                
+                // Check if overdue
+                if (status !== 'paid' && status !== 'completed' && status !== 'voided') {
+                    const dueDate = new Date(inv.DueDate);
+                    if (dueDate < new Date()) {
+                        counts.overdue++;
+                    }
+                }
+            });
+
+            // Update UI
+            document.getElementById('needsInvoiceCount').textContent = counts['needs-invoice'];
+            document.getElementById('draftCount').textContent = counts.draft;
+            document.getElementById('sentCount').textContent = counts.sent;
+            document.getElementById('paidCount').textContent = counts.paid;
+            document.getElementById('overdueCount').textContent = counts.overdue;
+            document.getElementById('allCount').textContent = counts.all;
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Display data for current tab
+            displayCurrentTab();
+        }
+
+        // Display data for current tab
+        function displayCurrentTab() {
+            const tableHeader = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('tableBody');
+            
+            // Clear existing content
+            tableHeader.innerHTML = '';
+            tableBody.innerHTML = '';
+            
+            if (currentTab === 'needs-invoice') {
+                displayNeedsInvoice();
+            } else {
+                displayInvoices();
+            }
+        }
+
+        // Display art requests that need invoices
+        function displayNeedsInvoice() {
+            const invoiceMap = new Map();
+            allInvoices.forEach(inv => {
+                const artRequestId = inv.InvoiceID.replace('ART-', '');
+                invoiceMap.set(artRequestId, inv);
+            });
+
+            // Filter art requests without invoices
+            const needsInvoice = allArtRequests.filter(req => !invoiceMap.has(req.ID_Design));
+            
+            if (needsInvoice.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            // Set up headers
+            const tableHeader = document.getElementById('tableHeader');
+            tableHeader.innerHTML = `
+                <tr>
+                    <th>ID Design</th>
+                    <th>Company</th>
+                    <th>Request Date</th>
+                    <th>Status</th>
+                    <th>Art Minutes</th>
+                    <th>Sales Rep</th>
+                    <th>Actions</th>
+                </tr>
+            `;
+
+            // Display rows
+            const tableBody = document.getElementById('tableBody');
+            needsInvoice.forEach(req => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${req.ID_Design || '-'}</strong></td>
+                    <td>${req.CompanyName || '-'}</td>
+                    <td>${formatDate(req.Date_Created)}</td>
+                    <td><span class="status-badge needs-invoice">${req.Status || 'Needs Invoice'}</span></td>
+                    <td>${req.Art_Minutes || 0} min</td>
+                    <td>${req.CustomerServiceRep || '-'}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="createQuickInvoice('${req.ID_Design}')">
+                            <i class="fas fa-file-invoice"></i>
+                            Create Invoice
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            showTable();
+        }
+
+        // Display invoices based on current tab
+        function displayInvoices() {
+            let invoices = [...allInvoices];
+            
+            // Filter by tab
+            if (currentTab === 'draft') {
+                invoices = invoices.filter(inv => inv.Status === 'Draft');
+            } else if (currentTab === 'sent') {
+                invoices = invoices.filter(inv => inv.Status === 'Sent' || inv.Status === 'Pending');
+            } else if (currentTab === 'paid') {
+                invoices = invoices.filter(inv => inv.Status === 'Paid' || inv.Status === 'Completed');
+            } else if (currentTab === 'overdue') {
+                invoices = invoices.filter(inv => {
+                    if (inv.Status === 'Paid' || inv.Status === 'Completed' || inv.Status === 'Voided') return false;
+                    const dueDate = new Date(inv.DueDate);
+                    return dueDate < new Date();
+                });
+            }
+
+            if (invoices.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            // Set up headers
+            const tableHeader = document.getElementById('tableHeader');
+            tableHeader.innerHTML = `
+                <tr>
+                    <th>Invoice ID</th>
+                    <th>Customer</th>
+                    <th>Project</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Actions</th>
+                </tr>
+            `;
+
+            // Display rows
+            const tableBody = document.getElementById('tableBody');
+            invoices.forEach(inv => {
+                const row = document.createElement('tr');
+                const status = getStatusBadge(inv);
+                const actions = getQuickActions(inv);
+                
+                row.innerHTML = `
+                    <td><strong>${inv.InvoiceID}</strong></td>
+                    <td>
+                        ${inv.CustomerName || '-'}<br>
+                        <small class="text-secondary">${inv.CustomerCompany || ''}</small>
+                    </td>
+                    <td>${inv.ProjectName || '-'}</td>
+                    <td><strong>$${parseFloat(inv.GrandTotal || 0).toFixed(2)}</strong></td>
+                    <td>${status}</td>
+                    <td>${formatDate(inv.DueDate)}</td>
+                    <td>
+                        <div class="quick-actions">
+                            <button class="btn btn-icon btn-sm" onclick="toggleQuickActions(this)">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="quick-actions-menu">
+                                ${actions}
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            showTable();
+        }
+
+        // Get status badge HTML
+        function getStatusBadge(invoice) {
+            const status = invoice.Status || 'Draft';
+            const statusClass = status.toLowerCase().replace(' ', '-');
+            
+            // Check if overdue
+            if (status !== 'Paid' && status !== 'Completed' && status !== 'Voided') {
+                const dueDate = new Date(invoice.DueDate);
+                if (dueDate < new Date()) {
+                    return '<span class="status-badge overdue">Overdue</span>';
+                }
+            }
+            
+            return `<span class="status-badge ${statusClass}">${status}</span>`;
+        }
+
+        // Get quick actions HTML
+        function getQuickActions(invoice) {
+            let actions = `
+                <a href="/art-invoice-view.html?id=${invoice.InvoiceID}" class="quick-actions-item">
+                    <i class="fas fa-eye"></i>
+                    View
+                </a>
+            `;
+
+            if (invoice.Status === 'Draft') {
+                actions += `
+                    <a href="#" onclick="sendInvoice('${invoice.InvoiceID}')" class="quick-actions-item">
+                        <i class="fas fa-paper-plane"></i>
+                        Send
+                    </a>
+                `;
+            } else if (invoice.Status === 'Sent' || invoice.Status === 'Pending') {
+                actions += `
+                    <a href="#" onclick="resendInvoice('${invoice.InvoiceID}')" class="quick-actions-item">
+                        <i class="fas fa-envelope"></i>
+                        Resend
+                    </a>
+                    <a href="#" onclick="markAsPaid('${invoice.InvoiceID}')" class="quick-actions-item">
+                        <i class="fas fa-check-circle"></i>
+                        Mark Paid
+                    </a>
+                `;
+            }
+
+            if (invoice.Status !== 'Voided' && invoice.Status !== 'Paid') {
+                actions += `
+                    <a href="#" onclick="voidInvoice('${invoice.InvoiceID}')" class="quick-actions-item">
+                        <i class="fas fa-ban"></i>
+                        Void
+                    </a>
+                `;
+            }
+
+            return actions;
+        }
+
+        // Create quick invoice
+        async function createQuickInvoice(idDesign) {
+            try {
+                // Find the art request
+                const request = allArtRequests.find(r => r.ID_Design == idDesign);
+                if (!request) {
+                    alert('Art request not found');
+                    return;
+                }
+
+                // Open modal with invoice form
+                const modal = document.getElementById('quickInvoiceModal');
+                const modalBody = document.getElementById('quickInvoiceBody');
+                
+                // Show loading
+                modalBody.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div></div>';
+                modal.classList.add('active');
+
+                // Get suggested service code
+                const suggestedCode = request.Art_Minutes ? 
+                    invoiceService.suggestServiceCode(request.Art_Minutes) : 'GRT-50';
+                
+                // Build form HTML
+                modalBody.innerHTML = `
+                    <form id="quickInvoiceForm">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Customer Name</label>
+                                <input type="text" id="qiCustomerName" value="${request.Full_Name_Contact || ''}" 
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Company</label>
+                                <input type="text" id="qiCompany" value="${request.CompanyName || ''}" 
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
+                                <input type="email" id="qiEmail" value="${request.Email_Contact || request.Email || ''}" 
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Art Request ID</label>
+                                <input type="text" value="${request.ID_Design}" readonly
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color);">
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Service Code</label>
+                            <select id="qiServiceCode" onchange="updateQuickInvoiceAmount()"
+                                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">
+                                ${Object.values(invoiceService.serviceCodes).filter(s => !s.isAdditional).map(service => 
+                                    `<option value="${service.code}" ${service.code === suggestedCode ? 'selected' : ''}>
+                                        ${service.code} - ${service.name} ($${service.amount})
+                                    </option>`
+                                ).join('')}
+                            </select>
+                            <small style="color: var(--text-secondary);">Art time: ${request.Art_Minutes || 0} minutes</small>
+                        </div>
+                        
+                        <div style="margin-top: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Notes</label>
+                            <textarea id="qiNotes" rows="3" placeholder="Add any notes..."
+                                      style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">${request.NOTES || ''}</textarea>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-color); border-radius: 6px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 500;">Total Amount:</span>
+                                <span id="qiTotalAmount" style="font-size: 1.5rem; font-weight: 600; color: var(--primary-color);">$0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button type="button" class="btn btn-secondary" onclick="closeQuickInvoiceModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-invoice"></i>
+                                Create Invoice
+                            </button>
+                        </div>
+                    </form>
+                `;
+
+                // Update amount
+                updateQuickInvoiceAmount();
+
+                // Attach submit handler
+                document.getElementById('quickInvoiceForm').onsubmit = (e) => {
+                    e.preventDefault();
+                    submitQuickInvoice(request);
+                };
+
+            } catch (error) {
+                console.error('Error creating quick invoice:', error);
+                alert('Failed to create invoice form');
+            }
+        }
+
+        // Update quick invoice amount
+        function updateQuickInvoiceAmount() {
+            const serviceCode = document.getElementById('qiServiceCode').value;
+            const service = invoiceService.getServiceByCode(serviceCode);
+            if (service) {
+                document.getElementById('qiTotalAmount').textContent = `$${service.amount.toFixed(2)}`;
+            }
+        }
+
+        // Submit quick invoice
+        async function submitQuickInvoice(request) {
+            try {
+                const serviceCode = document.getElementById('qiServiceCode').value;
+                const service = invoiceService.getServiceByCode(serviceCode);
+                
+                // Prepare invoice data
+                const invoiceData = {
+                    idDesign: request.ID_Design,
+                    customerName: document.getElementById('qiCustomerName').value,
+                    customerCompany: document.getElementById('qiCompany').value,
+                    customerEmail: document.getElementById('qiEmail').value,
+                    salesRepName: getSalesRepName(request.User_Email || getSalesRepEmail(request.CustomerServiceRep)),
+                    salesRepEmail: request.User_Email || getSalesRepEmail(request.CustomerServiceRep),
+                    projectName: request.NOTES || request.Note_Mockup || '',
+                    originalRequestDate: request.Date_Created,
+                    completionDate: new Date(),
+                    serviceItems: [{
+                        code: serviceCode,
+                        description: service.description,
+                        quantity: 1,
+                        rate: service.amount,
+                        amount: service.amount
+                    }],
+                    serviceSummary: `${serviceCode}: ${service.description}`,
+                    subtotalAmount: service.amount,
+                    rushFee: 0,
+                    revisionFee: 0,
+                    otherFees: 0,
+                    taxAmount: 0, // No tax for art services
+                    totalCost: service.amount,
+                    customerNotes: document.getElementById('qiNotes').value,
+                    notes: `Quick invoice created from unified dashboard`,
+                    status: 'Sent',
+                    artistName: 'Steve Deland',
+                    artistEmail: 'art@nwcustomapparel.com',
+                    ccEmails: 'erik@nwcustomapparel.com',
+                    createdBy: 'Unified Dashboard'
+                };
+
+                // Create invoice
+                const result = await invoiceService.createInvoice(invoiceData);
+                
+                if (result.success) {
+                    alert(`Invoice ${result.invoiceID} created successfully!`);
+                    closeQuickInvoiceModal();
+                    loadData(); // Refresh data
+                } else {
+                    throw new Error(result.error || 'Failed to create invoice');
+                }
+                
+            } catch (error) {
+                console.error('Error creating invoice:', error);
+                alert('Failed to create invoice: ' + error.message);
+            }
+        }
+
+        // Helper functions
+        function getSalesRepName(email) {
+            const reps = {
+                'nika@nwcustomapparel.com': 'Nika Lao',
+                'taylar@nwcustomapparel.com': 'Taylar Hanson',
+                'ruth@nwcustomapparel.com': 'Ruth Nhong',
+                'erik@nwcustomapparel.com': 'Erik Mickelson',
+                'adriyella@nwcustomapparel.com': 'Adriyella',
+                'bradley@nwcustomapparel.com': 'Bradley Wright',
+                'jim@nwcustomapparel.com': 'Jim Mickelson',
+                'art@nwcustomapparel.com': 'Steve Deland',
+                'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
+            };
+            return reps[email] || 'Northwest Custom Apparel Sales Team';
+        }
+
+        function getSalesRepEmail(name) {
+            const emails = {
+                'Nika': 'nika@nwcustomapparel.com',
+                'Taylar': 'taylar@nwcustomapparel.com',
+                'Ruth': 'ruth@nwcustomapparel.com',
+                'Erik': 'erik@nwcustomapparel.com',
+                'Adriyella': 'adriyella@nwcustomapparel.com',
+                'Bradley': 'bradley@nwcustomapparel.com',
+                'Jim': 'jim@nwcustomapparel.com',
+                'Steve': 'art@nwcustomapparel.com'
+            };
+            return emails[name] || 'sales@nwcustomapparel.com';
+        }
+
+        // Toggle quick actions menu
+        function toggleQuickActions(button) {
+            const menu = button.nextElementSibling;
+            const isOpen = menu.classList.contains('show');
+            
+            // Close all other menus
+            document.querySelectorAll('.quick-actions-menu').forEach(m => m.classList.remove('show'));
+            
+            // Toggle this menu
+            if (!isOpen) {
+                menu.classList.add('show');
+                
+                // Close on click outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeQuickActions);
+                }, 0);
+            }
+        }
+
+        function closeQuickActions(e) {
+            if (!e.target.closest('.quick-actions')) {
+                document.querySelectorAll('.quick-actions-menu').forEach(m => m.classList.remove('show'));
+                document.removeEventListener('click', closeQuickActions);
+            }
+        }
+
+        // Search functionality
+        function handleSearch(e) {
+            e.preventDefault();
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm) {
+                displayCurrentTab();
+                return;
+            }
+
+            // Search in current tab data
+            // Implementation depends on current tab
+            // For now, just filter displayed data
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            displayCurrentTab();
+        }
+
+        // UI Helper functions
+        function showLoading() {
+            document.getElementById('loadingContainer').style.display = 'flex';
+            document.getElementById('dataTable').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        function showTable() {
+            document.getElementById('loadingContainer').style.display = 'none';
+            document.getElementById('dataTable').style.display = 'table';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        function showEmptyState() {
+            document.getElementById('loadingContainer').style.display = 'none';
+            document.getElementById('dataTable').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+        }
+
+        function showError(message) {
+            console.error(message);
+            // Could implement a toast notification here
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString();
+        }
+
+        function refreshData() {
+            loadData();
+        }
+
+        function closeQuickInvoiceModal() {
+            document.getElementById('quickInvoiceModal').classList.remove('active');
+        }
+
+        // Quick action handlers
+        async function sendInvoice(invoiceId) {
+            if (confirm('Send this invoice to the customer?')) {
+                try {
+                    // Get invoice details
+                    const invoice = allInvoices.find(inv => inv.InvoiceID === invoiceId);
+                    if (!invoice) {
+                        alert('Invoice not found');
+                        return;
+                    }
+
+                    // Update status to Sent
+                    const updateData = {
+                        Status: 'Sent',
+                        EmailSentDate: new Date().toISOString(),
+                        EmailSentTo: invoice.CustomerEmail
+                    };
+
+                    const result = await invoiceService.updateInvoice(invoice.PK_ID, updateData);
+                    if (result.success) {
+                        alert('Invoice sent successfully!');
+                        // In production, this would trigger actual email send
+                        loadData();
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    console.error('Error sending invoice:', error);
+                    alert('Failed to send invoice');
+                }
+            }
+        }
+
+        async function resendInvoice(invoiceId) {
+            if (confirm('Resend this invoice to the customer?')) {
+                try {
+                    const invoice = allInvoices.find(inv => inv.InvoiceID === invoiceId);
+                    if (!invoice) {
+                        alert('Invoice not found');
+                        return;
+                    }
+
+                    // Update reminder count
+                    const reminderCount = parseInt(invoice.ReminderCount || 0) + 1;
+                    const updateData = {
+                        ReminderCount: reminderCount,
+                        LastReminderDate: new Date().toISOString()
+                    };
+
+                    const result = await invoiceService.updateInvoice(invoice.PK_ID, updateData);
+                    if (result.success) {
+                        alert('Invoice resent successfully!');
+                        loadData();
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    console.error('Error resending invoice:', error);
+                    alert('Failed to resend invoice');
+                }
+            }
+        }
+
+        async function markAsPaid(invoiceId) {
+            const paymentDate = prompt('Enter payment date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+            if (!paymentDate) return;
+
+            const paymentAmount = prompt('Enter payment amount:');
+            if (!paymentAmount) return;
+
+            const paymentMethod = prompt('Enter payment method (Check, Credit Card, etc.):');
+            if (!paymentMethod) return;
+
+            try {
+                const invoice = allInvoices.find(inv => inv.InvoiceID === invoiceId);
+                if (!invoice) {
+                    alert('Invoice not found');
+                    return;
+                }
+
+                const updateData = {
+                    Status: 'Paid',
+                    PaymentDate: paymentDate,
+                    PaymentAmount: parseFloat(paymentAmount),
+                    PaymentMethod: paymentMethod,
+                    BalanceDue: 0
+                };
+
+                const result = await invoiceService.updateInvoice(invoice.PK_ID, updateData);
+                if (result.success) {
+                    alert('Invoice marked as paid!');
+                    loadData();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error marking as paid:', error);
+                alert('Failed to update invoice status');
+            }
+        }
+
+        async function voidInvoice(invoiceId) {
+            const reason = prompt('Please provide a reason for voiding this invoice:');
+            if (!reason) return;
+
+            if (confirm('Are you sure you want to void this invoice? This action cannot be undone.')) {
+                try {
+                    const invoice = allInvoices.find(inv => inv.InvoiceID === invoiceId);
+                    if (!invoice) {
+                        alert('Invoice not found');
+                        return;
+                    }
+
+                    const updateData = {
+                        Status: 'Voided',
+                        IsDeleted: true,
+                        DeletedDate: new Date().toISOString(),
+                        DeletedBy: 'Unified Dashboard',
+                        Notes: (invoice.Notes || '') + `\n\nVOIDED: ${reason}`
+                    };
+
+                    const result = await invoiceService.updateInvoice(invoice.PK_ID, updateData);
+                    if (result.success) {
+                        alert('Invoice voided successfully!');
+                        loadData();
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    console.error('Error voiding invoice:', error);
+                    alert('Failed to void invoice');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

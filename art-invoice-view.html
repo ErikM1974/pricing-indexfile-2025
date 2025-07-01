@@ -745,7 +745,7 @@
             tbody.innerHTML = '';
             
             // Check if this invoice uses service codes
-            if (currentInvoice.ServiceItems) {
+            if (currentInvoice.ServiceItems && currentInvoice.ServiceItems !== 'null' && currentInvoice.ServiceItems !== '') {
                 try {
                     // Parse service items from JSON
                     const serviceItems = JSON.parse(currentInvoice.ServiceItems);
@@ -754,83 +754,57 @@
                     tableHeader.innerHTML = `
                         <th>Description</th>
                         <th class="text-right">Service Code</th>
-                        <th class="text-right">-</th>
+                        <th class="text-right">Qty</th>
                         <th class="text-right">Amount</th>
                     `;
                     
                     // Display each service item
                     serviceItems.forEach(item => {
+                        const quantity = item.quantity || 1;
+                        const rate = item.rate || item.amount;
+                        const total = item.amount || (rate * quantity);
+                        
                         tbody.innerHTML += `
                             <tr>
-                                <td>${item.description}</td>
+                                <td>${item.description || 'Art Services'}</td>
                                 <td class="text-right">${item.code}</td>
-                                <td class="text-right">-</td>
-                                <td class="text-right">$${item.amount.toFixed(2)}</td>
+                                <td class="text-right">${quantity}</td>
+                                <td class="text-right">$${total.toFixed(2)}</td>
                             </tr>
                         `;
                     });
                 } catch (e) {
                     console.error('Error parsing service items:', e);
-                    // Fall back to hourly display
-                    displayHourlyBilling();
+                    console.log('ServiceItems data:', currentInvoice.ServiceItems);
+                    // Fall back to subtotal display
+                    displaySubtotalOnly();
                 }
             } else {
-                // Use traditional hourly billing display
-                displayHourlyBilling();
+                // If no service items, just show the subtotal
+                displaySubtotalOnly();
             }
             
-            function displayHourlyBilling() {
-                // Main service row
-                const timeSpent = parseFloat(currentInvoice.TimeSpent || 0);
-                const hourlyRate = parseFloat(currentInvoice.HourlyRate || 0);
+            function displaySubtotalOnly() {
+                // Update headers for simple display
+                tableHeader.innerHTML = `
+                    <th>Description</th>
+                    <th class="text-right">Service Code</th>
+                    <th class="text-right">Qty</th>
+                    <th class="text-right">Amount</th>
+                `;
+                
+                // Display subtotal as single line item
                 const subtotal = parseFloat(currentInvoice.SubtotalAmount || 0);
+                const projectType = currentInvoice.ProjectType || 'Design';
                 
                 tbody.innerHTML += `
                     <tr>
-                        <td>Art Services - ${currentInvoice.ProjectType || 'Design'}</td>
-                        <td class="text-right">${timeSpent.toFixed(2)} hours</td>
-                        <td class="text-right">$${hourlyRate.toFixed(2)}</td>
+                        <td>Art Services - ${projectType}</td>
+                        <td class="text-right">-</td>
+                        <td class="text-right">1</td>
                         <td class="text-right">$${subtotal.toFixed(2)}</td>
                     </tr>
                 `;
-                
-                // Additional fees
-                const rushFee = parseFloat(currentInvoice.RushFee || 0);
-                const revisionFee = parseFloat(currentInvoice.RevisionFee || 0);
-                const otherFees = parseFloat(currentInvoice.OtherFees || 0);
-                
-                if (rushFee > 0) {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>Rush Fee</td>
-                            <td class="text-right">1</td>
-                            <td class="text-right">$${rushFee.toFixed(2)}</td>
-                            <td class="text-right">$${rushFee.toFixed(2)}</td>
-                        </tr>
-                    `;
-                }
-                
-                if (revisionFee > 0) {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>Revision Fee</td>
-                            <td class="text-right">1</td>
-                            <td class="text-right">$${revisionFee.toFixed(2)}</td>
-                            <td class="text-right">$${revisionFee.toFixed(2)}</td>
-                        </tr>
-                    `;
-                }
-                
-                if (otherFees > 0) {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>Additional Fees</td>
-                            <td class="text-right">1</td>
-                            <td class="text-right">$${otherFees.toFixed(2)}</td>
-                            <td class="text-right">$${otherFees.toFixed(2)}</td>
-                        </tr>
-                    `;
-                }
             }
             
             // Totals

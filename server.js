@@ -91,6 +91,10 @@ app.get('/art-invoice-view.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'art-invoice-view.html'));
 });
 
+app.get('/art-invoice-unified-dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'art-invoice-unified-dashboard.html'));
+});
+
 app.get('/webstore-info.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'webstore-info.html'));
 });
