@@ -113,13 +113,13 @@ const NWCAUtils = (function() {
         if (item.sourceUrl) {
             return item.sourceUrl;
         }
-        let pagePath = 'embroidery-pricing.html'; // Default
+        let pagePath = '/pricing/embroidery'; // Default
         if (item.embellishmentType) {
             const embType = String(item.embellishmentType).toLowerCase();
-            if (embType === 'dtg') pagePath = 'dtg-pricing.html';
-            else if (embType === 'screen-print' || embType === 'screenprint') pagePath = 'screen-print-pricing.html';
-            else if (embType === 'cap-embroidery') pagePath = 'cap-embroidery-pricing.html';
-            else if (embType === 'dtf') pagePath = 'dtf-pricing.html';
+            if (embType === 'dtg') pagePath = '/pricing/dtg';
+            else if (embType === 'screen-print' || embType === 'screenprint') pagePath = '/pricing/screen-print';
+            else if (embType === 'cap-embroidery') pagePath = '/pricing/cap-embroidery';
+            else if (embType === 'dtf') pagePath = '/pricing/dtf';
         }
         let url = `${pagePath}?StyleNumber=${encodeURIComponent(item.styleNumber || '')}`;
         if (item.color) {
