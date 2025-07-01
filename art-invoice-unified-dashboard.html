@@ -588,13 +588,21 @@
             max-width: 90%;
             max-height: 90vh;
             cursor: default;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .modal-artwork-image {
             max-width: 100%;
-            max-height: 90vh;
+            max-height: 70vh;
             object-fit: contain;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            display: none;
+        }
+
+        .modal-artwork-image.active {
+            display: block;
         }
 
         .artwork-modal-close {
@@ -623,11 +631,67 @@
             font-weight: 500;
         }
 
-        .artwork-modal-download {
+        .artwork-modal-nav {
             position: absolute;
-            bottom: -50px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 1rem 0.75rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: background 0.2s;
+            z-index: 1;
+        }
+
+        .artwork-modal-nav:hover:not(:disabled) {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .artwork-modal-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .artwork-modal-prev {
+            left: -60px;
+        }
+
+        .artwork-modal-next {
+            right: -60px;
+        }
+
+        .artwork-modal-footer {
+            position: absolute;
+            bottom: -60px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .artwork-modal-indicators {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .artwork-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .artwork-indicator.active {
+            background: white;
+        }
+
+        .artwork-modal-download {
             background: var(--accent-color);
             color: white;
             border: none;
@@ -640,6 +704,20 @@
 
         .artwork-modal-download:hover {
             background: var(--accent-dark);
+        }
+
+        .artwork-count-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent-color);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
         }
 
         @keyframes fadeIn {
@@ -817,6 +895,22 @@
             return null;
         }
 
+        function getAllArtworks(artRequest) {
+            const cdnFields = ['CDN_Link', 'CDN_Link_Two', 'CDN_Link_Three', 'CDN_Link_Four'];
+            const artworks = [];
+            
+            cdnFields.forEach((field, index) => {
+                if (hasArtwork(artRequest[field])) {
+                    artworks.push({
+                        url: artRequest[field],
+                        label: `Artwork ${index + 1}`
+                    });
+                }
+            });
+            
+            return artworks;
+        }
+
         function createArtworkThumbnail(artRequest) {
             const artworkUrl = getFirstArtwork(artRequest);
             
@@ -824,49 +918,173 @@
                 return '';
             }
             
+            // Count total artwork files
+            const artworkCount = getAllArtworks(artRequest).length;
+            const countBadge = artworkCount > 1 ? `<span class="artwork-count-badge">+${artworkCount - 1}</span>` : '';
+            
             return `
-                <div class="artwork-thumbnail" onclick="showArtworkModal('${artworkUrl}', ${artRequest.ID_Design})">
+                <div class="artwork-thumbnail" onclick='showArtworkModal(${JSON.stringify(artRequest).replace(/'/g, "&#39;")})' style="position: relative;">
                     <img src="${artworkUrl}" 
                          alt="Artwork ${artRequest.ID_Design}" 
                          onload="this.classList.add('loaded')"
                          onerror="this.parentElement.style.display='none'"
                          loading="lazy">
                     <i class="fas fa-search-plus"></i>
+                    ${countBadge}
                 </div>
             `;
         }
 
-        function showArtworkModal(imageUrl, idDesign) {
+        let currentArtworkIndex = 0;
+        let currentArtworks = [];
+        let currentDesignId = null;
+
+        function showArtworkModal(artRequest) {
             let modal = document.getElementById('artworkModal');
             if (!modal) {
                 modal = createArtworkModal();
             }
             
-            const modalImage = modal.querySelector('.modal-artwork-image');
-            const modalTitle = modal.querySelector('.artwork-modal-title');
-            const downloadBtn = modal.querySelector('.artwork-modal-download');
+            // Get all artworks for this request
+            currentArtworks = getAllArtworks(artRequest);
+            currentDesignId = artRequest.ID_Design;
+            currentArtworkIndex = 0;
             
-            modalImage.src = imageUrl;
-            modalTitle.textContent = `Design #${idDesign}`;
-            downloadBtn.onclick = () => downloadArtwork(imageUrl, idDesign);
+            if (currentArtworks.length === 0) {
+                return;
+            }
             
+            // Update modal for gallery view
+            updateArtworkModalContent();
             modal.classList.add('active');
+        }
+
+        function updateArtworkModalContent() {
+            const modal = document.getElementById('artworkModal');
+            const modalTitle = modal.querySelector('.artwork-modal-title');
+            
+            // Update title with counter
+            if (currentArtworks.length > 1) {
+                modalTitle.textContent = `Design #${currentDesignId} - ${currentArtworkIndex + 1} of ${currentArtworks.length}`;
+            } else {
+                modalTitle.textContent = `Design #${currentDesignId}`;
+            }
+            
+            // Update images
+            const images = modal.querySelectorAll('.modal-artwork-image');
+            images.forEach((img, index) => {
+                if (index < currentArtworks.length && index === currentArtworkIndex) {
+                    img.src = currentArtworks[index].url;
+                    img.classList.add('active');
+                } else {
+                    img.classList.remove('active');
+                }
+            });
+            
+            // Update navigation buttons visibility
+            const prevBtn = modal.querySelector('.artwork-modal-prev');
+            const nextBtn = modal.querySelector('.artwork-modal-next');
+            if (currentArtworks.length > 1) {
+                if (prevBtn) {
+                    prevBtn.style.display = 'block';
+                    prevBtn.disabled = currentArtworkIndex === 0;
+                }
+                if (nextBtn) {
+                    nextBtn.style.display = 'block';
+                    nextBtn.disabled = currentArtworkIndex === currentArtworks.length - 1;
+                }
+            } else {
+                if (prevBtn) prevBtn.style.display = 'none';
+                if (nextBtn) nextBtn.style.display = 'none';
+            }
+            
+            // Update indicators
+            const indicators = modal.querySelectorAll('.artwork-indicator');
+            const indicatorsContainer = modal.querySelector('.artwork-modal-indicators');
+            
+            indicators.forEach((indicator, index) => {
+                if (index < currentArtworks.length) {
+                    indicator.style.display = 'block';
+                    if (index === currentArtworkIndex) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
+                } else {
+                    indicator.style.display = 'none';
+                }
+            });
+            
+            // Hide indicators container if only one image
+            if (indicatorsContainer) {
+                indicatorsContainer.style.display = currentArtworks.length > 1 ? 'flex' : 'none';
+            }
+        }
+
+        function navigateArtwork(direction) {
+            if (direction === 'prev' && currentArtworkIndex > 0) {
+                currentArtworkIndex--;
+            } else if (direction === 'next' && currentArtworkIndex < currentArtworks.length - 1) {
+                currentArtworkIndex++;
+            }
+            updateArtworkModalContent();
+        }
+
+        function setArtworkIndex(index) {
+            if (index >= 0 && index < currentArtworks.length) {
+                currentArtworkIndex = index;
+                updateArtworkModalContent();
+            }
         }
 
         function createArtworkModal() {
             const modal = document.createElement('div');
             modal.id = 'artworkModal';
             modal.className = 'artwork-modal';
-            modal.innerHTML = `
+            
+            let modalContent = `
                 <div class="artwork-modal-content">
                     <span class="artwork-modal-title"></span>
                     <button class="artwork-modal-close" onclick="closeArtworkModal()">×</button>
-                    <img class="modal-artwork-image" src="" alt="Artwork">
-                    <button class="artwork-modal-download">
-                        <i class="fas fa-download"></i> Download
+                    
+                    <!-- Navigation buttons -->
+                    <button class="artwork-modal-nav artwork-modal-prev" onclick="navigateArtwork('prev')">
+                        <i class="fas fa-chevron-left"></i>
                     </button>
+                    <button class="artwork-modal-nav artwork-modal-next" onclick="navigateArtwork('next')">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    
+                    <!-- Images container -->
+                    <div class="artwork-images-container">`;
+            
+            // Create placeholders for up to 4 images
+            for (let i = 0; i < 4; i++) {
+                modalContent += `<img class="modal-artwork-image" src="" alt="Artwork ${i + 1}">`;
+            }
+            
+            modalContent += `
+                    </div>
+                    
+                    <!-- Footer with indicators and download -->
+                    <div class="artwork-modal-footer">
+                        <div class="artwork-modal-indicators">`;
+            
+            // Create indicators
+            for (let i = 0; i < 4; i++) {
+                modalContent += `<span class="artwork-indicator" onclick="setArtworkIndex(${i})"></span>`;
+            }
+            
+            modalContent += `
+                        </div>
+                        <button class="artwork-modal-download" onclick="downloadCurrentArtwork()">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
                 </div>
             `;
+            
+            modal.innerHTML = modalContent;
             document.body.appendChild(modal);
             
             // Close on overlay click
@@ -886,10 +1104,13 @@
             }
         }
 
-        function downloadArtwork(imageUrl, idDesign) {
+        function downloadCurrentArtwork() {
+            if (currentArtworks.length === 0 || currentArtworkIndex < 0) return;
+            
+            const artwork = currentArtworks[currentArtworkIndex];
             const link = document.createElement('a');
-            link.href = imageUrl;
-            link.download = `Design_${idDesign}_Artwork.png`;
+            link.href = artwork.url;
+            link.download = `Design_${currentDesignId}_${artwork.label.replace(' ', '_')}.png`;
             link.target = '_blank';
             document.body.appendChild(link);
             link.click();
@@ -1052,7 +1273,7 @@
                     <td>${formatDate(req.Date_Created)}</td>
                     <td><span class="status-badge needs-invoice">${req.Status || 'Needs Invoice'}</span></td>
                     <td>${req.Art_Minutes || 0} min</td>
-                    <td>${req.CustomerServiceRep || '-'}</td>
+                    <td>${getFirstNameFromEmail(req.User_Email) || req.CustomerServiceRep || '-'}</td>
                     <td>
                         <button class="btn btn-success btn-sm" onclick="createQuickInvoice('${req.ID_Design}')">
                             <i class="fas fa-file-invoice"></i>
@@ -1374,6 +1595,28 @@
                 'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
             };
             return reps[email] || 'Northwest Custom Apparel Sales Team';
+        }
+
+        // Extract and capitalize first name from email
+        function getFirstNameFromEmail(email) {
+            if (!email) return '-';
+            
+            // First check if we have a full name mapping
+            const fullName = getSalesRepName(email);
+            if (fullName !== 'Northwest Custom Apparel Sales Team') {
+                // Extract just the first name from the full name
+                return fullName.split(' ')[0];
+            }
+            
+            // Otherwise, extract from email
+            const emailParts = email.split('@');
+            if (emailParts.length > 0 && emailParts[0]) {
+                // Capitalize first letter
+                const firstName = emailParts[0];
+                return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+            }
+            
+            return '-';
         }
 
         function getSalesRepEmail(name) {
