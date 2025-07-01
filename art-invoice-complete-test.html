@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Invoice Complete Test Suite - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- Art Invoice Service V2 -->
+    <script src="calculators/art-invoice-service-v2.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --info-bg: #dbeafe;
+            --info-text: #1e40af;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .test-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .test-section h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .test-card {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .test-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .test-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info-text);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-text);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--error-text);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-text);
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .results {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 6px;
+            max-height: 600px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            border: 1px solid var(--border-color);
+        }
+
+        .success {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border-color: var(--success-text);
+        }
+
+        .error {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border-color: var(--error-text);
+        }
+
+        .warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            border-color: var(--warning-text);
+        }
+
+        .info {
+            background: var(--info-bg);
+            color: var(--info-text);
+            border-color: var(--info-text);
+        }
+
+        .loading {
+            opacity: 0.6;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-draft {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .status-sent {
+            background: var(--info-bg);
+            color: var(--info-text);
+        }
+
+        .status-paid {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .status-overdue {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        .status-voided {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+
+        .test-scenario {
+            background: #f3f4f6;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .test-scenario h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .test-steps {
+            list-style: decimal;
+            margin-left: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .test-steps li {
+            margin-bottom: 0.25rem;
+        }
+
+        .quick-actions {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 2px solid var(--primary-color);
+        }
+
+        .quick-actions h4 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .id-input {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <i class="fas fa-vial"></i>
+            Art Invoice Complete Test Suite
+        </h1>
+        
+        <!-- Test Overview -->
+        <div class="test-section">
+            <h2><i class="fas fa-info-circle"></i> Test Overview</h2>
+            <div class="test-grid">
+                <div class="test-card">
+                    <h3>System Status</h3>
+                    <div class="test-value" id="systemStatus">Initializing...</div>
+                </div>
+                <div class="test-card">
+                    <h3>Total Art Requests</h3>
+                    <div class="test-value" id="totalRequests">0</div>
+                </div>
+                <div class="test-card">
+                    <h3>Uninvoiced Requests</h3>
+                    <div class="test-value" id="uninvoicedRequests">0</div>
+                </div>
+                <div class="test-card">
+                    <h3>Total Invoices</h3>
+                    <div class="test-value" id="totalInvoices">0</div>
+                </div>
+                <div class="test-card">
+                    <h3>Draft Invoices</h3>
+                    <div class="test-value" id="draftInvoices">0</div>
+                </div>
+                <div class="test-card">
+                    <h3>Unpaid Invoices</h3>
+                    <div class="test-value" id="unpaidInvoices">0</div>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="refreshOverview()">
+                <i class="fas fa-sync"></i> Refresh Overview
+            </button>
+        </div>
+
+        <!-- ID_Design Based Testing -->
+        <div class="test-section">
+            <h2><i class="fas fa-key"></i> ID_Design Based Invoice Testing</h2>
+            <div class="test-scenario">
+                <h3>Test Scenario: One-to-One Relationship</h3>
+                <ol class="test-steps">
+                    <li>Get an art request with ID_Design</li>
+                    <li>Create invoice using ID_Design (format: ART-{ID_Design})</li>
+                    <li>Verify duplicate prevention</li>
+                    <li>Test linking between tables</li>
+                </ol>
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="testIDDesignWorkflow()">
+                    <i class="fas fa-play"></i> Run Complete Workflow
+                </button>
+                <button class="btn-info" onclick="testDuplicatePrevention()">
+                    <i class="fas fa-copy"></i> Test Duplicate Prevention
+                </button>
+                <button class="btn-secondary" onclick="testGetInvoiceByDesign()">
+                    <i class="fas fa-search"></i> Get Invoice by ID_Design
+                </button>
+            </div>
+            <div id="idDesignResults" class="results"></div>
+        </div>
+
+        <!-- Payment Quick Actions Testing -->
+        <div class="test-section">
+            <h2><i class="fas fa-dollar-sign"></i> Bradley's Payment Dashboard</h2>
+            <div class="test-scenario">
+                <h3>Test Scenario: Quick Payment Marking</h3>
+                <ol class="test-steps">
+                    <li>Find unpaid invoices</li>
+                    <li>Use quick "Mark as Paid" button</li>
+                    <li>Verify status updates</li>
+                    <li>Test undo payment (same day only)</li>
+                </ol>
+            </div>
+            <div class="button-group">
+                <button class="btn-success" onclick="testQuickPayment()">
+                    <i class="fas fa-check-circle"></i> Test Quick Payment
+                </button>
+                <button class="btn-primary" onclick="testBatchPayment()">
+                    <i class="fas fa-tasks"></i> Test Batch Payment
+                </button>
+                <button class="btn-warning" onclick="testUndoPayment()">
+                    <i class="fas fa-undo"></i> Test Undo Payment
+                </button>
+                <button class="btn-info" onclick="getUnpaidInvoices()">
+                    <i class="fas fa-list"></i> List Unpaid Invoices
+                </button>
+            </div>
+            <div id="paymentResults" class="results"></div>
+        </div>
+
+        <!-- Invoice Lifecycle Testing -->
+        <div class="test-section">
+            <h2><i class="fas fa-life-ring"></i> Invoice Lifecycle Management</h2>
+            <div class="test-scenario">
+                <h3>Test Scenario: Complete Invoice Lifecycle</h3>
+                <ol class="test-steps">
+                    <li>Create Draft Invoice</li>
+                    <li>Edit Draft (allowed)</li>
+                    <li>Send Invoice</li>
+                    <li>Attempt Edit (should fail)</li>
+                    <li>Void Invoice</li>
+                    <li>Create Replacement</li>
+                </ol>
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="testCompleteLifecycle()">
+                    <i class="fas fa-circle-notch"></i> Run Full Lifecycle
+                </button>
+                <button class="btn-info" onclick="testDraftEditing()">
+                    <i class="fas fa-edit"></i> Test Draft Editing
+                </button>
+                <button class="btn-warning" onclick="testVoidAndRecreate()">
+                    <i class="fas fa-ban"></i> Test Void & Recreate
+                </button>
+            </div>
+            <div id="lifecycleResults" class="results"></div>
+        </div>
+
+        <!-- Search and Filter Testing -->
+        <div class="test-section">
+            <h2><i class="fas fa-search"></i> Search and Filter Testing</h2>
+            <div class="button-group">
+                <button class="btn-primary" onclick="testSearchByCustomer()">
+                    <i class="fas fa-user"></i> Search by Customer
+                </button>
+                <button class="btn-primary" onclick="testSearchByCompany()">
+                    <i class="fas fa-building"></i> Search by Company
+                </button>
+                <button class="btn-primary" onclick="testSearchByDateRange()">
+                    <i class="fas fa-calendar"></i> Search by Date Range
+                </button>
+                <button class="btn-info" onclick="testAdvancedSearch()">
+                    <i class="fas fa-search-plus"></i> Advanced Search
+                </button>
+            </div>
+            <div id="searchResults" class="results"></div>
+        </div>
+
+        <!-- Error Handling and Edge Cases -->
+        <div class="test-section">
+            <h2><i class="fas fa-exclamation-triangle"></i> Error Handling & Edge Cases</h2>
+            <div class="button-group">
+                <button class="btn-danger" onclick="testInvalidIDDesign()">
+                    <i class="fas fa-times"></i> Test Invalid ID_Design
+                </button>
+                <button class="btn-danger" onclick="testMissingRequiredFields()">
+                    <i class="fas fa-exclamation"></i> Test Missing Fields
+                </button>
+                <button class="btn-warning" onclick="testConcurrentUpdates()">
+                    <i class="fas fa-sync-alt"></i> Test Concurrent Updates
+                </button>
+                <button class="btn-info" onclick="testDataIntegrity()">
+                    <i class="fas fa-check-double"></i> Test Data Integrity
+                </button>
+            </div>
+            <div id="errorResults" class="results"></div>
+        </div>
+
+        <!-- Quick Actions Panel -->
+        <div class="quick-actions">
+            <h4>Quick Actions</h4>
+            <div style="margin-bottom: 0.5rem;">
+                <input type="text" class="id-input" id="quickIDDesign" placeholder="ID_Design (e.g., 52503)">
+                <button class="btn-primary btn-sm" onclick="quickCreateInvoice()">
+                    <i class="fas fa-plus"></i> Create
+                </button>
+            </div>
+            <div>
+                <input type="text" class="id-input" id="quickInvoiceID" placeholder="Invoice ID (e.g., ART-52503)">
+                <button class="btn-success btn-sm" onclick="quickMarkPaid()">
+                    <i class="fas fa-check"></i> Paid
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize service
+        const service = new ArtInvoiceServiceV2();
+        let testData = {
+            testIDDesign: null,
+            testInvoiceID: null,
+            testPKID: null
+        };
+        
+        // Helper function to display results
+        function displayResults(elementId, data, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = `[${timestamp}] `;
+            
+            element.textContent = prefix + (typeof data === 'object' ? JSON.stringify(data, null, 2) : data);
+            element.className = `results ${type}`;
+        }
+        
+        // System Overview
+        async function refreshOverview() {
+            try {
+                // Get art requests stats
+                const allRequests = await service.getArtRequests({ limit: 1000 });
+                const uninvoiced = await service.getArtRequests({ 
+                    invoiced: false, 
+                    status: 'Completed ✅',
+                    limit: 100 
+                });
+                
+                // Get invoice stats
+                const stats = await service.getInvoiceStats();
+                
+                // Update display
+                document.getElementById('systemStatus').textContent = 'Connected';
+                document.getElementById('systemStatus').style.color = 'var(--success-text)';
+                document.getElementById('totalRequests').textContent = allRequests.length;
+                document.getElementById('uninvoicedRequests').textContent = uninvoiced.length;
+                document.getElementById('totalInvoices').textContent = stats.total;
+                document.getElementById('draftInvoices').textContent = stats.draft;
+                document.getElementById('unpaidInvoices').textContent = stats.sent + stats.overdue;
+                
+                displayResults('idDesignResults', 'System overview refreshed successfully', 'success');
+            } catch (error) {
+                document.getElementById('systemStatus').textContent = 'Error';
+                document.getElementById('systemStatus').style.color = 'var(--error-text)';
+                displayResults('idDesignResults', error.message, 'error');
+            }
+        }
+        
+        // ID_Design Based Testing
+        async function testIDDesignWorkflow() {
+            displayResults('idDesignResults', 'Starting ID_Design workflow test...', 'info');
+            
+            try {
+                // Step 1: Get an uninvoiced art request
+                const uninvoiced = await service.getArtRequests({ 
+                    invoiced: false,
+                    status: 'Completed ✅',
+                    limit: 1 
+                });
+                
+                if (uninvoiced.length === 0) {
+                    throw new Error('No uninvoiced completed art requests found');
+                }
+                
+                const artRequest = uninvoiced[0];
+                testData.testIDDesign = artRequest.ID_Design;
+                
+                displayResults('idDesignResults', 
+                    `Found art request:\n` +
+                    `PK_ID: ${artRequest.PK_ID}\n` +
+                    `ID_Design: ${artRequest.ID_Design}\n` +
+                    `Company: ${artRequest.CompanyName}\n` +
+                    `Status: ${artRequest.Status}`, 
+                    'success'
+                );
+                
+                // Step 2: Create invoice using ID_Design
+                const invoiceData = {
+                    idDesign: artRequest.ID_Design,
+                    artRequestID: artRequest.ID_Design,
+                    customerName: artRequest.CompanyName || 'Test Customer',
+                    customerCompany: artRequest.CompanyName || 'Test Company',
+                    customerEmail: 'test@example.com',
+                    projectName: artRequest.NOTES || 'Test Project',
+                    projectType: 'Design',
+                    timeSpent: 2.5,
+                    hourlyRate: 75,
+                    rushFee: 0,
+                    notes: 'Created via ID_Design workflow test',
+                    artworkDescription: 'Testing ID_Design based invoice',
+                    fileReferences: `REF-${artRequest.ID_Design}`,
+                    complexity: 'Medium'
+                };
+                
+                const result = await service.createInvoice(invoiceData);
+                
+                if (result.success) {
+                    testData.testInvoiceID = result.invoiceID;
+                    displayResults('idDesignResults', 
+                        `Invoice created successfully:\n` +
+                        `Invoice ID: ${result.invoiceID}\n` +
+                        `Format: ART-${artRequest.ID_Design}`, 
+                        'success'
+                    );
+                } else {
+                    throw new Error(result.error);
+                }
+                
+                // Step 3: Verify art request was marked as invoiced
+                const updatedRequest = await service.getArtRequest(artRequest.PK_ID);
+                displayResults('idDesignResults', 
+                    `Art request updated:\n` +
+                    `Invoiced: ${updatedRequest.Invoiced}\n` +
+                    `Invoice Date: ${updatedRequest.Invoiced_Date}`, 
+                    'success'
+                );
+                
+            } catch (error) {
+                displayResults('idDesignResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testDuplicatePrevention() {
+            displayResults('idDesignResults', 'Testing duplicate invoice prevention...', 'info');
+            
+            try {
+                if (!testData.testIDDesign) {
+                    throw new Error('Run ID_Design workflow test first');
+                }
+                
+                // Try to create duplicate invoice
+                const duplicateData = {
+                    idDesign: testData.testIDDesign,
+                    artRequestID: testData.testIDDesign,
+                    customerName: 'Duplicate Test',
+                    customerCompany: 'Duplicate Company',
+                    customerEmail: 'duplicate@test.com',
+                    projectName: 'Duplicate Project',
+                    projectType: 'Design',
+                    timeSpent: 1,
+                    hourlyRate: 75
+                };
+                
+                const result = await service.createInvoice(duplicateData);
+                
+                if (result.success) {
+                    displayResults('idDesignResults', 
+                        'ERROR: Duplicate invoice was created (should have been prevented)', 
+                        'error'
+                    );
+                } else {
+                    displayResults('idDesignResults', 
+                        `Duplicate prevention working correctly:\n${result.error}`, 
+                        'success'
+                    );
+                }
+                
+            } catch (error) {
+                displayResults('idDesignResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testGetInvoiceByDesign() {
+            displayResults('idDesignResults', 'Testing invoice retrieval by ID_Design...', 'info');
+            
+            try {
+                const idDesign = document.getElementById('quickIDDesign').value || testData.testIDDesign;
+                
+                if (!idDesign) {
+                    throw new Error('Enter an ID_Design or run workflow test first');
+                }
+                
+                const invoice = await service.getInvoiceByDesign(idDesign);
+                
+                if (invoice) {
+                    displayResults('idDesignResults', 
+                        `Found invoice:\n` +
+                        `Invoice ID: ${invoice.InvoiceID}\n` +
+                        `Status: ${invoice.Status}\n` +
+                        `Customer: ${invoice.CustomerName}\n` +
+                        `Amount: $${invoice.GrandTotal}`, 
+                        'success'
+                    );
+                } else {
+                    displayResults('idDesignResults', 
+                        `No active invoice found for ID_Design: ${idDesign}`, 
+                        'warning'
+                    );
+                }
+                
+            } catch (error) {
+                displayResults('idDesignResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Payment Testing
+        async function testQuickPayment() {
+            displayResults('paymentResults', 'Testing quick payment functionality...', 'info');
+            
+            try {
+                // Get an unpaid invoice
+                const unpaid = await service.getInvoices({ status: 'Sent', limit: 1 });
+                
+                if (unpaid.length === 0) {
+                    throw new Error('No sent invoices found to test payment');
+                }
+                
+                const invoice = unpaid[0];
+                testData.testPKID = invoice.PK_ID;
+                
+                displayResults('paymentResults', 
+                    `Found unpaid invoice:\n` +
+                    `Invoice ID: ${invoice.InvoiceID}\n` +
+                    `Amount Due: $${invoice.BalanceDue}`, 
+                    'info'
+                );
+                
+                // Quick mark as paid
+                const result = await service.quickMarkPaid(invoice.PK_ID, 'Bradley (Test)');
+                
+                if (result.success) {
+                    displayResults('paymentResults', 
+                        `Payment recorded successfully:\n` +
+                        `Status changed to: Paid\n` +
+                        `Payment Date: ${new Date().toLocaleDateString()}\n` +
+                        `Modified By: Bradley (Test)`, 
+                        'success'
+                    );
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                displayResults('paymentResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testBatchPayment() {
+            displayResults('paymentResults', 'Testing batch payment functionality...', 'info');
+            
+            try {
+                // Get multiple unpaid invoices
+                const unpaid = await service.getInvoices({ status: 'Sent', limit: 3 });
+                
+                if (unpaid.length < 2) {
+                    throw new Error('Need at least 2 unpaid invoices for batch test');
+                }
+                
+                const ids = unpaid.slice(0, 2).map(inv => inv.PK_ID);
+                displayResults('paymentResults', 
+                    `Processing batch payment for ${ids.length} invoices...`, 
+                    'info'
+                );
+                
+                const results = await service.markMultiplePaid(ids, 'Bradley (Batch Test)');
+                
+                displayResults('paymentResults', 
+                    `Batch payment results:\n` +
+                    `Successful: ${results.success.length}\n` +
+                    `Failed: ${results.failed.length}`, 
+                    results.failed.length > 0 ? 'warning' : 'success'
+                );
+                
+            } catch (error) {
+                displayResults('paymentResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testUndoPayment() {
+            displayResults('paymentResults', 'Testing undo payment functionality...', 'info');
+            
+            try {
+                if (!testData.testPKID) {
+                    throw new Error('Run quick payment test first');
+                }
+                
+                const result = await service.undoPayment(testData.testPKID, 'Bradley (Test Undo)');
+                
+                if (result.success) {
+                    displayResults('paymentResults', 
+                        `Payment undone successfully:\n` +
+                        `Status changed back to: Sent\n` +
+                        `Balance Due restored`, 
+                        'success'
+                    );
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                displayResults('paymentResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function getUnpaidInvoices() {
+            displayResults('paymentResults', 'Fetching unpaid invoices...', 'info');
+            
+            try {
+                const unpaid = await service.searchInvoices({ unpaidOnly: true });
+                
+                const summary = unpaid.map(inv => ({
+                    InvoiceID: inv.InvoiceID,
+                    Customer: inv.CustomerName,
+                    Amount: `$${inv.BalanceDue}`,
+                    Status: inv.Status,
+                    DueDate: new Date(inv.DueDate).toLocaleDateString()
+                }));
+                
+                displayResults('paymentResults', 
+                    `Found ${unpaid.length} unpaid invoices:\n` +
+                    JSON.stringify(summary, null, 2), 
+                    'success'
+                );
+                
+            } catch (error) {
+                displayResults('paymentResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Lifecycle Testing
+        async function testCompleteLifecycle() {
+            displayResults('lifecycleResults', 'Starting complete invoice lifecycle test...', 'info');
+            
+            try {
+                // Find a design number to use
+                const requests = await service.getArtRequests({ limit: 100 });
+                const availableDesign = requests.find(r => !r.Invoiced && r.ID_Design);
+                
+                if (!availableDesign) {
+                    throw new Error('No available design found for lifecycle test');
+                }
+                
+                const idDesign = availableDesign.ID_Design;
+                displayResults('lifecycleResults', 
+                    `Using ID_Design: ${idDesign}`, 
+                    'info'
+                );
+                
+                // Step 1: Create Draft
+                const draftData = {
+                    idDesign: idDesign,
+                    artRequestID: idDesign,
+                    customerName: 'Lifecycle Test Customer',
+                    customerCompany: 'Lifecycle Test Company',
+                    customerEmail: 'lifecycle@test.com',
+                    projectName: 'Lifecycle Test Project',
+                    projectType: 'Design',
+                    timeSpent: 1,
+                    hourlyRate: 75,
+                    status: 'Draft',
+                    notes: 'Lifecycle test - Draft stage'
+                };
+                
+                const createResult = await service.createInvoice(draftData);
+                if (!createResult.success) throw new Error(createResult.error);
+                
+                const invoiceID = createResult.invoiceID;
+                displayResults('lifecycleResults', 
+                    `Draft created: ${invoiceID}`, 
+                    'success'
+                );
+                
+                // Get the invoice to find PK_ID
+                const invoices = await service.getInvoices({ invoiceID: invoiceID });
+                if (invoices.length === 0) throw new Error('Invoice not found after creation');
+                
+                const pkID = invoices[0].PK_ID;
+                
+                // Step 2: Edit Draft
+                const editResult = await service.updateInvoice(pkID, {
+                    Notes: 'Lifecycle test - Draft edited',
+                    TimeSpent: 2
+                });
+                
+                displayResults('lifecycleResults', 
+                    `Draft edited successfully`, 
+                    'success'
+                );
+                
+                // Step 3: Send Invoice
+                const sendResult = await service.markInvoiceAsSent(pkID, 'lifecycle@test.com');
+                displayResults('lifecycleResults', 
+                    `Invoice sent successfully`, 
+                    'success'
+                );
+                
+                // Step 4: Try to edit sent invoice (should be restricted in UI)
+                displayResults('lifecycleResults', 
+                    `Note: Sent invoices should not be edited (UI restriction)`, 
+                    'warning'
+                );
+                
+                // Step 5: Void Invoice
+                const voidResult = await service.voidInvoice(pkID, 'Test User', 'Lifecycle test');
+                displayResults('lifecycleResults', 
+                    `Invoice voided successfully`, 
+                    'success'
+                );
+                
+                // Step 6: Create Replacement
+                const replacementData = {
+                    ...draftData,
+                    notes: 'Replacement invoice after void'
+                };
+                
+                const replaceResult = await service.createInvoice(replacementData);
+                displayResults('lifecycleResults', 
+                    `Replacement invoice created: ${replaceResult.invoiceID}`, 
+                    'success'
+                );
+                
+                displayResults('lifecycleResults', 
+                    `Complete lifecycle test finished successfully!`, 
+                    'success'
+                );
+                
+            } catch (error) {
+                displayResults('lifecycleResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testDraftEditing() {
+            displayResults('lifecycleResults', 'Testing draft editing capabilities...', 'info');
+            
+            try {
+                const drafts = await service.getInvoices({ status: 'Draft', limit: 1 });
+                
+                if (drafts.length === 0) {
+                    throw new Error('No draft invoices found');
+                }
+                
+                const draft = drafts[0];
+                displayResults('lifecycleResults', 
+                    `Found draft: ${draft.InvoiceID}`, 
+                    'info'
+                );
+                
+                const updates = {
+                    Notes: `Draft edited at ${new Date().toLocaleString()}`,
+                    TimeSpent: parseFloat(draft.TimeSpent || 0) + 0.5,
+                    CustomerNotes: 'Updated customer notes'
+                };
+                
+                const result = await service.updateInvoice(draft.PK_ID, updates);
+                
+                if (result.success) {
+                    displayResults('lifecycleResults', 
+                        `Draft edited successfully:\n` +
+                        `Time increased by 0.5 hours\n` +
+                        `Notes updated`, 
+                        'success'
+                    );
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                displayResults('lifecycleResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testVoidAndRecreate() {
+            displayResults('lifecycleResults', 'Testing void and recreate workflow...', 'info');
+            
+            try {
+                // Find a sent invoice to void
+                const sent = await service.getInvoices({ status: 'Sent', limit: 1 });
+                
+                if (sent.length === 0) {
+                    throw new Error('No sent invoices found to void');
+                }
+                
+                const invoice = sent[0];
+                const idDesign = invoice.ArtRequestID;
+                
+                displayResults('lifecycleResults', 
+                    `Voiding invoice: ${invoice.InvoiceID}`, 
+                    'info'
+                );
+                
+                // Void the invoice
+                const voidResult = await service.voidInvoice(
+                    invoice.PK_ID, 
+                    'Test User', 
+                    'Testing void and recreate'
+                );
+                
+                if (!voidResult.success) throw new Error(voidResult.error);
+                
+                displayResults('lifecycleResults', 
+                    `Invoice voided successfully`, 
+                    'success'
+                );
+                
+                // Now recreate
+                const newData = {
+                    idDesign: idDesign,
+                    artRequestID: idDesign,
+                    customerName: invoice.CustomerName,
+                    customerCompany: invoice.CustomerCompany,
+                    customerEmail: invoice.CustomerEmail,
+                    projectName: invoice.ProjectName,
+                    projectType: 'Design',
+                    timeSpent: parseFloat(invoice.TimeSpent || 0),
+                    hourlyRate: parseFloat(invoice.HourlyRate || 75),
+                    notes: `Replacement for voided invoice ${invoice.InvoiceID}`
+                };
+                
+                const createResult = await service.createInvoice(newData);
+                
+                if (createResult.success) {
+                    displayResults('lifecycleResults', 
+                        `Replacement invoice created: ${createResult.invoiceID}`, 
+                        'success'
+                    );
+                } else {
+                    throw new Error(createResult.error);
+                }
+                
+            } catch (error) {
+                displayResults('lifecycleResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Search Testing
+        async function testSearchByCustomer() {
+            displayResults('searchResults', 'Testing search by customer...', 'info');
+            
+            try {
+                const results = await service.searchInvoices({ customerName: 'Church' });
+                
+                displayResults('searchResults', 
+                    `Found ${results.length} invoices matching "Church":\n` +
+                    results.map(inv => `${inv.InvoiceID} - ${inv.CustomerName}`).join('\n'), 
+                    'success'
+                );
+                
+            } catch (error) {
+                displayResults('searchResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSearchByCompany() {
+            displayResults('searchResults', 'Testing search by company...', 'info');
+            
+            try {
+                const results = await service.searchInvoices({ companyName: 'Metal' });
+                
+                displayResults('searchResults', 
+                    `Found ${results.length} invoices matching "Metal":\n` +
+                    results.map(inv => `${inv.InvoiceID} - ${inv.CustomerCompany}`).join('\n'), 
+                    'success'
+                );
+                
+            } catch (error) {
+                displayResults('searchResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSearchByDateRange() {
+            displayResults('searchResults', 'Testing search by date range...', 'info');
+            
+            try {
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - 30); // Last 30 days
+                
+                const results = await service.searchInvoices({
+                    dateFrom: startDate.toISOString().split('T')[0],
+                    dateTo: endDate.toISOString().split('T')[0]
+                });
+                
+                displayResults('searchResults', 
+                    `Found ${results.length} invoices in last 30 days`, 
+                    'success'
+                );
+                
+            } catch (error) {
+                displayResults('searchResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAdvancedSearch() {
+            displayResults('searchResults', 'Testing advanced search...', 'info');
+            
+            try {
+                const results = await service.searchInvoices({
+                    status: 'Sent',
+                    unpaidOnly: true,
+                    companyName: ''
+                });
+                
+                const summary = results.slice(0, 5).map(inv => ({
+                    Invoice: inv.InvoiceID,
+                    Customer: inv.CustomerName,
+                    Due: `$${inv.BalanceDue}`,
+                    DueDate: new Date(inv.DueDate).toLocaleDateString()
+                }));
+                
+                displayResults('searchResults', 
+                    `Advanced search results (first 5):\n` +
+                    JSON.stringify(summary, null, 2), 
+                    'success'
+                );
+                
+            } catch (error) {
+                displayResults('searchResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Error Testing
+        async function testInvalidIDDesign() {
+            displayResults('errorResults', 'Testing invalid ID_Design handling...', 'info');
+            
+            try {
+                const result = await service.createInvoice({
+                    idDesign: null, // Invalid
+                    customerName: 'Test',
+                    timeSpent: 1
+                });
+                
+                if (result.success) {
+                    displayResults('errorResults', 
+                        'ERROR: Invoice created without ID_Design', 
+                        'error'
+                    );
+                } else {
+                    displayResults('errorResults', 
+                        `Validation working correctly: ${result.error}`, 
+                        'success'
+                    );
+                }
+                
+            } catch (error) {
+                displayResults('errorResults', `Expected error: ${error.message}`, 'success');
+            }
+        }
+        
+        async function testMissingRequiredFields() {
+            displayResults('errorResults', 'Testing missing required fields...', 'info');
+            
+            try {
+                const result = await service.createInvoice({
+                    idDesign: '99999',
+                    // Missing customer name, email, etc.
+                });
+                
+                displayResults('errorResults', 
+                    `Result: ${result.success ? 'Created' : result.error}`, 
+                    result.success ? 'warning' : 'success'
+                );
+                
+            } catch (error) {
+                displayResults('errorResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testConcurrentUpdates() {
+            displayResults('errorResults', 'Testing concurrent update handling...', 'info');
+            
+            try {
+                const drafts = await service.getInvoices({ status: 'Draft', limit: 1 });
+                if (drafts.length === 0) throw new Error('No drafts available');
+                
+                const id = drafts[0].PK_ID;
+                
+                // Simulate concurrent updates
+                const updates = [
+                    service.updateInvoice(id, { Notes: 'Update 1' }),
+                    service.updateInvoice(id, { Notes: 'Update 2' }),
+                    service.updateInvoice(id, { Notes: 'Update 3' })
+                ];
+                
+                const results = await Promise.allSettled(updates);
+                const successful = results.filter(r => r.status === 'fulfilled').length;
+                
+                displayResults('errorResults', 
+                    `Concurrent updates: ${successful}/3 succeeded`, 
+                    'info'
+                );
+                
+            } catch (error) {
+                displayResults('errorResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testDataIntegrity() {
+            displayResults('errorResults', 'Testing data integrity...', 'info');
+            
+            try {
+                // Check for orphaned records
+                const invoices = await service.getInvoices({ limit: 100 });
+                const artRequests = await service.getArtRequests({ limit: 1000 });
+                
+                // Build ID_Design lookup
+                const designLookup = new Set(artRequests.map(r => r.ID_Design));
+                
+                // Check each invoice
+                const orphaned = invoices.filter(inv => 
+                    inv.ArtRequestID && !designLookup.has(inv.ArtRequestID)
+                );
+                
+                displayResults('errorResults', 
+                    `Data integrity check:\n` +
+                    `Total invoices: ${invoices.length}\n` +
+                    `Orphaned invoices: ${orphaned.length}\n` +
+                    `Status: ${orphaned.length === 0 ? 'PASSED' : 'ISSUES FOUND'}`, 
+                    orphaned.length === 0 ? 'success' : 'warning'
+                );
+                
+            } catch (error) {
+                displayResults('errorResults', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Quick Actions
+        async function quickCreateInvoice() {
+            const idDesign = document.getElementById('quickIDDesign').value;
+            if (!idDesign) {
+                alert('Please enter an ID_Design');
+                return;
+            }
+            
+            try {
+                const result = await service.createInvoice({
+                    idDesign: idDesign,
+                    artRequestID: idDesign,
+                    customerName: 'Quick Test Customer',
+                    customerCompany: 'Quick Test Company',
+                    customerEmail: 'quick@test.com',
+                    projectName: 'Quick Test Project',
+                    projectType: 'Design',
+                    timeSpent: 1,
+                    hourlyRate: 75,
+                    notes: 'Created via quick action'
+                });
+                
+                if (result.success) {
+                    alert(`Invoice created: ${result.invoiceID}`);
+                    document.getElementById('quickInvoiceID').value = result.invoiceID;
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+        
+        async function quickMarkPaid() {
+            const invoiceID = document.getElementById('quickInvoiceID').value;
+            if (!invoiceID) {
+                alert('Please enter an Invoice ID');
+                return;
+            }
+            
+            try {
+                // Get invoice to find PK_ID
+                const invoice = await service.getInvoice(invoiceID);
+                if (!invoice) {
+                    alert('Invoice not found');
+                    return;
+                }
+                
+                const result = await service.quickMarkPaid(invoice.PK_ID, 'Quick Action');
+                
+                if (result.success) {
+                    alert(`Invoice ${invoiceID} marked as paid`);
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('Art Invoice Complete Test Suite Loaded');
+            refreshOverview();
+        });
+    </script>
+</body>
+</html>

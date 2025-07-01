@@ -1083,6 +1083,354 @@ The Misc API provides a variety of utility and product-related functionality.
 
 ---
 
+## Art Requests API
+
+The Art Requests API provides comprehensive CRUD functionality for managing art request records from the ArtRequests table.
+
+**Important Note - Dynamic Field Handling**: This API is designed to automatically handle any fields present in the Caspio ArtRequests table. When you add new fields to the Caspio table, the API will immediately start accepting and returning those fields without requiring any code changes. This applies to all CRUD operations.
+
+### Art Requests
+
+**Important Note - Dynamic Field Handling**: This API is designed to automatically handle any fields present in the Caspio table. When new fields are added to the ArtRequests table in Caspio (such as Invoiced, Invoiced_Date, Invoice_Updated_Date), they are immediately available through the API without requiring any code changes.
+
+**Testing Results & Tips**:
+- ✅ All CRUD operations tested and verified working on Heroku (June 30, 2025)
+- ⚠️ **Special Character Handling**: Avoid using special Unicode characters (emojis, etc.) in field values as they may cause 500 errors during PUT operations
+- 💡 **Best Practice**: Use simple alphanumeric data for reliable updates
+- 🔍 **Field Discovery**: The GET endpoints will return ALL fields from your Caspio table, making it easy to discover new fields
+- 📝 **Flexible Schema**: The API accepts ANY fields in POST/PUT requests - if a field exists in Caspio, it will be processed
+
+#### GET /artrequests
+
+-   **Description**: Retrieves a list of art requests. Supports extensive filtering options, field selection, sorting, grouping, and pagination. The response automatically includes ALL fields present in the Caspio ArtRequests table.
+-   **Method**: `GET`
+-   **URL**: `/artrequests`
+-   **Query Parameters**:
+    -   **Filtering**:
+        -   `pk_id` (integer, optional): The primary key ID of the art request.
+        -   `status` (string, optional): The status of the art request (e.g., "Completed", "In Progress", "Awaiting Approval").
+        -   `id_design` (integer, optional): The design ID.
+        -   `companyName` (string, optional): The company name (supports partial matching).
+        -   `customerServiceRep` (string, optional): The customer service representative name.
+        -   `priority` (string, optional): The priority level.
+        -   `mockup` (boolean, optional): Whether this is a mockup request.
+        -   `orderType` (string, optional): The type of order.
+        -   `customerType` (string, optional): The type of customer (e.g., "Construction").
+        -   `happyStatus` (string, optional): The happiness/satisfaction status.
+        -   `salesRep` (string, optional): The sales representative name.
+        -   `id_customer` (integer, optional): The customer ID.
+        -   `id_contact` (integer, optional): The contact ID.
+        -   `dateCreatedFrom` (string, optional): Filter by creation date (from).
+        -   `dateCreatedTo` (string, optional): Filter by creation date (to).
+        -   `dueDateFrom` (string, optional): Filter by due date (from).
+        -   `dueDateTo` (string, optional): Filter by due date (to).
+    -   **Field Selection**:
+        -   `select` (string, optional): Comma-separated list of fields to return.
+    -   **Sorting**:
+        -   `orderBy` (string, optional): ORDER BY clause (default: "Date_Created DESC").
+    -   **Grouping**:
+        -   `groupBy` (string, optional): GROUP BY clause.
+    -   **Pagination**:
+        -   `limit` (integer, optional): Maximum number of records (max: 1000, default: 100).
+        -   `pageNumber` (integer, optional): Page number (used with pageSize).
+        -   `pageSize` (integer, optional): Records per page (5-1000, used with pageNumber).
+-   **Response**: Returns an array of art request objects with fields such as:
+    -   `PK_ID`, `Status`, `ID_Design`, `CompanyName`, `Due_Date`, `NOTES`
+    -   `CustomerServiceRep`, `Priority`, `Date_Created`, `Date_Updated`
+    -   `Mockup`, `Art_Minutes`, `Amount_Art_Billed`
+    -   `GarmentColor`, `GarmentStyle`, `Garment_Placement`
+    -   File upload fields, contact information, and more
+-   **Example `curl` Requests**:
+    ```bash
+    # Get all art requests (default limit: 100)
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests"
+    
+    # Get art requests with specific status
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests?status=In%20Progress"
+    
+    # Get art requests for a specific company with pagination
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests?companyName=Metal&pageNumber=1&pageSize=25"
+    
+    # Get specific fields only
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests?select=PK_ID,Status,CompanyName,Date_Created&limit=50"
+    
+    # Get art requests created in a date range, ordered by priority
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests?dateCreatedFrom=2023-01-01&dateCreatedTo=2023-12-31&orderBy=Priority%20ASC,Date_Created%20DESC"
+    ```
+
+#### GET /artrequests/:id
+
+-   **Description**: Retrieves a specific art request by its primary key ID. Returns ALL fields from the Caspio table.
+-   **Method**: `GET`
+-   **URL**: `/artrequests/:id`
+-   **Path Parameters**:
+    -   `id` (integer, required): The primary key ID of the art request.
+-   **Example `curl` Request**:
+    ```bash
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests/1279"
+    ```
+-   **Response**: Returns a single art request object containing ALL fields from the Caspio table if found, or a 404 error if not found.
+
+#### POST /artrequests
+
+-   **Description**: Creates a new art request record. Accepts ANY fields that exist in the Caspio ArtRequests table.
+-   **Method**: `POST`
+-   **URL**: `/artrequests`
+-   **Request Body**: The request body can include any fields from the Caspio table. Below are commonly used fields:
+    ```json
+    {
+      "Status": "string (optional)",
+      "CompanyName": "string (optional)",
+      "Due_Date": "string (optional)",
+      "CustomerServiceRep": "string (optional)",
+      "Priority": "string (optional)",
+      "Mockup": "boolean (optional)",
+      "GarmentStyle": "string (optional)",
+      "GarmentColor": "string (optional)",
+      "NOTES": "string (optional)",
+      "Invoiced": "boolean (optional)",
+      "Invoiced_Date": "string (optional)",
+      "...any other fields from your Caspio table..."
+    }
+    ```
+    **Note**: You can include ANY field that exists in your Caspio ArtRequests table. The API will automatically handle all fields without requiring code changes.
+-   **Example `curl` Request**:
+    ```bash
+    curl -X POST -H "Content-Type: application/json" \
+      -d '{"CompanyName": "Test Company", "Status": "In Progress", "CustomerServiceRep": "John Doe"}' \
+      "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests"
+    ```
+-   **Response**: Returns a 201 status with the created art request data.
+
+#### PUT /artrequests/:id
+
+-   **Description**: Updates an existing art request by ID. Accepts ANY fields that exist in the Caspio ArtRequests table.
+-   **Method**: `PUT`
+-   **URL**: `/artrequests/:id`
+-   **Path Parameters**:
+    -   `id` (integer, required): The primary key ID of the art request to update.
+-   **Request Body**: Any fields from the Caspio ArtRequests table that need to be updated. The API will automatically handle all fields present in your table without requiring code changes.
+-   **Example `curl` Request**:
+    ```bash
+    curl -X PUT -H "Content-Type: application/json" \
+      -d '{"Status": "Completed", "Invoiced": true, "Invoiced_Date": "2025-06-30"}' \
+      "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests/1279"
+    ```
+-   **Response**: Returns the updated art request data.
+
+#### DELETE /artrequests/:id
+
+-   **Description**: Deletes an art request by ID.
+-   **Method**: `DELETE`
+-   **URL**: `/artrequests/:id`
+-   **Path Parameters**:
+    -   `id` (integer, required): The primary key ID of the art request to delete.
+-   **Example `curl` Request**:
+    ```bash
+    curl -X DELETE "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests/1279"
+    ```
+-   **Response**: Returns a success message if the deletion was successful.
+
+### Testing Examples & Troubleshooting
+
+**Successful Test Sequence** (verified on Heroku):
+```bash
+# 1. List all art requests
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests"
+# Result: Returns array including new fields like Invoiced, Invoiced_Date
+
+# 2. Create a test art request
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"CompanyName": "Test Company", "Status": "In Progress", "Invoiced": false}' \
+  "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests"
+# Result: 201 Created with new record ID (e.g., 2519)
+
+# 3. Get specific art request
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests/2519"
+# Result: Returns full record with all fields
+
+# 4. Update art request (simple data)
+curl -X PUT -H "Content-Type: application/json" \
+  -d '{"Status": "Completed", "Invoiced": true}' \
+  "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests/2519"
+# Result: Successfully updated
+
+# 5. Delete art request
+curl -X DELETE "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests/2519"
+# Result: Successfully deleted, subsequent GET returns 404
+```
+
+**Common Issues & Solutions**:
+- **500 Error on PUT**: Usually caused by special characters. Solution: Use simple text without emojis or complex Unicode
+- **404 Error**: Record doesn't exist. Verify the ID with a GET request first
+- **Missing Fields**: The API returns ALL fields from Caspio. If a field is missing, check your Caspio table configuration
+
+### Art Request Schema
+
+The art request object includes fields from the Caspio ArtRequests table. Common fields include:
+
+- `PK_ID`: Primary key identifier
+- `Status`: Current status of the request
+- `ID_Design`: Design identifier
+- `CompanyName`: Company name
+- `Due_Date`: Due date for the request
+- `NOTES`: Additional notes
+- `CustomerServiceRep`: Customer service representative
+- `Priority`: Priority level
+- `Date_Created`: Creation date
+- `Date_Updated`: Last update date
+- `Mockup`: Boolean indicating if this is a mockup
+- `Art_Minutes`: Time spent on art
+- `Amount_Art_Billed`: Amount billed for art
+- `Invoiced`: Boolean indicating if invoiced (newly added field)
+- `Invoiced_Date`: Date when invoiced (newly added field)
+- `Invoice_Updated_Date`: Date when invoice was last updated (newly added field)
+- `GarmentColor`, `GarmentStyle`, `Garment_Placement`: Garment details
+- `File_Upload_One`, `File_Upload_Two`, `File_Upload_Three`, `File_Upload_Four`: File uploads
+- `Happy_Status`: Customer satisfaction status
+
+**Note**: This list is not exhaustive. The API automatically handles ALL fields present in your Caspio ArtRequests table, including any custom fields you may have added. Additional fields include contact info, order details, and more.
+
+---
+
+## Art Invoices API
+
+The Art Invoices API provides comprehensive CRUD functionality for managing art invoice records through the Heroku API endpoint.
+
+**Important Note - Dynamic Field Handling**: This API is designed to automatically handle any fields present in the Caspio Art_Invoices table. When you add new fields to the Caspio table, the API will immediately start accepting and returning those fields without requiring any code changes. This applies to all CRUD operations.
+
+### Art Invoices
+
+#### GET /art-invoices
+
+-   **Description**: Retrieves a list of art invoices. Supports filtering by multiple fields including invoice ID, request ID, status, artist name, customer details, and more. The response automatically includes ALL fields present in the Caspio Art_Invoices table.
+-   **Method**: `GET`
+-   **URL**: `/art-invoices`
+-   **Query Parameters**:
+    -   `invoiceID` (string, optional): The unique invoice identifier.
+    -   `artRequestID` (string, optional): The associated art request ID.
+    -   `sessionID` (string, optional): The session ID.
+    -   `status` (string, optional): The invoice status.
+    -   `artistName` (string, optional): The artist's name (supports partial matching).
+    -   `customerName` (string, optional): The customer's name (supports partial matching).
+    -   `customerCompany` (string, optional): The customer's company (supports partial matching).
+    -   `projectName` (string, optional): The project name (supports partial matching).
+    -   `isDeleted` (boolean, optional): Filter by deletion status.
+-   **Example `curl` Request**:
+    ```bash
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/art-invoices?status=pending&artistName=Steve"
+    ```
+-   **Response**: Returns an array of art invoice objects sorted by PK_ID in descending order. Each object contains ALL fields from the Caspio table, including any custom fields you've added.
+
+#### GET /art-invoices/:id
+
+-   **Description**: Retrieves a specific art invoice by its primary key ID. Returns ALL fields from the Caspio table.
+-   **Method**: `GET`
+-   **URL**: `/art-invoices/:id`
+-   **Path Parameters**:
+    -   `id` (integer, required): The primary key ID of the art invoice.
+-   **Example `curl` Request**:
+    ```bash
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/art-invoices/2"
+    ```
+-   **Response**: Returns a single art invoice object containing ALL fields from the Caspio table if found, or a 404 error if not found.
+
+#### POST /art-invoices
+
+-   **Description**: Creates a new art invoice record. Accepts ANY fields that exist in the Caspio Art_Invoices table.
+-   **Method**: `POST`
+-   **URL**: `/art-invoices`
+-   **Request Body**: The request body can include any fields from the Caspio table. Below are commonly used fields:
+    ```json
+    {
+      "InvoiceID": "string (required)",
+      "ArtRequestID": "string (required)",
+      "SessionID": "string (optional)",
+      "InvoiceDate": "string (optional)",
+      "DueDate": "string (optional)",
+      "Status": "string (optional)",
+      "ArtistName": "string (optional)",
+      "ArtistEmail": "string (optional)",
+      "CustomerName": "string (optional)",
+      "CustomerCompany": "string (optional)",
+      "CustomerEmail": "string (optional)",
+      "ProjectName": "string (optional)",
+      "TotalAmount": "number (optional)",
+      "Notes": "string (optional)",
+      "...any other fields from your Caspio table..."
+    }
+    ```
+    **Note**: You can include ANY field that exists in your Caspio Art_Invoices table. The API will automatically handle all fields without requiring code changes.
+-   **Example `curl` Request**:
+    ```bash
+    curl -X POST -H "Content-Type: application/json" \
+      -d '{"InvoiceID": "INV-2025-001", "ArtRequestID": "AR-2025-001", "ArtistName": "John Doe", "Status": "pending"}' \
+      "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/art-invoices"
+    ```
+-   **Response**: Returns a 201 status with the created invoice data.
+
+#### PUT /art-invoices/:id
+
+-   **Description**: Updates an existing art invoice by ID. Accepts ANY fields that exist in the Caspio Art_Invoices table.
+-   **Method**: `PUT`
+-   **URL**: `/art-invoices/:id`
+-   **Path Parameters**:
+    -   `id` (integer, required): The primary key ID of the art invoice to update.
+-   **Request Body**: Any fields from the Caspio Art_Invoices table that need to be updated. The API will automatically handle all fields present in your table without requiring code changes.
+-   **Example `curl` Request**:
+    ```bash
+    curl -X PUT -H "Content-Type: application/json" \
+      -d '{"Status": "completed", "PaymentDate": "2025-06-30", "PaymentAmount": 500.00}' \
+      "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/art-invoices/2"
+    ```
+-   **Response**: Returns the updated invoice data.
+
+#### DELETE /art-invoices/:id
+
+-   **Description**: Deletes an art invoice by ID.
+-   **Method**: `DELETE`
+-   **URL**: `/art-invoices/:id`
+-   **Path Parameters**:
+    -   `id` (integer, required): The primary key ID of the art invoice to delete.
+-   **Example `curl` Request**:
+    ```bash
+    curl -X DELETE "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/art-invoices/2"
+    ```
+-   **Response**: Returns a success message if the deletion was successful.
+
+### Art Invoice Schema
+
+The art invoice object includes fields from the Caspio Art_Invoices table. Common fields include:
+
+- `PK_ID`: Primary key identifier
+- `InvoiceID`: Unique invoice identifier (required for creation)
+- `ArtRequestID`: Associated art request ID (required for creation)
+- `SessionID`: Session identifier
+- `InvoiceDate`: Date the invoice was created
+- `DueDate`: Payment due date
+- `Status`: Current status of the invoice
+- `ArtistName`, `ArtistEmail`: Artist information
+- `SalesRepName`, `SalesRepEmail`: Sales representative information
+- `CustomerName`, `CustomerCompany`, `CustomerEmail`: Customer details
+- `ProjectName`, `ProjectType`: Project information
+- `OriginalRequestDate`, `CompletionDate`: Project timeline
+- `TimeSpent`, `HourlyRate`: Time tracking
+- `SubtotalAmount`, `RushFee`, `RevisionFee`, `OtherFees`: Pricing breakdown
+- `TotalAmount`, `TaxAmount`, `GrandTotal`: Total calculations
+- `PaymentMethod`, `PaymentReference`, `PaymentDate`, `PaymentAmount`: Payment information
+- `BalanceDue`: Outstanding balance
+- `Notes`, `CustomerNotes`, `ArtworkDescription`: Additional information
+- `FileReferences`: Associated file references
+- `Complexity`, `Priority`: Job classification
+- `CCEmails`, `EmailSentDate`, `EmailSentTo`: Email tracking
+- `ReminderCount`, `LastReminderDate`: Reminder tracking
+- `InternalCode`, `Department`: Internal classification
+- `ApprovedBy`, `ApprovalDate`: Approval tracking
+- `CreatedAt`, `UpdatedAt`, `CreatedBy`, `ModifiedBy`: Audit fields
+- `IsDeleted`, `DeletedDate`, `DeletedBy`: Soft delete tracking
+
+**Note**: This list shows commonly used fields. The actual schema may include additional custom fields that you've added to your Caspio table. All fields present in the Caspio table will be automatically handled by the API.
+
 ## Transfers API
 
 The Transfers API provides functionality for managing transfer pricing.

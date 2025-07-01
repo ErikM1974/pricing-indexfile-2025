@@ -42,30 +42,62 @@ app.use((req, res, next) => {
 // Compress all responses
 app.use(compression());
 
-// Serve product folder static files
-app.use('/product', express.static(path.join(__dirname, 'product'), {
-  maxAge: '0', // Don't cache static assets
-  setHeaders: (res, path) => {
-    // Set no-cache for all files to ensure changes are immediately visible
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-  }
-}));
-
-// Set proper cache headers for static assets
-app.use(express.static(__dirname, {
-  maxAge: '0', // Don't cache static assets
-  setHeaders: (res, path) => {
-    // Set no-cache for all files to ensure changes are immediately visible
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-  }
-}));
-
+// Parse JSON and URL-encoded bodies
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Serve static files from specific directories
+const staticOptions = {
+  maxAge: '0', // Don't cache static assets
+  setHeaders: (res, path) => {
+    // Set no-cache for all files to ensure changes are immediately visible
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+};
+
+// Serve specific directories as static
+app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));
+app.use('/styles', express.static(path.join(__dirname, 'styles'), staticOptions));
+app.use('/scripts', express.static(path.join(__dirname, 'scripts'), staticOptions));
+app.use('/images', express.static(path.join(__dirname, 'images'), staticOptions));
+app.use('/forms', express.static(path.join(__dirname, 'forms'), staticOptions));
+app.use('/guides', express.static(path.join(__dirname, 'guides'), staticOptions));
+app.use('/hr', express.static(path.join(__dirname, 'hr'), staticOptions));
+app.use('/product', express.static(path.join(__dirname, 'product'), staticOptions));
+
+// Serve CSS and JS files from root directory
+app.get('/*.css', (req, res) => {
+  const fileName = req.params[0] + '.css';
+  res.sendFile(path.join(__dirname, fileName));
+});
+
+app.get('/*.js', (req, res) => {
+  const fileName = req.params[0] + '.js';
+  res.sendFile(path.join(__dirname, fileName));
+});
+
+// Serve specific HTML files from root
+app.get('/staff-dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'staff-dashboard.html'));
+});
+
+app.get('/art-invoices-dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'art-invoices-dashboard.html'));
+});
+
+app.get('/art-invoice-view.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'art-invoice-view.html'));
+});
+
+app.get('/art-invoice-unified-dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'art-invoice-unified-dashboard.html'));
+});
+
+app.get('/webstore-info.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'webstore-info.html'));
+});
 
 // API configuration
 const API_BASE_URL = process.env.API_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
@@ -105,7 +137,14 @@ async function makeApiRequest(endpoint, method = 'GET', body = null) {
   }
 }
 
-// Server status endpoint for debugging
+// ROUTE DEFINITIONS - Order matters!
+// 1. First define the root route
+app.get('/', (req, res) => {
+  console.log('Serving index.html for root route');
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// 2. API routes
 app.get('/api/status', (req, res) => {
   res.json({
     status: 'running',
@@ -114,11 +153,6 @@ app.get('/api/status', (req, res) => {
     apiBaseUrl: API_BASE_URL,
     environment: process.env.NODE_ENV || 'development'
   });
-});
-
-// Serve index.html as the root route
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Serve product.html for the /product route (product details page)

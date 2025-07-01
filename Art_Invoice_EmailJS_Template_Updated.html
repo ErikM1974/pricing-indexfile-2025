@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Invoice {{invoice_id}} - {{project_name}}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <table role="presentation" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: #4cb354; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                                 alt="Northwest Custom Apparel" style="max-width: 200px; height: auto;">
+                            <h1 style="margin: 20px 0 0 0; color: #ffffff; font-size: 28px; font-weight: bold;">ART DEPARTMENT INVOICE</h1>
+                        </td>
+                    </tr>
+
+                    <!-- Invoice Title -->
+                    <tr>
+                        <td style="padding: 30px 30px 20px 30px; text-align: center;">
+                            <h2 style="margin: 0; color: #333333; font-size: 24px;">Invoice {{invoice_id}}</h2>
+                            <p style="margin: 10px 0 0 0; color: #666666; font-size: 16px;">{{project_name}}</p>
+                        </td>
+                    </tr>
+
+                    <!-- Invoice Info -->
+                    <tr>
+                        <td style="padding: 0 30px 20px 30px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #f8f9fa; padding: 20px; border-radius: 6px;">
+                                <tr>
+                                    <td style="width: 50%; vertical-align: top;">
+                                        <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 16px;">Invoice Details</h3>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Date:</strong> {{invoice_date}}</p>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Due Date:</strong> {{due_date}}</p>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Sales Rep:</strong> {{sales_rep_name}}</p>
+                                    </td>
+                                    <td style="width: 50%; vertical-align: top;">
+                                        <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 16px;">Customer Information</h3>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Name:</strong> {{customer_name}}</p>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Company:</strong> {{company_name}}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Project Details -->
+                    <tr>
+                        <td style="padding: 0 30px 20px 30px;">
+                            <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">Project Details</h3>
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px;">
+                                <tr>
+                                    <td style="padding: 15px;">
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Type:</strong> {{project_type}}</p>
+                                        <p style="margin: 5px 0; color: #666666;"><strong>Description:</strong> {{artwork_description}}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Billing Details -->
+                    <tr>
+                        <td style="padding: 0 30px 20px 30px;">
+                            <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">Billing Details</h3>
+                            <div style="background-color: #ffffff; border: 2px solid #4cb354; border-radius: 6px; overflow: hidden;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
+                                    <tr>
+                                        <td style="padding: 15px; border-bottom: 1px solid #e5e7eb;">
+                                            <span style="color: #333333;">Art Services</span>
+                                        </td>
+                                        <td style="padding: 15px; text-align: right; border-bottom: 1px solid #e5e7eb;">
+                                            <span style="color: #333333;">${{subtotal}}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 15px; border-bottom: 1px solid #e5e7eb;">
+                                            <span style="color: #333333;">Rush Fee</span>
+                                        </td>
+                                        <td style="padding: 15px; text-align: right; border-bottom: 1px solid #e5e7eb;">
+                                            <span style="color: #333333;">${{rush_fee}}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 15px; border-bottom: 1px solid #e5e7eb;">
+                                            <span style="color: #333333;">Revision Fee</span>
+                                        </td>
+                                        <td style="padding: 15px; text-align: right; border-bottom: 1px solid #e5e7eb;">
+                                            <span style="color: #333333;">${{revision_fee}}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 15px; border-bottom: 1px solid #e5e7eb;">
+                                            <span style="color: #333333;">Additional Fees</span>
+                                        </td>
+                                        <td style="padding: 15px; text-align: right; border-bottom: 1px solid #e5e7eb;">
+                                            <span style="color: #333333;">${{other_fees}}</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Total -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #4cb354; color: white; padding: 20px; border-radius: 6px;">
+                                <tr>
+                                    <td align="center">
+                                        <h2 style="margin: 0; font-size: 24px;">Total Due: ${{grand_total}}</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Notes Section -->
+                    <tr>
+                        <td style="padding: 0 30px 20px 30px;">
+                            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px;">
+                                <h3 style="margin: 0 0 10px 0; color: #856404; font-size: 16px;">
+                                    <strong>Notes & Special Instructions:</strong>
+                                </h3>
+                                <p style="margin: 0; color: #856404;">{{notes}}</p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Instructions -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <div style="background-color: #e8f4fd; border: 1px solid #bee5eb; border-radius: 6px; padding: 15px;">
+                                <p style="margin: 0 0 10px 0; color: #0c5460; font-weight: bold;">
+                                    <i>Important:</i>
+                                </p>
+                                <p style="margin: 0 0 10px 0; color: #0c5460;">
+                                    Please forward this invoice to your customer. Payment is due within 30 days.
+                                </p>
+                                <p style="margin: 0; color: #0c5460;">
+                                    For questions about this invoice, please contact the Art Department at {{reply_to}}
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #333333; padding: 30px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 18px; font-weight: bold;">
+                                Northwest Custom Apparel
+                            </p>
+                            <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 14px;">
+                                Family Owned & Operated Since {{company_year}}
+                            </p>
+                            <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 14px;">
+                                2025 Freeman Road East, Milton, WA 98354
+                            </p>
+                            <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 14px;">
+                                Phone: {{company_phone}} | Toll Free: 1-800-851-3671
+                            </p>
+                            <p style="margin: 0; color: #ffffff; font-size: 14px;">
+                                <a href="https://www.nwcustomapparel.com" style="color: #4cb354; text-decoration: none;">www.nwcustomapparel.com</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

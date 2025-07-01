@@ -180,3 +180,38 @@ The following calculators are currently active in the system:
 - **Embroidered Emblems** (PATCH) - Custom patches and badges
 
 Remember: These existing calculators serve as working examples. When in doubt, reference their implementation patterns.
+
+## Art Invoice System
+
+### Overview
+The Art Invoice System provides comprehensive invoice management for design services with quote ID format: ART-{ID_Design}.
+
+### Recent Improvements (2025-06-30)
+- **Enhanced dashboard layout** with separate Email Actions and Payment Actions columns
+- **Improved undo payment functionality** with better date parsing and same-day restriction
+- **Email tracking display** showing when invoices were sent and to whom
+- **Resend capability** for all sent invoices with proper tracking
+- **Status enhancement** with detailed email and payment tracking information
+- **Professional UI redesign** with better organization and mobile responsiveness
+
+### Key Features
+- **Dynamic field handling**: API automatically handles any fields in Caspio tables
+- **Service code billing**: GRT-25, GRT-50, GRT-75, etc. with automatic suggestions
+- **Professional invoice theme**: Blue/gray professional appearance
+- **Void functionality**: Proper audit trail with 24-hour payment undo restriction
+- **Email integration**: EmailJS with template system for sending invoices
+- **Database integration**: Full CRUD operations via Heroku proxy API
+
+### Files
+- `/art-invoices-dashboard.html` - Main dashboard with enhanced layout
+- `/art-invoice-view.html` - Individual invoice viewing and editing
+- `/calculators/art-invoice-creator.html` - Invoice creation page
+- `/calculators/art-invoice-service-v2.js` - Backend service with full API integration
+
+### Dashboard Functionality
+- **Email Actions Column**: View, Send, Resend, Remind
+- **Payment Actions Column**: Mark Paid, Undo Payment, Add Payment
+- **Enhanced Status Display**: Shows email sent dates and payment tracking
+- **Improved Filtering**: By status, date range, customer, and project
+- **Bulk Operations**: Mark multiple invoices as paid
+- **Mobile Responsive**: Optimized layout for all devices
