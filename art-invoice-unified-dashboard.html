@@ -1240,7 +1240,30 @@
             });
 
             // Filter art requests without invoices
-            const needsInvoice = allArtRequests.filter(req => !invoiceMap.has(req.ID_Design));
+            const needsInvoiceAll = allArtRequests.filter(req => !invoiceMap.has(req.ID_Design));
+            
+            // Deduplicate by ID_Design - keep the most recent record
+            const deduplicatedMap = new Map();
+            needsInvoiceAll.forEach(req => {
+                const existingReq = deduplicatedMap.get(req.ID_Design);
+                if (!existingReq) {
+                    // First occurrence of this ID_Design
+                    deduplicatedMap.set(req.ID_Design, req);
+                } else {
+                    // Compare dates to keep the most recent
+                    const existingDate = new Date(existingReq.Date_Created || 0);
+                    const currentDate = new Date(req.Date_Created || 0);
+                    
+                    // If current record is newer, or if dates are equal but PK_ID is higher, replace
+                    if (currentDate > existingDate || 
+                        (currentDate.getTime() === existingDate.getTime() && req.PK_ID > existingReq.PK_ID)) {
+                        deduplicatedMap.set(req.ID_Design, req);
+                    }
+                }
+            });
+            
+            // Convert map back to array
+            const needsInvoice = Array.from(deduplicatedMap.values());
             
             if (needsInvoice.length === 0) {
                 showEmptyState();
