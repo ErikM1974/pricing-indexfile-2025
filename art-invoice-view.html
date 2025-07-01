@@ -387,6 +387,138 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Artwork Section Styles */
+        .artwork-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-color);
+            border-radius: 8px;
+        }
+
+        .artwork-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-size: 1.125rem;
+        }
+
+        .artwork-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .artwork-item {
+            text-align: center;
+            padding: 0.5rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .artwork-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .artwork-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .artwork-item label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .no-artwork {
+            color: var(--text-secondary);
+            font-style: italic;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Artwork Modal */
+        .artwork-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            cursor: pointer;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .artwork-modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .artwork-modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90vh;
+            cursor: default;
+        }
+
+        .modal-artwork-image {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .artwork-modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: opacity 0.2s;
+        }
+
+        .artwork-modal-close:hover {
+            opacity: 0.7;
+        }
+
+        .artwork-modal-download {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .artwork-modal-download:hover {
+            background: var(--primary-dark);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         /* Print Styles */
         @media print {
             body {
@@ -395,7 +527,8 @@
             
             .header,
             .action-bar,
-            .btn {
+            .btn,
+            .artwork-modal {
                 display: none !important;
             }
             
@@ -609,6 +742,11 @@
                     </div>
                 </div>
 
+                <!-- Artwork Section -->
+                <div id="artworkSection" class="artwork-section" style="display: none;">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
                 <!-- Notes Section -->
                 <div id="notesSection" class="notes-section" style="display: none;">
                     <h3>Notes</h3>
@@ -651,6 +789,112 @@
         let invoiceService;
         let currentInvoice = null;
         let invoiceId = null;
+        let currentArtRequest = null;
+
+        // Artwork Helper Functions
+        function hasArtwork(cdnLink) {
+            return cdnLink && cdnLink.includes('/Artwork/') && cdnLink !== 'https://cdn.caspio.com/A0E15000';
+        }
+
+        function displayInvoiceArtwork(artRequest) {
+            const artworkSection = document.getElementById('artworkSection');
+            if (!artRequest) {
+                artworkSection.style.display = 'none';
+                return;
+            }
+
+            const cdnFields = [
+                { field: 'CDN_Link', label: 'Artwork 1' },
+                { field: 'CDN_Link_Two', label: 'Artwork 2' },
+                { field: 'CDN_Link_Three', label: 'Artwork 3' },
+                { field: 'CDN_Link_Four', label: 'Artwork 4' }
+            ];
+            
+            let artworkHTML = '<h3>Associated Artwork</h3>';
+            artworkHTML += '<div class="artwork-grid">';
+            
+            let hasAnyArtwork = false;
+            
+            cdnFields.forEach(({ field, label }) => {
+                if (hasArtwork(artRequest[field])) {
+                    hasAnyArtwork = true;
+                    artworkHTML += `
+                        <div class="artwork-item" onclick="showArtworkModal('${artRequest[field]}', '${label}')">
+                            <img src="${artRequest[field]}" alt="${label}" 
+                                 onerror="this.parentElement.style.display='none'">
+                            <label>${label}</label>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (!hasAnyArtwork) {
+                artworkHTML += '<p class="no-artwork">No artwork files available for this design.</p>';
+            }
+            
+            artworkHTML += '</div>';
+            
+            artworkSection.innerHTML = artworkHTML;
+            artworkSection.style.display = 'block';
+        }
+
+        function showArtworkModal(imageUrl, label) {
+            let modal = document.getElementById('artworkModal');
+            if (!modal) {
+                modal = createArtworkModal();
+            }
+            
+            const modalImage = modal.querySelector('.modal-artwork-image');
+            const downloadBtn = modal.querySelector('.artwork-modal-download');
+            
+            modalImage.src = imageUrl;
+            downloadBtn.onclick = () => downloadArtwork(imageUrl, label);
+            
+            modal.classList.add('active');
+        }
+
+        function createArtworkModal() {
+            const modal = document.createElement('div');
+            modal.id = 'artworkModal';
+            modal.className = 'artwork-modal';
+            modal.innerHTML = `
+                <div class="artwork-modal-content">
+                    <button class="artwork-modal-close" onclick="closeArtworkModal()">×</button>
+                    <img class="modal-artwork-image" src="" alt="Artwork">
+                    <button class="artwork-modal-download">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Close on overlay click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeArtworkModal();
+                }
+            });
+            
+            return modal;
+        }
+
+        function closeArtworkModal() {
+            const modal = document.getElementById('artworkModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function downloadArtwork(imageUrl, label) {
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            const idDesign = currentInvoice.ArtRequestID || 'Unknown';
+            link.download = `Design_${idDesign}_${label.replace(' ', '_')}.png`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
         
         document.addEventListener('DOMContentLoaded', async function() {
             invoiceService = new ArtInvoiceServiceV2();
@@ -684,6 +928,22 @@
                 
                 currentInvoice = invoices[0];
                 displayInvoice();
+                
+                // Load art request data if available
+                if (currentInvoice.ArtRequestID) {
+                    try {
+                        const artRequests = await invoiceService.getArtRequests({ 
+                            id_design: currentInvoice.ArtRequestID,
+                            limit: 1 
+                        });
+                        if (artRequests && artRequests.length > 0) {
+                            currentArtRequest = artRequests[0];
+                            displayInvoiceArtwork(currentArtRequest);
+                        }
+                    } catch (error) {
+                        console.error('Error loading art request:', error);
+                    }
+                }
                 
                 // Hide loading, show content
                 document.getElementById('loadingContainer').style.display = 'none';
