@@ -910,6 +910,29 @@
             font-weight: 500;
         }
 
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-container {
@@ -1618,8 +1641,11 @@
 
             // Set up headers
             const tableHeader = document.getElementById('tableHeader');
+            // Add checkbox column only for sent/overdue tabs
+            const showCheckbox = currentTab === 'sent' || currentTab === 'overdue';
             tableHeader.innerHTML = `
                 <tr>
+                    ${showCheckbox ? '<th style="width: 40px;"><input type="checkbox" id="selectAllInvoices" onchange="toggleAllInvoices()"></th>' : ''}
                     <th>Invoice ID</th>
                     <th>Customer</th>
                     <th>Project</th>
@@ -1632,12 +1658,15 @@
 
             // Display rows
             const tableBody = document.getElementById('tableBody');
+            const showCheckbox = currentTab === 'sent' || currentTab === 'overdue';
+            
             invoices.forEach(inv => {
                 const row = document.createElement('tr');
                 const status = getStatusBadge(inv);
                 const actions = getQuickActions(inv);
                 
                 row.innerHTML = `
+                    ${showCheckbox ? `<td><input type="checkbox" class="invoice-checkbox" value="${inv.InvoiceID}" data-pk="${inv.PK_ID}"></td>` : ''}
                     <td><strong>${inv.InvoiceID}</strong></td>
                     <td>
                         ${inv.CustomerName || '-'}<br>
@@ -2331,6 +2360,177 @@
                 }
             }
         }
+        
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                background: ${type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : '#d1ecf1'};
+                color: ${type === 'success' ? '#155724' : type === 'error' ? '#721c24' : '#0c5460'};
+                border: 1px solid ${type === 'success' ? '#c3e6cb' : type === 'error' ? '#f5c6cb' : '#bee5eb'};
+                border-radius: 4px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                z-index: 1001;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Toggle all invoice checkboxes
+        function toggleAllInvoices() {
+            const selectAll = document.getElementById('selectAllInvoices');
+            const checkboxes = document.querySelectorAll('.invoice-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+            
+            updateBulkActionUI();
+        }
+        
+        // Update UI based on selected invoices
+        function updateBulkActionUI() {
+            const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
+            const bulkActionContainer = document.getElementById('bulkActionContainer');
+            
+            if (checkedBoxes.length > 0) {
+                // Show bulk action button if it doesn't exist
+                if (!bulkActionContainer) {
+                    const container = document.createElement('div');
+                    container.id = 'bulkActionContainer';
+                    container.style.cssText = 'margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px; display: flex; align-items: center; gap: 1rem;';
+                    container.innerHTML = `
+                        <span><strong>${checkedBoxes.length}</strong> invoice(s) selected</span>
+                        <button class="btn btn-primary" onclick="markSelectedAsPaid()">
+                            <i class="fas fa-check-circle"></i> Mark Selected as Paid
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearSelection()">
+                            Clear Selection
+                        </button>
+                    `;
+                    
+                    const tableContainer = document.querySelector('.table-container');
+                    tableContainer.parentNode.insertBefore(container, tableContainer);
+                } else {
+                    // Update count
+                    bulkActionContainer.querySelector('span').innerHTML = `<strong>${checkedBoxes.length}</strong> invoice(s) selected`;
+                }
+            } else {
+                // Remove bulk action container
+                if (bulkActionContainer) {
+                    bulkActionContainer.remove();
+                }
+            }
+        }
+        
+        // Clear all selections
+        function clearSelection() {
+            const selectAll = document.getElementById('selectAllInvoices');
+            if (selectAll) selectAll.checked = false;
+            document.querySelectorAll('.invoice-checkbox').forEach(cb => cb.checked = false);
+            updateBulkActionUI();
+        }
+        
+        // Mark selected invoices as paid
+        async function markSelectedAsPaid() {
+            const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
+            
+            const invoiceIds = Array.from(checkedBoxes).map(cb => ({
+                invoiceId: cb.value,
+                pkId: cb.dataset.pk
+            }));
+            
+            if (!confirm(`Mark ${invoiceIds.length} invoice(s) as paid?`)) return;
+            
+            const paymentDate = new Date().toISOString().split('T')[0];
+            let successCount = 0;
+            let failCount = 0;
+            
+            // Show progress
+            const progressDiv = document.createElement('div');
+            progressDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: white; padding: 1rem; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;';
+            progressDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing payments...';
+            document.body.appendChild(progressDiv);
+            
+            // Process each invoice
+            for (const invoice of invoiceIds) {
+                try {
+                    const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/art-invoices/${invoice.pkId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            Status: 'paid',
+                            PaymentDate: paymentDate,
+                            PaymentMethod: 'Bulk Update',
+                            BalanceDue: 0
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        failCount++;
+                        console.error(`Failed to update invoice ${invoice.invoiceId}`);
+                    }
+                } catch (error) {
+                    failCount++;
+                    console.error(`Error updating invoice ${invoice.invoiceId}:`, error);
+                }
+            }
+            
+            // Remove progress and show result
+            progressDiv.remove();
+            
+            if (successCount > 0) {
+                showNotification(`Successfully marked ${successCount} invoice(s) as paid!`, 'success');
+                loadInvoices(currentInvoiceTab); // Reload current tab
+                clearSelection();
+            }
+            
+            if (failCount > 0) {
+                showNotification(`Failed to update ${failCount} invoice(s)`, 'error');
+            }
+        }
+        
+        // Add event listener for individual checkboxes
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('invoice-checkbox')) {
+                updateBulkActionUI();
+                
+                // Update select all checkbox state
+                const allCheckboxes = document.querySelectorAll('.invoice-checkbox');
+                const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
+                const selectAll = document.getElementById('selectAllInvoices');
+                
+                if (selectAll) {
+                    selectAll.checked = allCheckboxes.length === checkedBoxes.length && allCheckboxes.length > 0;
+                }
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Art Invoice Dashboard initialized');
+            loadNeedsInvoice(); // Load the first tab by default
+        });
     </script>
 </body>
 </html>
