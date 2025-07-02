@@ -429,15 +429,282 @@
             font-size: 0.875rem;
         }
 
-        /* Request Results */
+        /* Enhanced Request Results */
         .request-results {
-            max-height: 400px;
+            max-height: 600px;
             overflow-y: auto;
             border: 1px solid var(--border-color);
-            border-radius: 3px;
-            background: white;
+            border-radius: 8px;
+            background: #f8f9fa;
+            padding: 0.5rem;
         }
 
+        /* Search Filters */
+        .search-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--invoice-accent);
+        }
+        
+        .filter-btn.active {
+            background: var(--invoice-header-bg);
+            color: white;
+            border-color: var(--invoice-header-bg);
+        }
+
+        /* Enhanced Request Cards */
+        .request-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .request-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            border-color: var(--invoice-accent);
+        }
+        
+        .request-card.selected {
+            border-color: var(--success-color);
+            border-width: 2px;
+            background: #f0fff4;
+        }
+        
+        .request-card.invoiced {
+            opacity: 0.6;
+            background: #f8f9fa;
+        }
+        
+        /* Card Content Area */
+        .card-main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        /* Thumbnail Styles */
+        .card-thumbnail {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f5f5;
+            flex-shrink: 0;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+        
+        .card-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s;
+        }
+        
+        .card-thumbnail:hover img {
+            transform: scale(1.05);
+        }
+        
+        .card-thumbnail.no-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #999;
+            font-size: 0.875rem;
+        }
+        
+        .card-thumbnail.no-image i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+        
+        /* Multiple images indicator */
+        .image-count {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        
+        .image-count i {
+            font-size: 0.625rem;
+        }
+
+        /* Card Header with Badges */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .card-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .badge-ready {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-new-request {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-in-progress {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+        
+        .badge-awaiting {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+        
+        .badge-invoiced {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-rush {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Quick Invoice Button */
+        .quick-invoice-btn {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--invoice-accent);
+        }
+        
+        .quick-invoice-btn:hover {
+            background: var(--invoice-accent);
+            color: white;
+        }
+
+        /* Card Body */
+        .card-body h4 {
+            margin: 0 0 0.25rem 0;
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .card-body .customer {
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-body .description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Card Footer */
+        .card-footer {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            padding-top: 0.5rem;
+            border-top: 1px solid #f3f4f6;
+            margin-top: 0.75rem;
+        }
+        
+        .card-footer span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .card-footer i {
+            font-size: 0.875rem;
+        }
+
+        /* Search Input Enhancement */
+        .enhanced-search {
+            flex: 1;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            transition: all 0.2s;
+            border-radius: 6px;
+        }
+        
+        .enhanced-search:focus {
+            border-color: var(--invoice-accent);
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.1);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+        
+        /* Legacy styles for compatibility */
         .request-item {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
@@ -511,6 +778,19 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .request-card {
+                flex-direction: column;
+            }
+            
+            .card-thumbnail {
+                width: 100%;
+                height: 200px;
+                order: -1; /* Move thumbnail to top on mobile */
+            }
+        }
 
         /* Print Styles */
         @media print {
@@ -549,6 +829,250 @@
             
             .invoice-totals {
                 width: 100%;
+            }
+            
+            /* Responsive thumbnail styles */
+            .request-card {
+                flex-direction: column;
+            }
+            
+            .card-thumbnail {
+                width: 100%;
+                height: 200px;
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Artwork Modal Styles */
+        .artwork-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .artwork-modal.active {
+            display: flex;
+        }
+
+        .artwork-modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .artwork-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .artwork-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            z-index: 10001;
+        }
+
+        .artwork-modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .artwork-images-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-artwork-image {
+            display: none;
+            max-width: 80vw;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .modal-artwork-image.active {
+            display: block;
+        }
+
+        .artwork-modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            padding: 1rem;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s;
+            z-index: 10001;
+        }
+
+        .artwork-modal-nav:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .artwork-modal-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .artwork-modal-prev {
+            left: -60px;
+        }
+
+        .artwork-modal-next {
+            right: -60px;
+        }
+
+        .artwork-modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 1rem;
+        }
+
+        .artwork-modal-indicators {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .artwork-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .artwork-indicator.active {
+            background: var(--primary-color);
+        }
+
+        .artwork-indicator:hover {
+            background: var(--primary-light);
+        }
+
+        .artwork-modal-download {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .artwork-modal-download:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Artwork Thumbnail Enhancements */
+        .artwork-thumbnail {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .artwork-thumbnail::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0);
+            transition: background 0.2s;
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .artwork-thumbnail:hover::before {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .artwork-thumbnail i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 2;
+        }
+
+        .artwork-thumbnail:hover i {
+            opacity: 1;
+        }
+
+        .artwork-count-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 3;
+        }
+
+        /* Mobile responsiveness for modal */
+        @media (max-width: 768px) {
+            .artwork-modal-content {
+                max-width: 95vw;
+                max-height: 95vh;
+                padding: 0.5rem;
+            }
+
+            .artwork-modal-nav {
+                padding: 0.75rem;
+                font-size: 1.25rem;
+            }
+
+            .artwork-modal-prev {
+                left: -50px;
+            }
+
+            .artwork-modal-next {
+                right: -50px;
+            }
+
+            .modal-artwork-image {
+                max-width: 90vw;
+                max-height: 75vh;
             }
         }
     </style>
@@ -590,11 +1114,23 @@
             <div class="search-controls">
                 <input type="text" 
                        id="searchInput" 
-                       class="search-input" 
-                       placeholder="Search by request ID, customer name, or project...">
+                       class="enhanced-search" 
+                       placeholder="Search by ID, customer, project, or invoice amount...">
                 <button type="button" class="btn btn-secondary" onclick="searchArtRequests()">
                     <i class="fas fa-search"></i>
                     Search
+                </button>
+            </div>
+            
+            <div class="search-filters">
+                <button class="filter-btn active" data-filter="all" onclick="filterRequests('all')">
+                    <i class="fas fa-list"></i> All Uninvoiced
+                </button>
+                <button class="filter-btn" data-filter="ready" onclick="filterRequests('ready')">
+                    <i class="fas fa-check-circle"></i> Ready to Invoice
+                </button>
+                <button class="filter-btn" data-filter="overdue" onclick="filterRequests('overdue')">
+                    <i class="fas fa-exclamation-triangle"></i> Overdue
                 </button>
             </div>
             
@@ -877,12 +1413,18 @@
                 // Fetch art requests
                 const requests = await invoiceService.getArtRequests();
                 
+                // Debug: Log first 2 requests to see data structure
+                console.log('[searchArtRequests] Sample requests:', requests.slice(0, 2));
+                
                 // Filter for requests from June 1, 2025 forward (per user request)
                 const cutoffDate = new Date('2025-06-01T00:00:00Z');
                 
                 let filteredRequests = requests.filter(req => {
                     // Include all statuses: NULL (new), Awaiting Approval 🟣, and Completed ✅
                     // We'll show them all and let user see the full workflow
+                    
+                    // Exclude already invoiced requests
+                    if (req.Invoiced === true) return false;
                     
                     // Check date is after June 1, 2025
                     if (!req.Date_Created) return false;
@@ -923,74 +1465,424 @@
                 
                 // Display results
                 if (uniqueRequests.length === 0) {
-                    resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No art requests found after June 1, 2025.</div>';
+                    resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No uninvoiced art requests found after June 1, 2025.</div>';
                 } else {
-                    resultsDiv.innerHTML = uniqueRequests.map(req => {
-                        // Calculate days in current status
-                        const statusDate = req.Date_Updated || req.Date_Created;
-                        const daysInStatus = statusDate ? Math.floor((new Date() - new Date(statusDate)) / (1000 * 60 * 60 * 24)) : 0;
-                        
-                        // Determine status display
-                        let statusDisplay = '';
-                        let statusColor = '';
-                        let ageWarning = '';
-                        
-                        if (req.Status === 'Completed ✅') {
-                            statusDisplay = 'Completed ✅';
-                            statusColor = 'var(--success-color)';
-                            // Check if already invoiced
-                            if (req.Invoiced) {
-                                statusDisplay += ' (Invoiced)';
-                                statusColor = 'var(--text-secondary)';
-                            }
-                        } else if (req.Status === 'Awaiting Approval 🟣') {
-                            statusDisplay = 'Awaiting Approval 🟣';
-                            statusColor = 'var(--warning-color)';
-                            if (daysInStatus > 7) {
-                                ageWarning = 'background: var(--error-bg); border-left: 3px solid var(--danger-color);';
-                                statusDisplay += ` (${daysInStatus} days)`;
-                            } else if (daysInStatus > 5) {
-                                ageWarning = 'background: var(--warning-bg);';
-                                statusDisplay += ` (${daysInStatus} days)`;
-                            }
-                        } else {
-                            statusDisplay = 'New/Not Started';
-                            statusColor = 'var(--text-secondary)';
-                            if (daysInStatus > 3) {
-                                ageWarning = 'background: var(--warning-bg);';
-                            }
-                        }
-                        
-                        return `
-                        <div class="request-item${selectedRequest && selectedRequest.ID_Design === req.ID_Design ? ' selected' : ''}" 
-                             onclick="selectRequest('${req.ID_Design}', event)"
-                             style="${ageWarning}">
-                            <div class="request-info">
-                                <div class="request-details">
-                                    <h4>${req.NOTES || req.Note_Mockup || 'Untitled Project'}</h4>
-                                    <p>${req.CompanyName || 'Unknown Company'} ${req.Full_Name_Contact ? `- ${req.Full_Name_Contact}` : ''}</p>
-                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">
-                                        Sales Rep: ${req.CustomerServiceRep || 'Unknown'} | 
-                                        Type: ${getOrderType(req)} | 
-                                        ID: ${req.ID_Design}
-                                    </p>
-                                    <p style="font-size: 0.875rem; margin-top: 0.25rem;">
-                                        <span style="color: ${statusColor}; font-weight: 500;">${statusDisplay}</span>
-                                    </p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="font-size: 0.75rem; color: var(--text-secondary);">${formatDate(req.Date_Created)}</div>
-                                    ${req.Art_Minutes ? `<div style="font-size: 0.875rem; color: var(--accent-color); font-weight: 500;">${(req.Art_Minutes / 60).toFixed(2)} hrs</div>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                        `;
-                    }).join('');
+                    // Store all requests for filtering
+                    window.allRequests = uniqueRequests;
+                    displayFilteredRequests(uniqueRequests);
                 }
             } catch (error) {
                 console.error('Error searching requests:', error);
                 resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--danger-color);">Error loading requests</div>';
             }
+        }
+        
+        // Artwork Helper Functions (matching working dashboard)
+        function hasArtwork(cdnLink) {
+            return cdnLink && cdnLink.includes('/Artwork/') && cdnLink !== 'https://cdn.caspio.com/A0E15000';
+        }
+
+        function getFirstArtwork(artRequest) {
+            const cdnFields = ['CDN_Link', 'CDN_Link_Two', 'CDN_Link_Three', 'CDN_Link_Four'];
+            
+            for (const field of cdnFields) {
+                if (hasArtwork(artRequest[field])) {
+                    return artRequest[field];
+                }
+            }
+            return null;
+        }
+
+        function getAllArtworks(artRequest) {
+            const cdnFields = ['CDN_Link', 'CDN_Link_Two', 'CDN_Link_Three', 'CDN_Link_Four'];
+            const artworks = [];
+            
+            cdnFields.forEach((field, index) => {
+                if (hasArtwork(artRequest[field])) {
+                    artworks.push({
+                        url: artRequest[field],
+                        label: `Artwork ${index + 1}`
+                    });
+                }
+            });
+            
+            return artworks;
+        }
+        
+        function createArtworkThumbnail(artRequest) {
+            const artworkUrl = getFirstArtwork(artRequest);
+            
+            if (!artworkUrl) {
+                return `
+                    <div class="card-thumbnail no-image">
+                        <i class="fas fa-image"></i>
+                        <span>No artwork</span>
+                    </div>
+                `;
+            }
+            
+            // Count total artwork files
+            const artworkCount = getAllArtworks(artRequest).length;
+            const countBadge = artworkCount > 1 ? `<span class="artwork-count-badge">+${artworkCount - 1}</span>` : '';
+            
+            return `
+                <div class="card-thumbnail artwork-thumbnail" onclick='showArtworkModal(${JSON.stringify(artRequest).replace(/'/g, "&#39;")})' style="position: relative; cursor: pointer;">
+                    <img src="${artworkUrl}" 
+                         alt="Artwork ${artRequest.ID_Design}" 
+                         onload="this.classList.add('loaded')"
+                         onerror="this.parentElement.innerHTML='<div class=\\'card-thumbnail no-image\\'><i class=\\'fas fa-exclamation-triangle\\'></i><span>Failed to load</span></div>'"
+                         loading="lazy">
+                    <i class="fas fa-search-plus"></i>
+                    ${countBadge}
+                </div>
+            `;
+        }
+
+        // Alias for compatibility
+        function generateThumbnailHTML(request) {
+            return createArtworkThumbnail(request);
+        }
+
+        // Modal Gallery System
+        let currentArtworkIndex = 0;
+        let currentArtworks = [];
+        let currentDesignId = null;
+
+        function showArtworkModal(artRequest) {
+            let modal = document.getElementById('artworkModal');
+            if (!modal) {
+                modal = createArtworkModal();
+            }
+            
+            // Get all artworks for this request
+            currentArtworks = getAllArtworks(artRequest);
+            currentDesignId = artRequest.ID_Design;
+            currentArtworkIndex = 0;
+            
+            if (currentArtworks.length === 0) {
+                return;
+            }
+            
+            // Update modal for gallery view
+            updateArtworkModalContent();
+            modal.classList.add('active');
+        }
+
+        function updateArtworkModalContent() {
+            const modal = document.getElementById('artworkModal');
+            const modalTitle = modal.querySelector('.artwork-modal-title');
+            
+            // Update title with counter
+            if (currentArtworks.length > 1) {
+                modalTitle.textContent = `Design #${currentDesignId} - ${currentArtworkIndex + 1} of ${currentArtworks.length}`;
+            } else {
+                modalTitle.textContent = `Design #${currentDesignId}`;
+            }
+            
+            // Update images
+            const images = modal.querySelectorAll('.modal-artwork-image');
+            images.forEach((img, index) => {
+                if (index < currentArtworks.length && index === currentArtworkIndex) {
+                    img.src = currentArtworks[index].url;
+                    img.classList.add('active');
+                } else {
+                    img.classList.remove('active');
+                }
+            });
+            
+            // Update navigation buttons visibility
+            const prevBtn = modal.querySelector('.artwork-modal-prev');
+            const nextBtn = modal.querySelector('.artwork-modal-next');
+            if (currentArtworks.length > 1) {
+                if (prevBtn) {
+                    prevBtn.style.display = 'block';
+                    prevBtn.disabled = currentArtworkIndex === 0;
+                }
+                if (nextBtn) {
+                    nextBtn.style.display = 'block';
+                    nextBtn.disabled = currentArtworkIndex === currentArtworks.length - 1;
+                }
+            } else {
+                if (prevBtn) prevBtn.style.display = 'none';
+                if (nextBtn) nextBtn.style.display = 'none';
+            }
+            
+            // Update indicators
+            const indicators = modal.querySelectorAll('.artwork-indicator');
+            const indicatorsContainer = modal.querySelector('.artwork-modal-indicators');
+            
+            indicators.forEach((indicator, index) => {
+                if (index < currentArtworks.length) {
+                    indicator.style.display = 'block';
+                    if (index === currentArtworkIndex) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
+                } else {
+                    indicator.style.display = 'none';
+                }
+            });
+            
+            // Hide indicators container if only one image
+            if (indicatorsContainer) {
+                indicatorsContainer.style.display = currentArtworks.length > 1 ? 'flex' : 'none';
+            }
+        }
+
+        function navigateArtwork(direction) {
+            if (direction === 'prev' && currentArtworkIndex > 0) {
+                currentArtworkIndex--;
+            } else if (direction === 'next' && currentArtworkIndex < currentArtworks.length - 1) {
+                currentArtworkIndex++;
+            }
+            updateArtworkModalContent();
+        }
+
+        function setArtworkIndex(index) {
+            if (index >= 0 && index < currentArtworks.length) {
+                currentArtworkIndex = index;
+                updateArtworkModalContent();
+            }
+        }
+
+        function createArtworkModal() {
+            const modal = document.createElement('div');
+            modal.id = 'artworkModal';
+            modal.className = 'artwork-modal';
+            
+            let modalContent = `
+                <div class="artwork-modal-content">
+                    <span class="artwork-modal-title"></span>
+                    <button class="artwork-modal-close" onclick="closeArtworkModal()">×</button>
+                    
+                    <!-- Navigation buttons -->
+                    <button class="artwork-modal-nav artwork-modal-prev" onclick="navigateArtwork('prev')">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="artwork-modal-nav artwork-modal-next" onclick="navigateArtwork('next')">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    
+                    <!-- Images container -->
+                    <div class="artwork-images-container">`;
+            
+            // Create placeholders for up to 4 images
+            for (let i = 0; i < 4; i++) {
+                modalContent += `<img class="modal-artwork-image" src="" alt="Artwork ${i + 1}">`;
+            }
+            
+            modalContent += `
+                    </div>
+                    
+                    <!-- Footer with indicators and download -->
+                    <div class="artwork-modal-footer">
+                        <div class="artwork-modal-indicators">`;
+            
+            // Create indicators
+            for (let i = 0; i < 4; i++) {
+                modalContent += `<span class="artwork-indicator" onclick="setArtworkIndex(${i})"></span>`;
+            }
+            
+            modalContent += `
+                        </div>
+                        <button class="artwork-modal-download" onclick="downloadCurrentArtwork()">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.innerHTML = modalContent;
+            document.body.appendChild(modal);
+            
+            // Close on overlay click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeArtworkModal();
+                }
+            });
+            
+            return modal;
+        }
+
+        function closeArtworkModal() {
+            const modal = document.getElementById('artworkModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function downloadCurrentArtwork() {
+            if (currentArtworks.length === 0 || currentArtworkIndex < 0) return;
+            
+            const artwork = currentArtworks[currentArtworkIndex];
+            const link = document.createElement('a');
+            link.href = artwork.url;
+            link.download = `Design_${currentDesignId}_${artwork.label.replace(' ', '_')}.png`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Display filtered requests with enhanced card UI
+        function displayFilteredRequests(requests) {
+            const resultsDiv = document.getElementById('requestResults');
+            
+            if (requests.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                        <h3>No Requests Found</h3>
+                        <p>Try adjusting your filters or search criteria</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="request-list">';
+            
+            // Debug: Log first request to see field names
+            if (requests.length > 0) {
+                console.log('[displayFilteredRequests] First request object:', requests[0]);
+                console.log('[displayFilteredRequests] Field names:', Object.keys(requests[0]));
+            }
+            
+            requests.forEach(req => {
+                const status = getRequestStatus(req);
+                const orderType = getOrderType(req);
+                const timeSpent = req.Art_Minutes ? `${req.Art_Minutes} min` : 'Not tracked';
+                const isInvoiced = req.Invoiced || false;
+                const daysSinceCreated = Math.floor((new Date() - new Date(req.Date_Created)) / (1000 * 60 * 60 * 24));
+                
+                // Determine badges based on status
+                let badges = '';
+                
+                // Primary status badges
+                if (status === 'New') {
+                    badges += '<span class="badge badge-new-request">New Request</span>';
+                } else if (status === 'In Progress') {
+                    badges += '<span class="badge badge-in-progress">In Progress</span>';
+                } else if (status === 'Awaiting Approval') {
+                    badges += '<span class="badge badge-awaiting">Awaiting Approval</span>';
+                } else if (status === 'Completed ✅' && !isInvoiced) {
+                    badges += '<span class="badge badge-ready">Ready to Invoice</span>';
+                }
+                
+                // Secondary badges
+                if (isInvoiced) {
+                    badges += '<span class="badge badge-invoiced">Invoiced</span>';
+                }
+                if (req.Priority === 'High' || req.RUSH) {
+                    badges += '<span class="badge badge-rush">Rush</span>';
+                }
+                
+                html += `
+                    <div class="request-card ${isInvoiced ? 'invoiced' : ''}" onclick="selectRequest('${req.ID_Design}', event)">
+                        <div class="card-main-content">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <h3>${req.CompanyName || 'No Company'} - Design #${req.ID_Design}</h3>
+                                    <div class="badges">${badges}</div>
+                                </div>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-calendar"></i> ${formatDate(req.Date_Created)}</span>
+                                    <span class="status-badge status-${status.toLowerCase().replace(/\s+/g, '-')}">${status}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="card-body">
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <label>Contact:</label>
+                                        <span>${req.Full_Name_Contact || 'Unknown'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Sales Rep:</label>
+                                        <span>${getSalesRepFirstName(req.User_Email) || 'Unassigned'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Order Type:</label>
+                                        <span>${orderType}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Time Spent:</label>
+                                        <span>${timeSpent}</span>
+                                    </div>
+                                </div>
+                                
+                                ${req.NOTES ? `
+                                    <div class="card-description">
+                                        <label>Description:</label>
+                                        <p>${req.NOTES.substring(0, 150)}${req.NOTES.length > 150 ? '...' : ''}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="card-footer">
+                                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectRequest('${req.ID_Design}', event)">
+                                    <i class="fas fa-file-invoice"></i> Create Invoice
+                                </button>
+                            </div>
+                        </div>
+                        
+                        ${generateThumbnailHTML(req)}
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Get request status
+        function getRequestStatus(request) {
+            if (!request.Status) return 'New';
+            
+            const status = request.Status.toString().trim();
+            if (status === 'Awaiting Approval 🟣') return 'Awaiting Approval';
+            if (status === 'Completed ✅') return 'Completed ✅';
+            if (status === 'In Progress') return 'In Progress';
+            
+            return status || 'New';
+        }
+        
+        // Filter requests
+        function filterRequests(filterType) {
+            if (!window.allRequests) return;
+            
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            let filtered = [...window.allRequests];
+            
+            switch(filterType) {
+                case 'ready':
+                    filtered = filtered.filter(req => 
+                        getRequestStatus(req) === 'Completed ✅' && !req.Invoiced
+                    );
+                    break;
+                    
+                case 'overdue':
+                    const fourteenDaysAgo = new Date();
+                    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+                    filtered = filtered.filter(req => 
+                        new Date(req.Date_Created) < fourteenDaysAgo && 
+                        getRequestStatus(req) === 'Completed ✅'
+                    );
+                    break;
+                    
+                case 'all':
+                default:
+                    // Show all requests
+                    break;
+            }
+            
+            displayFilteredRequests(filtered);
         }
         
         // Select Art Request
@@ -1015,10 +1907,13 @@
                 selectedRequest = request;
                 
                 // Update UI to show selection
-                document.querySelectorAll('.request-item').forEach(item => {
-                    item.classList.remove('selected');
+                document.querySelectorAll('.request-card').forEach(card => {
+                    card.classList.remove('selected');
                 });
-                event.target.closest('.request-item').classList.add('selected');
+                const selectedCard = event.target.closest('.request-card');
+                if (selectedCard) {
+                    selectedCard.classList.add('selected');
+                }
                 
                 // Show selected indicator
                 document.getElementById('selectedIndicator').style.display = 'block';
@@ -1031,7 +1926,7 @@
                 document.getElementById('projectName').value = request.NOTES || request.Note_Mockup || '';
                 
                 // Get and display sales rep
-                const salesRepEmail = request.User_Email || getSalesRepEmail(request.CustomerServiceRep || '');
+                const salesRepEmail = request.User_Email || 'sales@nwcustomapparel.com';
                 const salesRepName = getSalesRepName(salesRepEmail);
                 document.getElementById('salesRepDisplay').value = `${salesRepName} (${salesRepEmail})`;
                 
@@ -1062,6 +1957,17 @@
                 console.error('Error selecting request:', error);
                 showAlert('Error loading request details', 'error');
             }
+        }
+        
+        // Helper function to get sales rep first name from email
+        function getSalesRepFirstName(email) {
+            if (!email) return null;
+            
+            // Extract the part before @ 
+            const username = email.split('@')[0];
+            
+            // Capitalize first letter
+            return username.charAt(0).toUpperCase() + username.slice(1);
         }
         
         // Helper function to get sales rep name from email
@@ -1271,7 +2177,7 @@
         // Update credit availability info (placeholder for future implementation)
         function updateCreditInfo() {
             const creditInfo = document.getElementById('creditInfo');
-            const salesRepEmail = selectedRequest?.User_Email || getSalesRepEmail(selectedRequest?.CustomerServiceRep || '');
+            const salesRepEmail = selectedRequest?.User_Email || 'sales@nwcustomapparel.com';
             const salesRepName = getSalesRepName(salesRepEmail);
             
             // For now, show static message - can be enhanced later with real credit tracking
@@ -1364,7 +2270,7 @@
             const grandTotal = subtotal + taxAmount;
             
             // Get sales rep info
-            const salesRepEmail = selectedRequest.User_Email || getSalesRepEmail(selectedRequest.CustomerServiceRep || '');
+            const salesRepEmail = selectedRequest.User_Email || 'sales@nwcustomapparel.com';
             const salesRepName = getSalesRepName(salesRepEmail);
             
             // Prepare invoice data

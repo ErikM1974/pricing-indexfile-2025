@@ -1749,7 +1749,6 @@
 
             // Display rows
             const tableBody = document.getElementById('tableBody');
-            const showCheckbox = currentTab === 'sent' || currentTab === 'overdue';
             
             invoices.forEach(inv => {
                 const row = document.createElement('tr');
@@ -2392,10 +2391,6 @@
             displayCurrentTab();
         }
 
-        // Refresh data
-        function refreshData() {
-            loadData();
-        }
 
         // Send approval reminder for art requests
         async function sendApprovalReminder(idDesign, companyName, customerEmail) {

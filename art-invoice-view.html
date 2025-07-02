@@ -519,37 +519,389 @@
             to { opacity: 1; }
         }
 
-        /* Print Styles */
+        /* Print Styles - Single Page Professional Layout */
+        @page {
+            size: letter;
+            margin: 0.5in;
+        }
+        
         @media print {
-            body {
-                background: white;
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             
+            body {
+                background: white !important;
+                font-size: 11px !important;
+                line-height: 1.3 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* Hide navigation and interactive elements */
             .header,
             .action-bar,
             .btn,
-            .artwork-modal {
+            .artwork-modal,
+            .breadcrumb {
                 display: none !important;
             }
             
+            /* Main container optimization */
             .main-container {
-                max-width: 100%;
-                margin: 0;
-                padding: 0;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
+            /* Invoice container - single page layout */
             .invoice-container {
-                box-shadow: none;
-                padding: 0;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 100vh !important;
+                display: flex !important;
+                flex-direction: column !important;
+                page-break-inside: avoid !important;
+            }
+            
+            /* Compact header - 15% of page */
+            .invoice-header {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: flex-start !important;
+                margin-bottom: 0.3in !important;
+                padding-bottom: 0.1in !important;
+                border-bottom: 2px solid #4cb354 !important;
+                flex-shrink: 0 !important;
+            }
+            
+            .invoice-logo {
+                max-width: 1.5in !important;
+                height: auto !important;
+                max-height: 0.6in !important;
+            }
+            
+            .invoice-title {
+                text-align: right !important;
+                margin: 0 !important;
+            }
+            
+            .invoice-title h1 {
+                font-size: 18px !important;
+                margin: 0 0 0.1in 0 !important;
+                color: #4cb354 !important;
+                font-weight: bold !important;
+            }
+            
+            .invoice-title p {
+                margin: 0.02in 0 !important;
+                font-size: 10px !important;
+                line-height: 1.2 !important;
+            }
+            
+            /* Customer/Project info - 20% of page */
+            .invoice-details {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr 1fr !important;
+                gap: 0.2in !important;
+                margin-bottom: 0.2in !important;
+                flex-shrink: 0 !important;
             }
             
             .invoice-section {
-                background: white;
-                border: 1px solid #ddd;
+                background: white !important;
+                border: 1px solid #ddd !important;
+                padding: 0.1in !important;
+                margin: 0 !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .invoice-section h3 {
+                font-size: 12px !important;
+                margin: 0 0 0.05in 0 !important;
+                color: #4cb354 !important;
+                font-weight: bold !important;
+                border-bottom: 1px solid #eee !important;
+                padding-bottom: 0.02in !important;
+            }
+            
+            .invoice-section p {
+                margin: 0.02in 0 !important;
+                font-size: 9px !important;
+                line-height: 1.2 !important;
+            }
+            
+            /* Project details section optimization */
+            .invoice-section[style*="margin-bottom: 2rem"] {
+                margin-bottom: 0.1in !important;
+                grid-column: 1 / -1 !important;
+            }
+            
+            .invoice-section[style*="margin-bottom: 2rem"] > div {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr 1fr !important;
+                gap: 0.15in !important;
+            }
+            
+            /* Artwork section - 25% of page */
+            .artwork-section,
+            #artworkSection {
+                display: block !important;
+                margin: 0.1in 0 !important;
+                flex-shrink: 0 !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .artwork-section h3 {
+                font-size: 12px !important;
+                margin: 0 0 0.05in 0 !important;
+                color: #4cb354 !important;
+                font-weight: bold !important;
+            }
+            
+            .artwork-grid {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 0.1in !important;
+                margin-bottom: 0.1in !important;
+            }
+            
+            .artwork-item {
+                text-align: center !important;
+                padding: 0.05in !important;
+                background: white !important;
+                border: 1px solid #ddd !important;
+                border-radius: 3px !important;
+                cursor: default !important;
+                transition: none !important;
+            }
+            
+            .artwork-item:hover {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            
+            .artwork-item img {
+                width: 100% !important;
+                height: 0.8in !important;
+                object-fit: cover !important;
+                border-radius: 2px !important;
+                margin-bottom: 0.02in !important;
+                display: block !important;
+            }
+            
+            .artwork-item label {
+                font-size: 8px !important;
+                color: #666 !important;
+                display: block !important;
+                margin: 0 !important;
+            }
+            
+            .no-artwork {
+                color: #999 !important;
+                font-style: italic !important;
+                text-align: center !important;
+                padding: 0.1in !important;
+                font-size: 9px !important;
+            }
+            
+            /* Spec Art section */
+            #specArtSection {
+                margin: 0.1in 0 !important;
+                flex-shrink: 0 !important;
+            }
+            
+            #specArtSection div[style*="background: #fff3cd"] {
+                background: #fff3cd !important;
+                border: 1px solid #ffeaa7 !important;
+                padding: 0.08in !important;
+                border-radius: 3px !important;
+            }
+            
+            #specArtSection h4 {
+                margin: 0 0 0.05in 0 !important;
+                color: #856404 !important;
+                font-size: 10px !important;
+                font-weight: bold !important;
+            }
+            
+            #specArtSection div[style*="display: grid"] {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.1in !important;
+            }
+            
+            #specArtSection p {
+                margin: 0.01in 0 !important;
+                font-size: 8px !important;
+                line-height: 1.2 !important;
+            }
+            
+            /* Invoice table - 25% of page */
+            .invoice-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin: 0.1in 0 !important;
+                flex-shrink: 0 !important;
+                font-size: 10px !important;
             }
             
             .invoice-table th {
-                background: #f5f5f5;
+                background: #f5f5f5 !important;
+                border: 1px solid #ddd !important;
+                padding: 0.05in !important;
+                font-size: 10px !important;
+                font-weight: bold !important;
+                text-align: left !important;
+            }
+            
+            .invoice-table td {
+                border: 1px solid #ddd !important;
+                padding: 0.05in !important;
+                font-size: 9px !important;
+                line-height: 1.2 !important;
+            }
+            
+            .text-right {
+                text-align: right !important;
+            }
+            
+            /* Totals section - 15% of page */
+            .invoice-totals {
+                margin: 0.1in 0 !important;
+                flex-shrink: 0 !important;
+            }
+            
+            .total-row {
+                display: flex !important;
+                justify-content: space-between !important;
+                padding: 0.02in 0 !important;
+                font-size: 10px !important;
+                line-height: 1.2 !important;
+            }
+            
+            .grand-total {
+                border-top: 2px solid #4cb354 !important;
+                padding-top: 0.05in !important;
+                margin-top: 0.05in !important;
+                font-weight: bold !important;
+                font-size: 12px !important;
+            }
+            
+            /* Payment and notes sections */
+            .payment-section,
+            .notes-section {
+                margin: 0.05in 0 !important;
+                padding: 0.05in !important;
+                background: #f8f9fa !important;
+                border: 1px solid #ddd !important;
+                border-radius: 3px !important;
+                flex-shrink: 0 !important;
+            }
+            
+            .payment-section h3,
+            .notes-section h3 {
+                font-size: 10px !important;
+                margin: 0 0 0.03in 0 !important;
+                color: #4cb354 !important;
+                font-weight: bold !important;
+            }
+            
+            .payment-info {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr 1fr !important;
+                gap: 0.1in !important;
+            }
+            
+            .payment-item p {
+                margin: 0.01in 0 !important;
+                font-size: 8px !important;
+                line-height: 1.2 !important;
+            }
+            
+            /* Footer - at bottom */
+            .invoice-container > div:last-child {
+                margin-top: auto !important;
+                padding-top: 0.1in !important;
+                border-top: 1px solid #ddd !important;
+                text-align: center !important;
+                font-size: 8px !important;
+                line-height: 1.2 !important;
+                flex-shrink: 0 !important;
+            }
+            
+            .invoice-container > div:last-child p {
+                margin: 0.01in 0 !important;
+                font-size: 8px !important;
+            }
+            
+            .invoice-container > div:last-child hr {
+                margin: 0.05in 0 !important;
+                border: none !important;
+                border-top: 1px solid #ddd !important;
+            }
+            
+            /* Page break controls */
+            .invoice-header,
+            .invoice-details,
+            .artwork-section,
+            .invoice-table,
+            .invoice-totals {
+                page-break-inside: avoid !important;
+            }
+            
+            /* Ensure single page */
+            body, .main-container, .invoice-container {
+                max-height: 10in !important;
+                overflow: hidden !important;
+            }
+            
+            /* Enhanced print optimization */
+            * {
+                print-color-adjust: exact !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            /* Force artwork images to print */
+            .artwork-item img {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                image-rendering: -webkit-optimize-contrast !important;
+                image-rendering: crisp-edges !important;
+            }
+            
+            /* Optimize for different browsers */
+            .invoice-container {
+                -webkit-transform: translateZ(0) !important;
+                transform: translateZ(0) !important;
+            }
+            
+            /* Ensure all content fits */
+            .invoice-section {
+                max-width: 100% !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+            }
+            
+            /* Fix tax display based on tax status */
+            .has-tax #taxExemptRow {
+                display: none !important;
+            }
+            
+            .has-tax #taxRow {
+                display: flex !important;
+            }
+            
+            .tax-exempt #taxRow {
+                display: none !important;
+            }
+            
+            .tax-exempt #taxExemptRow {
+                display: flex !important;
             }
         }
 
@@ -703,27 +1055,6 @@
                     </div>
                 </div>
 
-                <!-- Spec Art Info Section -->
-                <div id="specArtSection" class="invoice-section" style="margin-bottom: 2rem; display: none;">
-                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 1rem; border-radius: 8px;">
-                        <h4 style="margin: 0 0 1rem 0; color: #856404;">
-                            <i class="fas fa-gift"></i>
-                            Spec Artwork Information
-                        </h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                            <div>
-                                <p style="margin: 0.25rem 0;"><strong>Purpose:</strong> <span id="specArtPurpose"></span></p>
-                                <p style="margin: 0.25rem 0;"><strong>Sales Rep Credit Applied:</strong> <span id="creditApplied"></span></p>
-                            </div>
-                            <div>
-                                <p style="margin: 0.25rem 0; color: #856404; font-style: italic;">
-                                    This artwork was provided as complimentary spec work to support the sales process.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Invoice Table -->
                 <table class="invoice-table" id="invoiceTable">
                     <thead>
@@ -773,7 +1104,7 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div>
                                 <p style="margin: 0.25rem 0;"><strong>Purpose:</strong> <span id="specArtPurpose"></span></p>
-                                <p style="margin: 0.25rem 0;"><strong>Credit Applied:</strong> <span id="specArtCredit"></span></p>
+                                <p style="margin: 0.25rem 0;"><strong>Credit Applied:</strong> <span id="creditApplied"></span></p>
                             </div>
                             <div>
                                 <p style="margin: 0.25rem 0; color: #856404; font-style: italic;">
@@ -1176,10 +1507,16 @@
                 const subtotal = parseFloat(currentInvoice.SubtotalAmount || 0);
                 const projectType = currentInvoice.ProjectType || 'Design';
                 
+                // Check for ServiceCodes field - this contains comma-separated codes like "GRT-50,GRT-25"
+                let serviceCodeDisplay = '-';
+                if (currentInvoice.ServiceCodes && currentInvoice.ServiceCodes.trim() !== '') {
+                    serviceCodeDisplay = currentInvoice.ServiceCodes;
+                }
+                
                 tbody.innerHTML += `
                     <tr>
                         <td>Art Services - ${projectType}</td>
-                        <td class="text-right">-</td>
+                        <td class="text-right">${serviceCodeDisplay}</td>
                         <td class="text-right">1</td>
                         <td class="text-right">$${subtotal.toFixed(2)}</td>
                     </tr>
@@ -1201,13 +1538,21 @@
             
             // Sales tax display
             const taxAmount = parseFloat(currentInvoice.TaxAmount || 0);
+            const invoiceContainer = document.querySelector('.invoice-container');
+            
             if (taxAmount > 0) {
                 document.getElementById('taxRow').style.display = 'flex';
                 document.getElementById('taxAmount').textContent = `$${taxAmount.toFixed(2)}`;
                 document.getElementById('taxExemptRow').style.display = 'none';
+                // Add class for print CSS
+                invoiceContainer.classList.remove('tax-exempt');
+                invoiceContainer.classList.add('has-tax');
             } else {
                 document.getElementById('taxRow').style.display = 'none';
                 document.getElementById('taxExemptRow').style.display = 'flex';
+                // Add class for print CSS
+                invoiceContainer.classList.remove('has-tax');
+                invoiceContainer.classList.add('tax-exempt');
             }
             
             const grandTotal = parseFloat(currentInvoice.GrandTotal || 0);
@@ -1236,9 +1581,9 @@
                 
                 const creditApplied = parseFloat(currentInvoice.CreditApplied || 0);
                 if (creditApplied > 0) {
-                    document.getElementById('specArtCredit').textContent = `$${creditApplied.toFixed(2)}`;
+                    document.getElementById('creditApplied').textContent = `$${creditApplied.toFixed(2)}`;
                 } else {
-                    document.getElementById('specArtCredit').textContent = 'Complimentary';
+                    document.getElementById('creditApplied').textContent = 'Complimentary';
                 }
             } else {
                 document.getElementById('specArtSection').style.display = 'none';
