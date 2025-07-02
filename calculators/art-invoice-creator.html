@@ -453,6 +453,26 @@
             background: #e3f2fd;
             border-left: 3px solid var(--invoice-accent);
         }
+        
+        .request-info {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .request-details {
+            flex: 1;
+        }
+        
+        .request-details h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+        }
+        
+        .request-details p {
+            margin: 0.25rem 0;
+            color: var(--text-secondary);
+        }
 
         /* Alert Messages */
         .alert {
@@ -819,14 +839,14 @@
                 // Fetch art requests
                 const requests = await invoiceService.getArtRequests();
                 
-                // Filter for completed requests from June 15, 2025 forward
-                const cutoffDate = new Date('2025-06-15T00:00:00Z');
+                // Filter for requests from June 1, 2025 forward (per user request)
+                const cutoffDate = new Date('2025-06-01T00:00:00Z');
                 
                 let filteredRequests = requests.filter(req => {
-                    // Check status is Completed (with checkmark emoji)
-                    if (req.Status !== 'Completed ✅') return false;
+                    // Include all statuses: NULL (new), Awaiting Approval 🟣, and Completed ✅
+                    // We'll show them all and let user see the full workflow
                     
-                    // Check date is after June 15, 2025
+                    // Check date is after June 1, 2025
                     if (!req.Date_Created) return false;
                     
                     try {
@@ -865,10 +885,48 @@
                 
                 // Display results
                 if (uniqueRequests.length === 0) {
-                    resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No completed art requests found after June 15, 2025.</div>';
+                    resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No art requests found after June 1, 2025.</div>';
                 } else {
-                    resultsDiv.innerHTML = uniqueRequests.map(req => `
-                        <div class="request-item${selectedRequest && selectedRequest.ID_Design === req.ID_Design ? ' selected' : ''}" onclick="selectRequest('${req.ID_Design}', event)">
+                    resultsDiv.innerHTML = uniqueRequests.map(req => {
+                        // Calculate days in current status
+                        const statusDate = req.Date_Updated || req.Date_Created;
+                        const daysInStatus = statusDate ? Math.floor((new Date() - new Date(statusDate)) / (1000 * 60 * 60 * 24)) : 0;
+                        
+                        // Determine status display
+                        let statusDisplay = '';
+                        let statusColor = '';
+                        let ageWarning = '';
+                        
+                        if (req.Status === 'Completed ✅') {
+                            statusDisplay = 'Completed ✅';
+                            statusColor = 'var(--success-color)';
+                            // Check if already invoiced
+                            if (req.Invoiced) {
+                                statusDisplay += ' (Invoiced)';
+                                statusColor = 'var(--text-secondary)';
+                            }
+                        } else if (req.Status === 'Awaiting Approval 🟣') {
+                            statusDisplay = 'Awaiting Approval 🟣';
+                            statusColor = 'var(--warning-color)';
+                            if (daysInStatus > 7) {
+                                ageWarning = 'background: var(--error-bg); border-left: 3px solid var(--danger-color);';
+                                statusDisplay += ` (${daysInStatus} days)`;
+                            } else if (daysInStatus > 5) {
+                                ageWarning = 'background: var(--warning-bg);';
+                                statusDisplay += ` (${daysInStatus} days)`;
+                            }
+                        } else {
+                            statusDisplay = 'New/Not Started';
+                            statusColor = 'var(--text-secondary)';
+                            if (daysInStatus > 3) {
+                                ageWarning = 'background: var(--warning-bg);';
+                            }
+                        }
+                        
+                        return `
+                        <div class="request-item${selectedRequest && selectedRequest.ID_Design === req.ID_Design ? ' selected' : ''}" 
+                             onclick="selectRequest('${req.ID_Design}', event)"
+                             style="${ageWarning}">
                             <div class="request-info">
                                 <div class="request-details">
                                     <h4>${req.NOTES || req.Note_Mockup || 'Untitled Project'}</h4>
@@ -878,6 +936,9 @@
                                         Type: ${getOrderType(req)} | 
                                         ID: ${req.ID_Design}
                                     </p>
+                                    <p style="font-size: 0.875rem; margin-top: 0.25rem;">
+                                        <span style="color: ${statusColor}; font-weight: 500;">${statusDisplay}</span>
+                                    </p>
                                 </div>
                                 <div style="text-align: right;">
                                     <div style="font-size: 0.75rem; color: var(--text-secondary);">${formatDate(req.Date_Created)}</div>
@@ -885,7 +946,8 @@
                                 </div>
                             </div>
                         </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
             } catch (error) {
                 console.error('Error searching requests:', error);

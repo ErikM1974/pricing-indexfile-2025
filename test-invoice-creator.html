@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Invoice Creator</title>
+    <script src="calculators/art-invoice-service-v2.js"></script>
+</head>
+<body>
+    <h1>Testing Invoice Creator API</h1>
+    <button onclick="testGetRequests()">Test Get Art Requests</button>
+    <button onclick="testCreateInvoice()">Test Create Invoice</button>
+    <div id="results"></div>
+    
+    <script>
+        const resultsDiv = document.getElementById('results');
+        const service = new ArtInvoiceServiceV2();
+        
+        async function testGetRequests() {
+            resultsDiv.innerHTML = '<p>Testing get requests...</p>';
+            try {
+                const requests = await service.getArtRequests();
+                
+                // Filter for requests from June 1, 2025
+                const cutoffDate = new Date('2025-06-01T00:00:00Z');
+                const filtered = requests.filter(req => {
+                    if (!req.Date_Created) return false;
+                    return new Date(req.Date_Created) >= cutoffDate;
+                });
+                
+                resultsDiv.innerHTML = `
+                    <h3>Found ${filtered.length} requests after June 1, 2025</h3>
+                    <ul>
+                        ${filtered.slice(0, 5).map(req => `
+                            <li>
+                                ID: ${req.ID_Design} - ${req.CompanyName || 'Unknown'} - 
+                                Status: ${req.Status || 'Not Started'} - 
+                                Invoiced: ${req.Invoiced ? 'Yes' : 'No'}
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testCreateInvoice() {
+            resultsDiv.innerHTML = '<p>Testing create invoice...</p>';
+            
+            // Find a completed, non-invoiced request
+            try {
+                const requests = await service.getArtRequests();
+                const cutoffDate = new Date('2025-06-01T00:00:00Z');
+                
+                const validRequest = requests.find(req => 
+                    req.Date_Created && 
+                    new Date(req.Date_Created) >= cutoffDate &&
+                    req.Status === 'Completed ✅' &&
+                    !req.Invoiced
+                );
+                
+                if (!validRequest) {
+                    resultsDiv.innerHTML = '<p style="color: red;">No valid requests found for testing</p>';
+                    return;
+                }
+                
+                resultsDiv.innerHTML = `<p>Found test request: ${validRequest.ID_Design} - ${validRequest.CompanyName}</p>`;
+                
+                // Create test invoice data
+                const invoiceData = {
+                    idDesign: validRequest.ID_Design,
+                    customerName: validRequest.Full_Name_Contact || 'Test Customer',
+                    customerCompany: validRequest.CompanyName || 'Test Company',
+                    customerEmail: validRequest.Email_Contact || 'test@example.com',
+                    salesRepName: 'Test Rep',
+                    salesRepEmail: 'sales@nwcustomapparel.com',
+                    projectName: 'Test Invoice Creation',
+                    originalRequestDate: validRequest.Date_Created,
+                    completionDate: new Date(),
+                    serviceItems: [
+                        {
+                            code: 'GRT-50',
+                            description: 'Logo Mockup Test',
+                            quantity: 1,
+                            rate: 50.00,
+                            amount: 50.00
+                        }
+                    ],
+                    serviceSummary: 'GRT-50: Logo Mockup Test',
+                    subtotalAmount: 50.00,
+                    taxAmount: 5.10,
+                    totalCost: 55.10,
+                    customerNotes: 'This is a test invoice',
+                    notes: 'Internal test note',
+                    status: 'Draft',
+                    artistName: 'Steve Deland',
+                    artistEmail: 'art@nwcustomapparel.com',
+                    ccEmails: 'erik@nwcustomapparel.com',
+                    createdBy: 'Test System'
+                };
+                
+                console.log('Creating invoice with data:', invoiceData);
+                
+                const result = await service.createInvoice(invoiceData);
+                
+                if (result.success) {
+                    resultsDiv.innerHTML = `<p style="color: green;">Success! Created invoice: ${result.invoiceID}</p>`;
+                } else {
+                    resultsDiv.innerHTML = `<p style="color: red;">Failed: ${result.error}</p>`;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                console.error('Test error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
