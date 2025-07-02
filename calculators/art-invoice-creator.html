@@ -94,11 +94,67 @@
             text-decoration: underline;
         }
 
-        /* Main Container */
+        /* Main Container - Split Layout */
         .main-container {
-            max-width: 1000px;
+            max-width: 1600px;
             margin: 2rem auto;
             padding: 0 2rem;
+        }
+
+        /* Split Screen Layout */
+        .split-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .form-panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .preview-panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: sticky;
+            top: 2rem;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .preview-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .preview-content {
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 1200px) {
+            .split-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .preview-panel {
+                position: static;
+                max-height: none;
+                order: -1;
+            }
         }
 
         /* Invoice Document Style */
@@ -1075,6 +1131,188 @@
                 max-height: 75vh;
             }
         }
+
+        /* Professional Invoice Preview Styles */
+        .invoice-preview {
+            background: white;
+            border: 1px solid #ddd;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .invoice-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #4cb354;
+        }
+
+        .invoice-preview-logo {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .invoice-preview-title {
+            text-align: right;
+        }
+
+        .invoice-preview-title h1 {
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem 0;
+            color: #4cb354;
+            font-weight: bold;
+        }
+
+        .invoice-preview-title p {
+            margin: 0.125rem 0;
+            font-size: 0.8rem;
+            line-height: 1.2;
+        }
+
+        .invoice-preview-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .invoice-preview-section {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            border-radius: 4px;
+        }
+
+        .invoice-preview-section h3 {
+            font-size: 0.875rem;
+            margin: 0 0 0.5rem 0;
+            color: #4cb354;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.25rem;
+        }
+
+        .invoice-preview-section p {
+            margin: 0.125rem 0;
+            font-size: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .invoice-preview-project {
+            grid-column: 1 / -1;
+            margin-bottom: 1rem;
+        }
+
+        .invoice-preview-project-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .invoice-preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.75rem;
+        }
+
+        .invoice-preview-table th {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 0.5rem 0.25rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .invoice-preview-table td {
+            border: 1px solid #ddd;
+            padding: 0.5rem 0.25rem;
+            font-size: 0.7rem;
+            line-height: 1.2;
+        }
+
+        .invoice-preview-totals {
+            margin: 1rem 0;
+            font-size: 0.75rem;
+        }
+
+        .invoice-preview-total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+            line-height: 1.2;
+        }
+
+        .invoice-preview-grand-total {
+            border-top: 2px solid #4cb354;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+
+        .invoice-preview-footer {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 0.65rem;
+            line-height: 1.3;
+            color: #666;
+        }
+
+        .invoice-preview-empty {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+            font-style: italic;
+        }
+
+        .invoice-preview-artwork {
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .invoice-preview-artwork.show {
+            display: block;
+        }
+
+        .invoice-preview-artwork h3 {
+            font-size: 0.875rem;
+            margin: 0 0 0.5rem 0;
+            color: #4cb354;
+            font-weight: bold;
+        }
+
+        .invoice-preview-artwork-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .invoice-preview-artwork-item {
+            text-align: center;
+            padding: 0.5rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .invoice-preview-artwork-item img {
+            width: 100%;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 2px;
+            margin-bottom: 0.25rem;
+        }
+
+        .invoice-preview-artwork-item label {
+            font-size: 0.6rem;
+            color: #666;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -1100,7 +1338,11 @@
         <!-- Alert Container -->
         <div id="alertContainer"></div>
 
-        <!-- Art Request Selection -->
+        <!-- Split Screen Layout -->
+        <div class="split-container">
+            <!-- Form Panel -->
+            <div class="form-panel">
+                <!-- Art Request Selection -->
         <div class="search-section" id="searchSection">
             <div class="search-header">
                 <h2>Select Art Request</h2>
@@ -1331,6 +1573,27 @@
                 </div>
             </div>
         </form>
+            </div>
+            <!-- End Form Panel -->
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <i class="fas fa-eye"></i>
+                    Live Invoice Preview
+                </div>
+                <div class="preview-content">
+                    <div id="invoicePreviewContainer" class="invoice-preview">
+                        <div class="invoice-preview-empty">
+                            <i class="fas fa-file-invoice"></i>
+                            <p>Select an art request to see the invoice preview</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Preview Panel -->
+        </div>
+        <!-- End Split Container -->
     </main>
 
     <script>
@@ -1339,7 +1602,7 @@
         let selectedRequest = null;
         let serviceLineCount = 0;
         
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             invoiceService = new ArtInvoiceServiceV2();
             
             // Initialize EmailJS
@@ -1352,8 +1615,61 @@
             document.getElementById('invoiceDate').value = today.toISOString().split('T')[0];
             document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
             
-            // Load initial art requests
-            searchArtRequests();
+            // Parse URL parameters for deep linking
+            const urlParams = new URLSearchParams(window.location.search);
+            const designIdFromUrl = urlParams.get('id');
+            
+            if (designIdFromUrl) {
+                console.log('Deep link detected - Design ID:', designIdFromUrl);
+                
+                try {
+                    // Show loading state
+                    document.getElementById('requestResults').innerHTML = '<div style="padding: 2rem; text-align: center;"><div class="loading"></div><p>Loading art request...</p></div>';
+                    document.getElementById('requestResults').style.display = 'block';
+                    
+                    // Fetch the specific request
+                    const requests = await invoiceService.getArtRequests({ id_design: designIdFromUrl });
+                    const request = requests.find(r => r.ID_Design == designIdFromUrl);
+                    
+                    if (request) {
+                        console.log('Art request loaded:', request);
+                        
+                        // Hide the search section
+                        document.getElementById('searchSection').style.display = 'none';
+                        
+                        // Select the request directly
+                        await selectRequest(designIdFromUrl, null);
+                        
+                        // Clear loading state
+                        document.getElementById('requestResults').innerHTML = '';
+                        document.getElementById('requestResults').style.display = 'none';
+                        
+                        // Show form section if it's hidden
+                        const formSection = document.getElementById('formSection');
+                        if (formSection) {
+                            formSection.style.display = 'block';
+                        }
+                        
+                        // Update preview
+                        if (typeof updateInvoicePreview === 'function') {
+                            setTimeout(updateInvoicePreview, 500);
+                        }
+                    } else {
+                        console.error('Art request not found for ID:', designIdFromUrl);
+                        showAlert('Art request not found', 'error');
+                        // Fall back to search interface
+                        searchArtRequests();
+                    }
+                } catch (error) {
+                    console.error('Error loading art request:', error);
+                    showAlert('Failed to load art request', 'error');
+                    // Fall back to search interface
+                    searchArtRequests();
+                }
+            } else {
+                // No deep link - show regular search interface
+                searchArtRequests();
+            }
             
             // Form submit handler
             document.getElementById('invoiceForm').addEventListener('submit', handleSubmit);
@@ -1918,40 +2234,8 @@
                 // Show selected indicator
                 document.getElementById('selectedIndicator').style.display = 'block';
                 
-                // Fill in the invoice form
-                document.getElementById('customerName').value = request.Full_Name_Contact || '';
-                document.getElementById('customerCompany').value = request.CompanyName || '';
-                document.getElementById('customerEmail').value = request.Email_Contact || request.Email || '';
-                document.getElementById('artRequestId').value = request.ID_Design || '';
-                document.getElementById('projectName').value = request.NOTES || request.Note_Mockup || '';
-                
-                // Get and display sales rep
-                const salesRepEmail = request.User_Email || 'sales@nwcustomapparel.com';
-                const salesRepName = getSalesRepName(salesRepEmail);
-                document.getElementById('salesRepDisplay').value = `${salesRepName} (${salesRepEmail})`;
-                
-                // Show invoice number
-                const invoiceId = invoiceService.generateInvoiceID(idDesign);
-                document.getElementById('invoiceNumberDisplay').textContent = invoiceId;
-                
-                // Suggest service code based on time spent
-                if (request.Art_Minutes) {
-                    const suggestedCode = invoiceService.suggestServiceCode(request.Art_Minutes);
-                    if (suggestedCode && suggestedCode !== 'CUSTOM') {
-                        // Update the first service line with suggestion
-                        const firstSelect = document.querySelector('.service-select');
-                        if (firstSelect) {
-                            firstSelect.value = suggestedCode;
-                            updateServiceLine(firstSelect);
-                        }
-                    }
-                }
-                
-                // Show the invoice form
-                document.getElementById('invoiceForm').style.display = 'block';
-                
-                // Scroll to invoice
-                document.getElementById('invoiceForm').scrollIntoView({ behavior: 'smooth' });
+                // Use the new populateInvoiceForm function with intelligent defaults
+                populateInvoiceForm(request);
                 
             } catch (error) {
                 console.error('Error selecting request:', error);
@@ -2007,6 +2291,182 @@
                 'Steve': 'art@nwcustomapparel.com'
             };
             return repEmails[repName] || 'sales@nwcustomapparel.com';
+        }
+        
+        // Data cleaning helper functions
+        
+        /**
+         * Clean project name from raw notes/internal data
+         * @param {string} rawText - Raw text from NOTES or Note_Mockup fields
+         * @returns {string} Clean, professional project name
+         */
+        function cleanProjectName(rawText) {
+            if (!rawText) return '';
+            
+            // Remove common internal prefixes/patterns
+            let cleaned = rawText
+                .replace(/^(mockup|mock up|mock-up|proof|sample|test|draft)[\s:-]*/i, '')
+                .replace(/^(rush|urgent|asap|priority)[\s:-]*/i, '')
+                .replace(/^(reorder|re-order|repeat|redo)[\s:-]*/i, '');
+            
+            // Remove file extensions
+            cleaned = cleaned.replace(/\.(jpg|jpeg|png|pdf|ai|eps|psd|svg|gif|bmp|tiff?)$/i, '');
+            
+            // Remove paths
+            cleaned = cleaned.replace(/^.*[\\\/]/, '');
+            
+            // Remove special characters and clean up spacing
+            cleaned = cleaned
+                .replace(/[_-]+/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            
+            // Capitalize first letter of each word
+            cleaned = cleaned.replace(/\b\w/g, l => l.toUpperCase());
+            
+            // Limit length for cleanliness
+            if (cleaned.length > 100) {
+                cleaned = cleaned.substring(0, 97) + '...';
+            }
+            
+            return cleaned || 'Design Project';
+        }
+        
+        /**
+         * Infer service codes based on art request data
+         * @param {Object} request - Art request object
+         * @returns {Array} Array of suggested service codes with reasons
+         */
+        function inferServiceCodes(request) {
+            const suggestions = [];
+            
+            // Check art minutes for primary service code
+            if (request.Art_Minutes) {
+                const minutes = parseInt(request.Art_Minutes);
+                const suggestedCode = invoiceService.suggestServiceCode(minutes);
+                if (suggestedCode && suggestedCode !== 'CUSTOM') {
+                    suggestions.push({
+                        code: suggestedCode,
+                        reason: `Based on ${minutes} minutes of art time`,
+                        primary: true
+                    });
+                }
+            }
+            
+            // Check for mockup indication
+            const notes = (request.NOTES || '').toLowerCase();
+            const noteMockup = (request.Note_Mockup || '').toLowerCase();
+            const allText = notes + ' ' + noteMockup;
+            
+            if (request.Mockup === 'Yes' || request.Mockup === true || 
+                allText.includes('mockup') || allText.includes('mock up')) {
+                suggestions.push({
+                    code: 'V-MOCK',
+                    reason: 'Mockup requested',
+                    primary: false
+                });
+            }
+            
+            // Check for digitizing indication
+            if (allText.includes('digitiz') || allText.includes('embroidery') || 
+                allText.includes('stitch') || allText.includes('dst')) {
+                suggestions.push({
+                    code: 'DIGIT',
+                    reason: 'Digitizing work detected',
+                    primary: false
+                });
+            }
+            
+            // Check for rush indication
+            if (allText.includes('rush') || allText.includes('urgent') || 
+                allText.includes('asap') || allText.includes('priority')) {
+                // Find the primary suggestion and suggest its rush version
+                const primarySuggestion = suggestions.find(s => s.primary);
+                if (primarySuggestion) {
+                    const rushCode = primarySuggestion.code + '-R';
+                    suggestions.push({
+                        code: rushCode,
+                        reason: 'Rush service indicated',
+                        primary: false
+                    });
+                }
+            }
+            
+            // Check for vector/redraw work
+            if (allText.includes('vector') || allText.includes('redraw') || 
+                allText.includes('recreate') || allText.includes('trace')) {
+                suggestions.push({
+                    code: 'GRT-75',
+                    reason: 'Vector/redraw work indicated',
+                    primary: !suggestions.some(s => s.primary)
+                });
+            }
+            
+            return suggestions;
+        }
+        
+        /**
+         * Populate invoice form with cleaned and intelligent defaults
+         * @param {Object} request - Art request object
+         */
+        function populateInvoiceForm(request) {
+            // Clean and set project name
+            const projectName = cleanProjectName(request.NOTES || request.Note_Mockup || '');
+            document.getElementById('projectName').value = projectName;
+            
+            // Set customer information
+            document.getElementById('customerName').value = request.Full_Name_Contact || '';
+            document.getElementById('customerCompany').value = request.CompanyName || '';
+            document.getElementById('customerEmail').value = request.Email_Contact || request.Email || '';
+            document.getElementById('artRequestId').value = request.ID_Design || '';
+            
+            // Get and display sales rep
+            const salesRepEmail = request.User_Email || 'sales@nwcustomapparel.com';
+            const salesRepName = getSalesRepName(salesRepEmail);
+            document.getElementById('salesRepDisplay').value = `${salesRepName} (${salesRepEmail})`;
+            
+            // Show invoice number
+            const invoiceId = invoiceService.generateInvoiceID(request.ID_Design);
+            document.getElementById('invoiceNumberDisplay').textContent = invoiceId;
+            
+            // Get service code suggestions
+            const suggestions = inferServiceCodes(request);
+            
+            // Apply primary suggestion to first service line
+            const primarySuggestion = suggestions.find(s => s.primary);
+            if (primarySuggestion) {
+                const firstSelect = document.querySelector('.service-select');
+                if (firstSelect) {
+                    firstSelect.value = primarySuggestion.code;
+                    updateServiceLine(firstSelect);
+                }
+            }
+            
+            // Add additional suggested services
+            suggestions.filter(s => !s.primary).forEach((suggestion, index) => {
+                if (index === 0 && document.querySelectorAll('.service-line').length === 1) {
+                    // If only one line exists and it's filled, add a new line
+                    addServiceLineItem();
+                }
+                
+                const serviceLines = document.querySelectorAll('.service-line');
+                const targetLine = serviceLines[serviceLines.length - 1];
+                const select = targetLine.querySelector('.service-select');
+                
+                if (select && !select.value) {
+                    select.value = suggestion.code;
+                    updateServiceLine(select);
+                }
+            });
+            
+            // Show the invoice form
+            document.getElementById('invoiceForm').style.display = 'block';
+            
+            // Scroll to invoice
+            document.getElementById('invoiceForm').scrollIntoView({ behavior: 'smooth' });
+            
+            // Update preview
+            updateInvoicePreview();
         }
         
         // Add Service Line Item
@@ -2172,6 +2632,33 @@
             }
             
             calculateTotals();
+        }
+
+        // Get Service Items from form
+        function getServiceItems() {
+            const serviceRows = document.querySelectorAll('.service-line');
+            const items = [];
+            
+            serviceRows.forEach((row, index) => {
+                const serviceSelect = row.querySelector('.service-select');
+                const quantityInput = row.querySelector('.quantity-input');
+                const customRate = row.querySelector('.custom-rate');
+                const lineTotal = row.querySelector('.line-total');
+                
+                if (serviceSelect && serviceSelect.value) {
+                    const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+                    items.push({
+                        serviceCode: serviceSelect.value,
+                        description: selectedOption ? selectedOption.textContent : serviceSelect.value,
+                        quantity: parseFloat(quantityInput?.value || 1),
+                        rate: parseFloat(customRate?.value || 0),
+                        amount: parseFloat(lineTotal?.textContent.replace('$', '') || 0),
+                        lineNumber: index + 1
+                    });
+                }
+            });
+            
+            return items;
         }
 
         // Update credit availability info (placeholder for future implementation)
@@ -2359,6 +2846,244 @@
                 }
             }
         }
+
+        // Live Preview Functions
+        function updateInvoicePreview() {
+            const previewContainer = document.getElementById('invoicePreviewContainer');
+            
+            if (!selectedRequest) {
+                previewContainer.innerHTML = `
+                    <div class="invoice-preview-empty">
+                        <i class="fas fa-file-invoice"></i>
+                        <p>Select an art request to see the invoice preview</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Get form values
+            const customerName = document.getElementById('customerName').value || 'Customer Name';
+            const customerCompany = document.getElementById('customerCompany').value || '';
+            const customerEmail = document.getElementById('customerEmail').value || 'customer@email.com';
+            const projectName = document.getElementById('projectName').value || selectedRequest.NOTES || 'Project Name';
+            const projectType = document.getElementById('projectType').value || 'Design Work';
+            const complexity = document.getElementById('complexity').value || 'Standard';
+            const artistName = 'Steve Deland';
+            const requestDate = selectedRequest.Date_Created ? new Date(selectedRequest.Date_Created).toLocaleDateString() : 'N/A';
+            const completionDate = new Date().toLocaleDateString();
+            
+            // Get service items and calculate totals
+            const serviceItems = getServiceItems();
+            const subtotal = serviceItems.reduce((sum, item) => sum + item.amount, 0);
+            const applyTax = document.getElementById('applyTax').checked;
+            const taxAmount = applyTax ? subtotal * 0.102 : 0;
+            const grandTotal = subtotal + taxAmount;
+            
+            // Generate invoice ID preview
+            const now = new Date();
+            const invoiceDate = now.toLocaleDateString();
+            const dueDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString();
+            const invoiceId = `ART-${selectedRequest.ID_Design}`;
+            
+            // Build the preview HTML
+            previewContainer.innerHTML = `
+                <!-- Invoice Header -->
+                <div class="invoice-preview-header">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                         alt="Northwest Custom Apparel" class="invoice-preview-logo">
+                    <div class="invoice-preview-title">
+                        <h1>ART INVOICE</h1>
+                        <p><strong>Invoice ID:</strong> ${invoiceId}</p>
+                        <p><strong>Date:</strong> ${invoiceDate}</p>
+                        <p><strong>Due Date:</strong> ${dueDate}</p>
+                    </div>
+                </div>
+
+                <!-- Invoice Details -->
+                <div class="invoice-preview-details">
+                    <div class="invoice-preview-section">
+                        <h3>Bill To</h3>
+                        <p><strong>Northwest Custom Apparel</strong></p>
+                        <p>2025 Freeman Road East</p>
+                        <p>Milton, WA 98354</p>
+                    </div>
+                    
+                    <div class="invoice-preview-section">
+                        <h3>Customer</h3>
+                        <p><strong>${customerName}</strong></p>
+                        ${customerCompany ? `<p>${customerCompany}</p>` : ''}
+                        <p>${customerEmail}</p>
+                    </div>
+                </div>
+
+                <!-- Project Info -->
+                <div class="invoice-preview-section invoice-preview-project">
+                    <h3>Project Details</h3>
+                    <div class="invoice-preview-project-grid">
+                        <div>
+                            <p><strong>Project:</strong> ${projectName}</p>
+                            <p><strong>Type:</strong> ${projectType}</p>
+                            <p><strong>Complexity:</strong> ${complexity}</p>
+                        </div>
+                        <div>
+                            <p><strong>Request Date:</strong> ${requestDate}</p>
+                            <p><strong>Completion Date:</strong> ${completionDate}</p>
+                            <p><strong>Artist:</strong> ${artistName}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Items Table -->
+                <table class="invoice-preview-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th style="text-align: right;">Qty</th>
+                            <th style="text-align: right;">Rate</th>
+                            <th style="text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${serviceItems.length > 0 ? serviceItems.map(item => `
+                            <tr>
+                                <td>${item.description}</td>
+                                <td style="text-align: right;">${item.quantity}</td>
+                                <td style="text-align: right;">$${item.rate.toFixed(2)}</td>
+                                <td style="text-align: right;">$${item.amount.toFixed(2)}</td>
+                            </tr>
+                        `).join('') : `
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #999; font-style: italic;">
+                                    No service items added yet
+                                </td>
+                            </tr>
+                        `}
+                    </tbody>
+                </table>
+
+                <!-- Invoice Totals -->
+                <div class="invoice-preview-totals">
+                    <div class="invoice-preview-total-row">
+                        <span>Subtotal:</span>
+                        <span>$${subtotal.toFixed(2)}</span>
+                    </div>
+                    ${applyTax ? `
+                        <div class="invoice-preview-total-row">
+                            <span>WA State Sales Tax (10.20%):</span>
+                            <span>$${taxAmount.toFixed(2)}</span>
+                        </div>
+                    ` : ''}
+                    <div class="invoice-preview-total-row invoice-preview-grand-total">
+                        <span>Total Due:</span>
+                        <span>$${grandTotal.toFixed(2)}</span>
+                    </div>
+                </div>
+
+                ${generateArtworkPreview(selectedRequest)}
+
+                <!-- Footer -->
+                <div class="invoice-preview-footer">
+                    <p>Payment due within 30 days</p>
+                    <p>Please reference Invoice ID: <strong>${invoiceId}</strong> with payment</p>
+                    <hr style="margin: 1rem 0; border: none; border-top: 1px solid #ddd;">
+                    <p><strong>Northwest Custom Apparel</strong></p>
+                    <p>Family Owned & Operated Since 1977</p>
+                    <p>Phone: 253-922-5793 | Email: sales@nwcustomapparel.com</p>
+                </div>
+            `;
+        }
+
+        function generateArtworkPreview(artRequest) {
+            const artworks = getAllArtworks(artRequest);
+            if (artworks.length === 0) {
+                return '';
+            }
+
+            return `
+                <div class="invoice-preview-artwork show">
+                    <h3>Artwork</h3>
+                    <div class="invoice-preview-artwork-grid">
+                        ${artworks.map(artwork => `
+                            <div class="invoice-preview-artwork-item">
+                                <img src="${artwork.url}" alt="${artwork.label}" loading="lazy">
+                                <label>${artwork.label}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Add event listeners for real-time updates
+        function initializePreviewUpdates() {
+            // Update preview when form fields change
+            const formFields = [
+                'customerName', 'customerCompany', 'customerEmail',
+                'projectName', 'projectType', 'complexity', 'applyTax'
+            ];
+            
+            formFields.forEach(fieldId => {
+                const element = document.getElementById(fieldId);
+                if (element) {
+                    element.addEventListener('input', updateInvoicePreview);
+                    element.addEventListener('change', updateInvoicePreview);
+                }
+            });
+            
+            // Update preview when service items change
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('service-select') || 
+                    e.target.classList.contains('quantity-input') ||
+                    e.target.classList.contains('custom-rate') ||
+                    e.target.classList.contains('add-service-btn') ||
+                    e.target.classList.contains('remove-line-btn')) {
+                    setTimeout(updateInvoicePreview, 100); // Small delay to let DOM update
+                }
+            });
+            
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('service-select') || 
+                    e.target.classList.contains('quantity-input') ||
+                    e.target.classList.contains('custom-rate')) {
+                    updateInvoicePreview();
+                }
+            });
+        }
+
+        // Override the existing selectRequest function to update preview
+        const originalSelectRequest = window.selectRequest;
+        window.selectRequest = async function(idDesign, event) {
+            // Call the original function with correct parameters
+            if (originalSelectRequest) {
+                await originalSelectRequest.call(this, idDesign, event);
+            } else {
+                // Fallback implementation
+                try {
+                    // Fetch the specific request
+                    const requests = await invoiceService.getArtRequests({ id_design: idDesign });
+                    const request = requests.find(r => r.ID_Design == idDesign);
+                    
+                    if (!request) {
+                        showAlert('Request not found', 'error');
+                        return;
+                    }
+                    
+                    selectedRequest = request;
+                    showInvoiceForm();
+                    populateInvoiceForm(request);
+                } catch (error) {
+                    console.error('Error in selectRequest fallback:', error);
+                    showAlert('Failed to select request', 'error');
+                }
+            }
+            // Update preview after selection
+            setTimeout(updateInvoicePreview, 100);
+        };
+
+        // Initialize preview updates when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initializePreviewUpdates, 1000); // Wait for other initializations
+        });
     </script>
 </body>
 </html>

@@ -1093,11 +1093,11 @@
         <div class="status-filters" id="statusFilters" style="display: block;">
             <div class="filter-group">
                 <label class="filter-label">
-                    <input type="checkbox" id="filterNew" checked onchange="filterStatusChanged()">
+                    <input type="checkbox" id="filterNew" onchange="filterStatusChanged()">
                     <span>New (No Status)</span>
                 </label>
                 <label class="filter-label">
-                    <input type="checkbox" id="filterAwaitingApproval" checked onchange="filterStatusChanged()">
+                    <input type="checkbox" id="filterAwaitingApproval" onchange="filterStatusChanged()">
                     <span>Awaiting Approval 🟣</span>
                 </label>
                 <label class="filter-label">
@@ -1623,8 +1623,8 @@
             const filterAwaitingApprovalEl = safeGetElement('filterAwaitingApproval');
             const filterCompletedEl = safeGetElement('filterCompleted');
             
-            const filterNew = filterNewEl ? filterNewEl.checked : true;
-            const filterAwaitingApproval = filterAwaitingApprovalEl ? filterAwaitingApprovalEl.checked : true;
+            const filterNew = filterNewEl ? filterNewEl.checked : false;
+            const filterAwaitingApproval = filterAwaitingApprovalEl ? filterAwaitingApprovalEl.checked : false;
             const filterCompleted = filterCompletedEl ? filterCompletedEl.checked : true;
             
             needsInvoice = needsInvoice.filter(req => {
