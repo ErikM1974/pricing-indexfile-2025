@@ -910,7 +910,33 @@
             font-weight: 500;
         }
 
+        /* Button loading state */
+        .btn-loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+            position: relative;
+        }
+        
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            border-top-color: currentColor;
+            animation: spin 0.8s linear infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
         /* Animations */
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
@@ -1396,6 +1422,25 @@
             const loadingDiv = document.getElementById('loadingIndicator');
             if (loadingDiv) {
                 loadingDiv.remove();
+            }
+        }
+        
+        // Set button loading state
+        function setButtonLoading(button, loading = true) {
+            if (!button) return;
+            
+            if (loading) {
+                button.disabled = true;
+                button.classList.add('btn-loading');
+                button.dataset.originalText = button.innerHTML;
+                button.innerHTML = '<span style="opacity: 0;">Loading</span>';
+            } else {
+                button.disabled = false;
+                button.classList.remove('btn-loading');
+                if (button.dataset.originalText) {
+                    button.innerHTML = button.dataset.originalText;
+                    delete button.dataset.originalText;
+                }
             }
         }
 
