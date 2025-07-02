@@ -719,6 +719,42 @@
                         </div>
                     </div>
 
+                    <!-- Spec Art Credit Section -->
+                    <div class="spec-art-section" style="margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px;">
+                        <h3 style="margin-bottom: 1rem; color: #495057;">Spec Art & Credits</h3>
+                        
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <input type="checkbox" id="isSpecArtwork" onchange="handleSpecArtworkToggle()">
+                            <label for="isSpecArtwork" style="margin: 0; font-weight: 500;">This is spec artwork (complimentary)</label>
+                        </div>
+                        
+                        <div id="specArtDetails" style="display: none;">
+                            <div class="detail-field" style="margin-bottom: 1rem;">
+                                <label>Spec Art Purpose</label>
+                                <input type="text" id="specArtPurpose" placeholder="e.g., New customer mockup, design variation, etc." 
+                                       style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 3px;">
+                            </div>
+                            
+                            <div class="detail-field" style="margin-bottom: 1rem;">
+                                <label>Apply Sales Rep Credit</label>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span>$</span>
+                                    <input type="number" id="creditAmount" min="0" max="1000" step="0.01" placeholder="0.00"
+                                           style="width: 120px; padding: 0.5rem; border: 1px solid #ddd; border-radius: 3px; text-align: right;"
+                                           onchange="calculateTotals()">
+                                    <div id="creditInfo" style="font-size: 0.875rem; color: #6c757d;">
+                                        Available credit will be shown here
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="creditWarning" style="display: none; background: #fff3cd; border: 1px solid #ffeaa7; padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem;">
+                                <i class="fas fa-exclamation-triangle" style="color: #856404;"></i>
+                                <span style="color: #856404; font-size: 0.875rem;">Credit amount exceeds available balance. Manager approval may be required.</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Notes Section -->
                     <div class="notes-section">
                         <h3>Notes</h3>
@@ -1208,6 +1244,39 @@
             
             calculateTotals();
         }
+
+        // Handle Spec Artwork Toggle
+        function handleSpecArtworkToggle() {
+            const isSpec = document.getElementById('isSpecArtwork').checked;
+            const specDetails = document.getElementById('specArtDetails');
+            const creditAmount = document.getElementById('creditAmount');
+            
+            if (isSpec) {
+                specDetails.style.display = 'block';
+                // Set credit amount to the current subtotal by default
+                const subtotalText = document.getElementById('subtotalDisplay').textContent;
+                const subtotal = parseFloat(subtotalText.replace('$', '')) || 0;
+                creditAmount.value = subtotal.toFixed(2);
+                
+                // Update credit info
+                updateCreditInfo();
+            } else {
+                specDetails.style.display = 'none';
+                creditAmount.value = '';
+            }
+            
+            calculateTotals();
+        }
+
+        // Update credit availability info (placeholder for future implementation)
+        function updateCreditInfo() {
+            const creditInfo = document.getElementById('creditInfo');
+            const salesRepEmail = selectedRequest?.User_Email || getSalesRepEmail(selectedRequest?.CustomerServiceRep || '');
+            const salesRepName = getSalesRepName(salesRepEmail);
+            
+            // For now, show static message - can be enhanced later with real credit tracking
+            creditInfo.textContent = `Sales rep: ${salesRepName} (Credit tracking coming soon)`;
+        }
         
         // Show Alert
         function showAlert(message, type = 'success') {
@@ -1334,6 +1403,11 @@
                 
                 // Status
                 status: document.getElementById('saveAsDraft').checked ? 'Draft' : 'Sent',
+                
+                // Spec Art Credit Fields
+                isSpecArtwork: document.getElementById('isSpecArtwork').checked,
+                creditApplied: parseFloat(document.getElementById('creditAmount').value) || 0,
+                specArtPurpose: document.getElementById('specArtPurpose').value.trim(),
                 
                 // Additional fields
                 artistName: 'Steve Deland',

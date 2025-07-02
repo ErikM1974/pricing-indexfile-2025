@@ -338,6 +338,18 @@ class ArtInvoiceServiceV2 {
         return this.serviceCodes[code] || null;
     }
     
+    // Extract service codes for ServiceCodes field
+    extractServiceCodes(serviceItems) {
+        if (!serviceItems || !Array.isArray(serviceItems)) {
+            return '';
+        }
+        
+        return serviceItems
+            .map(item => item.code)
+            .filter(code => code) // Remove empty codes
+            .join(',');
+    }
+    
     // ========== ART INVOICES API METHODS ==========
     
     // Create new invoice using dedicated API
@@ -416,6 +428,17 @@ class ArtInvoiceServiceV2 {
                 GrandTotal: grandTotal,
                 BalanceDue: grandTotal,
                 
+                // Service Items - NEW FIELDS
+                ServiceItems: invoiceData.serviceItems ? JSON.stringify(invoiceData.serviceItems) : '',
+                ServiceSummary: invoiceData.serviceSummary || '',
+                ServiceCodes: this.extractServiceCodes(invoiceData.serviceItems),
+                InvoiceType: invoiceData.serviceItems && invoiceData.serviceItems.length > 0 ? 'Service Code' : 'Hourly',
+                
+                // Spec Art Credit System - NEW FIELDS
+                IsSpecArtwork: invoiceData.isSpecArtwork || false,
+                CreditApplied: invoiceData.creditApplied || 0,
+                SpecArtPurpose: invoiceData.specArtPurpose || '',
+                
                 // Additional details
                 Notes: this.buildNotesWithServiceItems(invoiceData),
                 CustomerNotes: invoiceData.customerNotes || '',
@@ -424,10 +447,6 @@ class ArtInvoiceServiceV2 {
                 Complexity: invoiceData.complexity || 'Standard',
                 Priority: invoiceData.priority || 'Normal',
                 CCEmails: invoiceData.ccEmails || 'erik@nwcustomapparel.com',
-                
-                // Store service items data in Notes field (JSON format)
-                // ServiceItems and ServiceSummary fields might not exist in Caspio
-                // So we'll store this info in the Notes field instead
                 
                 // System fields
                 CreatedBy: invoiceData.createdBy || 'Steve',

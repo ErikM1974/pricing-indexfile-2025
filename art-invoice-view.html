@@ -703,6 +703,27 @@
                     </div>
                 </div>
 
+                <!-- Spec Art Info Section -->
+                <div id="specArtSection" class="invoice-section" style="margin-bottom: 2rem; display: none;">
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 1rem; border-radius: 8px;">
+                        <h4 style="margin: 0 0 1rem 0; color: #856404;">
+                            <i class="fas fa-gift"></i>
+                            Spec Artwork Information
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div>
+                                <p style="margin: 0.25rem 0;"><strong>Purpose:</strong> <span id="specArtPurpose"></span></p>
+                                <p style="margin: 0.25rem 0;"><strong>Sales Rep Credit Applied:</strong> <span id="creditApplied"></span></p>
+                            </div>
+                            <div>
+                                <p style="margin: 0.25rem 0; color: #856404; font-style: italic;">
+                                    This artwork was provided as complimentary spec work to support the sales process.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Invoice Table -->
                 <table class="invoice-table" id="invoiceTable">
                     <thead>
@@ -739,6 +760,27 @@
                     <div class="total-row grand-total">
                         <span>Total Due:</span>
                         <span id="grandTotalAmount">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Spec Art Info Section -->
+                <div id="specArtSection" class="invoice-section" style="margin-bottom: 2rem; display: none;">
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 1rem; border-radius: 8px;">
+                        <h4 style="margin: 0 0 1rem 0; color: #856404;">
+                            <i class="fas fa-gift"></i>
+                            Spec Artwork Information
+                        </h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <p style="margin: 0.25rem 0;"><strong>Purpose:</strong> <span id="specArtPurpose"></span></p>
+                                <p style="margin: 0.25rem 0;"><strong>Credit Applied:</strong> <span id="specArtCredit"></span></p>
+                            </div>
+                            <div>
+                                <p style="margin: 0.25rem 0; color: #856404; font-style: italic;">
+                                    This artwork was provided as complimentary spec work to support sales efforts.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -794,6 +836,58 @@
         // Artwork Helper Functions
         function hasArtwork(cdnLink) {
             return cdnLink && cdnLink.includes('/Artwork/') && cdnLink !== 'https://cdn.caspio.com/A0E15000';
+        }
+
+        // Parse service items from Notes field (for backward compatibility)
+        function parseServiceItemsFromNotes(notes) {
+            if (!notes || !notes.includes('--- Service Items ---')) {
+                return null;
+            }
+
+            const serviceItems = [];
+            const lines = notes.split('\n');
+            let inServiceSection = false;
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                
+                if (trimmed === '--- Service Items ---') {
+                    inServiceSection = true;
+                    continue;
+                }
+                
+                if (inServiceSection && trimmed.startsWith('Summary:')) {
+                    break; // End of service items section
+                }
+                
+                if (inServiceSection && trimmed.match(/^\d+\.\s+([A-Z]+-[A-Z0-9]+):/)) {
+                    // Parse line like: "1. GRT-50: Logo mockup description"
+                    const match = trimmed.match(/^\d+\.\s+([A-Z]+-[A-Z0-9]+):\s*(.+)/);
+                    if (match) {
+                        const code = match[1];
+                        const description = match[2];
+                        
+                        // Look for the next line with quantity and amount
+                        const nextLineIndex = lines.indexOf(line) + 1;
+                        if (nextLineIndex < lines.length) {
+                            const nextLine = lines[nextLineIndex].trim();
+                            const amountMatch = nextLine.match(/Amount:\s*\$([0-9,]+\.?[0-9]*)/);
+                            const quantityMatch = nextLine.match(/Quantity:\s*([0-9]+)/);
+                            
+                            if (amountMatch) {
+                                serviceItems.push({
+                                    code: code,
+                                    description: description,
+                                    quantity: quantityMatch ? parseInt(quantityMatch[1]) : 1,
+                                    amount: parseFloat(amountMatch[1].replace(',', ''))
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return serviceItems.length > 0 ? serviceItems : null;
         }
 
         function displayInvoiceArtwork(artRequest) {
@@ -1040,8 +1134,33 @@
                     displaySubtotalOnly();
                 }
             } else {
-                // If no service items, just show the subtotal
-                displaySubtotalOnly();
+                // Try to parse service items from Notes field (for existing invoices)
+                const serviceItemsFromNotes = parseServiceItemsFromNotes(currentInvoice.Notes);
+                
+                if (serviceItemsFromNotes && serviceItemsFromNotes.length > 0) {
+                    // Update table headers for service code display
+                    tableHeader.innerHTML = `
+                        <th>Description</th>
+                        <th class="text-right">Service Code</th>
+                        <th class="text-right">Qty</th>
+                        <th class="text-right">Amount</th>
+                    `;
+                    
+                    // Display each service item from notes
+                    serviceItemsFromNotes.forEach(item => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${item.description || 'Art Services'}</td>
+                                <td class="text-right">${item.code}</td>
+                                <td class="text-right">${item.quantity || 1}</td>
+                                <td class="text-right">$${(item.amount || 0).toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    // If no service items anywhere, show the subtotal
+                    displaySubtotalOnly();
+                }
             }
             
             function displaySubtotalOnly() {
@@ -1108,6 +1227,21 @@
                 document.getElementById('paymentReference').textContent = currentInvoice.PaymentReference || 'N/A';
                 document.getElementById('paymentAmount').textContent = `$${parseFloat(currentInvoice.PaymentAmount).toFixed(2)}`;
                 document.getElementById('balanceDue').textContent = `$${parseFloat(currentInvoice.BalanceDue || 0).toFixed(2)}`;
+            }
+            
+            // Spec Art Information
+            if (currentInvoice.IsSpecArtwork === true || currentInvoice.IsSpecArtwork === 'true') {
+                document.getElementById('specArtSection').style.display = 'block';
+                document.getElementById('specArtPurpose').textContent = currentInvoice.SpecArtPurpose || 'Sales support';
+                
+                const creditApplied = parseFloat(currentInvoice.CreditApplied || 0);
+                if (creditApplied > 0) {
+                    document.getElementById('specArtCredit').textContent = `$${creditApplied.toFixed(2)}`;
+                } else {
+                    document.getElementById('specArtCredit').textContent = 'Complimentary';
+                }
+            } else {
+                document.getElementById('specArtSection').style.display = 'none';
             }
             
             // Update email button visibility

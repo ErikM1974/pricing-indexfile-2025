@@ -1010,6 +1010,7 @@
                         <td>
                             <div>${invoice.ProjectName}</div>
                             <div style="font-size: 0.75rem; color: var(--text-secondary);">${invoice.ProjectType}</div>
+                            ${invoice.ServiceCodes ? `<div style="font-size: 0.7rem; color: var(--primary-color); font-weight: 500;">${invoice.ServiceCodes}</div>` : ''}
                         </td>
                         <td>${invoice.SalesRepName || 'Unknown'}</td>
                         <td>
