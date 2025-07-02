@@ -725,6 +725,147 @@
             to { opacity: 1; }
         }
 
+        /* Invoice Preview Styles */
+        .invoice-preview {
+            background: white;
+            padding: 2rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .invoice-logo {
+            max-width: 200px;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h1 {
+            color: var(--primary-color);
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .invoice-number {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        .invoice-section {
+            margin-bottom: 2rem;
+        }
+
+        .invoice-section h3 {
+            color: var(--primary-color);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .invoice-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .invoice-info-box {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .invoice-info-box p {
+            margin: 0.25rem 0;
+            color: var(--text-primary);
+        }
+
+        .invoice-info-box strong {
+            color: var(--primary-color);
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .invoice-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .invoice-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .invoice-table .text-right {
+            text-align: right;
+        }
+
+        .invoice-totals {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .invoice-totals-box {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 6px;
+            min-width: 300px;
+        }
+
+        .invoice-total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+
+        .invoice-total-row.grand-total {
+            border-top: 2px solid var(--primary-color);
+            padding-top: 1rem;
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .invoice-footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .invoice-status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            border-radius: 20px;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-container {
@@ -753,6 +894,19 @@
             .tabs {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
+            }
+
+            .invoice-header {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .invoice-title {
+                text-align: left;
+            }
+
+            .invoice-info-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -874,6 +1028,60 @@
             </div>
             <div class="modal-body" id="quickInvoiceBody">
                 <!-- Invoice form will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Preview Modal -->
+    <div class="modal-overlay" id="invoicePreviewModal">
+        <div class="modal-container" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>Invoice Preview</h3>
+                <button class="modal-close" onclick="closeInvoicePreviewModal()">×</button>
+            </div>
+            <div class="modal-body" id="invoicePreviewBody" style="padding: 0;">
+                <!-- Invoice preview will be loaded here -->
+            </div>
+            <div style="padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="sendInvoiceEmail" checked>
+                        <span>Send invoice via email</span>
+                    </label>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-secondary" onclick="saveAsDraft()">Save as Draft</button>
+                    <button class="btn btn-primary" onclick="confirmCreateInvoice()">
+                        <i class="fas fa-check"></i>
+                        Create & Send Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header" style="background: var(--success-bg); color: var(--success-text);">
+                <h3><i class="fas fa-check-circle"></i> Invoice Created Successfully!</h3>
+                <button class="modal-close" onclick="closeSuccessModal()">×</button>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 2rem;">
+                <div style="font-size: 1.125rem; margin-bottom: 1.5rem;">
+                    <p>Invoice <strong id="successInvoiceId"></strong> has been created successfully!</p>
+                    <p id="successEmailStatus" style="color: var(--text-secondary);"></p>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button class="btn btn-secondary" onclick="viewInvoice()">
+                        <i class="fas fa-eye"></i>
+                        View Invoice
+                    </button>
+                    <button class="btn btn-primary" onclick="createAnother()">
+                        <i class="fas fa-plus"></i>
+                        Create Another
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1547,21 +1755,30 @@
             }
         }
 
-        // Submit quick invoice
+        // Global variables for invoice preview
+        let currentInvoiceData = null;
+        let currentRequest = null;
+
+        // Submit quick invoice - now shows preview first
         async function submitQuickInvoice(request) {
             try {
                 const serviceCode = document.getElementById('qiServiceCode').value;
                 const service = invoiceService.getServiceByCode(serviceCode);
                 
+                // Store request for later
+                currentRequest = request;
+                
                 // Prepare invoice data
-                const invoiceData = {
+                currentInvoiceData = {
                     idDesign: request.ID_Design,
                     customerName: document.getElementById('qiCustomerName').value,
                     customerCompany: document.getElementById('qiCompany').value,
                     customerEmail: document.getElementById('qiEmail').value,
+                    customerPhone: request.Phone_Contact || '',
                     salesRepName: getSalesRepName(request.User_Email || getSalesRepEmail(request.CustomerServiceRep)),
                     salesRepEmail: request.User_Email || getSalesRepEmail(request.CustomerServiceRep),
                     projectName: request.NOTES || request.Note_Mockup || '',
+                    orderType: getOrderType(request.Order_Type),
                     originalRequestDate: request.Date_Created,
                     completionDate: new Date(),
                     serviceItems: [{
@@ -1584,24 +1801,344 @@
                     artistName: 'Steve Deland',
                     artistEmail: 'art@nwcustomapparel.com',
                     ccEmails: 'erik@nwcustomapparel.com',
-                    createdBy: 'Unified Dashboard'
+                    createdBy: 'Unified Dashboard',
+                    artMinutes: request.Art_Minutes || 0,
+                    shopworksReferences: extractShopworksReferences(request.NOTES || '')
                 };
 
+                // Generate invoice ID
+                const invoiceId = invoiceService.generateInvoiceID(currentInvoiceData.idDesign);
+                currentInvoiceData.invoiceId = invoiceId;
+
+                // Show preview modal
+                showInvoicePreview();
+                
+            } catch (error) {
+                console.error('Error preparing invoice:', error);
+                alert('Failed to prepare invoice: ' + error.message);
+            }
+        }
+
+        // Helper function to extract Order_Type value
+        function getOrderType(orderType) {
+            if (!orderType) return 'General';
+            
+            // Handle if it's an object
+            if (typeof orderType === 'object') {
+                return orderType.value || orderType.name || orderType.text || 'General';
+            }
+            
+            return orderType.toString();
+        }
+
+        // Helper function to extract ShopWorks references
+        function extractShopworksReferences(notes) {
+            if (!notes) return '';
+            
+            // Look for patterns like SW12345, SW-12345, ShopWorks #12345, etc.
+            const patterns = [
+                /SW[\s-]?(\d+)/gi,
+                /ShopWorks[\s#:]+(\d+)/gi,
+                /Order[\s#:]+(\d+)/gi
+            ];
+            
+            const references = new Set();
+            patterns.forEach(pattern => {
+                const matches = notes.matchAll(pattern);
+                for (const match of matches) {
+                    references.add(match[0]);
+                }
+            });
+            
+            return Array.from(references).join(', ');
+        }
+
+        // Show invoice preview
+        function showInvoicePreview() {
+            if (!currentInvoiceData) return;
+
+            const previewBody = document.getElementById('invoicePreviewBody');
+            previewBody.innerHTML = generateInvoiceHTML(currentInvoiceData);
+            
+            // Close the create modal and show preview
+            closeQuickInvoiceModal();
+            document.getElementById('invoicePreviewModal').classList.add('active');
+        }
+
+        // Generate professional invoice HTML
+        function generateInvoiceHTML(invoiceData) {
+            const now = new Date();
+            const dueDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
+
+            return `
+                <div class="invoice-preview">
+                    <!-- Header -->
+                    <div class="invoice-header">
+                        <div>
+                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                                 alt="Northwest Custom Apparel" class="invoice-logo">
+                        </div>
+                        <div class="invoice-title">
+                            <h1>ART INVOICE</h1>
+                            <div class="invoice-number">${invoiceData.invoiceId}</div>
+                            <div class="invoice-status-badge">PREVIEW</div>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Details -->
+                    <div class="invoice-section">
+                        <div class="invoice-info-grid">
+                            <div>
+                                <h3>Bill To</h3>
+                                <div class="invoice-info-box">
+                                    <p><strong>${invoiceData.customerName || 'Customer Name'}</strong></p>
+                                    ${invoiceData.customerCompany ? `<p>${invoiceData.customerCompany}</p>` : ''}
+                                    <p>${invoiceData.customerEmail || ''}</p>
+                                    ${invoiceData.customerPhone ? `<p>${invoiceData.customerPhone}</p>` : ''}
+                                </div>
+                            </div>
+                            <div>
+                                <h3>Invoice Details</h3>
+                                <div class="invoice-info-box">
+                                    <p><strong>Invoice Date:</strong> ${now.toLocaleDateString()}</p>
+                                    <p><strong>Due Date:</strong> ${dueDate.toLocaleDateString()}</p>
+                                    <p><strong>Design ID:</strong> ${invoiceData.idDesign}</p>
+                                    <p><strong>Order Type:</strong> ${invoiceData.orderType || 'General'}</p>
+                                    ${invoiceData.shopworksReferences ? `<p><strong>References:</strong> ${invoiceData.shopworksReferences}</p>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Services Table -->
+                    <div class="invoice-section">
+                        <h3>Services</h3>
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Description</th>
+                                    <th class="text-right">Qty</th>
+                                    <th class="text-right">Rate</th>
+                                    <th class="text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${invoiceData.serviceItems.map(item => `
+                                    <tr>
+                                        <td><strong>${item.code}</strong></td>
+                                        <td>${item.description}</td>
+                                        <td class="text-right">1</td>
+                                        <td class="text-right">$${item.rate.toFixed(2)}</td>
+                                        <td class="text-right">$${item.amount.toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Project Details -->
+                    ${invoiceData.projectName || invoiceData.customerNotes ? `
+                        <div class="invoice-section">
+                            <h3>Project Details</h3>
+                            <div class="invoice-info-box">
+                                ${invoiceData.projectName ? `<p><strong>Project:</strong> ${invoiceData.projectName}</p>` : ''}
+                                ${invoiceData.artMinutes ? `<p><strong>Art Time:</strong> ${invoiceData.artMinutes} minutes</p>` : ''}
+                                ${invoiceData.customerNotes ? `<p><strong>Notes:</strong> ${invoiceData.customerNotes}</p>` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Totals -->
+                    <div class="invoice-totals">
+                        <div class="invoice-totals-box">
+                            <div class="invoice-total-row">
+                                <span>Subtotal:</span>
+                                <span>$${invoiceData.subtotalAmount.toFixed(2)}</span>
+                            </div>
+                            ${invoiceData.rushFee > 0 ? `
+                                <div class="invoice-total-row">
+                                    <span>Rush Fee:</span>
+                                    <span>$${invoiceData.rushFee.toFixed(2)}</span>
+                                </div>
+                            ` : ''}
+                            ${invoiceData.revisionFee > 0 ? `
+                                <div class="invoice-total-row">
+                                    <span>Revision Fee:</span>
+                                    <span>$${invoiceData.revisionFee.toFixed(2)}</span>
+                                </div>
+                            ` : ''}
+                            ${invoiceData.otherFees > 0 ? `
+                                <div class="invoice-total-row">
+                                    <span>Other Fees:</span>
+                                    <span>$${invoiceData.otherFees.toFixed(2)}</span>
+                                </div>
+                            ` : ''}
+                            <div class="invoice-total-row grand-total">
+                                <span>Total Due:</span>
+                                <span>$${invoiceData.totalCost.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="invoice-footer">
+                        <p><strong>Northwest Custom Apparel</strong></p>
+                        <p>2025 Freeman Road East, Milton, WA 98354</p>
+                        <p>Phone: 253-922-5793 | Email: sales@nwcustomapparel.com</p>
+                        <p>www.nwcustomapparel.com</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Close invoice preview modal
+        function closeInvoicePreviewModal() {
+            document.getElementById('invoicePreviewModal').classList.remove('active');
+            currentInvoiceData = null;
+        }
+
+        // Save as draft
+        async function saveAsDraft() {
+            if (!currentInvoiceData) return;
+
+            try {
+                // Update status to Draft
+                currentInvoiceData.status = 'Draft';
+                
                 // Create invoice
-                const result = await invoiceService.createInvoice(invoiceData);
+                const result = await invoiceService.createInvoice(currentInvoiceData);
                 
                 if (result.success) {
-                    alert(`Invoice ${result.invoiceID} created successfully!`);
-                    closeQuickInvoiceModal();
+                    closeInvoicePreviewModal();
+                    showSuccessModal(result.invoiceID, false);
                     loadData(); // Refresh data
                 } else {
                     throw new Error(result.error || 'Failed to create invoice');
                 }
+            } catch (error) {
+                console.error('Error saving draft:', error);
+                alert('Failed to save draft: ' + error.message);
+            }
+        }
+
+        // Confirm and create invoice
+        async function confirmCreateInvoice() {
+            if (!currentInvoiceData) return;
+
+            const sendEmail = document.getElementById('sendInvoiceEmail').checked;
+            
+            try {
+                // Update status based on email preference
+                currentInvoiceData.status = sendEmail ? 'Sent' : 'Draft';
                 
+                // Create invoice
+                const result = await invoiceService.createInvoice(currentInvoiceData);
+                
+                if (result.success) {
+                    // Send email if requested
+                    if (sendEmail) {
+                        await sendInvoiceEmail(result.invoiceID, currentInvoiceData);
+                    }
+                    
+                    closeInvoicePreviewModal();
+                    showSuccessModal(result.invoiceID, sendEmail);
+                    loadData(); // Refresh data
+                } else {
+                    throw new Error(result.error || 'Failed to create invoice');
+                }
             } catch (error) {
                 console.error('Error creating invoice:', error);
                 alert('Failed to create invoice: ' + error.message);
             }
+        }
+
+        // Send invoice email
+        async function sendInvoiceEmail(invoiceId, invoiceData) {
+            try {
+                // Prepare email data
+                const emailData = {
+                    to_email: invoiceData.customerEmail,
+                    from_name: 'Northwest Custom Apparel',
+                    reply_to: invoiceData.salesRepEmail,
+                    
+                    // Invoice identification
+                    invoice_id: invoiceId,
+                    invoice_date: new Date().toLocaleDateString(),
+                    due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                    
+                    // Customer info
+                    customer_name: invoiceData.customerName,
+                    customer_company: invoiceData.customerCompany || '',
+                    customer_email: invoiceData.customerEmail,
+                    customer_phone: invoiceData.customerPhone || '',
+                    
+                    // Project info
+                    project_name: invoiceData.projectName || '',
+                    id_design: invoiceData.idDesign,
+                    order_type: invoiceData.orderType || 'General',
+                    
+                    // Service details
+                    service_code: invoiceData.serviceItems[0].code,
+                    service_description: invoiceData.serviceItems[0].description,
+                    amount_art_billed: invoiceData.totalCost.toFixed(2),
+                    
+                    // Additional info
+                    art_minutes: invoiceData.artMinutes || 0,
+                    shopworks_references: invoiceData.shopworksReferences || 'N/A',
+                    notes: invoiceData.customerNotes || '',
+                    
+                    // Sales rep
+                    sales_rep_name: invoiceData.salesRepName,
+                    sales_rep_email: invoiceData.salesRepEmail,
+                    sales_rep_phone: '253-922-5793',
+                    
+                    // Company
+                    company_phone: '253-922-5793',
+                    company_year: '1977',
+                    
+                    // Artist
+                    artist_name: invoiceData.artistName,
+                    artist_email: invoiceData.artistEmail
+                };
+
+                // Send via EmailJS
+                await emailjs.send('service_1c4k67j', 'art_invoice', emailData);
+                
+                // Mark invoice as sent in database
+                await invoiceService.markInvoiceAsSent(invoiceId, invoiceData.customerEmail);
+                
+                return true;
+            } catch (error) {
+                console.error('Error sending invoice email:', error);
+                // Don't throw - invoice was created successfully
+                return false;
+            }
+        }
+
+        // Show success modal
+        function showSuccessModal(invoiceId, emailSent) {
+            document.getElementById('successInvoiceId').textContent = invoiceId;
+            document.getElementById('successEmailStatus').textContent = 
+                emailSent ? 'Email has been sent to the customer.' : 'Invoice saved as draft.';
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        // Close success modal
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        // View invoice from success modal
+        function viewInvoice() {
+            const invoiceId = document.getElementById('successInvoiceId').textContent;
+            window.location.href = `/art-invoice-view.html?id=${invoiceId}`;
+        }
+
+        // Create another invoice
+        function createAnother() {
+            closeSuccessModal();
+            // Optionally reset the form or prepare for next invoice
         }
 
         // Helper functions
