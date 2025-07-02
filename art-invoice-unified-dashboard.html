@@ -1370,6 +1370,35 @@
             document.body.removeChild(link);
         }
 
+        // Utility function to safely get DOM elements
+        function safeGetElement(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.warn(`Element with id '${id}' not found`);
+            }
+            return element;
+        }
+        
+        // Show loading indicator
+        function showLoading() {
+            const container = document.querySelector('.main-container');
+            if (container) {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.id = 'loadingIndicator';
+                loadingDiv.style.cssText = 'text-align: center; padding: 2rem;';
+                loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-color);"></i><p>Loading data...</p>';
+                container.insertBefore(loadingDiv, container.firstChild);
+            }
+        }
+        
+        // Hide loading indicator
+        function hideLoading() {
+            const loadingDiv = document.getElementById('loadingIndicator');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
         // Initialize
         const invoiceService = new ArtInvoiceServiceV2();
         let currentTab = 'needs-invoice';
@@ -1389,19 +1418,32 @@
             try {
                 // Fetch both art requests and invoices in parallel
                 const [requests, invoices] = await Promise.all([
-                    invoiceService.getArtRequests(),
-                    invoiceService.getInvoices()
+                    invoiceService.getArtRequests().catch(err => {
+                        console.error('Failed to load art requests:', err);
+                        return [];
+                    }),
+                    invoiceService.getInvoices().catch(err => {
+                        console.error('Failed to load invoices:', err);
+                        return [];
+                    })
                 ]);
 
-                allArtRequests = requests;
-                allInvoices = invoices;
+                allArtRequests = requests || [];
+                allInvoices = invoices || [];
 
-                // Process and display data
-                updateTabCounts();
-                displayCurrentTab();
+                // Check if we got any data
+                if (allArtRequests.length === 0 && allInvoices.length === 0) {
+                    showError('No data loaded. The API may be unavailable.');
+                } else {
+                    // Process and display data
+                    updateTabCounts();
+                    displayCurrentTab();
+                }
             } catch (error) {
                 console.error('Error loading data:', error);
-                showError('Failed to load data');
+                showError('Failed to load data. Please check your connection and try again.');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -1531,10 +1573,14 @@
             // Convert map back to array
             let needsInvoice = Array.from(deduplicatedMap.values());
             
-            // Apply status filters
-            const filterNew = document.getElementById('filterNew').checked;
-            const filterAwaitingApproval = document.getElementById('filterAwaitingApproval').checked;
-            const filterCompleted = document.getElementById('filterCompleted').checked;
+            // Apply status filters with safe element access
+            const filterNewEl = safeGetElement('filterNew');
+            const filterAwaitingApprovalEl = safeGetElement('filterAwaitingApproval');
+            const filterCompletedEl = safeGetElement('filterCompleted');
+            
+            const filterNew = filterNewEl ? filterNewEl.checked : true;
+            const filterAwaitingApproval = filterAwaitingApprovalEl ? filterAwaitingApprovalEl.checked : true;
+            const filterCompleted = filterCompletedEl ? filterCompletedEl.checked : true;
             
             needsInvoice = needsInvoice.filter(req => {
                 const status = req.Status || '';
@@ -2006,7 +2052,7 @@
 
         function showError(message) {
             console.error(message);
-            // Could implement a toast notification here
+            showNotification(message, 'error');
         }
 
         function formatDate(dateStr) {
@@ -2120,7 +2166,17 @@
                     };
 
                     // Send reminder via EmailJS
-                    await emailjs.send('service_1c4k67j', 'art_invoice_reminder', emailData);
+                    try {
+                        await emailjs.send('service_1c4k67j', 'art_invoice_reminder', emailData);
+                    } catch (emailError) {
+                        console.error('EmailJS Error:', emailError);
+                        if (emailError.text && emailError.text.includes('template')) {
+                            alert('Email template "art_invoice_reminder" not found. Please create it in EmailJS.');
+                        } else {
+                            alert('Failed to send email reminder. Please check your EmailJS configuration.');
+                        }
+                        return;
+                    }
 
                     // Update reminder count
                     const reminderCount = parseInt(invoice.ReminderCount || 0) + 1;
@@ -2131,14 +2187,14 @@
 
                     const result = await invoiceService.updateInvoice(invoice.PK_ID, updateData);
                     if (result.success) {
-                        alert('Payment reminder sent successfully!');
+                        showNotification('Payment reminder sent successfully!', 'success');
                         loadData();
                     } else {
                         throw new Error(result.error);
                     }
                 } catch (error) {
                     console.error('Error sending reminder:', error);
-                    alert('Failed to send reminder. Please check the email template.');
+                    showNotification('Failed to send reminder. Please try again.', 'error');
                 }
             }
         }
@@ -2269,11 +2325,7 @@
         }
 
         // Show error message
-        function showError(message) {
-            console.error(message);
-            showEmptyState();
-            // Optionally update empty state message
-        }
+        // Removed duplicate showError function
 
         // Handle search
         function handleSearch(event) {
@@ -2348,15 +2400,24 @@
                     };
 
                     // Send reminder via EmailJS
-                    await emailjs.send('service_1c4k67j', 'art_approval_reminder', emailData);
-                    
-                    alert('Approval reminder sent successfully!');
+                    try {
+                        await emailjs.send('service_1c4k67j', 'art_approval_reminder', emailData);
+                        showNotification('Approval reminder sent successfully!', 'success');
+                    } catch (emailError) {
+                        console.error('EmailJS Error:', emailError);
+                        if (emailError.text && emailError.text.includes('template')) {
+                            alert('Email template "art_approval_reminder" not found. Please create it in EmailJS.');
+                        } else {
+                            alert('Failed to send approval reminder. Please check your EmailJS configuration.');
+                        }
+                        return;
+                    }
                     
                     // Could update a reminder count in the database here if needed
                     
                 } catch (error) {
                     console.error('Error sending approval reminder:', error);
-                    alert('Failed to send reminder. Please check the email template.');
+                    showNotification('Failed to send reminder. Please try again.', 'error');
                 }
             }
         }
@@ -2501,7 +2562,7 @@
             
             if (successCount > 0) {
                 showNotification(`Successfully marked ${successCount} invoice(s) as paid!`, 'success');
-                loadInvoices(currentInvoiceTab); // Reload current tab
+                loadData(); // Reload all data
                 clearSelection();
             }
             
@@ -2526,11 +2587,8 @@
             }
         });
         
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Art Invoice Dashboard initialized');
-            loadNeedsInvoice(); // Load the first tab by default
-        });
+        // Initialize - Removed duplicate DOMContentLoaded listener
+        // The main initialization is already done above at line 1381
     </script>
 </body>
 </html>
