@@ -866,6 +866,50 @@
             margin-top: 0.5rem;
         }
 
+        /* Status Filters */
+        .status-filters {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .filter-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .filter-label:hover {
+            color: var(--text-primary);
+        }
+
+        .filter-label input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        /* Age Warning for Awaiting Approval */
+        .age-warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+            font-weight: 500;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-container {
@@ -996,6 +1040,24 @@
             </div>
         </div>
 
+        <!-- Status Filters (only shown for Needs Invoice tab) -->
+        <div class="status-filters" id="statusFilters" style="display: block;">
+            <div class="filter-group">
+                <label class="filter-label">
+                    <input type="checkbox" id="filterNew" checked onchange="filterStatusChanged()">
+                    <span>New (No Status)</span>
+                </label>
+                <label class="filter-label">
+                    <input type="checkbox" id="filterAwaitingApproval" checked onchange="filterStatusChanged()">
+                    <span>Awaiting Approval 🟣</span>
+                </label>
+                <label class="filter-label">
+                    <input type="checkbox" id="filterCompleted" checked onchange="filterStatusChanged()">
+                    <span>Completed ✅</span>
+                </label>
+            </div>
+        </div>
+
         <!-- Data Table -->
         <div class="data-table-container">
             <div id="loadingContainer" class="loading-container" style="display: none;">
@@ -1019,46 +1081,6 @@
         </div>
     </main>
 
-    <!-- Quick Invoice Modal -->
-    <div class="modal-overlay" id="quickInvoiceModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3>Create Invoice</h3>
-                <button class="modal-close" onclick="closeQuickInvoiceModal()">×</button>
-            </div>
-            <div class="modal-body" id="quickInvoiceBody">
-                <!-- Invoice form will be loaded here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Invoice Preview Modal -->
-    <div class="modal-overlay" id="invoicePreviewModal">
-        <div class="modal-container" style="max-width: 800px;">
-            <div class="modal-header">
-                <h3>Invoice Preview</h3>
-                <button class="modal-close" onclick="closeInvoicePreviewModal()">×</button>
-            </div>
-            <div class="modal-body" id="invoicePreviewBody" style="padding: 0;">
-                <!-- Invoice preview will be loaded here -->
-            </div>
-            <div style="padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="checkbox" id="sendInvoiceEmail" checked>
-                        <span>Send invoice via email</span>
-                    </label>
-                </div>
-                <div style="display: flex; gap: 1rem;">
-                    <button class="btn btn-secondary" onclick="saveAsDraft()">Save as Draft</button>
-                    <button class="btn btn-primary" onclick="confirmCreateInvoice()">
-                        <i class="fas fa-check"></i>
-                        Create & Send Invoice
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Success Modal -->
     <div class="modal-overlay" id="successModal">
@@ -1419,7 +1441,20 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             
+            // Show/hide status filters
+            const statusFilters = document.getElementById('statusFilters');
+            if (tab === 'needs-invoice') {
+                statusFilters.style.display = 'block';
+            } else {
+                statusFilters.style.display = 'none';
+            }
+            
             // Display data for current tab
+            displayCurrentTab();
+        }
+
+        // Handle status filter changes
+        function filterStatusChanged() {
             displayCurrentTab();
         }
 
@@ -1471,7 +1506,22 @@
             });
             
             // Convert map back to array
-            const needsInvoice = Array.from(deduplicatedMap.values());
+            let needsInvoice = Array.from(deduplicatedMap.values());
+            
+            // Apply status filters
+            const filterNew = document.getElementById('filterNew').checked;
+            const filterAwaitingApproval = document.getElementById('filterAwaitingApproval').checked;
+            const filterCompleted = document.getElementById('filterCompleted').checked;
+            
+            needsInvoice = needsInvoice.filter(req => {
+                const status = req.Status || '';
+                
+                if (!status && filterNew) return true;
+                if (status === 'Awaiting Approval 🟣' && filterAwaitingApproval) return true;
+                if (status === 'Completed ✅' && filterCompleted) return true;
+                
+                return false;
+            });
             
             if (needsInvoice.length === 0) {
                 showEmptyState();
@@ -1497,19 +1547,34 @@
             const tableBody = document.getElementById('tableBody');
             needsInvoice.forEach(req => {
                 const row = document.createElement('tr');
+                // Calculate age for Awaiting Approval items
+                let ageWarning = '';
+                if (req.Status === 'Awaiting Approval 🟣') {
+                    const createdDate = new Date(req.Date_Created);
+                    const now = new Date();
+                    const workingDays = getWorkingDays(createdDate, now);
+                    
+                    if (workingDays > 7) {
+                        ageWarning = `<span class="age-warning">${workingDays} days old</span>`;
+                    }
+                }
+                
                 row.innerHTML = `
                     <td><strong>${req.ID_Design || '-'}</strong></td>
                     <td class="artwork-cell">${createArtworkThumbnail(req)}</td>
                     <td>${req.CompanyName || '-'}</td>
                     <td>${formatDate(req.Date_Created)}</td>
-                    <td><span class="status-badge needs-invoice">${req.Status || 'Needs Invoice'}</span></td>
+                    <td>
+                        <span class="status-badge needs-invoice">${req.Status || 'New'}</span>
+                        ${ageWarning}
+                    </td>
                     <td>${req.Art_Minutes || 0} min</td>
                     <td>${getFirstNameFromEmail(req.User_Email) || req.CustomerServiceRep || '-'}</td>
                     <td>
-                        <button class="btn btn-success btn-sm" onclick="createQuickInvoice('${req.ID_Design}')">
+                        <a href="/calculators/art-invoice-creator.html?id=${req.ID_Design}" class="btn btn-success btn-sm">
                             <i class="fas fa-file-invoice"></i>
                             Create Invoice
-                        </button>
+                        </a>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -1647,177 +1712,6 @@
             return actions;
         }
 
-        // Create quick invoice
-        async function createQuickInvoice(idDesign) {
-            try {
-                // Find the art request
-                const request = allArtRequests.find(r => r.ID_Design == idDesign);
-                if (!request) {
-                    alert('Art request not found');
-                    return;
-                }
-
-                // Open modal with invoice form
-                const modal = document.getElementById('quickInvoiceModal');
-                const modalBody = document.getElementById('quickInvoiceBody');
-                
-                // Show loading
-                modalBody.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div></div>';
-                modal.classList.add('active');
-
-                // Get suggested service code
-                const suggestedCode = request.Art_Minutes ? 
-                    invoiceService.suggestServiceCode(request.Art_Minutes) : 'GRT-50';
-                
-                // Build form HTML
-                modalBody.innerHTML = `
-                    <form id="quickInvoiceForm">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div>
-                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Customer Name</label>
-                                <input type="text" id="qiCustomerName" value="${request.Full_Name_Contact || ''}" 
-                                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Company</label>
-                                <input type="text" id="qiCompany" value="${request.CompanyName || ''}" 
-                                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
-                                <input type="email" id="qiEmail" value="${request.Email_Contact || request.Email || ''}" 
-                                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Art Request ID</label>
-                                <input type="text" value="${request.ID_Design}" readonly
-                                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color);">
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Service Code</label>
-                            <select id="qiServiceCode" onchange="updateQuickInvoiceAmount()"
-                                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">
-                                ${Object.values(invoiceService.serviceCodes).filter(s => !s.isAdditional).map(service => 
-                                    `<option value="${service.code}" ${service.code === suggestedCode ? 'selected' : ''}>
-                                        ${service.code} - ${service.name} ($${service.amount})
-                                    </option>`
-                                ).join('')}
-                            </select>
-                            <small style="color: var(--text-secondary);">Art time: ${request.Art_Minutes || 0} minutes</small>
-                        </div>
-                        
-                        <div style="margin-top: 1rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Notes</label>
-                            <textarea id="qiNotes" rows="3" placeholder="Add any notes..."
-                                      style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">${request.NOTES || ''}</textarea>
-                        </div>
-                        
-                        <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-color); border-radius: 6px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 500;">Total Amount:</span>
-                                <span id="qiTotalAmount" style="font-size: 1.5rem; font-weight: 600; color: var(--primary-color);">$0.00</span>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
-                            <button type="button" class="btn btn-secondary" onclick="closeQuickInvoiceModal()">Cancel</button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-file-invoice"></i>
-                                Create Invoice
-                            </button>
-                        </div>
-                    </form>
-                `;
-
-                // Update amount
-                updateQuickInvoiceAmount();
-
-                // Attach submit handler
-                document.getElementById('quickInvoiceForm').onsubmit = (e) => {
-                    e.preventDefault();
-                    submitQuickInvoice(request);
-                };
-
-            } catch (error) {
-                console.error('Error creating quick invoice:', error);
-                alert('Failed to create invoice form');
-            }
-        }
-
-        // Update quick invoice amount
-        function updateQuickInvoiceAmount() {
-            const serviceCode = document.getElementById('qiServiceCode').value;
-            const service = invoiceService.getServiceByCode(serviceCode);
-            if (service) {
-                document.getElementById('qiTotalAmount').textContent = `$${service.amount.toFixed(2)}`;
-            }
-        }
-
-        // Global variables for invoice preview
-        let currentInvoiceData = null;
-        let currentRequest = null;
-
-        // Submit quick invoice - now shows preview first
-        async function submitQuickInvoice(request) {
-            try {
-                const serviceCode = document.getElementById('qiServiceCode').value;
-                const service = invoiceService.getServiceByCode(serviceCode);
-                
-                // Store request for later
-                currentRequest = request;
-                
-                // Prepare invoice data
-                currentInvoiceData = {
-                    idDesign: request.ID_Design,
-                    customerName: document.getElementById('qiCustomerName').value,
-                    customerCompany: document.getElementById('qiCompany').value,
-                    customerEmail: document.getElementById('qiEmail').value,
-                    customerPhone: request.Phone_Contact || '',
-                    salesRepName: getSalesRepName(request.User_Email || getSalesRepEmail(request.CustomerServiceRep)),
-                    salesRepEmail: request.User_Email || getSalesRepEmail(request.CustomerServiceRep),
-                    projectName: request.NOTES || request.Note_Mockup || '',
-                    orderType: getOrderType(request.Order_Type),
-                    originalRequestDate: request.Date_Created,
-                    completionDate: new Date(),
-                    serviceItems: [{
-                        code: serviceCode,
-                        description: service.description,
-                        quantity: 1,
-                        rate: service.amount,
-                        amount: service.amount
-                    }],
-                    serviceSummary: `${serviceCode}: ${service.description}`,
-                    subtotalAmount: service.amount,
-                    rushFee: 0,
-                    revisionFee: 0,
-                    otherFees: 0,
-                    taxAmount: 0, // No tax for art services
-                    totalCost: service.amount,
-                    customerNotes: document.getElementById('qiNotes').value,
-                    notes: `Quick invoice created from unified dashboard`,
-                    status: 'Sent',
-                    artistName: 'Steve Deland',
-                    artistEmail: 'art@nwcustomapparel.com',
-                    ccEmails: 'erik@nwcustomapparel.com',
-                    createdBy: 'Unified Dashboard',
-                    artMinutes: request.Art_Minutes || 0,
-                    shopworksReferences: extractShopworksReferences(request.NOTES || '')
-                };
-
-                // Generate invoice ID
-                const invoiceId = invoiceService.generateInvoiceID(currentInvoiceData.idDesign);
-                currentInvoiceData.invoiceId = invoiceId;
-
-                // Show preview modal
-                showInvoicePreview();
-                
-            } catch (error) {
-                console.error('Error preparing invoice:', error);
-                alert('Failed to prepare invoice: ' + error.message);
-            }
-        }
 
         // Helper function to extract Order_Type value
         function getOrderType(orderType) {
@@ -1853,205 +1747,10 @@
             return Array.from(references).join(', ');
         }
 
-        // Show invoice preview
-        function showInvoicePreview() {
-            if (!currentInvoiceData) return;
 
-            const previewBody = document.getElementById('invoicePreviewBody');
-            previewBody.innerHTML = generateInvoiceHTML(currentInvoiceData);
-            
-            // Close the create modal and show preview
-            closeQuickInvoiceModal();
-            document.getElementById('invoicePreviewModal').classList.add('active');
-        }
 
-        // Generate professional invoice HTML
-        function generateInvoiceHTML(invoiceData) {
-            const now = new Date();
-            const dueDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
-            return `
-                <div class="invoice-preview">
-                    <!-- Header -->
-                    <div class="invoice-header">
-                        <div>
-                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                                 alt="Northwest Custom Apparel" class="invoice-logo">
-                        </div>
-                        <div class="invoice-title">
-                            <h1>ART INVOICE</h1>
-                            <div class="invoice-number">${invoiceData.invoiceId}</div>
-                            <div class="invoice-status-badge">PREVIEW</div>
-                        </div>
-                    </div>
 
-                    <!-- Invoice Details -->
-                    <div class="invoice-section">
-                        <div class="invoice-info-grid">
-                            <div>
-                                <h3>Bill To</h3>
-                                <div class="invoice-info-box">
-                                    <p><strong>${invoiceData.customerName || 'Customer Name'}</strong></p>
-                                    ${invoiceData.customerCompany ? `<p>${invoiceData.customerCompany}</p>` : ''}
-                                    <p>${invoiceData.customerEmail || ''}</p>
-                                    ${invoiceData.customerPhone ? `<p>${invoiceData.customerPhone}</p>` : ''}
-                                </div>
-                            </div>
-                            <div>
-                                <h3>Invoice Details</h3>
-                                <div class="invoice-info-box">
-                                    <p><strong>Invoice Date:</strong> ${now.toLocaleDateString()}</p>
-                                    <p><strong>Due Date:</strong> ${dueDate.toLocaleDateString()}</p>
-                                    <p><strong>Design ID:</strong> ${invoiceData.idDesign}</p>
-                                    <p><strong>Order Type:</strong> ${invoiceData.orderType || 'General'}</p>
-                                    ${invoiceData.shopworksReferences ? `<p><strong>References:</strong> ${invoiceData.shopworksReferences}</p>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Services Table -->
-                    <div class="invoice-section">
-                        <h3>Services</h3>
-                        <table class="invoice-table">
-                            <thead>
-                                <tr>
-                                    <th>Service</th>
-                                    <th>Description</th>
-                                    <th class="text-right">Qty</th>
-                                    <th class="text-right">Rate</th>
-                                    <th class="text-right">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${invoiceData.serviceItems.map(item => `
-                                    <tr>
-                                        <td><strong>${item.code}</strong></td>
-                                        <td>${item.description}</td>
-                                        <td class="text-right">1</td>
-                                        <td class="text-right">$${item.rate.toFixed(2)}</td>
-                                        <td class="text-right">$${item.amount.toFixed(2)}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Project Details -->
-                    ${invoiceData.projectName || invoiceData.customerNotes ? `
-                        <div class="invoice-section">
-                            <h3>Project Details</h3>
-                            <div class="invoice-info-box">
-                                ${invoiceData.projectName ? `<p><strong>Project:</strong> ${invoiceData.projectName}</p>` : ''}
-                                ${invoiceData.artMinutes ? `<p><strong>Art Time:</strong> ${invoiceData.artMinutes} minutes</p>` : ''}
-                                ${invoiceData.customerNotes ? `<p><strong>Notes:</strong> ${invoiceData.customerNotes}</p>` : ''}
-                            </div>
-                        </div>
-                    ` : ''}
-
-                    <!-- Totals -->
-                    <div class="invoice-totals">
-                        <div class="invoice-totals-box">
-                            <div class="invoice-total-row">
-                                <span>Subtotal:</span>
-                                <span>$${invoiceData.subtotalAmount.toFixed(2)}</span>
-                            </div>
-                            ${invoiceData.rushFee > 0 ? `
-                                <div class="invoice-total-row">
-                                    <span>Rush Fee:</span>
-                                    <span>$${invoiceData.rushFee.toFixed(2)}</span>
-                                </div>
-                            ` : ''}
-                            ${invoiceData.revisionFee > 0 ? `
-                                <div class="invoice-total-row">
-                                    <span>Revision Fee:</span>
-                                    <span>$${invoiceData.revisionFee.toFixed(2)}</span>
-                                </div>
-                            ` : ''}
-                            ${invoiceData.otherFees > 0 ? `
-                                <div class="invoice-total-row">
-                                    <span>Other Fees:</span>
-                                    <span>$${invoiceData.otherFees.toFixed(2)}</span>
-                                </div>
-                            ` : ''}
-                            <div class="invoice-total-row grand-total">
-                                <span>Total Due:</span>
-                                <span>$${invoiceData.totalCost.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="invoice-footer">
-                        <p><strong>Northwest Custom Apparel</strong></p>
-                        <p>2025 Freeman Road East, Milton, WA 98354</p>
-                        <p>Phone: 253-922-5793 | Email: sales@nwcustomapparel.com</p>
-                        <p>www.nwcustomapparel.com</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Close invoice preview modal
-        function closeInvoicePreviewModal() {
-            document.getElementById('invoicePreviewModal').classList.remove('active');
-            currentInvoiceData = null;
-        }
-
-        // Save as draft
-        async function saveAsDraft() {
-            if (!currentInvoiceData) return;
-
-            try {
-                // Update status to Draft
-                currentInvoiceData.status = 'Draft';
-                
-                // Create invoice
-                const result = await invoiceService.createInvoice(currentInvoiceData);
-                
-                if (result.success) {
-                    closeInvoicePreviewModal();
-                    showSuccessModal(result.invoiceID, false);
-                    loadData(); // Refresh data
-                } else {
-                    throw new Error(result.error || 'Failed to create invoice');
-                }
-            } catch (error) {
-                console.error('Error saving draft:', error);
-                alert('Failed to save draft: ' + error.message);
-            }
-        }
-
-        // Confirm and create invoice
-        async function confirmCreateInvoice() {
-            if (!currentInvoiceData) return;
-
-            const sendEmail = document.getElementById('sendInvoiceEmail').checked;
-            
-            try {
-                // Update status based on email preference
-                currentInvoiceData.status = sendEmail ? 'Sent' : 'Draft';
-                
-                // Create invoice
-                const result = await invoiceService.createInvoice(currentInvoiceData);
-                
-                if (result.success) {
-                    // Send email if requested
-                    if (sendEmail) {
-                        await sendInvoiceEmail(result.invoiceID, currentInvoiceData);
-                    }
-                    
-                    closeInvoicePreviewModal();
-                    showSuccessModal(result.invoiceID, sendEmail);
-                    loadData(); // Refresh data
-                } else {
-                    throw new Error(result.error || 'Failed to create invoice');
-                }
-            } catch (error) {
-                console.error('Error creating invoice:', error);
-                alert('Failed to create invoice: ' + error.message);
-            }
-        }
 
         // Send invoice email
         async function sendInvoiceEmail(invoiceId, invoiceData) {
@@ -2415,6 +2114,91 @@
                     alert('Failed to void invoice');
                 }
             }
+        }
+
+        // Calculate working days between two dates
+        function getWorkingDays(startDate, endDate) {
+            let count = 0;
+            const current = new Date(startDate);
+            
+            while (current <= endDate) {
+                const dayOfWeek = current.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Not Sunday or Saturday
+                    count++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            
+            return count;
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Show loading state
+        function showLoading() {
+            document.getElementById('loadingContainer').style.display = 'flex';
+            document.getElementById('dataTable').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        // Show table
+        function showTable() {
+            document.getElementById('loadingContainer').style.display = 'none';
+            document.getElementById('dataTable').style.display = 'table';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            document.getElementById('loadingContainer').style.display = 'none';
+            document.getElementById('dataTable').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'flex';
+        }
+
+        // Show error message
+        function showError(message) {
+            console.error(message);
+            showEmptyState();
+            // Optionally update empty state message
+        }
+
+        // Handle search
+        function handleSearch(event) {
+            event.preventDefault();
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm) {
+                displayCurrentTab();
+                return;
+            }
+            
+            // Search functionality to be implemented
+            console.log('Search for:', searchTerm);
+        }
+
+        // Clear search
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            displayCurrentTab();
+        }
+
+        // Refresh data
+        function refreshData() {
+            loadData();
         }
     </script>
 </body>
