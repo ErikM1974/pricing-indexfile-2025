@@ -1549,10 +1549,11 @@
                 const row = document.createElement('tr');
                 // Calculate age for Awaiting Approval items
                 let ageWarning = '';
+                let workingDays = 0;
                 if (req.Status === 'Awaiting Approval 🟣') {
                     const createdDate = new Date(req.Date_Created);
                     const now = new Date();
-                    const workingDays = getWorkingDays(createdDate, now);
+                    workingDays = getWorkingDays(createdDate, now);
                     
                     if (workingDays > 7) {
                         ageWarning = `<span class="age-warning">${workingDays} days old</span>`;
@@ -1571,10 +1572,18 @@
                     <td>${req.Art_Minutes || 0} min</td>
                     <td>${getFirstNameFromEmail(req.User_Email) || req.CustomerServiceRep || '-'}</td>
                     <td>
-                        <a href="/calculators/art-invoice-creator.html?id=${req.ID_Design}" class="btn btn-success btn-sm">
-                            <i class="fas fa-file-invoice"></i>
-                            Create Invoice
-                        </a>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <a href="/calculators/art-invoice-creator.html?id=${req.ID_Design}" class="btn btn-success btn-sm">
+                                <i class="fas fa-file-invoice"></i>
+                                Create Invoice
+                            </a>
+                            ${req.Status === 'Awaiting Approval 🟣' && workingDays > 7 ? `
+                                <button class="btn btn-warning btn-sm" onclick="sendApprovalReminder('${req.ID_Design}', '${req.CompanyName || ''}', '${req.Email_Contact || ''}')">
+                                    <i class="fas fa-bell"></i>
+                                    Remind
+                                </button>
+                            ` : ''}
+                        </div>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -1692,6 +1701,10 @@
                     <a href="#" onclick="resendInvoice('${invoice.InvoiceID}')" class="quick-actions-item">
                         <i class="fas fa-envelope"></i>
                         Resend
+                    </a>
+                    <a href="#" onclick="sendReminder('${invoice.InvoiceID}')" class="quick-actions-item">
+                        <i class="fas fa-bell"></i>
+                        Send Reminder
                     </a>
                     <a href="#" onclick="markAsPaid('${invoice.InvoiceID}')" class="quick-actions-item">
                         <i class="fas fa-check-circle"></i>
@@ -2044,6 +2057,63 @@
             }
         }
 
+        async function sendReminder(invoiceId) {
+            if (confirm('Send a payment reminder for this invoice?')) {
+                try {
+                    // Get invoice details
+                    const invoice = allInvoices.find(inv => inv.InvoiceID === invoiceId);
+                    if (!invoice) {
+                        alert('Invoice not found');
+                        return;
+                    }
+
+                    // Prepare reminder email data
+                    const emailData = {
+                        to_email: invoice.CustomerEmail,
+                        from_name: 'Northwest Custom Apparel',
+                        reply_to: invoice.SalesRepEmail || 'sales@nwcustomapparel.com',
+                        
+                        // Invoice info
+                        invoice_id: invoice.InvoiceID,
+                        customer_name: invoice.CustomerName,
+                        company_name: invoice.CustomerCompany || '',
+                        amount_due: parseFloat(invoice.GrandTotal || 0).toFixed(2),
+                        due_date: new Date(invoice.DueDate).toLocaleDateString(),
+                        days_overdue: Math.max(0, Math.floor((new Date() - new Date(invoice.DueDate)) / (1000 * 60 * 60 * 24))),
+                        
+                        // Sales rep
+                        sales_rep_name: invoice.SalesRepName || 'Northwest Custom Apparel Sales Team',
+                        sales_rep_email: invoice.SalesRepEmail || 'sales@nwcustomapparel.com',
+                        sales_rep_phone: '253-922-5793',
+                        
+                        // Company
+                        company_phone: '253-922-5793'
+                    };
+
+                    // Send reminder via EmailJS
+                    await emailjs.send('service_1c4k67j', 'art_invoice_reminder', emailData);
+
+                    // Update reminder count
+                    const reminderCount = parseInt(invoice.ReminderCount || 0) + 1;
+                    const updateData = {
+                        ReminderCount: reminderCount,
+                        LastReminderDate: new Date().toISOString()
+                    };
+
+                    const result = await invoiceService.updateInvoice(invoice.PK_ID, updateData);
+                    if (result.success) {
+                        alert('Payment reminder sent successfully!');
+                        loadData();
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    console.error('Error sending reminder:', error);
+                    alert('Failed to send reminder. Please check the email template.');
+                }
+            }
+        }
+
         async function markAsPaid(invoiceId) {
             const paymentDate = prompt('Enter payment date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
             if (!paymentDate) return;
@@ -2199,6 +2269,67 @@
         // Refresh data
         function refreshData() {
             loadData();
+        }
+
+        // Send approval reminder for art requests
+        async function sendApprovalReminder(idDesign, companyName, customerEmail) {
+            if (!customerEmail) {
+                alert('No customer email found for this request.');
+                return;
+            }
+            
+            if (confirm(`Send approval reminder to ${customerEmail}?`)) {
+                try {
+                    // Get the full art request details
+                    const artRequest = allArtRequests.find(req => req.ID_Design === idDesign);
+                    if (!artRequest) {
+                        alert('Art request not found');
+                        return;
+                    }
+
+                    // Calculate days waiting
+                    const createdDate = new Date(artRequest.Date_Created);
+                    const now = new Date();
+                    const daysWaiting = getWorkingDays(createdDate, now);
+
+                    // Prepare email data
+                    const emailData = {
+                        to_email: customerEmail,
+                        from_name: 'Northwest Custom Apparel',
+                        reply_to: artRequest.User_Email || 'sales@nwcustomapparel.com',
+                        
+                        // Art request info
+                        id_design: idDesign,
+                        company_name: companyName,
+                        customer_name: artRequest.Full_Name_Contact || 'Customer',
+                        days_waiting: daysWaiting,
+                        request_date: formatDate(artRequest.Date_Created),
+                        
+                        // Artist info
+                        artist_name: 'Steve Deland',
+                        artist_email: 'art@nwcustomapparel.com',
+                        
+                        // Sales rep
+                        sales_rep_name: getSalesRepName(artRequest.User_Email) || 'Sales Team',
+                        sales_rep_email: artRequest.User_Email || 'sales@nwcustomapparel.com',
+                        sales_rep_phone: '253-922-5793',
+                        
+                        // Company
+                        company_phone: '253-922-5793'
+                    };
+
+                    // Send reminder via EmailJS
+                    await emailjs.send('service_1c4k67j', 'art_approval_reminder', emailData);
+                    
+                    alert('Approval reminder sent successfully!');
+                    
+                    // Could update a reminder count in the database here if needed
+                    
+                } catch (error) {
+                    console.error('Error sending approval reminder:', error);
+                    alert('Failed to send reminder. Please check the email template.');
+                }
+            }
         }
     </script>
 </body>
