@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     invoiceService = new ArtInvoiceServiceV2();
     
     // Initialize EmailJS
-    emailjs.init('4qSbDO-SQs19TbP80');
+    emailjs.init(ART_INVOICE_CONFIG.EMAIL.PUBLIC_KEY);
     
     // Get invoice ID from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -348,8 +348,8 @@ async function sendInvoiceEmail() {
     const emailData = {
         // System fields
         to_email: currentInvoice.SalesRepEmail,
-        reply_to: currentInvoice.ArtistEmail || 'art@nwcustomapparel.com',
-        from_name: 'Northwest Custom Apparel Art Department',
+        reply_to: currentInvoice.ArtistEmail || ART_INVOICE_CONFIG.EMAIL.DEFAULT_REPLY_TO,
+        from_name: ART_INVOICE_CONFIG.EMAIL.FROM_NAME,
         
         // Invoice details
         invoice_id: currentInvoice.InvoiceID,
@@ -389,8 +389,8 @@ async function sendInvoiceEmail() {
         notes: currentInvoice.CustomerNotes || 'No additional notes',
         
         // Company info
-        company_phone: '253-922-5793',
-        company_year: '1977'
+        company_phone: ART_INVOICE_CONFIG.COMPANY.PHONE,
+        company_year: ART_INVOICE_CONFIG.COMPANY.ESTABLISHED
     };
     
     // Build service items HTML if using service codes
@@ -437,8 +437,8 @@ async function sendInvoiceEmail() {
         
         // Send email using EmailJS
         await emailjs.send(
-            'service_1c4k67j',
-            'ArtInvoice', // Using the template ID you created
+            ART_INVOICE_CONFIG.EMAIL.SERVICE_ID,
+            ART_INVOICE_CONFIG.EMAIL.TEMPLATE_ID,
             emailData
         );
         

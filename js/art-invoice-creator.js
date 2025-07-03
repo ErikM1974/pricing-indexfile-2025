@@ -17,14 +17,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     invoiceService = new ArtInvoiceServiceV2();
     
     // Initialize EmailJS
-    emailjs.init('4qSbDO-SQs19TbP80');
+    emailjs.init(ART_INVOICE_CONFIG.EMAIL.PUBLIC_KEY);
     
     // Set default dates
     const today = new Date();
-    const dueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
+    const dueDate = new Date(today.getTime() + ART_INVOICE_CONFIG.DEFAULTS.DUE_DAYS * 24 * 60 * 60 * 1000);
     
     document.getElementById('invoiceDate').value = today.toISOString().split('T')[0];
-    document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+    document.getElementById('dueDate').value = calculateDueDate(today.toISOString().split('T')[0]);
     
     // Parse URL parameters for deep linking and edit mode
     const urlParams = new URLSearchParams(window.location.search);
@@ -681,7 +681,7 @@ function calculateTotals() {
     
     // Calculate tax
     const applyTax = document.getElementById('applyTax').checked;
-    const taxRate = 0.102; // 10.20%
+    const taxRate = ART_INVOICE_CONFIG.DEFAULTS.TAX_RATE; // WA state tax
     const taxAmount = applyTax ? subtotal * taxRate : 0;
     const grandTotal = subtotal + taxAmount;
     
@@ -759,7 +759,7 @@ function getServiceItems() {
 // Update credit availability info (placeholder for future implementation)
 function updateCreditInfo() {
     const creditInfo = document.getElementById('creditInfo');
-    const salesRepEmail = selectedRequest?.User_Email || 'sales@nwcustomapparel.com';
+    const salesRepEmail = selectedRequest?.User_Email || ART_INVOICE_CONFIG.COMPANY.EMAIL;
     const salesRepName = getSalesRepName(salesRepEmail);
     
     // For now, show static message - can be enhanced later with real credit tracking
@@ -848,11 +848,11 @@ async function handleSubmit(e) {
     // Calculate totals
     const subtotal = serviceItems.reduce((sum, item) => sum + item.amount, 0);
     const applyTax = document.getElementById('applyTax').checked;
-    const taxAmount = applyTax ? subtotal * 0.102 : 0;
+    const taxAmount = applyTax ? subtotal * ART_INVOICE_CONFIG.DEFAULTS.TAX_RATE : 0;
     const grandTotal = subtotal + taxAmount;
     
     // Get sales rep info
-    const salesRepEmail = selectedRequest.User_Email || 'sales@nwcustomapparel.com';
+    const salesRepEmail = selectedRequest.User_Email || ART_INVOICE_CONFIG.COMPANY.EMAIL;
     const salesRepName = getSalesRepName(salesRepEmail);
     
     // Prepare invoice data
@@ -899,7 +899,7 @@ async function handleSubmit(e) {
         
         // Additional fields
         artistName: 'Steve Deland',
-        artistEmail: 'art@nwcustomapparel.com',
+        artistEmail: ART_INVOICE_CONFIG.EMAIL.DEFAULT_REPLY_TO,
         ccEmails: 'erik@nwcustomapparel.com',
         createdBy: salesRepName
     };
@@ -1006,14 +1006,14 @@ function updateInvoicePreview() {
     const serviceItems = getServiceItems();
     const subtotal = serviceItems.reduce((sum, item) => sum + item.amount, 0);
     const applyTax = safeGetCheckboxValue('applyTax', false);
-    const taxAmount = applyTax ? subtotal * 0.102 : 0;
+    const taxAmount = applyTax ? subtotal * ART_INVOICE_CONFIG.DEFAULTS.TAX_RATE : 0;
     const grandTotal = subtotal + taxAmount;
     
     // Generate invoice ID preview
     const now = new Date();
     const invoiceDate = now.toLocaleDateString();
-    const dueDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString();
-    const invoiceId = `ART-${selectedRequest.ID_Design}`;
+    const dueDate = new Date(now.getTime() + ART_INVOICE_CONFIG.DEFAULTS.DUE_DAYS * 24 * 60 * 60 * 1000).toLocaleDateString();
+    const invoiceId = `${ART_INVOICE_CONFIG.DEFAULTS.INVOICE_PREFIX}${selectedRequest.ID_Design}`;
     
     // Build the preview HTML
     previewContainer.innerHTML = `
@@ -1033,9 +1033,8 @@ function updateInvoicePreview() {
         <div class="invoice-preview-details">
             <div class="invoice-preview-section">
                 <h3>Bill To</h3>
-                <p><strong>Northwest Custom Apparel</strong></p>
-                <p>2025 Freeman Road East</p>
-                <p>Milton, WA 98354</p>
+                <p><strong>${ART_INVOICE_CONFIG.COMPANY.NAME}</strong></p>
+                <p>${ART_INVOICE_CONFIG.COMPANY.ADDRESS}</p>
             </div>
             
             <div class="invoice-preview-section">

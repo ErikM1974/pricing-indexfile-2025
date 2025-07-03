@@ -498,7 +498,7 @@ function getSalesRepEmail(name) {
         }
     }
     // Default to general sales if not found
-    return 'sales@nwcustomapparel.com';
+    return ART_INVOICE_CONFIG.COMPANY.EMAIL;
 }
 
 // ========================================
