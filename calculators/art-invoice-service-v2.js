@@ -99,12 +99,50 @@ class ArtInvoiceServiceV2 {
             const invoiceID = `ART-${idDesign}`;
             const invoices = await this.getInvoices({ invoiceID: invoiceID });
             
-            // Filter out voided invoices
-            const activeInvoices = invoices.filter(inv => 
-                inv.Status !== 'Voided' && 
-                inv.Status !== 'Cancelled' &&
-                !inv.IsDeleted
-            );
+            console.log(`[ArtInvoiceServiceV2] Checking existing invoice for ID ${idDesign}:`);
+            console.log(`[ArtInvoiceServiceV2] Found ${invoices.length} total invoice(s) with ID ${invoiceID}`);
+            
+            if (invoices.length > 0) {
+                invoices.forEach((inv, index) => {
+                    console.log(`[ArtInvoiceServiceV2] Invoice ${index + 1} (Raw):`, {
+                        InvoiceID: inv.InvoiceID,
+                        Status: inv.Status,
+                        IsDeleted: inv.IsDeleted,
+                        PK_ID: inv.PK_ID,
+                        rawStatusValue: JSON.stringify(inv.Status),
+                        isDeletedType: typeof inv.IsDeleted,
+                        isDeletedValue: inv.IsDeleted
+                    });
+                });
+            }
+            
+            // Filter out voided/cancelled/deleted invoices - EXACT same logic as dashboard (lines 1837-1840)
+            const activeInvoices = invoices.filter(inv => {
+                const isActive = inv.Status !== 'Voided' && 
+                                inv.Status !== 'Cancelled' &&
+                                !inv.IsDeleted;
+                
+                console.log(`[ArtInvoiceServiceV2] Invoice ${inv.InvoiceID} filter result:`, {
+                    Status: inv.Status,
+                    isNotVoided: inv.Status !== 'Voided',
+                    isNotCancelled: inv.Status !== 'Cancelled', 
+                    isNotDeleted: !inv.IsDeleted,
+                    finalResult: isActive
+                });
+                
+                return isActive;
+            });
+            
+            console.log(`[ArtInvoiceServiceV2] Active invoices after filtering: ${activeInvoices.length}`);
+            
+            if (activeInvoices.length > 0) {
+                console.log(`[ArtInvoiceServiceV2] Blocking invoice found:`, {
+                    InvoiceID: activeInvoices[0].InvoiceID,
+                    Status: activeInvoices[0].Status,
+                    IsDeleted: activeInvoices[0].IsDeleted,
+                    PK_ID: activeInvoices[0].PK_ID
+                });
+            }
             
             return activeInvoices.length > 0 ? activeInvoices[0] : null;
         } catch (error) {
@@ -365,7 +403,13 @@ class ArtInvoiceServiceV2 {
             // Check for existing invoice
             const existingInvoice = await this.checkExistingInvoice(invoiceData.idDesign);
             if (existingInvoice) {
-                throw new Error(`An invoice already exists for this request (${existingInvoice.InvoiceID}). Please void it first.`);
+                console.error('[ArtInvoiceServiceV2] Blocking invoice creation due to existing invoice:', {
+                    InvoiceID: existingInvoice.InvoiceID,
+                    Status: existingInvoice.Status,
+                    IsDeleted: existingInvoice.IsDeleted,
+                    PK_ID: existingInvoice.PK_ID
+                });
+                throw new Error(`An invoice already exists for this request (${existingInvoice.InvoiceID}). Status: ${existingInvoice.Status}. Please void it first or contact support if this appears to be an error.`);
             }
             
             const invoiceID = this.generateInvoiceID(invoiceData.idDesign);
@@ -971,6 +1015,112 @@ class ArtInvoiceServiceV2 {
             customerName: customerName,
             unpaidOnly: true
         });
+    }
+    
+    // Revert invoice from Sent back to Draft status for editing
+    async revertToDraft(id, modifiedBy = 'System') {
+        try {
+            const invoice = await this.getInvoice(id);
+            if (!invoice) {
+                throw new Error('Invoice not found');
+            }
+            
+            // Only allow reverting from Sent status
+            if (invoice.Status !== 'Sent') {
+                throw new Error(`Cannot revert invoice with status '${invoice.Status}' to draft. Only 'Sent' invoices can be reverted.`);
+            }
+            
+            // Check if invoice has been paid
+            if (invoice.PaymentAmount > 0) {
+                throw new Error('Cannot revert invoice to draft - payment has been recorded. Undo payment first.');
+            }
+            
+            console.log(`[ArtInvoiceServiceV2] Reverting invoice ${id} from Sent to Draft`);
+            
+            const updates = {
+                Status: 'Draft',
+                EmailSentDate: null,
+                EmailSentTo: null,
+                ModifiedBy: modifiedBy,
+                UpdatedAt: this.formatDateForCaspio(new Date()),
+                Notes: `Reverted to draft by ${modifiedBy} on ${new Date().toLocaleDateString()} for editing`
+            };
+            
+            return this.updateInvoice(id, updates);
+            
+        } catch (error) {
+            console.error('[ArtInvoiceServiceV2] Error reverting invoice to draft:', error);
+            return { success: false, error: error.message };
+        }
+    }
+    
+    // Get invoice data specifically formatted for editing
+    async getInvoiceForEdit(idDesign) {
+        try {
+            const invoiceID = `ART-${idDesign}`;
+            console.log(`[ArtInvoiceServiceV2] Getting invoice ${invoiceID} for editing`);
+            
+            const invoices = await this.getInvoices({ invoiceID: invoiceID });
+            
+            if (invoices.length === 0) {
+                throw new Error(`No invoice found for ID_Design ${idDesign}`);
+            }
+            
+            // Get the first non-deleted invoice
+            const activeInvoices = invoices.filter(inv => 
+                inv.Status !== 'Voided' && 
+                inv.Status !== 'Cancelled' && 
+                !inv.IsDeleted
+            );
+            
+            if (activeInvoices.length === 0) {
+                throw new Error(`No active invoice found for ID_Design ${idDesign}`);
+            }
+            
+            const invoice = activeInvoices[0];
+            
+            // Check if invoice can be edited
+            if (invoice.Status === 'Paid') {
+                throw new Error('Cannot edit paid invoice');
+            }
+            
+            if (invoice.Status === 'Sent') {
+                console.log(`[ArtInvoiceServiceV2] Warning: Invoice is in 'Sent' status. It should be reverted to draft before editing.`);
+            }
+            
+            // Get the associated art request data
+            const artRequests = await this.getArtRequests({ 
+                id_design: idDesign,
+                limit: 1 
+            });
+            
+            let artRequest = null;
+            if (artRequests.length > 0) {
+                artRequest = artRequests[0];
+            }
+            
+            // Return formatted data for the invoice creator
+            const editData = {
+                invoice: invoice,
+                artRequest: artRequest,
+                isEditMode: true,
+                canEdit: invoice.Status === 'Draft' || invoice.Status === 'Sent',
+                originalStatus: invoice.Status
+            };
+            
+            console.log(`[ArtInvoiceServiceV2] Retrieved invoice for editing:`, {
+                invoiceID: invoice.InvoiceID,
+                status: invoice.Status,
+                canEdit: editData.canEdit,
+                hasArtRequest: !!artRequest
+            });
+            
+            return { success: true, data: editData };
+            
+        } catch (error) {
+            console.error('[ArtInvoiceServiceV2] Error getting invoice for edit:', error);
+            return { success: false, error: error.message };
+        }
     }
 }
 

@@ -13,7 +13,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <!-- Art Invoice Service V2 -->
-    <script src="calculators/art-invoice-service-v2.js?v=2.1"></script>
+    <script src="calculators/art-invoice-service-v2.js?v=2.2"></script>
     
     <style>
         /* Root variables - Professional Blue/Gray Theme */
@@ -1920,14 +1920,27 @@
             allInvoices.forEach(inv => {
                 // Skip voided, cancelled, or deleted invoices
                 if (inv.Status === 'Voided' || inv.Status === 'Cancelled' || inv.IsDeleted) {
+                    console.log(`[Dashboard] Skipping invoice ${inv.InvoiceID} - Status: ${inv.Status}, IsDeleted: ${inv.IsDeleted}`);
                     return;
                 }
                 const artRequestId = inv.InvoiceID.replace('ART-', '');
+                console.log(`[Dashboard] Adding active invoice ${inv.InvoiceID} (Status: ${inv.Status}) to map for art request ${artRequestId}`);
                 invoiceMap.set(artRequestId, inv);
             });
 
+            console.log(`[Dashboard] Built invoice map with ${invoiceMap.size} active invoices`);
+            console.log(`[Dashboard] Invoice map contents:`, Array.from(invoiceMap.entries()));
+
             // Filter art requests without invoices
-            const needsInvoiceAll = allArtRequests.filter(req => !invoiceMap.has(req.ID_Design));
+            const needsInvoiceAll = allArtRequests.filter(req => {
+                const hasInvoice = invoiceMap.has(req.ID_Design);
+                if (!hasInvoice) {
+                    console.log(`[Dashboard] Art request ${req.ID_Design} NEEDS invoice - no active invoice found`);
+                } else {
+                    console.log(`[Dashboard] Art request ${req.ID_Design} HAS invoice - excluding from needs list`);
+                }
+                return !hasInvoice;
+            });
             
             // Deduplicate by ID_Design - keep the most recent record
             const deduplicatedMap = new Map();
@@ -2264,12 +2277,28 @@
 
             if (invoice.Status === 'Draft') {
                 actions += `
+                    <a href="/calculators/art-invoice-creator.html?edit=${invoice.ArtRequestID}" class="quick-actions-item">
+                        <i class="fas fa-edit"></i>
+                        Edit
+                    </a>
                     <a href="#" onclick="sendInvoice('${invoice.InvoiceID}')" class="quick-actions-item">
                         <i class="fas fa-paper-plane"></i>
                         Send
                     </a>
                 `;
             } else if (invoice.Status === 'Sent' || invoice.Status === 'Pending') {
+                // Check if invoice has payments - if so, can't revert to draft
+                const hasPayments = invoice.PaymentAmount && parseFloat(invoice.PaymentAmount) > 0;
+                
+                if (!hasPayments) {
+                    actions += `
+                        <a href="#" onclick="revertToDraft('${invoice.InvoiceID}')" class="quick-actions-item">
+                            <i class="fas fa-undo"></i>
+                            Revert to Draft
+                        </a>
+                    `;
+                }
+                
                 actions += `
                     <a href="#" onclick="resendInvoice('${invoice.InvoiceID}')" class="quick-actions-item">
                         <i class="fas fa-envelope"></i>
@@ -2732,6 +2761,44 @@
             } catch (error) {
                 console.error('Error marking as paid:', error);
                 alert('Failed to update invoice status');
+            }
+        }
+
+        async function revertToDraft(invoiceId) {
+            if (!confirm('Are you sure you want to revert this invoice to draft status? This will allow it to be edited again.')) {
+                return;
+            }
+
+            try {
+                showLoading();
+                
+                const invoice = allInvoices.find(inv => inv.InvoiceID === invoiceId);
+                if (!invoice) {
+                    alert('Invoice not found');
+                    return;
+                }
+
+                // Check if invoice has payments
+                if (invoice.PaymentAmount && parseFloat(invoice.PaymentAmount) > 0) {
+                    alert('Cannot revert invoice to draft - payment has been recorded. Please undo payment first.');
+                    return;
+                }
+
+                console.log(`[Dashboard] Reverting invoice ${invoiceId} to draft status`);
+
+                const result = await invoiceService.revertToDraft(invoice.PK_ID, 'Dashboard User');
+                
+                if (result.success) {
+                    showNotification('Invoice successfully reverted to draft status!', 'success');
+                    loadData(); // Refresh the dashboard
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error reverting invoice to draft:', error);
+                showNotification(`Failed to revert invoice: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
             }
         }
 
