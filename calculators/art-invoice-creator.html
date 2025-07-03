@@ -1689,21 +1689,28 @@
                         document.getElementById('searchSection').style.display = 'none';
                         
                         // Select the request directly
-                        await selectRequest(designIdFromUrl, null);
-                        
-                        // Clear loading state
-                        document.getElementById('requestResults').innerHTML = '';
-                        document.getElementById('requestResults').style.display = 'none';
-                        
-                        // Show form section if it's hidden
-                        const formSection = document.getElementById('formSection');
-                        if (formSection) {
-                            formSection.style.display = 'block';
-                        }
-                        
-                        // Update preview
-                        if (typeof updateInvoicePreview === 'function') {
-                            setTimeout(updateInvoicePreview, 500);
+                        try {
+                            await selectRequest(designIdFromUrl, null);
+                            
+                            // Clear loading state
+                            document.getElementById('requestResults').innerHTML = '';
+                            document.getElementById('requestResults').style.display = 'none';
+                            
+                            // Show form section if it's hidden
+                            const formSection = document.getElementById('formSection');
+                            if (formSection) {
+                                formSection.style.display = 'block';
+                            }
+                            
+                            // Update preview only if request was selected successfully
+                            if (selectedRequest && typeof updateInvoicePreview === 'function') {
+                                setTimeout(updateInvoicePreview, 500);
+                            }
+                        } catch (error) {
+                            console.error('Failed to select request in deep link:', error);
+                            showAlert('Failed to load invoice form. Please try again.', 'error');
+                            // Fall back to search interface
+                            searchArtRequests();
                         }
                     } else {
                         console.error('Art request not found for ID:', designIdFromUrl);
@@ -2276,17 +2283,22 @@
                 
                 selectedRequest = request;
                 
-                // Update UI to show selection
-                document.querySelectorAll('.request-card').forEach(card => {
-                    card.classList.remove('selected');
-                });
-                const selectedCard = event.target.closest('.request-card');
-                if (selectedCard) {
-                    selectedCard.classList.add('selected');
+                // Update UI to show selection (only if called from click event)
+                if (event && event.target) {
+                    document.querySelectorAll('.request-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    const selectedCard = event.target.closest('.request-card');
+                    if (selectedCard) {
+                        selectedCard.classList.add('selected');
+                    }
                 }
                 
                 // Show selected indicator
-                document.getElementById('selectedIndicator').style.display = 'block';
+                const selectedIndicator = document.getElementById('selectedIndicator');
+                if (selectedIndicator) {
+                    selectedIndicator.style.display = 'block';
+                }
                 
                 // Use the new populateInvoiceForm function with intelligent defaults
                 populateInvoiceForm(request);
@@ -2901,6 +2913,18 @@
             }
         }
 
+        // Helper function for safe element access
+        function safeGetElementValue(id, defaultValue = '') {
+            const element = document.getElementById(id);
+            return element ? element.value : defaultValue;
+        }
+
+        // Helper function for safe checkbox access
+        function safeGetCheckboxValue(id, defaultValue = false) {
+            const element = document.getElementById(id);
+            return element ? element.checked : defaultValue;
+        }
+
         // Live Preview Functions
         function updateInvoicePreview() {
             const previewContainer = document.getElementById('invoicePreviewContainer');
@@ -2915,13 +2939,13 @@
                 return;
             }
 
-            // Get form values
-            const customerName = document.getElementById('customerName').value || 'Customer Name';
-            const customerCompany = document.getElementById('customerCompany').value || '';
-            const customerEmail = document.getElementById('customerEmail').value || 'customer@email.com';
-            const projectName = document.getElementById('projectName').value || selectedRequest.NOTES || 'Project Name';
-            const projectType = document.getElementById('projectType').value || 'Design Work';
-            const complexity = document.getElementById('complexity').value || 'Standard';
+            // Get form values safely
+            const customerName = safeGetElementValue('customerName', 'Customer Name');
+            const customerCompany = safeGetElementValue('customerCompany', '');
+            const customerEmail = safeGetElementValue('customerEmail', 'customer@email.com');
+            const projectName = safeGetElementValue('projectName', selectedRequest.NOTES || 'Project Name');
+            const projectType = safeGetElementValue('projectType', 'Design Work');
+            const complexity = safeGetElementValue('complexity', 'Standard');
             const artistName = 'Steve Deland';
             const requestDate = selectedRequest.Date_Created ? new Date(selectedRequest.Date_Created).toLocaleDateString() : 'N/A';
             const completionDate = new Date().toLocaleDateString();
@@ -2929,7 +2953,7 @@
             // Get service items and calculate totals
             const serviceItems = getServiceItems();
             const subtotal = serviceItems.reduce((sum, item) => sum + item.amount, 0);
-            const applyTax = document.getElementById('applyTax').checked;
+            const applyTax = safeGetCheckboxValue('applyTax', false);
             const taxAmount = applyTax ? subtotal * 0.102 : 0;
             const grandTotal = subtotal + taxAmount;
             
