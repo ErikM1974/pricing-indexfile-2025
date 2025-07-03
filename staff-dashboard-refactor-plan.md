@@ -56,55 +56,207 @@ Replace the inline style block with:
 Create `css/nwca-theme.css` to establish brand consistency:
 
 ```css
-/* Northwest Custom Apparel Global Theme - Matching teamnwca.com */
+/* Northwest Custom Apparel Global Theme - From Existing Codebase */
 :root {
-  /* Brand Colors from teamnwca.com */
-  --nwca-navy: #003366;         /* Primary brand color */
-  --nwca-blue: #0066cc;         /* Secondary blue */
-  --nwca-orange: #ff6600;       /* Accent color */
-  --nwca-gray-dark: #333333;    /* Text color */
-  --nwca-gray-light: #f5f5f5;   /* Background color */
+  /* Primary Brand Colors (from core.css and quote-system.css) */
+  --nwca-primary: #2e5827;      /* Primary green used throughout */
+  --nwca-primary-light: #f0f5ef; /* Light green background */
+  --nwca-primary-dark: #1a3319;  /* Dark green for hover states */
   
-  /* Typography matching main site */
+  /* Alternative Green (from quote widgets) */
+  --nwca-green: #5ab738;        /* Brighter green for accents */
+  --nwca-green-dark: #4a9c2d;   /* Darker accent green */
+  
+  /* Secondary Colors */
+  --nwca-secondary: #663c00;    /* Brown/orange secondary */
+  --nwca-secondary-light: #fff3cd;
+  
+  /* Status Colors */
+  --nwca-success: #28a745;
+  --nwca-warning: #ffc107;
+  --nwca-danger: #dc3545;
+  --nwca-info: #17a2b8;
+  
+  /* Text Colors */
+  --nwca-text-primary: #333333;
+  --nwca-text-secondary: #666666;
+  --nwca-text-muted: #999999;
+  
+  /* Background Colors */
+  --nwca-background-light: #f8f9fa;
+  --nwca-background-white: #ffffff;
+  --nwca-border-color: #dee2e6;
+  
+  /* Typography (from existing patterns) */
   --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-heading: 'Montserrat', sans-serif;
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-lg: 18px;
+  --line-height-base: 1.6;
   
-  /* Consistent spacing */
+  /* Spacing (from core.css) */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
   
-  /* Shadows and borders */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --border-radius: 4px;
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  /* Shadows (from core.css) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Transitions */
+  --transition-speed: 0.3s;
 }
 
-/* Global resets matching teamnwca.com */
+/* Global resets matching existing patterns */
 body {
   font-family: var(--font-primary);
-  color: var(--nwca-gray-dark);
-  line-height: 1.6;
-  background-color: var(--nwca-gray-light);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--nwca-text-primary);
+  background-color: var(--nwca-background-white);
+  margin: 0;
+  padding: 0;
 }
 
-/* Button styles matching main website */
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Links (from existing patterns) */
+a {
+  color: var(--nwca-primary);
+  text-decoration: none;
+  transition: all var(--transition-speed) ease;
+}
+
+a:hover {
+  color: var(--nwca-primary-dark);
+  text-decoration: underline;
+}
+
+/* Buttons (from components.css patterns) */
 .btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: 1px solid transparent;
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius);
-  font-weight: 500;
-  transition: all 0.3s ease;
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-speed) ease;
+  cursor: pointer;
+}
+
+.btn:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(46, 88, 39, 0.25);
 }
 
 .btn-primary {
-  background-color: var(--nwca-navy);
-  color: white;
+  color: #fff;
+  background-color: var(--nwca-primary);
+  border-color: var(--nwca-primary);
 }
 
 .btn-primary:hover {
-  background-color: var(--nwca-blue);
+  background-color: var(--nwca-primary-dark);
+  border-color: var(--nwca-primary-dark);
+}
+
+.btn-secondary {
+  color: #fff;
+  background-color: var(--nwca-secondary);
+  border-color: var(--nwca-secondary);
+}
+
+.btn-outline-primary {
+  color: var(--nwca-primary);
+  background-color: transparent;
+  border-color: var(--nwca-primary);
+}
+
+.btn-outline-primary:hover {
+  color: #fff;
+  background-color: var(--nwca-primary);
+}
+
+/* Form Controls (from components.css) */
+.form-control {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--nwca-text-primary);
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid var(--nwca-border-color);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.form-control:focus {
+  color: var(--nwca-text-primary);
+  background-color: #fff;
+  border-color: var(--nwca-primary);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(46, 88, 39, 0.25);
+}
+
+/* Utility Classes */
+.text-primary { color: var(--nwca-primary); }
+.text-secondary { color: var(--nwca-text-secondary); }
+.text-muted { color: var(--nwca-text-muted); }
+.text-success { color: var(--nwca-success); }
+.text-warning { color: var(--nwca-warning); }
+.text-danger { color: var(--nwca-danger); }
+
+.bg-primary { background-color: var(--nwca-primary); color: white; }
+.bg-light { background-color: var(--nwca-background-light); }
+.bg-white { background-color: var(--nwca-background-white); }
+
+/* Alerts (matching existing patterns) */
+.alert {
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.alert-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+}
+
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
 }
 ```
 

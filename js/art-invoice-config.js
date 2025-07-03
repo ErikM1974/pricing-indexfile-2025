@@ -71,7 +71,8 @@ const ART_INVOICE_CONFIG = {
 
     // Default Values
     DEFAULTS: {
-        DUE_DAYS: 30,
+        DUE_DAYS: 0, // COD - Payment due immediately via Credit Card
+        PAYMENT_TERMS: 'COD - Payment Via Credit Card',
         TAX_RATE: 0.10, // 10% WA state tax
         RUSH_FEE_PERCENTAGE: 0.50, // 50% rush fee
         LATE_FEE_PERCENTAGE: 0.015, // 1.5% per month
@@ -246,6 +247,10 @@ function formatDateConfig(date) {
 // Helper function to calculate due date
 function calculateDueDate(invoiceDate) {
     const date = new Date(invoiceDate);
+    // For COD/Credit Card payments, due date is same as invoice date
+    if (ART_INVOICE_CONFIG.DEFAULTS.DUE_DAYS === 0) {
+        return date.toISOString().split('T')[0];
+    }
     date.setDate(date.getDate() + ART_INVOICE_CONFIG.DEFAULTS.DUE_DAYS);
     return date.toISOString().split('T')[0];
 }

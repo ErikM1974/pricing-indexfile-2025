@@ -545,9 +545,18 @@ function populateInvoiceForm(request) {
         }
         
         const serviceLines = document.querySelectorAll('.service-line');
-        const targetLine = serviceLines[serviceLines.length - 1];
-        const select = targetLine.querySelector('.service-select');
+        if (serviceLines.length === 0) {
+            console.warn('No service lines found, skipping suggestion:', suggestion.code);
+            return;
+        }
         
+        const targetLine = serviceLines[serviceLines.length - 1];
+        if (!targetLine) {
+            console.warn('Target line not found, skipping suggestion:', suggestion.code);
+            return;
+        }
+        
+        const select = targetLine.querySelector('.service-select');
         if (select && !select.value) {
             select.value = suggestion.code;
             updateServiceLine(select);
