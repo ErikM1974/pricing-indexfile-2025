@@ -13,525 +13,17 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <!-- Art Invoice Service V2 - Using dedicated API endpoints -->
-    <script src="art-invoice-service-v2.js?v=2.1"></script>
+    <script src="art-invoice-service-v2.js?v=3.0&cache=bust"></script>
     
-    <style>
-        /* Root variables - Professional Invoice Theme */
-        :root {
-            --primary-color: #2c3e50;
-            --accent-color: #3498db;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --bg-color: #ecf0f1;
-            --card-bg: #ffffff;
-            --border-color: #bdc3c7;
-            --text-primary: #2c3e50;
-            --text-secondary: #7f8c8d;
-            --hover-bg: #f8f9fa;
-            --invoice-header-bg: #34495e;
-            --invoice-accent: #3498db;
-            --table-header-bg: #ecf0f1;
-            --table-border: #ddd;
-        }
+    <!-- Art Invoice Configuration -->
+    <script src="../js/art-invoice-config.js"></script>
+    
+    <!-- Shared Art Invoice Utilities -->
+    <script src="../js/art-invoice-utils.js"></script>
+    
+    <!-- Shared Art Invoice Styles -->
+    <link rel="stylesheet" href="../css/art-invoice-shared.css">
 
-        /* Base styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        /* Header */
-        .header {
-            background: var(--invoice-header-bg);
-            color: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .logo {
-            height: 40px;
-            filter: brightness(0) invert(1);
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: rgba(255,255,255,0.8);
-            font-size: 0.875rem;
-        }
-
-        .breadcrumb a {
-            color: var(--invoice-accent);
-            text-decoration: none;
-        }
-
-        .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-
-        /* Main Container */
-        .main-container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        /* Invoice Document Style */
-        .invoice-document {
-            background: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .invoice-header-section {
-            background: var(--invoice-header-bg);
-            color: white;
-            padding: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .invoice-title h1 {
-            font-size: 2rem;
-            margin: 0;
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-
-        .invoice-number {
-            text-align: right;
-        }
-
-        .invoice-number h2 {
-            font-size: 1rem;
-            font-weight: 400;
-            opacity: 0.8;
-            margin-bottom: 0.25rem;
-        }
-
-        .invoice-number .number {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        /* Invoice Body */
-        .invoice-body {
-            padding: 2rem;
-        }
-
-        /* Two Column Layout */
-        .invoice-details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .detail-section h3 {
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .detail-field {
-            margin-bottom: 0.75rem;
-        }
-
-        .detail-field label {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.25rem;
-        }
-
-        .detail-field input,
-        .detail-field select,
-        .detail-field textarea {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            font-size: 0.875rem;
-            transition: border-color 0.2s;
-        }
-
-        .detail-field input:focus,
-        .detail-field select:focus,
-        .detail-field textarea:focus {
-            outline: none;
-            border-color: var(--invoice-accent);
-        }
-
-        /* Service Table */
-        .service-table {
-            width: 100%;
-            margin: 2rem 0;
-            border-collapse: collapse;
-        }
-
-        .service-table th {
-            background: var(--table-header-bg);
-            padding: 0.75rem;
-            text-align: left;
-            font-size: 0.875rem;
-            font-weight: 600;
-            border-bottom: 2px solid var(--table-border);
-        }
-
-        .service-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--table-border);
-        }
-
-        .service-table .text-right {
-            text-align: right;
-        }
-
-        .service-table .text-center {
-            text-align: center;
-        }
-
-        /* Service Line Item */
-        .service-line-item {
-            display: grid;
-            grid-template-columns: 3fr 1fr 1fr auto;
-            gap: 0.5rem;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .service-select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            font-size: 0.875rem;
-        }
-
-        .quantity-input {
-            width: 80px;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            font-size: 0.875rem;
-            text-align: center;
-        }
-
-        .line-total {
-            font-weight: 600;
-            text-align: right;
-            min-width: 80px;
-        }
-
-        .remove-line-btn {
-            background: var(--danger-color);
-            color: white;
-            border: none;
-            padding: 0.5rem;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.875rem;
-        }
-
-        .remove-line-btn:hover {
-            background: #c0392b;
-        }
-
-        /* Add Service Button */
-        .add-service-btn {
-            background: none;
-            border: 2px dashed var(--border-color);
-            color: var(--text-secondary);
-            padding: 0.75rem 1rem;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: all 0.2s;
-            margin-top: 1rem;
-        }
-
-        .add-service-btn:hover {
-            border-color: var(--invoice-accent);
-            color: var(--invoice-accent);
-            background: var(--hover-bg);
-        }
-
-        /* Invoice Totals */
-        .invoice-totals {
-            margin-left: auto;
-            width: 350px;
-            margin-top: 2rem;
-        }
-
-        .total-line {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            font-size: 0.875rem;
-        }
-
-        .total-line.subtotal {
-            border-top: 1px solid var(--table-border);
-            margin-top: 0.5rem;
-            padding-top: 1rem;
-        }
-
-        .total-line.grand-total {
-            border-top: 2px solid var(--text-primary);
-            margin-top: 0.5rem;
-            padding-top: 1rem;
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        /* Tax Section */
-        .tax-notice {
-            background: #fff8dc;
-            border: 1px solid #ffd700;
-            padding: 1rem;
-            border-radius: 3px;
-            margin: 1.5rem 0;
-            font-size: 0.875rem;
-        }
-
-        .tax-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-        }
-
-        /* Notes Section */
-        .notes-section {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .notes-section h3 {
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 2rem;
-            background: var(--table-header-bg);
-            border-top: 1px solid var(--border-color);
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 3px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-        }
-
-        .btn-primary {
-            background: var(--invoice-accent);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2980b9;
-        }
-
-        .btn-secondary {
-            background: white;
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: var(--hover-bg);
-        }
-
-        /* Art Request Search */
-        .search-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-
-        .search-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .search-header h2 {
-            font-size: 1.25rem;
-            color: var(--text-primary);
-        }
-
-        .search-controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            font-size: 0.875rem;
-        }
-
-        /* Request Results */
-        .request-results {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            background: white;
-        }
-
-        .request-item {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .request-item:hover {
-            background: var(--hover-bg);
-        }
-
-        .request-item.selected {
-            background: #e3f2fd;
-            border-left: 3px solid var(--invoice-accent);
-        }
-
-        /* Alert Messages */
-        .alert {
-            padding: 1rem;
-            border-radius: 3px;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.875rem;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--border-color);
-            border-radius: 50%;
-            border-top-color: var(--invoice-accent);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Print Styles */
-        @media print {
-            body {
-                background: white;
-            }
-            
-            .header,
-            .search-section,
-            .action-buttons,
-            .add-service-btn,
-            .remove-line-btn {
-                display: none !important;
-            }
-            
-            .invoice-document {
-                box-shadow: none;
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .invoice-details-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .invoice-totals {
-                width: 100%;
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- Header -->
@@ -543,7 +35,9 @@
                 <nav class="breadcrumb">
                     <a href="/staff-dashboard.html">Staff Dashboard</a>
                     <span>/</span>
-                    <span>Create Art Invoice</span>
+                    <a href="/art-invoice-unified-dashboard.html">Art Invoicing</a>
+                    <span>/</span>
+                    <span>Create Invoice</span>
                 </nav>
             </div>
         </div>
@@ -554,7 +48,11 @@
         <!-- Alert Container -->
         <div id="alertContainer"></div>
 
-        <!-- Art Request Selection -->
+        <!-- Split Screen Layout -->
+        <div class="split-container">
+            <!-- Form Panel -->
+            <div class="form-panel">
+                <!-- Art Request Selection -->
         <div class="search-section" id="searchSection">
             <div class="search-header">
                 <h2>Select Art Request</h2>
@@ -568,11 +66,53 @@
             <div class="search-controls">
                 <input type="text" 
                        id="searchInput" 
-                       class="search-input" 
-                       placeholder="Search by request ID, customer name, or project...">
+                       class="enhanced-search" 
+                       placeholder="Search by ID, customer, project, or invoice amount...">
                 <button type="button" class="btn btn-secondary" onclick="searchArtRequests()">
                     <i class="fas fa-search"></i>
                     Search
+                </button>
+            </div>
+            
+            <div class="date-filter-controls">
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label for="dateFrom" style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">From:</label>
+                        <input type="date" 
+                               id="dateFrom" 
+                               class="form-control" 
+                               value="2025-06-01"
+                               style="padding: 0.5rem; font-size: 0.875rem; min-width: 150px;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label for="dateTo" style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">To:</label>
+                        <input type="date" 
+                               id="dateTo" 
+                               class="form-control"
+                               style="padding: 0.5rem; font-size: 0.875rem; min-width: 150px;">
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="clearDateFilter()" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                        <i class="fas fa-times"></i>
+                        Clear Dates
+                    </button>
+                </div>
+                <div style="margin-top: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); font-style: italic;">
+                        <i class="fas fa-info-circle"></i>
+                        Default filter shows requests from June 1, 2025 onwards. Clear dates to see all records.
+                    </span>
+                </div>
+            </div>
+            
+            <div class="search-filters">
+                <button class="filter-btn active" data-filter="all" onclick="filterRequests('all')">
+                    <i class="fas fa-list"></i> All Uninvoiced
+                </button>
+                <button class="filter-btn" data-filter="ready" onclick="filterRequests('ready')">
+                    <i class="fas fa-check-circle"></i> Ready to Invoice
+                </button>
+                <button class="filter-btn" data-filter="overdue" onclick="filterRequests('overdue')">
+                    <i class="fas fa-exclamation-triangle"></i> Overdue
                 </button>
             </div>
             
@@ -697,6 +237,42 @@
                         </div>
                     </div>
 
+                    <!-- Spec Art Credit Section -->
+                    <div class="spec-art-section" style="margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px;">
+                        <h3 style="margin-bottom: 1rem; color: #495057;">Spec Art & Credits</h3>
+                        
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <input type="checkbox" id="isSpecArtwork" onchange="handleSpecArtworkToggle()">
+                            <label for="isSpecArtwork" style="margin: 0; font-weight: 500;">This is spec artwork (complimentary)</label>
+                        </div>
+                        
+                        <div id="specArtDetails" style="display: none;">
+                            <div class="detail-field" style="margin-bottom: 1rem;">
+                                <label>Spec Art Purpose</label>
+                                <input type="text" id="specArtPurpose" placeholder="e.g., New customer mockup, design variation, etc." 
+                                       style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 3px;">
+                            </div>
+                            
+                            <div class="detail-field" style="margin-bottom: 1rem;">
+                                <label>Apply Sales Rep Credit</label>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span>$</span>
+                                    <input type="number" id="creditAmount" min="0" max="1000" step="0.01" placeholder="0.00"
+                                           style="width: 120px; padding: 0.5rem; border: 1px solid #ddd; border-radius: 3px; text-align: right;"
+                                           onchange="calculateTotals()">
+                                    <div id="creditInfo" style="font-size: 0.875rem; color: #6c757d;">
+                                        Available credit will be shown here
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="creditWarning" style="display: none; background: #fff3cd; border: 1px solid #ffeaa7; padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem;">
+                                <i class="fas fa-exclamation-triangle" style="color: #856404;"></i>
+                                <span style="color: #856404; font-size: 0.875rem;">Credit amount exceeds available balance. Manager approval may be required.</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Notes Section -->
                     <div class="notes-section">
                         <h3>Notes</h3>
@@ -737,584 +313,30 @@
                 </div>
             </div>
         </form>
+            </div>
+            <!-- End Form Panel -->
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <i class="fas fa-eye"></i>
+                    Live Invoice Preview
+                </div>
+                <div class="preview-content">
+                    <div id="invoicePreviewContainer" class="invoice-preview">
+                        <div class="invoice-preview-empty">
+                            <i class="fas fa-file-invoice"></i>
+                            <p>Select an art request to see the invoice preview</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Preview Panel -->
+        </div>
+        <!-- End Split Container -->
     </main>
 
-    <script>
-        // Initialize
-        let invoiceService;
-        let selectedRequest = null;
-        let serviceLineCount = 0;
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            invoiceService = new ArtInvoiceServiceV2();
-            
-            // Initialize EmailJS
-            emailjs.init('4qSbDO-SQs19TbP80');
-            
-            // Set default dates
-            const today = new Date();
-            const dueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
-            
-            document.getElementById('invoiceDate').value = today.toISOString().split('T')[0];
-            document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
-            
-            // Load initial art requests
-            searchArtRequests();
-            
-            // Form submit handler
-            document.getElementById('invoiceForm').addEventListener('submit', handleSubmit);
-            
-            // Add initial service line
-            addServiceLineItem();
-        });
-        
-        // Helper function to format date
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        }
-        
-        // Helper function to extract order type
-        function getOrderType(request) {
-            if (!request) return 'General';
-            
-            let orderType = '';
-            
-            if (request.Order_Type_1) {
-                if (typeof request.Order_Type_1 === 'object') {
-                    orderType = request.Order_Type_1.value || request.Order_Type_1.name || request.Order_Type_1.text || JSON.stringify(request.Order_Type_1);
-                } else {
-                    orderType = request.Order_Type_1;
-                }
-            } else if (request.Order_Type) {
-                if (typeof request.Order_Type === 'object') {
-                    orderType = request.Order_Type.value || request.Order_Type.name || request.Order_Type.text || JSON.stringify(request.Order_Type);
-                } else {
-                    orderType = request.Order_Type;
-                }
-            }
-            
-            if (orderType && orderType !== '[object Object]') {
-                return orderType;
-            }
-            
-            return 'General';
-        }
-        
-        // Search Art Requests
-        async function searchArtRequests() {
-            const searchTerm = document.getElementById('searchInput').value;
-            const resultsDiv = document.getElementById('requestResults');
-            
-            // Show loading
-            resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center;"><div class="loading"></div></div>';
-            resultsDiv.style.display = 'block';
-            
-            try {
-                // Fetch art requests
-                const requests = await invoiceService.getArtRequests();
-                
-                // Filter for completed requests from June 15, 2025 forward
-                const cutoffDate = new Date('2025-06-15T00:00:00Z');
-                
-                let filteredRequests = requests.filter(req => {
-                    // Check status is Completed (with checkmark emoji)
-                    if (req.Status !== 'Completed ✅') return false;
-                    
-                    // Check date is after June 15, 2025
-                    if (!req.Date_Created) return false;
-                    
-                    try {
-                        const requestDate = new Date(req.Date_Created);
-                        if (isNaN(requestDate.getTime())) return false;
-                        return requestDate.getTime() >= cutoffDate.getTime();
-                    } catch (e) {
-                        return false;
-                    }
-                });
-                
-                // Further filter based on search term
-                if (searchTerm) {
-                    const term = searchTerm.toLowerCase();
-                    filteredRequests = filteredRequests.filter(req => 
-                        (req.ID_Design && req.ID_Design.toString().includes(term)) ||
-                        (req.CompanyName && req.CompanyName.toLowerCase().includes(term)) ||
-                        (req.NOTES && req.NOTES.toLowerCase().includes(term)) ||
-                        (req.Note_Mockup && req.Note_Mockup.toLowerCase().includes(term)) ||
-                        (req.Full_Name_Contact && req.Full_Name_Contact.toLowerCase().includes(term))
-                    );
-                }
-                
-                // Remove duplicates based on ID_Design
-                const uniqueRequests = [];
-                const seenIds = new Set();
-                filteredRequests.forEach(req => {
-                    if (!seenIds.has(req.ID_Design)) {
-                        seenIds.add(req.ID_Design);
-                        uniqueRequests.push(req);
-                    }
-                });
-                
-                // Sort by date, newest first
-                uniqueRequests.sort((a, b) => new Date(b.Date_Created) - new Date(a.Date_Created));
-                
-                // Display results
-                if (uniqueRequests.length === 0) {
-                    resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No completed art requests found after June 15, 2025.</div>';
-                } else {
-                    resultsDiv.innerHTML = uniqueRequests.map(req => `
-                        <div class="request-item${selectedRequest && selectedRequest.ID_Design === req.ID_Design ? ' selected' : ''}" onclick="selectRequest('${req.ID_Design}', event)">
-                            <div class="request-info">
-                                <div class="request-details">
-                                    <h4>${req.NOTES || req.Note_Mockup || 'Untitled Project'}</h4>
-                                    <p>${req.CompanyName || 'Unknown Company'} ${req.Full_Name_Contact ? `- ${req.Full_Name_Contact}` : ''}</p>
-                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">
-                                        Sales Rep: ${req.CustomerServiceRep || 'Unknown'} | 
-                                        Type: ${getOrderType(req)} | 
-                                        ID: ${req.ID_Design}
-                                    </p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="font-size: 0.75rem; color: var(--text-secondary);">${formatDate(req.Date_Created)}</div>
-                                    ${req.Art_Minutes ? `<div style="font-size: 0.875rem; color: var(--accent-color); font-weight: 500;">${(req.Art_Minutes / 60).toFixed(2)} hrs</div>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error('Error searching requests:', error);
-                resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--danger-color);">Error loading requests</div>';
-            }
-        }
-        
-        // Select Art Request
-        async function selectRequest(idDesign, event) {
-            try {
-                // Fetch the specific request
-                const requests = await invoiceService.getArtRequests({ id_design: idDesign });
-                const request = requests.find(r => r.ID_Design == idDesign);
-                
-                if (!request) {
-                    showAlert('Request not found', 'error');
-                    return;
-                }
-                
-                // Check if invoice already exists
-                const existingInvoice = await invoiceService.checkExistingInvoice(idDesign);
-                if (existingInvoice) {
-                    showAlert(`An invoice already exists for this request (${existingInvoice.InvoiceID}). Please void it first.`, 'error');
-                    return;
-                }
-                
-                selectedRequest = request;
-                
-                // Update UI to show selection
-                document.querySelectorAll('.request-item').forEach(item => {
-                    item.classList.remove('selected');
-                });
-                event.target.closest('.request-item').classList.add('selected');
-                
-                // Show selected indicator
-                document.getElementById('selectedIndicator').style.display = 'block';
-                
-                // Fill in the invoice form
-                document.getElementById('customerName').value = request.Full_Name_Contact || '';
-                document.getElementById('customerCompany').value = request.CompanyName || '';
-                document.getElementById('customerEmail').value = request.Email_Contact || request.Email || '';
-                document.getElementById('artRequestId').value = request.ID_Design || '';
-                document.getElementById('projectName').value = request.NOTES || request.Note_Mockup || '';
-                
-                // Get and display sales rep
-                const salesRepEmail = request.User_Email || getSalesRepEmail(request.CustomerServiceRep || '');
-                const salesRepName = getSalesRepName(salesRepEmail);
-                document.getElementById('salesRepDisplay').value = `${salesRepName} (${salesRepEmail})`;
-                
-                // Show invoice number
-                const invoiceId = invoiceService.generateInvoiceID(idDesign);
-                document.getElementById('invoiceNumberDisplay').textContent = invoiceId;
-                
-                // Suggest service code based on time spent
-                if (request.Art_Minutes) {
-                    const suggestedCode = invoiceService.suggestServiceCode(request.Art_Minutes);
-                    if (suggestedCode && suggestedCode !== 'CUSTOM') {
-                        // Update the first service line with suggestion
-                        const firstSelect = document.querySelector('.service-select');
-                        if (firstSelect) {
-                            firstSelect.value = suggestedCode;
-                            updateServiceLine(firstSelect);
-                        }
-                    }
-                }
-                
-                // Show the invoice form
-                document.getElementById('invoiceForm').style.display = 'block';
-                
-                // Scroll to invoice
-                document.getElementById('invoiceForm').scrollIntoView({ behavior: 'smooth' });
-                
-            } catch (error) {
-                console.error('Error selecting request:', error);
-                showAlert('Error loading request details', 'error');
-            }
-        }
-        
-        // Helper function to get sales rep name from email
-        function getSalesRepName(repEmail) {
-            const repNames = {
-                'nika@nwcustomapparel.com': 'Nika Lao',
-                'taylar@nwcustomapparel.com': 'Taylar Hanson',
-                'ruth@nwcustomapparel.com': 'Ruth Nhong',
-                'erik@nwcustomapparel.com': 'Erik Mickelson',
-                'adriyella@nwcustomapparel.com': 'Adriyella',
-                'bradley@nwcustomapparel.com': 'Bradley Wright',
-                'jim@nwcustomapparel.com': 'Jim Mickelson',
-                'art@nwcustomapparel.com': 'Steve Deland',
-                'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
-            };
-            return repNames[repEmail] || 'Northwest Custom Apparel Sales Team';
-        }
-        
-        // Helper function to get sales rep email from name
-        function getSalesRepEmail(repName) {
-            const repEmails = {
-                'Nika Lao': 'nika@nwcustomapparel.com',
-                'Nika': 'nika@nwcustomapparel.com',
-                'Taylar': 'taylar@nwcustomapparel.com',
-                'Taylar Hanson': 'taylar@nwcustomapparel.com',
-                'Ruth Nhong': 'ruth@nwcustomapparel.com',
-                'Ruth': 'ruth@nwcustomapparel.com',
-                'Ruthie': 'ruth@nwcustomapparel.com',
-                'Erik Mickelson': 'erik@nwcustomapparel.com',
-                'Erik': 'erik@nwcustomapparel.com',
-                'Adriyella': 'adriyella@nwcustomapparel.com',
-                'Bradley Wright': 'bradley@nwcustomapparel.com',
-                'Bradley': 'bradley@nwcustomapparel.com',
-                'Jim Mickelson': 'jim@nwcustomapparel.com',
-                'Jim': 'jim@nwcustomapparel.com',
-                'Steve Deland': 'art@nwcustomapparel.com',
-                'Steve': 'art@nwcustomapparel.com'
-            };
-            return repEmails[repName] || 'sales@nwcustomapparel.com';
-        }
-        
-        // Add Service Line Item
-        function addServiceLineItem() {
-            serviceLineCount++;
-            const tbody = document.getElementById('serviceTableBody');
-            
-            // Get all available service codes
-            const serviceCodes = invoiceService.getAllServiceCodes(false); // Don't include rush versions in dropdown
-            
-            const row = document.createElement('tr');
-            row.className = 'service-line';
-            row.innerHTML = `
-                <td>
-                    <select class="service-select" onchange="updateServiceLine(this)" style="width: 100%;">
-                        <option value="">-- Select Service --</option>
-                        ${serviceCodes.filter(s => !s.isAdditional).map(service => 
-                            `<option value="${service.code}" data-amount="${service.amount}">${service.code} - ${service.name} ($${service.amount})</option>`
-                        ).join('')}
-                        <optgroup label="Additional Services">
-                            ${serviceCodes.filter(s => s.isAdditional).map(service => 
-                                `<option value="${service.code}" data-amount="${service.amount}">${service.code} - ${service.name} ($${service.amount})</option>`
-                            ).join('')}
-                        </optgroup>
-                        <option value="CUSTOM">Custom Service (Enter Amount)</option>
-                    </select>
-                    <input type="text" class="service-description" placeholder="Enter description..." 
-                           style="width: 100%; margin-top: 0.5rem; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 3px; font-size: 0.875rem; display: none;">
-                </td>
-                <td class="text-center">
-                    <input type="number" class="quantity-input" value="1" min="1" onchange="updateServiceLine(this)">
-                </td>
-                <td class="text-right">
-                    <span class="rate-display">$0.00</span>
-                    <input type="number" class="custom-rate" placeholder="0.00" step="0.01" min="0" 
-                           style="width: 80px; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 3px; font-size: 0.875rem; text-align: right; display: none;"
-                           onchange="updateServiceLine(this)">
-                </td>
-                <td class="text-right">
-                    <span class="line-total">$0.00</span>
-                    ${serviceLineCount > 1 ? '<button type="button" class="remove-line-btn" onclick="removeServiceLine(this)" style="margin-left: 1rem;"><i class="fas fa-trash"></i></button>' : ''}
-                </td>
-            `;
-            
-            tbody.appendChild(row);
-        }
-        
-        // Update Service Line
-        function updateServiceLine(element) {
-            const row = element.closest('tr');
-            const serviceSelect = row.querySelector('.service-select');
-            const descriptionInput = row.querySelector('.service-description');
-            const quantityInput = row.querySelector('.quantity-input');
-            const rateDisplay = row.querySelector('.rate-display');
-            const customRateInput = row.querySelector('.custom-rate');
-            const lineTotalSpan = row.querySelector('.line-total');
-            
-            const selectedCode = serviceSelect.value;
-            const quantity = parseInt(quantityInput.value) || 1;
-            
-            if (selectedCode === 'CUSTOM') {
-                // Show custom inputs
-                descriptionInput.style.display = 'block';
-                rateDisplay.style.display = 'none';
-                customRateInput.style.display = 'inline-block';
-                
-                const customRate = parseFloat(customRateInput.value) || 0;
-                const total = customRate * quantity;
-                lineTotalSpan.textContent = `$${total.toFixed(2)}`;
-                
-            } else if (selectedCode) {
-                // Get service details
-                const service = invoiceService.getServiceByCode(selectedCode);
-                if (service) {
-                    descriptionInput.style.display = 'block';
-                    descriptionInput.value = service.description;
-                    rateDisplay.style.display = 'inline';
-                    customRateInput.style.display = 'none';
-                    
-                    const rate = service.amount;
-                    rateDisplay.textContent = `$${rate.toFixed(2)}`;
-                    
-                    const total = rate * quantity;
-                    lineTotalSpan.textContent = `$${total.toFixed(2)}`;
-                }
-            } else {
-                // No service selected
-                descriptionInput.style.display = 'none';
-                rateDisplay.style.display = 'inline';
-                customRateInput.style.display = 'none';
-                rateDisplay.textContent = '$0.00';
-                lineTotalSpan.textContent = '$0.00';
-            }
-            
-            // Update totals
-            calculateTotals();
-        }
-        
-        // Remove Service Line
-        function removeServiceLine(button) {
-            const row = button.closest('tr');
-            row.remove();
-            serviceLineCount--;
-            calculateTotals();
-        }
-        
-        // Calculate Totals
-        function calculateTotals() {
-            let subtotal = 0;
-            
-            // Calculate service lines total
-            document.querySelectorAll('.service-line').forEach(row => {
-                const totalText = row.querySelector('.line-total').textContent;
-                const total = parseFloat(totalText.replace('$', '')) || 0;
-                subtotal += total;
-            });
-            
-            // Calculate tax
-            const applyTax = document.getElementById('applyTax').checked;
-            const taxRate = 0.102; // 10.20%
-            const taxAmount = applyTax ? subtotal * taxRate : 0;
-            const grandTotal = subtotal + taxAmount;
-            
-            // Update displays
-            document.getElementById('subtotalDisplay').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('taxDisplay').textContent = `$${taxAmount.toFixed(2)}`;
-            document.getElementById('grandTotalDisplay').textContent = `$${grandTotal.toFixed(2)}`;
-        }
-        
-        // Handle Tax Toggle
-        function handleTaxToggle() {
-            const applyTax = document.getElementById('applyTax').checked;
-            const resellerSection = document.getElementById('resellerSection');
-            
-            if (!applyTax) {
-                resellerSection.style.display = 'block';
-            } else {
-                resellerSection.style.display = 'none';
-                document.getElementById('resellerPermit').value = '';
-            }
-            
-            calculateTotals();
-        }
-        
-        // Show Alert
-        function showAlert(message, type = 'success') {
-            const alertContainer = document.getElementById('alertContainer');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                <span>${message}</span>
-            `;
-            
-            alertContainer.appendChild(alert);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
-        }
-        
-        // Handle Form Submit
-        async function handleSubmit(e) {
-            e.preventDefault();
-            
-            if (!selectedRequest) {
-                showAlert('Please select an art request first', 'error');
-                return;
-            }
-            
-            // Validate reseller permit if tax exempt
-            if (!document.getElementById('applyTax').checked) {
-                const permit = document.getElementById('resellerPermit').value.trim();
-                if (!permit) {
-                    showAlert('Reseller permit number is required for tax exemption', 'error');
-                    return;
-                }
-            }
-            
-            // Gather service items
-            const serviceItems = [];
-            let hasValidService = false;
-            
-            document.querySelectorAll('.service-line').forEach(row => {
-                const serviceSelect = row.querySelector('.service-select');
-                const descriptionInput = row.querySelector('.service-description');
-                const quantityInput = row.querySelector('.quantity-input');
-                const customRateInput = row.querySelector('.custom-rate');
-                const lineTotalText = row.querySelector('.line-total').textContent;
-                
-                const code = serviceSelect.value;
-                if (code) {
-                    hasValidService = true;
-                    const quantity = parseInt(quantityInput.value) || 1;
-                    const total = parseFloat(lineTotalText.replace('$', '')) || 0;
-                    
-                    if (code === 'CUSTOM') {
-                        serviceItems.push({
-                            code: 'CUSTOM',
-                            description: descriptionInput.value || 'Custom Art Service',
-                            quantity: quantity,
-                            rate: parseFloat(customRateInput.value) || 0,
-                            amount: total
-                        });
-                    } else {
-                        const service = invoiceService.getServiceByCode(code);
-                        serviceItems.push({
-                            code: code,
-                            description: descriptionInput.value || service.description,
-                            quantity: quantity,
-                            rate: service.amount,
-                            amount: total
-                        });
-                    }
-                }
-            });
-            
-            if (!hasValidService) {
-                showAlert('Please add at least one service', 'error');
-                return;
-            }
-            
-            // Calculate totals
-            const subtotal = serviceItems.reduce((sum, item) => sum + item.amount, 0);
-            const applyTax = document.getElementById('applyTax').checked;
-            const taxAmount = applyTax ? subtotal * 0.102 : 0;
-            const grandTotal = subtotal + taxAmount;
-            
-            // Get sales rep info
-            const salesRepEmail = selectedRequest.User_Email || getSalesRepEmail(selectedRequest.CustomerServiceRep || '');
-            const salesRepName = getSalesRepName(salesRepEmail);
-            
-            // Prepare invoice data
-            const invoiceData = {
-                idDesign: selectedRequest.ID_Design,
-                
-                // Customer info
-                customerName: document.getElementById('customerName').value,
-                customerCompany: document.getElementById('customerCompany').value,
-                customerEmail: document.getElementById('customerEmail').value,
-                
-                // Sales rep info
-                salesRepName: salesRepName,
-                salesRepEmail: salesRepEmail,
-                
-                // Project info
-                projectName: document.getElementById('projectName').value,
-                originalRequestDate: selectedRequest.Date_Created,
-                completionDate: new Date(),
-                
-                // Service items (as object for processing)
-                serviceItems: serviceItems,
-                serviceSummary: serviceItems.map(item => `${item.code}: ${item.description}`).join('; '),
-                
-                // Amounts
-                subtotalAmount: subtotal,
-                rushFee: 0, // Not used in service code model
-                revisionFee: 0, // Not used in service code model
-                otherFees: 0, // Not used in service code model
-                taxAmount: taxAmount,
-                totalCost: grandTotal,
-                
-                // Notes
-                customerNotes: document.getElementById('customerNotes').value,
-                notes: document.getElementById('internalNotes').value,
-                
-                // Status
-                status: document.getElementById('saveAsDraft').checked ? 'Draft' : 'Sent',
-                
-                // Additional fields
-                artistName: 'Steve Deland',
-                artistEmail: 'art@nwcustomapparel.com',
-                ccEmails: 'erik@nwcustomapparel.com',
-                createdBy: salesRepName
-            };
-            
-            // Get submit button reference
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            
-            try {
-                // Show loading
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
-                submitBtn.disabled = true;
-                
-                // Log the invoice data for debugging
-                console.log('Invoice data being sent:', invoiceData);
-                
-                // Create invoice
-                const result = await invoiceService.createInvoice(invoiceData);
-                
-                if (result.success) {
-                    showAlert(`Invoice ${result.invoiceID} created successfully!`, 'success');
-                    
-                    // Redirect to invoice view
-                    setTimeout(() => {
-                        window.location.href = `/art-invoice-view.html?id=${result.invoiceID}`;
-                    }, 1500);
-                } else {
-                    throw new Error(result.error || 'Failed to create invoice');
-                }
-                
-            } catch (error) {
-                console.error('Error creating invoice:', error);
-                showAlert(error.message || 'Failed to create invoice', 'error');
-                
-                // Restore button
-                if (submitBtn) {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                }
-            }
-        }
-    </script>
+    <!-- Art Invoice Creator Page-Specific JavaScript -->
+    <script src="../js/art-invoice-creator.js"></script>
 </body>
 </html>

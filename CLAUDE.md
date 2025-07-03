@@ -154,6 +154,14 @@ Service ID: service_1c4k67j
 - Key findings about API behavior and best practices
 - Test commands and examples for reference
 
+### Artwork Display System
+@memory/ARTWORK_DISPLAY_GUIDE.md
+- Complete guide for implementing artwork display and viewing
+- CDN integration and URL pattern recognition
+- Thumbnail generation and modal gallery systems
+- Helper functions for artwork detection and management
+- Mobile-responsive modal with navigation and download features
+
 
 
 
