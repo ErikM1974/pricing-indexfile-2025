@@ -268,15 +268,56 @@
             background: var(--hover-bg);
         }
 
-        /* Status Badges */
+        /* Visual Status Stripes - Phase 1 Improvements */
+        .data-table tbody tr {
+            transition: background 0.2s;
+        }
+
+        .data-table tbody tr[data-status="needs-invoice"],
+        .data-table tbody tr[data-status="new"] {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .data-table tbody tr[data-status="awaiting-approval"] {
+            border-left: 4px solid #9333ea; /* Purple */
+        }
+
+        .data-table tbody tr[data-status="completed"] {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .data-table tbody tr[data-status="draft"] {
+            border-left: 4px solid #6b7280; /* Gray */
+        }
+
+        .data-table tbody tr[data-status="sent"],
+        .data-table tbody tr[data-status="pending"] {
+            border-left: 4px solid var(--info-color);
+        }
+
+        .data-table tbody tr[data-status="paid"] {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .data-table tbody tr[data-status="overdue"] {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        /* Status Badges - Enhanced with icons and size */
         .status-badge {
             display: inline-flex;
             align-items: center;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 500;
+            gap: 0.375rem;
+            padding: 0.375rem 0.875rem;
+            font-size: 0.875rem;
+            font-weight: 600;
             border-radius: 9999px;
             white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .status-badge i {
+            font-size: 0.75rem;
         }
 
         .status-badge.draft {
@@ -307,6 +348,65 @@
         .status-badge.needs-invoice {
             background: #fef3c7;
             color: #92400e;
+        }
+        
+        .status-badge.needs-invoice.new {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-badge.needs-invoice.awaiting-approval {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+        
+        .status-badge.needs-invoice.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Age Warning */
+        .age-warning {
+            display: inline-block;
+            margin-left: 0.5rem;
+            padding: 0.125rem 0.5rem;
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 9999px;
+        }
+        
+        /* Email Status Info */
+        .email-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-left: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .email-status i {
+            font-size: 0.625rem;
+        }
+
+        /* Reminder count indicator */
+        .reminder-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-left: 0.5rem;
+            padding: 0.125rem 0.5rem;
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .reminder-count i {
+            font-size: 0.625rem;
         }
 
         /* Action Buttons */
@@ -959,6 +1059,81 @@
             }
         }
 
+        /* Date Filter Styles */
+        .date-filter-container {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .date-filter-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .date-filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .date-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-input-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .date-input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            background: white;
+            color: var(--text-primary);
+            min-width: 140px;
+            cursor: pointer;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: var(--focus-shadow);
+        }
+
+        .date-filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .date-filter-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-filter-info i {
+            color: var(--info-color);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-container {
@@ -1057,6 +1232,38 @@
                     Clear
                 </button>
             </form>
+        </div>
+
+        <!-- Date Filter -->
+        <div class="date-filter-container">
+            <div class="date-filter-header">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Date Filter</span>
+            </div>
+            <div class="date-filter-controls">
+                <div class="date-input-group">
+                    <label class="date-input-label" for="dateFrom">From:</label>
+                    <input type="date" id="dateFrom" class="date-input" value="2025-06-26">
+                </div>
+                <div class="date-input-group">
+                    <label class="date-input-label" for="dateTo">To:</label>
+                    <input type="date" id="dateTo" class="date-input" value="2025-07-03">
+                </div>
+                <div class="date-filter-actions">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="applyDateFilter()">
+                        <i class="fas fa-filter"></i>
+                        Apply Filter
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="clearDateFilter()">
+                        <i class="fas fa-times"></i>
+                        Clear Dates
+                    </button>
+                </div>
+            </div>
+            <div class="date-filter-info">
+                <i class="fas fa-info-circle"></i>
+                <span id="dateFilterInfo">Showing art requests from the last 7 days. Clear dates to see all records.</span>
+            </div>
         </div>
 
         <!-- Tabs -->
@@ -1451,9 +1658,84 @@
         let allInvoices = [];
         let filteredData = [];
 
+        // Date filter functions
+        function getDateFilters() {
+            const dateFrom = document.getElementById('dateFrom')?.value;
+            const dateTo = document.getElementById('dateTo')?.value;
+            
+            const filters = {};
+            if (dateFrom) {
+                filters.dateCreatedFrom = dateFrom;
+            }
+            if (dateTo) {
+                filters.dateCreatedTo = dateTo;
+            }
+            
+            return filters;
+        }
+
+        function applyDateFilter() {
+            // Get date values
+            const dateFrom = document.getElementById('dateFrom')?.value;
+            const dateTo = document.getElementById('dateTo')?.value;
+            
+            // Update info text
+            const dateFilterInfo = document.getElementById('dateFilterInfo');
+            if (dateFilterInfo) {
+                if (dateFrom && dateTo) {
+                    const fromDate = new Date(dateFrom).toLocaleDateString();
+                    const toDate = new Date(dateTo).toLocaleDateString();
+                    dateFilterInfo.textContent = `Showing art requests from ${fromDate} to ${toDate}`;
+                } else if (dateFrom) {
+                    const fromDate = new Date(dateFrom).toLocaleDateString();
+                    dateFilterInfo.textContent = `Showing art requests from ${fromDate}`;
+                } else if (dateTo) {
+                    const toDate = new Date(dateTo).toLocaleDateString();
+                    dateFilterInfo.textContent = `Showing art requests up to ${toDate}`;
+                } else {
+                    dateFilterInfo.textContent = 'Showing all art requests';
+                }
+            }
+            
+            // Reload data with filters
+            loadData();
+        }
+
+        function clearDateFilter() {
+            // Clear date inputs
+            const dateFrom = document.getElementById('dateFrom');
+            const dateTo = document.getElementById('dateTo');
+            if (dateFrom) dateFrom.value = '';
+            if (dateTo) dateTo.value = '';
+            
+            // Update info text
+            const dateFilterInfo = document.getElementById('dateFilterInfo');
+            if (dateFilterInfo) {
+                dateFilterInfo.textContent = 'Showing all art requests. Use the date filter to limit results.';
+            }
+            
+            // Reload data without filters
+            loadData();
+        }
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             emailjs.init('4qSbDO-SQs19TbP80');
+            
+            // Set default date range (7 days ago to today)
+            const today = new Date();
+            const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            const dateFromInput = document.getElementById('dateFrom');
+            const dateToInput = document.getElementById('dateTo');
+            
+            if (dateFromInput) {
+                dateFromInput.value = sevenDaysAgo.toISOString().split('T')[0];
+            }
+            if (dateToInput) {
+                dateToInput.value = today.toISOString().split('T')[0];
+            }
+            
             loadData();
         });
 
@@ -1461,9 +1743,18 @@
         async function loadData() {
             showLoading();
             try {
+                // Get date filters
+                const dateFilters = getDateFilters();
+                
+                // Build art request filters
+                const artRequestFilters = {
+                    ...dateFilters,
+                    limit: 1000  // Still set a reasonable limit
+                };
+                
                 // Fetch both art requests and invoices in parallel
                 const [requests, invoices] = await Promise.all([
-                    invoiceService.getArtRequests().catch(err => {
+                    invoiceService.getArtRequests(artRequestFilters).catch(err => {
                         console.error('Failed to load art requests:', err);
                         return [];
                     }),
@@ -1674,13 +1965,23 @@
                     }
                 }
                 
+                // Determine status for visual stripe
+                const status = req.Status === 'Awaiting Approval 🟣' ? 'awaiting-approval' : 
+                              req.Status === 'Completed ✅' ? 'completed' : 'new';
+                row.setAttribute('data-status', status);
+                
                 row.innerHTML = `
                     <td><strong>${req.ID_Design || '-'}</strong></td>
                     <td class="artwork-cell">${createArtworkThumbnail(req)}</td>
                     <td>${req.CompanyName || '-'}</td>
                     <td>${formatDate(req.Date_Created)}</td>
                     <td>
-                        <span class="status-badge needs-invoice">${req.Status || 'New'}</span>
+                        <span class="status-badge needs-invoice ${status}">
+                            ${status === 'awaiting-approval' ? '<i class="fas fa-clock"></i> ' : ''}
+                            ${status === 'completed' ? '<i class="fas fa-check-circle"></i> ' : ''}
+                            ${status === 'new' ? '<i class="fas fa-star"></i> ' : ''}
+                            ${req.Status || 'New'}
+                        </span>
                         ${ageWarning}
                     </td>
                     <td>${req.Art_Minutes || 0} min</td>
@@ -1738,6 +2039,7 @@
                 <tr>
                     ${showCheckbox ? '<th style="width: 40px;"><input type="checkbox" id="selectAllInvoices" onchange="toggleAllInvoices()"></th>' : ''}
                     <th>Invoice ID</th>
+                    <th>Art</th>
                     <th>Customer</th>
                     <th>Project</th>
                     <th>Amount</th>
@@ -1755,9 +2057,43 @@
                 const status = getStatusBadge(inv);
                 const actions = getQuickActions(inv);
                 
+                // Set data-status attribute based on invoice status
+                let statusAttr = (inv.Status || 'draft').toLowerCase();
+                if (statusAttr === 'pending') statusAttr = 'sent';
+                if (statusAttr === 'completed') statusAttr = 'paid';
+                
+                // Check if overdue
+                if (statusAttr !== 'paid' && statusAttr !== 'voided') {
+                    const dueDate = new Date(inv.DueDate);
+                    if (dueDate < new Date()) {
+                        statusAttr = 'overdue';
+                    }
+                }
+                
+                row.setAttribute('data-status', statusAttr);
+                
+                // Get artwork for invoice - need to find the related art request
+                let artworkThumbnail = '<div class="no-artwork">No artwork</div>';
+                if (inv.ArtRequestID) {
+                    // Extract the numeric ID from the invoice ID (e.g., "ART-52483" -> "52483")
+                    const artRequestId = inv.InvoiceID.replace('ART-', '');
+                    
+                    // Find the art request by matching ID_Design
+                    // Convert both to strings to ensure proper comparison
+                    const artRequest = allArtRequests.find(req => 
+                        String(req.ID_Design) === String(artRequestId) || 
+                        String(req.ID_Design) === String(inv.ArtRequestID)
+                    );
+                    
+                    if (artRequest) {
+                        artworkThumbnail = createArtworkThumbnail(artRequest);
+                    }
+                }
+                
                 row.innerHTML = `
                     ${showCheckbox ? `<td><input type="checkbox" class="invoice-checkbox" value="${inv.InvoiceID}" data-pk="${inv.PK_ID}"></td>` : ''}
                     <td><strong>${inv.InvoiceID}</strong></td>
+                    <td class="artwork-cell">${artworkThumbnail}</td>
                     <td>
                         ${inv.CustomerName || '-'}<br>
                         <small class="text-secondary">${inv.CustomerCompany || ''}</small>
@@ -1792,11 +2128,60 @@
             if (status !== 'Paid' && status !== 'Completed' && status !== 'Voided') {
                 const dueDate = new Date(invoice.DueDate);
                 if (dueDate < new Date()) {
-                    return '<span class="status-badge overdue">Overdue</span>';
+                    const daysOverdue = Math.floor((new Date() - dueDate) / (1000 * 60 * 60 * 24));
+                    return `<span class="status-badge overdue">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Overdue${daysOverdue > 0 ? ` (${daysOverdue}d)` : ''}
+                    </span>`;
                 }
             }
             
-            return `<span class="status-badge ${statusClass}">${status}</span>`;
+            // Add icons based on status
+            let icon = '';
+            let displayStatus = status;
+            let additionalInfo = '';
+            
+            switch(status.toLowerCase()) {
+                case 'draft':
+                    icon = '<i class="fas fa-pencil-alt"></i> ';
+                    break;
+                case 'sent':
+                case 'pending':
+                    icon = '<i class="fas fa-paper-plane"></i> ';
+                    displayStatus = 'Sent';
+                    // Add email sent info if available
+                    if (invoice.EmailSentDate) {
+                        const sentDate = new Date(invoice.EmailSentDate);
+                        const daysSent = Math.floor((new Date() - sentDate) / (1000 * 60 * 60 * 24));
+                        additionalInfo = `<span class="email-status">
+                            <i class="fas fa-clock"></i> ${daysSent}d ago
+                        </span>`;
+                    }
+                    // Add reminder count if available
+                    if (invoice.ReminderCount && invoice.ReminderCount > 0) {
+                        additionalInfo += `<span class="reminder-count" title="${invoice.ReminderCount} reminder${invoice.ReminderCount !== 1 ? 's' : ''} sent">
+                            <i class="fas fa-bell"></i> ${invoice.ReminderCount}
+                        </span>`;
+                    }
+                    break;
+                case 'paid':
+                case 'completed':
+                    icon = '<i class="fas fa-check-circle"></i> ';
+                    displayStatus = 'Paid';
+                    // Add payment date if available
+                    if (invoice.PaymentDate) {
+                        const payDate = new Date(invoice.PaymentDate);
+                        additionalInfo = `<span class="email-status">
+                            <i class="fas fa-calendar-check"></i> ${payDate.toLocaleDateString()}
+                        </span>`;
+                    }
+                    break;
+                case 'voided':
+                    icon = '<i class="fas fa-ban"></i> ';
+                    break;
+            }
+            
+            return `<span class="status-badge ${statusClass}">${icon}${displayStatus}</span>${additionalInfo}`;
         }
 
         // Get quick actions HTML

@@ -172,6 +172,8 @@ class ArtInvoiceServiceV2 {
             if (filters.customerServiceRep) queryParams.append('customerServiceRep', filters.customerServiceRep);
             if (filters.salesRep) queryParams.append('salesRep', filters.salesRep);
             if (filters.invoiced !== undefined) queryParams.append('invoiced', filters.invoiced);
+            if (filters.dateCreatedFrom) queryParams.append('dateCreatedFrom', filters.dateCreatedFrom);
+            if (filters.dateCreatedTo) queryParams.append('dateCreatedTo', filters.dateCreatedTo);
             if (filters.limit) queryParams.append('limit', filters.limit);
             if (filters.pageNumber) queryParams.append('pageNumber', filters.pageNumber);
             if (filters.pageSize) queryParams.append('pageSize', filters.pageSize);
