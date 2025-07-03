@@ -2273,12 +2273,6 @@
                     return;
                 }
                 
-                // Check if invoice already exists
-                const existingInvoice = await invoiceService.checkExistingInvoice(idDesign);
-                if (existingInvoice) {
-                    showAlert(`An invoice already exists for this request (${existingInvoice.InvoiceID}). Please void it first.`, 'error');
-                    return;
-                }
                 
                 selectedRequest = request;
                 

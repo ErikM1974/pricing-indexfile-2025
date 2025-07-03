@@ -364,6 +364,17 @@
             background: #d1fae5;
             color: #065f46;
         }
+        
+        /* Special styling for completed items that need invoicing */
+        .status-badge.ready-to-invoice {
+            background: #fed7aa;
+            color: #9a3412;
+            border: 1px solid #fb923c;
+        }
+        
+        .data-table tbody tr[data-status="ready-to-invoice"] {
+            border-left: 4px solid #fb923c; /* Orange */
+        }
 
         /* Age Warning */
         .age-warning {
@@ -375,6 +386,24 @@
             font-size: 0.75rem;
             font-weight: 600;
             border-radius: 9999px;
+        }
+        
+        /* Days Waiting Badge for Completed Items */
+        .days-waiting-badge {
+            display: inline-block;
+            margin-left: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            background: #fee2e2;
+            color: #dc2626;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid #fca5a5;
+        }
+        
+        .days-waiting-badge i {
+            font-size: 0.625rem;
+            margin-right: 0.25rem;
         }
         
         /* Email Status Info */
@@ -1802,9 +1831,18 @@
                 'all': allInvoices.length
             };
 
+            // Build a map of active invoices (excluding voided/deleted)
+            const activeInvoiceMap = new Map();
+            allInvoices.forEach(inv => {
+                if (inv.Status !== 'Voided' && inv.Status !== 'Cancelled' && !inv.IsDeleted) {
+                    const artRequestId = inv.InvoiceID.replace('ART-', '');
+                    activeInvoiceMap.set(artRequestId, inv);
+                }
+            });
+            
             // Count art requests that need invoices
             allArtRequests.forEach(req => {
-                if (!invoiceMap.has(req.ID_Design)) {
+                if (!activeInvoiceMap.has(req.ID_Design)) {
                     counts['needs-invoice']++;
                 }
             });
@@ -1878,7 +1916,12 @@
         // Display art requests that need invoices
         function displayNeedsInvoice() {
             const invoiceMap = new Map();
+            // Only consider active invoices (exclude voided/deleted)
             allInvoices.forEach(inv => {
+                // Skip voided, cancelled, or deleted invoices
+                if (inv.Status === 'Voided' || inv.Status === 'Cancelled' || inv.IsDeleted) {
+                    return;
+                }
                 const artRequestId = inv.InvoiceID.replace('ART-', '');
                 invoiceMap.set(artRequestId, inv);
             });
@@ -1967,8 +2010,36 @@
                 
                 // Determine status for visual stripe
                 const status = req.Status === 'Awaiting Approval 🟣' ? 'awaiting-approval' : 
-                              req.Status === 'Completed ✅' ? 'completed' : 'new';
+                              req.Status === 'Completed ✅' ? 'ready-to-invoice' : 'new';
                 row.setAttribute('data-status', status);
+                
+                // Create custom status display for items needing invoices
+                let statusDisplay = '';
+                let statusClass = '';
+                let daysWaitingBadge = '';
+                
+                if (req.Status === 'Completed ✅') {
+                    statusDisplay = '<i class="fas fa-file-invoice"></i> Ready to Invoice';
+                    statusClass = 'ready-to-invoice';
+                    
+                    // Calculate days since completion if Date_Updated is available
+                    if (req.Date_Updated) {
+                        const completedDate = new Date(req.Date_Updated);
+                        const now = new Date();
+                        const daysWaiting = Math.floor((now - completedDate) / (1000 * 60 * 60 * 24));
+                        if (daysWaiting > 0) {
+                            daysWaitingBadge = `<span class="days-waiting-badge" title="Completed ${daysWaiting} day${daysWaiting !== 1 ? 's' : ''} ago">
+                                <i class="fas fa-exclamation-triangle"></i> ${daysWaiting}d
+                            </span>`;
+                        }
+                    }
+                } else if (req.Status === 'Awaiting Approval 🟣') {
+                    statusDisplay = '<i class="fas fa-clock"></i> ' + req.Status;
+                    statusClass = 'awaiting-approval';
+                } else {
+                    statusDisplay = '<i class="fas fa-star"></i> ' + (req.Status || 'New');
+                    statusClass = 'new';
+                }
                 
                 row.innerHTML = `
                     <td><strong>${req.ID_Design || '-'}</strong></td>
@@ -1976,19 +2047,17 @@
                     <td>${req.CompanyName || '-'}</td>
                     <td>${formatDate(req.Date_Created)}</td>
                     <td>
-                        <span class="status-badge needs-invoice ${status}">
-                            ${status === 'awaiting-approval' ? '<i class="fas fa-clock"></i> ' : ''}
-                            ${status === 'completed' ? '<i class="fas fa-check-circle"></i> ' : ''}
-                            ${status === 'new' ? '<i class="fas fa-star"></i> ' : ''}
-                            ${req.Status || 'New'}
+                        <span class="status-badge ${statusClass}">
+                            ${statusDisplay}
                         </span>
+                        ${daysWaitingBadge}
                         ${ageWarning}
                     </td>
                     <td>${req.Art_Minutes || 0} min</td>
                     <td>${getFirstNameFromEmail(req.User_Email) || req.CustomerServiceRep || '-'}</td>
                     <td>
                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                            <a href="/calculators/art-invoice-creator.html?id=${req.ID_Design}" class="btn btn-success btn-sm">
+                            <a href="/calculators/art-invoice-creator.html?id=${req.ID_Design}" class="btn btn-warning btn-sm">
                                 <i class="fas fa-file-invoice"></i>
                                 Create Invoice
                             </a>

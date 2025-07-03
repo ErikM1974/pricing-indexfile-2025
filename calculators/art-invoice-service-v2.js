@@ -365,7 +365,7 @@ class ArtInvoiceServiceV2 {
             // Check for existing invoice
             const existingInvoice = await this.checkExistingInvoice(invoiceData.idDesign);
             if (existingInvoice) {
-                throw new Error(`Invoice already exists for Design #${invoiceData.idDesign} (${existingInvoice.InvoiceID}). Please void the existing invoice first.`);
+                throw new Error(`An invoice already exists for this request (${existingInvoice.InvoiceID}). Please void it first.`);
             }
             
             const invoiceID = this.generateInvoiceID(invoiceData.idDesign);
