@@ -239,57 +239,8 @@
 
         // Artwork Helper Functions are now loaded from art-invoice-utils.js
 
-        // Parse service items from Notes field (for backward compatibility)
-        function parseServiceItemsFromNotes(notes) {
-            if (!notes || !notes.includes('--- Service Items ---')) {
-                return null;
-            }
-
-            const serviceItems = [];
-            const lines = notes.split('\n');
-            let inServiceSection = false;
-
-            for (const line of lines) {
-                const trimmed = line.trim();
-                
-                if (trimmed === '--- Service Items ---') {
-                    inServiceSection = true;
-                    continue;
-                }
-                
-                if (inServiceSection && trimmed.startsWith('Summary:')) {
-                    break; // End of service items section
-                }
-                
-                if (inServiceSection && trimmed.match(/^\d+\.\s+([A-Z]+-[A-Z0-9]+):/)) {
-                    // Parse line like: "1. GRT-50: Logo mockup description"
-                    const match = trimmed.match(/^\d+\.\s+([A-Z]+-[A-Z0-9]+):\s*(.+)/);
-                    if (match) {
-                        const code = match[1];
-                        const description = match[2];
-                        
-                        // Look for the next line with quantity and amount
-                        const nextLineIndex = lines.indexOf(line) + 1;
-                        if (nextLineIndex < lines.length) {
-                            const nextLine = lines[nextLineIndex].trim();
-                            const amountMatch = nextLine.match(/Amount:\s*\$([0-9,]+\.?[0-9]*)/);
-                            const quantityMatch = nextLine.match(/Quantity:\s*([0-9]+)/);
-                            
-                            if (amountMatch) {
-                                serviceItems.push({
-                                    code: code,
-                                    description: description,
-                                    quantity: quantityMatch ? parseInt(quantityMatch[1]) : 1,
-                                    amount: parseFloat(amountMatch[1].replace(',', ''))
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-
-            return serviceItems.length > 0 ? serviceItems : null;
-        }
+        // DELETED: parseServiceItemsFromNotes - Now using superior regex-based version from art-invoice-utils.js
+        // The shared utility version handles all service code patterns more reliably
 
         function displayInvoiceArtwork(artRequest) {
             const artworkSection = document.getElementById('artworkSection');
@@ -298,32 +249,21 @@
                 return;
             }
 
-            const cdnFields = [
-                { field: 'CDN_Link', label: 'Artwork 1' },
-                { field: 'CDN_Link_Two', label: 'Artwork 2' },
-                { field: 'CDN_Link_Three', label: 'Artwork 3' },
-                { field: 'CDN_Link_Four', label: 'Artwork 4' }
-            ];
+            const artworks = getAllArtworks(artRequest);
             
             let artworkHTML = '<h3>Associated Artwork</h3>';
             artworkHTML += '<div class="artwork-grid">';
             
-            let hasAnyArtwork = false;
-            
-            cdnFields.forEach(({ field, label }) => {
-                if (hasArtwork(artRequest[field])) {
-                    hasAnyArtwork = true;
-                    artworkHTML += `
-                        <div class="artwork-item" onclick="showArtworkModal('${artRequest[field]}', '${label}')">
-                            <img src="${artRequest[field]}" alt="${label}" 
-                                 onerror="this.parentElement.style.display='none'">
-                            <label>${label}</label>
-                        </div>
-                    `;
-                }
-            });
-            
-            if (!hasAnyArtwork) {
+            if (artworks.length > 0) {
+                // Pass the full artRequest object to enable gallery navigation
+                artworkHTML += `
+                    <div class="artwork-item" onclick='showArtworkModal(${JSON.stringify(artRequest).replace(/'/g, "&#39;")})' style="cursor: pointer;">
+                        <img src="${artworks[0].url}" alt="${artworks[0].label}" 
+                             onerror="this.parentElement.style.display='none'">
+                        <label>${artworks.length} artwork file${artworks.length > 1 ? 's' : ''} - Click to view</label>
+                    </div>
+                `;
+            } else {
                 artworkHTML += '<p class="no-artwork">No artwork files available for this design.</p>';
             }
             
@@ -354,7 +294,8 @@
             invoiceId = urlParams.get('id');
             
             if (!invoiceId) {
-                showError('No invoice ID provided');
+                showAlert('No invoice ID provided', 'error');
+                document.getElementById('loadingContainer').style.display = 'none';
                 return;
             }
             
@@ -369,7 +310,8 @@
                 const invoices = await invoiceService.getInvoices({ invoiceID: invoiceId });
                 
                 if (!invoices || invoices.length === 0) {
-                    showError('Invoice not found');
+                    showAlert('Invoice not found', 'error');
+                    document.getElementById('loadingContainer').style.display = 'none';
                     return;
                 }
                 
@@ -399,7 +341,8 @@
                 
             } catch (error) {
                 console.error('Error loading invoice:', error);
-                showError('Error loading invoice');
+                showAlert('Error loading invoice', 'error');
+                document.getElementById('loadingContainer').style.display = 'none';
             }
         }
         
@@ -760,20 +703,6 @@
                     document.getElementById('emailBtn').innerHTML = '<i class="fas fa-envelope"></i> Resend Invoice';
                 }
             }
-        }
-        
-        // Show Error - Custom implementation for this page
-        function showError(message) {
-            document.getElementById('loadingContainer').innerHTML = `
-                <div style="text-align: center; color: var(--error-text);">
-                    <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                    <p>${message}</p>
-                    <button class="btn btn-secondary" onclick="window.history.back()" style="margin-top: 1rem;">
-                        <i class="fas fa-arrow-left"></i>
-                        Go Back
-                    </button>
-                </div>
-            `;
         }
         
         // Date and status functions are now loaded from art-invoice-utils.js
