@@ -13,7 +13,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <!-- Art Invoice Service V2 - Using dedicated API endpoints -->
-    <script src="art-invoice-service-v2.js?v=2.1"></script>
+    <script src="art-invoice-service-v2.js?v=3.0&cache=bust"></script>
     
     <style>
         /* Root variables - Professional Invoice Theme */
@@ -1666,61 +1666,112 @@
             document.getElementById('invoiceDate').value = today.toISOString().split('T')[0];
             document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
             
-            // Parse URL parameters for deep linking
+            // Parse URL parameters for deep linking and edit mode
             const urlParams = new URLSearchParams(window.location.search);
             const designIdFromUrl = urlParams.get('id');
+            const editIdFromUrl = urlParams.get('edit');
             
-            if (designIdFromUrl) {
-                console.log('Deep link detected - Design ID:', designIdFromUrl);
+            // Determine mode and ID
+            const isEditMode = !!editIdFromUrl;
+            const targetId = editIdFromUrl || designIdFromUrl;
+            
+            if (targetId) {
+                console.log(isEditMode ? 'Edit mode detected - Design ID:' : 'Deep link detected - Design ID:', targetId);
                 
                 try {
                     // Show loading state
-                    document.getElementById('requestResults').innerHTML = '<div style="padding: 2rem; text-align: center;"><div class="loading"></div><p>Loading art request...</p></div>';
+                    const loadingMessage = isEditMode ? 'Loading existing invoice for editing...' : 'Loading art request...';
+                    document.getElementById('requestResults').innerHTML = `<div style="padding: 2rem; text-align: center;"><div class="loading"></div><p>${loadingMessage}</p></div>`;
                     document.getElementById('requestResults').style.display = 'block';
                     
-                    // Fetch the specific request
-                    const requests = await invoiceService.getArtRequests({ id_design: designIdFromUrl });
-                    const request = requests.find(r => r.ID_Design == designIdFromUrl);
-                    
-                    if (request) {
-                        console.log('Art request loaded:', request);
+                    if (isEditMode) {
+                        // Edit mode: Load existing invoice for editing
+                        console.log('Loading invoice for editing:', targetId);
+                        const editResult = await invoiceService.getInvoiceForEdit(targetId);
                         
-                        // Hide the search section
-                        document.getElementById('searchSection').style.display = 'none';
+                        if (editResult.success) {
+                            const editData = editResult.data;
+                            console.log('Invoice loaded for editing:', editData);
+                            
+                            // Hide the search section
+                            document.getElementById('searchSection').style.display = 'none';
+                            
+                            // Select the art request
+                            if (editData.artRequest) {
+                                selectedRequest = editData.artRequest;
+                                
+                                // Clear loading state
+                                document.getElementById('requestResults').innerHTML = '';
+                                document.getElementById('requestResults').style.display = 'none';
+                                
+                                // Show form section
+                                const formSection = document.getElementById('formSection');
+                                if (formSection) {
+                                    formSection.style.display = 'block';
+                                }
+                                
+                                // Pre-populate form with existing invoice data
+                                await populateFormForEdit(editData);
+                                
+                                // Update preview
+                                if (typeof updateInvoicePreview === 'function') {
+                                    setTimeout(updateInvoicePreview, 500);
+                                }
+                                
+                                // Show edit mode indicator
+                                showEditModeIndicator(editData.invoice.InvoiceID);
+                                
+                            } else {
+                                throw new Error('Art request data not found for this invoice');
+                            }
+                        } else {
+                            throw new Error(editResult.error || 'Failed to load invoice for editing');
+                        }
+                    } else {
+                        // Create mode: Load art request for new invoice
+                        const requests = await invoiceService.getArtRequests({ id_design: targetId });
+                        const request = requests.find(r => r.ID_Design == targetId);
                         
-                        // Select the request directly
-                        try {
-                            await selectRequest(designIdFromUrl, null);
+                        if (request) {
+                            console.log('Art request loaded:', request);
                             
-                            // Clear loading state
-                            document.getElementById('requestResults').innerHTML = '';
-                            document.getElementById('requestResults').style.display = 'none';
+                            // Hide the search section
+                            document.getElementById('searchSection').style.display = 'none';
                             
-                            // Show form section if it's hidden
-                            const formSection = document.getElementById('formSection');
-                            if (formSection) {
-                                formSection.style.display = 'block';
+                            // Select the request directly
+                            try {
+                                await selectRequest(targetId, null);
+                                
+                                // Clear loading state
+                                document.getElementById('requestResults').innerHTML = '';
+                                document.getElementById('requestResults').style.display = 'none';
+                                
+                                // Show form section if it's hidden
+                                const formSection = document.getElementById('formSection');
+                                if (formSection) {
+                                    formSection.style.display = 'block';
+                                }
+                                
+                                // Update preview only if request was selected successfully
+                                if (selectedRequest && typeof updateInvoicePreview === 'function') {
+                                    setTimeout(updateInvoicePreview, 500);
+                                }
+                            } catch (error) {
+                                console.error('Failed to select request in deep link:', error);
+                                showAlert('Failed to load invoice form. Please try again.', 'error');
+                                // Fall back to search interface
+                                searchArtRequests();
                             }
-                            
-                            // Update preview only if request was selected successfully
-                            if (selectedRequest && typeof updateInvoicePreview === 'function') {
-                                setTimeout(updateInvoicePreview, 500);
-                            }
-                        } catch (error) {
-                            console.error('Failed to select request in deep link:', error);
-                            showAlert('Failed to load invoice form. Please try again.', 'error');
+                        } else {
+                            console.error('Art request not found for ID:', targetId);
+                            showAlert('Art request not found', 'error');
                             // Fall back to search interface
                             searchArtRequests();
                         }
-                    } else {
-                        console.error('Art request not found for ID:', designIdFromUrl);
-                        showAlert('Art request not found', 'error');
-                        // Fall back to search interface
-                        searchArtRequests();
                     }
                 } catch (error) {
-                    console.error('Error loading art request:', error);
-                    showAlert('Failed to load art request', 'error');
+                    console.error(isEditMode ? 'Error loading invoice for editing:' : 'Error loading art request:', error);
+                    showAlert(isEditMode ? 'Failed to load invoice for editing' : 'Failed to load art request', 'error');
                     // Fall back to search interface
                     searchArtRequests();
                 }
@@ -2232,14 +2283,19 @@
         }
         
         // Filter requests
-        function filterRequests(filterType) {
+        function filterRequests(filterType, event) {
             if (!window.allRequests) return;
             
             // Update active filter button
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            
+            // Find the button with the matching filter type and mark it active
+            const targetBtn = document.querySelector(`.filter-btn[data-filter="${filterType}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
             
             let filtered = [...window.allRequests];
             
@@ -2280,7 +2336,6 @@
                     return;
                 }
                 
-                
                 selectedRequest = request;
                 
                 // Update UI to show selection (only if called from click event)
@@ -2300,14 +2355,26 @@
                     selectedIndicator.style.display = 'block';
                 }
                 
+                // Show form section (for both click events and programmatic calls)
+                const formSection = document.getElementById('formSection');
+                if (formSection) {
+                    formSection.style.display = 'block';
+                }
+                
                 // Use the new populateInvoiceForm function with intelligent defaults
                 populateInvoiceForm(request);
+                
+                // Update preview after selection (with small delay to ensure form is populated)
+                if (typeof updateInvoicePreview === 'function') {
+                    setTimeout(updateInvoicePreview, 100);
+                }
                 
             } catch (error) {
                 console.error('Error selecting request:', error);
                 showAlert('Error loading request details', 'error');
             }
         }
+        
         
         // Helper function to get sales rep first name from email
         function getSalesRepFirstName(email) {
@@ -2880,30 +2947,65 @@
             const originalText = submitBtn.innerHTML;
             
             try {
-                // Show loading
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
-                submitBtn.disabled = true;
+                let result;
                 
-                // Log the invoice data for debugging
-                console.log('Invoice data being sent:', invoiceData);
-                
-                // Create invoice
-                const result = await invoiceService.createInvoice(invoiceData);
-                
-                if (result.success) {
-                    showAlert(`Invoice ${result.invoiceID} created successfully!`, 'success');
+                if (isEditMode && editInvoiceData) {
+                    // Update existing invoice
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                    submitBtn.disabled = true;
                     
-                    // Redirect to invoice view
-                    setTimeout(() => {
-                        window.location.href = `/art-invoice-view.html?id=${result.invoiceID}`;
-                    }, 1500);
+                    console.log('Updating existing invoice:', editInvoiceData.invoice.InvoiceID);
+                    console.log('Updated invoice data:', invoiceData);
+                    
+                    // Get the PK_ID for the update
+                    const pkId = editInvoiceData.invoice.PK_ID;
+                    
+                    // Update the invoice
+                    result = await invoiceService.updateInvoice(pkId, invoiceData);
+                    
+                    if (result.success) {
+                        showAlert(`Invoice ${editInvoiceData.invoice.InvoiceID} updated successfully!`, 'success');
+                        
+                        // Redirect to invoice view
+                        setTimeout(() => {
+                            window.location.href = `/art-invoice-view.html?id=${editInvoiceData.invoice.InvoiceID}`;
+                        }, 1500);
+                    } else {
+                        throw new Error(result.error || 'Failed to update invoice');
+                    }
                 } else {
-                    throw new Error(result.error || 'Failed to create invoice');
+                    // Create new invoice
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+                    submitBtn.disabled = true;
+                    
+                    console.log('Creating new invoice');
+                    console.log('Invoice data being sent:', invoiceData);
+                    
+                    // Check for existing invoice first
+                    const existingCheck = await invoiceService.checkExistingInvoice(selectedRequest.ID_Design);
+                    if (existingCheck) {
+                        throw new Error(`An invoice already exists for this request (${existingCheck.InvoiceID}). Please edit the existing invoice instead.`);
+                    }
+                    
+                    // Create invoice
+                    result = await invoiceService.createInvoice(invoiceData);
+                    
+                    if (result.success) {
+                        showAlert(`Invoice ${result.invoiceID} created successfully!`, 'success');
+                        
+                        // Redirect to invoice view
+                        setTimeout(() => {
+                            window.location.href = `/art-invoice-view.html?id=${result.invoiceID}`;
+                        }, 1500);
+                    } else {
+                        throw new Error(result.error || 'Failed to create invoice');
+                    }
                 }
                 
             } catch (error) {
-                console.error('Error creating invoice:', error);
-                showAlert(error.message || 'Failed to create invoice', 'error');
+                const action = isEditMode ? 'updating' : 'creating';
+                console.error(`Error ${action} invoice:`, error);
+                showAlert(error.message || `Failed to ${action.slice(0, -3)}e invoice`, 'error');
                 
                 // Restore button
                 if (submitBtn) {
@@ -3128,35 +3230,10 @@
             });
         }
 
-        // Override the existing selectRequest function to update preview
-        const originalSelectRequest = window.selectRequest;
-        window.selectRequest = async function(idDesign, event) {
-            // Call the original function with correct parameters
-            if (originalSelectRequest) {
-                await originalSelectRequest.call(this, idDesign, event);
-            } else {
-                // Fallback implementation
-                try {
-                    // Fetch the specific request
-                    const requests = await invoiceService.getArtRequests({ id_design: idDesign });
-                    const request = requests.find(r => r.ID_Design == idDesign);
-                    
-                    if (!request) {
-                        showAlert('Request not found', 'error');
-                        return;
-                    }
-                    
-                    selectedRequest = request;
-                    showInvoiceForm();
-                    populateInvoiceForm(request);
-                } catch (error) {
-                    console.error('Error in selectRequest fallback:', error);
-                    showAlert('Failed to select request', 'error');
-                }
-            }
-            // Update preview after selection
-            setTimeout(updateInvoicePreview, 100);
-        };
+        // Ensure selectRequest function is available globally for deep link navigation
+        if (typeof window.selectRequest !== 'function') {
+            console.warn('selectRequest function not found, this may indicate a loading order issue');
+        }
         
         // Clear date filter function
         function clearDateFilter() {
@@ -3199,6 +3276,138 @@
                 searchArtRequests();
             }, 500); // Small delay to ensure everything is loaded
         });
+        
+        // Global variable to track edit mode
+        let isEditMode = false;
+        let editInvoiceData = null;
+        
+        // Helper function to populate form with existing invoice data for editing
+        async function populateFormForEdit(editData) {
+            try {
+                console.log('[Edit Mode] Populating form with invoice data:', editData);
+                
+                isEditMode = true;
+                editInvoiceData = editData;
+                const invoice = editData.invoice;
+                
+                // Populate customer information
+                document.getElementById('customerName').value = invoice.CustomerName || '';
+                document.getElementById('customerCompany').value = invoice.CustomerCompany || '';
+                document.getElementById('customerEmail').value = invoice.CustomerEmail || '';
+                document.getElementById('projectName').value = invoice.ProjectName || '';
+                document.getElementById('projectType').value = invoice.ProjectType || 'Design Work';
+                document.getElementById('complexity').value = invoice.Complexity || 'Standard';
+                
+                // Populate dates
+                if (invoice.InvoiceDate) {
+                    const invoiceDate = new Date(invoice.InvoiceDate);
+                    document.getElementById('invoiceDate').value = invoiceDate.toISOString().split('T')[0];
+                }
+                if (invoice.DueDate) {
+                    const dueDate = new Date(invoice.DueDate);
+                    document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+                }
+                
+                // Populate tax option
+                if (invoice.TaxAmount && parseFloat(invoice.TaxAmount) > 0) {
+                    document.getElementById('applyTax').checked = true;
+                }
+                
+                // Populate spec artwork credit fields
+                if (invoice.IsSpecArtwork) {
+                    document.getElementById('isSpecArtwork').checked = true;
+                    document.getElementById('creditAmount').value = invoice.CreditApplied || '';
+                    document.getElementById('specArtPurpose').value = invoice.SpecArtPurpose || '';
+                }
+                
+                // Populate notes
+                document.getElementById('customerNotes').value = invoice.CustomerNotes || '';
+                document.getElementById('internalNotes').value = invoice.Notes || '';
+                
+                // Set draft mode checkbox based on current status
+                document.getElementById('saveAsDraft').checked = invoice.Status === 'Draft';
+                
+                // Clear existing service line items
+                const serviceContainer = document.getElementById('serviceLineItems');
+                serviceContainer.innerHTML = '';
+                serviceLineCount = 0;
+                
+                // Parse service details from invoice and populate service lines
+                if (invoice.ServiceCodeList) {
+                    const serviceCodes = invoice.ServiceCodeList.split(',').map(code => code.trim());
+                    serviceCodes.forEach(code => {
+                        if (code && invoiceService.serviceCodes[code]) {
+                            addServiceLineItem(code);
+                        }
+                    });
+                }
+                
+                // If no service codes, add one empty line
+                if (serviceLineCount === 0) {
+                    addServiceLineItem();
+                }
+                
+                console.log('[Edit Mode] Form populated successfully');
+                
+            } catch (error) {
+                console.error('[Edit Mode] Error populating form:', error);
+                throw error;
+            }
+        }
+        
+        // Helper function to show edit mode indicator
+        function showEditModeIndicator(invoiceID) {
+            // Create edit mode banner
+            const editBanner = document.createElement('div');
+            editBanner.id = 'editModeBanner';
+            editBanner.innerHTML = `
+                <div style="
+                    background: linear-gradient(45deg, #f39c12, #e67e22);
+                    color: white;
+                    padding: 1rem;
+                    margin-bottom: 1rem;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                ">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-edit" style="font-size: 1.25rem;"></i>
+                        <div>
+                            <strong>Edit Mode</strong>
+                            <div style="font-size: 0.875rem; opacity: 0.9;">
+                                Editing existing invoice: ${invoiceID}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.875rem; opacity: 0.9;">
+                        Changes will update the existing invoice
+                    </div>
+                </div>
+            `;
+            
+            // Insert at the top of the main container
+            const mainContainer = document.querySelector('.main-container');
+            if (mainContainer && mainContainer.firstChild) {
+                mainContainer.insertBefore(editBanner, mainContainer.firstChild);
+            }
+            
+            // Update page title
+            document.title = `Edit Invoice ${invoiceID} - Northwest Custom Apparel`;
+            
+            // Update form submit button text
+            const submitBtn = document.querySelector('#invoiceForm button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Invoice';
+            }
+        }
+        
+        // Make functions available globally for deep link navigation and UI interactions
+        window.selectRequest = selectRequest;
+        window.searchArtRequests = searchArtRequests;
+        window.filterRequests = filterRequests;
+        
     </script>
 </body>
 </html>
