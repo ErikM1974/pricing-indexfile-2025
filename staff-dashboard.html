@@ -1526,9 +1526,320 @@
         initializePortal = function() {
             originalInitializePortal();
             initializeAnnouncements();
+            initializeProductionSchedule();
         };
 
-        // Remove old fallback - we have a better retry mechanism now
+        // Production Schedule Service
+        class ProductionScheduleService {
+            constructor() {
+                this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+                this.cacheKey = 'nwca_production_schedule_cache';
+                this.cacheExpiry = 60 * 60 * 1000; // 1 hour cache
+            }
+
+            async getLatestSchedule() {
+                // Check cache first
+                const cached = this.getCachedSchedule();
+                if (cached && !this.isCacheExpired(cached)) {
+                    console.log('Using cached production schedule');
+                    return cached.data;
+                }
+
+                try {
+                    // For now, use mock data until proxy endpoint is ready
+                    const mockData = this.getMockData();
+                    
+                    // In production, this would be:
+                    // const response = await fetch(`${this.baseURL}/production-schedule/latest`);
+                    // const data = await response.json();
+                    
+                    const formattedData = this.formatScheduleData(mockData);
+                    
+                    // Cache the response
+                    this.cacheSchedule(formattedData);
+                    
+                    return formattedData;
+                } catch (error) {
+                    console.error('Failed to fetch production schedule:', error);
+                    return this.getFallbackSchedule();
+                }
+            }
+
+            getCachedSchedule() {
+                const cached = localStorage.getItem(this.cacheKey);
+                return cached ? JSON.parse(cached) : null;
+            }
+
+            isCacheExpired(cached) {
+                return Date.now() - cached.timestamp > this.cacheExpiry;
+            }
+
+            cacheSchedule(data) {
+                localStorage.setItem(this.cacheKey, JSON.stringify({
+                    data: data,
+                    timestamp: Date.now()
+                }));
+            }
+
+            formatScheduleData(rawData) {
+                const schedule = rawData.Result[0];
+                
+                return {
+                    lastUpdated: schedule.Date,
+                    updatedBy: schedule.Employee,
+                    production: [
+                        {
+                            method: 'DTG',
+                            date: schedule.DTG,
+                            comment: schedule.Comment_DTG,
+                            isRush: false
+                        },
+                        {
+                            method: 'DTG Rush',
+                            date: this.calculateRushDate(schedule.DTG),
+                            comment: 'Rush orders available',
+                            isRush: true
+                        },
+                        {
+                            method: 'Embroidery',
+                            date: schedule.Embroidery,
+                            comment: schedule.Comment_Emb,
+                            isRush: false
+                        },
+                        {
+                            method: 'Caps',
+                            date: schedule.Cap_Embroidery,
+                            comment: schedule.Comment_Cap,
+                            isRush: false
+                        },
+                        {
+                            method: 'Screen Print',
+                            date: schedule.Screenprint,
+                            comment: schedule.Comment_SP,
+                            isRush: false
+                        },
+                        {
+                            method: 'Transfers',
+                            date: schedule.Transfers,
+                            comment: schedule.Comment_Transfers,
+                            isRush: false
+                        }
+                    ],
+                    capacity: this.extractCapacityInfo(schedule)
+                };
+            }
+
+            calculateRushDate(standardDate) {
+                // Rush is typically 1 week before standard
+                const date = new Date(standardDate);
+                date.setDate(date.getDate() - 7);
+                return date.toISOString();
+            }
+
+            extractCapacityInfo(schedule) {
+                // Extract capacity from comments or use defaults
+                const dtgComment = schedule.Comment_DTG || '';
+                const capacity = dtgComment.match(/(\d+)-(\d+)\s*Prints/);
+                
+                return {
+                    min: capacity ? parseInt(capacity[1]) : 100,
+                    max: capacity ? parseInt(capacity[2]) : 200,
+                    rushAvailable: true,
+                    notes: 'Ask for rushes'
+                };
+            }
+
+            getMockData() {
+                // Mock data based on current date for testing
+                const today = new Date();
+                const addDays = (days) => {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() + days);
+                    return date.toISOString();
+                };
+
+                return {
+                    Result: [{
+                        PK_ID: 1000,
+                        ID_Log: "MOCK2025",
+                        Date: new Date().toISOString(),
+                        Employee: "Ruth",
+                        DTG: addDays(14),
+                        Embroidery: addDays(7),
+                        Cap_Embroidery: addDays(7),
+                        Screenprint: addDays(12),
+                        Transfers: addDays(7),
+                        Comment_DTG: "2 weeks out, 100-200 prints capacity",
+                        Comment_Emb: "Taking orders",
+                        Comment_Cap: "Taking orders",
+                        Comment_SP: "Nearly 2 weeks out",
+                        Comment_Transfers: "Quick turnaround available"
+                    }]
+                };
+            }
+
+            getFallbackSchedule() {
+                // Fallback to default schedule if all else fails
+                return {
+                    lastUpdated: new Date().toISOString(),
+                    updatedBy: 'System',
+                    production: [
+                        { method: 'DTG', date: this.addDaysToDate(14), isRush: false },
+                        { method: 'DTG Rush', date: this.addDaysToDate(7), isRush: true },
+                        { method: 'Embroidery', date: this.addDaysToDate(7), isRush: false },
+                        { method: 'Caps', date: this.addDaysToDate(7), isRush: false },
+                        { method: 'Screen Print', date: this.addDaysToDate(12), isRush: false },
+                        { method: 'Transfers', date: this.addDaysToDate(7), isRush: false }
+                    ],
+                    capacity: {
+                        min: 100,
+                        max: 200,
+                        rushAvailable: true,
+                        notes: 'Ask for rushes'
+                    }
+                };
+            }
+
+            addDaysToDate(days) {
+                const date = new Date();
+                date.setDate(date.getDate() + days);
+                return date.toISOString();
+            }
+        }
+
+        // Initialize Production Schedule
+        async function initializeProductionSchedule() {
+            const scheduleService = new ProductionScheduleService();
+            const schedule = await scheduleService.getLatestSchedule();
+            
+            updateProductionWidget(schedule);
+            
+            // Set up periodic updates (every hour)
+            setInterval(async () => {
+                const updatedSchedule = await scheduleService.getLatestSchedule();
+                updateProductionWidget(updatedSchedule);
+            }, 60 * 60 * 1000);
+        }
+
+        function updateProductionWidget(schedule) {
+            const container = document.querySelector('.production-list');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            schedule.production.forEach(item => {
+                const element = createProductionItem(item);
+                container.appendChild(element);
+            });
+            
+            // Update capacity status
+            updateCapacityStatus(schedule.capacity);
+            
+            // Add last updated info
+            addLastUpdatedInfo(schedule.lastUpdated, schedule.updatedBy);
+        }
+
+        function createProductionItem(item) {
+            const div = document.createElement('div');
+            div.className = `production-item ${item.isRush ? 'rush' : ''}`;
+            
+            const methodSpan = document.createElement('span');
+            methodSpan.className = 'production-method';
+            methodSpan.textContent = item.method;
+            
+            const dateSpan = document.createElement('span');
+            dateSpan.className = 'production-date';
+            dateSpan.textContent = formatAvailabilityDate(item.date);
+            
+            div.appendChild(methodSpan);
+            div.appendChild(dateSpan);
+            
+            if (item.comment) {
+                div.title = item.comment;
+            }
+            
+            return div;
+        }
+
+        function formatAvailabilityDate(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            date.setHours(0, 0, 0, 0);
+            
+            const daysUntil = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysUntil <= 0) {
+                return 'Available Now';
+            } else if (daysUntil === 1) {
+                return 'Available Tomorrow';
+            } else if (daysUntil <= 7) {
+                return `Available in ${daysUntil} days`;
+            } else {
+                return `Available ${date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                })}`;
+            }
+        }
+
+        function updateCapacityStatus(capacity) {
+            const statusDiv = document.querySelector('.capacity-status');
+            if (!statusDiv) return;
+            
+            statusDiv.innerHTML = `
+                <strong>Current Capacity:</strong><br>
+                ${capacity.min}-${capacity.max} Prints • ${capacity.notes}
+            `;
+        }
+
+        function addLastUpdatedInfo(lastUpdated, updatedBy) {
+            const widget = document.querySelector('.production-widget');
+            if (!widget) return;
+            
+            // Remove existing update info if present
+            const existingInfo = widget.querySelector('.last-updated-info');
+            if (existingInfo) {
+                existingInfo.remove();
+            }
+            
+            // Add new update info
+            const updateInfo = document.createElement('div');
+            updateInfo.className = 'last-updated-info';
+            updateInfo.style.cssText = `
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                text-align: center;
+                margin-top: 0.5rem;
+                padding-top: 0.5rem;
+                border-top: 1px solid var(--border-light);
+            `;
+            
+            const updateDate = new Date(lastUpdated);
+            const timeAgo = getTimeAgo(updateDate);
+            
+            updateInfo.innerHTML = `
+                <i class="fas fa-sync-alt" style="font-size: 0.625rem; margin-right: 0.25rem;"></i>
+                Updated ${timeAgo} by ${updatedBy}
+            `;
+            
+            widget.appendChild(updateInfo);
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'just now';
+            if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
     </script>
 </body>
 </html>
