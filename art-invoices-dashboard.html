@@ -436,6 +436,212 @@
             display: flex;
         }
 
+        /* Artwork Display Styles */
+        .card-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f5f5f5;
+            flex-shrink: 0;
+            position: relative;
+            border: 1px solid var(--border-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .artwork-thumbnail {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .artwork-thumbnail:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-color);
+        }
+
+        .artwork-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .artwork-thumbnail .fa-search-plus {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px;
+            border-radius: 2px;
+            font-size: 0.6rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .artwork-thumbnail:hover .fa-search-plus {
+            opacity: 1;
+        }
+
+        .artwork-count-badge {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1px 4px;
+            border-radius: 10px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            z-index: 3;
+        }
+
+        .no-image {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-align: center;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .no-image i {
+            font-size: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Artwork Modal Styles */
+        .artwork-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .artwork-modal.active {
+            display: flex;
+        }
+
+        .artwork-modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .artwork-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .artwork-modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .artwork-modal-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .modal-artwork-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-artwork-image {
+            max-width: 80vw;
+            max-height: 70vh;
+            object-fit: contain;
+        }
+
+        .artwork-modal-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .nav-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: background 0.2s;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+
+        .nav-button:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .artwork-indicators {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .artwork-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .artwork-indicator.active {
+            background: var(--primary-color);
+        }
+
+        .artwork-indicator:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .artwork-modal-content {
+                max-width: 95vw;
+                max-height: 95vh;
+                padding: 0.5rem;
+            }
+
+            .modal-artwork-image {
+                max-width: 90vw;
+                max-height: 75vh;
+            }
+        }
+
         .modal-content {
             background: var(--card-bg);
             border-radius: 12px;
@@ -586,14 +792,15 @@
         /* Table column widths */
         #invoicesTable th:nth-child(1) { width: 8%; }  /* Invoice ID */
         #invoicesTable th:nth-child(2) { width: 8%; }  /* Date */
-        #invoicesTable th:nth-child(3) { width: 15%; } /* Customer */
-        #invoicesTable th:nth-child(4) { width: 12%; } /* Project */
-        #invoicesTable th:nth-child(5) { width: 10%; } /* Sales Rep */
-        #invoicesTable th:nth-child(6) { width: 15%; } /* Status & Tracking */
-        #invoicesTable th:nth-child(7) { width: 8%; }  /* Amount */
-        #invoicesTable th:nth-child(8) { width: 8%; }  /* Balance */
-        #invoicesTable th:nth-child(9) { width: 8%; }  /* Email Actions */
-        #invoicesTable th:nth-child(10) { width: 8%; } /* Payment Actions */
+        #invoicesTable th:nth-child(3) { width: 8%; }  /* Artwork */
+        #invoicesTable th:nth-child(4) { width: 14%; } /* Customer */
+        #invoicesTable th:nth-child(5) { width: 11%; } /* Project */
+        #invoicesTable th:nth-child(6) { width: 9%; }  /* Sales Rep */
+        #invoicesTable th:nth-child(7) { width: 14%; } /* Status & Tracking */
+        #invoicesTable th:nth-child(8) { width: 7%; }  /* Amount */
+        #invoicesTable th:nth-child(9) { width: 7%; }  /* Balance */
+        #invoicesTable th:nth-child(10) { width: 7%; } /* Email Actions */
+        #invoicesTable th:nth-child(11) { width: 7%; } /* Payment Actions */
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -635,10 +842,10 @@
             }
 
             /* Hide some columns on mobile */
-            #invoicesTable th:nth-child(4),
-            #invoicesTable td:nth-child(4),
             #invoicesTable th:nth-child(5),
-            #invoicesTable td:nth-child(5) {
+            #invoicesTable td:nth-child(5),
+            #invoicesTable th:nth-child(6),
+            #invoicesTable td:nth-child(6) {
                 display: none;
             }
         }
@@ -652,7 +859,7 @@
                 <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
                      alt="Northwest Custom Apparel" class="logo">
                 <nav class="breadcrumb">
-                    <a href="/staff-dashboard.html">Staff Dashboard</a>
+                    <a href="/calculators/art-invoice-creator.html">Art Requests</a>
                     <span>/</span>
                     <span>Art Invoices</span>
                 </nav>
@@ -764,10 +971,16 @@
         <div class="table-container">
             <div class="table-header">
                 <h2 class="table-title">All Invoices</h2>
-                <button class="btn btn-secondary btn-sm" onclick="refreshInvoices()">
-                    <i class="fas fa-sync"></i>
-                    Refresh
-                </button>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <label style="font-size: 0.875rem; margin: 0; display: flex; align-items: center; gap: 0.25rem;">
+                        <input type="checkbox" id="artworkToggle" onchange="toggleArtworkLoading()">
+                        Show Artwork
+                    </label>
+                    <button class="btn btn-secondary btn-sm" onclick="refreshInvoices()">
+                        <i class="fas fa-sync"></i>
+                        Refresh
+                    </button>
+                </div>
             </div>
             
             <div class="table-wrapper">
@@ -776,6 +989,7 @@
                         <tr>
                             <th>Invoice ID</th>
                             <th>Date</th>
+                            <th>Artwork</th>
                             <th>Customer</th>
                             <th>Project</th>
                             <th>Sales Rep</th>
@@ -877,6 +1091,205 @@
         let invoiceService;
         let allInvoices = [];
         let currentInvoiceId = null;
+        let artRequestsMap = new Map(); // Map ID_Design to art request data
+        
+        // Artwork modal variables
+        let currentArtworkIndex = 0;
+        let currentArtworks = [];
+        let currentDesignId = null;
+        
+        // Artwork Helper Functions
+        function hasArtwork(cdnLink) {
+            return cdnLink && cdnLink.includes('/Artwork/') && cdnLink !== 'https://cdn.caspio.com/A0E15000';
+        }
+        
+        function getFirstArtwork(artRequest) {
+            const cdnFields = ['CDN_Link', 'CDN_Link_Two', 'CDN_Link_Three', 'CDN_Link_Four'];
+            
+            for (const field of cdnFields) {
+                if (hasArtwork(artRequest[field])) {
+                    return artRequest[field];
+                }
+            }
+            return null;
+        }
+        
+        function getAllArtworks(artRequest) {
+            const cdnFields = ['CDN_Link', 'CDN_Link_Two', 'CDN_Link_Three', 'CDN_Link_Four'];
+            const artworks = [];
+            
+            cdnFields.forEach((field, index) => {
+                if (hasArtwork(artRequest[field])) {
+                    artworks.push({
+                        url: artRequest[field],
+                        label: `Artwork ${index + 1}`
+                    });
+                }
+            });
+            
+            return artworks;
+        }
+        
+        function createArtworkThumbnail(artRequest) {
+            const artworkUrl = getFirstArtwork(artRequest);
+            
+            if (!artworkUrl) {
+                return `
+                    <div class="card-thumbnail no-image">
+                        <i class="fas fa-image"></i>
+                        <span>No artwork</span>
+                    </div>
+                `;
+            }
+            
+            // Count total artwork files
+            const artworkCount = getAllArtworks(artRequest).length;
+            const countBadge = artworkCount > 1 ? `<span class="artwork-count-badge">+${artworkCount - 1}</span>` : '';
+            
+            return `
+                <div class="card-thumbnail artwork-thumbnail" onclick='showArtworkModal(${JSON.stringify(artRequest).replace(/'/g, "&#39;")})' style="position: relative; cursor: pointer;">
+                    <img src="${artworkUrl}" 
+                         alt="Artwork ${artRequest.ID_Design}" 
+                         onload="this.classList.add('loaded')"
+                         onerror="this.parentElement.innerHTML='<div class=\\'card-thumbnail no-image\\'><i class=\\'fas fa-exclamation-triangle\\'></i><span>Failed to load</span></div>'"
+                         loading="lazy">
+                    <i class="fas fa-search-plus"></i>
+                    ${countBadge}
+                </div>
+            `;
+        }
+        
+        // Artwork Modal Functions
+        function showArtworkModal(artRequest) {
+            let modal = document.getElementById('artworkModal');
+            if (!modal) {
+                modal = createArtworkModal();
+            }
+            
+            // Get all artworks for this request
+            currentArtworks = getAllArtworks(artRequest);
+            currentDesignId = artRequest.ID_Design;
+            currentArtworkIndex = 0;
+            
+            if (currentArtworks.length === 0) {
+                return;
+            }
+            
+            // Update modal for gallery view
+            updateArtworkModalContent();
+            modal.classList.add('active');
+        }
+        
+        function createArtworkModal() {
+            const modal = document.createElement('div');
+            modal.id = 'artworkModal';
+            modal.className = 'artwork-modal';
+            modal.innerHTML = `
+                <div class="artwork-modal-content">
+                    <div class="artwork-modal-header">
+                        <div class="artwork-modal-title">
+                            <span id="artworkModalTitle">Design #0 - Artwork 1 of 1</span>
+                        </div>
+                        <div class="artwork-modal-controls">
+                            <button class="btn btn-secondary btn-sm" onclick="downloadCurrentArtwork()">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="modal-close" onclick="closeArtworkModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-artwork-container">
+                        <img id="modalArtworkImage" class="modal-artwork-image" src="" alt="Artwork">
+                    </div>
+                    <div class="artwork-modal-nav">
+                        <button class="nav-button" id="prevButton" onclick="navigateArtwork('prev')">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <div class="artwork-indicators" id="artworkIndicators"></div>
+                        <button class="nav-button" id="nextButton" onclick="navigateArtwork('next')">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Add click outside to close
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeArtworkModal();
+                }
+            });
+            
+            return modal;
+        }
+        
+        function updateArtworkModalContent() {
+            if (currentArtworks.length === 0) return;
+            
+            const artwork = currentArtworks[currentArtworkIndex];
+            const modalTitle = document.getElementById('artworkModalTitle');
+            const modalImage = document.getElementById('modalArtworkImage');
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            const indicatorsContainer = document.getElementById('artworkIndicators');
+            
+            // Update title
+            modalTitle.textContent = `Design #${currentDesignId} - ${artwork.label} of ${currentArtworks.length}`;
+            
+            // Update image
+            modalImage.src = artwork.url;
+            
+            // Update navigation buttons
+            prevButton.disabled = currentArtworkIndex === 0;
+            nextButton.disabled = currentArtworkIndex === currentArtworks.length - 1;
+            
+            // Update indicators
+            indicatorsContainer.innerHTML = '';
+            currentArtworks.forEach((_, index) => {
+                const indicator = document.createElement('div');
+                indicator.className = `artwork-indicator ${index === currentArtworkIndex ? 'active' : ''}`;
+                indicator.onclick = () => setArtworkIndex(index);
+                indicatorsContainer.appendChild(indicator);
+            });
+        }
+        
+        function navigateArtwork(direction) {
+            if (direction === 'prev' && currentArtworkIndex > 0) {
+                currentArtworkIndex--;
+            } else if (direction === 'next' && currentArtworkIndex < currentArtworks.length - 1) {
+                currentArtworkIndex++;
+            }
+            updateArtworkModalContent();
+        }
+        
+        function setArtworkIndex(index) {
+            if (index >= 0 && index < currentArtworks.length) {
+                currentArtworkIndex = index;
+                updateArtworkModalContent();
+            }
+        }
+        
+        function closeArtworkModal() {
+            const modal = document.getElementById('artworkModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+        
+        function downloadCurrentArtwork() {
+            if (currentArtworks.length === 0 || currentArtworkIndex < 0) return;
+            
+            const artwork = currentArtworks[currentArtworkIndex];
+            const link = document.createElement('a');
+            link.href = artwork.url;
+            link.download = `Design_${currentDesignId}_${artwork.label.replace(' ', '_')}.png`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
         
         document.addEventListener('DOMContentLoaded', function() {
             invoiceService = new ArtInvoiceServiceV2();
@@ -886,6 +1299,12 @@
             const today = new Date();
             document.getElementById('dateTo').value = '';
             document.getElementById('dateFrom').value = '';
+            
+            // Check if invoice service has getInvoices method
+            if (!invoiceService.getInvoices) {
+                console.error('[Art Invoices] getInvoices method not found on service');
+                // Fallback to using the API directly if needed
+            }
             
             // Load invoices
             loadInvoices();
@@ -914,8 +1333,20 @@
                 
                 console.log(`[Art Invoices] Loaded ${allInvoices.length} invoices`);
                 
-                // Apply filters and display
+                // Apply filters and display first (show invoices immediately)
                 applyFilters();
+                
+                // Then fetch art requests in the background and update display
+                // Check if artwork loading is enabled (can be disabled for performance)
+                const loadArtwork = localStorage.getItem('loadArtwork') !== 'false';
+                if (loadArtwork) {
+                    loadArtRequestsForInvoices().then(() => {
+                        console.log('[Art Invoices] Art requests loaded, refreshing display');
+                        applyFilters(); // Refresh display with artwork
+                    });
+                } else {
+                    console.log('[Art Invoices] Artwork loading disabled for performance');
+                }
                 
                 // Update stats
                 updateStats();
@@ -926,6 +1357,93 @@
                 throw error; // Re-throw for refresh function to catch
             } finally {
                 showLoading(false);
+            }
+        }
+        
+        // Load art requests data for invoices
+        async function loadArtRequestsForInvoices() {
+            try {
+                // Clear existing map
+                artRequestsMap.clear();
+                
+                // Get unique ID_Design values from invoices
+                // Handle both "ART-123" format and plain "123" format
+                const designIds = [...new Set(allInvoices
+                    .map(inv => {
+                        // Extract numeric ID from "ART-123" format if present
+                        if (inv.ArtRequestID && inv.ArtRequestID.toString().startsWith('ART-')) {
+                            return inv.ArtRequestID.toString().replace('ART-', '');
+                        }
+                        return inv.ArtRequestID;
+                    })
+                    .filter(id => id && id !== ''))];
+                
+                if (designIds.length === 0) {
+                    console.log('[Art Invoices] No design IDs found in invoices');
+                    return;
+                }
+                
+                console.log(`[Art Invoices] Loading art requests for ${designIds.length} design IDs`);
+                
+                // Batch fetch art requests in chunks of 10 to reduce API calls
+                const batchSize = 10;
+                const batches = [];
+                
+                for (let i = 0; i < designIds.length; i += batchSize) {
+                    batches.push(designIds.slice(i, i + batchSize));
+                }
+                
+                // Process batches concurrently for faster loading
+                const batchPromises = batches.map(async (batch) => {
+                    try {
+                        // Create promises for each ID in the batch
+                        const requests = await Promise.all(
+                            batch.map(async (designId) => {
+                                try {
+                                    const artRequests = await invoiceService.getArtRequests({
+                                        id_design: designId,
+                                        limit: 1
+                                    });
+                                    
+                                    if (artRequests.length > 0) {
+                                        return { designId, request: artRequests[0] };
+                                    }
+                                    return null;
+                                } catch (error) {
+                                    console.error(`Error loading art request for design ${designId}:`, error);
+                                    return null;
+                                }
+                            })
+                        );
+                        
+                        // Process successful requests
+                        requests.forEach(result => {
+                            if (result) {
+                                artRequestsMap.set(result.designId.toString(), result.request);
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error processing batch:', error);
+                    }
+                });
+                
+                // Wait for all batches to complete
+                await Promise.all(batchPromises);
+                
+                console.log(`[Art Invoices] Successfully loaded ${artRequestsMap.size} art requests with artwork data`);
+                
+                // Log summary of artwork found
+                let artworkCount = 0;
+                artRequestsMap.forEach(request => {
+                    if (getFirstArtwork(request)) {
+                        artworkCount++;
+                    }
+                });
+                console.log(`[Art Invoices] Found artwork in ${artworkCount} of ${artRequestsMap.size} art requests`);
+                
+            } catch (error) {
+                console.error('Error loading art requests:', error);
+                // Continue even if art requests fail to load
             }
         }
         
@@ -999,10 +1517,43 @@
                 const balanceDue = parseFloat(invoice.BalanceDue || 0);
                 const isOverdue = invoice.Status === 'Overdue';
                 
+                // Get art request data for this invoice
+                // Handle both "ART-123" format and plain "123" format
+                let designId = invoice.ArtRequestID;
+                if (designId && designId.toString().startsWith('ART-')) {
+                    designId = designId.toString().replace('ART-', '');
+                }
+                
+                const artRequest = designId ? artRequestsMap.get(designId.toString()) : null;
+                let artworkThumbnail;
+                
+                if (artRequest) {
+                    artworkThumbnail = createArtworkThumbnail(artRequest);
+                } else if (designId && artRequestsMap.size === 0) {
+                    // Still loading art requests
+                    artworkThumbnail = `
+                        <div class="card-thumbnail no-image">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading...</span>
+                        </div>
+                    `;
+                } else {
+                    // No art request found
+                    artworkThumbnail = `
+                        <div class="card-thumbnail no-image">
+                            <i class="fas fa-image"></i>
+                            <span>No data</span>
+                        </div>
+                    `;
+                }
+                
                 return `
                     <tr>
                         <td><strong>${invoice.InvoiceID}</strong></td>
                         <td>${formatDate(invoice.InvoiceDate)}</td>
+                        <td style="text-align: center;">
+                            ${artworkThumbnail}
+                        </td>
                         <td>
                             <div>${invoice.CustomerName || 'Unknown'}</div>
                             ${invoice.CustomerCompany ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">${invoice.CustomerCompany}</div>` : ''}
@@ -1652,6 +2203,32 @@
             } catch (error) {
                 console.error('Error sending reminder:', error);
                 showError('Error sending reminder');
+            }
+        }
+        
+        // Toggle artwork loading function
+        function toggleArtworkLoading() {
+            const checkbox = document.getElementById('artworkToggle');
+            const isEnabled = checkbox.checked;
+            
+            // Save preference
+            localStorage.setItem('loadArtwork', isEnabled ? 'true' : 'false');
+            
+            if (isEnabled && artRequestsMap.size === 0) {
+                // If enabling and no artwork loaded, load it now
+                console.log('[Art Invoices] Enabling artwork display, loading art requests...');
+                loadArtRequestsForInvoices().then(() => {
+                    console.log('[Art Invoices] Art requests loaded, refreshing display');
+                    applyFilters(); // Refresh display with artwork
+                });
+            } else if (!isEnabled) {
+                // If disabling, just refresh display (artwork data remains cached if already loaded)
+                console.log('[Art Invoices] Disabling artwork display');
+                applyFilters();
+            } else {
+                // If enabling and artwork already loaded, just refresh
+                console.log('[Art Invoices] Artwork already loaded, refreshing display');
+                applyFilters();
             }
         }
     </script>

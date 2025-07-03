@@ -495,6 +495,27 @@
             padding: 0.5rem;
         }
 
+        /* Date Filter Controls */
+        .date-filter-controls {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+        
+        .date-filter-controls .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            color: var(--text-primary);
+            transition: border-color 0.2s;
+        }
+        
+        .date-filter-controls .form-control:focus {
+            outline: none;
+            border-color: var(--invoice-accent);
+        }
+        
         /* Search Filters */
         .search-filters {
             display: flex;
@@ -1364,6 +1385,36 @@
                 </button>
             </div>
             
+            <div class="date-filter-controls">
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label for="dateFrom" style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">From:</label>
+                        <input type="date" 
+                               id="dateFrom" 
+                               class="form-control" 
+                               value="2025-06-01"
+                               style="padding: 0.5rem; font-size: 0.875rem; min-width: 150px;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label for="dateTo" style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">To:</label>
+                        <input type="date" 
+                               id="dateTo" 
+                               class="form-control"
+                               style="padding: 0.5rem; font-size: 0.875rem; min-width: 150px;">
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="clearDateFilter()" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                        <i class="fas fa-times"></i>
+                        Clear Dates
+                    </button>
+                </div>
+                <div style="margin-top: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); font-style: italic;">
+                        <i class="fas fa-info-circle"></i>
+                        Default filter shows requests from June 1, 2025 onwards. Clear dates to see all records.
+                    </span>
+                </div>
+            </div>
+            
             <div class="search-filters">
                 <button class="filter-btn active" data-filter="all" onclick="filterRequests('all')">
                     <i class="fas fa-list"></i> All Uninvoiced
@@ -1726,32 +1777,39 @@
             resultsDiv.style.display = 'block';
             
             try {
-                // Fetch art requests
-                const requests = await invoiceService.getArtRequests();
+                // Get date filter values for API call
+                const dateFromInput = document.getElementById('dateFrom').value;
+                const dateToInput = document.getElementById('dateTo').value;
+                
+                // Build API filters
+                const apiFilters = {
+                    invoiced: false, // Only get uninvoiced requests
+                    limit: 500 // Reasonable limit
+                };
+                
+                // Add date filters to API call if available
+                if (dateFromInput) {
+                    apiFilters.dateCreatedFrom = dateFromInput;
+                }
+                if (dateToInput) {
+                    apiFilters.dateCreatedTo = dateToInput;
+                }
+                
+                console.log('[searchArtRequests] API filters:', apiFilters);
+                
+                // Fetch art requests with filters
+                const requests = await invoiceService.getArtRequests(apiFilters);
                 
                 // Debug: Log first 2 requests to see data structure
                 console.log('[searchArtRequests] Sample requests:', requests.slice(0, 2));
                 
-                // Filter for requests from June 1, 2025 forward (per user request)
-                const cutoffDate = new Date('2025-06-01T00:00:00Z');
-                
+                // Filter requests (API already filtered by date and invoiced status)
                 let filteredRequests = requests.filter(req => {
                     // Include all statuses: NULL (new), Awaiting Approval 🟣, and Completed ✅
                     // We'll show them all and let user see the full workflow
                     
-                    // Exclude already invoiced requests
-                    if (req.Invoiced === true) return false;
-                    
-                    // Check date is after June 1, 2025
-                    if (!req.Date_Created) return false;
-                    
-                    try {
-                        const requestDate = new Date(req.Date_Created);
-                        if (isNaN(requestDate.getTime())) return false;
-                        return requestDate.getTime() >= cutoffDate.getTime();
-                    } catch (e) {
-                        return false;
-                    }
+                    // Basic validation - API should have already filtered most of this
+                    return req.Date_Created && req.ID_Design;
                 });
                 
                 // Further filter based on search term
@@ -1781,7 +1839,9 @@
                 
                 // Display results
                 if (uniqueRequests.length === 0) {
-                    resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No uninvoiced art requests found after June 1, 2025.</div>';
+                    const dateMessage = dateFromInput ? `from ${new Date(dateFromInput).toLocaleDateString()}` : '';
+                    const toMessage = dateToInput ? ` to ${new Date(dateToInput).toLocaleDateString()}` : '';
+                    resultsDiv.innerHTML = `<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No uninvoiced art requests found ${dateMessage}${toMessage}.</div>`;
                 } else {
                     // Store all requests for filtering
                     window.allRequests = uniqueRequests;
@@ -3079,10 +3139,47 @@
             // Update preview after selection
             setTimeout(updateInvoicePreview, 100);
         };
+        
+        // Clear date filter function
+        function clearDateFilter() {
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            // Re-run search to show all results
+            searchArtRequests();
+        }
 
         // Initialize preview updates when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('[Art Invoice Creator] Page loaded, initializing...');
             setTimeout(initializePreviewUpdates, 1000); // Wait for other initializations
+            
+            // Set default date values
+            const today = new Date();
+            const in30Days = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+            
+            const invoiceDateInput = document.getElementById('invoiceDate');
+            const dueDateInput = document.getElementById('dueDate');
+            const dateFromInput = document.getElementById('dateFrom');
+            
+            if (invoiceDateInput) {
+                invoiceDateInput.value = today.toISOString().split('T')[0];
+            }
+            if (dueDateInput) {
+                dueDateInput.value = in30Days.toISOString().split('T')[0];
+            }
+            
+            // Verify date filter elements exist
+            if (dateFromInput) {
+                console.log('[Art Invoice Creator] Date filter elements found, default value:', dateFromInput.value);
+            } else {
+                console.error('[Art Invoice Creator] Date filter elements not found!');
+            }
+            
+            // Automatically run search with default date filter on page load
+            setTimeout(() => {
+                console.log('[Art Invoice Creator] Running initial search...');
+                searchArtRequests();
+            }, 500); // Small delay to ensure everything is loaded
         });
     </script>
 </body>
