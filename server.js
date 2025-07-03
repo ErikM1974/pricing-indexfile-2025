@@ -166,6 +166,11 @@ app.get('/cart', (req, res) => {
   res.sendFile(path.join(__dirname, 'cart.html'));
 });
 
+// Serve inventory-details.html as a specific page
+app.get('/inventory-details.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'inventory-details.html'));
+});
+
 // Serve pricing pages
 app.get('/pricing/embroidery', (req, res) => {
   res.sendFile(path.join(__dirname, 'embroidery-pricing.html'));
