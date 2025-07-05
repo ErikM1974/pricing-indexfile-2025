@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Schedule API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .test-section h2 {
+            color: #4cb354;
+            margin-bottom: 10px;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 4px;
+            border-left: 4px solid #4cb354;
+        }
+        
+        .schedule-item.rush {
+            border-left-color: #f59e0b;
+        }
+        
+        .method {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .date {
+            color: #666;
+        }
+        
+        .api-response {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+        
+        button {
+            background: #4cb354;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #409a47;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .last-updated {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Production Schedule API Test</h1>
+        
+        <div class="test-section">
+            <h2>Test Controls</h2>
+            <button onclick="testMockData()">Test Mock Data</button>
+            <button onclick="testDateFormatting()">Test Date Formatting</button>
+            <button onclick="testCaching()">Test Cache Behavior</button>
+            <button onclick="clearCache()">Clear Cache</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>Current Production Schedule</h2>
+            <div id="scheduleDisplay">Click a test button to load schedule</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>API Response</h2>
+            <div class="api-response" id="apiResponse">No data loaded yet</div>
+        </div>
+    </div>
+
+    <script>
+        // Copy of ProductionScheduleService from main dashboard
+        class ProductionScheduleService {
+            constructor() {
+                this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+                this.cacheKey = 'nwca_production_schedule_cache';
+                this.cacheExpiry = 60 * 60 * 1000; // 1 hour cache
+            }
+
+            async getLatestSchedule() {
+                const cached = this.getCachedSchedule();
+                if (cached && !this.isCacheExpired(cached)) {
+                    console.log('Using cached production schedule');
+                    return cached.data;
+                }
+
+                try {
+                    const mockData = this.getMockData();
+                    const formattedData = this.formatScheduleData(mockData);
+                    this.cacheSchedule(formattedData);
+                    return formattedData;
+                } catch (error) {
+                    console.error('Failed to fetch production schedule:', error);
+                    return this.getFallbackSchedule();
+                }
+            }
+
+            getCachedSchedule() {
+                const cached = localStorage.getItem(this.cacheKey);
+                return cached ? JSON.parse(cached) : null;
+            }
+
+            isCacheExpired(cached) {
+                return Date.now() - cached.timestamp > this.cacheExpiry;
+            }
+
+            cacheSchedule(data) {
+                localStorage.setItem(this.cacheKey, JSON.stringify({
+                    data: data,
+                    timestamp: Date.now()
+                }));
+            }
+
+            formatScheduleData(rawData) {
+                const schedule = rawData.Result[0];
+                
+                return {
+                    lastUpdated: schedule.Date,
+                    updatedBy: schedule.Employee,
+                    production: [
+                        {
+                            method: 'DTG',
+                            date: schedule.DTG,
+                            comment: schedule.Comment_DTG,
+                            isRush: false
+                        },
+                        {
+                            method: 'DTG Rush',
+                            date: this.calculateRushDate(schedule.DTG),
+                            comment: 'Rush orders available',
+                            isRush: true
+                        },
+                        {
+                            method: 'Embroidery',
+                            date: schedule.Embroidery,
+                            comment: schedule.Comment_Emb,
+                            isRush: false
+                        },
+                        {
+                            method: 'Caps',
+                            date: schedule.Cap_Embroidery,
+                            comment: schedule.Comment_Cap,
+                            isRush: false
+                        },
+                        {
+                            method: 'Screen Print',
+                            date: schedule.Screenprint,
+                            comment: schedule.Comment_SP,
+                            isRush: false
+                        },
+                        {
+                            method: 'Transfers',
+                            date: schedule.Transfers,
+                            comment: schedule.Comment_Transfers,
+                            isRush: false
+                        }
+                    ],
+                    capacity: this.extractCapacityInfo(schedule)
+                };
+            }
+
+            calculateRushDate(standardDate) {
+                const date = new Date(standardDate);
+                date.setDate(date.getDate() - 7);
+                return date.toISOString();
+            }
+
+            extractCapacityInfo(schedule) {
+                const dtgComment = schedule.Comment_DTG || '';
+                const capacity = dtgComment.match(/(\d+)-(\d+)\s*Prints/);
+                
+                return {
+                    min: capacity ? parseInt(capacity[1]) : 100,
+                    max: capacity ? parseInt(capacity[2]) : 200,
+                    rushAvailable: true,
+                    notes: 'Ask for rushes'
+                };
+            }
+
+            getMockData() {
+                const today = new Date();
+                const addDays = (days) => {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() + days);
+                    return date.toISOString();
+                };
+
+                return {
+                    Result: [{
+                        PK_ID: 1000,
+                        ID_Log: "MOCK2025",
+                        Date: new Date().toISOString(),
+                        Employee: "Ruth",
+                        DTG: addDays(14),
+                        Embroidery: addDays(7),
+                        Cap_Embroidery: addDays(7),
+                        Screenprint: addDays(12),
+                        Transfers: addDays(7),
+                        Comment_DTG: "2 weeks out, 100-200 prints capacity",
+                        Comment_Emb: "Taking orders",
+                        Comment_Cap: "Taking orders",
+                        Comment_SP: "Nearly 2 weeks out",
+                        Comment_Transfers: "Quick turnaround available"
+                    }]
+                };
+            }
+
+            getFallbackSchedule() {
+                return {
+                    lastUpdated: new Date().toISOString(),
+                    updatedBy: 'System',
+                    production: [
+                        { method: 'DTG', date: this.addDaysToDate(14), isRush: false },
+                        { method: 'DTG Rush', date: this.addDaysToDate(7), isRush: true },
+                        { method: 'Embroidery', date: this.addDaysToDate(7), isRush: false },
+                        { method: 'Caps', date: this.addDaysToDate(7), isRush: false },
+                        { method: 'Screen Print', date: this.addDaysToDate(12), isRush: false },
+                        { method: 'Transfers', date: this.addDaysToDate(7), isRush: false }
+                    ],
+                    capacity: {
+                        min: 100,
+                        max: 200,
+                        rushAvailable: true,
+                        notes: 'Ask for rushes'
+                    }
+                };
+            }
+
+            addDaysToDate(days) {
+                const date = new Date();
+                date.setDate(date.getDate() + days);
+                return date.toISOString();
+            }
+        }
+
+        // Helper function to format dates
+        function formatAvailabilityDate(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            date.setHours(0, 0, 0, 0);
+            
+            const daysUntil = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysUntil <= 0) {
+                return 'Available Now';
+            } else if (daysUntil === 1) {
+                return 'Available Tomorrow';
+            } else if (daysUntil <= 7) {
+                return `Available in ${daysUntil} days`;
+            } else {
+                return `Available ${date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                })}`;
+            }
+        }
+
+        // Test functions
+        async function testMockData() {
+            const service = new ProductionScheduleService();
+            const schedule = await service.getLatestSchedule();
+            
+            displaySchedule(schedule);
+            document.getElementById('apiResponse').textContent = JSON.stringify(schedule, null, 2);
+            
+            console.log('Mock data test:', schedule);
+        }
+
+        async function testDateFormatting() {
+            const testDates = [
+                { days: -1, expected: 'Available Now' },
+                { days: 0, expected: 'Available Now' },
+                { days: 1, expected: 'Available Tomorrow' },
+                { days: 3, expected: 'Available in 3 days' },
+                { days: 7, expected: 'Available in 7 days' },
+                { days: 14, expected: 'Available [Date]' }
+            ];
+            
+            let html = '<h3>Date Formatting Test Results:</h3>';
+            
+            testDates.forEach(test => {
+                const date = new Date();
+                date.setDate(date.getDate() + test.days);
+                const formatted = formatAvailabilityDate(date.toISOString());
+                html += `<div>+${test.days} days: ${formatted}</div>`;
+            });
+            
+            document.getElementById('scheduleDisplay').innerHTML = html;
+            document.getElementById('apiResponse').textContent = 'Date formatting test complete';
+        }
+
+        async function testCaching() {
+            const service = new ProductionScheduleService();
+            
+            // Clear cache first
+            localStorage.removeItem(service.cacheKey);
+            
+            console.time('First load (no cache)');
+            const firstLoad = await service.getLatestSchedule();
+            console.timeEnd('First load (no cache)');
+            
+            console.time('Second load (from cache)');
+            const secondLoad = await service.getLatestSchedule();
+            console.timeEnd('Second load (from cache)');
+            
+            const cacheInfo = {
+                firstLoad: 'Fetched from mock data',
+                secondLoad: 'Loaded from cache',
+                cacheExpiry: '1 hour',
+                currentCache: JSON.parse(localStorage.getItem(service.cacheKey))
+            };
+            
+            document.getElementById('apiResponse').textContent = JSON.stringify(cacheInfo, null, 2);
+            displaySchedule(secondLoad);
+        }
+
+        function clearCache() {
+            const service = new ProductionScheduleService();
+            localStorage.removeItem(service.cacheKey);
+            
+            document.getElementById('scheduleDisplay').innerHTML = '<div class="status success">Cache cleared successfully</div>';
+            document.getElementById('apiResponse').textContent = 'Cache has been cleared';
+        }
+
+        function displaySchedule(schedule) {
+            let html = '';
+            
+            schedule.production.forEach(item => {
+                html += `
+                    <div class="schedule-item ${item.isRush ? 'rush' : ''}">
+                        <span class="method">${item.method}</span>
+                        <span class="date">${formatAvailabilityDate(item.date)}</span>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <div class="last-updated">
+                    <i class="fas fa-sync-alt"></i>
+                    Updated by ${schedule.updatedBy} on ${new Date(schedule.lastUpdated).toLocaleString()}
+                </div>
+            `;
+            
+            document.getElementById('scheduleDisplay').innerHTML = html;
+        }
+    </script>
+</body>
+</html>

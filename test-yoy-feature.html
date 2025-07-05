@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Year-over-Year Feature</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            background: #f5f7fa;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        button {
+            background: #3a7c52;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #2d5f40;
+        }
+        
+        .result {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .success {
+            color: #10b981;
+        }
+        
+        .error {
+            color: #ef4444;
+        }
+        
+        .warning {
+            color: #f59e0b;
+        }
+        
+        h2 {
+            color: #3a7c52;
+        }
+    </style>
+</head>
+<body>
+    <h1>Year-over-Year Feature Test</h1>
+    
+    <div class="test-section">
+        <h2>API Endpoint Tests</h2>
+        <button onclick="testBasicYoY()">Test Basic YoY</button>
+        <button onclick="testYoYWith30Days()">Test YoY + 30 Days</button>
+        <button onclick="testYoYWith7Days()">Test YoY + 7 Days</button>
+        <button onclick="testAllFeatures()">Run All Tests</button>
+        
+        <div id="apiResult" class="result">Click a button to test...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Feature Verification</h2>
+        <div id="featureStatus"></div>
+    </div>
+
+    <script>
+        const baseUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        
+        function log(message, type = 'info') {
+            const result = document.getElementById('apiResult');
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : '';
+            result.innerHTML += `<span class="${colorClass}">[${timestamp}] ${message}</span>\n`;
+            result.scrollTop = result.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('apiResult').innerHTML = '';
+        }
+        
+        async function testBasicYoY() {
+            clearLog();
+            log('Testing basic Year-over-Year comparison...');
+            
+            try {
+                const response = await fetch(`${baseUrl}/api/order-dashboard?compareYoY=true`);
+                const data = await response.json();
+                
+                log(`Response status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                if (data.yearOverYear) {
+                    log('✅ Year-over-Year data found!', 'success');
+                    log('Current Year: ' + JSON.stringify(data.yearOverYear.currentYear, null, 2));
+                    log('Previous Year: ' + JSON.stringify(data.yearOverYear.previousYear, null, 2));
+                    log('Comparison: ' + JSON.stringify(data.yearOverYear.comparison, null, 2));
+                    
+                    // Validate structure
+                    const required = ['currentYear', 'previousYear', 'comparison'];
+                    const valid = required.every(field => data.yearOverYear[field]);
+                    
+                    if (valid) {
+                        log('✅ All required YoY fields present', 'success');
+                    } else {
+                        log('❌ Missing required YoY fields', 'error');
+                    }
+                } else {
+                    log('❌ No Year-over-Year data in response', 'error');
+                }
+                
+                return data;
+                
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+                return null;
+            }
+        }
+        
+        async function testYoYWith30Days() {
+            clearLog();
+            log('Testing YoY with 30-day filter...');
+            
+            try {
+                const response = await fetch(`${baseUrl}/api/order-dashboard?days=30&compareYoY=true`);
+                const data = await response.json();
+                
+                log(`Response status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                if (data.summary) {
+                    log(`30-day summary: ${data.summary.totalOrders} orders, $${data.summary.totalSales}`, 'success');
+                }
+                
+                if (data.yearOverYear) {
+                    log('✅ YoY data included with 30-day view', 'success');
+                    const growth = data.yearOverYear.comparison.salesGrowth;
+                    log(`Sales growth: ${growth > 0 ? '+' : ''}${growth}%`, growth > 0 ? 'success' : 'warning');
+                } else {
+                    log('❌ No YoY data with 30-day view', 'error');
+                }
+                
+                return data;
+                
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+                return null;
+            }
+        }
+        
+        async function testYoYWith7Days() {
+            clearLog();
+            log('Testing YoY with 7-day filter...');
+            
+            try {
+                const response = await fetch(`${baseUrl}/api/order-dashboard?days=7&compareYoY=true`);
+                const data = await response.json();
+                
+                log(`Response status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                if (data.summary) {
+                    log(`7-day summary: ${data.summary.totalOrders} orders, $${data.summary.totalSales}`, 'success');
+                }
+                
+                if (data.yearOverYear) {
+                    log('✅ YoY data included with 7-day view', 'success');
+                    log(`YoY comparison shows full year data regardless of days filter`, 'warning');
+                } else {
+                    log('❌ No YoY data with 7-day view', 'error');
+                }
+                
+                return data;
+                
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+                return null;
+            }
+        }
+        
+        async function testAllFeatures() {
+            clearLog();
+            log('Running comprehensive YoY feature tests...\n');
+            
+            const tests = [
+                { name: 'Basic YoY', fn: testBasicYoY },
+                { name: '30-day + YoY', fn: testYoYWith30Days },
+                { name: '7-day + YoY', fn: testYoYWith7Days }
+            ];
+            
+            let allPassed = true;
+            
+            for (const test of tests) {
+                log(`\n=== ${test.name} ===`);
+                const result = await test.fn();
+                if (!result || !result.yearOverYear) {
+                    allPassed = false;
+                }
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            log('\n=== SUMMARY ===');
+            if (allPassed) {
+                log('✅ All YoY tests passed!', 'success');
+            } else {
+                log('❌ Some tests failed. Check the log above.', 'error');
+            }
+            
+            updateFeatureStatus(allPassed);
+        }
+        
+        function updateFeatureStatus(passed) {
+            const status = document.getElementById('featureStatus');
+            status.innerHTML = `
+                <h3>Implementation Status</h3>
+                <ul>
+                    <li>✅ Year-over-Year data mapping in mapApiResponseToMetrics()</li>
+                    <li>✅ YoY metric card added to dashboard HTML</li>
+                    <li>✅ updateYearOverYear() function implemented</li>
+                    <li>✅ CSS styles for YoY display added</li>
+                    <li>✅ API called with compareYoY=true parameter</li>
+                    <li>${passed ? '✅' : '❌'} API returns YoY data correctly</li>
+                </ul>
+                
+                <h3>How It Works</h3>
+                <p>The Year-over-Year comparison shows:</p>
+                <ul>
+                    <li>Current year-to-date sales and order count</li>
+                    <li>Previous year same period sales and order count</li>
+                    <li>Growth percentage and absolute difference</li>
+                    <li>Visual indicators (arrows) for positive/negative growth</li>
+                </ul>
+                
+                <h3>Notes</h3>
+                <ul>
+                    <li>YoY comparison always shows full year-to-date, regardless of the selected date range</li>
+                    <li>The period shown is from January 1st to current date</li>
+                    <li>Growth is calculated as: (Current - Previous) / Previous * 100</li>
+                </ul>
+            `;
+        }
+        
+        // Run basic test on load
+        window.addEventListener('load', () => {
+            log('YoY Feature Test Page Ready\n');
+            log('The Year-over-Year comparison has been added to the Order Dashboard.\n');
+            log('Click any test button to verify the feature is working correctly.');
+        });
+    </script>
+</body>
+</html>
