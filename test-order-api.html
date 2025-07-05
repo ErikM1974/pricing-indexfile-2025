@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .api-response {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        button {
+            background: #4cb354;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background: #409a47;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .field-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .field-list h3 {
+            margin-top: 0;
+        }
+        
+        .field-list ul {
+            columns: 2;
+            column-gap: 30px;
+        }
+        
+        .field-list li {
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order API Test - Direct API Call</h1>
+        
+        <div>
+            <button onclick="testDirectAPI()">Test Direct API Call</button>
+            <button onclick="testFirstOrder()">Show First Order Details</button>
+            <button onclick="testDateFormats()">Test Date Formats</button>
+            <button onclick="testFieldMapping()">Test Field Mapping</button>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div id="fieldList" class="field-list" style="display: none;">
+            <h3>Available Fields in API Response:</h3>
+            <ul id="fields"></ul>
+        </div>
+        
+        <div class="api-response" id="apiResponse">Click a button to test the API</div>
+    </div>
+
+    <script>
+        async function testDirectAPI() {
+            const status = document.getElementById('status');
+            const response = document.getElementById('apiResponse');
+            
+            status.style.display = 'block';
+            status.className = 'status';
+            status.textContent = 'Fetching order data...';
+            
+            try {
+                const apiResponse = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/order-odbc');
+                
+                if (!apiResponse.ok) {
+                    throw new Error(`HTTP error! status: ${apiResponse.status}`);
+                }
+                
+                const data = await apiResponse.json();
+                
+                status.className = 'status success';
+                status.textContent = `Success! Retrieved ${data ? data.length : 0} orders`;
+                
+                // Show raw response
+                response.textContent = JSON.stringify(data, null, 2);
+                
+                // Store for other tests
+                window.orderData = data;
+                
+                console.log('Full API Response:', data);
+                console.log('Total orders:', data ? data.length : 0);
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = `Error: ${error.message}`;
+                response.textContent = `Error fetching data: ${error.message}`;
+                console.error('API Error:', error);
+            }
+        }
+        
+        async function testFirstOrder() {
+            if (!window.orderData || window.orderData.length === 0) {
+                await testDirectAPI();
+            }
+            
+            if (window.orderData && window.orderData.length > 0) {
+                const firstOrder = window.orderData[0];
+                const response = document.getElementById('apiResponse');
+                const fieldList = document.getElementById('fieldList');
+                const fields = document.getElementById('fields');
+                
+                // Show first order details
+                response.textContent = 'FIRST ORDER DETAILS:\n\n' + JSON.stringify(firstOrder, null, 2);
+                
+                // List all field names
+                const fieldNames = Object.keys(firstOrder);
+                fieldList.style.display = 'block';
+                fields.innerHTML = fieldNames.map(field => `<li>${field}</li>`).join('');
+                
+                console.log('First order:', firstOrder);
+                console.log('Field names:', fieldNames);
+                
+                // Log specific fields we're looking for
+                console.log('Looking for date fields:');
+                fieldNames.filter(f => f.toLowerCase().includes('date')).forEach(f => {
+                    console.log(`  ${f}: ${firstOrder[f]}`);
+                });
+                
+                console.log('Looking for CSR/employee fields:');
+                fieldNames.filter(f => f.toLowerCase().includes('csr') || f.toLowerCase().includes('employee') || f.toLowerCase().includes('rep')).forEach(f => {
+                    console.log(`  ${f}: ${firstOrder[f]}`);
+                });
+                
+                console.log('Looking for amount/total fields:');
+                fieldNames.filter(f => f.toLowerCase().includes('amount') || f.toLowerCase().includes('total') || f.toLowerCase().includes('price')).forEach(f => {
+                    console.log(`  ${f}: ${firstOrder[f]}`);
+                });
+            }
+        }
+        
+        async function testDateFormats() {
+            if (!window.orderData || window.orderData.length === 0) {
+                await testDirectAPI();
+            }
+            
+            if (window.orderData && window.orderData.length > 0) {
+                const response = document.getElementById('apiResponse');
+                let output = 'DATE FORMAT ANALYSIS:\n\n';
+                
+                // Find all date fields
+                const firstOrder = window.orderData[0];
+                const dateFields = Object.keys(firstOrder).filter(key => 
+                    key.toLowerCase().includes('date') || 
+                    key.toLowerCase().includes('time') ||
+                    key.toLowerCase().includes('created') ||
+                    key.toLowerCase().includes('updated')
+                );
+                
+                output += `Found ${dateFields.length} date-related fields:\n\n`;
+                
+                // Test parsing each date field
+                dateFields.forEach(field => {
+                    output += `Field: ${field}\n`;
+                    
+                    // Sample first 5 values
+                    for (let i = 0; i < Math.min(5, window.orderData.length); i++) {
+                        const value = window.orderData[i][field];
+                        output += `  Order ${i}: ${value}`;
+                        
+                        if (value) {
+                            try {
+                                const date = new Date(value);
+                                if (!isNaN(date.getTime())) {
+                                    output += ` → Valid Date: ${date.toLocaleDateString()}`;
+                                } else {
+                                    output += ' → Invalid Date';
+                                }
+                            } catch (e) {
+                                output += ' → Parse Error';
+                            }
+                        }
+                        output += '\n';
+                    }
+                    output += '\n';
+                });
+                
+                response.textContent = output;
+            }
+        }
+        
+        async function testFieldMapping() {
+            if (!window.orderData || window.orderData.length === 0) {
+                await testDirectAPI();
+            }
+            
+            if (window.orderData && window.orderData.length > 0) {
+                const response = document.getElementById('apiResponse');
+                const firstOrder = window.orderData[0];
+                
+                // Expected field mappings
+                const fieldMappings = {
+                    'ORDER_DATE': null,
+                    'ORDER_TOTAL': null,
+                    'CSR': null,
+                    'ORDER_STATUS': null,
+                    'CUSTOMER_NAME': null,
+                    'ID': null
+                };
+                
+                // Try to find matching fields
+                Object.keys(firstOrder).forEach(field => {
+                    const upperField = field.toUpperCase();
+                    
+                    // Direct match
+                    if (fieldMappings.hasOwnProperty(upperField)) {
+                        fieldMappings[upperField] = field;
+                    }
+                    // Partial matches
+                    else if (upperField.includes('DATE') && upperField.includes('ORDER')) {
+                        fieldMappings['ORDER_DATE'] = field;
+                    }
+                    else if (upperField.includes('TOTAL') || upperField.includes('AMOUNT')) {
+                        fieldMappings['ORDER_TOTAL'] = field;
+                    }
+                    else if (upperField.includes('CSR') || upperField.includes('REP') || upperField.includes('EMPLOYEE')) {
+                        fieldMappings['CSR'] = field;
+                    }
+                    else if (upperField.includes('STATUS')) {
+                        fieldMappings['ORDER_STATUS'] = field;
+                    }
+                    else if (upperField.includes('CUSTOMER') && upperField.includes('NAME')) {
+                        fieldMappings['CUSTOMER_NAME'] = field;
+                    }
+                    else if (field === 'id' || field === 'Id' || field === 'ID' || upperField === 'ORDER_ID') {
+                        fieldMappings['ID'] = field;
+                    }
+                });
+                
+                let output = 'FIELD MAPPING RESULTS:\n\n';
+                output += 'Expected Field → Actual Field\n';
+                output += '─'.repeat(50) + '\n';
+                
+                Object.entries(fieldMappings).forEach(([expected, actual]) => {
+                    output += `${expected.padEnd(20)} → ${actual || 'NOT FOUND'}\n`;
+                    if (actual) {
+                        output += `  Sample value: ${firstOrder[actual]}\n`;
+                    }
+                });
+                
+                output += '\n\nSUGGESTED FIELD MAPPING OBJECT:\n';
+                output += JSON.stringify(fieldMappings, null, 2);
+                
+                response.textContent = output;
+                
+                // Log to console for easy copying
+                console.log('Field Mapping Object:', fieldMappings);
+            }
+        }
+        
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            console.log('Order API Test Page Loaded');
+            console.log('Click "Test Direct API Call" to begin');
+        });
+    </script>
+</body>
+</html>
