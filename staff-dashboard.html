@@ -84,12 +84,13 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-solid);
-            background-image: var(--bg-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Loading State */
@@ -226,6 +227,12 @@
             display: block;
         }
 
+        .current-datetime {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
         .nav-links {
             display: flex;
             align-items: center;
@@ -339,11 +346,18 @@
         /* Dashboard Grid - Advanced Layout */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 2fr 380px;
             grid-template-rows: auto;
-            gap: 1.5rem;
+            gap: 2rem;
             grid-template-areas:
                 "main sidebar";
+        }
+
+        @media (max-width: 1400px) {
+            .dashboard-grid {
+                grid-template-columns: 2fr 340px;
+                gap: 1.5rem;
+            }
         }
         
         /* Main Column Container */
@@ -357,9 +371,18 @@
         /* Left Column - Calculators */
         .calculators-section {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-normal);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .calculators-section:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-1px);
         }
 
         .section-header {
@@ -544,14 +567,33 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             padding: 1.25rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
             backdrop-filter: blur(10px);
             transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .production-widget::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-success);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
 
         .production-widget:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-1px);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-2px);
+            border-color: var(--success);
         }
 
         .widget-header {
@@ -904,17 +946,30 @@
 
         /* Order Dashboard Styles */
         .order-dashboard {
-            margin-top: 1.5rem;
-            padding: 1.5rem;
+            padding: 2rem;
             background: var(--card-bg);
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            transition: all var(--transition-normal);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .order-dashboard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         }
 
         .order-dashboard:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-green);
         }
 
         .date-range-selector {
@@ -980,23 +1035,30 @@
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
             margin-top: 1.5rem;
         }
 
+        @media (max-width: 1200px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .metric-card {
-            background: var(--bg-solid);
-            border: 1px solid var(--border-color);
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.8);
             border-radius: var(--radius-md);
-            padding: 1.25rem;
-            transition: all var(--transition-fast);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
         }
 
         .metric-card:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--primary-green);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            border-color: #4cb354;
         }
 
         .metric-card.wide {
@@ -1030,19 +1092,19 @@
             gap: 0.75rem;
         }
 
-        .pipeline-item, .revenue-item, .urgent-item {
+        .revenue-item, .urgent-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0.5rem 0;
         }
 
-        .pipeline-item .label, .revenue-item .label, .urgent-item .label {
+        .revenue-item .label, .urgent-item .label {
             font-size: 0.875rem;
             color: var(--text-secondary);
         }
 
-        .pipeline-item .value, .revenue-item .value, .urgent-item .value {
+        .revenue-item .value, .urgent-item .value {
             font-size: 1.125rem;
             font-weight: 600;
             color: var(--text-primary);
@@ -1378,6 +1440,376 @@
                 font-size: 1.5rem;
             }
         }
+
+        /* ===== NEW SIDEBAR LAYOUT STYLES ===== */
+        
+        /* Layout wrapper */
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Sidebar styles - Modern light theme */
+        .sidebar {
+            width: 260px;
+            background: #ffffff;
+            color: #1f2937;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #4cb354 0%, #3a9842 100%);
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-logo img {
+            height: 45px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-user-avatar {
+            width: 42px;
+            height: 42px;
+            background: #ffffff;
+            color: #4cb354;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.125rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-user-info {
+            flex: 1;
+        }
+
+        .sidebar-user-name {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: #ffffff;
+        }
+
+        .sidebar-user-role {
+            font-size: 0.8125rem;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Sidebar navigation */
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: #4b5563;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: #f0fdf4;
+            color: #16a34a;
+            padding-left: 1.75rem;
+        }
+
+        .nav-link.active {
+            background: #f0fdf4;
+            color: #16a34a;
+            font-weight: 600;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #16a34a;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+            color: #6b7280;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover i,
+        .nav-link.active i {
+            color: #16a34a;
+        }
+
+        /* Colorful icon system */
+        .nav-link .fa-tachometer-alt { color: #3b82f6; } /* Dashboard - Blue */
+        .nav-link .fa-calculator { color: #10b981; } /* Calculators - Green */
+        .nav-link .fa-palette { color: #f59e0b; } /* Design - Orange */
+        .nav-link .fa-ticket-alt { color: #8b5cf6; } /* Sales - Purple */
+        .nav-link .fa-book { color: #ec4899; } /* Resources - Pink */
+        .nav-link .fa-users { color: #06b6d4; } /* HR - Cyan */
+        .nav-link .fa-chart-line { color: #14b8a6; } /* Financial - Teal */
+        .nav-link .fa-paint-brush { color: #f97316; } /* Art - Orange */
+        .nav-link .fa-cog { color: #6b7280; } /* Settings - Gray */
+        .nav-link .fa-question-circle { color: #6366f1; } /* Help - Indigo */
+        
+        .nav-link:hover .fa-tachometer-alt,
+        .nav-link.active .fa-tachometer-alt { color: #2563eb; }
+        .nav-link:hover .fa-calculator,
+        .nav-link.active .fa-calculator { color: #059669; }
+        .nav-link:hover .fa-palette,
+        .nav-link.active .fa-palette { color: #d97706; }
+        .nav-link:hover .fa-ticket-alt,
+        .nav-link.active .fa-ticket-alt { color: #7c3aed; }
+        .nav-link:hover .fa-book,
+        .nav-link.active .fa-book { color: #db2777; }
+        .nav-link:hover .fa-users,
+        .nav-link.active .fa-users { color: #0891b2; }
+        .nav-link:hover .fa-chart-line,
+        .nav-link.active .fa-chart-line { color: #0d9488; }
+        .nav-link:hover .fa-paint-brush,
+        .nav-link.active .fa-paint-brush { color: #ea580c; }
+        .nav-link:hover .fa-cog,
+        .nav-link.active .fa-cog { color: #4b5563; }
+        .nav-link:hover .fa-question-circle,
+        .nav-link.active .fa-question-circle { color: #4f46e5; }
+
+        .nav-link-text {
+            flex: 1;
+        }
+
+        .nav-link-arrow {
+            font-size: 0.75rem;
+            transition: transform 0.2s;
+            color: #9ca3af;
+        }
+
+        .nav-link.expanded .nav-link-arrow {
+            transform: rotate(90deg);
+        }
+
+        /* Submenu styles */
+        .nav-submenu {
+            background: #f9fafb;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+            border-left: 2px solid #e5e7eb;
+            margin-left: 1.5rem;
+            opacity: 0;
+        }
+
+        .nav-submenu.show {
+            max-height: 600px; /* Increased for safety */
+            opacity: 1;
+        }
+
+        .nav-subitem {
+            padding-left: 1.5rem;
+        }
+
+        .nav-sublink {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.813rem;
+            transition: all 0.2s;
+            border-left: 2px solid transparent;
+            margin-left: -2px;
+        }
+
+        .nav-sublink:hover {
+            color: #16a34a;
+            background: #f0fdf4;
+            border-left-color: #16a34a;
+        }
+
+        .nav-sublink.active {
+            color: #16a34a;
+            background: #f0fdf4;
+            font-weight: 500;
+            border-left-color: #16a34a;
+        }
+
+        /* Main content area adjustment */
+        .main-wrapper {
+            flex: 1;
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Mobile toggle button */
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        /* Mobile sidebar backdrop */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .sidebar-backdrop.show {
+            display: block;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-wrapper {
+                margin-left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+        }
+
+        /* Adjust existing styles */
+        .header {
+            display: none; /* Hide old header */
+        }
+
+        .main-container {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 2rem;
+        }
+
+        .personal-welcome {
+            display: none; /* Remove old welcome banner */
+        }
+
+        /* Updated main column to work with sidebar */
+        .main-column {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Production widget adjustment */
+        .production-widget,
+        .announcements-widget {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .production-widget:hover,
+        .announcements-widget:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-column {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .info-column {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1385,7 +1817,6 @@
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
     </div>
-
 
     <!-- Hidden Caspio Authentication Container -->
     <div class="caspio-hidden-container">
@@ -1407,181 +1838,186 @@
         -->
     </div>
 
-    <!-- Header (Initially Hidden) -->
-    <header class="header" id="mainHeader">
-        <div class="header-container">
-            <div class="welcome-section">
-                <div class="logo">NW</div>
-                <div class="user-info">
-                    <div class="welcome-text" id="headerWelcome">Welcome</div>
-                    <div class="user-role" id="headerRole"></div>
+    <!-- App Wrapper -->
+    <div class="app-wrapper">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
+                </div>
+                <div class="sidebar-user">
+                    <div class="sidebar-user-avatar" id="userAvatar">NW</div>
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name" id="sidebarUserName">Welcome</div>
+                        <div class="sidebar-user-role" id="sidebarUserRole">Staff</div>
+                    </div>
                 </div>
             </div>
-            <div class="header-actions">
-                <div class="last-login" id="lastLogin"></div>
-                <div class="nav-links">
-                    <a href="/" class="nav-link primary">
-                        <i class="fas fa-home"></i>
-                        <span>Main Website</span>
-                    </a>
-                    <a href="https://c3eku948.caspio.com/folderlogout" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Sign Out</span>
+            
+            <nav class="sidebar-nav">
+                <!-- Dashboard -->
+                <div class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="nav-link-text">Dashboard</span>
                     </a>
                 </div>
-            </div>
-        </div>
-    </header>
 
-    <!-- Main Content (Initially Hidden) -->
-    <main class="main-container" id="mainContent">
-        <!-- Personal Welcome Banner -->
-        <div class="personal-welcome" id="personalWelcome">
-            <h1 id="welcomeGreeting">Welcome back!</h1>
-            <p id="welcomeMessage">Select a calculator below to get started</p>
-        </div>
+                <!-- Pricing Calculators -->
+                <div class="nav-item">
+                    <button class="nav-link has-submenu" onclick="toggleSubmenu('pricing-submenu')">
+                        <i class="fas fa-calculator"></i>
+                        <span class="nav-link-text">Pricing Calculators</span>
+                        <i class="fas fa-chevron-right nav-link-arrow"></i>
+                    </button>
+                    <div class="nav-submenu" id="pricing-submenu">
+                        <!-- Contract Pricing -->
+                        <div class="nav-subitem">
+                            <strong style="display: block; padding: 0.5rem 1rem; color: #9ca3af; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Contract Pricing</strong>
+                            <a href="/calculators/dtg-contract.html" class="nav-sublink">DTG Calculator</a>
+                            <a href="/calculators/embroidery-contract.html" class="nav-sublink">Contract Embroidery</a>
+                        </div>
+                        <!-- Customer Supplied -->
+                        <div class="nav-subitem">
+                            <strong style="display: block; padding: 0.5rem 1rem; color: #9ca3af; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Customer Supplied</strong>
+                            <a href="/calculators/embroidery-customer.html" class="nav-sublink">Embroidery</a>
+                            <a href="/calculators/screenprint-customer.html" class="nav-sublink">Screen Print</a>
+                        </div>
+                        <!-- Specialty Items -->
+                        <div class="nav-subitem">
+                            <strong style="display: block; padding: 0.5rem 1rem; color: #9ca3af; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Specialty Items</strong>
+                            <a href="/calculators/embroidered-emblem-calculator.html" class="nav-sublink">Embroidered Emblems</a>
+                            <a href="/calculators/leatherette-quote-form.html" class="nav-sublink">Leatherette</a>
+                            <a href="/calculators/laser-tumbler-polarcamel.html" class="nav-sublink">Laser Tumblers</a>
+                        </div>
+                        <!-- Other Vendors -->
+                        <div class="nav-subitem">
+                            <strong style="display: block; padding: 0.5rem 1rem; color: #9ca3af; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Other Vendors</strong>
+                            <a href="/calculators/richardson-2025.html" class="nav-sublink">Richardson Caps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Design Tools -->
+                <div class="nav-item">
+                    <button class="nav-link has-submenu" onclick="toggleSubmenu('design-submenu')">
+                        <i class="fas fa-palette"></i>
+                        <span class="nav-link-text">Design Tools</span>
+                        <i class="fas fa-chevron-right nav-link-arrow"></i>
+                    </button>
+                    <div class="nav-submenu" id="design-submenu">
+                        <a href="/calculators/safety-stripe-creator.html" class="nav-sublink">Safety Stripe Creator</a>
+                        <a href="/calculators/webstores.html" class="nav-sublink">Webstores</a>
+                    </div>
+                </div>
+
+                <!-- Sales Tools -->
+                <div class="nav-item">
+                    <button class="nav-link has-submenu" onclick="toggleSubmenu('sales-submenu')">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span class="nav-link-text">Sales Tools</span>
+                        <i class="fas fa-chevron-right nav-link-arrow"></i>
+                    </button>
+                    <div class="nav-submenu" id="sales-submenu">
+                        <a href="https://northwestcustomapparel.com/hot-ticket-builder/" class="nav-sublink" target="_blank">Hot Tickets</a>
+                        <a href="/bulk-quoting-app.html" class="nav-sublink">Lead Forms</a>
+                        <a href="https://northwestcustomapparel.com/wp-admin/edit.php?post_type=product" class="nav-sublink" target="_blank">À La Carte</a>
+                    </div>
+                </div>
+
+                <!-- Resources -->
+                <div class="nav-item">
+                    <button class="nav-link has-submenu" onclick="toggleSubmenu('resources-submenu')">
+                        <i class="fas fa-book"></i>
+                        <span class="nav-link-text">Resources</span>
+                        <i class="fas fa-chevron-right nav-link-arrow"></i>
+                    </button>
+                    <div class="nav-submenu" id="resources-submenu">
+                        <a href="/task-guides.html" class="nav-sublink">Task Guide</a>
+                        <a href="/skills-guides.html" class="nav-sublink">Skills Guide</a>
+                    </div>
+                </div>
+
+                <!-- HR Resources -->
+                <div class="nav-item">
+                    <a href="/hr-resources.html" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span class="nav-link-text">HR Resources</span>
+                    </a>
+                </div>
+
+                <!-- Financial Tools -->
+                <div class="nav-item">
+                    <a href="/financial-tools.html" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="nav-link-text">Financial Tools</span>
+                    </a>
+                </div>
+
+                <!-- Art Invoicing -->
+                <div class="nav-item">
+                    <a href="/art-invoice-unified-dashboard.html" class="nav-link">
+                        <i class="fas fa-paint-brush"></i>
+                        <span class="nav-link-text">Art Invoicing</span>
+                    </a>
+                </div>
+
+                <!-- Settings -->
+                <div class="nav-item">
+                    <a href="#settings" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span class="nav-link-text">Settings</span>
+                    </a>
+                </div>
+
+                <!-- Help -->
+                <div class="nav-item">
+                    <a href="#help" class="nav-link">
+                        <i class="fas fa-question-circle"></i>
+                        <span class="nav-link-text">Help</span>
+                    </a>
+                </div>
+            </nav>
+        </nav>
+
+        <!-- Sidebar Backdrop for mobile -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            <!-- New Header -->
+            <header class="main-header">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 style="font-size: 1.25rem; font-weight: 600; margin: 0;">Staff Dashboard</h1>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <div class="current-datetime" id="currentDateTime"></div>
+                    <div class="nav-links">
+                        <a href="/" class="nav-link primary">
+                            <i class="fas fa-home"></i>
+                            <span>Main Website</span>
+                        </a>
+                        <a href="https://c3eku948.caspio.com/folderlogout" class="nav-link">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Sign Out</span>
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="main-container" id="mainContent">
 
         <!-- Dashboard Grid -->
         <div class="dashboard-grid">
             <!-- Main Column Container -->
             <div class="main-column">
-                <!-- Calculators Section -->
-                <section class="calculators-section">
-                <div class="section-header">
-                    <i class="fas fa-calculator" style="color: var(--primary-green); font-size: 1.5rem;"></i>
-                    <h1 class="section-title">Pricing Calculators</h1>
-                </div>
-
-                <!-- Contract Pricing Group -->
-                <div class="calculator-group contract-pricing">
-                    <h2 class="group-title">Contract Pricing</h2>
-                    <div class="calculator-grid">
-                        <a href="calculators/dtg-contract.html" class="calculator-card" 
-                           title="Wholesale DTG pricing for blank apparel. Contact: Taylar">
-                            <i class="fas fa-tshirt calculator-icon"></i>
-                            <span class="calculator-name">DTG Calculator-Contract</span>
-                        </a>
-                        <a href="/calculators/embroidery-contract.html" class="calculator-card"
-                           title="Flat &amp; cap embroidery pricing. Contact: Ruthie">
-                            <i class="fas fa-sewing-needle calculator-icon"></i>
-                            <span class="calculator-name">Contract Embroidery</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Customer Supplied Group -->
-                <div class="calculator-group customer-supplied">
-                    <h2 class="group-title">Customer Supplied Goods</h2>
-                    <div class="calculator-grid">
-                        <a href="/calculators/embroidery-customer.html" class="calculator-card"
-                           title="Embroidery pricing for customer-supplied garments">
-                            <i class="fas fa-hand-holding calculator-icon"></i>
-                            <span class="calculator-name">Embroidery</span>
-                        </a>
-                        <a href="/calculators/screenprint-customer.html" class="calculator-card"
-                           title="Screen printing for customer-supplied items. Contact: General Sales">
-                            <i class="fas fa-print calculator-icon"></i>
-                            <span class="calculator-name">Screen Print</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Specialty Items Group -->
-                <div class="calculator-group specialty-items">
-                    <h2 class="group-title">Specialty Items</h2>
-                    <div class="calculator-grid">
-                        <a href="/calculators/embroidered-emblem-calculator.html" class="calculator-card"
-                           title="Custom embroidered emblem and patch pricing. Contact: Jim Mickelson">
-                            <i class="fas fa-certificate calculator-icon"></i>
-                            <span class="calculator-name">Embroidered Emblems</span>
-                        </a>
-                        <a href="/calculators/leatherette.html" class="calculator-card"
-                           title="Leatherette patch pricing. Note: Tariff applies">
-                            <i class="fas fa-tag calculator-icon"></i>
-                            <span class="calculator-name">Leatherette</span>
-                        </a>
-                        <a href="/calculators/laser-tumbler-polarcamel.html" class="calculator-card"
-                           title="Polar Camel 16 oz laser engraved tumblers. Note: Tariff applies">
-                            <i class="fas fa-mug-hot calculator-icon"></i>
-                            <span class="calculator-name">Laser Tumblers</span>
-                        </a>
-                        <a href="/calculators/webstores.html" class="calculator-card"
-                           title="Webstore setup and management pricing">
-                            <i class="fas fa-store calculator-icon"></i>
-                            <span class="calculator-name">Webstores</span>
-                        </a>
-                        <a href="/calculators/safety-stripe-creator.html" class="calculator-card"
-                           title="Design custom safety stripe layouts for t-shirts">
-                            <i class="fas fa-vest-patches calculator-icon" style="color: #ff6b35;"></i>
-                            <span class="calculator-name">Safety Stripe Creator</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Other Vendors Group -->
-                <div class="calculator-group other-vendors">
-                    <h2 class="group-title">Other Vendors</h2>
-                    <div class="calculator-grid">
-                        <a href="calculators/richardson-2025.html" class="calculator-card"
-                           title="Cap pricing from Richardson vendor">
-                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Richardson%20Caps%20EmbroideryLeatherette.png?ver=1" class="calculator-icon" style="width: 3rem; height: 3rem; object-fit: contain;" alt="Richardson Caps">
-                            <span class="calculator-name">Richardson Caps</span>
-                        </a>
-                    </div>
-                </div>
-            </section>
-
-                <!-- Other Tools Section -->
-                <section class="other-tools">
-                    <div class="section-header">
-                        <i class="fas fa-toolbox" style="color: var(--primary-green); font-size: 1.25rem;"></i>
-                        <h2 class="section-title" style="font-size: 1.25rem;">Other Tools & Resources</h2>
-                    </div>
-                    <div class="tools-grid">
-                        <a href="/forms/hot-ticket.html" class="tool-card">
-                            <i class="fas fa-fire-flame-curved tool-icon" style="color: #ef4444;"></i>
-                            <span class="tool-name">Hot Tickets</span>
-                        </a>
-                        <a href="/forms/leads.html" class="tool-card">
-                            <i class="fas fa-user-plus tool-icon"></i>
-                            <span class="tool-name">Lead Forms</span>
-                        </a>
-                        <a href="/forms/alacarte.html" class="tool-card">
-                            <i class="fas fa-concierge-bell tool-icon"></i>
-                            <span class="tool-name">À La Carte</span>
-                        </a>
-                        <a href="/guides/tasks.html" class="tool-card">
-                            <i class="fas fa-book tool-icon"></i>
-                            <span class="tool-name">Task Guide</span>
-                        </a>
-                        <a href="/guides/skills.html" class="tool-card">
-                            <i class="fas fa-graduation-cap tool-icon"></i>
-                            <span class="tool-name">Skills Guide</span>
-                        </a>
-                        <a href="/hr/resources.html" class="tool-card">
-                            <i class="fas fa-users tool-icon"></i>
-                            <span class="tool-name">HR Resources</span>
-                        </a>
-                    </div>
-                </section>
-
-                <!-- Financial Tools Section -->
-                <section class="financial-tools">
-                    <div class="section-header">
-                        <i class="fas fa-file-invoice-dollar" style="color: var(--primary-green); font-size: 1.25rem;"></i>
-                        <h2 class="section-title" style="font-size: 1.25rem;">Financial Tools</h2>
-                    </div>
-                    <div class="tools-grid">
-                        <a href="art-invoice-unified-dashboard.html" class="tool-card"
-                           title="Complete art invoicing system - view requests, create and manage invoices. Contact: Steve Deland">
-                            <i class="fas fa-palette tool-icon" style="color: #8b5cf6;"></i>
-                            <span class="tool-name">Art Invoicing</span>
-                            <span class="new-badge" style="background: #8b5cf6;">UNIFIED</span>
-                        </a>
-                    </div>
-                </section>
-
-                <!-- Order Dashboard Section -->
+                <!-- Order Dashboard Section (Moved to top) -->
                 <section class="order-dashboard">
                     <div class="section-header">
                         <i class="fas fa-chart-line" style="color: var(--primary-green); font-size: 1.25rem;"></i>
@@ -1604,28 +2040,6 @@
                     </div>
                     
                     <div class="metrics-grid">
-                        <!-- Order Pipeline -->
-                        <div class="metric-card">
-                            <div class="metric-header">
-                                <i class="fas fa-stream"></i>
-                                <h3>Order Pipeline</h3>
-                            </div>
-                            <div class="metric-content">
-                                <div class="pipeline-item">
-                                    <span class="label">Not Invoiced</span>
-                                    <span class="value" id="notInvoiced">--</span>
-                                </div>
-                                <div class="pipeline-item">
-                                    <span class="label">Invoiced, Not Shipped</span>
-                                    <span class="value" id="notShipped">--</span>
-                                </div>
-                                <div class="pipeline-item">
-                                    <span class="label">Shipped Today</span>
-                                    <span class="value" id="shippedToday">--</span>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Revenue Tracking -->
                         <div class="metric-card">
                             <div class="metric-header">
@@ -1682,6 +2096,7 @@
                         </div>
                     </div>
                 </section>
+
             </div>
 
             <!-- Right Column -->
@@ -1739,9 +2154,80 @@
                 </div>
             </aside>
         </div>
-    </main>
+                </div>
+            </main>
+        </div>
+    </div>
 
     <script>
+        // Sidebar toggle functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            if (!sidebar || !backdrop) {
+                console.error('Sidebar elements not found');
+                return;
+            }
+            
+            const isShowing = sidebar.classList.contains('show');
+            sidebar.classList.toggle('show');
+            backdrop.classList.toggle('show');
+            
+            // Prevent body scroll when sidebar is open on mobile
+            if (window.innerWidth <= 1024) {
+                document.body.style.overflow = isShowing ? 'auto' : 'hidden';
+            }
+            
+            console.log(`Mobile sidebar ${isShowing ? 'closed' : 'opened'}`);
+        }
+        
+        // Close sidebar when clicking outside on mobile
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            if (sidebar && backdrop) {
+                sidebar.classList.remove('show');
+                backdrop.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function toggleSubmenu(submenuId) {
+            console.log('toggleSubmenu called with:', submenuId);
+            
+            const submenu = document.getElementById(submenuId);
+            if (!submenu) {
+                console.error('Submenu not found:', submenuId);
+                return;
+            }
+            
+            const parentButton = submenu.previousElementSibling;
+            if (!parentButton) {
+                console.error('Parent button not found for submenu:', submenuId);
+                return;
+            }
+            
+            // Close other submenus
+            document.querySelectorAll('.nav-submenu').forEach(menu => {
+                if (menu.id !== submenuId) {
+                    menu.classList.remove('show');
+                    const menuParent = menu.previousElementSibling;
+                    if (menuParent) {
+                        menuParent.classList.remove('expanded');
+                    }
+                }
+            });
+            
+            // Toggle current submenu
+            const isShowing = submenu.classList.contains('show');
+            submenu.classList.toggle('show');
+            parentButton.classList.toggle('expanded');
+            
+            console.log(`Submenu ${submenuId} ${isShowing ? 'closed' : 'opened'}`);
+        }
+
         // Wait for page and Caspio to load
         window.addEventListener('load', function() {
             // Try to initialize portal with retry mechanism
@@ -1783,43 +2269,58 @@
             // Create full name
             const fullName = lastName ? `${firstName} ${lastName}` : firstName;
 
-            // Update header with first name only for welcome
-            document.getElementById('headerWelcome').textContent = `Welcome, ${firstName}`;
-            if (role) {
-                document.getElementById('headerRole').textContent = role;
+            // Update header elements if they exist (old header is now hidden)
+            const headerWelcome = document.getElementById('headerWelcome');
+            if (headerWelcome) {
+                headerWelcome.textContent = `Welcome, ${firstName}`;
+            }
+            
+            const headerRole = document.getElementById('headerRole');
+            if (role && headerRole) {
+                headerRole.textContent = role;
             }
 
-            // Update personal welcome banner with first name
-            const hour = new Date().getHours();
-            let greeting = 'Welcome back';
-            if (hour < 12) greeting = 'Good morning';
-            else if (hour < 17) greeting = 'Good afternoon';
-            else greeting = 'Good evening';
+            // Update personal welcome banner if it exists (now hidden)
+            const welcomeGreeting = document.getElementById('welcomeGreeting');
+            if (welcomeGreeting) {
+                const hour = new Date().getHours();
+                let greeting = 'Welcome back';
+                if (hour < 12) greeting = 'Good morning';
+                else if (hour < 17) greeting = 'Good afternoon';
+                else greeting = 'Good evening';
 
-            document.getElementById('welcomeGreeting').textContent = `${greeting}, ${firstName}!`;
+                welcomeGreeting.textContent = `${greeting}, ${firstName}!`;
+            }
             
-            // Personalized message based on time/day
-            const messages = [
-                "Let's make today productive!",
-                "Ready to help customers create something amazing?",
-                "Select a calculator below to get started",
-                "Here to help you provide excellent service"
-            ];
-            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-            document.getElementById('welcomeMessage').textContent = randomMessage;
+            // Update welcome message if it exists
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            if (welcomeMessage) {
+                const messages = [
+                    "Let's make today productive!",
+                    "Ready to help customers create something amazing?",
+                    "Select a calculator below to get started",
+                    "Here to help you provide excellent service"
+                ];
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                welcomeMessage.textContent = randomMessage;
+            }
 
-            // Show last login if available
+            // Show last login if available and element exists
             if (lastLogin) {
                 const lastLoginEl = document.getElementById('lastLogin');
-                lastLoginEl.textContent = `Last login: ${formatDate(lastLogin)}`;
-                lastLoginEl.classList.add('show');
+                if (lastLoginEl) {
+                    lastLoginEl.textContent = `Last login: ${formatDate(lastLogin)}`;
+                    lastLoginEl.classList.add('show');
+                }
             }
+
+            // Update current date and time
+            updateDateTime();
+            setInterval(updateDateTime, 60000); // Update every minute
 
             // Hide loading and show content with animation
             document.getElementById('loadingOverlay').classList.add('fade-out');
-            document.getElementById('mainHeader').classList.add('show');
             document.getElementById('mainContent').classList.add('show');
-            document.getElementById('personalWelcome').classList.add('show');
 
             // Store user info for use in calculators
             sessionStorage.setItem('nwca_user_name', fullName);
@@ -1829,6 +2330,9 @@
 
             // Log successful initialization
             console.log('Portal initialized for:', firstName);
+            
+            // Update sidebar user info
+            updateSidebarUserInfo(firstName, role);
             
             // Initialize dashboards
             initializeProductionSchedule();
@@ -1864,6 +2368,52 @@
             } catch (e) {
                 return dateString;
             }
+        }
+        
+        // Update sidebar user info
+        function updateSidebarUserInfo(firstName, role) {
+            // Update sidebar user avatar
+            const userAvatar = document.getElementById('userAvatar');
+            if (userAvatar && firstName) {
+                const initials = firstName.charAt(0).toUpperCase();
+                userAvatar.textContent = initials;
+            }
+            
+            // Update sidebar user name
+            const sidebarUserName = document.getElementById('sidebarUserName');
+            if (sidebarUserName && firstName) {
+                sidebarUserName.textContent = firstName;
+            }
+            
+            // Update sidebar user role
+            const sidebarUserRole = document.getElementById('sidebarUserRole');
+            if (sidebarUserRole && role) {
+                sidebarUserRole.textContent = role;
+            }
+        }
+
+        // Update current date and time
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const timeOptions = { 
+                hour: 'numeric', 
+                minute: '2-digit' 
+            };
+            
+            const dateStr = now.toLocaleDateString('en-US', dateOptions);
+            const timeStr = now.toLocaleTimeString('en-US', timeOptions);
+            
+            // Update all datetime elements
+            const dateTimeEls = document.querySelectorAll('.current-datetime');
+            dateTimeEls.forEach(el => {
+                el.textContent = `${dateStr} • ${timeStr}`;
+            });
         }
 
         // Professional Announcements System
@@ -2012,14 +2562,25 @@
             card.classList.toggle('active');
         };
 
-        // Initialize announcements when portal loads
-        const originalInitializePortal = initializePortal;
-        initializePortal = function() {
-            originalInitializePortal();
-            initializeAnnouncements();
-            initializeProductionSchedule();
-            initializeOrderDashboard();
-        };
+        // Update sidebar user info
+        function updateSidebarUserInfo(firstName, role) {
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('sidebarUserName');
+            const userRole = document.getElementById('sidebarUserRole');
+            
+            if (userAvatar && firstName) {
+                userAvatar.textContent = firstName.charAt(0).toUpperCase();
+            }
+            
+            if (userName && firstName) {
+                userName.textContent = firstName;
+            }
+            
+            if (userRole && role) {
+                userRole.textContent = role;
+            }
+        }
+
 
         // Production Schedule Service
         class ProductionScheduleService {
@@ -2318,11 +2879,6 @@
             mapApiResponseToMetrics(apiData) {
                 // Map the new API response structure to the existing metrics format
                 const metrics = {
-                    // Order Pipeline - from summary
-                    notInvoiced: apiData.summary?.notInvoiced || 0,
-                    notShipped: apiData.summary?.notShipped || 0,
-                    shippedToday: apiData.todayStats?.shippedToday || 0,
-                    
                     // Revenue Tracking
                     revenueToday: apiData.todayStats?.salesToday || 0,
                     revenueWeek: apiData.summary?.totalSales || 0, // Using total sales for the period
@@ -2721,11 +3277,6 @@
                 
                 console.log('Metrics received:', metrics);
                 
-                // Update Order Pipeline
-                document.getElementById('notInvoiced').textContent = metrics.notInvoiced;
-                document.getElementById('notShipped').textContent = metrics.notShipped;
-                document.getElementById('shippedToday').textContent = metrics.shippedToday;
-                
                 // Update Revenue Tracking
                 document.getElementById('revenueToday').textContent = formatCurrency(metrics.revenueToday);
                 document.getElementById('revenueWeek').textContent = formatCurrency(metrics.revenueWeek);
@@ -3058,6 +3609,80 @@
         console.log('  window.debugOrderDashboard.testAPI() - Test API directly');
         console.log('  window.debugOrderDashboard.testDateRange(30) - Test last 30 days');
         console.log('  window.debugOrderDashboard.inspectCache() - View cache contents');
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize core features
+            initializeOrderDashboard();
+            initializeProductionSchedule();
+            // initializeCalendarWidget(); // Removed - function doesn't exist
+            updateDateTime();
+            setInterval(updateDateTime, 60000); // Update every minute
+            
+            // Initialize sidebar functionality
+            initializeSidebar();
+            
+            // Handle window resize for responsive behavior
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 1024) {
+                    // Reset mobile sidebar state on desktop
+                    const sidebar = document.getElementById('sidebar');
+                    const backdrop = document.getElementById('sidebarBackdrop');
+                    if (sidebar && backdrop) {
+                        sidebar.classList.remove('show');
+                        backdrop.classList.remove('show');
+                        document.body.style.overflow = 'auto';
+                    }
+                }
+            });
+            
+            // Wait for Caspio authentication data
+            const maxRetries = 10;
+            let retryCount = 0;
+            
+            function attemptInitialization() {
+                // Check if Caspio has loaded the data
+                const caspioData = document.querySelector('.cbResultSetData');
+                
+                if (caspioData && caspioData.textContent.trim()) {
+                    initializePortal();
+                } else if (retryCount < maxRetries) {
+                    retryCount++;
+                    setTimeout(attemptInitialization, 500);
+                } else {
+                    // Fallback to generic welcome
+                    initializePortal();
+                }
+            }
+            
+            // Start checking after initial delay
+            setTimeout(attemptInitialization, 1000);
+        });
+        
+        // Initialize sidebar functionality
+        function initializeSidebar() {
+            // Set active state based on current page
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                    // If it's in a submenu, expand the parent
+                    const submenu = link.closest('.nav-submenu');
+                    if (submenu) {
+                        submenu.classList.add('show');
+                        const parentButton = submenu.previousElementSibling;
+                        if (parentButton && parentButton.classList.contains('nav-link')) {
+                            parentButton.classList.add('expanded');
+                        }
+                    }
+                }
+            });
+            
+            // Note: No additional click handlers needed - using inline onclick for simplicity
+            console.log('Sidebar initialized - using inline onclick handlers for submenus');
+        }
     </script>
 </body>
 </html>
