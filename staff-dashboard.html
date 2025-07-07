@@ -28,7 +28,7 @@
 
         .dashboard-container {
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 320px 1fr;
             min-height: 100vh;
         }
 
@@ -41,6 +41,153 @@
             padding: 2rem 0;
             position: relative;
             overflow-y: auto;
+            width: 320px; /* Increased width for better visibility */
+        }
+        
+        /* Dashboard card styles */
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin: 0.5rem 0;
+        }
+        
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .metric-change.change-positive {
+            color: #10b981;
+        }
+        
+        .metric-change.change-negative {
+            color: #ef4444;
+        }
+        
+        .change-icon {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Performer styles */
+        .performer-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+        
+        .performer-rank {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #A60F2D, #8B0C25);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .performer-info {
+            flex: 1;
+        }
+        
+        .performer-name {
+            font-weight: 500;
+            color: #2d3748;
+        }
+        
+        .performer-stats {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        
+        /* Error message styles */
+        .error-message {
+            color: #dc2626;
+            background: #fee2e2;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .loading {
+            color: #6b7280;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* Date Range Selector */
+        .date-range-selector {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .date-range-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: white;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        
+        .date-range-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .date-range-btn.active {
+            background: #A60F2D;
+            color: white;
+        }
+        
+        /* Order Type Item Styles */
+        .order-type-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f3f4f6;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .order-type-item:hover {
+            background: #e5e7eb;
+        }
+        
+        .type-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .type-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .type-orders {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .type-sales {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #A60F2D;
         }
 
         .logo {
@@ -290,6 +437,31 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* Date Range Buttons */
+        .date-range-btn {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #6b7280;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .date-range-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .date-range-btn.active {
+            background: #A60F2D;
+            border-color: #A60F2D;
+            color: white;
+            box-shadow: 0 1px 2px rgba(166, 15, 45, 0.3);
         }
 
         /* Responsive */
@@ -2025,12 +2197,21 @@
     </style>
 </head>
 <body>
+    <!-- Hidden Caspio Authentication Container -->
+    <div id="caspio-auth-container" style="display: none;">
+        <div class="cbResultSetData">[@authfield:First_Name]</div>
+        <div id="auth-firstname">[@authfield:First_Name]</div>
+        <div id="auth-lastname">[@authfield:Last_Name]</div>
+        <div id="auth-email">[@authfield:Email]</div>
+        <div id="auth-role">[@authfield:Role]</div>
+    </div>
+    
     <div class="dashboard-container">
         <!-- Sidebar -->
         <nav class="sidebar">
-            <div class="logo">
-                <h2>NW Custom Apparel</h2>
-                <p>Staff Dashboard</p>
+            <div class="logo" style="text-align: center; padding: 1.5rem;">
+                <h2 style="color: #ffffff; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">NW Custom Apparel</h2>
+                <p style="color: rgba(255,255,255,0.9); font-size: 1rem; margin: 0; font-weight: 500;">Staff Dashboard</p>
             </div>
             
             <div class="nav-section">
@@ -2143,86 +2324,81 @@
                     <h1 id="dynamicGreeting">Good Morning, Erik!</h1>
                     <p class="header-info" id="currentDateTime">Sunday, July 6, 2025 • 6:31 AM</p>
                 </div>
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">EM</div>
-                    <span id="userDisplayName">Erik Mickelson</span>
+                <div style="display: flex; align-items: center; gap: 2rem;">
+                    <!-- Date Range Selector -->
+                    <div class="date-range-selector" style="display: flex; gap: 0.5rem;">
+                        <button class="date-range-btn active" data-days="1" onclick="changeDateRange(1)">Today</button>
+                        <button class="date-range-btn" data-days="7" onclick="changeDateRange(7)">Last 7 Days</button>
+                        <button class="date-range-btn" data-days="30" onclick="changeDateRange(30)">Last 30 Days</button>
+                        <button class="date-range-btn" data-days="365" onclick="changeDateRange(365)">YTD</button>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar">EM</div>
+                        <span id="userDisplayName">Erik Mickelson</span>
+                    </div>
                 </div>
             </header>
 
-            <!-- Dashboard Grid -->
+            <!-- Year-over-Year Comparison - MOVED TO TOP -->
+            <div class="dashboard-grid" style="margin-bottom: 2rem;">
+                <div class="card" data-widget="year-over-year" style="grid-column: span 2;">
+                    <div class="card-header">
+                        <h3 class="card-title">Year-over-Year Sales Comparison</h3>
+                    </div>
+                    <div class="yoy-content" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; padding: 1rem;">
+                        <div class="yoy-item">
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">Last Year Total</div>
+                            <div class="yoy-value" id="lastYearTotal" style="font-size: 2rem; font-weight: 700; color: #6b7280;">Loading...</div>
+                        </div>
+                        <div class="yoy-item">
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">This Year Total</div>
+                            <div class="yoy-value" id="thisYearTotal" style="font-size: 2rem; font-weight: 700; color: #A60F2D;">Loading...</div>
+                        </div>
+                        <div class="yoy-item">
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">Growth</div>
+                            <div class="yoy-growth" id="yoyGrowth" style="font-size: 2rem; font-weight: 700;">Loading...</div>
+                        </div>
+                    </div>
+                    <div style="padding: 0 1rem 1rem;">
+                        <canvas id="yoyChart" style="max-height: 200px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Grid -->
             <div class="dashboard-grid">
-                <!-- Revenue Card -->
-                <div class="card">
+
+                <!-- Enhanced Production Schedule (ALL TYPES) -->
+                <div class="card" data-widget="production-schedule">
                     <div class="card-header">
-                        <h3 class="card-title">Revenue Tracking</h3>
+                        <h3 class="card-title">Production Schedule - All Decoration Types</h3>
                     </div>
-                    <div class="metric-value" id="totalRevenue">$225,797</div>
-                    <div class="metric-change change-positive">
-                        <svg class="change-icon" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"/>
-                        </svg>
-                        +12.4% from last period
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="revenueChart"></canvas>
+                    <div class="schedule-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <!-- This will be populated by loadProductionSchedule() -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+                            <span style="font-weight: 500;">Loading all production schedules...</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Production Schedule -->
-                <div class="card">
+                <!-- Sales Team Performance -->
+                <div class="card" data-widget="sales-team-performance">
                     <div class="card-header">
-                        <h3 class="card-title">Production Schedule</h3>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-                            <span style="font-weight: 500;">DTG</span>
-                            <span style="background: #edf2f7; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem;">Available Jul 24</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-                            <span style="font-weight: 500;">DTG Rush</span>
-                            <span style="background: #edf2f7; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem;">Available Jul 17</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-                            <span style="font-weight: 500;">Embroidery</span>
-                            <span style="background: #edf2f7; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem;">Available Jul 16</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-                            <span style="font-weight: 500;">Screen Print</span>
-                            <span style="background: #edf2f7; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem;">Available Jul 16</span>
-                        </div>
-                    </div>
-                    <div style="margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #A60F2D, #8B0C25); color: white; border-radius: 8px; font-size: 0.9rem;">
-                        <div style="font-weight: 500;">Current Capacity</div>
-                        <div style="opacity: 0.9;">100-500 Prints • Ask for rushes</div>
-                    </div>
-                </div>
-
-                <!-- Team Performance -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Top Performers</h3>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-weight: 500;">Nika Lao</span>
-                            <div style="text-align: right;">
-                                <div style="font-weight: 600; color: #38a169;">$134,644</div>
-                                <div style="font-size: 0.875rem; color: #718096;">163 orders</div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div>
+                                <h3 class="card-title">Sales Team Performance</h3>
+                                <p style="font-size: 0.875rem; color: #6b7280; margin: 0.25rem 0 0 0;" id="salesTeamTimeframe">Last 30 days</p>
+                            </div>
+                            <div class="sales-team-date-selector" style="display: flex; gap: 0.5rem;">
+                                <button class="date-range-btn" data-days="1" onclick="changeSalesTeamRange(1)" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; background: white; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer; color: #374151;">Today</button>
+                                <button class="date-range-btn" data-days="7" onclick="changeSalesTeamRange(7)" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; background: white; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer; color: #374151;">7 Days</button>
+                                <button class="date-range-btn active" data-days="30" onclick="changeSalesTeamRange(30)" style="padding: 0.375rem 0.75rem; border: 1px solid #A60F2D; background: #A60F2D; color: white; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer;">30 Days</button>
                             </div>
                         </div>
+                    </div>
+                    <div class="sales-team-list" style="display: flex; flex-direction: column; gap: 1rem; max-height: 400px; overflow-y: auto; padding: 0.5rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-weight: 500;">Taylar Hanson</span>
-                            <div style="text-align: right;">
-                                <div style="font-weight: 600; color: #38a169;">$74,266</div>
-                                <div style="font-size: 0.875rem; color: #718096;">142 orders</div>
-                            </div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-weight: 500;">Ruth Nhong</span>
-                            <div style="text-align: right;">
-                                <div style="font-weight: 600; color: #38a169;">$18,554</div>
-                                <div style="font-size: 0.875rem; color: #718096;">90 orders</div>
-                            </div>
+                            <span style="font-weight: 500;">Loading all sales representatives...</span>
                         </div>
                     </div>
                 </div>
@@ -2230,70 +2406,35 @@
 
             <!-- Secondary Row -->
             <div class="dashboard-grid">
-                <!-- Quick Actions -->
+                <!-- Quick Actions - Art Invoices Only -->
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Quick Actions</h3>
                     </div>
-                    <div class="quick-actions">
-                        <a href="/calculators/dtg-contract.html" class="quick-action">
-                            <div class="action-icon">📊</div>
-                            <div>New Quote</div>
-                        </a>
-                        <a href="/financial-tools.html" class="quick-action">
-                            <div class="action-icon">📋</div>
-                            <div>View Orders</div>
-                        </a>
-                        <a href="#" class="quick-action">
-                            <div class="action-icon">⚙️</div>
-                            <div>Settings</div>
-                        </a>
-                        <a href="/art-invoice-unified-dashboard.html" class="quick-action">
-                            <div class="action-icon">📈</div>
-                            <div>Art Invoices</div>
+                    <div class="quick-actions" style="justify-content: center;">
+                        <a href="/art-invoice-unified-dashboard.html" class="quick-action" style="min-width: 200px;">
+                            <div class="action-icon">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                            </div>
+                            <div style="font-weight: 600;">Art Invoices Dashboard</div>
                         </a>
                     </div>
                 </div>
 
-                <!-- Team Updates -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Team Updates</h3>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 1rem; border-radius: 8px;">
-                            <div style="font-weight: 600; margin-bottom: 0.5rem;">🎉 June Birthdays</div>
-                            <div style="opacity: 0.8;">BBQ celebration on June 30th</div>
-                        </div>
-                        <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 1rem; border-radius: 8px;">
-                            <div style="font-weight: 600; margin-bottom: 0.5rem;">🚀 New Calculator Launch</div>
-                            <div style="opacity: 0.8;">2025 calculators are now live</div>
+                <!-- Order Types Breakdown with Date Selector -->
+                <div class="card" data-widget="order-types-breakdown" style="grid-column: span 2;">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="card-title">Order Types Breakdown</h3>
+                        <div class="order-types-date-selector" style="display: flex; gap: 0.5rem;">
+                            <button class="date-range-btn" data-days="1" onclick="changeOrderTypesRange(1)">Today</button>
+                            <button class="date-range-btn" data-days="7" onclick="changeOrderTypesRange(7)">7 Days</button>
+                            <button class="date-range-btn active" data-days="30" onclick="changeOrderTypesRange(30)">30 Days</button>
                         </div>
                     </div>
-                </div>
-
-                <!-- Year Comparison -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Year-over-Year Growth</h3>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                        <div>
-                            <div style="font-size: 0.85rem; color: #718096; margin-bottom: 0.25rem;">2025 Sales</div>
-                            <div class="metric-value" style="font-size: 1.5rem;">$1,134,855</div>
-                            <div style="font-size: 0.85rem; color: #718096;">2,734 orders</div>
+                    <div class="order-types-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding: 1.5rem;">
+                        <div style="text-align: center; grid-column: span 3; padding: 2rem;">
+                            <span style="font-weight: 500;">Loading all order types...</span>
                         </div>
-                        <div>
-                            <div style="font-size: 0.85rem; color: #718096; margin-bottom: 0.25rem;">2024 Sales</div>
-                            <div style="font-size: 1.5rem; font-weight: 600; color: #4a5568;">$1,486,804</div>
-                            <div style="font-size: 0.85rem; color: #718096;">2,668 orders</div>
-                        </div>
-                    </div>
-                    <div class="metric-change change-negative">
-                        <svg class="change-icon" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"/>
-                        </svg>
-                        -10.22% revenue, +2.47% orders
                     </div>
                 </div>
             </div>
@@ -2301,33 +2442,145 @@
     </div>
 
     <!-- Hidden Caspio Authentication Container -->
-    <div style="position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; overflow: hidden;">
-        <!-- Caspio Authentication DataPage -->
-        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+    <div id="caspio-auth-container" style="display: none;">
+        <!-- Caspio DataPage embed will go here -->
+        <div class="cbResultSetData">[@authfield:First_Name]</div>
+        <div id="auth-firstname">[@authfield:First_Name]</div>
+        <div id="auth-lastname">[@authfield:Last_Name]</div>
+        <div id="auth-email">[@authfield:Email]</div>
+        <div id="auth-role">[@authfield:Role]</div>
     </div>
 
     <script>
         // API Configuration
         const API_CONFIG = {
             baseURL: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api',
-            refreshInterval: 60 * 60 * 1000, // 1 hour
+            refreshInterval: 5 * 60 * 1000, // 5 minutes as per original
             cache: {
                 revenue: 'dashboard_revenue_cache',
                 production: 'dashboard_production_cache'
             }
         };
 
-        // Initialize Chart.js charts and API data
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load API data
-            loadDashboardData();
+        // User Data Functions
+        function getUserData() {
+            // Try multiple methods to get user data
+            let firstName = 'Team Member'; // Default fallback
             
-            // Set up refresh interval
-            setInterval(loadDashboardData, API_CONFIG.refreshInterval);
-            // Revenue Chart
-            const revenueCtx = document.getElementById('revenueChart');
-            if (revenueCtx) {
-                new Chart(revenueCtx, {
+            // Method 1: Direct Caspio element parsing
+            const caspioData = document.querySelector('.cbResultSetData');
+            if (caspioData && caspioData.textContent) {
+                firstName = caspioData.textContent.trim();
+            }
+            
+            // Method 2: Check auth fields
+            if (firstName === 'Team Member') {
+                const authFirstName = document.getElementById('auth-firstname');
+                if (authFirstName && authFirstName.textContent) {
+                    firstName = authFirstName.textContent.trim();
+                }
+            }
+            
+            // Method 3: Check sessionStorage (if previously saved)
+            if (firstName === 'Team Member') {
+                const savedName = sessionStorage.getItem('userFirstName');
+                if (savedName) {
+                    firstName = savedName;
+                }
+            }
+            
+            // Save for future use
+            if (firstName !== 'Team Member') {
+                sessionStorage.setItem('userFirstName', firstName);
+            }
+            
+            return {
+                firstName: firstName,
+                lastName: document.getElementById('auth-lastname')?.textContent?.trim() || '',
+                email: document.getElementById('auth-email')?.textContent?.trim() || '',
+                role: document.getElementById('auth-role')?.textContent?.trim() || ''
+            };
+        }
+
+        function updateUserGreeting() {
+            const userData = getUserData();
+            const hour = new Date().getHours();
+            let greeting = 'Welcome back';
+            
+            if (hour < 12) greeting = 'Good morning';
+            else if (hour < 17) greeting = 'Good afternoon';
+            else greeting = 'Good evening';
+            
+            const greetingElement = document.getElementById('dynamicGreeting');
+            if (greetingElement) {
+                greetingElement.textContent = `${greeting}, ${userData.firstName}!`;
+            }
+            
+            // Update the date/time display
+            const dateTimeElement = document.getElementById('currentDateTime');
+            if (dateTimeElement) {
+                const now = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const dateStr = now.toLocaleDateString('en-US', options);
+                const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                dateTimeElement.textContent = `${dateStr} • ${timeStr}`;
+            }
+            
+            // Update user avatar initials
+            const avatarElement = document.getElementById('userAvatar');
+            if (avatarElement && userData.firstName !== 'Team Member') {
+                const initials = userData.firstName.charAt(0) + (userData.lastName ? userData.lastName.charAt(0) : '');
+                avatarElement.textContent = initials.toUpperCase();
+            }
+            
+            // Update display name
+            const displayNameElement = document.getElementById('userDisplayName');
+            if (displayNameElement) {
+                const fullName = userData.firstName + (userData.lastName ? ' ' + userData.lastName : '');
+                displayNameElement.textContent = fullName;
+            }
+        }
+
+        // Initialize Chart.js charts and API data
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize user greeting
+            updateUserGreeting();
+            
+            // Load all dashboard data
+            await Promise.all([
+                loadRevenueData(),      // Revenue and orders count
+                loadProductionSchedule(), // Production availability
+                loadSalesTeamPerformance(),     // ALL sales reps performance
+                loadYearOverYear(),      // Enhanced YTD comparison
+                loadOrderTypesBreakdown() // ALL order types breakdown
+            ]);
+            
+            // Set up refresh intervals
+            setInterval(updateUserGreeting, 60000); // Update greeting every minute
+            setInterval(async () => {
+                // Refresh all data every 5 minutes
+                await Promise.all([
+                    loadRevenueData(),
+                    loadProductionSchedule(),
+                    loadSalesTeamPerformance(),
+                    loadOrderTypesBreakdown()
+                ]);
+            }, API_CONFIG.refreshInterval);
+            
+            // Listen for postMessage if using iframe approach
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.type === 'caspioUserData') {
+                    const userData = event.data.data;
+                    if (userData.firstName) {
+                        sessionStorage.setItem('userFirstName', userData.firstName);
+                        updateUserGreeting();
+                    }
+                }
+            });
+            // Initialize Charts with safe creation
+            // Revenue Chart - only create this if canvas exists
+            setTimeout(() => {
+                createOrUpdateChart('revenueChart', {
                     type: 'line',
                     data: {
                         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
@@ -2363,105 +2616,60 @@
                         }
                     }
                 });
-            }
-
-            // Orders Chart
-            const ordersCtx = document.getElementById('ordersChart');
-            if (ordersCtx) {
-                new Chart(ordersCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['DTG', 'Embroidery', 'Screen Print', 'Caps', 'Other'],
-                        datasets: [{
-                            label: 'Orders',
-                            data: [145, 89, 67, 45, 23],
-                            backgroundColor: [
-                                'rgba(166, 15, 45, 0.8)',
-                                'rgba(139, 12, 37, 0.8)',
-                                'rgba(196, 18, 54, 0.8)',
-                                'rgba(166, 15, 45, 0.6)',
-                                'rgba(77, 77, 77, 0.8)'
-                            ],
-                            borderRadius: 8,
-                            borderSkipped: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+            }, 100); // Small delay to ensure DOM is ready
         });
 
-        // API Functions
-        async function loadDashboardData() {
-            try {
-                // Load revenue data
-                await loadRevenueData();
-                
-                // Load production schedule
-                await loadProductionSchedule();
-                
-                // Load year-over-year comparison
-                await loadYearOverYear();
-                
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-            }
-        }
-
+        // API Functions with Correct Response Structure
         async function loadRevenueData() {
+            const revenueCard = document.querySelector('[data-metric="revenue"]');
+            const valueElement = document.getElementById('totalRevenue');
+            const trendElement = revenueCard?.querySelector('.metric-change');
+            const ordersElement = document.querySelector('[data-metric="orders"] .metric-value');
+            
             try {
-                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=30`);
+                // Show loading state
+                if (valueElement) valueElement.textContent = 'Loading...';
+                if (ordersElement) ordersElement.textContent = 'Loading...';
                 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch revenue data');
-                }
+                // Fetch data with current date range and YoY comparison
+                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=${currentDateRange}&compareYoY=true`);
+                
+                if (!response.ok) throw new Error('API request failed');
                 
                 const data = await response.json();
                 
-                // Update revenue display
-                const revenueElement = document.getElementById('totalRevenue');
-                if (revenueElement && data.totalRevenue) {
-                    revenueElement.textContent = `$${data.totalRevenue.toLocaleString()}`;
+                // Update revenue display using correct path
+                if (valueElement) {
+                    valueElement.textContent = `$${(data.summary.totalSales || 0).toLocaleString()}`;
                 }
                 
-                // Update revenue chart with actual data
-                if (window.revenueChart && data.dailyRevenue) {
-                    const labels = data.dailyRevenue.map(item => {
-                        const date = new Date(item.date);
-                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    });
-                    
-                    const values = data.dailyRevenue.map(item => item.revenue);
-                    
-                    window.revenueChart.data.labels = labels;
-                    window.revenueChart.data.datasets[0].data = values;
-                    window.revenueChart.update();
+                // Update orders count
+                if (ordersElement) {
+                    ordersElement.textContent = data.summary.totalOrders || '0';
+                }
+                
+                // Update trend using YoY data if available
+                if (trendElement && data.yearOverYear) {
+                    const growth = data.yearOverYear.comparison.salesGrowth;
+                    const arrow = growth >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                    const color = growth >= 0 ? '#10b981' : '#ef4444';
+                    const changeClass = growth >= 0 ? 'change-positive' : 'change-negative';
+                    trendElement.innerHTML = `
+                        <svg class="change-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="${growth >= 0 ? 
+                                'M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z' : 
+                                'M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z'}"/>
+                        </svg>
+                        ${Math.abs(growth).toFixed(1)}% from last year
+                    `;
+                    trendElement.className = `metric-change ${changeClass}`;
                 }
                 
             } catch (error) {
-                console.error('Error loading revenue data:', error);
-                document.getElementById('totalRevenue').textContent = 'Unavailable';
+                console.error('Revenue API Error:', error);
+                if (valueElement) valueElement.textContent = 'Unavailable';
+                if (ordersElement) ordersElement.textContent = 'Unavailable';
+                if (trendElement) trendElement.textContent = 'Unable to load data';
             }
         }
 
@@ -2487,34 +2695,38 @@
         }
 
         function updateProductionDisplay(schedule) {
-            const container = document.querySelector('.card:nth-child(2) > div:last-child');
+            const container = document.querySelector('[data-widget="production-schedule"] .schedule-list');
             if (!container) return;
             
+            // Show ALL decoration types
             const productionItems = [
                 { label: 'DTG', date: schedule.DTG, comment: schedule.Comment_DTG },
-                { label: 'DTG Rush', date: calculateRushDate(schedule.DTG), comment: 'Rush orders available' },
+                { label: 'DTG Rush', date: schedule.DTG_Sneak_In || calculateRushDate(schedule.DTG), comment: 'Rush orders available' },
                 { label: 'Embroidery', date: schedule.Embroidery, comment: schedule.Comment_Emb },
-                { label: 'Screen Print', date: schedule.Screenprint, comment: schedule.Comment_SP }
+                { label: 'Cap Embroidery', date: schedule.Cap_Embroidery, comment: schedule.Comment_Cap },
+                { label: 'Screen Print', date: schedule.Screenprint, comment: schedule.Comment_SP },
+                { label: 'Transfers', date: schedule.Transfers, comment: schedule.Comment_Transfers }
             ];
             
             let html = '';
-            productionItems.forEach(item => {
+            productionItems.forEach((item, index) => {
                 const availability = formatAvailabilityDate(item.date);
+                const isRush = item.label.includes('Rush');
+                const bgColor = isRush ? '#fee2e2' : (index % 2 === 0 ? '#f9fafb' : 'white');
+                
                 html += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-                        <span style="font-weight: 500;">${item.label}</span>
-                        <span style="background: #edf2f7; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem;" 
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: ${bgColor}; border-radius: 0.375rem; margin-bottom: 0.5rem;">
+                        <span style="font-weight: 600; color: ${isRush ? '#dc2626' : '#1f2937'};">${item.label}</span>
+                        <span style="background: ${isRush ? '#dc2626' : '#A60F2D'}; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;" 
                               title="${item.comment || ''}">${availability}</span>
                     </div>
                 `;
             });
             
-            // Add capacity info
+            // Clean production schedule - just show updated info
             html += `
-                <div style="margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #A60F2D, #8B0C25); color: white; border-radius: 8px; font-size: 0.9rem;">
-                    <div style="font-weight: 500;">Current Capacity</div>
-                    <div style="opacity: 0.9;">100-500 Prints • Ask for rushes</div>
-                    <div style="font-size: 0.75rem; margin-top: 0.5rem; opacity: 0.8;">Updated by ${schedule.Employee || 'System'}</div>
+                <div style="margin-top: 1rem; padding: 0.5rem; text-align: center; font-size: 0.75rem; color: #6b7280; border-top: 1px solid #e5e7eb;">
+                    Updated by ${schedule.Employee || 'System'} on ${formatDate(schedule.Date)}
                 </div>
             `;
             
@@ -2544,7 +2756,7 @@
         }
 
         function showProductionError() {
-            const container = document.querySelector('.card:nth-child(2) > div:last-child');
+            const container = document.querySelector('[data-widget="production-schedule"] .schedule-list');
             if (container) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: #dc2626;">
@@ -2556,71 +2768,357 @@
         }
 
         async function loadYearOverYear() {
+            const yoyCard = document.querySelector('[data-widget="year-over-year"]');
+            const lastYearTotal = document.getElementById('lastYearTotal');
+            const thisYearTotal = document.getElementById('thisYearTotal');
+            const yoyGrowth = document.getElementById('yoyGrowth');
+            const yoyChartCanvas = document.getElementById('yoyChart');
+            
             try {
-                // This would need a specific endpoint for YoY comparison
-                // For now, we'll simulate it
-                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=365`);
+                // Fetch with YoY comparison
+                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?compareYoY=true`);
                 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch YoY data');
-                }
+                if (!response.ok) throw new Error('API request failed');
                 
                 const data = await response.json();
                 
-                // Update YoY display
-                const yoyElement = document.querySelector('.metric-value:contains("$1,488,804")');
-                if (yoyElement && data.totalRevenue) {
-                    yoyElement.textContent = `$${data.totalRevenue.toLocaleString()}`;
+                if (data.yearOverYear) {
+                    const yoy = data.yearOverYear;
+                    const currentSales = yoy.currentYear.totalSales;
+                    const previousSales = yoy.previousYear.totalSales;
+                    const growth = yoy.comparison.salesGrowth;
+                    const orderGrowth = yoy.comparison.orderGrowth;
+                    
+                    // Update the three main values
+                    if (lastYearTotal) {
+                        lastYearTotal.textContent = `$${previousSales.toLocaleString()}`;
+                    }
+                    
+                    if (thisYearTotal) {
+                        thisYearTotal.textContent = `$${currentSales.toLocaleString()}`;
+                    }
+                    
+                    if (yoyGrowth) {
+                        const isPositive = growth >= 0;
+                        yoyGrowth.innerHTML = `
+                            <span style="color: ${isPositive ? '#10b981' : '#ef4444'};">
+                                ${isPositive ? '↑' : '↓'} ${Math.abs(growth).toFixed(1)}%
+                            </span>
+                        `;
+                    }
+                    
+                    // Create comparison chart
+                    if (yoyChartCanvas && window.Chart) {
+                        createOrUpdateChart('yoyChart', {
+                            type: 'bar',
+                            data: {
+                                labels: ['Last Year', 'This Year'],
+                                datasets: [{
+                                    label: 'Total Sales',
+                                    data: [previousSales, currentSales],
+                                    backgroundColor: ['#6b7280', '#A60F2D'],
+                                    borderRadius: 8
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return `Sales: $${context.parsed.y.toLocaleString()}`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            callback: function(value) {
+                                                return '$' + (value / 1000).toFixed(0) + 'K';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
                 }
                 
             } catch (error) {
-                console.error('Error loading YoY data:', error);
+                console.error('YoY API Error:', error);
+                if (lastYearTotal) lastYearTotal.textContent = 'Unavailable';
+                if (thisYearTotal) thisYearTotal.textContent = 'Unavailable';
+                if (yoyGrowth) yoyGrowth.textContent = 'Unable to load';
             }
         }
-
-        // Store chart instance globally for updates
-        let revenueChart;
-        document.addEventListener('DOMContentLoaded', function() {
-            const revenueCtx = document.getElementById('revenueChart');
-            if (revenueCtx) {
-                window.revenueChart = new Chart(revenueCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Loading...'],
-                        datasets: [{
-                            label: 'Revenue',
-                            data: [0],
-                            borderColor: '#A60F2D',
-                            backgroundColor: 'rgba(166, 15, 45, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                }
-                            }
-                        }
-                    }
-                });
+        
+        // Load ALL Sales Team Performance (not just top 5)
+        async function loadSalesTeamPerformance() {
+            const salesTeamCard = document.querySelector('[data-widget="sales-team-performance"]');
+            const salesTeamList = salesTeamCard?.querySelector('.sales-team-list');
+            
+            try {
+                if (salesTeamList) {
+                    salesTeamList.innerHTML = '<div class="loading">Loading all sales representatives...</div>';
+                }
+                
+                // Use order-dashboard API which provides CSR breakdown
+                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=${currentSalesTeamRange}`);
+                
+                if (!response.ok) throw new Error('API request failed');
+                
+                const data = await response.json();
+                
+                // Get ALL sales reps - no slicing!
+                const allSalesReps = data.breakdown.byCsr;
+                
+                // Display ALL sales reps with improved spacing
+                const salesTeamHTML = allSalesReps.map((rep, index) => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: ${index % 2 === 0 ? '#f9fafb' : 'white'}; border-radius: 0.5rem; border: 1px solid #e5e7eb; margin-bottom: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 36px; height: 36px; background: ${index < 3 ? 'linear-gradient(135deg, #A60F2D, #8B0C25)' : '#e5e7eb'}; color: ${index < 3 ? 'white' : '#6b7280'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
+                                ${index + 1}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #1f2937; font-size: 1rem; margin-bottom: 0.25rem;">${rep.name}</div>
+                                <div style="font-size: 0.875rem; color: #6b7280;">${rep.orders} orders</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: #1f2937; font-size: 1.25rem; margin-bottom: 0.25rem;">$${rep.sales.toLocaleString()}</div>
+                            <div style="font-size: 0.75rem; color: #6b7280;">Avg: $${(rep.sales / (rep.orders || 1)).toFixed(0)}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                if (salesTeamList) {
+                    salesTeamList.innerHTML = salesTeamHTML || '<div class="error-message">No sales data available</div>';
+                }
+                
+            } catch (error) {
+                console.error('Sales Team API Error:', error);
+                if (salesTeamList) {
+                    salesTeamList.innerHTML = '<div class="error-message">Unavailable - Unable to load sales team data</div>';
+                }
             }
-        });
+        }
+        
+        // Keep the old function for backward compatibility but have it call the new one
+        async function loadTopPerformers() {
+            return loadSalesTeamPerformance();
+        }
+        
+        async function loadTodayStats() {
+            const todayCard = document.querySelector('[data-widget="today-stats"]');
+            const statsDisplay = todayCard?.querySelector('.stats-display');
+            
+            try {
+                // Fetch dashboard data
+                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=7`);
+                
+                if (!response.ok) throw new Error('API request failed');
+                
+                const data = await response.json();
+                
+                if (data.todayStats && statsDisplay) {
+                    const stats = data.todayStats;
+                    statsDisplay.innerHTML = `
+                        <div class="stat-item">
+                            <div class="stat-value">${stats.ordersToday || 0}</div>
+                            <div class="stat-label">Orders Today</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$${(stats.salesToday || 0).toLocaleString()}</div>
+                            <div class="stat-label">Sales Today</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${stats.shippedToday || 0}</div>
+                            <div class="stat-label">Shipped Today</div>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Today Stats API Error:', error);
+                if (statsDisplay) {
+                    statsDisplay.innerHTML = '<div class="error-message">Unavailable</div>';
+                }
+            }
+        }
+        
+        // Load ALL Order Types Breakdown with Date Range Selector
+        let currentOrderTypesRange = 30; // Default to 30 days
+        
+        // Sales Team Performance Date Range
+        let currentSalesTeamRange = 30; // Default to 30 days
+        
+        async function loadOrderTypesBreakdown() {
+            const breakdownCard = document.querySelector('[data-widget="order-types-breakdown"]');
+            const orderTypesList = breakdownCard?.querySelector('.order-types-list');
+            
+            try {
+                if (orderTypesList) {
+                    orderTypesList.innerHTML = '<div style="grid-column: span 3; text-align: center; padding: 2rem; color: #6b7280;">Loading all order types...</div>';
+                }
+                
+                // Use order-dashboard API which provides order type breakdown
+                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=${currentOrderTypesRange}`);
+                
+                if (!response.ok) throw new Error('API request failed');
+                
+                const data = await response.json();
+                
+                // Get ALL order types
+                const allOrderTypes = data.breakdown.byOrderType || [];
+                
+                // Display ALL order types as clean cards
+                const orderTypesHTML = allOrderTypes.map((type, index) => {
+                    const maxSales = Math.max(...allOrderTypes.map(t => t.sales));
+                    const percentage = maxSales > 0 ? (type.sales / maxSales) * 100 : 0;
+                    
+                    return `
+                        <div style="background: #ffffff; padding: 1.5rem; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s ease;">
+                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; font-size: 1rem;">${type.type}</div>
+                            <div style="font-size: 1.75rem; font-weight: 700; color: #A60F2D; margin-bottom: 0.5rem;">$${type.sales.toLocaleString()}</div>
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1rem;">${type.orders} orders</div>
+                            <div style="background: #f1f5f9; height: 6px; border-radius: 3px; overflow: hidden;">
+                                <div style="background: linear-gradient(135deg, #A60F2D, #8B0C25); height: 100%; width: ${percentage}%; transition: width 0.5s ease;"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                if (orderTypesList) {
+                    orderTypesList.innerHTML = orderTypesHTML || '<div style="grid-column: span 3; text-align: center; padding: 2rem; color: #dc2626;">No order types data available</div>';
+                }
+                
+            } catch (error) {
+                console.error('Order Types API Error:', error);
+                if (orderTypesList) {
+                    orderTypesList.innerHTML = '<div style="grid-column: span 3; text-align: center; padding: 2rem; color: #dc2626;">Unavailable - Unable to load order types</div>';
+                }
+            }
+        }
+        
+        // Change order types date range
+        function changeOrderTypesRange(days) {
+            currentOrderTypesRange = days;
+            
+            // Update active button
+            document.querySelectorAll('.order-types-date-selector .date-range-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.getAttribute('data-days')) === days) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Reload data
+            loadOrderTypesBreakdown();
+        }
+        
+        function changeSalesTeamRange(days) {
+            currentSalesTeamRange = days;
+            
+            // Update active button
+            document.querySelectorAll('.sales-team-date-selector .date-range-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'white';
+                btn.style.color = '#374151';
+                btn.style.border = '1px solid #d1d5db';
+                if (parseInt(btn.getAttribute('data-days')) === days) {
+                    btn.classList.add('active');
+                    btn.style.background = '#A60F2D';
+                    btn.style.color = 'white';
+                    btn.style.border = '1px solid #A60F2D';
+                }
+            });
+            
+            // Update timeframe text
+            const timeframeElement = document.getElementById('salesTeamTimeframe');
+            if (timeframeElement) {
+                if (days === 1) {
+                    timeframeElement.textContent = 'Today';
+                } else {
+                    timeframeElement.textContent = `Last ${days} days`;
+                }
+            }
+            
+            // Reload data
+            loadSalesTeamPerformance();
+        }
+        
+        // Keep the old function for backward compatibility
+        async function loadOrderTypeBreakdown() {
+            return loadOrderTypesBreakdown();
+        }
+        
+        // Helper functions
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+        
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Store chart instances globally for updates
+        let chartInstances = {
+            revenue: null,
+            orders: null,
+            yoyChart: null,
+            orderTypesChart: null
+        };
+        
+        // Current date range for dashboard
+        let currentDateRange = 30;
+        
+        // Date range selector function
+        async function changeDateRange(days) {
+            currentDateRange = days;
+            
+            // Update active button state
+            document.querySelectorAll('.date-range-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-days') == days) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Reload all data with new date range
+            await Promise.all([
+                loadRevenueData(),
+                loadSalesTeamPerformance(),
+                loadYearOverYear(),
+                loadOrderTypesBreakdown()
+            ]);
+        }
+        
+        // Function to safely create or update a chart
+        function createOrUpdateChart(chartId, chartConfig) {
+            const ctx = document.getElementById(chartId);
+            if (!ctx) return null;
+            
+            // Destroy existing chart if it exists
+            if (chartInstances[chartId]) {
+                chartInstances[chartId].destroy();
+                chartInstances[chartId] = null;
+            }
+            
+            // Create new chart instance
+            chartInstances[chartId] = new Chart(ctx, chartConfig);
+            return chartInstances[chartId];
+        }
     </script>
 </body>
 </html>
