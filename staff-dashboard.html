@@ -2670,15 +2670,15 @@
             const maxRetries = 10;
             
             function attemptInitialization() {
-                // Check if Caspio has loaded the data
-                const caspioData = document.querySelector('.cbResultSetData');
+                // Check if Caspio has created the auth-firstname element with actual data
+                const authFirstName = document.getElementById('auth-firstname');
                 
-                if (caspioData && caspioData.textContent.trim()) {
-                    console.log('Caspio data found, initializing portal...');
+                if (authFirstName && authFirstName.textContent.trim()) {
+                    console.log('Caspio auth data found, initializing portal...');
                     initializePortal();
                 } else if (retryCount < maxRetries) {
                     retryCount++;
-                    console.log(`Waiting for Caspio data... attempt ${retryCount}/${maxRetries}`);
+                    console.log(`Waiting for Caspio auth data... attempt ${retryCount}/${maxRetries}`);
                     setTimeout(attemptInitialization, 500);
                 } else {
                     console.log('Max retries reached, initializing with fallback');
@@ -2692,9 +2692,9 @@
 
         function initializePortal() {
             // Try to get authenticated user data from Caspio
-            // Caspio outputs the first name in a dd element with class cbResultSetData
-            const firstName = document.querySelector('.cbResultSetData')?.textContent?.trim() || 
-                            document.getElementById('auth-firstname')?.textContent?.trim() || 
+            // Caspio creates a span with id="auth-firstname" containing the actual first name
+            const firstName = document.getElementById('auth-firstname')?.textContent?.trim() || 
+                            document.querySelector('.cbResultSetData')?.textContent?.trim() || 
                             document.querySelector('[id*="firstname"]')?.textContent?.trim() || 
                             'Team Member';
             const lastName = document.getElementById('auth-lastname')?.textContent?.trim() || 
