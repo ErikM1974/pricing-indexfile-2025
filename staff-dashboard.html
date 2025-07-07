@@ -35,13 +35,13 @@
         /* Sidebar */
         .sidebar {
             grid-column: 1;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            background: #2d3748;
+            border-right: 2px solid #A60F2D;
             padding: 2rem 0;
             position: relative;
             overflow-y: auto;
-            width: 320px; /* Increased width for better visibility */
+            width: 320px;
+            box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
         }
         
         /* Dashboard card styles */
@@ -193,18 +193,19 @@
         .logo {
             text-align: center;
             margin-bottom: 3rem;
-            padding: 0 1.5rem;
+            padding: 1.5rem;
         }
 
         .logo h2 {
-            color: #2d3748;
+            color: #ffffff;
             font-weight: 700;
             font-size: 1.6rem;
             line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .logo p {
-            color: #4a5568;
+            color: #e2e8f0;
             font-size: 1rem;
             margin-top: 0.25rem;
             font-weight: 500;
@@ -218,7 +219,7 @@
             padding: 0 1.5rem;
             font-size: 0.75rem;
             font-weight: 600;
-            color: #a0aec0;
+            color: #cbd5e0;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 1rem;
@@ -228,7 +229,7 @@
             display: flex;
             align-items: center;
             padding: 0.75rem 1.5rem;
-            color: #4a5568;
+            color: #e2e8f0;
             text-decoration: none;
             transition: all 0.2s ease;
             border-left: 3px solid transparent;
@@ -236,15 +237,15 @@
         }
 
         .nav-item:hover {
-            background: rgba(166, 15, 45, 0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-left-color: #A60F2D;
-            color: #A60F2D;
+            color: #ffffff;
         }
 
         .nav-item.active {
-            background: rgba(166, 15, 45, 0.15);
+            background: #A60F2D;
             border-left-color: #A60F2D;
-            color: #A60F2D;
+            color: #ffffff;
             font-weight: 600;
         }
 
@@ -2209,9 +2210,9 @@
     <div class="dashboard-container">
         <!-- Sidebar -->
         <nav class="sidebar">
-            <div class="logo" style="text-align: center; padding: 1.5rem;">
-                <h2 style="color: #ffffff; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">NW Custom Apparel</h2>
-                <p style="color: rgba(255,255,255,0.9); font-size: 1rem; margin: 0; font-weight: 500;">Staff Dashboard</p>
+            <div class="logo">
+                <h2>NW Custom Apparel</h2>
+                <p>Staff Dashboard</p>
             </div>
             
             <div class="nav-section">
