@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Create Announcement - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #4D4D4D 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header Navigation */
+        .header-nav {
+            background: rgba(30, 30, 50, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(166, 15, 45, 0.3);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-title {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: rgba(166, 15, 45, 0.2);
+            color: #ff6b88;
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.125rem;
+        }
+
+        /* Content Card */
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.2),
+                0 0 80px rgba(166, 15, 45, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-title i {
+            color: #a60f2d;
+        }
+
+        /* Caspio embed container */
+        .caspio-container {
+            min-height: 600px;
+            position: relative;
+        }
+
+        /* Loading state */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 10;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(166, 15, 45, 0.2);
+            border-top-color: #a60f2d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Caspio form styles */
+        #caspioform {
+            min-height: 400px;
+            width: 100%;
+        }
+        
+        /* Ensure Caspio content is visible */
+        .cbFormTable, 
+        [id^="cbform"],
+        iframe[name^="cbform"] {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .nav-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .main-container {
+                padding: 0 1rem;
+            }
+
+            .content-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <nav class="header-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <h2 class="nav-title">Admin Tools</h2>
+            </div>
+            <div class="nav-links">
+                <a href="/staff-dashboard.html" class="nav-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+                <a href="/announcements-create.html" class="nav-link active">
+                    <i class="fas fa-plus-circle"></i>
+                    Create
+                </a>
+                <a href="/announcements-manage.html" class="nav-link">
+                    <i class="fas fa-list"></i>
+                    Manage
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="page-header">
+            <h1>Create Announcement</h1>
+            <p>Post a new announcement for the team</p>
+        </div>
+
+        <div class="content-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-bullhorn"></i>
+                    New Announcement
+                </h3>
+            </div>
+
+            <!-- Caspio DataPage Container -->
+            <div class="caspio-container">
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="loading-spinner"></div>
+                </div>
+                
+                <!-- Caspio Deploy Code -->
+                <div id="caspioform">
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150008551501faaf64d18aef3/emb"></script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hide loading overlay when Caspio form loads
+        window.addEventListener('load', function() {
+            // Wait for Caspio to load
+            let checkInterval = setInterval(() => {
+                const caspioForm = document.querySelector('[id^="cbform"]') || 
+                                  document.querySelector('iframe[name^="cbform"]') ||
+                                  document.querySelector('.cbFormTable');
+                
+                if (caspioForm) {
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = 'none';
+                    }
+                    clearInterval(checkInterval);
+                }
+            }, 500);
+            
+            // Fallback - hide after 3 seconds regardless
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                }
+            }, 3000);
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.location.href = '/staff-dashboard.html';
+            }
+        });
+        
+        // Debug Caspio loading
+        console.log('Announcements Create page loaded');
+        window.addEventListener('message', function(event) {
+            console.log('Received message from:', event.origin);
+        });
+    </script>
+</body>
+</html>
