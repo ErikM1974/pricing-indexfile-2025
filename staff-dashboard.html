@@ -1248,98 +1248,443 @@
             font-weight: 700;
         }
 
-        /* Announcements */
-        .announcements-widget {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            box-shadow: var(--shadow-md);
-            backdrop-filter: blur(10px);
-            transition: all var(--transition-normal);
+        /* Announcements Section - Enhanced Glassmorphic Design */
+        .announcements-section {
+            animation: fadeInUp 0.5s ease-out;
+            position: relative;
         }
 
-        .announcements-widget:hover {
-            box-shadow: var(--shadow-lg);
+        .announcements-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 
+                0 8px 32px rgba(166, 15, 45, 0.3),
+                0 0 80px rgba(166, 15, 45, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        /* Add noise texture for realistic glass effect */
+        .announcements-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255, 255, 255, 0.05) 35px, rgba(255, 255, 255, 0.05) 70px);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .announcements-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 48px rgba(166, 15, 45, 0.35),
+                0 0 100px rgba(166, 15, 45, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+        }
+
+        .announcements-container.collapsed {
+            max-height: 80px;
+        }
+
+        .announcements-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(166, 15, 45, 0.15) 0%, rgba(166, 15, 45, 0.05) 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .announcements-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(166, 15, 45, 0.5) 20%, 
+                rgba(166, 15, 45, 0.5) 80%, 
+                transparent);
+        }
+
+        .announcements-header:hover {
+            background: linear-gradient(135deg, rgba(166, 15, 45, 0.2) 0%, rgba(166, 15, 45, 0.1) 100%);
+        }
+
+        .announcements-header:focus {
+            outline: 2px solid #A60F2D;
+            outline-offset: 2px;
+        }
+
+        .announcements-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .announcements-title i {
+            filter: drop-shadow(0 2px 4px rgba(166, 15, 45, 0.5));
+        }
+
+        .announcement-badge {
+            background: linear-gradient(135deg, #A60F2D 0%, #8B0D26 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            min-width: 28px;
+            text-align: center;
+            box-shadow: 
+                0 2px 8px rgba(166, 15, 45, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .announcements-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .toggle-dismissed {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s ease;
+        }
+        
+        .toggle-dismissed:hover {
+            color: white;
+        }
+        
+        .toggle-dismissed input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+            accent-color: #A60F2D;
+        }
+
+        .collapse-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .collapse-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
             transform: translateY(-1px);
         }
 
-        /* New Professional Announcement Styles */
+        .collapse-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .announcements-container.collapsed .collapse-btn i {
+            transform: rotate(180deg);
+        }
+
+        .announcements-body {
+            padding: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Custom scrollbar for announcements */
+        .announcements-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .announcements-body::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .announcements-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(166, 15, 45, 0.6) 0%, rgba(166, 15, 45, 0.4) 100%);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .announcements-body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, rgba(166, 15, 45, 0.8) 0%, rgba(166, 15, 45, 0.6) 100%);
+        }
+
+        /* Loading skeleton */
+        .skeleton-card {
+            margin-bottom: 1rem;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.1) 25%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                rgba(255, 255, 255, 0.1) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 6px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .skeleton-title {
+            height: 24px;
+            width: 60%;
+            margin-bottom: 0.75rem;
+        }
+
+        .skeleton-text {
+            height: 16px;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Empty state */
+        .announcements-empty {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .announcements-empty i {
+            margin-bottom: 1rem;
+        }
+
+        /* Individual Announcement Card Styles */
         .announcement-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1rem;
+            border: 1px solid rgba(166, 15, 45, 0.1);
+            box-shadow: 0 4px 16px rgba(166, 15, 45, 0.1);
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .announcement-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 8px 24px rgba(166, 15, 45, 0.15);
         }
 
-        .announcement-header {
-            padding: 16px;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-bottom: 1px solid #e0e0e0;
+        .announcement-card.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #A60F2D;
+        }
+        
+        .announcement-card.dismissed {
+            opacity: 0.6;
+            position: relative;
+        }
+        
+        .announcement-card.dismissed::after {
+            content: 'DISMISSED';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(166, 15, 45, 0.8);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .announcement-card-header {
+            padding: 1rem 1.25rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: background 0.3s ease;
         }
 
-        .announcement-header.birthday {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        .announcement-card-header:hover {
+            background: rgba(166, 15, 45, 0.02);
         }
 
-        .announcement-header.success {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        .announcement-card-header:focus {
+            outline: 2px solid #A60F2D;
+            outline-offset: -2px;
         }
 
-        .announcement-header.info {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        /* Type-specific styling */
+        .announcement-card[data-type="celebration"] .announcement-card-header {
+            background: linear-gradient(135deg, rgba(254, 243, 199, 0.3) 0%, rgba(253, 230, 138, 0.3) 100%);
         }
 
-        .announcement-header.warning {
-            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+        .announcement-card[data-type="success"] .announcement-card-header {
+            background: linear-gradient(135deg, rgba(209, 250, 229, 0.3) 0%, rgba(167, 243, 208, 0.3) 100%);
         }
 
-        .announcement-title {
+        .announcement-card[data-type="info"] .announcement-card-header {
+            background: linear-gradient(135deg, rgba(219, 234, 254, 0.3) 0%, rgba(191, 219, 254, 0.3) 100%);
+        }
+
+        .announcement-card[data-type="warning"] .announcement-card-header {
+            background: linear-gradient(135deg, rgba(254, 215, 170, 0.3) 0%, rgba(253, 186, 116, 0.3) 100%);
+        }
+
+        .announcement-card-title {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 0.75rem;
             font-weight: 600;
             color: #1f2937;
+            font-size: 1rem;
         }
 
-        .announcement-icon {
-            font-size: 20px;
+        .announcement-card-icon {
+            font-size: 1.25rem;
+            width: 28px;
+            text-align: center;
         }
 
-        .announcement-date {
-            font-size: 12px;
+        .announcement-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .announcement-card-date {
+            font-size: 0.75rem;
             color: #6b7280;
         }
 
-        .announcement-content {
-            padding: 16px;
+        .announcement-card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .announcement-card-actions button {
+            background: none;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #6b7280;
+            transition: all 0.2s ease;
+        }
+
+        .announcement-card-actions button:hover {
+            background: rgba(166, 15, 45, 0.1);
+            color: #A60F2D;
+        }
+
+        .announcement-card-actions button:focus {
+            outline: 2px solid #A60F2D;
+            outline-offset: 2px;
+        }
+
+        .announcement-card-content {
+            padding: 0 1.25rem;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
         }
 
-        .announcement-card.active .announcement-content {
+        .announcement-card.expanded .announcement-card-content {
             max-height: 500px;
+            padding: 0 1.25rem 1.25rem;
         }
 
-        .expand-icon {
+        .announcement-card-expand {
             transition: transform 0.3s ease;
             color: #6b7280;
         }
 
-        .announcement-card.active .expand-icon {
+        .announcement-card.expanded .announcement-card-expand {
             transform: rotate(180deg);
+        }
+
+        /* Priority indicators */
+        .announcement-priority-high {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #ef4444;
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         /* Content Styles */
@@ -2500,6 +2845,22 @@
                 </a>
             </div>
 
+            <div class="nav-section">
+                <div class="nav-title">Admin Tools</div>
+                <a href="/announcements-create.html" class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
+                    </svg>
+                    Create Announcement
+                </a>
+                <a href="/announcements-manage.html" class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H6z"/>
+                    </svg>
+                    Manage Announcements
+                </a>
+            </div>
+
             <div class="nav-section" style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
                 <div class="nav-title">Quick Links</div>
                 <a href="https://www.teamnwca.com" class="nav-item" target="_blank">
@@ -2524,6 +2885,55 @@
                 <h1 id="welcomeGreeting">Welcome, <span id="userName">Team Member</span>!</h1>
                 <p id="welcomeMessage">Ready to help customers create something amazing</p>
             </div>
+
+            <!-- Company Announcements Section -->
+            <section class="announcements-section" id="announcementsSection" role="region" aria-label="Company Announcements" style="margin-bottom: 2rem;">
+                <div class="announcements-container glassmorphic-card">
+                    <div class="announcements-header" role="button" tabindex="0" aria-expanded="true" aria-controls="announcementsList">
+                        <h2 class="announcements-title">
+                            <i class="fas fa-bullhorn" style="color: #A60F2D;"></i>
+                            Company Announcements
+                            <span class="announcement-badge" id="announcementCount" aria-live="polite">0</span>
+                        </h2>
+                        <div class="announcements-controls">
+                            <label class="toggle-dismissed" for="showDismissed">
+                                <input type="checkbox" id="showDismissed" onchange="toggleDismissedAnnouncements()">
+                                <span>Show dismissed</span>
+                            </label>
+                            <button class="collapse-btn" aria-label="Toggle announcements">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="announcements-body" id="announcementsList">
+                        <!-- Loading skeleton -->
+                        <div class="announcements-loading" id="announcementsLoading">
+                            <div class="skeleton-card">
+                                <div class="skeleton skeleton-title"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                            </div>
+                            <div class="skeleton-card">
+                                <div class="skeleton skeleton-title"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text" style="width: 60%;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Announcements will be loaded here -->
+                        <div class="announcements-list" id="announcementsContent" style="display: none;">
+                            <!-- Dynamic content -->
+                        </div>
+                        
+                        <!-- Empty state -->
+                        <div class="announcements-empty" id="announcementsEmpty" style="display: none;">
+                            <i class="fas fa-info-circle" style="font-size: 3rem; color: #A60F2D; opacity: 0.3;"></i>
+                            <p>No active announcements at this time</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <header class="header">
                 <div>
@@ -2792,7 +3202,8 @@
                 loadProductionSchedule(), // Production availability
                 loadSalesTeamPerformance(),     // ALL sales reps performance
                 loadYearOverYear(),      // Enhanced YTD comparison
-                loadOrderTypesBreakdown() // ALL order types breakdown
+                loadOrderTypesBreakdown(), // ALL order types breakdown
+                loadAnnouncements()      // Company announcements
             ]);
             
             // Set up refresh intervals
@@ -3311,6 +3722,290 @@
         
         // Current date range for dashboard
         let currentDateRange = 30;
+        
+        // Load Company Announcements
+        async function loadAnnouncements() {
+            const loadingEl = document.getElementById('announcementsLoading');
+            const contentEl = document.getElementById('announcementsContent');
+            const emptyEl = document.getElementById('announcementsEmpty');
+            const countBadge = document.getElementById('announcementCount');
+            
+            console.log('[Announcements] Starting to load announcements...');
+            
+            try {
+                // Show loading state
+                if (loadingEl) loadingEl.style.display = 'block';
+                if (contentEl) contentEl.style.display = 'none';
+                if (emptyEl) emptyEl.style.display = 'none';
+                
+                // Fetch announcements
+                console.log('[Announcements] Fetching from:', `${API_CONFIG.baseURL}/staff-announcements`);
+                const response = await fetch(`${API_CONFIG.baseURL}/staff-announcements`);
+                
+                console.log('[Announcements] Response status:', response.status);
+                if (!response.ok) throw new Error(`Failed to fetch announcements: ${response.status}`);
+                
+                const announcements = await response.json();
+                console.log('[Announcements] Received data:', announcements);
+                
+                // Check if we should show dismissed announcements
+                const showDismissed = document.getElementById('showDismissed')?.checked || false;
+                
+                // Filter out expired announcements (and optionally dismissed ones)
+                const activeAnnouncements = announcements.filter(announcement => {
+                    // Check if dismissed
+                    const isDismissed = localStorage.getItem(`announcement-dismissed-${announcement.PK_ID}`) === 'true';
+                    if (isDismissed && !showDismissed) {
+                        console.log('[Announcements] Announcement dismissed:', announcement.PK_ID);
+                        return false;
+                    }
+                    
+                    // Check expiry
+                    if (!announcement.ExpiryDate) return true;
+                    const expiryDate = new Date(announcement.ExpiryDate);
+                    const now = new Date();
+                    const isActive = expiryDate > now;
+                    console.log('[Announcements] Checking expiry:', announcement.ExpiryDate, 'Active:', isActive);
+                    return isActive;
+                });
+                
+                console.log('[Announcements] Active announcements:', activeAnnouncements.length);
+                
+                // Update count badge
+                if (countBadge) {
+                    countBadge.textContent = activeAnnouncements.length;
+                    countBadge.style.display = activeAnnouncements.length > 0 ? 'inline-flex' : 'none';
+                }
+                
+                // Hide loading state
+                if (loadingEl) loadingEl.style.display = 'none';
+                
+                if (activeAnnouncements.length === 0) {
+                    // Show empty state
+                    console.log('[Announcements] No active announcements, showing empty state');
+                    if (emptyEl) {
+                        const showDismissed = document.getElementById('showDismissed')?.checked || false;
+                        if (showDismissed) {
+                            emptyEl.innerHTML = '<i class="fas fa-info-circle" style="font-size: 3rem; color: #A60F2D; opacity: 0.3;"></i><p>No announcements to display (all are expired)</p>';
+                        } else {
+                            emptyEl.innerHTML = '<i class="fas fa-info-circle" style="font-size: 3rem; color: #A60F2D; opacity: 0.3;"></i><p>No active announcements at this time</p><p style="font-size: 0.875rem; opacity: 0.6;">Check "Show dismissed" to see previously dismissed announcements</p>';
+                        }
+                        emptyEl.style.display = 'block';
+                    }
+                    return;
+                }
+                
+                // Render announcements
+                if (contentEl) {
+                    contentEl.innerHTML = activeAnnouncements.map((announcement, index) => {
+                        const isUnread = localStorage.getItem(`announcement-read-${announcement.PK_ID}`) !== 'true';
+                        const isDismissed = localStorage.getItem(`announcement-dismissed-${announcement.PK_ID}`) === 'true';
+                        
+                        return `
+                            <div class="announcement-card ${isUnread ? 'unread' : ''} ${isDismissed ? 'dismissed' : ''}" 
+                                 data-type="${announcement.Type}" 
+                                 data-id="${announcement.PK_ID}"
+                                 role="article"
+                                 aria-expanded="false">
+                                ${announcement.Priority === 'high' ? '<span class="announcement-priority-high">High Priority</span>' : ''}
+                                
+                                <div class="announcement-card-header" 
+                                     onclick="toggleAnnouncement(${announcement.PK_ID})"
+                                     onkeypress="if(event.key === 'Enter' || event.key === ' ') toggleAnnouncement(${announcement.PK_ID})"
+                                     tabindex="0"
+                                     role="button"
+                                     aria-controls="announcement-content-${announcement.PK_ID}">
+                                    <div class="announcement-card-title">
+                                        <i class="${announcement.Icon} announcement-card-icon" style="color: ${getIconColor(announcement.Type)}"></i>
+                                        <span>${getAnnouncementTitle(announcement)}</span>
+                                    </div>
+                                    <div class="announcement-card-meta">
+                                        <span class="announcement-card-date">
+                                            ${formatAnnouncementDate(announcement.CreatedAt || new Date())}
+                                        </span>
+                                        <div class="announcement-card-actions">
+                                            ${isUnread ? '<button onclick="markAsRead(' + announcement.PK_ID + ')" aria-label="Mark as read"><i class="fas fa-eye"></i></button>' : ''}
+                                            <button onclick="dismissAnnouncement(${announcement.PK_ID})" aria-label="Dismiss announcement">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            <i class="fas fa-chevron-down announcement-card-expand"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="announcement-card-content" id="announcement-content-${announcement.PK_ID}" role="region">
+                                    ${announcement.Content}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    contentEl.style.display = 'block';
+                    
+                    // Add animation to cards
+                    const cards = contentEl.querySelectorAll('.announcement-card');
+                    cards.forEach((card, index) => {
+                        card.style.animation = `fadeInUp 0.5s ease-out ${index * 0.1}s`;
+                        card.style.animationFillMode = 'both';
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Failed to load announcements:', error);
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (emptyEl) {
+                    emptyEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #A60F2D; opacity: 0.3;"></i><p>Unable to load announcements</p>';
+                    emptyEl.style.display = 'block';
+                }
+            }
+        }
+        
+        // Helper functions for announcements
+        function getIconColor(type) {
+            const colors = {
+                'celebration': '#f59e0b',
+                'success': '#10b981',
+                'info': '#3b82f6',
+                'warning': '#ef4444',
+                'general': '#6b7280'
+            };
+            return colors[type] || colors.general;
+        }
+        
+        function getAnnouncementTitle(announcement) {
+            // Extract title from content if not provided separately
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = announcement.Content;
+            const firstHeading = tempDiv.querySelector('h1, h2, h3, h4, strong');
+            return firstHeading ? firstHeading.textContent : 'Company Announcement';
+        }
+        
+        function formatAnnouncementDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            if (diffDays < 7) return `${diffDays} days ago`;
+            
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+        
+        function toggleAnnouncement(id) {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            if (!card) return;
+            
+            const isExpanded = card.classList.contains('expanded');
+            card.classList.toggle('expanded');
+            card.setAttribute('aria-expanded', !isExpanded);
+            
+            // Mark as read when opened
+            if (!isExpanded && card.classList.contains('unread')) {
+                markAsRead(id);
+            }
+        }
+        
+        function markAsRead(id) {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            if (!card) return;
+            
+            card.classList.remove('unread');
+            localStorage.setItem(`announcement-read-${id}`, 'true');
+            
+            // Update count
+            const unreadCount = document.querySelectorAll('.announcement-card.unread').length;
+            const countBadge = document.getElementById('announcementCount');
+            if (countBadge) {
+                countBadge.textContent = unreadCount;
+                if (unreadCount === 0) {
+                    countBadge.style.display = 'none';
+                }
+            }
+        }
+        
+        function toggleDismissedAnnouncements() {
+            console.log('[Announcements] Toggle dismissed clicked');
+            loadAnnouncements(); // Reload with new filter state
+        }
+        
+        function dismissAnnouncement(id) {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            if (!card) return;
+            
+            // Add slide out animation
+            card.style.animation = 'slideOut 0.3s ease-out';
+            card.addEventListener('animationend', () => {
+                card.remove();
+                
+                // Check if no announcements left
+                const remainingCards = document.querySelectorAll('.announcement-card').length;
+                if (remainingCards === 0) {
+                    document.getElementById('announcementsEmpty').style.display = 'block';
+                }
+                
+                // Update count
+                const countBadge = document.getElementById('announcementCount');
+                if (countBadge) {
+                    countBadge.textContent = remainingCards;
+                    if (remainingCards === 0) {
+                        countBadge.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Store dismissal in localStorage
+            localStorage.setItem(`announcement-dismissed-${id}`, 'true');
+        }
+        
+        // Toggle announcements section collapse
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.querySelector('.announcements-header');
+            const container = document.querySelector('.announcements-container');
+            const collapseBtn = document.querySelector('.collapse-btn');
+            
+            if (header && container) {
+                header.addEventListener('click', function(e) {
+                    // Don't toggle if clicking on the collapse button itself
+                    if (e.target.closest('.collapse-btn')) return;
+                    
+                    container.classList.toggle('collapsed');
+                    const isCollapsed = container.classList.contains('collapsed');
+                    header.setAttribute('aria-expanded', !isCollapsed);
+                });
+                
+                header.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        container.classList.toggle('collapsed');
+                        const isCollapsed = container.classList.contains('collapsed');
+                        header.setAttribute('aria-expanded', !isCollapsed);
+                    }
+                });
+            }
+            
+            if (collapseBtn) {
+                collapseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    container.classList.toggle('collapsed');
+                    const isCollapsed = container.classList.contains('collapsed');
+                    header.setAttribute('aria-expanded', !isCollapsed);
+                });
+            }
+        });
+        
+        // Add slideOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                to {
+                    transform: translateX(-100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
         
         // Date range selector function
         async function changeDateRange(days) {

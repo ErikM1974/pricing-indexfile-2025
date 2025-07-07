@@ -99,6 +99,14 @@ app.get('/webstore-info.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'webstore-info.html'));
 });
 
+app.get('/announcements-create.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'announcements-create.html'));
+});
+
+app.get('/announcements-manage.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'announcements-manage.html'));
+});
+
 // API configuration
 const API_BASE_URL = process.env.API_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
 
