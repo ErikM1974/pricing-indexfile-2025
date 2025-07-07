@@ -430,23 +430,24 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 1rem;
-            background: rgba(220, 38, 38, 0.1);
-            border: 1px solid rgba(220, 38, 38, 0.3);
+            background: rgba(220, 38, 38, 0.9);
+            border: 1px solid rgba(220, 38, 38, 1);
             border-radius: 6px;
-            color: rgba(220, 38, 38, 0.9);
+            color: white;
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
         }
 
         .logout-btn:hover {
-            background: rgba(220, 38, 38, 0.15);
-            border-color: rgba(220, 38, 38, 0.5);
-            color: rgb(220, 38, 38);
+            background: rgb(220, 38, 38);
+            border-color: rgb(185, 28, 28);
+            color: white;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
         }
 
         .logout-btn svg {
@@ -2259,6 +2260,59 @@
             }
         }
 
+        /* Welcome banner at top */
+        .welcome-banner {
+            background: linear-gradient(135deg, #a60f2d 0%, #881028 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(166, 15, 45, 0.2);
+        }
+        
+        .welcome-banner h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .welcome-banner p {
+            font-size: 1.125rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+        /* Enhanced logout button styling */
+        .logout-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+            font-size: 1rem;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+        }
+
+        .logout-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
         /* Adjust existing styles */
         .header {
             display: none; /* Hide old header */
@@ -2326,12 +2380,14 @@
 </head>
 <body>
     <!-- Hidden Caspio Authentication Container -->
-    <div id="caspio-auth-container" style="display: none;">
-        <div class="cbResultSetData">[@authfield:First_Name]</div>
-        <div id="auth-firstname">[@authfield:First_Name]</div>
-        <div id="auth-lastname">[@authfield:Last_Name]</div>
-        <div id="auth-email">[@authfield:Email]</div>
-        <div id="auth-role">[@authfield:Role]</div>
+    <div id="caspio-auth-container" style="position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; overflow: hidden;">
+        <!-- Caspio authentication data placeholders -->
+        <div class="cbResultSetData" style="display: none;">[@authfield:First_Name]</div>
+        <div id="auth-firstname" style="display: none;">[@authfield:First_Name]</div>
+        <div id="auth-lastname" style="display: none;">[@authfield:Last_Name]</div>
+        <div id="auth-email" style="display: none;">[@authfield:Email]</div>
+        <div id="auth-role" style="display: none;">[@authfield:Role]</div>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
     </div>
     
     <div class="dashboard-container">
@@ -2452,15 +2508,27 @@
                     </svg>
                     Visit Homepage
                 </a>
+                <button class="logout-btn" onclick="handleLogout()" title="Logout" style="width: 100%; margin-top: 1rem;">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"/>
+                    </svg>
+                    <span>Logout</span>
+                </button>
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <h1 id="welcomeGreeting">Welcome, <span id="userName">Team Member</span>!</h1>
+                <p id="welcomeMessage">Ready to help customers create something amazing</p>
+            </div>
+
             <header class="header">
                 <div>
-                    <h1 id="dynamicGreeting">Good Morning, Erik!</h1>
-                    <p class="header-info" id="currentDateTime">Sunday, July 6, 2025 • 6:31 AM</p>
+                    <h1 id="dynamicGreeting">Welcome to Staff Dashboard</h1>
+                    <p class="header-info" id="currentDateTime">Loading...</p>
                 </div>
                 <div style="display: flex; align-items: center; gap: 2rem;">
                     <!-- Date Range Selector -->
@@ -2471,17 +2539,9 @@
                         <button class="date-range-btn" data-days="365" onclick="changeDateRange(365)">YTD</button>
                     </div>
                     <div class="user-info">
-                        <div class="user-avatar" id="userAvatar">EM</div>
-                        <span id="userDisplayName">Erik Mickelson</span>
+                        <div class="user-avatar" id="userAvatar">?</div>
+                        <span id="userDisplayName">Loading...</span>
                     </div>
-                    
-                    <!-- Logout Button -->
-                    <button class="logout-btn" onclick="handleLogout()" title="Logout">
-                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"/>
-                        </svg>
-                        <span>Logout</span>
-                    </button>
                 </div>
             </header>
 
@@ -2587,15 +2647,6 @@
         </main>
     </div>
 
-    <!-- Hidden Caspio Authentication Container -->
-    <div id="caspio-auth-container" style="display: none;">
-        <!-- Caspio DataPage embed will go here -->
-        <div class="cbResultSetData">[@authfield:First_Name]</div>
-        <div id="auth-firstname">[@authfield:First_Name]</div>
-        <div id="auth-lastname">[@authfield:Last_Name]</div>
-        <div id="auth-email">[@authfield:Email]</div>
-        <div id="auth-role">[@authfield:Role]</div>
-    </div>
 
     <script>
         // API Configuration
@@ -2608,48 +2659,63 @@
             }
         };
 
-        // User Data Functions
-        function getUserData() {
-            // Try multiple methods to get user data
-            let firstName = 'Team Member'; // Default fallback
+        // Caspio DataPageReady Event Listener
+        document.addEventListener('DataPageReady', function(event) {
+            console.log('Caspio DataPage Ready');
             
-            // Method 1: Direct Caspio element parsing
-            const caspioData = document.querySelector('.cbResultSetData');
-            if (caspioData && caspioData.textContent) {
-                firstName = caspioData.textContent.trim();
-            }
+            // Update greeting when Caspio loads
+            setTimeout(updateUserGreeting, 500);
+        });
+
+        // Try to get user data from various Caspio elements
+        function getCaspioUserData() {
+            // Try to extract user data from Caspio-generated elements
+            // Look for various possible element patterns that Caspio might generate
+            const possibleSelectors = [
+                '.cbResultSetData',  // Old dashboard pattern - check this first
+                '#auth-firstname',
+                '#fname',            // From caspio-user-script.html pattern
+                '[id*="First_Name"]',
+                '[data-cb-name="First_Name"]',
+                '.cbFormData[id*="First_Name"]',
+                'span[id*="First_Name"]',
+                'div[id*="First_Name"]',
+                '[id^="InsertRecordFirst_Name"]',
+                '[id^="EditRecordFirst_Name"]',
+                '.cbFormDataCell:contains("First_Name")',
+                'td:contains("First_Name") + td',
+                '[name*="First_Name"]'
+            ];
             
-            // Method 2: Check auth fields
-            if (firstName === 'Team Member') {
-                const authFirstName = document.getElementById('auth-firstname');
-                if (authFirstName && authFirstName.textContent) {
-                    firstName = authFirstName.textContent.trim();
+            let firstName = null;
+            
+            // Try each selector
+            for (const selector of possibleSelectors) {
+                try {
+                    const element = document.querySelector(selector);
+                    if (element && element.textContent) {
+                        const content = element.textContent.trim();
+                        if (content && 
+                            content !== '[@authfield:First_Name]' && 
+                            !content.includes('@authfield') &&
+                            content !== '' &&
+                            content !== 'First_Name') {
+                            firstName = content;
+                            console.log(`✓ Found name using selector ${selector}:`, firstName);
+                            break;
+                        }
+                    }
+                } catch (e) {
+                    // Some selectors might throw errors, ignore them
                 }
             }
             
-            // Method 3: Check sessionStorage (if previously saved)
-            if (firstName === 'Team Member') {
-                const savedName = sessionStorage.getItem('userFirstName');
-                if (savedName) {
-                    firstName = savedName;
-                }
-            }
-            
-            // Save for future use
-            if (firstName !== 'Team Member') {
-                sessionStorage.setItem('userFirstName', firstName);
-            }
-            
-            return {
-                firstName: firstName,
-                lastName: document.getElementById('auth-lastname')?.textContent?.trim() || '',
-                email: document.getElementById('auth-email')?.textContent?.trim() || '',
-                role: document.getElementById('auth-role')?.textContent?.trim() || ''
-            };
+            return firstName;
         }
 
+        // Function to update the user greeting
         function updateUserGreeting() {
-            const userData = getUserData();
+            const firstName = getCaspioUserData() || 'Team Member';
             const hour = new Date().getHours();
             let greeting = 'Welcome back';
             
@@ -2657,43 +2723,20 @@
             else if (hour < 17) greeting = 'Good afternoon';
             else greeting = 'Good evening';
             
-            const greetingElement = document.getElementById('dynamicGreeting');
+            const greetingElement = document.getElementById('welcomeGreeting');
+            const userNameElement = document.getElementById('userName');
+            
             if (greetingElement) {
-                greetingElement.textContent = `${greeting}, ${userData.firstName}!`;
+                greetingElement.textContent = `${greeting}, ${firstName}!`;
             }
             
-            // Update sidebar welcome message
-            const sidebarWelcomeElement = document.getElementById('welcome-message');
-            if (sidebarWelcomeElement && userData.firstName !== 'Team Member') {
-                sidebarWelcomeElement.textContent = `Welcome ${userData.firstName}`;
-            } else if (sidebarWelcomeElement) {
-                sidebarWelcomeElement.textContent = 'Staff Dashboard';
+            if (userNameElement) {
+                userNameElement.textContent = firstName;
             }
             
-            // Update the date/time display
-            const dateTimeElement = document.getElementById('currentDateTime');
-            if (dateTimeElement) {
-                const now = new Date();
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                const dateStr = now.toLocaleDateString('en-US', options);
-                const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-                dateTimeElement.textContent = `${dateStr} • ${timeStr}`;
-            }
-            
-            // Update user avatar initials
-            const avatarElement = document.getElementById('userAvatar');
-            if (avatarElement && userData.firstName !== 'Team Member') {
-                const initials = userData.firstName.charAt(0) + (userData.lastName ? userData.lastName.charAt(0) : '');
-                avatarElement.textContent = initials.toUpperCase();
-            }
-            
-            // Update display name
-            const displayNameElement = document.getElementById('userDisplayName');
-            if (displayNameElement) {
-                const fullName = userData.firstName + (userData.lastName ? ' ' + userData.lastName : '');
-                displayNameElement.textContent = fullName;
-            }
+            console.log('Updated greeting for:', firstName);
         }
+
 
         // Handle logout functionality
         function handleLogout() {
@@ -2716,7 +2759,7 @@
                     // Try Caspio logout first, fallback to homepage
                     try {
                         // Attempt Caspio logout
-                        window.location.href = 'https://c0aae832.caspio.com/dp/A0E15000043ee3ae5ca546eb8e19';
+                        window.location.href = 'https://c3eku948.caspio.com/folderlogout';
                     } catch (error) {
                         // Fallback to homepage
                         window.location.href = 'https://www.teamnwca.com';
@@ -2733,6 +2776,55 @@
         document.addEventListener('DOMContentLoaded', async function() {
             // Initialize user greeting
             updateUserGreeting();
+            
+            // Also implement retry mechanism similar to old dashboard
+            setTimeout(function() {
+                console.log('Starting authentication retry mechanism...');
+                let retryCount = 0;
+                const maxRetries = 10;
+                
+                function attemptAuthentication() {
+                    // Check if we already have valid data
+                    const savedName = sessionStorage.getItem('userFirstName');
+                    if (savedName && savedName !== 'Team Member') {
+                        console.log('✓ Authentication already successful');
+                        return;
+                    }
+                    
+                    // Try to find authentication data using old dashboard pattern
+                    const cbResultSetData = document.querySelector('.cbResultSetData');
+                    if (cbResultSetData && cbResultSetData.textContent) {
+                        const content = cbResultSetData.textContent.trim();
+                        console.log(`Found .cbResultSetData with content: "${content}"`);
+                        
+                        if (content && content !== '[@authfield:First_Name]' && content !== '') {
+                            sessionStorage.setItem('userFirstName', content);
+                            console.log('✓ Successfully captured name from .cbResultSetData:', content);
+                            updateUserGreeting();
+                            return;
+                        }
+                    }
+                    
+                    // Also check for DataPage elements
+                    const authElements = document.querySelectorAll('[id*="DataPage"]');
+                    if (authElements.length > 0) {
+                        console.log('Found Caspio DataPage elements, triggering DataPageReady');
+                        document.dispatchEvent(new Event('DataPageReady'));
+                    }
+                    
+                    // Retry if needed
+                    if (retryCount < maxRetries) {
+                        retryCount++;
+                        console.log(`Retry attempt ${retryCount} of ${maxRetries}`);
+                        setTimeout(attemptAuthentication, 500);
+                    } else {
+                        console.log('✗ Max retries reached. Using default greeting.');
+                        updateUserGreeting();
+                    }
+                }
+                
+                attemptAuthentication();
+            }, 1000); // Start after 1 second like old dashboard
             
             // Load all dashboard data
             await Promise.all([
@@ -2761,7 +2853,17 @@
                     const userData = event.data.data;
                     if (userData.firstName) {
                         sessionStorage.setItem('userFirstName', userData.firstName);
+                        console.log('Received first name via postMessage:', userData.firstName);
                         updateUserGreeting();
+                    }
+                    if (userData.lastName) {
+                        sessionStorage.setItem('userLastName', userData.lastName);
+                    }
+                    if (userData.email) {
+                        sessionStorage.setItem('userEmail', userData.email);
+                    }
+                    if (userData.role) {
+                        sessionStorage.setItem('userRole', userData.role);
                     }
                 }
             });
@@ -3307,6 +3409,70 @@
             chartInstances[chartId] = new Chart(ctx, chartConfig);
             return chartInstances[chartId];
         }
+
+        // Initialize dashboard on DOM load
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Dashboard initializing...');
+            
+            // Update user greeting immediately
+            updateUserGreeting();
+            
+            // Load all dashboard data
+            await Promise.all([
+                loadRevenueData(),
+                loadSalesTeamPerformance(),
+                loadProductionSchedule(),
+                loadYearOverYear(),
+                loadOrderTypesBreakdown()
+            ]);
+            
+            console.log('Dashboard initialized successfully');
+            
+            // Set up refresh intervals
+            setInterval(updateUserGreeting, 60000); // Update greeting every minute
+            setInterval(async () => {
+                // Refresh all data every 5 minutes
+                await Promise.all([
+                    loadRevenueData(),
+                    loadSalesTeamPerformance(),
+                    loadProductionSchedule(),
+                    loadOrderTypesBreakdown()
+                ]);
+            }, 300000);
+        });
+
+        // Listen for Caspio DataPage Ready event
+        document.addEventListener('DataPageReady', function(event) {
+            console.log('Caspio DataPage Ready event fired');
+            // Update greeting when Caspio loads
+            setTimeout(updateUserGreeting, 500);
+        });
+
+        // Also listen for window load as a fallback
+        window.addEventListener('load', function() {
+            console.log('Window loaded - checking for Caspio data');
+            setTimeout(updateUserGreeting, 1000);
+        });
+
+        // Listen for postMessage from Caspio iframe (alternative method)
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'caspioUserData') {
+                console.log('Received Caspio user data via postMessage:', event.data.data);
+                const userData = event.data.data;
+                if (userData.firstName && userData.firstName !== '[@authfield:First_Name]') {
+                    sessionStorage.setItem('userFirstName', userData.firstName);
+                    sessionStorage.setItem('userLastName', userData.lastName || '');
+                    sessionStorage.setItem('userEmail', userData.email || '');
+                    sessionStorage.setItem('userRole', userData.role || '');
+                    updateUserGreeting();
+                }
+            }
+        });
+
+        // Try to update greeting multiple times as Caspio may load slowly
+        setTimeout(updateUserGreeting, 1500);
+        setTimeout(updateUserGreeting, 2500);
+        setTimeout(updateUserGreeting, 3500);
     </script>
 </body>
 </html>
