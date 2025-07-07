@@ -2670,15 +2670,13 @@
             const maxRetries = 10;
             
             function attemptInitialization() {
-                // Check if Caspio has created the auth-firstname element with actual data
-                const authFirstName = document.getElementById('auth-firstname');
-                
-                if (authFirstName && authFirstName.textContent.trim()) {
-                    console.log('Caspio auth data found, initializing portal...');
+                // Check if Caspio has set the user data
+                if (window.caspioUser && window.caspioUser.firstName) {
+                    console.log('Caspio user data found, initializing portal...');
                     initializePortal();
                 } else if (retryCount < maxRetries) {
                     retryCount++;
-                    console.log(`Waiting for Caspio auth data... attempt ${retryCount}/${maxRetries}`);
+                    console.log(`Waiting for Caspio user data... attempt ${retryCount}/${maxRetries}`);
                     setTimeout(attemptInitialization, 500);
                 } else {
                     console.log('Max retries reached, initializing with fallback');
@@ -2689,18 +2687,32 @@
             // Start checking after initial delay
             setTimeout(attemptInitialization, 1000);
         });
+        
+        // Also listen for the custom event from Caspio
+        window.addEventListener('caspioUserReady', function(event) {
+            console.log('Caspio user ready event received:', event.detail);
+            initializePortal();
+        });
 
         function initializePortal() {
             // Try to get authenticated user data from Caspio
-            // Caspio creates a span with id="auth-firstname" containing the actual first name
-            const firstName = document.getElementById('auth-firstname')?.textContent?.trim() || 
-                            document.querySelector('.cbResultSetData')?.textContent?.trim() || 
-                            document.querySelector('[id*="firstname"]')?.textContent?.trim() || 
-                            'Team Member';
-            const lastName = document.getElementById('auth-lastname')?.textContent?.trim() || 
-                           document.querySelector('[id*="lastname"]')?.textContent?.trim() || '';
-            const email = document.getElementById('auth-email')?.textContent?.trim() || '';
-            const role = document.getElementById('auth-role')?.textContent?.trim() || 'Staff';
+            // Check if window.caspioUser exists, otherwise try sessionStorage or fallback
+            let userData = window.caspioUser;
+            
+            // If not in window, check sessionStorage
+            if (!userData && sessionStorage.getItem('caspioUserData')) {
+                try {
+                    userData = JSON.parse(sessionStorage.getItem('caspioUserData'));
+                } catch (e) {
+                    console.error('Error parsing stored user data:', e);
+                }
+            }
+            
+            // Extract user data with fallbacks
+            const firstName = userData?.firstName || 'Team Member';
+            const lastName = userData?.lastName || '';
+            const email = userData?.email || '';
+            const role = userData?.role || 'Staff';
 
             // Create full name
             const fullName = lastName ? `${firstName} ${lastName}` : firstName;
