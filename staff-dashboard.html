@@ -219,24 +219,38 @@
         .sidebar .logo {
             text-align: center !important;
             margin-bottom: 2rem !important;
-            padding: 2rem 1.5rem !important;
+            padding: 2rem 1.5rem 1.5rem 1.5rem !important;
             background: rgba(255, 255, 255, 0.05) !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(10px) !important;
             display: flex !important;
+            flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
+            width: 100% !important;
+        }
+
+        .sidebar .logo h2 {
+            color: #ffffff !important;
+            font-size: 1.25rem !important;
+            margin: 0 0 0.5rem 0 !important;
+            font-weight: 700 !important;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+            text-align: center !important;
+            line-height: 1.2 !important;
+            width: 100% !important;
         }
 
         .sidebar .logo p {
-            color: #ffffff !important;
-            font-size: 1.125rem !important;
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-size: 0.875rem !important;
             margin: 0 !important;
-            font-weight: 600 !important;
+            font-weight: 400 !important;
             text-transform: uppercase !important;
-            letter-spacing: 0.15em !important;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+            letter-spacing: 0.1em !important;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
             text-align: center !important;
+            width: 100% !important;
         }
 
         /* Navigation Sections - Glassmorphic Dark Theme */
@@ -2281,7 +2295,8 @@
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="logo">
-                <p>Staff Dashboard</p>
+                <h2 id="welcome-message">Staff Dashboard</h2>
+                <p>Northwest Custom Apparel</p>
             </div>
             
             <div class="nav-section">
@@ -2584,6 +2599,14 @@
             const greetingElement = document.getElementById('dynamicGreeting');
             if (greetingElement) {
                 greetingElement.textContent = `${greeting}, ${userData.firstName}!`;
+            }
+            
+            // Update sidebar welcome message
+            const sidebarWelcomeElement = document.getElementById('welcome-message');
+            if (sidebarWelcomeElement && userData.firstName !== 'Team Member') {
+                sidebarWelcomeElement.textContent = `Welcome ${userData.firstName}`;
+            } else if (sidebarWelcomeElement) {
+                sidebarWelcomeElement.textContent = 'Staff Dashboard';
             }
             
             // Update the date/time display
