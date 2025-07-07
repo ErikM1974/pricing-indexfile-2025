@@ -68,6 +68,16 @@
         .sidebar::-webkit-scrollbar-thumb:hover {
             background: rgba(166, 15, 45, 0.8) !important;
         }
+
+        /* Account section at bottom of sidebar */
+        .sidebar {
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        .sidebar > div:last-child {
+            margin-top: auto !important;
+        }
         
         /* Dashboard card styles */
         .metric-value {
@@ -2400,6 +2410,22 @@
                     Invoice Dashboard
                 </a>
             </div>
+
+            <div class="nav-section" style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                <div class="nav-title">Account</div>
+                <a href="https://www.nwcustomapparel.com" class="nav-item" target="_blank">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                    Visit Homepage
+                </a>
+                <a href="#" class="nav-item" onclick="handleLogout()" id="logout-link">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"/>
+                    </svg>
+                    Logout
+                </a>
+            </div>
         </nav>
 
         <!-- Main Content -->
@@ -2631,6 +2657,40 @@
             if (displayNameElement) {
                 const fullName = userData.firstName + (userData.lastName ? ' ' + userData.lastName : '');
                 displayNameElement.textContent = fullName;
+            }
+        }
+
+        // Handle logout functionality
+        function handleLogout() {
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    // Clear any stored authentication data
+                    sessionStorage.clear();
+                    localStorage.clear();
+                    
+                    // Clear any cookies (if applicable)
+                    document.cookie.split(";").forEach(function(c) { 
+                        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                    });
+                    
+                    // Show logout message
+                    alert('You have been successfully logged out.');
+                    
+                    // Redirect to Caspio logout or homepage
+                    // Try Caspio logout first, fallback to homepage
+                    try {
+                        // Attempt Caspio logout
+                        window.location.href = 'https://c0aae832.caspio.com/dp/A0E15000043ee3ae5ca546eb8e19';
+                    } catch (error) {
+                        // Fallback to homepage
+                        window.location.href = 'https://www.nwcustomapparel.com';
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    // Even if there's an error, redirect to homepage
+                    window.location.href = 'https://www.nwcustomapparel.com';
+                }
             }
         }
 
