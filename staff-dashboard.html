@@ -2663,66 +2663,33 @@
         document.addEventListener('DataPageReady', function(event) {
             console.log('Caspio DataPage Ready');
             
-            // Update greeting when Caspio loads
-            setTimeout(updateUserGreeting, 500);
+            // Re-initialize portal when Caspio loads
+            setTimeout(initializePortal, 500);
         });
 
-        // Try to get user data from various Caspio elements
-        function getCaspioUserData() {
-            // Try to extract user data from Caspio-generated elements
-            // Look for various possible element patterns that Caspio might generate
-            const possibleSelectors = [
-                '.cbResultSetData',  // Old dashboard pattern - check this first
-                '#auth-firstname',
-                '#fname',            // From caspio-user-script.html pattern
-                '[id*="First_Name"]',
-                '[data-cb-name="First_Name"]',
-                '.cbFormData[id*="First_Name"]',
-                'span[id*="First_Name"]',
-                'div[id*="First_Name"]',
-                '[id^="InsertRecordFirst_Name"]',
-                '[id^="EditRecordFirst_Name"]',
-                '.cbFormDataCell:contains("First_Name")',
-                'td:contains("First_Name") + td',
-                '[name*="First_Name"]'
-            ];
-            
-            let firstName = null;
-            
-            // Try each selector
-            for (const selector of possibleSelectors) {
-                try {
-                    const element = document.querySelector(selector);
-                    if (element && element.textContent) {
-                        const content = element.textContent.trim();
-                        if (content && 
-                            content !== '[@authfield:First_Name]' && 
-                            !content.includes('@authfield') &&
-                            content !== '' &&
-                            content !== 'First_Name') {
-                            firstName = content;
-                            console.log(`✓ Found name using selector ${selector}:`, firstName);
-                            break;
-                        }
-                    }
-                } catch (e) {
-                    // Some selectors might throw errors, ignore them
-                }
-            }
-            
-            return firstName;
-        }
+        // Simple working authentication pattern from successful commit
+        function initializePortal() {
+            // Try to get authenticated user data from Caspio
+            // Caspio outputs the first name in a dd element with class cbResultSetData
+            const firstName = document.querySelector('.cbResultSetData')?.textContent?.trim() || 
+                            document.getElementById('auth-firstname')?.textContent?.trim() || 
+                            document.querySelector('[id*="firstname"]')?.textContent?.trim() || 
+                            'Team Member';
+            const lastName = document.getElementById('auth-lastname')?.textContent?.trim() || 
+                           document.querySelector('[id*="lastname"]')?.textContent?.trim() || '';
+            const email = document.getElementById('auth-email')?.textContent?.trim() || '';
+            const role = document.getElementById('auth-role')?.textContent?.trim() || 'Staff';
 
-        // Function to update the user greeting
-        function updateUserGreeting() {
-            const firstName = getCaspioUserData() || 'Team Member';
+            // Create full name
+            const fullName = lastName ? `${firstName} ${lastName}` : firstName;
+
+            // Update personal welcome banner with first name
             const hour = new Date().getHours();
             let greeting = 'Welcome back';
-            
             if (hour < 12) greeting = 'Good morning';
             else if (hour < 17) greeting = 'Good afternoon';
             else greeting = 'Good evening';
-            
+
             const greetingElement = document.getElementById('welcomeGreeting');
             const userNameElement = document.getElementById('userName');
             
@@ -2733,8 +2700,15 @@
             if (userNameElement) {
                 userNameElement.textContent = firstName;
             }
-            
-            console.log('Updated greeting for:', firstName);
+
+            // Store user info for use in calculators
+            sessionStorage.setItem('nwca_user_name', fullName);
+            sessionStorage.setItem('nwca_user_email', email);
+            sessionStorage.setItem('nwca_user_role', role);
+            sessionStorage.setItem('nwca_user_firstname', firstName);
+
+            // Log successful initialization
+            console.log('Portal initialized for:', firstName);
         }
 
 
@@ -2773,58 +2747,10 @@
         }
 
         // Initialize Chart.js charts and API data
+        // Initialize after DOM loads
         document.addEventListener('DOMContentLoaded', async function() {
-            // Initialize user greeting
-            updateUserGreeting();
-            
-            // Also implement retry mechanism similar to old dashboard
-            setTimeout(function() {
-                console.log('Starting authentication retry mechanism...');
-                let retryCount = 0;
-                const maxRetries = 10;
-                
-                function attemptAuthentication() {
-                    // Check if we already have valid data
-                    const savedName = sessionStorage.getItem('userFirstName');
-                    if (savedName && savedName !== 'Team Member') {
-                        console.log('✓ Authentication already successful');
-                        return;
-                    }
-                    
-                    // Try to find authentication data using old dashboard pattern
-                    const cbResultSetData = document.querySelector('.cbResultSetData');
-                    if (cbResultSetData && cbResultSetData.textContent) {
-                        const content = cbResultSetData.textContent.trim();
-                        console.log(`Found .cbResultSetData with content: "${content}"`);
-                        
-                        if (content && content !== '[@authfield:First_Name]' && content !== '') {
-                            sessionStorage.setItem('userFirstName', content);
-                            console.log('✓ Successfully captured name from .cbResultSetData:', content);
-                            updateUserGreeting();
-                            return;
-                        }
-                    }
-                    
-                    // Also check for DataPage elements
-                    const authElements = document.querySelectorAll('[id*="DataPage"]');
-                    if (authElements.length > 0) {
-                        console.log('Found Caspio DataPage elements, triggering DataPageReady');
-                        document.dispatchEvent(new Event('DataPageReady'));
-                    }
-                    
-                    // Retry if needed
-                    if (retryCount < maxRetries) {
-                        retryCount++;
-                        console.log(`Retry attempt ${retryCount} of ${maxRetries}`);
-                        setTimeout(attemptAuthentication, 500);
-                    } else {
-                        console.log('✗ Max retries reached. Using default greeting.');
-                        updateUserGreeting();
-                    }
-                }
-                
-                attemptAuthentication();
-            }, 1000); // Start after 1 second like old dashboard
+            // Start checking after initial delay
+            setTimeout(initializePortal, 1000);
             
             // Load all dashboard data
             await Promise.all([
@@ -2836,7 +2762,6 @@
             ]);
             
             // Set up refresh intervals
-            setInterval(updateUserGreeting, 60000); // Update greeting every minute
             setInterval(async () => {
                 // Refresh all data every 5 minutes
                 await Promise.all([
@@ -2847,26 +2772,6 @@
                 ]);
             }, API_CONFIG.refreshInterval);
             
-            // Listen for postMessage if using iframe approach
-            window.addEventListener('message', function(event) {
-                if (event.data && event.data.type === 'caspioUserData') {
-                    const userData = event.data.data;
-                    if (userData.firstName) {
-                        sessionStorage.setItem('userFirstName', userData.firstName);
-                        console.log('Received first name via postMessage:', userData.firstName);
-                        updateUserGreeting();
-                    }
-                    if (userData.lastName) {
-                        sessionStorage.setItem('userLastName', userData.lastName);
-                    }
-                    if (userData.email) {
-                        sessionStorage.setItem('userEmail', userData.email);
-                    }
-                    if (userData.role) {
-                        sessionStorage.setItem('userRole', userData.role);
-                    }
-                }
-            });
             // Initialize Charts with safe creation
             // Revenue Chart - only create this if canvas exists
             setTimeout(() => {
@@ -3441,38 +3346,6 @@
             }, 300000);
         });
 
-        // Listen for Caspio DataPage Ready event
-        document.addEventListener('DataPageReady', function(event) {
-            console.log('Caspio DataPage Ready event fired');
-            // Update greeting when Caspio loads
-            setTimeout(updateUserGreeting, 500);
-        });
-
-        // Also listen for window load as a fallback
-        window.addEventListener('load', function() {
-            console.log('Window loaded - checking for Caspio data');
-            setTimeout(updateUserGreeting, 1000);
-        });
-
-        // Listen for postMessage from Caspio iframe (alternative method)
-        window.addEventListener('message', function(event) {
-            if (event.data && event.data.type === 'caspioUserData') {
-                console.log('Received Caspio user data via postMessage:', event.data.data);
-                const userData = event.data.data;
-                if (userData.firstName && userData.firstName !== '[@authfield:First_Name]') {
-                    sessionStorage.setItem('userFirstName', userData.firstName);
-                    sessionStorage.setItem('userLastName', userData.lastName || '');
-                    sessionStorage.setItem('userEmail', userData.email || '');
-                    sessionStorage.setItem('userRole', userData.role || '');
-                    updateUserGreeting();
-                }
-            }
-        });
-
-        // Try to update greeting multiple times as Caspio may load slowly
-        setTimeout(updateUserGreeting, 1500);
-        setTimeout(updateUserGreeting, 2500);
-        setTimeout(updateUserGreeting, 3500);
     </script>
 </body>
 </html>
