@@ -19,7 +19,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4D4D4D 0%, #2d2d2d 100%);
             min-height: 100vh;
             color: #2d3748;
             -webkit-font-smoothing: antialiased;
@@ -50,15 +50,17 @@
         }
 
         .logo h2 {
-            color: #4a5568;
+            color: #2d3748;
             font-weight: 700;
-            font-size: 1.3rem;
+            font-size: 1.6rem;
+            line-height: 1.2;
         }
 
         .logo p {
-            color: #718096;
-            font-size: 0.85rem;
+            color: #4a5568;
+            font-size: 1rem;
             margin-top: 0.25rem;
+            font-weight: 500;
         }
 
         .nav-section {
@@ -87,15 +89,15 @@
         }
 
         .nav-item:hover {
-            background: rgba(102, 126, 234, 0.1);
-            border-left-color: #667eea;
-            color: #667eea;
+            background: rgba(166, 15, 45, 0.1);
+            border-left-color: #A60F2D;
+            color: #A60F2D;
         }
 
         .nav-item.active {
-            background: rgba(102, 126, 234, 0.15);
-            border-left-color: #667eea;
-            color: #667eea;
+            background: rgba(166, 15, 45, 0.15);
+            border-left-color: #A60F2D;
+            color: #A60F2D;
             font-weight: 600;
         }
 
@@ -103,7 +105,8 @@
             width: 20px;
             height: 20px;
             margin-right: 0.75rem;
-            opacity: 0.7;
+            opacity: 0.9;
+            color: #e2e8f0;
         }
 
         .submenu {
@@ -119,15 +122,15 @@
         .submenu-item {
             display: block;
             padding: 0.5rem 1rem;
-            color: #718096;
+            color: #cbd5e0;
             text-decoration: none;
             font-size: 0.875rem;
             transition: all 0.2s ease;
         }
 
         .submenu-item:hover {
-            color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
+            color: #A60F2D;
+            background: rgba(166, 15, 45, 0.1);
             border-radius: 6px;
         }
 
@@ -169,7 +172,7 @@
         .user-avatar {
             width: 32px;
             height: 32px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #A60F2D, #8B0C25);
             border-radius: 50%;
             margin-right: 0.75rem;
             display: flex;
@@ -265,7 +268,7 @@
         }
 
         .quick-action {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #A60F2D, #8B0C25);
             color: white;
             padding: 1rem;
             border-radius: 12px;
@@ -2188,7 +2191,7 @@
                             <span style="background: #edf2f7; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem;">Available Jul 16</span>
                         </div>
                     </div>
-                    <div style="margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 8px; font-size: 0.9rem;">
+                    <div style="margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #A60F2D, #8B0C25); color: white; border-radius: 8px; font-size: 0.9rem;">
                         <div style="font-weight: 500;">Current Capacity</div>
                         <div style="opacity: 0.9;">100-500 Prints • Ask for rushes</div>
                     </div>
@@ -2304,8 +2307,23 @@
     </div>
 
     <script>
-        // Initialize Chart.js charts
+        // API Configuration
+        const API_CONFIG = {
+            baseURL: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api',
+            refreshInterval: 60 * 60 * 1000, // 1 hour
+            cache: {
+                revenue: 'dashboard_revenue_cache',
+                production: 'dashboard_production_cache'
+            }
+        };
+
+        // Initialize Chart.js charts and API data
         document.addEventListener('DOMContentLoaded', function() {
+            // Load API data
+            loadDashboardData();
+            
+            // Set up refresh interval
+            setInterval(loadDashboardData, API_CONFIG.refreshInterval);
             // Revenue Chart
             const revenueCtx = document.getElementById('revenueChart');
             if (revenueCtx) {
@@ -2316,8 +2334,8 @@
                         datasets: [{
                             label: 'Revenue',
                             data: [185000, 195000, 220000, 210000, 240000, 235000],
-                            borderColor: '#667eea',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderColor: '#A60F2D',
+                            backgroundColor: 'rgba(166, 15, 45, 0.1)',
                             borderWidth: 3,
                             tension: 0.4
                         }]
@@ -2358,11 +2376,11 @@
                             label: 'Orders',
                             data: [145, 89, 67, 45, 23],
                             backgroundColor: [
-                                'rgba(102, 126, 234, 0.8)',
-                                'rgba(118, 75, 162, 0.8)',
-                                'rgba(159, 122, 234, 0.8)',
-                                'rgba(139, 92, 246, 0.8)',
-                                'rgba(124, 58, 237, 0.8)'
+                                'rgba(166, 15, 45, 0.8)',
+                                'rgba(139, 12, 37, 0.8)',
+                                'rgba(196, 18, 54, 0.8)',
+                                'rgba(166, 15, 45, 0.6)',
+                                'rgba(77, 77, 77, 0.8)'
                             ],
                             borderRadius: 8,
                             borderSkipped: false
@@ -2386,6 +2404,216 @@
                             x: {
                                 grid: {
                                     display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        // API Functions
+        async function loadDashboardData() {
+            try {
+                // Load revenue data
+                await loadRevenueData();
+                
+                // Load production schedule
+                await loadProductionSchedule();
+                
+                // Load year-over-year comparison
+                await loadYearOverYear();
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        async function loadRevenueData() {
+            try {
+                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=30`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch revenue data');
+                }
+                
+                const data = await response.json();
+                
+                // Update revenue display
+                const revenueElement = document.getElementById('totalRevenue');
+                if (revenueElement && data.totalRevenue) {
+                    revenueElement.textContent = `$${data.totalRevenue.toLocaleString()}`;
+                }
+                
+                // Update revenue chart with actual data
+                if (window.revenueChart && data.dailyRevenue) {
+                    const labels = data.dailyRevenue.map(item => {
+                        const date = new Date(item.date);
+                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    });
+                    
+                    const values = data.dailyRevenue.map(item => item.revenue);
+                    
+                    window.revenueChart.data.labels = labels;
+                    window.revenueChart.data.datasets[0].data = values;
+                    window.revenueChart.update();
+                }
+                
+            } catch (error) {
+                console.error('Error loading revenue data:', error);
+                document.getElementById('totalRevenue').textContent = 'Unavailable';
+            }
+        }
+
+        async function loadProductionSchedule() {
+            try {
+                const response = await fetch(`${API_CONFIG.baseURL}/production-schedules?q.orderBy=Date%20DESC&q.limit=1`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch production schedule');
+                }
+                
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    const schedule = data[0];
+                    updateProductionDisplay(schedule);
+                }
+                
+            } catch (error) {
+                console.error('Error loading production schedule:', error);
+                showProductionError();
+            }
+        }
+
+        function updateProductionDisplay(schedule) {
+            const container = document.querySelector('.card:nth-child(2) > div:last-child');
+            if (!container) return;
+            
+            const productionItems = [
+                { label: 'DTG', date: schedule.DTG, comment: schedule.Comment_DTG },
+                { label: 'DTG Rush', date: calculateRushDate(schedule.DTG), comment: 'Rush orders available' },
+                { label: 'Embroidery', date: schedule.Embroidery, comment: schedule.Comment_Emb },
+                { label: 'Screen Print', date: schedule.Screenprint, comment: schedule.Comment_SP }
+            ];
+            
+            let html = '';
+            productionItems.forEach(item => {
+                const availability = formatAvailabilityDate(item.date);
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+                        <span style="font-weight: 500;">${item.label}</span>
+                        <span style="background: #edf2f7; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem;" 
+                              title="${item.comment || ''}">${availability}</span>
+                    </div>
+                `;
+            });
+            
+            // Add capacity info
+            html += `
+                <div style="margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #A60F2D, #8B0C25); color: white; border-radius: 8px; font-size: 0.9rem;">
+                    <div style="font-weight: 500;">Current Capacity</div>
+                    <div style="opacity: 0.9;">100-500 Prints • Ask for rushes</div>
+                    <div style="font-size: 0.75rem; margin-top: 0.5rem; opacity: 0.8;">Updated by ${schedule.Employee || 'System'}</div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function calculateRushDate(standardDate) {
+            const date = new Date(standardDate);
+            date.setDate(date.getDate() - 7);
+            return date.toISOString();
+        }
+
+        function formatAvailabilityDate(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            const daysUntil = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysUntil <= 0) {
+                return 'Available Now';
+            } else if (daysUntil === 1) {
+                return 'Available Tomorrow';
+            } else if (daysUntil <= 7) {
+                return `Available in ${daysUntil} days`;
+            } else {
+                return `Available ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+            }
+        }
+
+        function showProductionError() {
+            const container = document.querySelector('.card:nth-child(2) > div:last-child');
+            if (container) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                        <p>Production schedule unavailable</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadYearOverYear() {
+            try {
+                // This would need a specific endpoint for YoY comparison
+                // For now, we'll simulate it
+                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=365`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch YoY data');
+                }
+                
+                const data = await response.json();
+                
+                // Update YoY display
+                const yoyElement = document.querySelector('.metric-value:contains("$1,488,804")');
+                if (yoyElement && data.totalRevenue) {
+                    yoyElement.textContent = `$${data.totalRevenue.toLocaleString()}`;
+                }
+                
+            } catch (error) {
+                console.error('Error loading YoY data:', error);
+            }
+        }
+
+        // Store chart instance globally for updates
+        let revenueChart;
+        document.addEventListener('DOMContentLoaded', function() {
+            const revenueCtx = document.getElementById('revenueChart');
+            if (revenueCtx) {
+                window.revenueChart = new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Loading...'],
+                        datasets: [{
+                            label: 'Revenue',
+                            data: [0],
+                            borderColor: '#A60F2D',
+                            backgroundColor: 'rgba(166, 15, 45, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
                                 }
                             }
                         }
