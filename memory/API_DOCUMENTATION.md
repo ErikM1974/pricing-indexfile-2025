@@ -2,13 +2,43 @@
 
 This document provides a comprehensive overview of the Caspio Pricing Proxy API. It includes detailed information about each endpoint, its functionality, and how to interact with it.
 
+## Architecture Overview
+
+**Modular Route Structure** (Updated 2025): The API has been refactored from a monolithic 6,000+ line server.js file into a clean modular architecture for improved maintainability and organization. Each domain area is now organized into separate route modules:
+
+### Route Modules
+- **`/src/routes/cart.js`** - Cart sessions, items, and sizes management
+- **`/src/routes/orders.js`** - Orders, customers, order dashboard, and order ODBC
+- **`/src/routes/products.js`** - Product search, details, colors, brands, and categories  
+- **`/src/routes/inventory.js`** - Inventory lookup and size availability
+- **`/src/routes/pricing.js`** - Pricing tiers, costs, and rules
+- **`/src/routes/pricing-matrix.js`** - Pricing matrix operations and lookups
+- **`/src/routes/quotes.js`** - Quote analytics, items, and sessions
+- **`/src/routes/transfers.js`** - Transfer pricing and availability
+- **`/src/routes/misc.js`** - Utility endpoints and miscellaneous operations
+
+### Benefits of Modular Architecture
+- **Easy Navigation**: Developers can quickly locate endpoint implementations
+- **Domain Separation**: Related functionality grouped logically
+- **Maintainability**: Smaller, focused files instead of one massive file
+- **Backward Compatibility**: All existing endpoints work exactly as before
+
+### Finding Endpoint Implementations
+To locate the code for any specific endpoint, refer to the route module mapping above. For example:
+- Cart endpoints (`/api/cart-sessions`, `/api/cart-items`) → `src/routes/cart.js`
+- Product search (`/api/search`, `/api/stylesearch`) → `src/routes/products.js`  
+- Order dashboard (`/api/order-dashboard`) → `src/routes/orders.js`
+- Inventory lookups (`/api/inventory`) → `src/routes/inventory.js`
+
 ## API Status
 
-Most endpoints (51 out of 59) are fully operational. The following features have limited or no availability:
+All endpoints are fully operational following the recent modular refactoring (2025). Key status notes:
 
-- Status/Test endpoints (`/status`, `/test`) are not implemented
-- Transfer pricing endpoints (`/transfers/*`) are currently under development
-- Some inventory queries may return 404 if no matching products are found
+- **✅ Modular Architecture**: All endpoints successfully migrated to organized route modules
+- **✅ Full Compatibility**: No breaking changes - all existing integrations continue to work  
+- **✅ Performance**: Improved maintainability with no performance impact
+- **⚠️ Inventory Queries**: May return 404 if no matching products found for given style/color
+- **🔧 Ongoing**: Transfers API continues active development with new features
 
 
 ## Base URL
@@ -320,18 +350,6 @@ The Pricing API provides functionality for retrieving pricing information.
     curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/max-prices-by-style?styleNumber=PC61"
     ```
 
-#### GET /pricing-bundle
-
--   **Description**: Retrieves a bundle of pricing information for a given decoration method and style.
--   **Method**: `GET`
--   **URL**: `/pricing-bundle`
--   **Query Parameters**:
-    -   `method` (string, required): The decoration method.
-    -   `styleNumber` (string, optional): The style number of the item.
--   **Example `curl` Request**:
-    ```bash
-    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTG&styleNumber=PC61"
-    ```
 ---
 
 ## Product API
@@ -340,7 +358,7 @@ The Product API provides functionality for searching and retrieving product info
 
 #### GET /stylesearch
 
--   **Description**: Retrieves a list of style suggestions based on a search term.
+-   **Description**: Retrieves a list of style suggestions based on a search term. The search is performed in two stages: first, it looks for styles that **start with** the term, and then for styles that **contain** the term.
 -   **Method**: `GET`
 -   **URL**: `/stylesearch`
 -   **Query Parameters**:
@@ -357,7 +375,7 @@ The Product API provides functionality for searching and retrieving product info
 -   **URL**: `/product-details`
 -   **Query Parameters**:
     -   `styleNumber` (string, required): The style number of the product.
-    -   `color` (string, optional): The color of the product.
+    -   `color` / `COLOR_NAME` / `CATALOG_COLOR` (string, optional): The color of the product. The server accepts any of these parameter names.
 -   **Example `curl` Request**:
     ```bash
     curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=PC61&color=Ash"
@@ -570,7 +588,7 @@ The Order API provides functionality for managing orders and customers.
 
 #### POST /customers
 
--   **Description**: Creates a new customer.
+-   **Description**: Creates a new customer. If the `Name` field is not provided, it will be automatically constructed by combining the `FirstName` and `LastName` fields.
 -   **Method**: `POST`
 -   **URL**: `/customers`
 -   **Request Body**:
@@ -657,6 +675,97 @@ The Order API provides functionality for managing orders and customers.
     -   `CustomerServiceRep`: CSR name
     -   `CustomerPurchaseOrder`: PO number
 
+### Order Dashboard
+
+#### GET /order-dashboard
+
+-   **Description**: Retrieves pre-calculated order metrics for dashboard displays. Optimized for UI dashboards with summary statistics, breakdowns by CSR and order type, and cached for performance.
+-   **Method**: `GET`
+-   **URL**: `/order-dashboard`
+-   **Query Parameters**:
+    -   `days` (integer, optional): Number of days to look back (default: 7)
+    -   `includeDetails` (boolean, optional): Whether to include recent orders array (default: false)
+    -   `compareYoY` (boolean, optional): Include year-over-year comparison data (default: false)
+-   **Example `curl` Requests**:
+    ```bash
+    # Get 7-day dashboard (default)
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/order-dashboard"
+    
+    # Get 30-day dashboard
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/order-dashboard?days=30"
+    
+    # Get 7-day dashboard with order details
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/order-dashboard?days=7&includeDetails=true"
+    
+    # Get today's orders only
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/order-dashboard?days=1"
+    
+    # Get dashboard with year-over-year comparison
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/order-dashboard?compareYoY=true"
+    ```
+-   **Response Structure**:
+    ```json
+    {
+      "summary": {
+        "totalOrders": 45,
+        "totalSales": 28450.50,
+        "notInvoiced": 12,
+        "notShipped": 23,
+        "avgOrderValue": 632.23
+      },
+      "dateRange": {
+        "start": "2025-06-28T00:00:00Z",
+        "end": "2025-07-04T23:59:59Z",
+        "mostRecentOrder": "2025-07-03T00:00:00"
+      },
+      "breakdown": {
+        "byCsr": [
+          {"name": "Taylar Hanson", "orders": 15, "sales": 9780.00},
+          {"name": "Nika Lao", "orders": 20, "sales": 12450.50}
+        ],
+        "byOrderType": [
+          {"type": "Digital Printing", "orders": 25, "sales": 16300.00},
+          {"type": "Screen Printing", "orders": 15, "sales": 9200.50}
+        ]
+      },
+      "todayStats": {
+        "ordersToday": 3,
+        "salesToday": 1850.00,
+        "shippedToday": 1
+      },
+      "recentOrders": [
+        // Only included when includeDetails=true
+        {
+          "ID_Order": 137091,
+          "date_OrderPlaced": "2025-07-03T00:00:00",
+          "CompanyName": "BlackStone Construction",
+          "CustomerServiceRep": "Nika Lao",
+          "ORDER_TYPE": "Digital Printing",
+          "cur_Subtotal": 652.00,
+          "sts_Invoiced": 0,
+          "sts_Shipped": 0
+        }
+      ],
+      "yoyComparison": {
+        // Only included when compareYoY=true
+        "currentYearTotal": 125430.50,
+        "lastYearTotal": 108200.25,
+        "currentYearOrders": 245,
+        "lastYearOrders": 198,
+        "salesGrowthPercent": 15.92,
+        "orderGrowthPercent": 23.74
+      }
+    }
+    ```
+-   **Key Features**:
+    -   Pre-calculated metrics for immediate dashboard display
+    -   Sales calculations use `cur_Subtotal` (pre-tax amount)
+    -   60-second server-side cache for performance
+    -   Breakdown by Customer Service Rep and Order Type
+    -   Today's statistics included automatically
+    -   Optional detailed order list (up to 10 most recent)
+    -   Year-over-year comparison with growth percentages (optional)
+
 ---
 
 ## Inventory API
@@ -701,6 +810,33 @@ The Pricing Matrix API provides functionality for managing pricing matrices.
 -   **Method**: `GET`
 -   **URL**: `/pricing-matrix`
 -   **Example `curl` Request**:
+#### GET /prices-by-style-color
+
+-   **Description**: Retrieves a list of prices for each size of a given style and color, sorted by size.
+-   **Method**: `GET`
+-   **URL**: `/prices-by-style-color`
+-   **Query Parameters**:
+    -   `styleNumber` (string, required): The style number of the product.
+    -   `color` (string, required): The color of the product.
+-   **Example `curl` Request**:
+    ```bash
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/prices-by-style-color?styleNumber=PC61&color=White"
+    ```
+
+#### GET /product-variant-sizes
+
+-   **Description**: Retrieves a list of all available (and sorted) sizes for a specific product variant (style and color combination).
+-   **Method**: `GET`
+-   **URL**: `/product-variant-sizes`
+-   **Query Parameters**:
+    -   `styleNumber` (string, required): The style number of the product.
+    -   `color` / `colorName` / `catalogColor` (string, required): The color of the product. The server accepts any of these parameter names.
+-   **Example `curl` Request**:
+    ```bash
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-variant-sizes?styleNumber=PC61&color=Aquatic%20Blue"
+    ```
+
+---
     ```bash
     curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-matrix?sessionID=some-session-id"
     ```
@@ -1001,7 +1137,7 @@ The Misc API provides a variety of utility and product-related functionality.
 -   **URL**: `/status`
 -   **Example `curl` Request**:
     ```bash
-    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/status"
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/status"
     ```
 
 #### GET /test
@@ -1011,7 +1147,7 @@ The Misc API provides a variety of utility and product-related functionality.
 -   **URL**: `/test`
 -   **Example `curl` Request**:
     ```bash
-    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/test"
+    curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/test"
     ```
 
 #### GET /cart-integration.js
