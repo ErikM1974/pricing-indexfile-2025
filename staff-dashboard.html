@@ -2662,12 +2662,34 @@
         // Caspio DataPageReady Event Listener
         document.addEventListener('DataPageReady', function(event) {
             console.log('Caspio DataPage Ready');
-            
-            // Re-initialize portal when Caspio loads
-            setTimeout(initializePortal, 500);
         });
 
-        // Simple working authentication pattern from successful commit
+        // Working retry mechanism from successful commit
+        window.addEventListener('load', function() {
+            let retryCount = 0;
+            const maxRetries = 10;
+            
+            function attemptInitialization() {
+                // Check if Caspio has loaded the data
+                const caspioData = document.querySelector('.cbResultSetData');
+                
+                if (caspioData && caspioData.textContent.trim()) {
+                    console.log('Caspio data found, initializing portal...');
+                    initializePortal();
+                } else if (retryCount < maxRetries) {
+                    retryCount++;
+                    console.log(`Waiting for Caspio data... attempt ${retryCount}/${maxRetries}`);
+                    setTimeout(attemptInitialization, 500);
+                } else {
+                    console.log('Max retries reached, initializing with fallback');
+                    initializePortal();
+                }
+            }
+            
+            // Start checking after initial delay
+            setTimeout(attemptInitialization, 1000);
+        });
+
         function initializePortal() {
             // Try to get authenticated user data from Caspio
             // Caspio outputs the first name in a dd element with class cbResultSetData
@@ -3319,8 +3341,7 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Dashboard initializing...');
             
-            // Update user greeting immediately
-            updateUserGreeting();
+            // User greeting handled by initializePortal() when Caspio loads
             
             // Load all dashboard data
             await Promise.all([
@@ -3334,7 +3355,6 @@
             console.log('Dashboard initialized successfully');
             
             // Set up refresh intervals
-            setInterval(updateUserGreeting, 60000); // Update greeting every minute
             setInterval(async () => {
                 // Refresh all data every 5 minutes
                 await Promise.all([
