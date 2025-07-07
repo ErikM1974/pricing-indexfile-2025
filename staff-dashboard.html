@@ -3011,12 +3011,12 @@
                 
                 const data = await response.json();
                 
-                if (data.yearOverYear) {
-                    const yoy = data.yearOverYear;
-                    const currentSales = yoy.currentYear.totalSales;
-                    const previousSales = yoy.previousYear.totalSales;
-                    const growth = yoy.comparison.salesGrowth;
-                    const orderGrowth = yoy.comparison.orderGrowth;
+                if (data.yoyComparison) {
+                    const yoy = data.yoyComparison;
+                    const currentSales = yoy.currentYearTotal;
+                    const previousSales = yoy.lastYearTotal;
+                    const growth = yoy.salesGrowthPercent;
+                    const orderGrowth = yoy.orderGrowthPercent;
                     
                     // Update the three main values
                     if (lastYearTotal) {
