@@ -96,7 +96,7 @@
             const colorCode = urlParams.get('COLOR');
             
             if (styleNumber && colorCode) {
-                const productURL = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode)}`;
+                const productURL = `/product.html?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode)}`;
                 
                 // Update back to product button
                 const backBtn = document.getElementById('back-to-product');
@@ -350,7 +350,7 @@
             
             if (currentPage === 'product' || currentPage === 'unknown') {
                 // If we're on the product page or unknown page, go to product page
-                const productURL = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode || 'default')}`;
+                const productURL = `/product.html?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode || 'default')}`;
                 console.log('[UNIVERSAL-HEADER] Navigating to product page:', productURL);
                 window.location.href = productURL;
             } else {
@@ -441,7 +441,7 @@
                 this.showNotification(`Error loading ${styleNumber}: ${error.message}`, 'error');
                 
                 // Fallback: redirect to product page
-                const productURL = `/product?StyleNumber=${encodeURIComponent(styleNumber)}`;
+                const productURL = `/product.html?StyleNumber=${encodeURIComponent(styleNumber)}`;
                 console.log('[UNIVERSAL-HEADER] Falling back to product page:', productURL);
                 window.location.href = productURL;
             }
@@ -673,7 +673,7 @@
             }
             
             if (breadcrumbProductLink && styleNumber && colorCode) {
-                const productURL = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode)}`;
+                const productURL = `/product.html?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorCode)}`;
                 breadcrumbProductLink.href = productURL;
                 breadcrumbProductLink.title = `Go back to ${styleNumber} - ${colorCode} product page`;
                 console.log('[UNIVERSAL-HEADER] Breadcrumb product link updated:', productURL);

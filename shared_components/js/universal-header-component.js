@@ -189,7 +189,7 @@ const UniversalHeaderComponent = {
     generateBackButton(config) {
         let href = '#';
         if (config.styleNumber) {
-            href = `/product?StyleNumber=${config.styleNumber}`;
+            href = `/product.html?StyleNumber=${config.styleNumber}`;
             if (config.color) {
                 href += `&COLOR=${encodeURIComponent(config.color)}`;
             }
@@ -214,14 +214,14 @@ const UniversalHeaderComponent = {
                         <a href="/" class="breadcrumb-link">Home</a>
                         <span class="breadcrumb-separator">›</span>
                         ${config.styleNumber ? 
-                            `<a href="/product?StyleNumber=${config.styleNumber}${config.color ? '&COLOR=' + encodeURIComponent(config.color) : ''}" class="breadcrumb-link">Products</a>` : 
+                            `<a href="/product.html?StyleNumber=${config.styleNumber}${config.color ? '&COLOR=' + encodeURIComponent(config.color) : ''}" class="breadcrumb-link">Products</a>` : 
                             `<span>Products</span>`
                         }
         `;
         
         // Add product link if we have a style number
         if (config.styleNumber) {
-            const productHref = `/product?StyleNumber=${config.styleNumber}`;
+            const productHref = `/product.html?StyleNumber=${config.styleNumber}`;
             breadcrumbHTML += `
                 <span class="breadcrumb-separator">›</span>
                 <a id="breadcrumb-product-link" href="${productHref}" class="breadcrumb-link">
