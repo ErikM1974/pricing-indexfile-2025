@@ -76,7 +76,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
 
         const backLink = document.getElementById('back-to-product');
         if (backLink && styleNumber) {
-            backLink.href = `/product?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorFromUrl || '')}`;
+            backLink.href = `/product.html?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorFromUrl || '')}`;
         } else if (backLink) {
             backLink.href = '/';
         }

@@ -4,6 +4,18 @@
 
 This is the Northwest Custom Apparel (NWCA) pricing system, a web application that provides pricing calculators for various decoration methods (embroidery, DTG, laser engraving, etc.) on apparel and promotional products.
 
+## Claude Rules
+1. First think through the problem, read the codebase for relevant files, and write a plan to tasks/todo.md.
+2. The plan should have a list of todo items that you can check off as you complete them
+3. Before you begin working, check in with me and I will verify the plan.
+4. Then, begin working on the todo items, marking them as complete as you go.
+5. Please every step of the way just give me a high level explanation of what changes you made
+6. Make every task and code change you do as simple as possible. We want to avoid making any massive or complex changes. Every change should impact as little code as possible. Everything is about simplicity.
+
+
+## Security prompt:
+Please check through all the code you just wrote and make sure it follows security best practices. make sure there are no sensitive information in the front and and there are no vulnerabilities that can be exploited
+
 ## Adding New Documentation
 
 **IMPORTANT**: Claude does NOT automatically scan the memory/ directory. You MUST update this file when adding new documentation.
@@ -153,14 +165,6 @@ Service ID: service_1c4k67j
 - Verified endpoints for CREATE, READ, UPDATE, DELETE
 - Key findings about API behavior and best practices
 - Test commands and examples for reference
-
-### Artwork Display System
-@memory/ARTWORK_DISPLAY_GUIDE.md
-- Complete guide for implementing artwork display and viewing
-- CDN integration and URL pattern recognition
-- Thumbnail generation and modal gallery systems
-- Helper functions for artwork detection and management
-- Mobile-responsive modal with navigation and download features
 
 
 

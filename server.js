@@ -57,6 +57,18 @@ const staticOptions = {
   }
 };
 
+// Serve product.html routes BEFORE static middleware to avoid conflicts
+app.get('/product', (req, res) => {
+  console.log('Serving product.html page');
+  res.sendFile(path.join(__dirname, 'product.html'));
+});
+
+// Also serve product.html when accessed with .html extension
+app.get('/product.html', (req, res) => {
+  console.log('Serving product.html page (with .html extension)');
+  res.sendFile(path.join(__dirname, 'product.html'));
+});
+
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));
 app.use('/styles', express.static(path.join(__dirname, 'styles'), staticOptions));
@@ -161,12 +173,6 @@ app.get('/api/status', (req, res) => {
     apiBaseUrl: API_BASE_URL,
     environment: process.env.NODE_ENV || 'development'
   });
-});
-
-// Serve product.html for the /product route (product details page)
-app.get('/product', (req, res) => {
-  console.log('Serving product.html page');
-  res.sendFile(path.join(__dirname, 'product.html'));
 });
 
 // Serve cart.html for the /cart route (shopping cart page)

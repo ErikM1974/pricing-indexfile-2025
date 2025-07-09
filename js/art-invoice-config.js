@@ -24,7 +24,7 @@ const ART_INVOICE_CONFIG = {
     },
 
     // Hourly Rate
-    HOURLY_RATE: 100,
+    HOURLY_RATE: 75,
 
     // Project Types
     PROJECT_TYPES: [
