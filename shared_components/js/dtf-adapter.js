@@ -70,9 +70,9 @@
                 const data = await response.json();
                 this.log('DTF Adapter: Received base costs data:', data);
                 
-                if (data && data.prices) {
+                if (data && data.baseCosts) {
                     // Find the lowest price
-                    const prices = Object.values(data.prices);
+                    const prices = Object.values(data.baseCosts);
                     const lowestPrice = Math.min(...prices);
                     
                     this.log('DTF Adapter: Found lowest base cost:', lowestPrice);
