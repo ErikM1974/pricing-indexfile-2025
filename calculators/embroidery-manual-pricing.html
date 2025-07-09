@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Manual Embroidery Pricing Calculator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4A5568; /* Slate blue for embroidery */
+            --primary-dark: #2D3748;
+            --primary-light: #718096;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --info-bg: #dbeafe;
+            --info-text: #1e40af;
+            --focus-shadow: 0 0 0 0.25rem rgba(74, 85, 104, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .calculator-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+        }
+
+        .calculator-title i {
+            color: var(--primary-color);
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 968px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: var(--focus-shadow);
+        }
+
+        .form-help {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Radio Group */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radio-option:hover {
+            background: var(--hover-bg);
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 0.75rem;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-content {
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .radio-option input[type="radio"]:checked {
+            accent-color: var(--primary-color);
+        }
+
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 0.5rem;
+            accent-color: var(--primary-color);
+        }
+
+        /* Price Display */
+        .price-display {
+            background: var(--hover-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .price-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+
+        .price-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .pricing-breakdown {
+            background: var(--hover-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        .pricing-row:not(:last-child) {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pricing-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .pricing-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .total-row {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .total-row .pricing-label {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .total-row .pricing-value {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: var(--info-bg);
+            border: 1px solid var(--info-text);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-box-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--info-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box-content {
+            color: var(--info-text);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-text);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .warning-box i {
+            color: var(--warning-text);
+            margin-right: 0.5rem;
+        }
+
+        .warning-text {
+            color: var(--warning-text);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Location Controls */
+        .location-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .location-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .location-tag button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+            line-height: 1;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .location-tag button:hover {
+            opacity: 1;
+        }
+
+        /* Add Location Button */
+        .add-location-btn {
+            padding: 0.5rem 1rem;
+            background: var(--hover-bg);
+            border: 1px dashed var(--border-color);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-location-btn:hover {
+            background: var(--bg-color);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .calculator-title {
+                font-size: 1.5rem;
+            }
+
+            .price-value {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .header {
+                position: static;
+            }
+
+            body {
+                background: white;
+            }
+
+            .card, .results-section {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>Manual Embroidery Pricing</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <h1 class="calculator-title">
+            <i class="fas fa-sewing"></i>
+            Manual Embroidery Pricing Calculator
+        </h1>
+
+        <div class="calculator-grid">
+            <!-- Input Section -->
+            <div class="card">
+                <h2 class="card-title">Pricing Details</h2>
+
+                <!-- Garment Cost -->
+                <div class="form-group">
+                    <label class="form-label" for="garmentCost">
+                        Blank Garment Cost
+                        <span style="color: var(--text-secondary); font-weight: normal;">(per piece)</span>
+                    </label>
+                    <input type="number" 
+                           id="garmentCost" 
+                           class="form-control" 
+                           placeholder="0.00"
+                           min="0"
+                           step="0.01"
+                           value="">
+                    <p class="form-help">Enter the cost of the blank garment</p>
+                </div>
+
+                <!-- Quantity -->
+                <div class="form-group">
+                    <label class="form-label" for="quantity">Quantity</label>
+                    <input type="number" 
+                           id="quantity" 
+                           class="form-control" 
+                           placeholder="24"
+                           min="1"
+                           value="24">
+                    <p class="form-help">Minimum order: 1 piece (LTM fee applies under 24)</p>
+                </div>
+
+                <!-- Garment Type -->
+                <div class="form-group">
+                    <label class="form-label">Garment Type</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="garmentType" value="shirts" checked>
+                            <span class="radio-content">Shirts/Polos/Jackets (60% margin)</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="garmentType" value="caps">
+                            <span class="radio-content">Caps/Hats (70% margin)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Stitch Count -->
+                <div class="form-group">
+                    <label class="form-label">Stitch Count per Location</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="stitchCount" value="5000">
+                            <span class="radio-content">Up to 5,000 stitches</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="stitchCount" value="8000" checked>
+                            <span class="radio-content">Up to 8,000 stitches (most common)</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="stitchCount" value="10000">
+                            <span class="radio-content">Up to 10,000 stitches</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="stitchCount" value="12000">
+                            <span class="radio-content">Up to 12,000 stitches</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="stitchCount" value="15000">
+                            <span class="radio-content">Up to 15,000 stitches</span>
+                        </label>
+                    </div>
+                    <p class="form-help">$1.25 per additional 1,000 stitches over 8,000</p>
+                </div>
+
+                <!-- Embroidery Locations -->
+                <div class="form-group">
+                    <label class="form-label">Embroidery Locations</label>
+                    <div class="location-controls" id="locationControls">
+                        <div class="location-tag">
+                            <span>Front/Chest</span>
+                            <button onclick="removeLocation(this)" title="Remove location">×</button>
+                        </div>
+                        <button class="add-location-btn" onclick="showLocationOptions()">
+                            <i class="fas fa-plus"></i> Add Location
+                        </button>
+                    </div>
+                    <p class="form-help">First location is included, additional locations are $5.00 each (5,000 stitches)</p>
+                </div>
+
+                <!-- Thread Colors -->
+                <div class="form-group">
+                    <label class="form-label" for="threadColors">Number of Thread Colors</label>
+                    <input type="number" 
+                           id="threadColors" 
+                           class="form-control" 
+                           placeholder="4"
+                           min="1"
+                           max="20"
+                           value="4">
+                    <p class="form-help">First 4 colors included, $1.00 per additional color</p>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div>
+                <div class="results-section">
+                    <h2 class="card-title">Pricing Results</h2>
+
+                    <div id="results" style="display: none;">
+                        <!-- Pricing Breakdown -->
+                        <div class="pricing-breakdown">
+                            <div class="pricing-row">
+                                <span class="pricing-label">Blank Garment Cost:</span>
+                                <span class="pricing-value" id="blankCost">$0.00</span>
+                            </div>
+                            <div class="pricing-row">
+                                <span class="pricing-label">Garment with Margin:</span>
+                                <span class="pricing-value" id="garmentWithMargin">$0.00</span>
+                            </div>
+                            <div class="pricing-row">
+                                <span class="pricing-label">Base Embroidery:</span>
+                                <span class="pricing-value" id="baseEmbroidery">$0.00</span>
+                            </div>
+                            <div class="pricing-row" id="extraStitchRow" style="display: none;">
+                                <span class="pricing-label">Extra Stitches:</span>
+                                <span class="pricing-value" id="extraStitchCost">$0.00</span>
+                            </div>
+                            <div class="pricing-row" id="locationRow" style="display: none;">
+                                <span class="pricing-label">Additional Locations:</span>
+                                <span class="pricing-value" id="locationCost">$0.00</span>
+                            </div>
+                            <div class="pricing-row" id="colorRow" style="display: none;">
+                                <span class="pricing-label">Extra Thread Colors:</span>
+                                <span class="pricing-value" id="colorCost">$0.00</span>
+                            </div>
+                            <div class="pricing-row" id="ltmRow" style="display: none;">
+                                <span class="pricing-label">Less Than Minimum Fee:</span>
+                                <span class="pricing-value" id="ltmFee">$0.00</span>
+                            </div>
+                            <div class="pricing-row total-row">
+                                <span class="pricing-label">Price per Item:</span>
+                                <span class="pricing-value" id="unitPrice">$0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Total Display -->
+                        <div class="price-display">
+                            <div class="price-value" id="totalPrice">$0.00</div>
+                            <div class="price-label">Total Order Price</div>
+                        </div>
+
+                        <!-- Info Box -->
+                        <div class="info-box" id="pricingInfo">
+                            <div class="info-box-title">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Pricing Details</span>
+                            </div>
+                            <div class="info-box-content" id="infoContent">
+                                <!-- Dynamic content -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning when no cost entered -->
+                    <div class="warning-box" id="warningBox">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span class="warning-text">Please enter a blank garment cost to calculate pricing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Location Modal -->
+    <div id="locationModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200;">
+        <div style="background: white; max-width: 400px; margin: 100px auto; padding: 2rem; border-radius: 12px;">
+            <h3 style="margin-bottom: 1rem;">Select Location</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <button class="btn btn-primary" onclick="addLocation('Back')">Back</button>
+                <button class="btn btn-primary" onclick="addLocation('Left Sleeve')">Left Sleeve</button>
+                <button class="btn btn-primary" onclick="addLocation('Right Sleeve')">Right Sleeve</button>
+                <button class="btn btn-primary" onclick="addLocation('Left Chest')">Left Chest</button>
+                <button class="btn btn-primary" onclick="addLocation('Right Chest')">Right Chest</button>
+                <button class="btn btn-primary" onclick="addLocation('Hat Front')">Hat Front</button>
+                <button class="btn btn-primary" onclick="addLocation('Hat Back')">Hat Back</button>
+                <button class="btn btn-primary" onclick="addLocation('Hat Side')">Hat Side</button>
+            </div>
+            <button class="btn" style="margin-top: 1rem; width: 100%;" onclick="hideLocationModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Embroidery pricing configuration based on master bundle
+        const embroideryConfig = {
+            // Base pricing constants
+            baseStitches: 8000,
+            pricePerThousand: 1.25,
+            logoBasePrice: 5.00,
+            logoBaseStitches: 5000,
+            ltmFee: 50.00,
+            minQuantity: 24,
+            
+            // Margin configuration
+            margins: {
+                shirts: 0.6,  // 60% margin (divide by 0.6)
+                caps: 0.7     // 70% margin (divide by 0.7)
+            },
+            
+            // Pricing tiers by quantity
+            tiers: {
+                shirts: {
+                    '1-23': { embroideryCharge: 10.50 },
+                    '24-47': { embroideryCharge: 9.50 },
+                    '48-71': { embroideryCharge: 8.75 },
+                    '72+': { embroideryCharge: 8.00 }
+                },
+                caps: {
+                    '1-11': { embroideryCharge: 9.50 },
+                    '12-23': { embroideryCharge: 8.50 },
+                    '24-47': { embroideryCharge: 7.75 },
+                    '48-71': { embroideryCharge: 7.00 },
+                    '72+': { embroideryCharge: 6.25 }
+                }
+            },
+            
+            // Additional charges
+            extraColorCharge: 1.00,  // Per color beyond 4
+            includedColors: 4
+        };
+
+        // Track current locations
+        let currentLocations = ['Front/Chest'];
+
+        // Get pricing tier based on quantity and garment type
+        function getPricingTier(quantity, garmentType) {
+            const tiers = embroideryConfig.tiers[garmentType];
+            
+            if (garmentType === 'shirts') {
+                if (quantity < 24) return tiers['1-23'];
+                if (quantity < 48) return tiers['24-47'];
+                if (quantity < 72) return tiers['48-71'];
+                return tiers['72+'];
+            } else {
+                // Caps
+                if (quantity < 12) return tiers['1-11'];
+                if (quantity < 24) return tiers['12-23'];
+                if (quantity < 48) return tiers['24-47'];
+                if (quantity < 72) return tiers['48-71'];
+                return tiers['72+'];
+            }
+        }
+
+        // Calculate additional logo price based on stitch count
+        function calculateAdditionalLogoPrice(stitches) {
+            const base = embroideryConfig.logoBasePrice;
+            const extraStitches = Math.max(0, stitches - embroideryConfig.logoBaseStitches);
+            return base + (extraStitches / 1000) * embroideryConfig.pricePerThousand;
+        }
+
+        // Location management
+        function showLocationOptions() {
+            document.getElementById('locationModal').style.display = 'block';
+        }
+
+        function hideLocationModal() {
+            document.getElementById('locationModal').style.display = 'none';
+        }
+
+        function addLocation(location) {
+            if (!currentLocations.includes(location)) {
+                currentLocations.push(location);
+                updateLocationDisplay();
+                calculatePrice();
+            }
+            hideLocationModal();
+        }
+
+        function removeLocation(button) {
+            const locationTag = button.parentElement;
+            const location = locationTag.querySelector('span').textContent;
+            currentLocations = currentLocations.filter(loc => loc !== location);
+            updateLocationDisplay();
+            calculatePrice();
+        }
+
+        function updateLocationDisplay() {
+            const container = document.getElementById('locationControls');
+            const addButton = container.querySelector('.add-location-btn');
+            
+            // Clear existing tags
+            container.innerHTML = '';
+            
+            // Add location tags
+            currentLocations.forEach(location => {
+                const tag = document.createElement('div');
+                tag.className = 'location-tag';
+                tag.innerHTML = `
+                    <span>${location}</span>
+                    <button onclick="removeLocation(this)" title="Remove location">×</button>
+                `;
+                container.appendChild(tag);
+            });
+            
+            // Re-add the add button
+            container.appendChild(addButton);
+        }
+
+        // Calculate price
+        function calculatePrice() {
+            const garmentCost = parseFloat(document.getElementById('garmentCost').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const garmentType = document.querySelector('input[name="garmentType"]:checked').value;
+            const stitchCount = parseInt(document.querySelector('input[name="stitchCount"]:checked').value);
+            const threadColors = parseInt(document.getElementById('threadColors').value) || 4;
+            
+            if (garmentCost <= 0) {
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('warningBox').style.display = 'block';
+                return;
+            }
+            
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('warningBox').style.display = 'none';
+            
+            // Get margin and pricing tier
+            const margin = embroideryConfig.margins[garmentType];
+            const tier = getPricingTier(quantity, garmentType);
+            
+            // Calculate base costs
+            const garmentWithMargin = garmentCost / margin;
+            const baseEmbroideryCharge = tier.embroideryCharge;
+            
+            // Calculate extra stitch charge
+            const extraStitches = Math.max(0, stitchCount - embroideryConfig.baseStitches);
+            const extraStitchCharge = (extraStitches / 1000) * embroideryConfig.pricePerThousand;
+            
+            // Calculate location charges (first location is included)
+            const additionalLocations = Math.max(0, currentLocations.length - 1);
+            let locationCharge = 0;
+            for (let i = 0; i < additionalLocations; i++) {
+                locationCharge += calculateAdditionalLogoPrice(stitchCount);
+            }
+            
+            // Calculate thread color charges
+            const extraColors = Math.max(0, threadColors - embroideryConfig.includedColors);
+            const colorCharge = extraColors * embroideryConfig.extraColorCharge;
+            
+            // Calculate subtotal
+            let unitPrice = garmentWithMargin + baseEmbroideryCharge + extraStitchCharge + locationCharge + colorCharge;
+            
+            // Apply LTM fee if under minimum
+            let ltmPerUnit = 0;
+            if (quantity < embroideryConfig.minQuantity) {
+                ltmPerUnit = embroideryConfig.ltmFee / quantity;
+                unitPrice += ltmPerUnit;
+            }
+            
+            // Round to nearest 50 cents
+            unitPrice = Math.ceil(unitPrice * 2) / 2;
+            
+            // Calculate total
+            const totalPrice = unitPrice * quantity;
+            
+            // Update display
+            document.getElementById('blankCost').textContent = `$${garmentCost.toFixed(2)}`;
+            document.getElementById('garmentWithMargin').textContent = `$${garmentWithMargin.toFixed(2)}`;
+            document.getElementById('baseEmbroidery').textContent = `$${baseEmbroideryCharge.toFixed(2)}`;
+            
+            // Extra stitches
+            if (extraStitchCharge > 0) {
+                document.getElementById('extraStitchRow').style.display = 'flex';
+                document.getElementById('extraStitchCost').textContent = `$${extraStitchCharge.toFixed(2)}`;
+            } else {
+                document.getElementById('extraStitchRow').style.display = 'none';
+            }
+            
+            // Location charges
+            if (locationCharge > 0) {
+                document.getElementById('locationRow').style.display = 'flex';
+                document.getElementById('locationCost').textContent = `$${locationCharge.toFixed(2)}`;
+            } else {
+                document.getElementById('locationRow').style.display = 'none';
+            }
+            
+            // Color charges
+            if (colorCharge > 0) {
+                document.getElementById('colorRow').style.display = 'flex';
+                document.getElementById('colorCost').textContent = `$${colorCharge.toFixed(2)}`;
+            } else {
+                document.getElementById('colorRow').style.display = 'none';
+            }
+            
+            // LTM fee
+            if (ltmPerUnit > 0) {
+                document.getElementById('ltmRow').style.display = 'flex';
+                document.getElementById('ltmFee').textContent = `$${ltmPerUnit.toFixed(2)}`;
+            } else {
+                document.getElementById('ltmRow').style.display = 'none';
+            }
+            
+            document.getElementById('unitPrice').textContent = `$${unitPrice.toFixed(2)}`;
+            document.getElementById('totalPrice').textContent = `$${totalPrice.toFixed(2)}`;
+            
+            // Update info box
+            updateInfoBox(quantity, garmentType, stitchCount, threadColors, ltmPerUnit > 0);
+        }
+
+        function updateInfoBox(quantity, garmentType, stitchCount, threadColors, hasLTM) {
+            const infoContent = document.getElementById('infoContent');
+            let info = [];
+            
+            // Quantity tier info
+            const tierName = garmentType === 'shirts' ? 
+                (quantity < 24 ? '1-23' : quantity < 48 ? '24-47' : quantity < 72 ? '48-71' : '72+') :
+                (quantity < 12 ? '1-11' : quantity < 24 ? '12-23' : quantity < 48 ? '24-47' : quantity < 72 ? '48-71' : '72+');
+            
+            info.push(`• Quantity tier: ${tierName} pieces`);
+            info.push(`• Garment margin: ${garmentType === 'shirts' ? '60%' : '70%'}`);
+            info.push(`• Base embroidery includes up to ${embroideryConfig.baseStitches.toLocaleString()} stitches`);
+            
+            if (stitchCount > embroideryConfig.baseStitches) {
+                const extra = stitchCount - embroideryConfig.baseStitches;
+                info.push(`• Extra ${extra.toLocaleString()} stitches charged at $${embroideryConfig.pricePerThousand}/1000`);
+            }
+            
+            if (currentLocations.length > 1) {
+                info.push(`• ${currentLocations.length - 1} additional location${currentLocations.length > 2 ? 's' : ''}`);
+            }
+            
+            if (threadColors > embroideryConfig.includedColors) {
+                info.push(`• ${threadColors - embroideryConfig.includedColors} extra thread color${threadColors - embroideryConfig.includedColors > 1 ? 's' : ''}`);
+            }
+            
+            if (hasLTM) {
+                info.push(`• Less Than Minimum fee applied (under ${embroideryConfig.minQuantity} pieces)`);
+            }
+            
+            infoContent.innerHTML = info.join('<br>');
+        }
+
+        // Event listeners
+        document.getElementById('garmentCost').addEventListener('input', calculatePrice);
+        document.getElementById('quantity').addEventListener('input', calculatePrice);
+        document.getElementById('threadColors').addEventListener('input', calculatePrice);
+        document.querySelectorAll('input[name="garmentType"]').forEach(radio => {
+            radio.addEventListener('change', calculatePrice);
+        });
+        document.querySelectorAll('input[name="stitchCount"]').forEach(radio => {
+            radio.addEventListener('change', calculatePrice);
+        });
+
+        // Initial calculation
+        calculatePrice();
+    </script>
+</body>
+</html>
