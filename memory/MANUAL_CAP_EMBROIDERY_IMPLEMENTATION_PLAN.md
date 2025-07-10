@@ -2,286 +2,311 @@
 
 ## Overview
 
-This guide documents the implementation of manual pricing calculators for Northwest Custom Apparel, starting with the Manual Cap Embroidery Calculator. These calculators allow staff to price custom items not in the standard catalog while maintaining consistent pricing logic and professional quote generation.
+This guide documents the implementation of manual pricing calculators for Northwest Custom Apparel. These calculators enable staff to price custom items not in the standard catalog while maintaining consistent pricing logic with the Sanmar-style calculators.
 
 ### Purpose
 - Price custom/non-catalog items with manual blank cost entry
-- Maintain pricing consistency with catalog items
-- Generate professional quotes with unique IDs
-- Track quotes in the database
-- Send quotes via email to customers
+- Model interface and functionality after Sanmar pricing calculators
+- Use API data for embellishment pricing while allowing manual garment costs
+- Generate professional quotes with database tracking
+- Provide programmatic testing capabilities for accuracy
 
 ### Calculator Types This Guide Covers
-- Manual Cap Embroidery (implemented)
-- Manual Flat Embroidery (future)
-- Manual DTG (future)
-- Manual DTF (future)
-- Manual Screen Printing (future)
+- Manual Cap Embroidery (✅ implemented)
+- Manual Flat Embroidery (planned - model after Sanmar embroidery)
+- Manual DTG (planned)
+- Manual DTF (planned)
+- Manual Screen Printing (planned)
 
-## Manual Cap Embroidery Pricing Implementation
+## Lessons Learned from Cap Embroidery Implementation
 
-### Key Architecture Decisions
+### 1. UI/UX Design Principles
 
-1. **Hybrid Approach**: Uses live API data for embroidery pricing while allowing manual blank cost input
-2. **Consistent UI**: Maintains the same 3-step interface as catalog calculators
-3. **Real-time Calculations**: All pricing updates instantly as users adjust inputs
-4. **Professional Output**: Generates quotes identical to catalog item quotes
+**Two-Column Layout with Sticky Pricing**
+- Left column: Input form with all configuration options
+- Right column: Sticky pricing card that follows scroll (top: 80px)
+- Live updates as user changes any input
+- Large, prominent final pricing display (3.5rem font)
+- Clear price breakdown showing each component
 
-### Pricing Formula Breakdown
+**Visual Hierarchy**
+```css
+/* Price display hierarchy */
+.final-price { font-size: 3.5rem; }  /* Main price */
+.subtotal { font-size: 1.5rem; }     /* Component totals */
+.line-items { font-size: 1rem; }     /* Individual items */
+```
+
+### 2. Pricing Architecture
+
+**Hybrid API/Manual Approach**
+- Fetch embroidery pricing from Caspio API on load
+- Allow manual blank cost entry
+- Apply consistent margin calculation (divide by 0.6 = 40% margin)
+- Show margin-adjusted cost in breakdowns, not raw cost
+
+### 3. Accurate Pricing Calculations
 
 #### Front Logo Pricing (Primary Location)
 ```javascript
-// Formula for front logo on caps
-function calculateFrontLogoPrice(stitches, blankCost, tierLabel) {
-    // Step 1: Get base embroidery cost from API (for 8,000 stitches)
-    const baseEmbCost = embroideryBaseCosts[tierLabel];  // e.g., $11.00 for 24-47 tier
-    
-    // Step 2: Calculate stitch adjustment
-    const stitchDiff = stitches - 8000;  // Base is 8,000 for caps
-    const stitchAdjustment = (stitchDiff / 1000) * 1.00;  // $1.00 per 1,000 stitches
-    
-    // Step 3: Final embroidery cost
-    const finalEmbCost = baseEmbCost + stitchAdjustment;
-    
-    // Step 4: Apply margin to blank cost
+// Front logo includes blank cost with margin + embroidery
+function calculateFrontLogoPrice(stitches, blankCost, tierData) {
+    // Step 1: Apply margin to blank cost
     const marginDenom = 0.6;  // 40% margin (divide by 0.6)
     const markedUpBlank = blankCost / marginDenom;
     
-    // Step 5: Total cost
-    const totalCost = markedUpBlank + finalEmbCost;
+    // Step 2: Get embroidery cost from API tier data
+    const baseCost = tierData.baseCost;  // Base cost for 8,000 stitches
+    const stitchDiff = stitches - 8000;
+    const stitchAdjustment = (stitchDiff / 1000) * 1.00;  // $1.00 per 1,000
+    const embroideryTotal = baseCost + stitchAdjustment;
     
-    // Step 6: Apply rounding (CeilDollar = round up to nearest dollar)
-    return Math.ceil(totalCost);
+    // Step 3: Combine costs
+    const total = markedUpBlank + embroideryTotal;
+    
+    // Step 4: Round to nearest dollar
+    return Math.round(total);
 }
-
-// Example: 
-// Blank cost: $5.00, 8,000 stitches, 24-47 tier
-// Marked up blank: $5.00 / 0.6 = $8.33
-// Embroidery: $11.00 (from API)
-// Total: $8.33 + $11.00 = $19.33
-// Rounded: $20.00
 ```
 
 #### Additional Logo Pricing (Back, Left Side, Right Side)
 ```javascript
-// UPDATED Formula for additional logos - Simple fixed pricing
+// CRITICAL: Additional logos do NOT include blank cost - embroidery only
+// NO ROUNDING on individual logo costs - only round final total
 function calculateAdditionalLogoPrice(stitches) {
-    // Base price for up to 5,000 stitches
-    const basePrice = 5.00;
+    const basePrice = 5.00;      // Base for up to 5,000 stitches
     const baseStitches = 5000;
     const pricePerThousand = 1.00;
     
-    // Calculate additional stitches beyond 5,000
+    // Calculate additional cost for stitches beyond 5,000
     const additionalStitches = Math.max(0, stitches - baseStitches);
     const additionalThousands = additionalStitches / 1000;
     
-    // Total cost
-    const totalCost = basePrice + (additionalThousands * pricePerThousand);
-    
-    // Apply rounding
-    return Math.ceil(totalCost);
+    // Return exact cost - NO ROUNDING HERE
+    return basePrice + (additionalThousands * pricePerThousand);
 }
 
-// Examples:
-// 5,000 stitches: $5.00 (base)
-// 6,000 stitches: $5.00 + (1 × $1.00) = $6.00
-// 7,000 stitches: $5.00 + (2 × $1.00) = $7.00
-// 10,000 stitches: $5.00 + (5 × $1.00) = $10.00
-// 12,000 stitches: $5.00 + (7 × $1.00) = $12.00
+// Examples (exact costs, no rounding):
+// 5,000 stitches: $5.00
+// 6,000 stitches: $5.00 + $1.00 = $6.00
+// 7,000 stitches: $5.00 + $2.00 = $7.00
+// 8,500 stitches: $5.00 + $3.50 = $8.50  ← Note: NOT rounded
+// 10,000 stitches: $5.00 + $5.00 = $10.00
 ```
 
-### Pricing Constants and Rules
+### 4. Critical Implementation Details
 
+#### API Data Requirements
+**IMPORTANT**: Request the Caspio XML file to understand API endpoints and data structure.
+- Embroidery pricing tiers come from API
+- Cap-specific pricing uses different base than flat embroidery
+- API provides tier breakpoints and base costs
+
+#### Pricing Display Rules
+1. **Always show margin-adjusted blank cost** in breakdowns, not raw cost
+2. **Label pricing tables clearly** - e.g., "Volume Pricing (Cap + Front Logo)"
+3. **LTM fees** must be clearly explained with per-unit breakdown
+4. **Component visibility** - only show logos that are enabled
+5. **Rounding** - Apply only to final total, not individual components
+
+#### Common Pitfalls to Avoid
+1. **Don't round additional logo costs** - causes confusion in totals
+2. **Don't include blank cost in additional logos** - embroidery only
+3. **Don't show raw costs** - always show margin-adjusted prices
+4. **Don't mislabel margin** - it's 40% margin (divide by 0.6), not 60%
+
+### 5. Programmatic Testing Strategy
+
+**Create Comprehensive Test Scenarios**
 ```javascript
-// Constants used throughout the calculator
-const BASE_STITCHES = 8000;         // Base stitch count for front logo
-const PRICE_PER_THOUSAND = 1.00;    // Price per 1,000 stitches adjustment
-const LOGO_BASE_STITCHES = 5000;    // Base for additional logos
-const LOGO_BASE_PRICE = 5.00;       // Base price for additional logos
-const LTM_FEE = 50.00;              // Less than minimum fee
-const MIN_QUANTITY = 24;            // Minimum before LTM applies
-
-// Quantity tiers (from API)
-const tiers = [
-    { label: "24-47", min: 24, max: 47 },
-    { label: "48-71", min: 48, max: 71 },
-    { label: "72+", min: 72, max: 9999 }
-];
-```
-
-### Less Than Minimum (LTM) Fee Calculation
-
-```javascript
-// LTM applies to orders under 24 pieces
-if (quantity < MIN_QUANTITY) {
-    const ltmPerUnit = LTM_FEE / quantity;
-    totalPrice += ltmPerUnit;
-}
-
-// Example: 12 pieces
-// LTM fee: $50.00 / 12 = $4.17 per piece
-// This is added to the final unit price
-```
-
-## Technical Implementation Details
-
-### API Integration Strategy
-
-The calculator uses a "hybrid" approach that combines:
-1. **Manual Input**: Blank cap cost entered by user
-2. **Live API Data**: Embroidery pricing pulled from the API
-3. **Real-time Calculation**: Instant price updates as inputs change
-
-#### API Endpoint
-```
-https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=CAP&styleNumber=MANUAL
-```
-
-#### Key Data Extracted from API
-```javascript
-// 1. Tier Structure (quantity breaks)
-tierData = [
-    { TierLabel: "24-47", MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6 },
-    { TierLabel: "48-71", MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6 },
-    { TierLabel: "72+", MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6 }
+// Test framework pattern that works
+const testScenarios = [
+    {
+        name: "Basic order",
+        inputs: { blankCost: 5, quantity: 24, frontStitches: 8000 },
+        expected: { /* calculated values */ }
+    },
+    {
+        name: "With additional logos",
+        inputs: { 
+            blankCost: 5, 
+            quantity: 24, 
+            frontStitches: 8000,
+            logos: { back: 5000, left: 7000 }
+        },
+        expected: { /* calculated values */ }
+    }
 ];
 
-// 2. Base Embroidery Costs (for 8,000 stitches)
-embroideryBaseCosts = {
-    "24-47": 11.00,
-    "48-71": 10.00,
-    "72+": 8.50
+// Critical testing considerations:
+// 1. Reset all inputs between scenarios
+// 2. Only read visible values from DOM
+// 3. Wait for UI updates with setTimeout
+// 4. Expose config and data on window for tests
+```
+
+### 6. Standardized Header Implementation
+
+**Universal Header for All Manual Calculators**
+```html
+<header class="header">
+    <div class="header-container">
+        <div class="header-left">
+            <img src="[logo-url]" alt="Northwest Custom Apparel" class="logo">
+            <nav class="breadcrumb">
+                <a href="/staff-dashboard.html">Staff Dashboard</a>
+                <span>/</span>
+                <a href="/">Main Site</a>
+                <span>/</span>
+                <span>[Calculator Name]</span>
+            </nav>
+        </div>
+        <div class="header-right">
+            <button class="help-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Quote
+            </button>
+        </div>
+    </div>
+</header>
+```
+## Building Manual Calculators for Other Embellishments
+
+### Key Principle: Model After Sanmar Calculators
+
+All manual calculators should be modeled after their Sanmar counterparts:
+- **Manual Embroidery** → Model after: https://www.teamnwca.com/pricing/embroidery?StyleNumber=C112&COLOR=Flame%20Red%2FBlk
+- **Manual DTG** → Model after Sanmar DTG calculator
+- **Manual Screen Print** → Model after Sanmar screen print calculator
+- **Manual DTF** → Model after Sanmar DTF calculator
+
+### Implementation Process
+
+1. **Study the Sanmar Version**
+   - Examine the UI layout and flow
+   - Note the pricing breakdown structure
+   - Understand the input options and ranges
+   - Observe how quantities affect pricing
+
+2. **Request Caspio XML Files**
+   - Essential for understanding API endpoints
+   - Shows data structure and field names
+   - Reveals pricing tier logic
+
+3. **Adapt to Manual Entry**
+   - Replace product selection with blank cost input
+   - Keep all other functionality identical
+   - Use same API endpoints with styleNumber=MANUAL
+
+### Manual Flat Embroidery Calculator
+
+**Key Differences from Cap Embroidery:**
+- Base stitch count may differ (check API)
+- Pricing tiers may vary
+- No "side" locations - typically chest, full front, full back
+- Maximum stitch count: 20,000 (vs 12,000 for caps)
+
+```javascript
+// Flat embroidery specifics
+const FLAT_BASE_STITCHES = 8000;  // Verify from API
+const MAX_STITCHES = 20000;
+const LOCATIONS = ['Left Chest', 'Right Chest', 'Full Front', 'Full Back'];
+
+### Manual DTG Calculator
+
+**Key Features from Sanmar DTG:**
+- Print size selection (not square inches)
+- Standard sizes: Pocket, Standard, Oversized
+- Single location pricing
+- White/light vs dark garment pricing
+
+```javascript
+// DTG manual specifics
+const PRINT_SIZES = {
+    'Pocket': { width: 4, height: 4 },
+    'Standard': { width: 12, height: 14 },
+    'Oversized': { width: 14, height: 16 }
 };
-
-// 3. Rounding Method
-roundingMethod = "CeilDollar";  // Round up to nearest dollar
-
-// 4. Available Locations
-locations = ["Cap Front", "Cap Back", "Left Side", "Right Side"];
+// Pricing varies by garment color (light vs dark)
 ```
 
-### User Interface Design
+### Manual Screen Print Calculator
 
-The calculator follows NWCA's standard 3-step process:
-
-#### Step 1: Configure Your Order
-- **Manual Blank Cost Input**: Text field for entering cap cost
-- **Quantity Selection**: Number input (minimum 1)
-- **Front Logo Configuration**: Slider for 5,000-12,000 stitches
-- **Additional Logos**: Checkboxes with sliders for Back, Left, Right
-
-#### Step 2: Your Instant Quote
-- **Pricing Breakdown**: Shows all components
-- **Total Per Piece**: Final calculated price
-- **Estimated Total**: Quantity × Unit Price
-- **Email Quote Button**: Opens quote form
-
-#### Step 3: Pricing Grid
-- **Quantity Tiers**: Shows pricing at different quantities
-- **Consistent Pricing**: Same price across all cap sizes
-- **Live Updates**: Reflects current configuration
-
-## Creating Manual Calculators for Other Decoration Methods
-
-### General Architecture Pattern
-
-All manual calculators should follow this structure:
+**Key Features from Sanmar Screen Print:**
+- Color count per location (1-6 colors)
+- Multiple print locations
+- Setup fees per screen/color
+- Location-specific pricing
 
 ```javascript
-// 1. Constants specific to decoration method
-const BASE_UNITS = 8000;        // Base units (stitches, colors, etc.)
-const PRICE_PER_UNIT = 1.00;    // Price per additional unit
-const MIN_QUANTITY = 24;        // Minimum before LTM
-const LTM_FEE = 50.00;         // Less than minimum fee
-
-// 2. State management
-let manualBlankCost = 0;       // User input
-let currentUnits = BASE_UNITS;  // Current decoration units
-let currentQuantity = 24;       // Order quantity
-
-// 3. API data storage
-let tierData = [];              // From API
-let decorationCosts = {};       // From API
-let roundingMethod = '';        // From API
-
-// 4. Core calculation function
-function calculatePrice(units, blankCost, tierLabel) {
-    // Get base cost from API
-    const baseCost = decorationCosts[tierLabel];
-    
-    // Calculate adjustment
-    const adjustment = ((units - BASE_UNITS) / 1000) * PRICE_PER_UNIT;
-    
-    // Apply margin
-    const markedUpBlank = blankCost / 0.6;
-    
-    // Total and round
-    const total = markedUpBlank + baseCost + adjustment;
-    return applyRounding(total, roundingMethod);
-}
+// Screen print manual specifics
+const SETUP_FEE_PER_SCREEN = 30.00;
+const MAX_COLORS = 6;
+const LOCATIONS = ['Front', 'Back', 'Left Sleeve', 'Right Sleeve'];
+// Each location calculated separately
 ```
 
-### Manual DTG Calculator Guidelines
+### Manual DTF Calculator
+
+**Key Features from Sanmar DTF:**
+- Gang sheet sizes
+- No color limitations
+- Simple size-based pricing
 
 ```javascript
-// DTG-specific constants
-const BASE_INCHES = 50;         // Base square inches
-const PRICE_PER_10_INCHES = 1.00;  // Price per 10 square inches
-
-// Locations: Full Front, Full Back, Left Chest, etc.
-// No additional location charges (included in base)
-
-// Formula:
-// 1. Calculate square inches (width × height)
-// 2. Adjust from base (50 sq in)
-// 3. Apply tier pricing from API
-// 4. Add marked up blank cost
-```
-
-### Manual Screen Print Calculator Guidelines
-
-```javascript
-// Screen print-specific constants
-const SETUP_FEE_PER_COLOR = 30.00;  // Per screen/color
-const BASE_COLORS = 1;              // Base includes 1 color
-
-// Multiple locations treated separately
-// Each location has its own color count
-// Setup fees apply per location
-
-// Formula:
-// 1. Calculate per-location costs
-// 2. Add setup fees (colors × $30)
-// 3. Apply quantity tier discounts
-// 4. Add marked up blank cost
-```
-
-### Manual DTF Calculator Guidelines
-
-```javascript
-// DTF-specific constants
-const BASE_SIZE = "11x14";     // Base size
-const SIZE_UPCHARGES = {
-    "11x14": 0,
-    "11x17": 2.00,
-    "22x28": 5.00
+// DTF manual specifics
+const DTF_SIZES = {
+    'Small (up to 10")': { maxSize: 10, upcharge: 0 },
+    'Medium (10-14")': { maxSize: 14, upcharge: 2 },
+    'Large (14-22")': { maxSize: 22, upcharge: 5 }
 };
-
-// Single price regardless of colors
-// Size-based pricing only
-
-// Formula:
-// 1. Get base DTF cost from API
-// 2. Add size upcharge if applicable
-// 3. Apply quantity discounts
-// 4. Add marked up blank cost
 ```
 
-## Complete Implementation Blueprint
+## Complete Implementation Checklist
 
-### File Structure and Naming Convention
+### 1. Pre-Development Setup
+- [ ] Study the corresponding Sanmar calculator thoroughly
+- [ ] Request Caspio XML file for API structure
+- [ ] Document all input options and ranges
+- [ ] Map out pricing breakdown components
 
-```
+### 2. Development Process
+- [ ] Create HTML structure with 2-column layout
+- [ ] Implement sticky pricing card (right column)
+- [ ] Add standardized header with navigation
+- [ ] Build input form matching Sanmar options
+- [ ] Integrate API calls for pricing data
+- [ ] Create real-time calculation functions
+- [ ] Add comprehensive price breakdown display
+- [ ] Implement quote system (optional)
+- [ ] Add print functionality
+
+### 3. Testing Requirements  
+- [ ] Create programmatic test scenarios
+- [ ] Test all quantity tiers
+- [ ] Verify LTM fee calculations
+- [ ] Check all decoration options
+- [ ] Validate margin calculations
+- [ ] Test edge cases (min/max values)
+- [ ] Ensure responsive design works
+
+### 4. Final Polish
+- [ ] Large, prominent pricing display (3.5rem)
+- [ ] Clear component breakdowns
+- [ ] Proper labeling of all fees
+- [ ] Mobile responsive design
+- [ ] Print-friendly layout
+- [ ] Consistent NWCA branding
+
+## Summary
+
+The key to successful manual calculator implementation is:
+1. **Model after Sanmar** - Don't reinvent the wheel
+2. **Use live API data** - Ensures pricing consistency  
+3. **Clear pricing breakdowns** - No confusion about costs
+4. **Programmatic testing** - Catch calculation errors early
+5. **Standardized UI** - Consistent experience across calculators
+
+By following this guide and learning from the cap embroidery implementation, all manual calculators can be built efficiently with minimal issues.
 /calculators/
 ├── cap-embroidery-manual.html          # Main calculator
 ├── cap-embroidery-manual-service.js    # Quote service
