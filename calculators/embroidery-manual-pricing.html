@@ -3,29 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manual Flat Embroidery Pricing Calculator - Northwest Custom Apparel</title>
+    <meta name="robots" content="noindex, nofollow">
+    <title>Manual Embroidery Pricing Calculator - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Quote Service -->
+    <script src="embroidery-manual-service.js"></script>
+    
     <style>
+        /* Root variables - Green Theme for Manual Calculators */
         :root {
-            --primary-color: #4A5568;
-            --primary-dark: #2D3748;
-            --primary-light: #718096;
-            --success-color: #48BB78;
-            --warning-color: #F56565;
-            --info-color: #4299E1;
-            --bg-color: #F7FAFC;
-            --card-bg: #FFFFFF;
-            --text-primary: #2D3748;
-            --text-secondary: #718096;
-            --border-color: #E2E8F0;
-            --hover-bg: #EDF2F7;
-            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --radius: 0.5rem;
+            --primary-color: #3a7c52;
+            --primary-dark: #2d5f3f;
+            --primary-light: #e8f5e9;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
         }
 
         * {
@@ -35,28 +41,37 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
             color: var(--text-primary);
             line-height: 1.6;
         }
 
-        /* Header Styles */
+        /* Header */
         .header {
             background: var(--card-bg);
-            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        .header-content {
-            max-width: 1200px;
+        .header-container {
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 1rem 2rem;
+            padding: 0 2rem;
             display: flex;
+            justify-content: space-between;
             align-items: center;
             gap: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
 
         .logo {
@@ -64,113 +79,291 @@
             width: auto;
         }
 
-        .company-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
         }
 
         /* Main Container */
-        .main-container {
-            max-width: 1200px;
+        .container {
+            max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
         }
 
-        /* Calculator Header */
-        .calculator-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: var(--radius);
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-md);
-        }
-
-        .breadcrumb {
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-            opacity: 0.9;
-        }
-
-        .breadcrumb a {
-            color: white;
-            text-decoration: none;
-            transition: opacity 0.2s;
-        }
-
-        .breadcrumb a:hover {
-            opacity: 0.7;
-        }
-
-        .breadcrumb span {
-            margin: 0 0.5rem;
-            opacity: 0.7;
-        }
-
-        h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        /* Form Layout */
-        .calculator-grid {
+        /* Calculator Layout */
+        .calculator-layout {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 400px;
             gap: 2rem;
+            align-items: start;
         }
 
-        .pricing-section {
+        /* Input Section */
+        .input-section {
             background: var(--card-bg);
+            border-radius: 12px;
             padding: 2rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .section-title {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 0.75rem;
+        }
+
+        .section-title i {
             color: var(--primary-color);
         }
 
         /* Form Elements */
-        .form-grid {
+        .form-row {
             display: grid;
-            gap: 1.5rem;
-        }
-
-        .form-grid.two-column {
             grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
         }
 
-        label {
-            font-weight: 500;
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
             color: var(--text-primary);
-            font-size: 0.875rem;
         }
 
-        .required {
-            color: var(--warning-color);
+        /* Blank Cost Input */
+        .blank-cost-input {
+            position: relative;
         }
 
+        .blank-cost-input input {
+            padding-left: 40px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .blank-cost-input::before {
+            content: '$';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            z-index: 1;
+        }
+
+        /* Interactive Slider Styles */
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stitch-display {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .price-display {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .price-display.neutral {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .price-display.positive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .price-display.negative {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #e0e0e0 0%, #e0e0e0 100%);
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .slider::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .slider-tooltip {
+            position: absolute;
+            top: -50px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .slider-tooltip.dual-line {
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .slider-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(0,0,0,0.8);
+        }
+
+        .slider-range-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stitch-slider-container {
+            margin-top: 10px;
+        }
+
+        .stitch-slider-container label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .stitch-range {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            appearance: none;
+            margin: 10px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Form Controls */
         .form-control {
-            padding: 0.75rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
             border: 1px solid var(--border-color);
-            border-radius: 0.375rem;
+            border-radius: 8px;
             font-size: 1rem;
             transition: all 0.2s;
             background: white;
@@ -179,626 +372,1926 @@
         .form-control:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.1);
+            box-shadow: var(--focus-shadow);
         }
 
-        select.form-control {
+        /* Additional Logos Section */
+        .additional-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
             cursor: pointer;
         }
 
-        .field-help {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
+        .checkbox-wrapper label {
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
         }
 
-        /* Results Display */
-        .results-section {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .pricing-display {
+        .logo-stitch-control {
+            margin-left: 2rem;
+            padding: 1rem;
+            background: var(--bg-color);
+            border-radius: 8px;
             display: none;
         }
 
-        .pricing-display.active {
+        .logo-stitch-control.active {
             display: block;
         }
 
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
+        /* Results Card */
+        .results-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 100px;
+        }
+
+        .quote-header {
+            text-align: center;
             margin-bottom: 2rem;
         }
 
-        .summary-item {
-            padding: 1rem;
-            background: var(--bg-color);
-            border-radius: 0.375rem;
-            border: 1px solid var(--border-color);
+        .quote-total {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
         }
 
-        .summary-label {
-            font-size: 0.75rem;
+        .quote-label {
+            font-size: 0.875rem;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
         }
 
-        .summary-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
+        /* Price Breakdown */
+        .price-breakdown {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        /* Pricing Breakdown */
-        .breakdown-table {
-            width: 100%;
-            margin-top: 1.5rem;
-        }
-
-        .breakdown-row {
+        .price-row {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .breakdown-row:last-child {
-            border-bottom: none;
-        }
-
-        .breakdown-label {
-            color: var(--text-secondary);
             font-size: 0.875rem;
         }
 
-        .breakdown-value {
-            font-weight: 500;
+        .price-row:not(:last-child) {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .price-label {
+            color: var(--text-secondary);
+        }
+
+        .price-value {
+            font-weight: 600;
             color: var(--text-primary);
         }
 
-        .breakdown-row.subtotal {
-            margin-top: 0.5rem;
+        .total-row {
+            margin-top: 1rem;
             padding-top: 1rem;
-            border-top: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
         }
 
-        .breakdown-row.total {
-            background: var(--bg-color);
-            margin: 1rem -1rem -1rem;
-            padding: 1rem;
-            border-radius: 0 0 0.375rem 0.375rem;
-            border: none;
-        }
-
-        .breakdown-row.total .breakdown-label,
-        .breakdown-row.total .breakdown-value {
-            font-size: 1.125rem;
+        .total-row .price-label {
             font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .total-row .price-value {
+            font-size: 1.25rem;
             color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
         }
 
         /* Warning Box */
         .warning-box {
-            background: #FEF3C7;
-            border: 1px solid #F59E0B;
-            color: #92400E;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-top: 1rem;
-            font-size: 0.875rem;
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--warning-bg);
+            border-radius: 8px;
+            margin-top: 1rem;
         }
 
         .warning-box i {
+            color: var(--warning-text);
             font-size: 1.25rem;
-            color: #F59E0B;
         }
 
-        /* Info Alert */
-        .info-alert {
-            background: #E0E7FF;
-            border: 1px solid #6366F1;
-            color: #4338CA;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1.5rem;
+        .warning-content {
+            flex: 1;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: var(--warning-text);
+            margin-bottom: 0.25rem;
+        }
+
+        .warning-text {
             font-size: 0.875rem;
+            color: var(--warning-text);
+        }
+
+        /* Pricing Table */
+        .pricing-table-section {
+            margin-top: 3rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .pricing-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .pricing-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .pricing-table td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pricing-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pricing-table tr:nth-child(even) td {
+            background: var(--bg-color);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        .modal-container {
+            background: white;
+            max-width: 600px;
+            margin: 50px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s;
         }
 
-        .info-alert i {
-            font-size: 1.25rem;
-            color: #6366F1;
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .calculator-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-grid.two-column {
-                grid-template-columns: 1fr;
-            }
-
-            .summary-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .main-container {
-                padding: 1rem;
-            }
-
-            .pricing-section,
-            .results-section {
-                padding: 1.5rem;
-            }
+        .modal-body {
+            padding: 2rem;
         }
 
-        /* Print Styles */
-        @media print {
-            .header {
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Form Grid in Modal */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .calculator-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-card {
                 position: static;
             }
+        }
 
-            .calculator-header {
-                background: none;
-                color: black;
-                border: 1px solid #000;
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
             }
-
-            .pricing-display {
-                display: block !important;
+            
+            .form-row {
+                grid-template-columns: 1fr;
             }
-
-            body {
-                background: white;
-            }
-
-            .pricing-section,
-            .results-section {
-                box-shadow: none;
-                border: 1px solid #000;
+            
+            .form-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Header -->
     <header class="header">
-        <div class="header-content">
-            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                 alt="Northwest Custom Apparel" class="logo">
-            <span class="company-name">Northwest Custom Apparel</span>
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <a href="/manual-calculators.html">Manual Calculators</a>
+                    <span>/</span>
+                    <span>Embroidery</span>
+                </nav>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-secondary" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    Print Quote
+                </button>
+            </div>
         </div>
     </header>
 
-    <div class="container">
-        <main class="main-container">
-            <div class="calculator-header">
-                <div class="header-content">
-                    <div class="breadcrumb">
-                        <a href="/staff-dashboard.html">Staff Dashboard</a>
-                        <span>/</span>
-                        <span>Manual Calculators</span>
-                        <span>/</span>
-                        <span>Flat Embroidery Pricing</span>
+    <!-- Main Content -->
+    <main class="container">
+        <div class="calculator-layout">
+            <!-- Input Section -->
+            <div class="input-section">
+                <h2 class="section-title">
+                    <i class="fas fa-cog"></i>
+                    Configure Your Order
+                </h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="blank-cost">
+                            <i class="fas fa-dollar-sign"></i>
+                            Manual Blank Cost
+                        </label>
+                        <div class="blank-cost-input">
+                            <input type="number" 
+                                   id="blank-cost" 
+                                   class="form-control" 
+                                   placeholder="Enter cost"
+                                   min="0" 
+                                   step="0.01"
+                                   value="3">
+                        </div>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                            Enter the cost of your blank garment
+                        </span>
                     </div>
-                    <h1>
-                        <i class="fas fa-sewing-needle"></i>
-                        Manual Flat Embroidery Pricing Calculator
-                    </h1>
-                    <p>Calculate embroidery pricing for shirts, bags, and other flat items not in our standard catalog.</p>
+
+                    <div class="form-group">
+                        <label class="form-label" for="quantity-input">
+                            <i class="fas fa-sort-numeric-up"></i>
+                            Order Quantity
+                        </label>
+                        <input type="number" 
+                               id="quantity-input" 
+                               class="form-control" 
+                               placeholder="Quantity"
+                               min="1" 
+                               value="24">
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                            Minimum quantity: 24 pieces
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-star"></i>
+                        Garment Type
+                    </label>
+                    <select class="form-control" id="garment-type">
+                        <option value="shirt">Shirt</option>
+                        <option value="polo">Polo</option>
+                        <option value="jacket">Jacket</option>
+                        <option value="bag">Bag</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Front Logo Section -->
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <div>
+                            <i class="fas fa-star"></i>
+                            <strong>Front Logo Embroidery</strong>
+                        </div>
+                        <span class="price-display neutral" id="front-price-display">Base Price</span>
+                    </div>
+                    <div class="slider-header" style="margin-top: 10px;">
+                        <span>Stitch Count: <span class="stitch-display" id="front-stitch-display">8,000 stitches</span></span>
+                    </div>
+                    <div class="slider-wrapper">
+                        <input type="range" 
+                               class="slider" 
+                               id="front-stitch-slider" 
+                               min="5000" 
+                               max="20000" 
+                               value="8000" 
+                               step="100">
+                        <div class="slider-tooltip" id="front-tooltip"></div>
+                    </div>
+                    <div class="slider-range-info">
+                        <span>5,000</span>
+                        <span style="font-weight: 600;">Base: 8,000 stitches</span>
+                        <span>20,000</span>
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">
+                        Base price includes 8,000 stitches. $1.25 per 1,000 stitches above/below base.
+                    </p>
+                </div>
+
+                <!-- Additional Logos Section -->
+                <div class="additional-section">
+                    <h3 class="section-subtitle">
+                        <i class="fas fa-plus-circle"></i>
+                        Additional Logo Locations
+                    </h3>
+
+                    <div class="logo-checkbox-group">
+                        <!-- Back Logo -->
+                        <div>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="back-logo-enabled">
+                                <label for="back-logo-enabled">Add Back Logo Embroidery</label>
+                            </div>
+                            <div class="logo-stitch-control" id="back-logo-control">
+                                <div class="slider-container" style="margin-top: 0;">
+                                    <div class="slider-header">
+                                        <span>Stitch Count: <span class="stitch-display" id="back-stitch-display">5,000 stitches</span></span>
+                                        <span class="price-display neutral" id="back-price-display">$5.00</span>
+                                    </div>
+                                    <div class="slider-wrapper">
+                                        <input type="range" 
+                                               class="slider" 
+                                               id="back-stitch-slider" 
+                                               min="5000" 
+                                               max="20000" 
+                                               value="5000" 
+                                               step="100">
+                                        <div class="slider-tooltip" id="back-tooltip"></div>
+                                    </div>
+                                    <div class="slider-range-info">
+                                        <span>5,000</span>
+                                        <span style="font-weight: 600;">Base: 5,000 stitches</span>
+                                        <span>20,000</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Left Side Logo -->
+                        <div>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="left-logo-enabled">
+                                <label for="left-logo-enabled">Add Left Side Logo Embroidery</label>
+                            </div>
+                            <div class="logo-stitch-control" id="left-logo-control">
+                                <div class="slider-container" style="margin-top: 0;">
+                                    <div class="slider-header">
+                                        <span>Stitch Count: <span class="stitch-display" id="left-stitch-display">5,000 stitches</span></span>
+                                        <span class="price-display neutral" id="left-price-display">$5.00</span>
+                                    </div>
+                                    <div class="slider-wrapper">
+                                        <input type="range" 
+                                               class="slider" 
+                                               id="left-stitch-slider" 
+                                               min="5000" 
+                                               max="20000" 
+                                               value="5000" 
+                                               step="100">
+                                        <div class="slider-tooltip" id="left-tooltip"></div>
+                                    </div>
+                                    <div class="slider-range-info">
+                                        <span>5,000</span>
+                                        <span style="font-weight: 600;">Base: 5,000 stitches</span>
+                                        <span>20,000</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Side Logo -->
+                        <div>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="right-logo-enabled">
+                                <label for="right-logo-enabled">Add Right Side Logo Embroidery</label>
+                            </div>
+                            <div class="logo-stitch-control" id="right-logo-control">
+                                <div class="slider-container" style="margin-top: 0;">
+                                    <div class="slider-header">
+                                        <span>Stitch Count: <span class="stitch-display" id="right-stitch-display">5,000 stitches</span></span>
+                                        <span class="price-display neutral" id="right-price-display">$5.00</span>
+                                    </div>
+                                    <div class="slider-wrapper">
+                                        <input type="range" 
+                                               class="slider" 
+                                               id="right-stitch-slider" 
+                                               min="5000" 
+                                               max="20000" 
+                                               value="5000" 
+                                               step="100">
+                                        <div class="slider-tooltip" id="right-tooltip"></div>
+                                    </div>
+                                    <div class="slider-range-info">
+                                        <span>5,000</span>
+                                        <span style="font-weight: 600;">Base: 5,000 stitches</span>
+                                        <span>20,000</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Button -->
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="btn btn-primary" id="email-quote-btn">
+                        <i class="fas fa-envelope"></i>
+                        Email This Quote
+                    </button>
                 </div>
             </div>
 
-            <div class="calculator-grid">
-                <section class="pricing-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-cogs"></i>
-                        Pricing Configuration
-                    </h2>
-                    
-                    <div class="info-alert">
-                        <i class="fas fa-info-circle"></i>
-                        <div>
-                            <strong>Important:</strong> This calculator is for flat embroidery items only (shirts, bags, etc.). Maximum stitch count is 20,000.
+            <!-- Results Card -->
+            <div class="results-card">
+                <div class="quote-header">
+                    <div class="quote-label">Your Quote</div>
+                    <div class="quote-total" id="grandTotalDisplay">$0.00</div>
+                    <div class="quote-label">PRICE PER GARMENT</div>
+                </div>
+
+                <h3 class="section-subtitle">Price Breakdown</h3>
+                
+                <div class="price-breakdown">
+                    <div class="price-row">
+                        <span class="price-label">Garment with Margin (40%):</span>
+                        <span class="price-value" id="blankCostDisplay">$0.00</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Front Logo Embroidery (8,000 stitches):</span>
+                        <span class="price-value" id="frontLogoDisplay">$0.00</span>
+                    </div>
+                    <div class="price-row" id="backLogoLine" style="display: none;">
+                        <span class="price-label">Back Logo Embroidery:</span>
+                        <span class="price-value" id="backLogoDisplay">$0.00</span>
+                    </div>
+                    <div class="price-row" id="leftLogoLine" style="display: none;">
+                        <span class="price-label">Left Side Logo Embroidery:</span>
+                        <span class="price-value" id="leftLogoDisplay">$0.00</span>
+                    </div>
+                    <div class="price-row" id="rightLogoLine" style="display: none;">
+                        <span class="price-label">Right Side Logo Embroidery:</span>
+                        <span class="price-value" id="rightLogoDisplay">$0.00</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Subtotal per Garment:</span>
+                        <span class="price-value" id="subtotalDisplay">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="total-row">
+                    <div class="price-row">
+                        <span class="price-label">Final Price per Garment:</span>
+                        <span class="price-value" id="finalPriceDisplay">$0.00</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem;">
+                    <div class="price-row" style="font-size: 0.875rem;">
+                        <span class="price-label">Quantity:</span>
+                        <span class="price-value" id="quantityDisplay">24</span>
+                    </div>
+                    <div class="price-row" style="font-size: 0.875rem;">
+                        <span class="price-label">Per Garment:</span>
+                        <span class="price-value" id="perGarmentDisplay">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="total-row">
+                    <div class="price-row">
+                        <span class="price-label" style="font-size: 1.125rem;">Total Order:</span>
+                        <span class="price-value" style="font-size: 1.5rem; color: var(--primary-color);" id="totalOrderDisplay">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="warning-box" id="ltmWarning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="warning-content">
+                        <div class="warning-title">Less Than Minimum</div>
+                        <div class="warning-text">
+                            Orders under 24 pieces incur a $50.00 fee distributed across all items.
                         </div>
                     </div>
-                    
-                    <div class="form-grid two-column">
-                        <div class="form-group">
-                            <label for="blankCost">
-                                Blank Item Cost
-                                <span class="required">*</span>
-                            </label>
-                            <input type="number" 
-                                   id="blankCost" 
-                                   class="form-control" 
-                                   placeholder="e.g., 5.50"
-                                   step="0.01"
-                                   min="0"
-                                   required>
-                            <small class="field-help">Your cost for the blank garment</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="quantity">
-                                Quantity
-                                <span class="required">*</span>
-                            </label>
-                            <input type="number" 
-                                   id="quantity" 
-                                   class="form-control" 
-                                   placeholder="e.g., 24"
-                                   min="1"
-                                   required>
-                            <small class="field-help">Total number of items</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="stitchCount">
-                                Stitch Count
-                                <span class="required">*</span>
-                            </label>
-                            <input type="number" 
-                                   id="stitchCount" 
-                                   class="form-control" 
-                                   placeholder="e.g., 8000 (max 20,000)"
-                                   min="1"
-                                   max="20000"
-                                   required>
-                            <small class="field-help">Estimated number of stitches</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="locations">
-                                Number of Locations
-                            </label>
-                            <input type="number" 
-                                   id="locations" 
-                                   class="form-control" 
-                                   value="1"
-                                   min="1"
-                                   max="4">
-                            <small class="field-help">How many areas to embroider</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="threadColors">
-                                Thread Colors
-                            </label>
-                            <input type="number" 
-                                   id="threadColors" 
-                                   class="form-control" 
-                                   value="1"
-                                   min="1"
-                                   max="15">
-                            <small class="field-help">First 4 colors included</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="setupCharge">
-                                Include Setup Fee?
-                            </label>
-                            <select id="setupCharge" class="form-control">
-                                <option value="yes">Yes - $40.00</option>
-                                <option value="no">No</option>
-                            </select>
-                            <small class="field-help">One-time setup charge</small>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="results-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-calculator"></i>
-                        Pricing Results
-                    </h2>
-
-                    <div id="pricingDisplay" class="pricing-display">
-                        <div class="summary-grid">
-                            <div class="summary-item">
-                                <div class="summary-label">Product Type</div>
-                                <div class="summary-value">Flat Embroidery</div>
-                            </div>
-                            <div class="summary-item">
-                                <div class="summary-label">Quantity</div>
-                                <div class="summary-value" id="displayQuantity">-</div>
-                            </div>
-                            <div class="summary-item">
-                                <div class="summary-label">Stitch Count</div>
-                                <div class="summary-value" id="displayStitchLevel">-</div>
-                            </div>
-                            <div class="summary-item">
-                                <div class="summary-label">Unit Price</div>
-                                <div class="summary-value" id="displayUnitPrice">-</div>
-                            </div>
-                        </div>
-
-                        <div class="breakdown-table">
-                            <div class="breakdown-row">
-                                <span class="breakdown-label">Blank Garment Cost</span>
-                                <span class="breakdown-value" id="displayBlankCost">-</span>
-                            </div>
-                            <div class="breakdown-row">
-                                <span class="breakdown-label">Garment with Margin (40%)</span>
-                                <span class="breakdown-value" id="displayGarmentPrice">-</span>
-                            </div>
-                            <div class="breakdown-row">
-                                <span class="breakdown-label">Embroidery (<span id="displayLocations">1</span> location × <span id="displayEmbroideryRate">-</span>)</span>
-                                <span class="breakdown-value" id="displayEmbroideryTotal">-</span>
-                            </div>
-                            <div class="breakdown-row" id="threadChargeRow" style="display: none;">
-                                <span class="breakdown-label">Extra Thread Colors (<span id="displayExtraColors">0</span> × $1.00)</span>
-                                <span class="breakdown-value" id="displayThreadCharge">-</span>
-                            </div>
-                            
-                            <div class="breakdown-row subtotal">
-                                <span class="breakdown-label">Subtotal per Item</span>
-                                <span class="breakdown-value" id="displaySubtotal">-</span>
-                            </div>
-                            
-                            <div class="breakdown-row" id="ltmRow" style="display: none;">
-                                <span class="breakdown-label">Less Than Minimum Fee ($50 ÷ <span id="displayLTMQty">-</span> pcs)</span>
-                                <span class="breakdown-value" id="displayLTMPerUnit">-</span>
-                            </div>
-                            
-                            <div class="breakdown-row">
-                                <span class="breakdown-label"><strong>Price per Item</strong></span>
-                                <span class="breakdown-value"><strong id="displayFinalUnitPrice">-</strong></span>
-                            </div>
-                            
-                            <div class="breakdown-row">
-                                <span class="breakdown-label">Extended Price (<span id="displayQty2">-</span> × <span id="displayUnitPrice2">-</span>)</span>
-                                <span class="breakdown-value" id="displayExtendedPrice">-</span>
-                            </div>
-                            
-                            <div class="breakdown-row" id="setupFeeRow">
-                                <span class="breakdown-label">Setup Fee</span>
-                                <span class="breakdown-value" id="displaySetupFee">$40.00</span>
-                            </div>
-                            
-                            <div class="breakdown-row total">
-                                <span class="breakdown-label">Total Order Price</span>
-                                <span class="breakdown-value" id="displayGrandTotal">-</span>
-                            </div>
-                        </div>
-
-                        <div class="warning-box" id="ltmWarning" style="display: none;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <div>
-                                <strong>Less Than Minimum:</strong> Orders under 24 pieces incur a $50.00 fee distributed across all items.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="emptyState" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                        <i class="fas fa-arrow-left" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
-                        <p>Enter your pricing details to see the calculation</p>
-                    </div>
-                </section>
+                </div>
             </div>
-        </main>
+        </div>
+
+        <!-- Pricing Table -->
+        <div class="pricing-table-section" id="pricingTableSection" style="display: none;">
+            <h2 class="section-title">
+                <i class="fas fa-table"></i>
+                Complete Garment + Front Logo Pricing by Quantity
+            </h2>
+            
+            <table class="pricing-table" id="pricingTable">
+                <thead>
+                    <tr>
+                        <th>Quantity Tier</th>
+                        <th>Price Per Garment</th>
+                    </tr>
+                </thead>
+                <tbody id="pricingTableBody">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+
+            <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-color); border-radius: 8px;">
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                    <strong>Includes:</strong> Blank garment with margin + Front logo embroidery at your custom stitch count + any additional logos selected above.<br>
+                    <strong>Manual Entry:</strong> Garment cost entered manually. Embroidery pricing uses live data from our system. Additional logo costs calculated dynamically.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Email Modal -->
+    <div class="modal-overlay" id="emailModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">Send Quote</h3>
+                <button class="modal-close" onclick="closeEmailModal()">×</button>
+            </div>
+            <form id="quoteForm">
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="customerName">Customer Name *</label>
+                            <input type="text" class="form-control" id="customerName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="companyName">Company Name</label>
+                            <input type="text" class="form-control" id="companyName">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerEmail">Customer Email *</label>
+                            <input type="email" class="form-control" id="customerEmail" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input type="tel" class="form-control" id="customerPhone">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="projectName">Project/Order Name</label>
+                        <input type="text" class="form-control" id="projectName" 
+                               placeholder="e.g., Company Team Shirts">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="salesRep">Sales Representative *</label>
+                        <select class="form-control" id="salesRep" required>
+                            <option value="sales@nwcustomapparel.com" selected>General Sales</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                            <option value="taylar@nwcustomapparel.com">Taylar Hanson</option>
+                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                            <option value="art@nwcustomapparel.com">Steve Deland</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="notes">Notes</label>
+                        <textarea class="form-control" id="notes" rows="3" 
+                                  placeholder="Special instructions or additional information..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEmailModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="sendEmailBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Quote
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header" style="background: #10b981;">
+                <h3 class="modal-title">Quote Sent Successfully!</h3>
+                <button class="modal-close" onclick="closeSuccessModal()">×</button>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 2.5rem;">
+                <div style="margin-bottom: 2rem;">
+                    <i class="fas fa-check-circle" style="font-size: 4rem; color: #10b981; margin-bottom: 1rem; display: block;"></i>
+                    <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        Your quote has been sent successfully!
+                    </p>
+                </div>
+                
+                <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem;">
+                    <p style="margin: 0 0 0.5rem 0; color: var(--text-secondary); font-size: 0.875rem;">Your Quote ID:</p>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                        <h2 id="successQuoteID" style="margin: 0; font-size: 2rem; color: var(--primary-color); letter-spacing: 0.05em;">EMBM0000-0</h2>
+                        <button class="btn btn-secondary" onclick="copyQuoteID()" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-copy"></i>
+                            Copy
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="background: #e8f4fd; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; font-size: 0.875rem; color: #1e40af;">
+                    <i class="fas fa-info-circle"></i>
+                    Please save this Quote ID for your records. You'll need it to reference this quote.
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button class="btn btn-primary" onclick="printQuote()">
+                        <i class="fas fa-print"></i>
+                        Print Quote
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeSuccessModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Flat embroidery pricing configuration based on API data
-        const flatEmbroideryConfig = {
-            garmentMargin: 0.6, // 40% margin
-            setupFee: 40.00,
-            stitchCosts: {
-                8000: { // Up to 8,000 stitches
-                    tiers: [
-                        { minQty: 1, maxQty: 23, cost: 12.00 },
-                        { minQty: 24, maxQty: 47, cost: 12.00 },
-                        { minQty: 48, maxQty: 71, cost: 11.00 },
-                        { minQty: 72, maxQty: 999, cost: 10.00 }
-                    ]
-                },
-                12000: { // 8,001 to 12,000 stitches
-                    tiers: [
-                        { minQty: 1, maxQty: 23, cost: 14.00 },
-                        { minQty: 24, maxQty: 47, cost: 14.00 },
-                        { minQty: 48, maxQty: 71, cost: 13.00 },
-                        { minQty: 72, maxQty: 999, cost: 12.00 }
-                    ]
-                },
-                16000: { // 12,001 to 16,000 stitches
-                    tiers: [
-                        { minQty: 1, maxQty: 23, cost: 16.00 },
-                        { minQty: 24, maxQty: 47, cost: 16.00 },
-                        { minQty: 48, maxQty: 71, cost: 15.00 },
-                        { minQty: 72, maxQty: 999, cost: 14.00 }
-                    ]
-                },
-                20000: { // 16,001 to 20,000 stitches
-                    tiers: [
-                        { minQty: 1, maxQty: 23, cost: 18.00 },
-                        { minQty: 24, maxQty: 47, cost: 18.00 },
-                        { minQty: 48, maxQty: 71, cost: 17.00 },
-                        { minQty: 72, maxQty: 999, cost: 16.00 }
-                    ]
-                }
-            },
-            threadColorCharge: 1.00,
-            ltmFeeThreshold: 24,
-            ltmFeeAmount: 50.00
+        // Configuration
+        // Expose configuration globally for testing
+        window.CALCULATOR_CONFIG = {
+            emailPublicKey: '4qSbDO-SQs19TbP80',
+            emailServiceId: 'service_1c4k67j',
+            emailTemplateId: 'template_embroidery_manual', // TODO: Get actual template ID
+            debug: false // Set to true for debug logging
         };
+        const CALCULATOR_CONFIG = window.CALCULATOR_CONFIG;
 
-        function getStitchCountLevel(stitches) {
-            const levels = Object.keys(flatEmbroideryConfig.stitchCosts).map(Number).sort((a, b) => a - b);
-            
-            for (const level of levels) {
-                if (stitches <= level) {
-                    return level;
-                }
+        // Constants from implementation plan
+        const BASE_STITCHES = 8000;
+        const PRICE_PER_THOUSAND = 1.25;  // $1.25 per thousand stitches for flat embroidery
+        const LOGO_BASE_STITCHES = 5000;
+        const LOGO_BASE_PRICE = 5.00;  // $5.00 base price for additional logos
+        const LTM_FEE = 50.00;
+        const MIN_QUANTITY = 24;
+
+        // State variables
+        let manualBlankCost = 0;
+        let currentFrontStitches = 8000;
+        let currentBackStitches = 5000;
+        let currentLeftStitches = 5000;
+        let currentRightStitches = 5000;
+        let backLogoEnabled = false;
+        let leftLogoEnabled = false;
+        let rightLogoEnabled = false;
+        let currentQuantity = 24;
+
+        // Live API data (loaded on initialization) - expose some globally for testing
+        let pricingApiData = null;
+        window.tierData = [];
+        window.embroideryBaseCosts = {};
+        let tierData = window.tierData;
+        let embroideryBaseCosts = window.embroideryBaseCosts;
+        let roundingMethod = 'CeilDollar';
+        let printLocations = [];
+
+        // Manual size structure for garments (display only)
+        const manualSizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+
+        // Embroidery Manual Calculator Implementation
+        class EmbroideryManualCalculator {
+            constructor() {
+                emailjs.init(CALCULATOR_CONFIG.emailPublicKey);
+                this.quoteService = new EmbroideryManualQuoteService();
+                this.currentQuote = null;
+                this.lastQuoteData = null;
+                
+                // Store timeouts for cleanup
+                this.activeTimeouts = [];
+                
+                this.initializeElements();
+                this.initializeHybridCalculator();
             }
             
-            // If stitches exceed maximum level, return the highest level
-            return levels[levels.length - 1];
+            cleanup() {
+                // Clear any pending timeouts
+                this.activeTimeouts.forEach(timeout => clearTimeout(timeout));
+                this.activeTimeouts = [];
+                
+                // Remove event listeners if needed
+                if (this.debouncedUpdate) {
+                    this.debouncedUpdate = null;
+                }
+                
+                console.log('[ManualEmbroideryCalculator] Cleanup completed');
+            }
+
+            initializeElements() {
+                // Form elements
+                this.elements = {
+                    blankCost: document.getElementById('blank-cost'),
+                    quantityInput: document.getElementById('quantity-input'),
+                    frontStitchSlider: document.getElementById('front-stitch-slider'),
+                    frontStitchDisplay: document.getElementById('front-stitch-display'),
+                    garmentType: document.getElementById('garment-type'),
+                    
+                    // Additional logo checkboxes
+                    backLogoEnabled: document.getElementById('back-logo-enabled'),
+                    leftLogoEnabled: document.getElementById('left-logo-enabled'),
+                    rightLogoEnabled: document.getElementById('right-logo-enabled'),
+                    
+                    // Additional logo controls
+                    backLogoControl: document.getElementById('back-logo-control'),
+                    leftLogoControl: document.getElementById('left-logo-control'),
+                    rightLogoControl: document.getElementById('right-logo-control'),
+                    
+                    // Additional logo sliders
+                    backStitchSlider: document.getElementById('back-stitch-slider'),
+                    leftStitchSlider: document.getElementById('left-stitch-slider'),
+                    rightStitchSlider: document.getElementById('right-stitch-slider'),
+                    
+                    // Display elements
+                    backStitchDisplay: document.getElementById('back-stitch-display'),
+                    leftStitchDisplay: document.getElementById('left-stitch-display'),
+                    rightStitchDisplay: document.getElementById('right-stitch-display'),
+                    
+                    // Email elements
+                    emailQuoteBtn: document.getElementById('email-quote-btn'),
+                    quoteForm: document.getElementById('quoteForm'),
+                    
+                    // Email form fields
+                    customerName: document.getElementById('customerName'),
+                    companyName: document.getElementById('companyName'),
+                    customerEmail: document.getElementById('customerEmail'),
+                    customerPhone: document.getElementById('customerPhone'),
+                    projectName: document.getElementById('projectName'),
+                    salesRep: document.getElementById('salesRep'),
+                    notes: document.getElementById('notes')
+                };
+
+                this.attachEventListeners();
+                this.initializeInteractiveSliders();
+            }
+
+            initializeInteractiveSliders() {
+                // Clear any existing slider states to avoid duplicates
+                this.slidersInitialized = this.slidersInitialized || {};
+                
+                // Initialize all sliders with interactive tooltips
+                if (!this.slidersInitialized.front) {
+                    this.initializeSlider('front', 8000, true);  // Front logo with 8,000 base
+                    this.slidersInitialized.front = true;
+                }
+                if (!this.slidersInitialized.back) {
+                    this.initializeSlider('back', 5000, false);  // Back logo with 5,000 base
+                    this.slidersInitialized.back = true;
+                }
+                if (!this.slidersInitialized.left) {
+                    this.initializeSlider('left', 5000, false);  // Left logo with 5,000 base
+                    this.slidersInitialized.left = true;
+                }
+                if (!this.slidersInitialized.right) {
+                    this.initializeSlider('right', 5000, false); // Right logo with 5,000 base
+                    this.slidersInitialized.right = true;
+                }
+                
+                // Refresh all slider states after API data is loaded
+                this.refreshSliderStates();
+            }
+
+            refreshSliderStates() {
+                // Trigger state updates for all sliders to show current prices
+                ['front', 'back', 'left', 'right'].forEach(type => {
+                    const slider = document.getElementById(`${type}-stitch-slider`);
+                    if (slider && this.slidersInitialized && this.slidersInitialized[type]) {
+                        // Trigger update with current value
+                        slider.dispatchEvent(new Event('input'));
+                    }
+                });
+            }
+
+            initializeSlider(type, baseStitches, isBase8000) {
+                const slider = document.getElementById(`${type}-stitch-slider`);
+                const tooltip = document.getElementById(`${type}-tooltip`);
+                const display = document.getElementById(`${type}-stitch-display`);
+                const priceDisplay = document.getElementById(`${type}-price-display`);
+                
+                if (!slider || !tooltip || !display || !priceDisplay) {
+                    console.warn(`Missing slider elements for ${type}`);
+                    return;
+                }
+
+                // Store reference to calculator instance
+                const calculator = this;
+                
+                const updateSliderState = () => {
+                    const value = parseInt(slider.value);
+                    const formattedValue = value.toLocaleString();
+                    
+                    // Update global variables immediately when slider changes
+                    if (type === 'front') {
+                        currentFrontStitches = value;
+                    } else if (type === 'back') {
+                        currentBackStitches = value;
+                    } else if (type === 'left') {
+                        currentLeftStitches = value;
+                    } else if (type === 'right') {
+                        currentRightStitches = value;
+                    }
+                    
+                    // Update display
+                    display.textContent = formattedValue + ' stitches';
+                    
+                    // Calculate price adjustment
+                    let price, priceText, priceClass, tooltipColor;
+                    
+                    if (isBase8000) {
+                        // Front logo with 8,000 base
+                        const diff = value - BASE_STITCHES;
+                        price = (diff / 1000) * PRICE_PER_THOUSAND;
+                        
+                        if (diff > 0) {
+                            priceText = `+$${Math.abs(price).toFixed(2)}`;
+                            priceClass = 'positive';
+                            tooltipColor = '#f44336';
+                        } else if (diff < 0) {
+                            priceText = `-$${Math.abs(price).toFixed(2)}`;
+                            priceClass = 'negative';
+                            tooltipColor = '#4caf50';
+                        } else {
+                            priceText = 'Base Price';
+                            priceClass = 'neutral';
+                            tooltipColor = '#4caf50';
+                        }
+                    } else {
+                        // Additional logos: $5.00 for up to 5,000 stitches, then $1.25 per additional thousand
+                        const additionalStitches = Math.max(0, value - 5000);
+                        price = 5.00 + (additionalStitches / 1000) * 1.25;
+                        if (additionalStitches > 0) {
+                            priceText = `$5.00 + $${((additionalStitches / 1000) * 1.25).toFixed(2)} = $${price.toFixed(2)}`;
+                        } else {
+                            priceText = `$5.00`;
+                        }
+                        priceClass = 'neutral';
+                        tooltipColor = '#4caf50';
+                    }
+                    
+                    // Update price display
+                    priceDisplay.textContent = isBase8000 ? priceText : `$${price.toFixed(2)}`;
+                    priceDisplay.className = `price-display ${priceClass}`;
+                    
+                    // Update tooltip
+                    if (isBase8000) {
+                        const diff = value - BASE_STITCHES;
+                        tooltip.innerHTML = `<div>${formattedValue} stitches</div><div style="color: ${tooltipColor}">${priceText}</div>`;
+                        tooltip.classList.add('dual-line');
+                    } else {
+                        tooltip.innerHTML = `${formattedValue} stitches<br/>${priceText}`;
+                        tooltip.classList.add('dual-line');
+                    }
+                    
+                    // Trigger pricing update with debounce
+                    if (calculator.debouncedUpdate) {
+                        clearTimeout(calculator.debouncedUpdate);
+                    }
+                    calculator.debouncedUpdate = setTimeout(() => {
+                        calculator.updatePricingDisplay();
+                    }, 100);
+                };
+
+                // Mouse tracking for tooltip
+                let isDragging = false;
+                
+                const updateTooltipPosition = (e) => {
+                    const rect = slider.getBoundingClientRect();
+                    const percent = (slider.value - slider.min) / (slider.max - slider.min);
+                    const thumbWidth = 24; // Width of the thumb
+                    const trackWidth = rect.width - thumbWidth;
+                    const left = thumbWidth / 2 + (percent * trackWidth);
+                    
+                    tooltip.style.left = `${left}px`;
+                };
+
+                slider.addEventListener('input', (e) => {
+                    updateSliderState();
+                    updateTooltipPosition(e);
+                });
+
+                slider.addEventListener('mousedown', () => {
+                    isDragging = true;
+                    tooltip.style.opacity = '1';
+                });
+
+                slider.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    tooltip.style.opacity = '0';
+                });
+
+                slider.addEventListener('mouseleave', () => {
+                    if (!isDragging) {
+                        tooltip.style.opacity = '0';
+                    }
+                });
+
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    tooltip.style.opacity = '0';
+                });
+
+                // Initialize state
+                updateSliderState();
+            }
+
+            attachEventListeners() {
+                // Input listeners
+                this.elements.blankCost.addEventListener('input', () => {
+                    manualBlankCost = parseFloat(this.elements.blankCost.value) || 0;
+                    this.updatePricingDisplay();
+                });
+
+                this.elements.quantityInput.addEventListener('input', () => {
+                    currentQuantity = parseInt(this.elements.quantityInput.value) || 0;
+                    this.updatePricingDisplay();
+                });
+
+                // Logo checkbox listeners
+                this.elements.backLogoEnabled.addEventListener('change', (e) => {
+                    backLogoEnabled = e.target.checked;
+                    this.elements.backLogoControl.classList.toggle('active', backLogoEnabled);
+                    this.updatePricingDisplay();
+                });
+
+                this.elements.leftLogoEnabled.addEventListener('change', (e) => {
+                    leftLogoEnabled = e.target.checked;
+                    this.elements.leftLogoControl.classList.toggle('active', leftLogoEnabled);
+                    this.updatePricingDisplay();
+                });
+
+                this.elements.rightLogoEnabled.addEventListener('change', (e) => {
+                    rightLogoEnabled = e.target.checked;
+                    this.elements.rightLogoControl.classList.toggle('active', rightLogoEnabled);
+                    this.updatePricingDisplay();
+                });
+
+                // Email form listeners
+                this.elements.emailQuoteBtn.addEventListener('click', () => this.showEmailForm());
+                this.elements.quoteForm.addEventListener('submit', (e) => this.handleQuoteSubmit(e));
+            }
+
+            // Load live embroidery pricing data from API
+            async loadEmbroideryPricingData() {
+                try {
+                    const response = await fetch(
+                        'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=EMB&styleNumber=null'
+                    );
+                    
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status}`);
+                    }
+                    
+                    pricingApiData = await response.json();
+                    
+                    // Debug logging to understand API response
+                    console.log('[ManualEmbroideryCalculator] API Response:', pricingApiData);
+                    
+                    // Extract live data - update global references
+                    tierData = window.tierData = pricingApiData.tiersR || [];
+                    roundingMethod = pricingApiData.rulesR?.RoundingMethod || 'CeilDollar';
+                    printLocations = pricingApiData.locations || [];
+                    
+                    // Build embroidery base costs lookup (8,000 stitches only)
+                    embroideryBaseCosts = window.embroideryBaseCosts = {};
+                    if (pricingApiData.allEmbroideryCostsR && Array.isArray(pricingApiData.allEmbroideryCostsR)) {
+                        // Debug: Log all stitch counts to see what's available
+                        console.log('[ManualEmbroideryCalculator] All embroidery costs from API:');
+                        pricingApiData.allEmbroideryCostsR.forEach((cost, index) => {
+                            console.log(`  [${index}] StitchCount: ${cost.StitchCount} (type: ${typeof cost.StitchCount}), TierLabel: ${cost.TierLabel}, Cost: ${cost.EmbroideryCost}`);
+                        });
+                        
+                        pricingApiData.allEmbroideryCostsR
+                            .filter(cost => {
+                                // Handle both string and number types
+                                return parseInt(cost.StitchCount) === 8000;
+                            })
+                            .forEach(cost => {
+                                embroideryBaseCosts[cost.TierLabel] = cost.EmbroideryCost;
+                            });
+                    } else {
+                        console.error('[ManualEmbroideryCalculator] No allEmbroideryCostsR data in API response!');
+                    }
+                    
+                    // Debug logging for extracted data
+                    console.log('[ManualEmbroideryCalculator] Extracted tiers:', tierData);
+                    console.log('[ManualEmbroideryCalculator] Extracted base costs:', embroideryBaseCosts);
+                    
+                    // Warn if no costs were extracted
+                    if (Object.keys(embroideryBaseCosts).length === 0) {
+                        console.error('[ManualEmbroideryCalculator] WARNING: No base costs were extracted from API response!');
+                        console.error('[ManualEmbroideryCalculator] Check the API response structure and StitchCount values');
+                    }
+                        
+                    if (CALCULATOR_CONFIG.debug) {
+                        console.log('[ManualEmbroideryCalculator] Live pricing data loaded:', {
+                            tiers: Array.isArray(tierData) ? tierData.map(t => t.TierLabel) : [],
+                            baseCosts: embroideryBaseCosts,
+                            rounding: roundingMethod
+                        });
+                    }
+                    
+                    // Re-initialize sliders with live data
+                    this.initializeInteractiveSliders();
+                    
+                    return true;
+                    
+                } catch (error) {
+                    console.error('[ManualEmbroideryCalculator] Failed to load pricing data:', error);
+                    if (CALCULATOR_CONFIG.debug) {
+                        console.error('[ManualEmbroideryCalculator] Error details:', {
+                            message: error.message,
+                            stack: error.stack
+                        });
+                    }
+                    // DO NOT use fallback data - throw error instead
+                    throw error;
+                }
+            }
+
+            // Initialize calculator with live data
+            async initializeHybridCalculator() {
+                const success = await this.loadEmbroideryPricingData();
+                if (success) {
+                    this.updatePricingDisplay();
+                    this.refreshSliderStates(); // Add this to update sliders after API load
+                    if (CALCULATOR_CONFIG.debug) {
+                        console.log('[ManualEmbroideryCalculator] Hybrid calculator initialized with live API data');
+                    }
+                }
+            }
+
+            // Pricing calculation functions using live API data
+            calculateFrontLogoPrice(stitches, blankCost, tierLabel) {
+                // Get live base embroidery cost for 8,000 stitches
+                const baseEmbCost = embroideryBaseCosts[tierLabel];
+                if (!baseEmbCost) {
+                    console.error(`No base cost found for tier: ${tierLabel}`);
+                    console.error('embroideryBaseCosts object:', embroideryBaseCosts);
+                    return 0;
+                }
+                
+                // Round stitches UP to next 1,000 (matches live page logic)
+                const roundedStitches = Math.ceil(stitches / 1000) * 1000;
+                
+                // Calculate stitch adjustment from 8,000 base
+                const stitchDiff = roundedStitches - BASE_STITCHES;
+                const stitchAdjustment = (stitchDiff / 1000) * PRICE_PER_THOUSAND;
+                
+                // Final embroidery cost
+                const finalEmbCost = baseEmbCost + stitchAdjustment;
+                
+                // Get live margin denominator from tier data
+                const tierInfo = tierData.find(t => t.TierLabel === tierLabel);
+                const marginDenom = tierInfo ? tierInfo.MarginDenominator : 0.6;
+                
+                // Apply margin to blank cost only (matching XML logic)
+                const markedUpBlank = blankCost / marginDenom;
+                const totalCost = markedUpBlank + finalEmbCost;
+                
+                // Apply live rounding method
+                return this.applyRounding(totalCost, roundingMethod);
+            }
+
+            calculateAdditionalLogoPrice(stitches, tierLabel) {
+                // Additional logos: straight $1.25 per thousand (no base fee)
+                // Matches live page logic: stitches / 1000 * 1.25
+                const pricePerThousand = 1.25;
+                
+                // Round stitches UP to next 1,000 (matches live page logic)
+                const roundedStitches = Math.ceil(stitches / 1000) * 1000;
+                
+                // Calculate cost: simply stitches / 1000 * $1.25
+                const totalCost = (roundedStitches / 1000) * pricePerThousand;
+                
+                console.log(`[DEBUG] Additional Logo: ${stitches} → ${roundedStitches} rounded → $${totalCost.toFixed(2)}`);
+                
+                // Apply live rounding method
+                return this.applyRounding(totalCost, roundingMethod);
+            }
+
+            applyRounding(value, method) {
+                switch(method) {
+                    case 'CeilDollar':
+                        return Math.ceil(value);
+                    case 'FloorDollar':
+                        return Math.floor(value);
+                    case 'RoundDollar':
+                        return Math.round(value);
+                    case 'RoundToNearestFiveCents':
+                        return Math.round(value * 20) / 20;
+                    case 'None':
+                        return value;
+                    default:
+                        return Math.ceil(value); // Default to ceiling
+                }
+            }
+
+            getTierForQuantity(quantity) {
+                if (!Array.isArray(tierData) || tierData.length === 0) {
+                    console.error('[ManualEmbroideryCalculator] No tier data available');
+                    return null;
+                }
+                
+                const tier = tierData.find(t => 
+                    quantity >= t.MinQuantity && quantity <= t.MaxQuantity
+                );
+                
+                if (!tier) {
+                    console.error(`[ManualEmbroideryCalculator] No tier found for quantity ${quantity}`);
+                }
+                
+                return tier;
+            }
+
+            updatePricingDisplay() {
+                if (manualBlankCost === 0 || currentQuantity === 0) {
+                    this.resetDisplay();
+                    return;
+                }
+
+                // Get tier for current quantity
+                const tier = this.getTierForQuantity(currentQuantity);
+                if (!tier) {
+                    this.resetDisplay();
+                    return;
+                }
+
+                // Calculate front logo price (includes marked up blank)
+                const frontLogoTotal = this.calculateFrontLogoPrice(currentFrontStitches, manualBlankCost, tier.TierLabel);
+                
+                // Apply margin to blank cost
+                const marginDenom = tier.MarginDenominator || 0.6;
+                const markedUpBlank = manualBlankCost / marginDenom;
+                
+                // Get base embroidery cost from API
+                const baseEmbCost = embroideryBaseCosts[tier.TierLabel] || 0;
+                
+                // Use the proper rounding calculation (matches fixed logic)
+                const roundedFrontStitches = Math.ceil(currentFrontStitches / 1000) * 1000;
+                const frontStitchDiff = roundedFrontStitches - BASE_STITCHES;
+                const frontStitchAdjustment = (frontStitchDiff / 1000) * PRICE_PER_THOUSAND;
+                const frontEmbroideryOnly = baseEmbCost + frontStitchAdjustment;
+                
+                console.log(`[DEBUG] Front: ${currentFrontStitches} → ${roundedFrontStitches} rounded, diff: ${frontStitchDiff}, adj: $${frontStitchAdjustment.toFixed(2)}`);
+                
+                // Calculate additional logos
+                let backLogoPrice = 0;
+                let leftLogoPrice = 0; 
+                let rightLogoPrice = 0;
+                
+                if (backLogoEnabled) {
+                    backLogoPrice = this.calculateAdditionalLogoPrice(currentBackStitches, tier.TierLabel);
+                }
+                
+                if (leftLogoEnabled) {
+                    leftLogoPrice = this.calculateAdditionalLogoPrice(currentLeftStitches, tier.TierLabel);
+                }
+                
+                if (rightLogoEnabled) {
+                    rightLogoPrice = this.calculateAdditionalLogoPrice(currentRightStitches, tier.TierLabel);
+                }
+                
+                // Calculate subtotal (marked up blank + all embroidery)
+                const subtotal = markedUpBlank + frontEmbroideryOnly + backLogoPrice + leftLogoPrice + rightLogoPrice;
+                
+                console.log(`[DEBUG] Pricing: Blank=$${markedUpBlank.toFixed(2)}, Front=$${frontEmbroideryOnly.toFixed(2)}, Back=$${backLogoPrice.toFixed(2)}, Left=$${leftLogoPrice.toFixed(2)}, Right=$${rightLogoPrice.toFixed(2)}, Subtotal=$${subtotal.toFixed(2)}`);
+                
+                // Apply LTM if needed
+                let ltmPerUnit = 0;
+                const showLTM = currentQuantity < MIN_QUANTITY && tier.LTM_Fee;
+                if (showLTM) {
+                    ltmPerUnit = tier.LTM_Fee / currentQuantity;
+                }
+                
+                // Calculate final price
+                const finalPrice = this.applyRounding(subtotal + ltmPerUnit, roundingMethod);
+                const grandTotal = finalPrice * currentQuantity;
+                
+                // Update display
+                document.getElementById('blankCostDisplay').textContent = `$${markedUpBlank.toFixed(2)}`;
+                document.getElementById('frontLogoDisplay').textContent = `$${frontEmbroideryOnly.toFixed(2)}`;
+                
+                // Update additional logo displays
+                if (backLogoEnabled) {
+                    document.getElementById('backLogoLine').style.display = 'flex';
+                    document.getElementById('backLogoDisplay').textContent = `$${backLogoPrice.toFixed(2)}`;
+                } else {
+                    document.getElementById('backLogoLine').style.display = 'none';
+                }
+                
+                if (leftLogoEnabled) {
+                    document.getElementById('leftLogoLine').style.display = 'flex';
+                    document.getElementById('leftLogoDisplay').textContent = `$${leftLogoPrice.toFixed(2)}`;
+                } else {
+                    document.getElementById('leftLogoLine').style.display = 'none';
+                }
+                
+                if (rightLogoEnabled) {
+                    document.getElementById('rightLogoLine').style.display = 'flex';
+                    document.getElementById('rightLogoDisplay').textContent = `$${rightLogoPrice.toFixed(2)}`;
+                } else {
+                    document.getElementById('rightLogoLine').style.display = 'none';
+                }
+                
+                document.getElementById('subtotalDisplay').textContent = `$${subtotal.toFixed(2)}`;
+                document.getElementById('finalPriceDisplay').textContent = `$${finalPrice.toFixed(2)}`;
+                document.getElementById('grandTotalDisplay').textContent = `$${finalPrice.toFixed(2)}`;
+                
+                // Update quantity displays
+                document.getElementById('quantityDisplay').textContent = currentQuantity;
+                document.getElementById('perGarmentDisplay').textContent = `$${finalPrice.toFixed(2)}`;
+                document.getElementById('totalOrderDisplay').textContent = `$${grandTotal.toFixed(2)}`;
+                
+                // Show/hide LTM warning
+                document.getElementById('ltmWarning').style.display = showLTM ? 'flex' : 'none';
+                
+                // Update pricing table
+                this.updatePricingTable();
+                
+                // Store current quote data
+                this.currentQuote = {
+                    blankCost: manualBlankCost,
+                    markedUpBlank: markedUpBlank,
+                    manualBlankCost: manualBlankCost,
+                    quantity: currentQuantity,
+                    frontStitches: currentFrontStitches,
+                    frontEmbroideryPrice: frontEmbroideryOnly,
+                    backLogoEnabled: backLogoEnabled,
+                    backStitches: currentBackStitches,
+                    backLogoPrice: backLogoPrice,
+                    leftLogoEnabled: leftLogoEnabled,
+                    leftStitches: currentLeftStitches,
+                    leftLogoPrice: leftLogoPrice,
+                    rightLogoEnabled: rightLogoEnabled,
+                    rightStitches: currentRightStitches,
+                    rightLogoPrice: rightLogoPrice,
+                    subtotal: subtotal,
+                    ltmPerUnit: ltmPerUnit,
+                    ltmFee: showLTM ? LTM_FEE : 0,
+                    hasLTM: showLTM,
+                    finalPrice: finalPrice,
+                    unitPrice: finalPrice,
+                    totalCost: grandTotal,
+                    grandTotal: grandTotal,
+                    tier: tier.TierLabel,
+                    tierLabel: tier.TierLabel,
+                    marginDenominator: tier.MarginDenominator || 0.6,
+                    apiBaseCost: embroideryBaseCosts[tier.TierLabel] || 0
+                };
+                
+                if (CALCULATOR_CONFIG.debug) {
+                    console.log('[ManualEmbroideryCalculator] Current quote:', this.currentQuote);
+                }
+            }
+
+            resetDisplay() {
+                document.getElementById('blankCostDisplay').textContent = '$0.00';
+                document.getElementById('frontLogoDisplay').textContent = '$0.00';
+                document.getElementById('backLogoDisplay').textContent = '$0.00';
+                document.getElementById('leftLogoDisplay').textContent = '$0.00';
+                document.getElementById('rightLogoDisplay').textContent = '$0.00';
+                document.getElementById('subtotalDisplay').textContent = '$0.00';
+                document.getElementById('finalPriceDisplay').textContent = '$0.00';
+                document.getElementById('grandTotalDisplay').textContent = '$0.00';
+                document.getElementById('quantityDisplay').textContent = '0';
+                document.getElementById('perGarmentDisplay').textContent = '$0.00';
+                document.getElementById('totalOrderDisplay').textContent = '$0.00';
+                
+                // Hide additional logo lines
+                document.getElementById('backLogoLine').style.display = 'none';
+                document.getElementById('leftLogoLine').style.display = 'none';
+                document.getElementById('rightLogoLine').style.display = 'none';
+                
+                // Hide LTM warning
+                document.getElementById('ltmWarning').style.display = 'none';
+                
+                // Hide pricing table
+                document.getElementById('pricingTableSection').style.display = 'none';
+                
+                this.currentQuote = null;
+            }
+
+            updatePricingTable() {
+                if (!manualBlankCost || !Array.isArray(tierData) || tierData.length === 0) {
+                    document.getElementById('pricingTableSection').style.display = 'none';
+                    return;
+                }
+                
+                const tableBody = document.getElementById('pricingTableBody');
+                tableBody.innerHTML = '';
+                
+                // Generate a row for each tier
+                tierData.forEach(tier => {
+                    const row = document.createElement('tr');
+                    
+                    // Calculate price for this tier
+                    const tierPrice = this.calculateFrontLogoPrice(currentFrontStitches, manualBlankCost, tier.TierLabel);
+                    
+                    // Add additional logo costs if enabled
+                    let additionalCost = 0;
+                    if (backLogoEnabled) {
+                        additionalCost += this.calculateAdditionalLogoPrice(currentBackStitches, tier.TierLabel);
+                    }
+                    if (leftLogoEnabled) {
+                        additionalCost += this.calculateAdditionalLogoPrice(currentLeftStitches, tier.TierLabel);
+                    }
+                    if (rightLogoEnabled) {
+                        additionalCost += this.calculateAdditionalLogoPrice(currentRightStitches, tier.TierLabel);
+                    }
+                    
+                    // Subtract the embroidery cost from tierPrice to get just marked up blank
+                    const marginDenom = tier.MarginDenominator || 0.6;
+                    const markedUpBlank = manualBlankCost / marginDenom;
+                    const baseEmbCost = embroideryBaseCosts[tier.TierLabel] || 0;
+                    const frontStitchDiff = currentFrontStitches - BASE_STITCHES;
+                    const frontStitchAdjustment = (frontStitchDiff / 1000) * PRICE_PER_THOUSAND;
+                    const frontEmbroideryOnly = baseEmbCost + frontStitchAdjustment;
+                    
+                    const subtotal = markedUpBlank + frontEmbroideryOnly + additionalCost;
+                    const finalPrice = this.applyRounding(subtotal, roundingMethod);
+                    
+                    row.innerHTML = `
+                        <td>${tier.TierLabel}</td>
+                        <td>$${finalPrice.toFixed(2)}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+                
+                document.getElementById('pricingTableSection').style.display = 'block';
+            }
+
+            showEmailForm() {
+                document.getElementById('emailModal').classList.add('active');
+            }
+
+            async handleQuoteSubmit(e) {
+                e.preventDefault();
+                
+                if (!this.currentQuote) {
+                    alert('Please calculate a quote first');
+                    return;
+                }
+                
+                const submitBtn = document.getElementById('sendEmailBtn');
+                const originalText = submitBtn.innerHTML;
+                
+                try {
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                    submitBtn.disabled = true;
+                    
+                    // Get form data
+                    const formData = {
+                        customerName: this.elements.customerName.value,
+                        companyName: this.elements.companyName.value,
+                        customerEmail: this.elements.customerEmail.value,
+                        customerPhone: this.elements.customerPhone.value,
+                        projectName: this.elements.projectName.value,
+                        salesRep: this.elements.salesRep.value,
+                        notes: this.elements.notes.value
+                    };
+                    
+                    // Get sales rep name
+                    const salesRepOption = this.elements.salesRep.options[this.elements.salesRep.selectedIndex];
+                    const salesRepName = salesRepOption.text;
+                    
+                    // Generate quote data with proper mapping
+                    const quoteData = {
+                        ...this.currentQuote,
+                        ...formData,
+                        salesRepName: salesRepName,
+                        garmentType: this.elements.garmentType.value,
+                        date: new Date().toISOString(),
+                        
+                        // Map back/left/right to logo1/2/3 for consistency with quote service
+                        logo1Enabled: this.currentQuote.backLogoEnabled,
+                        logo1Stitches: this.currentQuote.backStitches,
+                        logo1Price: this.currentQuote.backLogoPrice,
+                        
+                        logo2Enabled: this.currentQuote.leftLogoEnabled,
+                        logo2Stitches: this.currentQuote.leftStitches,
+                        logo2Price: this.currentQuote.leftLogoPrice,
+                        
+                        logo3Enabled: this.currentQuote.rightLogoEnabled,
+                        logo3Stitches: this.currentQuote.rightStitches,
+                        logo3Price: this.currentQuote.rightLogoPrice
+                    };
+                    
+                    // Save to database
+                    const result = await this.quoteService.saveQuote(quoteData);
+                    
+                    if (result.success) {
+                        // Send email
+                        await this.sendEmail(quoteData, result.quoteID);
+                        
+                        // Show success modal
+                        document.getElementById('successQuoteID').textContent = result.quoteID;
+                        closeEmailModal();
+                        document.getElementById('successModal').classList.add('active');
+                        
+                        // Store for print function
+                        this.lastQuoteData = {
+                            ...quoteData,
+                            quoteID: result.quoteID
+                        };
+                        
+                        // Reset form
+                        document.getElementById('quoteForm').reset();
+                    } else {
+                        throw new Error('Failed to save quote');
+                    }
+                    
+                } catch (error) {
+                    console.error('Quote submission error:', error);
+                    alert('Failed to send quote. Please try again.');
+                } finally {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }
+
+            async sendEmail(quoteData, quoteID) {
+                // Build email parameters
+                const emailParams = {
+                    // Email routing
+                    to_email: quoteData.customerEmail,
+                    from_name: 'Northwest Custom Apparel',
+                    reply_to: quoteData.salesRep,
+                    
+                    // Quote details
+                    quote_type: 'Manual Embroidery',
+                    quote_id: quoteID,
+                    quote_date: new Date().toLocaleDateString(),
+                    
+                    // Customer info
+                    customer_name: quoteData.customerName,
+                    company_name: quoteData.companyName || 'Not Provided',
+                    customer_email: quoteData.customerEmail,
+                    customer_phone: quoteData.customerPhone || 'Not Provided',
+                    project_name: quoteData.projectName || '',
+                    
+                    // Pricing
+                    grand_total: `$${quoteData.totalCost.toFixed(2)}`,
+                    
+                    // Sales rep
+                    sales_rep_name: quoteData.salesRepName,
+                    sales_rep_email: quoteData.salesRep,
+                    sales_rep_phone: '253-922-5793',
+                    
+                    // Company info
+                    company_year: '1977',
+                    
+                    // Notes
+                    notes: quoteData.notes || 'No special notes for this order',
+                    
+                    // Products HTML
+                    products_html: this.generateProductsHTML(quoteData)
+                };
+                
+                // Send email via EmailJS
+                await emailjs.send(
+                    CALCULATOR_CONFIG.emailServiceId,
+                    CALCULATOR_CONFIG.emailTemplateId,
+                    emailParams
+                );
+            }
+            
+            generateProductsHTML(quoteData) {
+                let html = `
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <thead>
+                            <tr style="background-color: #f3f4f6;">
+                                <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Item</th>
+                                <th style="padding: 12px; text-align: center; border: 1px solid #e5e7eb;">Stitches</th>
+                                <th style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e5e7eb;">Manual Blank Garment (${quoteData.garmentType})</td>
+                                <td style="padding: 12px; text-align: center; border: 1px solid #e5e7eb;">-</td>
+                                <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">$${quoteData.markedUpBlank.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e5e7eb;">Front Logo Embroidery</td>
+                                <td style="padding: 12px; text-align: center; border: 1px solid #e5e7eb;">${quoteData.frontStitches.toLocaleString()}</td>
+                                <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">$${quoteData.frontEmbroideryPrice.toFixed(2)}</td>
+                            </tr>`;
+                
+                if (quoteData.backLogoEnabled) {
+                    html += `
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e5e7eb;">Back Logo Embroidery</td>
+                                <td style="padding: 12px; text-align: center; border: 1px solid #e5e7eb;">${quoteData.backStitches.toLocaleString()}</td>
+                                <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">$${quoteData.backLogoPrice.toFixed(2)}</td>
+                            </tr>`;
+                }
+                
+                if (quoteData.leftLogoEnabled) {
+                    html += `
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e5e7eb;">Left Side Logo Embroidery</td>
+                                <td style="padding: 12px; text-align: center; border: 1px solid #e5e7eb;">${quoteData.leftStitches.toLocaleString()}</td>
+                                <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">$${quoteData.leftLogoPrice.toFixed(2)}</td>
+                            </tr>`;
+                }
+                
+                if (quoteData.rightLogoEnabled) {
+                    html += `
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e5e7eb;">Right Side Logo Embroidery</td>
+                                <td style="padding: 12px; text-align: center; border: 1px solid #e5e7eb;">${quoteData.rightStitches.toLocaleString()}</td>
+                                <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">$${quoteData.rightLogoPrice.toFixed(2)}</td>
+                            </tr>`;
+                }
+                
+                html += `
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2" style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;"><strong>Subtotal per Garment:</strong></td>
+                                <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;"><strong>$${quoteData.subtotal.toFixed(2)}</strong></td>
+                            </tr>`;
+                
+                if (quoteData.hasLTM) {
+                    html += `
+                            <tr>
+                                <td colspan="2" style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">Less Than Minimum Fee:</td>
+                                <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;">$${quoteData.ltmFee.toFixed(2)}</td>
+                            </tr>`;
+                }
+                
+                html += `
+                            <tr style="background-color: #f3f4f6;">
+                                <td colspan="2" style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;"><strong>Price per Garment:</strong></td>
+                                <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb;"><strong>$${quoteData.finalPrice.toFixed(2)}</strong></td>
+                            </tr>
+                            <tr style="background-color: #3a7c52; color: white;">
+                                <td style="padding: 12px; border: 1px solid #3a7c52;"><strong>Quantity: ${quoteData.quantity}</strong></td>
+                                <td colspan="2" style="padding: 12px; text-align: right; border: 1px solid #3a7c52;"><strong>Total Order: $${quoteData.totalCost.toFixed(2)}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                `;
+                
+                return html;
+            }
         }
 
-        function calculateEmbroideryPricing() {
-            const blankCost = parseFloat(document.getElementById('blankCost').value) || 0;
-            const quantity = parseInt(document.getElementById('quantity').value) || 0;
-            const stitchCount = parseInt(document.getElementById('stitchCount').value) || 0;
-            const locations = parseInt(document.getElementById('locations').value) || 1;
-            const threadColors = parseInt(document.getElementById('threadColors').value) || 1;
-            const includeSetup = document.getElementById('setupCharge').value === 'yes';
-            
-            if (!blankCost || !quantity || !stitchCount) {
-                resetDisplay();
-                return;
-            }
-            
-            // Validate stitch count
-            if (stitchCount > 20000) {
-                alert('Maximum stitch count for flat embroidery is 20,000 stitches.');
-                document.getElementById('stitchCount').value = 20000;
-                return;
-            }
-            
-            // Calculate garment cost with margin
-            const garmentPrice = blankCost / flatEmbroideryConfig.garmentMargin;
-            
-            // Get stitch level and find appropriate tier
-            const stitchLevel = getStitchCountLevel(stitchCount);
-            const tiers = flatEmbroideryConfig.stitchCosts[stitchLevel].tiers;
-            const tier = tiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
-            
-            // Calculate embroidery cost per location
-            const embroideryPerLocation = tier.cost;
-            const totalEmbroidery = embroideryPerLocation * locations;
-            
-            // Thread color charges (only for colors beyond 4)
-            const extraColors = Math.max(0, threadColors - 4);
-            const threadCharge = extraColors * flatEmbroideryConfig.threadColorCharge;
-            
-            // Calculate subtotal
-            const subtotal = garmentPrice + totalEmbroidery + threadCharge;
-            
-            // Apply LTM fee if needed
-            let ltmFee = 0;
-            let ltmPerUnit = 0;
-            if (quantity < flatEmbroideryConfig.ltmFeeThreshold) {
-                ltmFee = flatEmbroideryConfig.ltmFeeAmount;
-                ltmPerUnit = ltmFee / quantity;
-            }
-            
-            const unitPrice = subtotal + ltmPerUnit;
-            const totalPrice = (subtotal * quantity) + ltmFee;
-            const setupFee = includeSetup ? flatEmbroideryConfig.setupFee : 0;
-            const grandTotal = totalPrice + setupFee;
-            
-            // Update display
-            updateDisplay({
-                blankCost,
-                quantity,
-                stitchCount,
-                stitchLevel,
-                locations,
-                threadColors,
-                extraColors,
-                garmentPrice,
-                embroideryPerLocation,
-                totalEmbroidery,
-                threadCharge,
-                subtotal,
-                ltmFee,
-                ltmPerUnit,
-                unitPrice,
-                totalPrice,
-                setupFee,
-                grandTotal
+        // Modal Functions
+        function closeEmailModal() {
+            document.getElementById('emailModal').classList.remove('active');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        function copyQuoteID() {
+            const quoteID = document.getElementById('successQuoteID').textContent;
+            navigator.clipboard.writeText(quoteID).then(() => {
+                const copyBtn = event.target.closest('button');
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                }, 2000);
             });
         }
 
-        function updateDisplay(data) {
-            // Show pricing display, hide empty state
-            document.getElementById('pricingDisplay').classList.add('active');
-            document.getElementById('emptyState').style.display = 'none';
-            
-            // Update summary grid
-            document.getElementById('displayQuantity').textContent = data.quantity.toLocaleString();
-            document.getElementById('displayStitchLevel').textContent = `${data.stitchCount.toLocaleString()} stitches`;
-            document.getElementById('displayUnitPrice').textContent = `$${data.unitPrice.toFixed(2)}`;
-            
-            // Update breakdown
-            document.getElementById('displayBlankCost').textContent = `$${data.blankCost.toFixed(2)}`;
-            document.getElementById('displayGarmentPrice').textContent = `$${data.garmentPrice.toFixed(2)}`;
-            document.getElementById('displayLocations').textContent = data.locations;
-            document.getElementById('displayEmbroideryRate').textContent = `$${data.embroideryPerLocation.toFixed(2)}`;
-            document.getElementById('displayEmbroideryTotal').textContent = `$${data.totalEmbroidery.toFixed(2)}`;
-            
-            // Thread colors
-            if (data.extraColors > 0) {
-                document.getElementById('threadChargeRow').style.display = 'flex';
-                document.getElementById('displayExtraColors').textContent = data.extraColors;
-                document.getElementById('displayThreadCharge').textContent = `$${data.threadCharge.toFixed(2)}`;
-            } else {
-                document.getElementById('threadChargeRow').style.display = 'none';
+        function printQuote() {
+            const calculator = window.embroideryManualCalculator;
+            if (!calculator || !calculator.lastQuoteData) {
+                alert('No quote data available to print');
+                return;
             }
             
-            document.getElementById('displaySubtotal').textContent = `$${data.subtotal.toFixed(2)}`;
+            const quote = calculator.lastQuoteData;
+            const printWindow = window.open('', '_blank');
             
-            // LTM fee
-            if (data.ltmFee > 0) {
-                document.getElementById('ltmRow').style.display = 'flex';
-                document.getElementById('ltmWarning').style.display = 'flex';
-                document.getElementById('displayLTMQty').textContent = data.quantity;
-                document.getElementById('displayLTMPerUnit').textContent = `$${data.ltmPerUnit.toFixed(2)}`;
-            } else {
-                document.getElementById('ltmRow').style.display = 'none';
-                document.getElementById('ltmWarning').style.display = 'none';
-            }
+            const printHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Embroidery Quote ${quote.quoteID}</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                            max-width: 800px;
+                            margin: 0 auto;
+                            padding: 20px;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                            padding-bottom: 20px;
+                            border-bottom: 2px solid #3a7c52;
+                        }
+                        .logo {
+                            max-width: 300px;
+                            margin-bottom: 20px;
+                        }
+                        .quote-info {
+                            margin-bottom: 30px;
+                        }
+                        .quote-info h2 {
+                            color: #3a7c52;
+                            margin-bottom: 10px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 30px;
+                        }
+                        th, td {
+                            padding: 10px;
+                            text-align: left;
+                            border-bottom: 1px solid #ddd;
+                        }
+                        th {
+                            background-color: #f5f5f5;
+                            font-weight: bold;
+                        }
+                        .total-row {
+                            font-weight: bold;
+                            font-size: 1.1em;
+                        }
+                        .footer {
+                            margin-top: 50px;
+                            text-align: center;
+                            font-size: 0.9em;
+                            color: #666;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" class="logo">
+                        <h1>Embroidery Quote</h1>
+                    </div>
+                    
+                    <div class="quote-info">
+                        <h2>Quote ID: ${quote.quoteID}</h2>
+                        <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                        <p><strong>Customer:</strong> ${quote.customerName}</p>
+                        ${quote.companyName ? `<p><strong>Company:</strong> ${quote.companyName}</p>` : ''}
+                        <p><strong>Email:</strong> ${quote.customerEmail}</p>
+                        ${quote.customerPhone ? `<p><strong>Phone:</strong> ${quote.customerPhone}</p>` : ''}
+                        ${quote.projectName ? `<p><strong>Project:</strong> ${quote.projectName}</p>` : ''}
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th style="text-align: right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Blank Garment Cost</td>
+                                <td style="text-align: right;">$${quote.blankCost.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td>Garment with Margin (40%)</td>
+                                <td style="text-align: right;">$${quote.markedUpBlank.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td>Front Logo Embroidery (${quote.frontStitches.toLocaleString()} stitches)</td>
+                                <td style="text-align: right;">$${quote.frontEmbroideryPrice.toFixed(2)}</td>
+                            </tr>
+                            ${quote.backLogoEnabled ? `
+                            <tr>
+                                <td>Back Logo Embroidery (${quote.backStitches.toLocaleString()} stitches)</td>
+                                <td style="text-align: right;">$${quote.backLogoPrice.toFixed(2)}</td>
+                            </tr>` : ''}
+                            ${quote.leftLogoEnabled ? `
+                            <tr>
+                                <td>Left Side Logo Embroidery (${quote.leftStitches.toLocaleString()} stitches)</td>
+                                <td style="text-align: right;">$${quote.leftLogoPrice.toFixed(2)}</td>
+                            </tr>` : ''}
+                            ${quote.rightLogoEnabled ? `
+                            <tr>
+                                <td>Right Side Logo Embroidery (${quote.rightStitches.toLocaleString()} stitches)</td>
+                                <td style="text-align: right;">$${quote.rightLogoPrice.toFixed(2)}</td>
+                            </tr>` : ''}
+                            <tr>
+                                <td><strong>Subtotal per Garment</strong></td>
+                                <td style="text-align: right;"><strong>$${quote.subtotal.toFixed(2)}</strong></td>
+                            </tr>
+                            ${quote.ltmPerUnit > 0 ? `
+                            <tr>
+                                <td>Less Than Minimum Fee (per garment)</td>
+                                <td style="text-align: right;">$${quote.ltmPerUnit.toFixed(2)}</td>
+                            </tr>` : ''}
+                            <tr class="total-row">
+                                <td>Price per Garment</td>
+                                <td style="text-align: right;">$${quote.finalPrice.toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><strong>Quantity:</strong></td>
+                                <td style="text-align: right;">${quote.quantity}</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Total Order:</strong></td>
+                                <td style="text-align: right;"><strong>$${quote.grandTotal.toFixed(2)}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    ${quote.notes ? `
+                    <div style="margin-top: 30px; padding: 15px; background-color: #f5f5f5; border-radius: 5px;">
+                        <h3 style="margin-top: 0;">Notes:</h3>
+                        <p>${quote.notes}</p>
+                    </div>` : ''}
+                    
+                    <div class="footer">
+                        <p>Northwest Custom Apparel</p>
+                        <p>Family Owned & Operated Since 1977</p>
+                        <p>253-922-5793 | sales@nwcustomapparel.com | www.nwcustomapparel.com</p>
+                    </div>
+                </body>
+                </html>
+            `;
             
-            document.getElementById('displayFinalUnitPrice').textContent = `$${data.unitPrice.toFixed(2)}`;
-            document.getElementById('displayQty2').textContent = data.quantity;
-            document.getElementById('displayUnitPrice2').textContent = `$${data.unitPrice.toFixed(2)}`;
-            document.getElementById('displayExtendedPrice').textContent = `$${data.totalPrice.toFixed(2)}`;
+            printWindow.document.write(printHTML);
+            printWindow.document.close();
             
-            // Setup fee
-            if (data.setupFee > 0) {
-                document.getElementById('setupFeeRow').style.display = 'flex';
-                document.getElementById('displaySetupFee').textContent = `$${data.setupFee.toFixed(2)}`;
-            } else {
-                document.getElementById('setupFeeRow').style.display = 'none';
-            }
-            
-            document.getElementById('displayGrandTotal').textContent = `$${data.grandTotal.toFixed(2)}`;
+            printWindow.onload = function() {
+                printWindow.print();
+                printWindow.onafterprint = function() {
+                    printWindow.close();
+                };
+            };
         }
 
-        function resetDisplay() {
-            document.getElementById('pricingDisplay').classList.remove('active');
-            document.getElementById('emptyState').style.display = 'block';
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add event listeners
-            document.getElementById('blankCost').addEventListener('input', calculateEmbroideryPricing);
-            document.getElementById('quantity').addEventListener('input', calculateEmbroideryPricing);
-            document.getElementById('stitchCount').addEventListener('input', calculateEmbroideryPricing);
-            document.getElementById('locations').addEventListener('input', calculateEmbroideryPricing);
-            document.getElementById('threadColors').addEventListener('input', calculateEmbroideryPricing);
-            document.getElementById('setupCharge').addEventListener('change', calculateEmbroideryPricing);
+        // Initialize calculator when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.embroideryManualCalculator = new EmbroideryManualCalculator();
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (window.embroideryManualCalculator && window.embroideryManualCalculator.cleanup) {
+                window.embroideryManualCalculator.cleanup();
+            }
         });
     </script>
 </body>
