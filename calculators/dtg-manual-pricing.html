@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Manual DTG Pricing Calculator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- Shared Calculator Styles -->
+    <link href="manual-calculator-styles.css" rel="stylesheet">
+    
+    <style>
+        /* DTG-specific styles */
+        .coming-soon {
+            text-align: center;
+            padding: 3rem;
+            background: var(--primary-lighter);
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        
+        .coming-soon-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .coming-soon h2 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .coming-soon p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+        
+        .placeholder-section {
+            background: var(--bg-color);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>Manual DTG Pricing</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="calculator-title text-center">
+            <h1>Manual DTG Pricing Calculator</h1>
+            <p>Calculate pricing for Direct-to-Garment printing on customer-supplied items</p>
+        </div>
+
+        <!-- Coming Soon Notice -->
+        <div class="coming-soon">
+            <i class="fas fa-paint-brush coming-soon-icon"></i>
+            <h2>Coming Soon!</h2>
+            <p>The Manual DTG Pricing Calculator is currently under development. Check back soon!</p>
+        </div>
+
+        <!-- Calculator Grid (Placeholder) -->
+        <div class="calculator-grid">
+            <!-- Input Section -->
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-tshirt" style="color: var(--primary-color);"></i>
+                    DTG Details
+                </h2>
+                
+                <div class="placeholder-section">
+                    <i class="fas fa-cog fa-3x mb-3" style="color: var(--border-color);"></i>
+                    <p>Input fields for manual DTG pricing will appear here</p>
+                    <p class="mt-2 text-muted">Features will include:</p>
+                    <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                        <li>• Manual garment cost input</li>
+                        <li>• Print size selection</li>
+                        <li>• Multiple print locations</li>
+                        <li>• Quantity-based pricing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card">
+                <div class="results-section">
+                    <div class="results-header">
+                        <h3 class="card-title">Your Quote</h3>
+                        <div class="price-display prompt">
+                            <i class="fas fa-calculator"></i>
+                            Calculator Loading...
+                        </div>
+                    </div>
+                    
+                    <div class="placeholder-section mt-3">
+                        <i class="fas fa-file-invoice-dollar fa-3x mb-3" style="color: var(--border-color);"></i>
+                        <p>Pricing breakdown will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Section -->
+        <div class="card">
+            <h3 class="card-title">
+                <i class="fas fa-info-circle" style="color: var(--primary-color);"></i>
+                About Manual DTG Pricing
+            </h3>
+            <div class="alert alert-info">
+                <i class="fas fa-lightbulb alert-icon"></i>
+                <div>
+                    <p><strong>What is Manual DTG Pricing?</strong></p>
+                    <p>This calculator will help you price Direct-to-Garment printing services for customer-supplied garments. It will account for print size, location, and quantity to provide accurate pricing.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

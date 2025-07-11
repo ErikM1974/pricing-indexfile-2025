@@ -15,88 +15,11 @@
     <!-- Quote Service -->
     <script src="cap-embroidery-manual-service.js"></script>
     
+    <!-- Shared Calculator Styles -->
+    <link href="manual-calculator-styles.css" rel="stylesheet">
+    
     <style>
-        /* Root variables - Green Theme for Manual Calculators */
-        :root {
-            --primary-color: #3a7c52;
-            --primary-dark: #2d5f3f;
-            --primary-light: #e8f5e9;
-            --bg-color: #f5f7fa;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --hover-bg: #f3f4f6;
-            --success-bg: #d1fae5;
-            --success-text: #065f46;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        /* Header */
-        .header {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .logo {
-            height: 40px;
-            width: auto;
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .breadcrumb a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .breadcrumb a:hover {
-            color: var(--primary-dark);
-        }
+        /* Cap Embroidery-specific styles - common styles are in manual-calculator-styles.css */
 
         .header-right {
             display: flex;
@@ -123,11 +46,9 @@
             color: var(--text-primary);
         }
 
-        /* Main Container */
+        /* Cap Embroidery uses wider container */
         .main-container {
             max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 20px;
         }
 
         /* Page Title */
