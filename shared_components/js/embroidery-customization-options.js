@@ -334,20 +334,20 @@ class EmbroideryCustomizationOptions {
         // Add event listeners for sliders
         container.querySelectorAll('.additional-logo-slider').forEach(slider => {
             slider.addEventListener('input', (e) => {
-                const logoId = parseInt(e.target.dataset.logoId);
+                const logoId = parseFloat(e.target.dataset.logoId);
                 const newValue = parseInt(e.target.value);
                 this.updateAdditionalLogoStitchesFromSlider(logoId, newValue);
                 this.updateAdditionalLogoVisuals(logoId, newValue);
             });
             
             // Initialize visuals
-            const logoId = parseInt(slider.dataset.logoId);
+            const logoId = parseFloat(slider.dataset.logoId);
             this.updateAdditionalLogoVisuals(logoId, parseInt(slider.value));
         });
         
         container.querySelectorAll('.remove-logo-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const logoId = parseInt(e.currentTarget.dataset.logoId);
+                const logoId = parseFloat(e.currentTarget.dataset.logoId);
                 const card = e.currentTarget.closest('.option-card');
                 card.classList.add('removing');
                 setTimeout(() => {
@@ -404,11 +404,18 @@ class EmbroideryCustomizationOptions {
     }
     
     updateAdditionalLogoStitchesFromSlider(logoId, newValue) {
+        console.log('[EmbroideryCustomization] updateAdditionalLogoStitchesFromSlider called:', logoId, newValue);
         const logo = this.state.additionalLogos.find(l => l.id === logoId);
-        if (!logo) return;
+        if (!logo) {
+            console.warn('[EmbroideryCustomization] Logo not found in state:', logoId);
+            return;
+        }
         
         logo.stitches = newValue;
+        console.log('[EmbroideryCustomization] About to call calculator.updateAdditionalLogo');
+        console.log('[EmbroideryCustomization] Calculator instance:', this.calculator);
         this.calculator.updateAdditionalLogo(logoId, newValue);
+        console.log('[EmbroideryCustomization] calculator.updateAdditionalLogo called');
         
         // Update the bubble value
         const bubble = document.querySelector(`.additional-bubble[data-logo-id="${logoId}"]`);

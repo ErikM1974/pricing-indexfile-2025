@@ -1,0 +1,163 @@
+{
+    "tiersR": [
+        {
+            "PK_ID": 1,
+            "TierID": 1,
+            "DecorationMethod": "EmbroideryShirts",
+            "TierLabel": "1-23",
+            "MinQuantity": 1,
+            "MaxQuantity": 23,
+            "MarginDenominator": 0.6,
+            "TargetMargin": 0,
+            "LTM_Fee": 50
+        },
+        {
+            "PK_ID": 2,
+            "TierID": 2,
+            "DecorationMethod": "EmbroideryShirts",
+            "TierLabel": "24-47",
+            "MinQuantity": 24,
+            "MaxQuantity": 47,
+            "MarginDenominator": 0.6,
+            "TargetMargin": 0,
+            "LTM_Fee": 0
+        },
+        {
+            "PK_ID": 3,
+            "TierID": 3,
+            "DecorationMethod": "EmbroideryShirts",
+            "TierLabel": "48-71",
+            "MinQuantity": 48,
+            "MaxQuantity": 71,
+            "MarginDenominator": 0.6,
+            "TargetMargin": 0,
+            "LTM_Fee": 0
+        },
+        {
+            "PK_ID": 4,
+            "TierID": 4,
+            "DecorationMethod": "EmbroideryShirts",
+            "TierLabel": "72+",
+            "MinQuantity": 72,
+            "MaxQuantity": 99999,
+            "MarginDenominator": 0.6,
+            "TargetMargin": 0,
+            "LTM_Fee": 0
+        }
+    ],
+    "rulesR": {
+        "RoundingMethod": "CeilDollar"
+    },
+    "locations": [
+        {
+            "code": "LC",
+            "name": "Left Chest"
+        },
+        {
+            "code": "FB",
+            "name": "Full Back"
+        },
+        {
+            "code": "Monogram",
+            "name": "Monogram"
+        },
+        {
+            "code": "RC",
+            "name": "Right Chest"
+        }
+    ],
+    "allEmbroideryCostsR": [
+        {
+            "PK_ID": 1,
+            "EmbroideryCostID": 1,
+            "ItemType": "Shirt",
+            "StitchCount": 8000,
+            "TierLabel": "1-23",
+            "EmbroideryCost": 12
+        },
+        {
+            "PK_ID": 2,
+            "EmbroideryCostID": 2,
+            "ItemType": "Shirt",
+            "StitchCount": 8000,
+            "TierLabel": "24-47",
+            "EmbroideryCost": 12
+        },
+        {
+            "PK_ID": 3,
+            "EmbroideryCostID": 3,
+            "ItemType": "Shirt",
+            "StitchCount": 8000,
+            "TierLabel": "48-71",
+            "EmbroideryCost": 11
+        },
+        {
+            "PK_ID": 4,
+            "EmbroideryCostID": 4,
+            "ItemType": "Shirt",
+            "StitchCount": 8000,
+            "TierLabel": "72+",
+            "EmbroideryCost": 10
+        }
+    ],
+    "sizes": [
+        {
+            "size": "S",
+            "price": 2.85,
+            "sortOrder": 22
+        },
+        {
+            "size": "M",
+            "price": 2.85,
+            "sortOrder": 23
+        },
+        {
+            "size": "L",
+            "price": 2.85,
+            "sortOrder": 24
+        },
+        {
+            "size": "XL",
+            "price": 2.85,
+            "sortOrder": 25
+        },
+        {
+            "size": "2XL",
+            "price": 4.25,
+            "sortOrder": 26
+        },
+        {
+            "size": "3XL",
+            "price": 5.53,
+            "sortOrder": 27
+        },
+        {
+            "size": "4XL",
+            "price": 5.53,
+            "sortOrder": 28
+        },
+        {
+            "size": "5XL",
+            "price": 5.53,
+            "sortOrder": 29
+        },
+        {
+            "size": "6XL",
+            "price": 5.53,
+            "sortOrder": 30
+        }
+    ],
+    "sellingPriceDisplayAddOns": {
+        "2XL": 2,
+        "2XLT": 5,
+        "3XL": 3,
+        "3XLT": 6,
+        "4XL": 4,
+        "4XLT": 7,
+        "5XL": 6,
+        "6XL": 7,
+        "LT": 4,
+        "XLT": 4,
+        "XXL": 2
+    }
+}

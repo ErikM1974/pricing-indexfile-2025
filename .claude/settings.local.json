@@ -53,7 +53,9 @@
       "Bash(# Move all remaining historical files in batches\nfor file in cap-embroidery-*.md; do\n    [ -f \"$file\" ] && mv \"$file\" archive/docs-historical/cap-embroidery/\ndone\n\nfor file in dtg-*.md; do\n    [ -f \"$file\" ] && mv \"$file\" archive/docs-historical/dtg/\ndone\n\nfor file in dtf-*.md; do\n    [ -f \"$file\" ] && mv \"$file\" archive/docs-historical/other/\ndone\n\nfor file in phase*.md; do\n    [ -f \"$file\" ] && mv \"$file\" archive/docs-historical/phases/\ndone\n\nfor file in git-workflow-*.md; do\n    [ -f \"$file\" ] && mv \"$file\" archive/docs-historical/other/\ndone\n\nfor file in *refactor*.md; do\n    [ -f \"$file\" ] && mv \"$file\" archive/docs-historical/refactoring/\ndone\n\nfor file in screenprint-*.md; do\n    [ -f \"$file\" ] && mv \"$file\" archive/docs-historical/other/\ndone\n\n# Move other misc files\nmv css-unification-*.md pricing-page*.md cumulative-quote-pricing-plan.md archive/docs-historical/other/ 2>/dev/null || true)",
       "Bash(npm run dev:*)",
       "Bash(awk:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "WebFetch(domain:caspio-pricing-proxy-ab30a049961a.herokuapp.com)",
+      "WebFetch(domain:localhost)"
     ],
     "deny": []
   }

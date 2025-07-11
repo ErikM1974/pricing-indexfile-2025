@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Manual DTF Pricing Calculator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Root variables matching DTF theme */
+        :root {
+            --primary-color: #3a7c52;
+            --primary-dark: #2d5f3f;
+            --primary-light: #4cb861;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Calculator Title */
+        .calculator-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .calculator-title h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .calculator-title p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Calculator Grid */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: var(--focus-shadow);
+        }
+
+        /* Transfer Locations */
+        .transfer-group {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .transfer-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .btn-remove {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .btn-remove:hover {
+            background: #dc2626;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        /* Results Section */
+        .results-section {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .price-row:last-child {
+            border-bottom: none;
+        }
+
+        .price-label {
+            color: var(--text-secondary);
+        }
+
+        .price-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .total-row {
+            border-top: 2px solid var(--primary-color);
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .total-value {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        /* Pricing Info */
+        .pricing-info {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-info h4 {
+            margin-bottom: 0.5rem;
+            color: #2e7d32;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #90caf9;
+        }
+
+        .alert-warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            border: 1px solid #fbbf24;
+        }
+
+        /* Size Guide */
+        .size-guide {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .size-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .size-card h5 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .size-guide {
+                grid-template-columns: 1fr;
+            }
+
+            .calculator-title h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>Manual DTF Pricing</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Title Section -->
+        <div class="calculator-title">
+            <h1>Manual DTF Pricing Calculator</h1>
+            <p>Calculate DTF transfer pricing for non-catalog items</p>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            This calculator is for items not in our Sanmar catalog. Enter the blank garment cost to calculate DTF transfer pricing.
+        </div>
+
+        <div class="calculator-grid">
+            <!-- Input Section -->
+            <div class="card">
+                <h2 class="card-title">Item Details</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Blank Garment Cost</label>
+                    <input type="number" class="form-control" id="garmentCost" 
+                           placeholder="Enter cost (e.g., 10.00)" step="0.01" min="0">
+                    <small class="text-muted">Enter the cost of the blank item from your supplier</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="quantity" 
+                           value="12" min="10" step="1">
+                    <small class="text-muted">Minimum order: 10 pieces</small>
+                </div>
+
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Transfer Locations</h3>
+                
+                <div id="transfersContainer">
+                    <!-- Transfer locations will be added here -->
+                </div>
+
+                <button class="btn btn-secondary" onclick="addTransfer()">
+                    <i class="fas fa-plus"></i> Add Transfer Location
+                </button>
+
+                <!-- Size Guide -->
+                <div class="pricing-info" style="margin-top: 2rem;">
+                    <h4>DTF Transfer Sizes</h4>
+                    <div class="size-guide">
+                        <div class="size-card">
+                            <h5>Small</h5>
+                            <p>Up to 5" x 5"</p>
+                            <small>Logos, pocket prints</small>
+                        </div>
+                        <div class="size-card">
+                            <h5>Medium</h5>
+                            <p>Up to 9" x 12"</p>
+                            <small>Standard designs</small>
+                        </div>
+                        <div class="size-card">
+                            <h5>Large</h5>
+                            <p>Up to 12" x 16.5"</p>
+                            <small>Full coverage</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card">
+                <h2 class="card-title">Pricing Breakdown</h2>
+                
+                <div id="results" style="display: none;">
+                    <div class="results-section">
+                        <h4>Cost Components</h4>
+                        <div class="price-row">
+                            <span class="price-label">Blank Garment (with 40% margin):</span>
+                            <span class="price-value" id="garmentPrice">$0.00</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Transfer Cost:</span>
+                            <span class="price-value" id="transferPrice">$0.00</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Labor Cost:</span>
+                            <span class="price-value" id="laborPrice">$0.00</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Freight:</span>
+                            <span class="price-value" id="freightPrice">$0.00</span>
+                        </div>
+                        <div class="price-row" id="ltmRow" style="display: none;">
+                            <span class="price-label">LTM Fee (per shirt):</span>
+                            <span class="price-value" id="ltmPrice">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="results-section">
+                        <div class="price-row total-row">
+                            <span class="price-label" style="font-size: 1.25rem;">Price Per Shirt:</span>
+                            <span class="price-value total-value" id="totalPerShirt">$0.00</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label" style="font-size: 1.1rem;">Total Order:</span>
+                            <span class="price-value" style="font-size: 1.25rem;" id="totalOrder">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning" id="ltmAlert" style="display: none; margin-top: 1rem;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Minimum Order Fee Applied</strong><br>
+                        Orders under 24 pieces include a $50.00 setup fee
+                    </div>
+                </div>
+
+                <div id="noResults" style="text-align: center; padding: 3rem;">
+                    <i class="fas fa-calculator fa-3x" style="color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                    <p style="color: var(--text-secondary);">Enter garment cost and add transfers to see pricing</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // DTF Pricing Configuration (hardcoded from DTF config)
+        const dtfConfig = {
+            garmentMargin: 0.6, // 40% margin
+            laborCostPerLocation: 2.00,
+            ltmFeeThreshold: 24,
+            ltmFeeAmount: 50.00,
+            transferSizes: {
+                small: {
+                    name: 'Small (up to 5" x 5")',
+                    tiers: [
+                        { minQty: 10, maxQty: 23, price: 6.00 },
+                        { minQty: 24, maxQty: 47, price: 5.25 },
+                        { minQty: 48, maxQty: 71, price: 4.00 },
+                        { minQty: 72, maxQty: 999999, price: 3.25 }
+                    ]
+                },
+                medium: {
+                    name: 'Medium (up to 9" x 12")',
+                    tiers: [
+                        { minQty: 10, maxQty: 23, price: 8.00 },
+                        { minQty: 24, maxQty: 47, price: 6.75 },
+                        { minQty: 48, maxQty: 71, price: 5.50 },
+                        { minQty: 72, maxQty: 999999, price: 4.50 }
+                    ]
+                },
+                large: {
+                    name: 'Large (up to 12" x 16.5")',
+                    tiers: [
+                        { minQty: 10, maxQty: 23, price: 10.00 },
+                        { minQty: 24, maxQty: 47, price: 8.50 },
+                        { minQty: 48, maxQty: 71, price: 7.00 },
+                        { minQty: 72, maxQty: 999999, price: 5.75 }
+                    ]
+                }
+            },
+            locations: [
+                { value: 'front', label: 'Front' },
+                { value: 'back', label: 'Back' },
+                { value: 'left-chest', label: 'Left Chest' },
+                { value: 'right-chest', label: 'Right Chest' },
+                { value: 'left-sleeve', label: 'Left Sleeve' },
+                { value: 'right-sleeve', label: 'Right Sleeve' },
+                { value: 'nape', label: 'Nape' },
+                { value: 'bottom-hem', label: 'Bottom Hem' }
+            ],
+            freightTiers: [
+                { minQty: 10, maxQty: 49, price: 0.50 },
+                { minQty: 50, maxQty: 99, price: 0.35 },
+                { minQty: 100, maxQty: 199, price: 0.25 },
+                { minQty: 200, maxQty: 999999, price: 0.15 }
+            ]
+        };
+
+        let transfers = [];
+        let transferId = 0;
+
+        function addTransfer() {
+            if (transfers.length >= 6) {
+                alert('Maximum 6 transfer locations allowed');
+                return;
+            }
+
+            const id = transferId++;
+            transfers.push({ id, location: '', size: '' });
+            renderTransfers();
+        }
+
+        function removeTransfer(id) {
+            transfers = transfers.filter(t => t.id !== id);
+            renderTransfers();
+            calculatePricing();
+        }
+
+        function renderTransfers() {
+            const container = document.getElementById('transfersContainer');
+            container.innerHTML = '';
+
+            transfers.forEach((transfer, index) => {
+                const transferDiv = document.createElement('div');
+                transferDiv.className = 'transfer-group';
+                transferDiv.innerHTML = `
+                    <div class="transfer-group-header">
+                        <h5>Transfer ${index + 1}</h5>
+                        ${transfers.length > 1 ? `<button class="btn-remove" onclick="removeTransfer(${transfer.id})">Remove</button>` : ''}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <select class="form-control" onchange="updateTransfer(${transfer.id}, 'location', this.value)">
+                            <option value="">Select Location</option>
+                            ${dtfConfig.locations.map(loc => 
+                                `<option value="${loc.value}" ${transfer.location === loc.value ? 'selected' : ''}>${loc.label}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Size</label>
+                        <select class="form-control" onchange="updateTransfer(${transfer.id}, 'size', this.value)">
+                            <option value="">Select Size</option>
+                            ${Object.entries(dtfConfig.transferSizes).map(([key, size]) => 
+                                `<option value="${key}" ${transfer.size === key ? 'selected' : ''}>${size.name}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                `;
+                container.appendChild(transferDiv);
+            });
+        }
+
+        function updateTransfer(id, field, value) {
+            const transfer = transfers.find(t => t.id === id);
+            if (transfer) {
+                transfer[field] = value;
+                calculatePricing();
+            }
+        }
+
+        function getTransferPrice(size, quantity) {
+            const sizeConfig = dtfConfig.transferSizes[size];
+            if (!sizeConfig) return 0;
+
+            const tier = sizeConfig.tiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
+            return tier ? tier.price : 0;
+        }
+
+        function getFreightPrice(quantity) {
+            const tier = dtfConfig.freightTiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
+            return tier ? tier.price : 0;
+        }
+
+        function calculatePricing() {
+            const garmentCost = parseFloat(document.getElementById('garmentCost').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+
+            if (garmentCost === 0 || quantity === 0 || transfers.filter(t => t.location && t.size).length === 0) {
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('noResults').style.display = 'block';
+                return;
+            }
+
+            // Calculate garment price with margin
+            const garmentPrice = garmentCost / dtfConfig.garmentMargin;
+
+            // Calculate transfer costs
+            let totalTransferCost = 0;
+            const validTransfers = transfers.filter(t => t.location && t.size);
+            validTransfers.forEach(transfer => {
+                totalTransferCost += getTransferPrice(transfer.size, quantity);
+            });
+
+            // Calculate labor cost
+            const laborCost = validTransfers.length * dtfConfig.laborCostPerLocation;
+
+            // Calculate freight
+            const freightPerTransfer = getFreightPrice(quantity);
+            const totalFreight = freightPerTransfer * validTransfers.length;
+
+            // Calculate LTM fee
+            let ltmFeePerShirt = 0;
+            if (quantity < dtfConfig.ltmFeeThreshold) {
+                ltmFeePerShirt = dtfConfig.ltmFeeAmount / quantity;
+            }
+
+            // Total per shirt
+            const totalPerShirt = garmentPrice + totalTransferCost + laborCost + totalFreight + ltmFeePerShirt;
+            const totalOrder = totalPerShirt * quantity;
+
+            // Update display
+            document.getElementById('garmentPrice').textContent = `$${garmentPrice.toFixed(2)}`;
+            document.getElementById('transferPrice').textContent = `$${totalTransferCost.toFixed(2)}`;
+            document.getElementById('laborPrice').textContent = `$${laborCost.toFixed(2)}`;
+            document.getElementById('freightPrice').textContent = `$${totalFreight.toFixed(2)}`;
+            
+            if (ltmFeePerShirt > 0) {
+                document.getElementById('ltmRow').style.display = 'flex';
+                document.getElementById('ltmPrice').textContent = `$${ltmFeePerShirt.toFixed(2)}`;
+                document.getElementById('ltmAlert').style.display = 'block';
+            } else {
+                document.getElementById('ltmRow').style.display = 'none';
+                document.getElementById('ltmAlert').style.display = 'none';
+            }
+
+            document.getElementById('totalPerShirt').textContent = `$${totalPerShirt.toFixed(2)}`;
+            document.getElementById('totalOrder').textContent = `$${totalOrder.toFixed(2)}`;
+
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('noResults').style.display = 'none';
+        }
+
+        // Initialize with one transfer
+        addTransfer();
+
+        // Event listeners
+        document.getElementById('garmentCost').addEventListener('input', calculatePricing);
+        document.getElementById('quantity').addEventListener('input', calculatePricing);
+    </script>
+</body>
+</html>

@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Cap Embroidery Pricing Calculator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4A5568;
+            --primary-dark: #2D3748;
+            --primary-light: #718096;
+            --success-color: #48BB78;
+            --warning-color: #F56565;
+            --info-color: #4299E1;
+            --bg-color: #F7FAFC;
+            --card-bg: #FFFFFF;
+            --text-primary: #2D3748;
+            --text-secondary: #6b7280;
+            --border-color: #E2E8F0;
+            --hover-bg: #EDF2F7;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 0.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--card-bg);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .company-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Calculator Header */
+        .calculator-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .breadcrumb {
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 0.7;
+        }
+
+        .breadcrumb span {
+            margin: 0 0.5rem;
+            opacity: 0.7;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Form Layout */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .pricing-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--primary-color);
+        }
+
+        /* Form Elements */
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-grid.two-column {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .required {
+            color: var(--warning-color);
+        }
+
+        .form-control {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.1);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        .field-help {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Results Display */
+        .results-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .pricing-display {
+            display: none;
+        }
+
+        .pricing-display.active {
+            display: block;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-item {
+            padding: 1rem;
+            background: var(--bg-color);
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Pricing Breakdown */
+        .breakdown-table {
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breakdown-row:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breakdown-value {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .breakdown-row.subtotal {
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .breakdown-row.total {
+            background: var(--bg-color);
+            margin: 1rem -1rem -1rem;
+            padding: 1rem;
+            border-radius: 0 0 0.375rem 0.375rem;
+            border: none;
+        }
+
+        .breakdown-row.total .breakdown-label,
+        .breakdown-row.total .breakdown-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            color: #92400E;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .warning-box i {
+            font-size: 1.25rem;
+            color: #F59E0B;
+        }
+
+        /* Info Alert */
+        .info-alert {
+            background: #E0E7FF;
+            border: 1px solid #6366F1;
+            color: #4338CA;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .info-alert i {
+            font-size: 1.25rem;
+            color: #6366F1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid.two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+
+            .pricing-section,
+            .results-section {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .header {
+                position: static;
+            }
+
+            .calculator-header {
+                background: none;
+                color: black;
+                border: 1px solid #000;
+            }
+
+            .pricing-display {
+                display: block !important;
+            }
+
+            body {
+                background: white;
+            }
+
+            .pricing-section,
+            .results-section {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                 alt="Northwest Custom Apparel" class="logo">
+            <span class="company-name">Northwest Custom Apparel</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <main class="main-container">
+            <div class="calculator-header">
+                <div class="header-content">
+                    <div class="breadcrumb">
+                        <a href="/staff-dashboard.html">Staff Dashboard</a>
+                        <span>/</span>
+                        <span>Manual Calculators</span>
+                        <span>/</span>
+                        <span>Cap Embroidery Pricing</span>
+                    </div>
+                    <h1>
+                        <i class="fas fa-hat-cowboy"></i>
+                        Manual Cap Embroidery Pricing Calculator
+                    </h1>
+                    <p>Calculate embroidery pricing for caps, hats, and visors not in our standard catalog.</p>
+                </div>
+            </div>
+
+            <div class="calculator-grid">
+                <section class="pricing-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-cogs"></i>
+                        Pricing Configuration
+                    </h2>
+                    
+                    <div class="info-alert">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Important:</strong> This calculator is for cap embroidery only. Maximum stitch count is 12,000.
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid two-column">
+                        <div class="form-group">
+                            <label for="blankCost">
+                                Blank Cap Cost
+                                <span class="required">*</span>
+                            </label>
+                            <input type="number" 
+                                   id="blankCost" 
+                                   class="form-control" 
+                                   placeholder="e.g., 5.50"
+                                   step="0.01"
+                                   min="0"
+                                   required>
+                            <small class="field-help">Your cost for the blank cap</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantity">
+                                Quantity
+                                <span class="required">*</span>
+                            </label>
+                            <input type="number" 
+                                   id="quantity" 
+                                   class="form-control" 
+                                   placeholder="e.g., 24"
+                                   min="1"
+                                   required>
+                            <small class="field-help">Total number of caps</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="stitchCount">
+                                Stitch Count
+                                <span class="required">*</span>
+                            </label>
+                            <input type="number" 
+                                   id="stitchCount" 
+                                   class="form-control" 
+                                   placeholder="e.g., 5000 (max 12,000)"
+                                   min="1"
+                                   max="12000"
+                                   required>
+                            <small class="field-help">Estimated number of stitches</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="threadColors">
+                                Thread Colors
+                            </label>
+                            <input type="number" 
+                                   id="threadColors" 
+                                   class="form-control" 
+                                   value="1"
+                                   min="1"
+                                   max="15">
+                            <small class="field-help">First 4 colors included</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="setupCharge">
+                                Include Setup Fee?
+                            </label>
+                            <select id="setupCharge" class="form-control">
+                                <option value="yes">Yes - $40.00</option>
+                                <option value="no">No</option>
+                            </select>
+                            <small class="field-help">One-time setup charge</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="results-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-calculator"></i>
+                        Pricing Results
+                    </h2>
+
+                    <div id="pricingDisplay" class="pricing-display">
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <div class="summary-label">Product Type</div>
+                                <div class="summary-value">Cap Embroidery</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-label">Quantity</div>
+                                <div class="summary-value" id="displayQuantity">-</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-label">Stitch Count</div>
+                                <div class="summary-value" id="displayStitchLevel">-</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-label">Unit Price</div>
+                                <div class="summary-value" id="displayUnitPrice">-</div>
+                            </div>
+                        </div>
+
+                        <div class="breakdown-table">
+                            <div class="breakdown-row">
+                                <span class="breakdown-label">Blank Cap Cost</span>
+                                <span class="breakdown-value" id="displayBlankCost">-</span>
+                            </div>
+                            <div class="breakdown-row">
+                                <span class="breakdown-label">Cap with Margin (40%)</span>
+                                <span class="breakdown-value" id="displayCapPrice">-</span>
+                            </div>
+                            <div class="breakdown-row">
+                                <span class="breakdown-label">Cap Embroidery (<span id="displayEmbroideryRate">-</span>)</span>
+                                <span class="breakdown-value" id="displayEmbroideryTotal">-</span>
+                            </div>
+                            <div class="breakdown-row" id="threadChargeRow" style="display: none;">
+                                <span class="breakdown-label">Extra Thread Colors (<span id="displayExtraColors">0</span> × $1.00)</span>
+                                <span class="breakdown-value" id="displayThreadCharge">-</span>
+                            </div>
+                            
+                            <div class="breakdown-row subtotal">
+                                <span class="breakdown-label">Subtotal per Cap</span>
+                                <span class="breakdown-value" id="displaySubtotal">-</span>
+                            </div>
+                            
+                            <div class="breakdown-row" id="ltmRow" style="display: none;">
+                                <span class="breakdown-label">Less Than Minimum Fee ($50 ÷ <span id="displayLTMQty">-</span> pcs)</span>
+                                <span class="breakdown-value" id="displayLTMPerUnit">-</span>
+                            </div>
+                            
+                            <div class="breakdown-row">
+                                <span class="breakdown-label"><strong>Price per Cap</strong></span>
+                                <span class="breakdown-value"><strong id="displayFinalUnitPrice">-</strong></span>
+                            </div>
+                            
+                            <div class="breakdown-row">
+                                <span class="breakdown-label">Extended Price (<span id="displayQty2">-</span> × <span id="displayUnitPrice2">-</span>)</span>
+                                <span class="breakdown-value" id="displayExtendedPrice">-</span>
+                            </div>
+                            
+                            <div class="breakdown-row" id="setupFeeRow">
+                                <span class="breakdown-label">Setup Fee</span>
+                                <span class="breakdown-value" id="displaySetupFee">$40.00</span>
+                            </div>
+                            
+                            <div class="breakdown-row total">
+                                <span class="breakdown-label">Total Order Price</span>
+                                <span class="breakdown-value" id="displayGrandTotal">-</span>
+                            </div>
+                        </div>
+
+                        <div class="warning-box" id="ltmWarning" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Less Than Minimum:</strong> Orders under 24 caps incur a $50.00 fee distributed across all items.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="emptyState" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                        <i class="fas fa-arrow-left" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+                        <p>Enter your pricing details to see the calculation</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Cap embroidery pricing configuration based on API data
+        const capEmbroideryConfig = {
+            garmentMargin: 0.6, // 40% margin
+            setupFee: 40.00,
+            stitchCosts: {
+                5000: { // Up to 5,000 stitches
+                    tiers: [
+                        { minQty: 1, maxQty: 23, cost: 9.75 },
+                        { minQty: 24, maxQty: 47, cost: 8.75 },
+                        { minQty: 48, maxQty: 71, cost: 7.75 },
+                        { minQty: 72, maxQty: 999, cost: 6.75 }
+                    ]
+                },
+                8000: { // 5,001 to 8,000 stitches
+                    tiers: [
+                        { minQty: 1, maxQty: 23, cost: 12.00 },
+                        { minQty: 24, maxQty: 47, cost: 11.00 },
+                        { minQty: 48, maxQty: 71, cost: 10.00 },
+                        { minQty: 72, maxQty: 999, cost: 9.00 }
+                    ]
+                },
+                10000: { // 8,001 to 10,000 stitches
+                    tiers: [
+                        { minQty: 1, maxQty: 23, cost: 14.00 },
+                        { minQty: 24, maxQty: 47, cost: 13.00 },
+                        { minQty: 48, maxQty: 71, cost: 12.00 },
+                        { minQty: 72, maxQty: 999, cost: 11.00 }
+                    ]
+                },
+                12000: { // 10,001 to 12,000 stitches
+                    tiers: [
+                        { minQty: 1, maxQty: 23, cost: 16.00 },
+                        { minQty: 24, maxQty: 47, cost: 15.00 },
+                        { minQty: 48, maxQty: 71, cost: 14.00 },
+                        { minQty: 72, maxQty: 999, cost: 13.00 }
+                    ]
+                }
+            },
+            threadColorCharge: 1.00,
+            ltmFeeThreshold: 24,
+            ltmFeeAmount: 50.00
+        };
+
+        function getStitchCountLevel(stitches) {
+            const levels = Object.keys(capEmbroideryConfig.stitchCosts).map(Number).sort((a, b) => a - b);
+            
+            for (const level of levels) {
+                if (stitches <= level) {
+                    return level;
+                }
+            }
+            
+            // If stitches exceed maximum level, return the highest level
+            return levels[levels.length - 1];
+        }
+
+        function calculateCapEmbroideryPricing() {
+            const blankCost = parseFloat(document.getElementById('blankCost').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            const stitchCount = parseInt(document.getElementById('stitchCount').value) || 0;
+            const threadColors = parseInt(document.getElementById('threadColors').value) || 1;
+            const includeSetup = document.getElementById('setupCharge').value === 'yes';
+            
+            if (!blankCost || !quantity || !stitchCount) {
+                resetDisplay();
+                return;
+            }
+            
+            // Validate stitch count
+            if (stitchCount > 12000) {
+                alert('Maximum stitch count for cap embroidery is 12,000 stitches.');
+                document.getElementById('stitchCount').value = 12000;
+                return;
+            }
+            
+            // Calculate cap cost with margin
+            const capPrice = blankCost / capEmbroideryConfig.garmentMargin;
+            
+            // Get stitch level and find appropriate tier
+            const stitchLevel = getStitchCountLevel(stitchCount);
+            const tiers = capEmbroideryConfig.stitchCosts[stitchLevel].tiers;
+            const tier = tiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
+            
+            // Calculate embroidery cost
+            const embroideryPerCap = tier.cost;
+            const totalEmbroidery = embroideryPerCap;
+            
+            // Thread color charges (only for colors beyond 4)
+            const extraColors = Math.max(0, threadColors - 4);
+            const threadCharge = extraColors * capEmbroideryConfig.threadColorCharge;
+            
+            // Calculate subtotal
+            const subtotal = capPrice + totalEmbroidery + threadCharge;
+            
+            // Apply LTM fee if needed
+            let ltmFee = 0;
+            let ltmPerUnit = 0;
+            if (quantity < capEmbroideryConfig.ltmFeeThreshold) {
+                ltmFee = capEmbroideryConfig.ltmFeeAmount;
+                ltmPerUnit = ltmFee / quantity;
+            }
+            
+            const unitPrice = subtotal + ltmPerUnit;
+            const totalPrice = (subtotal * quantity) + ltmFee;
+            const setupFee = includeSetup ? capEmbroideryConfig.setupFee : 0;
+            const grandTotal = totalPrice + setupFee;
+            
+            // Update display
+            updateDisplay({
+                blankCost,
+                quantity,
+                stitchCount,
+                stitchLevel,
+                threadColors,
+                extraColors,
+                capPrice,
+                embroideryPerCap,
+                totalEmbroidery,
+                threadCharge,
+                subtotal,
+                ltmFee,
+                ltmPerUnit,
+                unitPrice,
+                totalPrice,
+                setupFee,
+                grandTotal
+            });
+        }
+
+        function updateDisplay(data) {
+            // Show pricing display, hide empty state
+            document.getElementById('pricingDisplay').classList.add('active');
+            document.getElementById('emptyState').style.display = 'none';
+            
+            // Update summary grid
+            document.getElementById('displayQuantity').textContent = data.quantity.toLocaleString();
+            document.getElementById('displayStitchLevel').textContent = `${data.stitchCount.toLocaleString()} stitches`;
+            document.getElementById('displayUnitPrice').textContent = `$${data.unitPrice.toFixed(2)}`;
+            
+            // Update breakdown
+            document.getElementById('displayBlankCost').textContent = `$${data.blankCost.toFixed(2)}`;
+            document.getElementById('displayCapPrice').textContent = `$${data.capPrice.toFixed(2)}`;
+            document.getElementById('displayEmbroideryRate').textContent = `$${data.embroideryPerCap.toFixed(2)}`;
+            document.getElementById('displayEmbroideryTotal').textContent = `$${data.totalEmbroidery.toFixed(2)}`;
+            
+            // Thread colors
+            if (data.extraColors > 0) {
+                document.getElementById('threadChargeRow').style.display = 'flex';
+                document.getElementById('displayExtraColors').textContent = data.extraColors;
+                document.getElementById('displayThreadCharge').textContent = `$${data.threadCharge.toFixed(2)}`;
+            } else {
+                document.getElementById('threadChargeRow').style.display = 'none';
+            }
+            
+            document.getElementById('displaySubtotal').textContent = `$${data.subtotal.toFixed(2)}`;
+            
+            // LTM fee
+            if (data.ltmFee > 0) {
+                document.getElementById('ltmRow').style.display = 'flex';
+                document.getElementById('ltmWarning').style.display = 'flex';
+                document.getElementById('displayLTMQty').textContent = data.quantity;
+                document.getElementById('displayLTMPerUnit').textContent = `$${data.ltmPerUnit.toFixed(2)}`;
+            } else {
+                document.getElementById('ltmRow').style.display = 'none';
+                document.getElementById('ltmWarning').style.display = 'none';
+            }
+            
+            document.getElementById('displayFinalUnitPrice').textContent = `$${data.unitPrice.toFixed(2)}`;
+            document.getElementById('displayQty2').textContent = data.quantity;
+            document.getElementById('displayUnitPrice2').textContent = `$${data.unitPrice.toFixed(2)}`;
+            document.getElementById('displayExtendedPrice').textContent = `$${data.totalPrice.toFixed(2)}`;
+            
+            // Setup fee
+            if (data.setupFee > 0) {
+                document.getElementById('setupFeeRow').style.display = 'flex';
+                document.getElementById('displaySetupFee').textContent = `$${data.setupFee.toFixed(2)}`;
+            } else {
+                document.getElementById('setupFeeRow').style.display = 'none';
+            }
+            
+            document.getElementById('displayGrandTotal').textContent = `$${data.grandTotal.toFixed(2)}`;
+        }
+
+        function resetDisplay() {
+            document.getElementById('pricingDisplay').classList.remove('active');
+            document.getElementById('emptyState').style.display = 'block';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners
+            document.getElementById('blankCost').addEventListener('input', calculateCapEmbroideryPricing);
+            document.getElementById('quantity').addEventListener('input', calculateCapEmbroideryPricing);
+            document.getElementById('stitchCount').addEventListener('input', calculateCapEmbroideryPricing);
+            document.getElementById('threadColors').addEventListener('input', calculateCapEmbroideryPricing);
+            document.getElementById('setupCharge').addEventListener('change', calculateCapEmbroideryPricing);
+        });
+    </script>
+</body>
+</html>
