@@ -15,6 +15,10 @@
     <!-- Quote Service -->
     <script src="embroidery-manual-service.js"></script>
     
+    <!-- Embroidery Customization Component -->
+    <script src="/shared_components/js/embroidery-customization-options.js"></script>
+    <link rel="stylesheet" href="/shared_components/css/embroidery-customization-cool.css">
+    
     <style>
         /* Root variables - Green Theme for Manual Calculators */
         :root {
@@ -477,6 +481,176 @@
             border-bottom: 1px solid var(--border-color);
         }
 
+        /* Glassmorphism pricing table */
+        .pricing-table-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .table-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .pricing-breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pricing-breakdown-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+        }
+
+        .pricing-breakdown-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pricing-item-label {
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+        }
+
+        .pricing-item-value {
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+        }
+
+        .pricing-subtotal-row td {
+            padding-top: 1rem;
+            border-top: 2px solid rgba(58, 124, 82, 0.3);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+        }
+
+        .pricing-ltm-row td {
+            background: rgba(254, 243, 199, 0.5);
+            color: var(--warning-text);
+        }
+
+        .pricing-total-row td {
+            padding: 1rem;
+            border-top: 3px solid var(--primary-color);
+            font-size: 1.125rem;
+            font-weight: 700;
+            background: rgba(58, 124, 82, 0.05);
+        }
+
+        .pricing-total-label {
+            color: var(--primary-color);
+        }
+
+        .pricing-total-value {
+            color: var(--primary-color);
+            text-align: right;
+        }
+        
+        /* Glassmorphism Table Styles */
+        .glassmorphism-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .glassmorphism-table thead th {
+            padding: 12px 16px;
+            background: rgba(58, 124, 82, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+            text-align: left;
+            border-bottom: 2px solid rgba(58, 124, 82, 0.2);
+        }
+        
+        .glassmorphism-table thead th:last-child {
+            text-align: right;
+        }
+        
+        .glassmorphism-table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+        }
+        
+        .glassmorphism-table tbody td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+        
+        .glassmorphism-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .glassmorphism-table tfoot td {
+            padding: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .glassmorphism-table .subtotal-row {
+            border-top: 2px solid rgba(58, 124, 82, 0.1);
+        }
+        
+        .glassmorphism-table .total-row {
+            background: rgba(58, 124, 82, 0.05);
+            font-size: 1.1rem;
+        }
+        
+        .glassmorphism-table .ltm-row {
+            background: rgba(252, 165, 165, 0.1);
+        }
+        
+        /* Order Summary Glassmorphism Card */
+        .order-summary.glassmorphism-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .summary-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .order-summary .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(58, 124, 82, 0.1);
+        }
+        
+        .order-summary .summary-row:last-child {
+            border-bottom: none;
+        }
+        
+        .order-summary .summary-row.total {
+            border-top: 2px solid rgba(58, 124, 82, 0.2);
+            padding-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
         .price-label {
             color: var(--text-secondary);
         }
@@ -756,10 +930,10 @@
                             <input type="number" 
                                    id="blank-cost" 
                                    class="form-control" 
-                                   placeholder="Enter cost"
+                                   placeholder="Start here - Enter blank cost"
                                    min="0" 
                                    step="0.01"
-                                   value="3">
+                                   value="0">
                         </div>
                         <span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
                             Enter the cost of your blank garment
@@ -797,139 +971,9 @@
                     </select>
                 </div>
 
-                <!-- Front Logo Section -->
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <div>
-                            <i class="fas fa-star"></i>
-                            <strong>Front Logo Embroidery</strong>
-                        </div>
-                        <span class="price-display neutral" id="front-price-display">Base Price</span>
-                    </div>
-                    <div class="slider-header" style="margin-top: 10px;">
-                        <span>Stitch Count: <span class="stitch-display" id="front-stitch-display">8,000 stitches</span></span>
-                    </div>
-                    <div class="slider-wrapper">
-                        <input type="range" 
-                               class="slider" 
-                               id="front-stitch-slider" 
-                               min="5000" 
-                               max="20000" 
-                               value="8000" 
-                               step="100">
-                        <div class="slider-tooltip" id="front-tooltip"></div>
-                    </div>
-                    <div class="slider-range-info">
-                        <span>5,000</span>
-                        <span style="font-weight: 600;">Base: 8,000 stitches</span>
-                        <span>20,000</span>
-                    </div>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">
-                        Base price includes 8,000 stitches. $1.25 per 1,000 stitches above/below base.
-                    </p>
-                </div>
-
-                <!-- Additional Logos Section -->
-                <div class="additional-section">
-                    <h3 class="section-subtitle">
-                        <i class="fas fa-plus-circle"></i>
-                        Additional Logo Locations
-                    </h3>
-
-                    <div class="logo-checkbox-group">
-                        <!-- Back Logo -->
-                        <div>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="back-logo-enabled">
-                                <label for="back-logo-enabled">Add Back Logo Embroidery</label>
-                            </div>
-                            <div class="logo-stitch-control" id="back-logo-control">
-                                <div class="slider-container" style="margin-top: 0;">
-                                    <div class="slider-header">
-                                        <span>Stitch Count: <span class="stitch-display" id="back-stitch-display">5,000 stitches</span></span>
-                                        <span class="price-display neutral" id="back-price-display">$5.00</span>
-                                    </div>
-                                    <div class="slider-wrapper">
-                                        <input type="range" 
-                                               class="slider" 
-                                               id="back-stitch-slider" 
-                                               min="5000" 
-                                               max="20000" 
-                                               value="5000" 
-                                               step="100">
-                                        <div class="slider-tooltip" id="back-tooltip"></div>
-                                    </div>
-                                    <div class="slider-range-info">
-                                        <span>5,000</span>
-                                        <span style="font-weight: 600;">Base: 5,000 stitches</span>
-                                        <span>20,000</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Left Side Logo -->
-                        <div>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="left-logo-enabled">
-                                <label for="left-logo-enabled">Add Left Side Logo Embroidery</label>
-                            </div>
-                            <div class="logo-stitch-control" id="left-logo-control">
-                                <div class="slider-container" style="margin-top: 0;">
-                                    <div class="slider-header">
-                                        <span>Stitch Count: <span class="stitch-display" id="left-stitch-display">5,000 stitches</span></span>
-                                        <span class="price-display neutral" id="left-price-display">$5.00</span>
-                                    </div>
-                                    <div class="slider-wrapper">
-                                        <input type="range" 
-                                               class="slider" 
-                                               id="left-stitch-slider" 
-                                               min="5000" 
-                                               max="20000" 
-                                               value="5000" 
-                                               step="100">
-                                        <div class="slider-tooltip" id="left-tooltip"></div>
-                                    </div>
-                                    <div class="slider-range-info">
-                                        <span>5,000</span>
-                                        <span style="font-weight: 600;">Base: 5,000 stitches</span>
-                                        <span>20,000</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Side Logo -->
-                        <div>
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="right-logo-enabled">
-                                <label for="right-logo-enabled">Add Right Side Logo Embroidery</label>
-                            </div>
-                            <div class="logo-stitch-control" id="right-logo-control">
-                                <div class="slider-container" style="margin-top: 0;">
-                                    <div class="slider-header">
-                                        <span>Stitch Count: <span class="stitch-display" id="right-stitch-display">5,000 stitches</span></span>
-                                        <span class="price-display neutral" id="right-price-display">$5.00</span>
-                                    </div>
-                                    <div class="slider-wrapper">
-                                        <input type="range" 
-                                               class="slider" 
-                                               id="right-stitch-slider" 
-                                               min="5000" 
-                                               max="20000" 
-                                               value="5000" 
-                                               step="100">
-                                        <div class="slider-tooltip" id="right-tooltip"></div>
-                                    </div>
-                                    <div class="slider-range-info">
-                                        <span>5,000</span>
-                                        <span style="font-weight: 600;">Base: 5,000 stitches</span>
-                                        <span>20,000</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Embroidery Customization Options Container -->
+                <div id="customization-options-container" style="margin-top: 2rem;">
+                    <!-- Professional sliders will be initialized here -->
                 </div>
 
                 <!-- Email Button -->
@@ -949,57 +993,80 @@
                     <div class="quote-label">PRICE PER GARMENT</div>
                 </div>
 
-                <h3 class="section-subtitle">Price Breakdown</h3>
-                
-                <div class="price-breakdown">
-                    <div class="price-row">
-                        <span class="price-label">Garment with Margin (40%):</span>
-                        <span class="price-value" id="blankCostDisplay">$0.00</span>
-                    </div>
-                    <div class="price-row">
-                        <span class="price-label">Front Logo Embroidery (8,000 stitches):</span>
-                        <span class="price-value" id="frontLogoDisplay">$0.00</span>
-                    </div>
-                    <div class="price-row" id="backLogoLine" style="display: none;">
-                        <span class="price-label">Back Logo Embroidery:</span>
-                        <span class="price-value" id="backLogoDisplay">$0.00</span>
-                    </div>
-                    <div class="price-row" id="leftLogoLine" style="display: none;">
-                        <span class="price-label">Left Side Logo Embroidery:</span>
-                        <span class="price-value" id="leftLogoDisplay">$0.00</span>
-                    </div>
-                    <div class="price-row" id="rightLogoLine" style="display: none;">
-                        <span class="price-label">Right Side Logo Embroidery:</span>
-                        <span class="price-value" id="rightLogoDisplay">$0.00</span>
-                    </div>
-                    <div class="price-row">
-                        <span class="price-label">Subtotal per Garment:</span>
-                        <span class="price-value" id="subtotalDisplay">$0.00</span>
-                    </div>
+                <!-- Glassmorphism Pricing Table -->
+                <div class="pricing-table-container">
+                    <h4 class="table-title">
+                        <i class="fas fa-receipt"></i>
+                        Pricing Breakdown
+                    </h4>
+                    
+                    <table class="glassmorphism-table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <i class="fas fa-tshirt"></i>
+                                    Garment Price
+                                </td>
+                                <td id="blankCostDisplay">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fas fa-palette"></i>
+                                    Front Logo (<span id="frontStitchCount">8,000</span> stitches)
+                                </td>
+                                <td id="frontLogoDisplay">$0.00</td>
+                            </tr>
+                        </tbody>
+                        <!-- Additional logos will be inserted here dynamically -->
+                        <tbody id="additionalLogoPriceRows"></tbody>
+                        <tbody>
+                            <tr class="ltm-row" id="ltmRow" style="display: none;">
+                                <td>
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    Less Than Minimum Fee
+                                </td>
+                                <td id="ltmFeeDisplay">$0.00</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="subtotal-row">
+                                <td>Subtotal per Garment</td>
+                                <td id="subtotalDisplay">$0.00</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td>
+                                    <strong>Total per Garment</strong>
+                                </td>
+                                <td>
+                                    <strong id="finalPriceDisplay">$0.00</strong>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
 
-                <div class="total-row">
-                    <div class="price-row">
-                        <span class="price-label">Final Price per Garment:</span>
-                        <span class="price-value" id="finalPriceDisplay">$0.00</span>
+                <div class="order-summary glassmorphism-card">
+                    <h4 class="summary-title">
+                        <i class="fas fa-shopping-cart"></i>
+                        Order Summary
+                    </h4>
+                    <div class="summary-row">
+                        <span>Quantity:</span>
+                        <span id="quantityDisplay">24</span>
                     </div>
-                </div>
-
-                <div style="margin-top: 1.5rem;">
-                    <div class="price-row" style="font-size: 0.875rem;">
-                        <span class="price-label">Quantity:</span>
-                        <span class="price-value" id="quantityDisplay">24</span>
+                    <div class="summary-row">
+                        <span>Per Garment:</span>
+                        <span id="perGarmentDisplay">$0.00</span>
                     </div>
-                    <div class="price-row" style="font-size: 0.875rem;">
-                        <span class="price-label">Per Garment:</span>
-                        <span class="price-value" id="perGarmentDisplay">$0.00</span>
-                    </div>
-                </div>
-
-                <div class="total-row">
-                    <div class="price-row">
-                        <span class="price-label" style="font-size: 1.125rem;">Total Order:</span>
-                        <span class="price-value" style="font-size: 1.5rem; color: var(--primary-color);" id="totalOrderDisplay">$0.00</span>
+                    <div class="summary-row total">
+                        <span>Total Order:</span>
+                        <span id="totalOrderDisplay">$0.00</span>
                     </div>
                 </div>
 
@@ -1176,26 +1243,6 @@
         const LTM_FEE = 50.00;
         const MIN_QUANTITY = 24;
 
-        // State variables
-        let manualBlankCost = 0;
-        let currentFrontStitches = 8000;
-        let currentBackStitches = 5000;
-        let currentLeftStitches = 5000;
-        let currentRightStitches = 5000;
-        let backLogoEnabled = false;
-        let leftLogoEnabled = false;
-        let rightLogoEnabled = false;
-        let currentQuantity = 24;
-
-        // Live API data (loaded on initialization) - expose some globally for testing
-        let pricingApiData = null;
-        window.tierData = [];
-        window.embroideryBaseCosts = {};
-        let tierData = window.tierData;
-        let embroideryBaseCosts = window.embroideryBaseCosts;
-        let roundingMethod = 'CeilDollar';
-        let printLocations = [];
-
         // Manual size structure for garments (display only)
         const manualSizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
 
@@ -1209,6 +1256,34 @@
                 
                 // Store timeouts for cleanup
                 this.activeTimeouts = [];
+                
+                // Initialize all state variables as instance properties
+                this.manualBlankCost = 0;
+                this.currentFrontStitches = 8000;
+                this.currentQuantity = 24;
+                
+                // New dynamic logo management system
+                this.additionalLogos = []; // Array to track all additional logos
+                this.logoIdMap = new Map(); // Map logo IDs to array indices
+                
+                // Legacy properties for backward compatibility (will be removed later)
+                this.currentBackStitches = 5000;
+                this.currentLeftStitches = 5000;
+                this.currentRightStitches = 5000;
+                this.backLogoEnabled = false;
+                this.leftLogoEnabled = false;
+                this.rightLogoEnabled = false;
+                
+                // API data properties
+                this.pricingApiData = null;
+                this.tierData = [];
+                this.embroideryBaseCosts = {};
+                this.roundingMethod = 'CeilDollar';
+                this.printLocations = [];
+                
+                // Also expose globally for testing (temporary)
+                window.tierData = this.tierData;
+                window.embroideryBaseCosts = this.embroideryBaseCosts;
                 
                 this.initializeElements();
                 this.initializeHybridCalculator();
@@ -1232,29 +1307,10 @@
                 this.elements = {
                     blankCost: document.getElementById('blank-cost'),
                     quantityInput: document.getElementById('quantity-input'),
-                    frontStitchSlider: document.getElementById('front-stitch-slider'),
-                    frontStitchDisplay: document.getElementById('front-stitch-display'),
                     garmentType: document.getElementById('garment-type'),
                     
-                    // Additional logo checkboxes
-                    backLogoEnabled: document.getElementById('back-logo-enabled'),
-                    leftLogoEnabled: document.getElementById('left-logo-enabled'),
-                    rightLogoEnabled: document.getElementById('right-logo-enabled'),
-                    
-                    // Additional logo controls
-                    backLogoControl: document.getElementById('back-logo-control'),
-                    leftLogoControl: document.getElementById('left-logo-control'),
-                    rightLogoControl: document.getElementById('right-logo-control'),
-                    
-                    // Additional logo sliders
-                    backStitchSlider: document.getElementById('back-stitch-slider'),
-                    leftStitchSlider: document.getElementById('left-stitch-slider'),
-                    rightStitchSlider: document.getElementById('right-stitch-slider'),
-                    
-                    // Display elements
-                    backStitchDisplay: document.getElementById('back-stitch-display'),
-                    leftStitchDisplay: document.getElementById('left-stitch-display'),
-                    rightStitchDisplay: document.getElementById('right-stitch-display'),
+                    // Slider elements handled by professional component
+                    // Logo controls now managed by EmbroideryCustomizationOptions
                     
                     // Email elements
                     emailQuoteBtn: document.getElementById('email-quote-btn'),
@@ -1271,7 +1327,8 @@
                 };
 
                 this.attachEventListeners();
-                this.initializeInteractiveSliders();
+                // Sliders will be initialized by the professional component
+                // this.initializeInteractiveSliders();
             }
 
             initializeInteractiveSliders() {
@@ -1444,35 +1501,19 @@
             }
 
             attachEventListeners() {
-                // Input listeners
+                // Input listeners - now update instance properties
                 this.elements.blankCost.addEventListener('input', () => {
-                    manualBlankCost = parseFloat(this.elements.blankCost.value) || 0;
+                    this.manualBlankCost = parseFloat(this.elements.blankCost.value) || 0;
                     this.updatePricingDisplay();
                 });
 
                 this.elements.quantityInput.addEventListener('input', () => {
-                    currentQuantity = parseInt(this.elements.quantityInput.value) || 0;
+                    this.currentQuantity = parseInt(this.elements.quantityInput.value) || 0;
                     this.updatePricingDisplay();
                 });
 
-                // Logo checkbox listeners
-                this.elements.backLogoEnabled.addEventListener('change', (e) => {
-                    backLogoEnabled = e.target.checked;
-                    this.elements.backLogoControl.classList.toggle('active', backLogoEnabled);
-                    this.updatePricingDisplay();
-                });
-
-                this.elements.leftLogoEnabled.addEventListener('change', (e) => {
-                    leftLogoEnabled = e.target.checked;
-                    this.elements.leftLogoControl.classList.toggle('active', leftLogoEnabled);
-                    this.updatePricingDisplay();
-                });
-
-                this.elements.rightLogoEnabled.addEventListener('change', (e) => {
-                    rightLogoEnabled = e.target.checked;
-                    this.elements.rightLogoControl.classList.toggle('active', rightLogoEnabled);
-                    this.updatePricingDisplay();
-                });
+                // Logo checkboxes handled by professional component
+                // Event listeners removed as elements no longer exist
 
                 // Email form listeners
                 this.elements.emailQuoteBtn.addEventListener('click', () => this.showEmailForm());
@@ -1490,57 +1531,63 @@
                         throw new Error(`API Error: ${response.status}`);
                     }
                     
-                    pricingApiData = await response.json();
+                    this.pricingApiData = await response.json();
                     
                     // Debug logging to understand API response
-                    console.log('[ManualEmbroideryCalculator] API Response:', pricingApiData);
+                    console.log('[ManualEmbroideryCalculator] API Response:', this.pricingApiData);
                     
-                    // Extract live data - update global references
-                    tierData = window.tierData = pricingApiData.tiersR || [];
-                    roundingMethod = pricingApiData.rulesR?.RoundingMethod || 'CeilDollar';
-                    printLocations = pricingApiData.locations || [];
+                    // Extract live data - update instance properties
+                    this.tierData = this.pricingApiData.tiersR || [];
+                    this.roundingMethod = this.pricingApiData.rulesR?.RoundingMethod || 'CeilDollar';
+                    this.printLocations = this.pricingApiData.locations || [];
+                    
+                    // Also update global references for backward compatibility (temporary)
+                    window.tierData = this.tierData;
                     
                     // Build embroidery base costs lookup (8,000 stitches only)
-                    embroideryBaseCosts = window.embroideryBaseCosts = {};
-                    if (pricingApiData.allEmbroideryCostsR && Array.isArray(pricingApiData.allEmbroideryCostsR)) {
+                    this.embroideryBaseCosts = {};
+                    if (this.pricingApiData.allEmbroideryCostsR && Array.isArray(this.pricingApiData.allEmbroideryCostsR)) {
                         // Debug: Log all stitch counts to see what's available
                         console.log('[ManualEmbroideryCalculator] All embroidery costs from API:');
-                        pricingApiData.allEmbroideryCostsR.forEach((cost, index) => {
+                        this.pricingApiData.allEmbroideryCostsR.forEach((cost, index) => {
                             console.log(`  [${index}] StitchCount: ${cost.StitchCount} (type: ${typeof cost.StitchCount}), TierLabel: ${cost.TierLabel}, Cost: ${cost.EmbroideryCost}`);
                         });
                         
-                        pricingApiData.allEmbroideryCostsR
+                        this.pricingApiData.allEmbroideryCostsR
                             .filter(cost => {
                                 // Handle both string and number types
                                 return parseInt(cost.StitchCount) === 8000;
                             })
                             .forEach(cost => {
-                                embroideryBaseCosts[cost.TierLabel] = cost.EmbroideryCost;
+                                this.embroideryBaseCosts[cost.TierLabel] = cost.EmbroideryCost;
                             });
                     } else {
                         console.error('[ManualEmbroideryCalculator] No allEmbroideryCostsR data in API response!');
                     }
                     
+                    // Also update global reference for backward compatibility
+                    window.embroideryBaseCosts = this.embroideryBaseCosts;
+                    
                     // Debug logging for extracted data
-                    console.log('[ManualEmbroideryCalculator] Extracted tiers:', tierData);
-                    console.log('[ManualEmbroideryCalculator] Extracted base costs:', embroideryBaseCosts);
+                    console.log('[ManualEmbroideryCalculator] Extracted tiers:', this.tierData);
+                    console.log('[ManualEmbroideryCalculator] Extracted base costs:', this.embroideryBaseCosts);
                     
                     // Warn if no costs were extracted
-                    if (Object.keys(embroideryBaseCosts).length === 0) {
+                    if (Object.keys(this.embroideryBaseCosts).length === 0) {
                         console.error('[ManualEmbroideryCalculator] WARNING: No base costs were extracted from API response!');
                         console.error('[ManualEmbroideryCalculator] Check the API response structure and StitchCount values');
                     }
                         
                     if (CALCULATOR_CONFIG.debug) {
                         console.log('[ManualEmbroideryCalculator] Live pricing data loaded:', {
-                            tiers: Array.isArray(tierData) ? tierData.map(t => t.TierLabel) : [],
-                            baseCosts: embroideryBaseCosts,
-                            rounding: roundingMethod
+                            tiers: Array.isArray(this.tierData) ? this.tierData.map(t => t.TierLabel) : [],
+                            baseCosts: this.embroideryBaseCosts,
+                            rounding: this.roundingMethod
                         });
                     }
                     
-                    // Re-initialize sliders with live data
-                    this.initializeInteractiveSliders();
+                    // Sliders handled by professional component
+                    // this.initializeInteractiveSliders();
                     
                     return true;
                     
@@ -1562,20 +1609,30 @@
                 const success = await this.loadEmbroideryPricingData();
                 if (success) {
                     this.updatePricingDisplay();
-                    this.refreshSliderStates(); // Add this to update sliders after API load
+                    // Professional sliders will be refreshed by EmbroideryCustomizationOptions component
+                    // this.refreshSliderStates(); // Removed - handled by professional component
                     if (CALCULATOR_CONFIG.debug) {
                         console.log('[ManualEmbroideryCalculator] Hybrid calculator initialized with live API data');
                     }
                 }
             }
 
+            // Calculate garment cost with margin and rounding
+            calculateGarmentWithMargin(blankCost, marginDenom) {
+                // Apply margin first
+                const markedUpBlank = blankCost / marginDenom;
+                
+                // Then apply rounding for clean pricing
+                return this.applyRounding(markedUpBlank, this.roundingMethod);
+            }
+
             // Pricing calculation functions using live API data
-            calculateFrontLogoPrice(stitches, blankCost, tierLabel) {
+            calculateFrontLogoPrice(stitches, tierLabel) {
                 // Get live base embroidery cost for 8,000 stitches
-                const baseEmbCost = embroideryBaseCosts[tierLabel];
+                const baseEmbCost = this.embroideryBaseCosts[tierLabel];
                 if (!baseEmbCost) {
                     console.error(`No base cost found for tier: ${tierLabel}`);
-                    console.error('embroideryBaseCosts object:', embroideryBaseCosts);
+                    console.error('embroideryBaseCosts object:', this.embroideryBaseCosts);
                     return 0;
                 }
                 
@@ -1586,22 +1643,13 @@
                 const stitchDiff = roundedStitches - BASE_STITCHES;
                 const stitchAdjustment = (stitchDiff / 1000) * PRICE_PER_THOUSAND;
                 
-                // Final embroidery cost
+                // Final embroidery cost (no rounding)
                 const finalEmbCost = baseEmbCost + stitchAdjustment;
                 
-                // Get live margin denominator from tier data
-                const tierInfo = tierData.find(t => t.TierLabel === tierLabel);
-                const marginDenom = tierInfo ? tierInfo.MarginDenominator : 0.6;
-                
-                // Apply margin to blank cost only (matching XML logic)
-                const markedUpBlank = blankCost / marginDenom;
-                const totalCost = markedUpBlank + finalEmbCost;
-                
-                // Apply live rounding method
-                return this.applyRounding(totalCost, roundingMethod);
+                return finalEmbCost;
             }
 
-            calculateAdditionalLogoPrice(stitches, tierLabel) {
+            calculateAdditionalLogoPrice(stitches) {
                 // Additional logos: straight $1.25 per thousand (no base fee)
                 // Matches live page logic: stitches / 1000 * 1.25
                 const pricePerThousand = 1.25;
@@ -1609,13 +1657,10 @@
                 // Round stitches UP to next 1,000 (matches live page logic)
                 const roundedStitches = Math.ceil(stitches / 1000) * 1000;
                 
-                // Calculate cost: simply stitches / 1000 * $1.25
+                // Calculate cost: simply stitches / 1000 * $1.25 (no rounding)
                 const totalCost = (roundedStitches / 1000) * pricePerThousand;
                 
-                console.log(`[DEBUG] Additional Logo: ${stitches} → ${roundedStitches} rounded → $${totalCost.toFixed(2)}`);
-                
-                // Apply live rounding method
-                return this.applyRounding(totalCost, roundingMethod);
+                return totalCost;
             }
 
             applyRounding(value, method) {
@@ -1636,12 +1681,12 @@
             }
 
             getTierForQuantity(quantity) {
-                if (!Array.isArray(tierData) || tierData.length === 0) {
+                if (!Array.isArray(this.tierData) || this.tierData.length === 0) {
                     console.error('[ManualEmbroideryCalculator] No tier data available');
                     return null;
                 }
                 
-                const tier = tierData.find(t => 
+                const tier = this.tierData.find(t => 
                     quantity >= t.MinQuantity && quantity <= t.MaxQuantity
                 );
                 
@@ -1653,93 +1698,109 @@
             }
 
             updatePricingDisplay() {
-                if (manualBlankCost === 0 || currentQuantity === 0) {
+                if (this.manualBlankCost === 0 || this.currentQuantity === 0) {
                     this.resetDisplay();
                     return;
                 }
 
                 // Get tier for current quantity
-                const tier = this.getTierForQuantity(currentQuantity);
+                const tier = this.getTierForQuantity(this.currentQuantity);
                 if (!tier) {
                     this.resetDisplay();
                     return;
                 }
 
-                // Calculate front logo price (includes marked up blank)
-                const frontLogoTotal = this.calculateFrontLogoPrice(currentFrontStitches, manualBlankCost, tier.TierLabel);
-                
-                // Apply margin to blank cost
+                // Get margin denominator from tier
                 const marginDenom = tier.MarginDenominator || 0.6;
-                const markedUpBlank = manualBlankCost / marginDenom;
                 
-                // Get base embroidery cost from API
-                const baseEmbCost = embroideryBaseCosts[tier.TierLabel] || 0;
+                // Calculate garment cost with margin and rounding
+                const garmentCost = this.calculateGarmentWithMargin(this.manualBlankCost, marginDenom);
                 
-                // Use the proper rounding calculation (matches fixed logic)
-                const roundedFrontStitches = Math.ceil(currentFrontStitches / 1000) * 1000;
-                const frontStitchDiff = roundedFrontStitches - BASE_STITCHES;
-                const frontStitchAdjustment = (frontStitchDiff / 1000) * PRICE_PER_THOUSAND;
-                const frontEmbroideryOnly = baseEmbCost + frontStitchAdjustment;
+                // Calculate front logo embroidery cost (no rounding)
+                const frontEmbroideryOnly = this.calculateFrontLogoPrice(this.currentFrontStitches, tier.TierLabel);
                 
-                console.log(`[DEBUG] Front: ${currentFrontStitches} → ${roundedFrontStitches} rounded, diff: ${frontStitchDiff}, adj: $${frontStitchAdjustment.toFixed(2)}`);
+                // Debug logging removed
                 
-                // Calculate additional logos
+                // Calculate additional logos (no rounding)
                 let backLogoPrice = 0;
                 let leftLogoPrice = 0; 
                 let rightLogoPrice = 0;
                 
-                if (backLogoEnabled) {
-                    backLogoPrice = this.calculateAdditionalLogoPrice(currentBackStitches, tier.TierLabel);
+                if (this.backLogoEnabled) {
+                    backLogoPrice = this.calculateAdditionalLogoPrice(this.currentBackStitches);
                 }
                 
-                if (leftLogoEnabled) {
-                    leftLogoPrice = this.calculateAdditionalLogoPrice(currentLeftStitches, tier.TierLabel);
+                if (this.leftLogoEnabled) {
+                    leftLogoPrice = this.calculateAdditionalLogoPrice(this.currentLeftStitches);
                 }
                 
-                if (rightLogoEnabled) {
-                    rightLogoPrice = this.calculateAdditionalLogoPrice(currentRightStitches, tier.TierLabel);
+                if (this.rightLogoEnabled) {
+                    rightLogoPrice = this.calculateAdditionalLogoPrice(this.currentRightStitches);
                 }
                 
-                // Calculate subtotal (marked up blank + all embroidery)
-                const subtotal = markedUpBlank + frontEmbroideryOnly + backLogoPrice + leftLogoPrice + rightLogoPrice;
+                // Calculate subtotal (garment + all embroidery)
+                const subtotal = garmentCost + frontEmbroideryOnly + backLogoPrice + leftLogoPrice + rightLogoPrice;
                 
-                console.log(`[DEBUG] Pricing: Blank=$${markedUpBlank.toFixed(2)}, Front=$${frontEmbroideryOnly.toFixed(2)}, Back=$${backLogoPrice.toFixed(2)}, Left=$${leftLogoPrice.toFixed(2)}, Right=$${rightLogoPrice.toFixed(2)}, Subtotal=$${subtotal.toFixed(2)}`);
+                console.log(`[DEBUG] Pricing: Garment=$${garmentCost.toFixed(2)}, Front=$${frontEmbroideryOnly.toFixed(2)}, Back=$${backLogoPrice.toFixed(2)}, Left=$${leftLogoPrice.toFixed(2)}, Right=$${rightLogoPrice.toFixed(2)}, Subtotal=$${subtotal.toFixed(2)}`);
                 
                 // Apply LTM if needed
                 let ltmPerUnit = 0;
-                const showLTM = currentQuantity < MIN_QUANTITY && tier.LTM_Fee;
+                const showLTM = this.currentQuantity < MIN_QUANTITY && tier.LTM_Fee;
                 if (showLTM) {
-                    ltmPerUnit = tier.LTM_Fee / currentQuantity;
+                    ltmPerUnit = tier.LTM_Fee / this.currentQuantity;
                 }
                 
-                // Calculate final price
-                const finalPrice = this.applyRounding(subtotal + ltmPerUnit, roundingMethod);
-                const grandTotal = finalPrice * currentQuantity;
+                // Calculate final price (no additional rounding - just sum components)
+                const finalPrice = subtotal + ltmPerUnit;
+                const grandTotal = finalPrice * this.currentQuantity;
                 
                 // Update display
-                document.getElementById('blankCostDisplay').textContent = `$${markedUpBlank.toFixed(2)}`;
+                document.getElementById('blankCostDisplay').textContent = `$${garmentCost.toFixed(2)}`;
                 document.getElementById('frontLogoDisplay').textContent = `$${frontEmbroideryOnly.toFixed(2)}`;
+                document.getElementById('frontStitchCount').textContent = this.currentFrontStitches.toLocaleString();
                 
-                // Update additional logo displays
-                if (backLogoEnabled) {
-                    document.getElementById('backLogoLine').style.display = 'flex';
-                    document.getElementById('backLogoDisplay').textContent = `$${backLogoPrice.toFixed(2)}`;
-                } else {
-                    document.getElementById('backLogoLine').style.display = 'none';
+                // Update additional logo displays for glassmorphism table
+                const additionalLogoPriceRows = document.getElementById('additionalLogoPriceRows');
+                additionalLogoPriceRows.innerHTML = '';
+                
+                // Add rows for each additional logo
+                let logoIndex = 1;
+                if (this.backLogoEnabled) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <i class="fas fa-palette"></i>
+                            Additional Logo ${logoIndex} (${this.currentBackStitches.toLocaleString()} stitches)
+                        </td>
+                        <td>$${backLogoPrice.toFixed(2)}</td>
+                    `;
+                    additionalLogoPriceRows.appendChild(row);
+                    logoIndex++;
                 }
                 
-                if (leftLogoEnabled) {
-                    document.getElementById('leftLogoLine').style.display = 'flex';
-                    document.getElementById('leftLogoDisplay').textContent = `$${leftLogoPrice.toFixed(2)}`;
-                } else {
-                    document.getElementById('leftLogoLine').style.display = 'none';
+                if (this.leftLogoEnabled) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <i class="fas fa-palette"></i>
+                            Additional Logo ${logoIndex} (${this.currentLeftStitches.toLocaleString()} stitches)
+                        </td>
+                        <td>$${leftLogoPrice.toFixed(2)}</td>
+                    `;
+                    additionalLogoPriceRows.appendChild(row);
+                    logoIndex++;
                 }
                 
-                if (rightLogoEnabled) {
-                    document.getElementById('rightLogoLine').style.display = 'flex';
-                    document.getElementById('rightLogoDisplay').textContent = `$${rightLogoPrice.toFixed(2)}`;
-                } else {
-                    document.getElementById('rightLogoLine').style.display = 'none';
+                if (this.rightLogoEnabled) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <i class="fas fa-palette"></i>
+                            Additional Logo ${logoIndex} (${this.currentRightStitches.toLocaleString()} stitches)
+                        </td>
+                        <td>$${rightLogoPrice.toFixed(2)}</td>
+                    `;
+                    additionalLogoPriceRows.appendChild(row);
                 }
                 
                 document.getElementById('subtotalDisplay').textContent = `$${subtotal.toFixed(2)}`;
@@ -1747,11 +1808,18 @@
                 document.getElementById('grandTotalDisplay').textContent = `$${finalPrice.toFixed(2)}`;
                 
                 // Update quantity displays
-                document.getElementById('quantityDisplay').textContent = currentQuantity;
+                document.getElementById('quantityDisplay').textContent = this.currentQuantity;
                 document.getElementById('perGarmentDisplay').textContent = `$${finalPrice.toFixed(2)}`;
                 document.getElementById('totalOrderDisplay').textContent = `$${grandTotal.toFixed(2)}`;
                 
-                // Show/hide LTM warning
+                // Show/hide LTM row and warning
+                const ltmRow = document.getElementById('ltmRow');
+                if (showLTM) {
+                    ltmRow.style.display = 'table-row';
+                    document.getElementById('ltmFeeDisplay').textContent = `$${ltmPerUnit.toFixed(2)}`;
+                } else {
+                    ltmRow.style.display = 'none';
+                }
                 document.getElementById('ltmWarning').style.display = showLTM ? 'flex' : 'none';
                 
                 // Update pricing table
@@ -1759,20 +1827,21 @@
                 
                 // Store current quote data
                 this.currentQuote = {
-                    blankCost: manualBlankCost,
-                    markedUpBlank: markedUpBlank,
-                    manualBlankCost: manualBlankCost,
-                    quantity: currentQuantity,
-                    frontStitches: currentFrontStitches,
+                    blankCost: this.manualBlankCost,
+                    garmentCost: garmentCost,
+                    markedUpBlank: garmentCost, // For backward compatibility
+                    manualBlankCost: this.manualBlankCost,
+                    quantity: this.currentQuantity,
+                    frontStitches: this.currentFrontStitches,
                     frontEmbroideryPrice: frontEmbroideryOnly,
-                    backLogoEnabled: backLogoEnabled,
-                    backStitches: currentBackStitches,
+                    backLogoEnabled: this.backLogoEnabled,
+                    backStitches: this.currentBackStitches,
                     backLogoPrice: backLogoPrice,
-                    leftLogoEnabled: leftLogoEnabled,
-                    leftStitches: currentLeftStitches,
+                    leftLogoEnabled: this.leftLogoEnabled,
+                    leftStitches: this.currentLeftStitches,
                     leftLogoPrice: leftLogoPrice,
-                    rightLogoEnabled: rightLogoEnabled,
-                    rightStitches: currentRightStitches,
+                    rightLogoEnabled: this.rightLogoEnabled,
+                    rightStitches: this.currentRightStitches,
                     rightLogoPrice: rightLogoPrice,
                     subtotal: subtotal,
                     ltmPerUnit: ltmPerUnit,
@@ -1785,7 +1854,7 @@
                     tier: tier.TierLabel,
                     tierLabel: tier.TierLabel,
                     marginDenominator: tier.MarginDenominator || 0.6,
-                    apiBaseCost: embroideryBaseCosts[tier.TierLabel] || 0
+                    apiBaseCost: this.embroideryBaseCosts[tier.TierLabel] || 0
                 };
                 
                 if (CALCULATOR_CONFIG.debug) {
@@ -1796,9 +1865,7 @@
             resetDisplay() {
                 document.getElementById('blankCostDisplay').textContent = '$0.00';
                 document.getElementById('frontLogoDisplay').textContent = '$0.00';
-                document.getElementById('backLogoDisplay').textContent = '$0.00';
-                document.getElementById('leftLogoDisplay').textContent = '$0.00';
-                document.getElementById('rightLogoDisplay').textContent = '$0.00';
+                document.getElementById('frontStitchCount').textContent = '8,000';
                 document.getElementById('subtotalDisplay').textContent = '$0.00';
                 document.getElementById('finalPriceDisplay').textContent = '$0.00';
                 document.getElementById('grandTotalDisplay').textContent = '$0.00';
@@ -1806,12 +1873,11 @@
                 document.getElementById('perGarmentDisplay').textContent = '$0.00';
                 document.getElementById('totalOrderDisplay').textContent = '$0.00';
                 
-                // Hide additional logo lines
-                document.getElementById('backLogoLine').style.display = 'none';
-                document.getElementById('leftLogoLine').style.display = 'none';
-                document.getElementById('rightLogoLine').style.display = 'none';
+                // Clear additional logo rows
+                document.getElementById('additionalLogoPriceRows').innerHTML = '';
                 
-                // Hide LTM warning
+                // Hide LTM row and warning
+                document.getElementById('ltmRow').style.display = 'none';
                 document.getElementById('ltmWarning').style.display = 'none';
                 
                 // Hide pricing table
@@ -1821,7 +1887,7 @@
             }
 
             updatePricingTable() {
-                if (!manualBlankCost || !Array.isArray(tierData) || tierData.length === 0) {
+                if (!this.manualBlankCost || !Array.isArray(this.tierData) || this.tierData.length === 0) {
                     document.getElementById('pricingTableSection').style.display = 'none';
                     return;
                 }
@@ -1830,34 +1896,32 @@
                 tableBody.innerHTML = '';
                 
                 // Generate a row for each tier
-                tierData.forEach(tier => {
+                this.tierData.forEach(tier => {
                     const row = document.createElement('tr');
                     
-                    // Calculate price for this tier
-                    const tierPrice = this.calculateFrontLogoPrice(currentFrontStitches, manualBlankCost, tier.TierLabel);
+                    // Get margin denominator for this tier
+                    const marginDenom = tier.MarginDenominator || 0.6;
+                    
+                    // Calculate garment cost with margin and rounding
+                    const garmentCost = this.calculateGarmentWithMargin(this.manualBlankCost, marginDenom);
+                    
+                    // Calculate front embroidery cost
+                    const frontEmbroideryOnly = this.calculateFrontLogoPrice(this.currentFrontStitches, tier.TierLabel);
                     
                     // Add additional logo costs if enabled
                     let additionalCost = 0;
-                    if (backLogoEnabled) {
-                        additionalCost += this.calculateAdditionalLogoPrice(currentBackStitches, tier.TierLabel);
+                    if (this.backLogoEnabled) {
+                        additionalCost += this.calculateAdditionalLogoPrice(this.currentBackStitches);
                     }
-                    if (leftLogoEnabled) {
-                        additionalCost += this.calculateAdditionalLogoPrice(currentLeftStitches, tier.TierLabel);
+                    if (this.leftLogoEnabled) {
+                        additionalCost += this.calculateAdditionalLogoPrice(this.currentLeftStitches);
                     }
-                    if (rightLogoEnabled) {
-                        additionalCost += this.calculateAdditionalLogoPrice(currentRightStitches, tier.TierLabel);
+                    if (this.rightLogoEnabled) {
+                        additionalCost += this.calculateAdditionalLogoPrice(this.currentRightStitches);
                     }
                     
-                    // Subtract the embroidery cost from tierPrice to get just marked up blank
-                    const marginDenom = tier.MarginDenominator || 0.6;
-                    const markedUpBlank = manualBlankCost / marginDenom;
-                    const baseEmbCost = embroideryBaseCosts[tier.TierLabel] || 0;
-                    const frontStitchDiff = currentFrontStitches - BASE_STITCHES;
-                    const frontStitchAdjustment = (frontStitchDiff / 1000) * PRICE_PER_THOUSAND;
-                    const frontEmbroideryOnly = baseEmbCost + frontStitchAdjustment;
-                    
-                    const subtotal = markedUpBlank + frontEmbroideryOnly + additionalCost;
-                    const finalPrice = this.applyRounding(subtotal, roundingMethod);
+                    // Calculate final price (sum of all components, no additional rounding)
+                    const finalPrice = garmentCost + frontEmbroideryOnly + additionalCost;
                     
                     row.innerHTML = `
                         <td>${tier.TierLabel}</td>
@@ -2085,6 +2149,118 @@
                 
                 return html;
             }
+
+            // Calculator Interface Methods for EmbroideryCustomizationOptions
+            setPrimaryStitches(stitches) {
+                this.currentFrontStitches = stitches;
+                console.log('[Calculator Interface] Primary stitches updated:', stitches);
+                this.updatePricingDisplay();
+            }
+
+            addAdditionalLogo(stitches) {
+                // Generate unique ID for the logo
+                const logoId = Date.now() + Math.random();
+                
+                console.log('[Calculator Interface] addAdditionalLogo called with stitches:', stitches);
+                console.log('[Calculator Interface] Generated logo ID:', logoId);
+                
+                // Add to dynamic logo array
+                const logoData = {
+                    id: logoId,
+                    stitches: stitches,
+                    location: this.getNextAvailableLocation()
+                };
+                
+                this.additionalLogos.push(logoData);
+                this.logoIdMap.set(logoId, this.additionalLogos.length - 1);
+                
+                console.log('[Calculator Interface] Current logoIdMap:', this.logoIdMap);
+                console.log('[Calculator Interface] Current additionalLogos:', this.additionalLogos);
+                
+                // Update legacy properties for backward compatibility
+                this.syncLegacyProperties();
+                
+                console.log('[Calculator Interface] Added logo:', logoData);
+                this.updatePricingDisplay();
+                return logoId;
+            }
+            
+            getNextAvailableLocation() {
+                const usedLocations = this.additionalLogos.map(logo => logo.location);
+                const availableLocations = ['Back', 'Left Side', 'Right Side', 'Sleeve', 'Hat Side', 'Hat Back'];
+                
+                for (const location of availableLocations) {
+                    if (!usedLocations.includes(location)) {
+                        return location;
+                    }
+                }
+                
+                return `Additional Logo ${this.additionalLogos.length + 1}`;
+            }
+            
+            syncLegacyProperties() {
+                // Reset legacy properties
+                this.backLogoEnabled = false;
+                this.leftLogoEnabled = false;
+                this.rightLogoEnabled = false;
+                this.currentBackStitches = 5000;
+                this.currentLeftStitches = 5000;
+                this.currentRightStitches = 5000;
+                
+                // Map first 3 logos to legacy properties
+                this.additionalLogos.forEach((logo, index) => {
+                    if (index === 0) {
+                        this.backLogoEnabled = true;
+                        this.currentBackStitches = logo.stitches;
+                    } else if (index === 1) {
+                        this.leftLogoEnabled = true;
+                        this.currentLeftStitches = logo.stitches;
+                    } else if (index === 2) {
+                        this.rightLogoEnabled = true;
+                        this.currentRightStitches = logo.stitches;
+                    }
+                });
+            }
+
+            updateAdditionalLogo(logoId, stitches) {
+                console.log('[Calculator Interface] updateAdditionalLogo called:', logoId, stitches);
+                const index = this.logoIdMap.get(logoId);
+                if (index !== undefined && this.additionalLogos[index]) {
+                    this.additionalLogos[index].stitches = stitches;
+                    
+                    // Update legacy properties
+                    this.syncLegacyProperties();
+                    
+                    console.log('[Calculator Interface] Updated logo:', logoId, stitches);
+                    console.log('[Calculator Interface] About to call updatePricingDisplay');
+                    this.updatePricingDisplay();
+                    console.log('[Calculator Interface] updatePricingDisplay called');
+                } else {
+                    console.warn('[Calculator Interface] Logo not found:', logoId);
+                }
+            }
+
+            removeAdditionalLogo(logoId) {
+                const index = this.logoIdMap.get(logoId);
+                if (index !== undefined) {
+                    // Remove from array
+                    this.additionalLogos.splice(index, 1);
+                    
+                    // Update map indices
+                    this.logoIdMap.delete(logoId);
+                    this.additionalLogos.forEach((logo, newIndex) => {
+                        this.logoIdMap.set(logo.id, newIndex);
+                    });
+                    
+                    // Update legacy properties
+                    this.syncLegacyProperties();
+                    
+                    console.log('[Calculator Interface] Removed logo:', logoId);
+                    this.updatePricingDisplay();
+                } else {
+                    console.warn('[Calculator Interface] Logo not found for removal:', logoId);
+                }
+            }
         }
 
         // Modal Functions
@@ -2285,6 +2461,26 @@
         // Initialize calculator when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             window.embroideryManualCalculator = new EmbroideryManualCalculator();
+            
+            // Initialize the professional embroidery customization component
+            const customizationOptions = new EmbroideryCustomizationOptions(window.embroideryManualCalculator);
+            
+            // Customize configuration for manual calculator
+            customizationOptions.config.minPrimaryStitches = 5000;
+            customizationOptions.config.maxPrimaryStitches = 20000;
+            customizationOptions.config.includedStitches = 8000;
+            customizationOptions.config.minAdditionalStitches = 5000;
+            customizationOptions.config.maxAdditionalStitches = 20000;
+            customizationOptions.config.defaultAdditionalStitches = 5000;
+            customizationOptions.config.pricePerThousand = 1.25;
+            
+            // Set initial state
+            customizationOptions.state.primaryStitches = 8000;
+            
+            // Re-render with updated config
+            customizationOptions.render();
+            
+            console.log('[Manual Embroidery] Professional sliders initialized with custom config');
         });
         
         // Cleanup on page unload

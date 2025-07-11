@@ -54,7 +54,8 @@
       "Bash(npm run dev:*)",
       "Bash(awk:*)",
       "Bash(echo:*)",
-      "WebFetch(domain:caspio-pricing-proxy-ab30a049961a.herokuapp.com)"
+      "WebFetch(domain:caspio-pricing-proxy-ab30a049961a.herokuapp.com)",
+      "WebFetch(domain:localhost)"
     ],
     "deny": []
   }
