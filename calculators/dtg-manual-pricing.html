@@ -14,37 +14,176 @@
     
     <style>
         /* DTG-specific styles */
-        .coming-soon {
-            text-align: center;
-            padding: 3rem;
-            background: var(--primary-lighter);
-            border-radius: 12px;
-            margin: 2rem 0;
+        .location-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
         
-        .coming-soon-icon {
-            font-size: 4rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-        
-        .coming-soon h2 {
-            color: var(--primary-dark);
-            margin-bottom: 1rem;
-        }
-        
-        .coming-soon p {
-            color: var(--text-secondary);
-            font-size: 1.125rem;
-        }
-        
-        .placeholder-section {
-            background: var(--bg-color);
-            border: 2px dashed var(--border-color);
+        .location-card {
+            border: 2px solid var(--border-color);
             border-radius: 8px;
-            padding: 2rem;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .location-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .location-card.selected {
+            border-color: var(--primary-color);
+            background-color: var(--primary-lighter);
+        }
+        
+        .location-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .location-image {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 10px;
+        }
+        
+        .location-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .location-info {
+            padding: 12px;
             text-align: center;
+        }
+        
+        .location-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .location-size {
+            font-size: 12px;
             color: var(--text-secondary);
+        }
+        
+        .combo-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #ff9800;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .price-breakdown {
+            margin-top: 20px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .breakdown-row:last-child {
+            border-bottom: none;
+        }
+        
+        .breakdown-label {
+            color: var(--text-secondary);
+        }
+        
+        .breakdown-value {
+            font-weight: 500;
+        }
+        
+        .breakdown-row.total {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid var(--border-color);
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .pricing-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .pricing-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .pricing-table tr:nth-child(even) {
+            background: var(--bg-color);
+        }
+        
+        .pricing-table tr.active-tier {
+            background: var(--primary-lighter);
+            font-weight: 600;
+        }
+        
+        .pricing-table tr.active-tier td {
+            border-color: var(--primary-color);
+        }
+        
+        .ltm-notice {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .ltm-notice i {
+            font-size: 18px;
         }
     </style>
 </head>
@@ -71,14 +210,7 @@
             <p>Calculate pricing for Direct-to-Garment printing on customer-supplied items</p>
         </div>
 
-        <!-- Coming Soon Notice -->
-        <div class="coming-soon">
-            <i class="fas fa-paint-brush coming-soon-icon"></i>
-            <h2>Coming Soon!</h2>
-            <p>The Manual DTG Pricing Calculator is currently under development. Check back soon!</p>
-        </div>
-
-        <!-- Calculator Grid (Placeholder) -->
+        <!-- Calculator Grid -->
         <div class="calculator-grid">
             <!-- Input Section -->
             <div class="card">
@@ -87,16 +219,34 @@
                     DTG Details
                 </h2>
                 
-                <div class="placeholder-section">
-                    <i class="fas fa-cog fa-3x mb-3" style="color: var(--border-color);"></i>
-                    <p>Input fields for manual DTG pricing will appear here</p>
-                    <p class="mt-2 text-muted">Features will include:</p>
-                    <ul style="list-style: none; padding: 0; margin-top: 1rem;">
-                        <li>• Manual garment cost input</li>
-                        <li>• Print size selection</li>
-                        <li>• Multiple print locations</li>
-                        <li>• Quantity-based pricing</li>
-                    </ul>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="base-price" class="form-label">
+                            Garment Base Cost <span class="required">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="base-price" class="form-control" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                        <small class="field-help">Your cost for the blank garment</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quantity" class="form-label">
+                            Quantity <span class="required">*</span>
+                        </label>
+                        <input type="number" id="quantity" class="form-control" value="24" min="1" required>
+                        <small class="field-help">Total number of garments</small>
+                    </div>
+                </div>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">
+                        Print Location <span class="required">*</span>
+                    </label>
+                    <div class="location-cards" id="location-cards">
+                        <!-- Location cards will be populated by JavaScript -->
+                    </div>
                 </div>
             </div>
 
@@ -105,20 +255,76 @@
                 <div class="results-section">
                     <div class="results-header">
                         <h3 class="card-title">Your Quote</h3>
-                        <div class="price-display prompt">
-                            <i class="fas fa-calculator"></i>
-                            Calculator Loading...
+                        <div class="price-display" id="unit-price-display">$0.00</div>
+                        <div class="text-center text-muted">per garment</div>
+                    </div>
+                    
+                    <div id="pricing-breakdown" class="price-breakdown">
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Base Garment Cost:</span>
+                            <span class="breakdown-value" id="base-cost-display">$0.00</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Garment with Margin:</span>
+                            <span class="breakdown-value" id="garment-margin-display">$0.00</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Print Location:</span>
+                            <span class="breakdown-value" id="location-display">-</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Print Cost:</span>
+                            <span class="breakdown-value" id="print-cost-display">$0.00</span>
+                        </div>
+                        <div class="breakdown-row" id="ltm-fee-row" style="display: none;">
+                            <span class="breakdown-label">LTM Fee (per unit):</span>
+                            <span class="breakdown-value" id="ltm-fee-display">$0.00</span>
+                        </div>
+                        <div class="breakdown-row total">
+                            <span class="breakdown-label">Total Per Garment:</span>
+                            <span class="breakdown-value" id="total-unit-price">$0.00</span>
                         </div>
                     </div>
                     
-                    <div class="placeholder-section mt-3">
-                        <i class="fas fa-file-invoice-dollar fa-3x mb-3" style="color: var(--border-color);"></i>
-                        <p>Pricing breakdown will appear here</p>
+                    <div class="mt-3">
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Quantity:</span>
+                            <span class="breakdown-value" id="quantity-display">24</span>
+                        </div>
+                        <div class="breakdown-row total">
+                            <span class="breakdown-label">Total Order Price:</span>
+                            <span class="breakdown-value" id="total-order-price">$0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div id="ltm-notice" class="ltm-notice" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Less Than Minimum:</strong> Orders under 24 garments incur a $50.00 fee distributed across all items.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h3 class="card-title">Complete Pricing Table</h3>
+                    <div class="table-responsive">
+                        <table class="pricing-table" id="pricing-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Pricing table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-
+        
         <!-- Information Section -->
         <div class="card">
             <h3 class="card-title">
@@ -128,11 +334,454 @@
             <div class="alert alert-info">
                 <i class="fas fa-lightbulb alert-icon"></i>
                 <div>
-                    <p><strong>What is Manual DTG Pricing?</strong></p>
-                    <p>This calculator will help you price Direct-to-Garment printing services for customer-supplied garments. It will account for print size, location, and quantity to provide accurate pricing.</p>
+                    <p><strong>How Manual DTG Pricing Works</strong></p>
+                    <p>This calculator helps you price Direct-to-Garment printing services for customer-supplied garments. Enter your base garment cost, select a print location, and specify the quantity to get accurate pricing.</p>
+                    <p>The calculator uses the same pricing engine as our standard DTG pricing, with print costs and margins from our pricing database. Orders under 24 pieces include a $50 Less Than Minimum (LTM) fee.</p>
                 </div>
             </div>
         </div>
     </main>
+
+    <script>
+        // DTG print locations configuration - these are static and don't need to be fetched
+        const DTG_LOCATIONS = {
+            'LC': {
+                name: 'Left Chest',
+                size: '4" × 4"',
+                image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-left-chest-png.png?ver=1',
+                isPopular: true,
+                displayOrder: 1
+            },
+            'FF': {
+                name: 'Full Front',
+                size: '12" × 16"',
+                image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-full-front.png.png?ver=1',
+                isPopular: true,
+                displayOrder: 2
+            },
+            'LC_FB': {
+                name: 'Left Chest + Full Back',
+                size: '4"×4" + 12"×16"',
+                image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-combo-lc-fb.png?ver=1',
+                isPopular: true,
+                displayOrder: 3,
+                isCombo: true,
+                components: ['LC', 'FB']
+            },
+            'FB': {
+                name: 'Full Back',
+                size: '12" × 16"',
+                image: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9037959',
+                isPopular: false,
+                displayOrder: 4
+            },
+            'JF': {
+                name: 'Jumbo Front',
+                size: '16" × 20"',
+                image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-jumbo-front.png?ver=1',
+                isPopular: false,
+                displayOrder: 5
+            },
+            'JB': {
+                name: 'Jumbo Back',
+                size: '16" × 20"',
+                image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-Jumbo-back.png.png?ver=1',
+                isPopular: false,
+                displayOrder: 6
+            },
+            'LC_JB': {
+                name: 'Left Chest + Jumbo Back',
+                size: '4"×4" + 16"×20"',
+                image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-combo-lc-jb.png?ver=1',
+                isPopular: false,
+                displayOrder: 7,
+                isCombo: true,
+                components: ['LC', 'JB']
+            },
+            'FF_FB': {
+                name: 'Full Front + Full Back',
+                size: '12"×16" + 12"×16"',
+                image: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9037971',
+                isPopular: false,
+                displayOrder: 8,
+                isCombo: true,
+                components: ['FF', 'FB']
+            },
+            'JF_JB': {
+                name: 'Jumbo Front + Back',
+                size: '16"×20" + 16"×20"',
+                image: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9037968',
+                isPopular: false,
+                displayOrder: 9,
+                isCombo: true,
+                components: ['JF', 'JB']
+            }
+        };
+
+        // DTG pricing configuration
+        const DTG_CONFIG = {
+            // Margin denominator will come from API (apiData.marginDenominator)
+            ltmThreshold: 24,
+            ltmFee: 50,
+            quantityTiers: [
+                { min: 1, max: 11, label: '1-11' },
+                { min: 12, max: 23, label: '12-23' },
+                { min: 24, max: 47, label: '24-47' },
+                { min: 48, max: 71, label: '48-71' },
+                { min: 72, max: 143, label: '72-143' },
+                { min: 144, max: 287, label: '144-287' },
+                { min: 288, max: 499, label: '288-499' },
+                { min: 500, max: 999, label: '500+' }
+            ]
+        };
+
+        // API data storage
+        let apiData = {
+            tiersR: [],
+            allDtgCostsR: [],
+            locations: [],
+            loaded: false
+        };
+
+        // State management
+        let state = {
+            basePrice: 0,
+            quantity: 24,
+            selectedLocation: 'LC',
+            isLoading: true
+        };
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch API data first
+            fetchApiData().then(() => {
+                console.log('API data loaded:', apiData);
+                
+                // Populate location cards
+                populateLocationCards();
+                
+                // Set up event listeners
+                setupEventListeners();
+                
+                // Initialize with default values
+                updatePricing();
+                
+                // Hide loading state
+                state.isLoading = false;
+            }).catch(error => {
+                console.error('Error loading DTG pricing data:', error);
+                alert('Error loading pricing data. Please try again later.');
+            });
+        });
+
+        // Fetch API data
+        async function fetchApiData() {
+            try {
+                // Use empty style number as specified in the API requirements
+                const url = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTG&styleNumber=`;
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`API status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Store the API data
+                apiData.tiersR = data.tiersR || [];
+                apiData.allDtgCostsR = data.allDtgCostsR || [];
+                apiData.locations = data.locations || [];
+                apiData.marginDenominator = data.marginDenominator || 0.6; // Get margin denominator from API, fallback to 0.6
+                apiData.loaded = true;
+                
+                console.log('API data loaded successfully:', apiData);
+                
+                return data;
+            } catch (error) {
+                console.error('Error fetching API data:', error);
+                throw error;
+            }
+        }
+
+        // Populate location cards
+        function populateLocationCards() {
+            const container = document.getElementById('location-cards');
+            if (!container) return;
+            
+            // Sort locations by display order
+            const sortedLocations = Object.entries(DTG_LOCATIONS).sort((a, b) => 
+                a[1].displayOrder - b[1].displayOrder
+            );
+            
+            // Create cards for each location
+            sortedLocations.forEach(([code, location]) => {
+                const card = document.createElement('div');
+                card.className = `location-card ${code === state.selectedLocation ? 'selected' : ''}`;
+                card.dataset.location = code;
+                
+                const badgeHTML = location.isCombo ? 
+                    '<span class="combo-badge">COMBO</span>' : '';
+                
+                card.innerHTML = `
+                    ${badgeHTML}
+                    <div class="location-image">
+                        <img src="${location.image}" alt="${location.name}">
+                    </div>
+                    <div class="location-info">
+                        <div class="location-name">${location.name}</div>
+                        <div class="location-size">${location.size}</div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Base price input
+            const basePriceInput = document.getElementById('base-price');
+            if (basePriceInput) {
+                basePriceInput.addEventListener('input', function() {
+                    state.basePrice = parseFloat(this.value) || 0;
+                    updatePricing();
+                });
+            }
+            
+            // Quantity input
+            const quantityInput = document.getElementById('quantity');
+            if (quantityInput) {
+                quantityInput.addEventListener('input', function() {
+                    state.quantity = parseInt(this.value) || 1;
+                    if (state.quantity < 1) {
+                        state.quantity = 1;
+                        this.value = 1;
+                    }
+                    updatePricing();
+                });
+            }
+            
+            // Location cards
+            const locationCards = document.querySelectorAll('.location-card');
+            locationCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const locationCode = this.dataset.location;
+                    
+                    // Update selected state
+                    document.querySelectorAll('.location-card').forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    
+                    // Update state
+                    state.selectedLocation = locationCode;
+                    updatePricing();
+                });
+            });
+        }
+
+        // Get tier for quantity
+        function getTierForQuantity(quantity) {
+            for (const tier of DTG_CONFIG.quantityTiers) {
+                if (quantity >= tier.min && quantity <= tier.max) {
+                    return tier.label;
+                }
+            }
+            return DTG_CONFIG.quantityTiers[0].label; // Default to first tier
+        }
+
+        // Get tier data from API
+        function getTierData(tierLabel) {
+            if (!apiData.loaded) return null;
+            
+            return apiData.tiersR.find(tier => tier.TierLabel === tierLabel);
+        }
+
+        // Get print cost from API
+        function getPrintCost(locationCode, tierLabel) {
+            if (!apiData.loaded) return 0;
+            
+            // For combo locations, sum the individual costs
+            if (DTG_LOCATIONS[locationCode]?.isCombo && DTG_LOCATIONS[locationCode]?.components) {
+                let totalCost = 0;
+                console.log(`Getting costs for combo location: ${locationCode}, components:`, DTG_LOCATIONS[locationCode].components);
+                
+                for (const component of DTG_LOCATIONS[locationCode].components) {
+                    const costEntry = apiData.allDtgCostsR.find(c =>
+                        c.PrintLocationCode === component && c.TierLabel === tierLabel
+                    );
+                    
+                    if (costEntry && costEntry.PrintCost !== undefined) {
+                        const componentCost = parseFloat(costEntry.PrintCost);
+                        console.log(`Component ${component} cost: $${componentCost}`);
+                        totalCost += componentCost;
+                    } else {
+                        console.warn(`No cost found for component ${component} in tier ${tierLabel}`);
+                    }
+                }
+                console.log(`Total combo cost for ${locationCode}: $${totalCost}`);
+                return totalCost;
+            }
+            
+            // For single locations
+            const costEntry = apiData.allDtgCostsR.find(c =>
+                c.PrintLocationCode === locationCode && c.TierLabel === tierLabel
+            );
+            
+            if (costEntry && costEntry.PrintCost !== undefined) {
+                return parseFloat(costEntry.PrintCost);
+            } else {
+                console.warn(`No cost found for location ${locationCode} in tier ${tierLabel}`);
+                return 0;
+            }
+        }
+
+        // Format price as currency
+        function formatPrice(price) {
+            return '$' + price.toFixed(2);
+        }
+
+        // Round price to nearest half dollar
+        function roundToHalfDollar(price) {
+            return Math.ceil(price * 2) / 2;
+        }
+
+        // Calculate pricing
+        function calculatePricing() {
+            const basePrice = state.basePrice;
+            const quantity = state.quantity;
+            const locationCode = state.selectedLocation;
+            
+            // Get quantity tier
+            const tier = getTierForQuantity(quantity);
+            console.log(`Using tier: ${tier} for quantity: ${quantity}`);
+            
+            // Get tier data from API
+            const tierData = getTierData(tier);
+            console.log('Tier data:', tierData);
+            
+            // Use margin denominator from API
+            const marginDenominator = apiData.marginDenominator || 0.6; // Fallback to 0.6 if API data not available
+            console.log(`Using margin denominator: ${marginDenominator}`);
+            const garmentWithMargin = basePrice / marginDenominator;
+            
+            // Get print cost for location and tier from API
+            const printCost = getPrintCost(locationCode, tier);
+            console.log(`Print cost for ${locationCode} in tier ${tier}: $${printCost}`);
+            
+            // Calculate subtotal
+            const subtotal = garmentWithMargin + printCost;
+            console.log(`Subtotal (garment with margin + print cost): $${subtotal}`);
+            
+            // Apply LTM fee if needed
+            let ltmFeePerUnit = 0;
+            if (quantity < DTG_CONFIG.ltmThreshold) {
+                ltmFeePerUnit = DTG_CONFIG.ltmFee / quantity;
+                console.log(`LTM fee per unit: $${ltmFeePerUnit} (${DTG_CONFIG.ltmFee} / ${quantity})`);
+            }
+            
+            // Calculate total before rounding
+            const totalBeforeRounding = subtotal + ltmFeePerUnit;
+            console.log(`Total before rounding: $${totalBeforeRounding}`);
+            
+            // Calculate final unit price (rounded to nearest half dollar)
+            const unitPrice = roundToHalfDollar(totalBeforeRounding);
+            console.log(`Final unit price (rounded): $${unitPrice}`);
+            
+            // Calculate total order price
+            const totalPrice = unitPrice * quantity;
+            
+            return {
+                basePrice,
+                garmentWithMargin,
+                printCost,
+                locationName: DTG_LOCATIONS[locationCode].name,
+                ltmFeePerUnit,
+                subtotal,
+                unitPrice,
+                quantity,
+                totalPrice,
+                tier
+            };
+        }
+
+        // Update pricing display
+        function updatePricing() {
+            const pricing = calculatePricing();
+            
+            // Update unit price display
+            const unitPriceDisplay = document.getElementById('unit-price-display');
+            if (unitPriceDisplay) {
+                unitPriceDisplay.textContent = formatPrice(pricing.unitPrice);
+            }
+            
+            // Update breakdown
+            document.getElementById('base-cost-display').textContent = formatPrice(pricing.basePrice);
+            document.getElementById('garment-margin-display').textContent = formatPrice(pricing.garmentWithMargin);
+            document.getElementById('location-display').textContent = pricing.locationName;
+            document.getElementById('print-cost-display').textContent = formatPrice(pricing.printCost);
+            
+            // LTM fee
+            const ltmFeeRow = document.getElementById('ltm-fee-row');
+            const ltmNotice = document.getElementById('ltm-notice');
+            if (pricing.ltmFeePerUnit > 0) {
+                document.getElementById('ltm-fee-display').textContent = formatPrice(pricing.ltmFeePerUnit);
+                ltmFeeRow.style.display = 'flex';
+                ltmNotice.style.display = 'flex';
+            } else {
+                ltmFeeRow.style.display = 'none';
+                ltmNotice.style.display = 'none';
+            }
+            
+            // Total prices
+            document.getElementById('total-unit-price').textContent = formatPrice(pricing.unitPrice);
+            document.getElementById('quantity-display').textContent = pricing.quantity;
+            document.getElementById('total-order-price').textContent = formatPrice(pricing.totalPrice);
+            
+            // Update pricing table
+            updatePricingTable(pricing);
+        }
+
+        // Update pricing table
+        function updatePricingTable(currentPricing) {
+            const tableBody = document.querySelector('#pricing-table tbody');
+            if (!tableBody) return;
+            
+            // Clear existing rows
+            tableBody.innerHTML = '';
+            
+            // Add rows for each quantity tier
+            DTG_CONFIG.quantityTiers.forEach(tier => {
+                // Calculate pricing for this tier
+                const midPointQty = Math.floor((tier.min + tier.max) / 2);
+                
+                // Save current state
+                const currentQty = state.quantity;
+                
+                // Temporarily set quantity to mid-point of tier for calculation
+                state.quantity = midPointQty;
+                const tierPricing = calculatePricing();
+                
+                // Restore current quantity
+                state.quantity = currentQty;
+                
+                // Create row
+                const row = document.createElement('tr');
+                
+                // Highlight active tier
+                if (currentPricing.tier === tier.label) {
+                    row.className = 'active-tier';
+                }
+                
+                row.innerHTML = `
+                    <td>${tier.label}</td>
+                    <td>${formatPrice(tierPricing.unitPrice)}</td>
+                    <td>${formatPrice(tierPricing.unitPrice * midPointQty)}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+    </script>
 </body>
 </html>
