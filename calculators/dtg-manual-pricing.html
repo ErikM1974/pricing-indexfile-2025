@@ -13,6 +13,181 @@
     <link href="manual-calculator-styles.css" rel="stylesheet">
     
     <style>
+        /* Hero section styles */
+        .hero-section {
+            background: linear-gradient(to right, var(--primary-lighter), #f8f9fa);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
+            transition: opacity 0.3s ease;
+        }
+        
+        .hero-section.placeholder-mode {
+            opacity: 0.7;
+        }
+        
+        .hero-summary {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .hero-prices {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .hero-price-container {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .hero-price-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .hero-price {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .hero-price.placeholder {
+            font-size: 24px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        /* Placeholder message styles */
+        .pricing-placeholder {
+            background: #f8f9fa;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .pricing-placeholder i {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .pricing-placeholder h3 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        
+        .pricing-placeholder p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        /* Base cost input emphasis */
+        .base-cost-emphasis {
+            animation: pulseGlow 2s ease-in-out infinite;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 0 6px rgba(0, 123, 255, 0.2);
+            }
+            100% {
+                box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            }
+        }
+        
+        /* Arrow pointing to base cost */
+        .base-cost-arrow {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--primary-color);
+            font-size: 24px;
+            animation: bounce 1s ease-in-out infinite;
+            display: none;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+        
+        .form-group.highlight-base-cost {
+            position: relative;
+        }
+        
+        .form-group.highlight-base-cost .base-cost-arrow {
+            display: block;
+        }
+        
+        .hero-price-sublabel {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Collapsible section styles */
+        .collapsible-section {
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .collapsible-header {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .collapsible-header:hover {
+            background: #f0f0f0;
+        }
+        
+        .collapsible-content {
+            padding: 15px;
+            display: none;
+        }
+        
+        .collapsible-content.expanded {
+            display: block;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+        
+        .toggle-icon.expanded {
+            transform: rotate(180deg);
+        }
+        
         /* DTG-specific styles */
         .location-cards {
             display: grid;
@@ -137,40 +312,6 @@
             font-size: 1.1em;
         }
         
-        .pricing-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        
-        .pricing-table th {
-            background: var(--primary-color);
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        .pricing-table td {
-            padding: 10px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-        
-        .pricing-table tr:nth-child(even) {
-            background: var(--bg-color);
-        }
-        
-        .pricing-table tr.active-tier {
-            background: var(--primary-lighter);
-            font-weight: 600;
-        }
-        
-        .pricing-table tr.active-tier td {
-            border-color: var(--primary-color);
-        }
-        
         .ltm-notice {
             background: var(--warning-bg);
             color: var(--warning-text);
@@ -184,6 +325,115 @@
         
         .ltm-notice i {
             font-size: 18px;
+        }
+        
+        /* Progress bar styles */
+        .tier-progress {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .tier-progress-bar {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        .savings-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+        
+        /* Interactive elements */
+        .quantity-slider-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .quantity-slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .quantity-slider {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .cta-button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .cta-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .cta-primary:hover {
+            background: var(--primary-dark, #0056b3);
+        }
+        
+        .cta-secondary {
+            background: #f8f9fa;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .cta-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .hero-prices {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .hero-price {
+                font-size: 28px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+            
+            .sticky-hero {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: white;
+                padding: 10px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
         }
     </style>
 </head>
@@ -220,13 +470,16 @@
                 </h2>
                 
                 <div class="form-grid">
-                    <div class="form-group">
+                    <div class="form-group highlight-base-cost" id="base-cost-group">
+                        <div class="base-cost-arrow">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
                         <label for="base-price" class="form-label">
                             Garment Base Cost <span class="required">*</span>
                         </label>
                         <div class="input-group">
                             <span class="input-prefix">$</span>
-                            <input type="number" id="base-price" class="form-control" placeholder="0.00" step="0.01" min="0" required>
+                            <input type="number" id="base-price" class="form-control base-cost-emphasis" placeholder="0.00" step="0.01" min="0" required>
                         </div>
                         <small class="field-help">Your cost for the blank garment</small>
                     </div>
@@ -253,75 +506,99 @@
             <!-- Results Section -->
             <div class="card">
                 <div class="results-section">
-                    <div class="results-header">
-                        <h3 class="card-title">Your Quote</h3>
-                        <div class="price-display" id="unit-price-display">$0.00</div>
-                        <div class="text-center text-muted">per garment</div>
-                    </div>
-                    
-                    <div id="pricing-breakdown" class="price-breakdown">
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Base Garment Cost:</span>
-                            <span class="breakdown-value" id="base-cost-display">$0.00</span>
+                    <!-- Hero Section with Final Prices -->
+                    <div class="hero-section">
+                        <div class="hero-summary" id="order-summary">For 24 shirts with Left Chest print</div>
+                        <div class="hero-prices">
+                            <div class="hero-price-container">
+                                <div class="hero-price-label">
+                                    <i class="fas fa-tshirt"></i> Price Per Item
+                                </div>
+                                <div class="hero-price placeholder" id="hero-unit-price">--</div>
+                                <div class="hero-price-sublabel">per garment</div>
+                            </div>
+                            <div class="hero-price-container">
+                                <div class="hero-price-label">
+                                    <i class="fas fa-shopping-cart"></i> Total Order
+                                </div>
+                                <div class="hero-price placeholder" id="hero-total-price">--</div>
+                                <div class="hero-price-sublabel" id="hero-quantity">24 items</div>
+                            </div>
                         </div>
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Garment with Margin:</span>
-                            <span class="breakdown-value" id="garment-margin-display">$0.00</span>
-                        </div>
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Print Location:</span>
-                            <span class="breakdown-value" id="location-display">-</span>
-                        </div>
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Print Cost:</span>
-                            <span class="breakdown-value" id="print-cost-display">$0.00</span>
-                        </div>
-                        <div class="breakdown-row" id="ltm-fee-row" style="display: none;">
-                            <span class="breakdown-label">LTM Fee (per unit):</span>
-                            <span class="breakdown-value" id="ltm-fee-display">$0.00</span>
-                        </div>
-                        <div class="breakdown-row total">
-                            <span class="breakdown-label">Total Per Garment:</span>
-                            <span class="breakdown-value" id="total-unit-price">$0.00</span>
+                        
+                        <!-- Small Order Fee Notice (integrated but less prominent) -->
+                        <div id="hero-ltm-notice" class="mt-3" style="display: none; font-size: 12px; color: var(--warning-text);">
+                            <i class="fas fa-info-circle"></i> Includes small order fee for orders under 24 items
                         </div>
                     </div>
                     
-                    <div class="mt-3">
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Quantity:</span>
-                            <span class="breakdown-value" id="quantity-display">24</span>
+                    <!-- Collapsible Pricing Breakdown -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" id="breakdown-toggle">
+                            <span><i class="fas fa-receipt"></i> View Price Details</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </div>
-                        <div class="breakdown-row total">
-                            <span class="breakdown-label">Total Order Price:</span>
-                            <span class="breakdown-value" id="total-order-price">$0.00</span>
+                        <div class="collapsible-content" id="breakdown-content">
+                            <div id="pricing-breakdown">
+                                <div class="breakdown-row">
+                                    <span class="breakdown-label">Garment Price:</span>
+                                    <span class="breakdown-value" id="garment-price-display">$0.00</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span class="breakdown-label">Printing (<span id="location-display">-</span>):</span>
+                                    <span class="breakdown-value" id="print-cost-display">$0.00</span>
+                                </div>
+                                <div class="breakdown-row" id="ltm-fee-row" style="display: none;">
+                                    <span class="breakdown-label">
+                                        Small Order Fee:
+                                        <i class="fas fa-info-circle" style="color: var(--primary-color); font-size: 12px; cursor: help;"
+                                           title="A fee for orders under 24 pieces to cover setup and production costs."></i>
+                                    </span>
+                                    <span class="breakdown-value" id="ltm-fee-display">$0.00</span>
+                                </div>
+                                <div class="breakdown-row total">
+                                    <span class="breakdown-label">Price Per Item:</span>
+                                    <span class="breakdown-value" id="total-unit-price">$0.00</span>
+                                </div>
+                                <div class="breakdown-row" style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color);">
+                                    <span class="breakdown-label">Quantity:</span>
+                                    <span class="breakdown-value" id="quantity-display">24</span>
+                                </div>
+                                <div class="breakdown-row total">
+                                    <span class="breakdown-label">Total Order:</span>
+                                    <span class="breakdown-value" id="total-order-price">$0.00</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <div id="ltm-notice" class="ltm-notice" style="display: none;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <div>
-                            <strong>Less Than Minimum:</strong> Orders under 24 garments incur a $50.00 fee distributed across all items.
+                    <!-- Interactive Quantity Slider -->
+                    <div class="quantity-slider-container">
+                        <div class="quantity-slider-label">
+                            <span>What if I order...</span>
+                            <span id="slider-quantity">24 items</span>
                         </div>
+                        <input type="range" id="quantity-slider" class="quantity-slider" min="1" max="100" value="24">
+                        <div class="tier-progress">
+                            <div class="tier-progress-bar" style="width: 50%"></div>
+                        </div>
+                        <div class="quantity-slider-label">
+                            <span>New price:</span>
+                            <span id="slider-price">$0.00</span>
+                        </div>
+                    </div>
+                    
+                    <!-- CTA Buttons -->
+                    <div class="cta-buttons">
+                        <button class="cta-button cta-primary" id="save-quote-btn">
+                            <i class="fas fa-save"></i> Save Quote
+                        </button>
+                        <button class="cta-button cta-secondary" id="get-pdf-btn">
+                            <i class="fas fa-file-pdf"></i> Get PDF
+                        </button>
                     </div>
                 </div>
                 
-                <div class="mt-4">
-                    <h3 class="card-title">Complete Pricing Table</h3>
-                    <div class="table-responsive">
-                        <table class="pricing-table" id="pricing-table">
-                            <thead>
-                                <tr>
-                                    <th>Quantity</th>
-                                    <th>Unit Price</th>
-                                    <th>Total Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Pricing table rows will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
         
@@ -336,7 +613,115 @@
                 <div>
                     <p><strong>How Manual DTG Pricing Works</strong></p>
                     <p>This calculator helps you price Direct-to-Garment printing services for customer-supplied garments. Enter your base garment cost, select a print location, and specify the quantity to get accurate pricing.</p>
-                    <p>The calculator uses the same pricing engine as our standard DTG pricing, with print costs and margins from our pricing database. Orders under 24 pieces include a $50 Less Than Minimum (LTM) fee.</p>
+                    <p>The calculator uses the same pricing engine as our standard DTG pricing, with print costs and margins from our pricing database. Orders under 24 pieces include a $50 Less Than Minimum (LTM) fee, which is divided across all items to cover setup and production costs.</p>
+                </div>
+            </div>
+            
+            <!-- Detailed Pricing Explanation (Collapsible) -->
+            <div class="collapsible-section mt-3">
+                <div class="collapsible-header" id="pricing-explanation-toggle">
+                    <span><i class="fas fa-calculator"></i> Detailed Pricing Explanation</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="collapsible-content" id="pricing-explanation-content">
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                        <h4 style="margin-top: 0; color: var(--primary-color);">Complete DTG Pricing Formula</h4>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <p><strong>Base Formula:</strong></p>
+                            <code style="display: block; padding: 10px; background: white; border-radius: 4px; margin: 10px 0;">
+                                Unit Price = RoundToHalfDollar((Base Cost ÷ Margin Denominator) + Print Cost + LTM Fee Per Unit)
+                            </code>
+                        </div>
+                        
+                        <h5 style="color: var(--primary-color); margin-top: 20px;">1. Margin Application</h5>
+                        <p>The margin is applied using a <strong>margin denominator</strong> retrieved from our pricing API (typically 0.6):</p>
+                        <ul>
+                            <li><strong>Garment with Margin</strong> = Base Cost ÷ Margin Denominator</li>
+                            <li>Example: $10 base cost ÷ 0.6 = $16.67 after margin</li>
+                        </ul>
+                        
+                        <h5 style="color: var(--primary-color); margin-top: 20px;">2. Print Cost Determination</h5>
+                        <p>Print costs are retrieved from our pricing API based on location and quantity tier:</p>
+                        <ul>
+                            <li><strong>Single Locations:</strong> Direct cost lookup (e.g., Left Chest, Full Front)</li>
+                            <li><strong>Combo Locations:</strong> Sum of individual component costs
+                                <ul>
+                                    <li>Example: "Left Chest + Full Back" = LC cost + FB cost</li>
+                                    <li>The system automatically identifies combo locations and calculates total print cost</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        
+                        <h5 style="color: var(--primary-color); margin-top: 20px;">3. Quantity Tiers & Pricing</h5>
+                        <p>Pricing is based on quantity tiers with volume discounts:</p>
+                        <table style="width: 100%; margin: 10px 0; border-collapse: collapse;">
+                            <tr style="background: #e9ecef;">
+                                <th style="padding: 8px; text-align: left; border: 1px solid #dee2e6;">Quantity Range</th>
+                                <th style="padding: 8px; text-align: left; border: 1px solid #dee2e6;">Pricing Tier Used</th>
+                                <th style="padding: 8px; text-align: left; border: 1px solid #dee2e6;">Special Rules</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">1-23 pieces</td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">24-47 tier</td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">Uses 24+ pricing + LTM fee</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">24-47 pieces</td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">24-47 tier</td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">Standard pricing</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">48-71 pieces</td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">48-71 tier</td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">Volume discount</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">72+ pieces</td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">72+ tier</td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">Best pricing</td>
+                            </tr>
+                        </table>
+                        
+                        <div style="background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                            <i class="fas fa-exclamation-triangle" style="color: #856404;"></i>
+                            <strong>Important:</strong> Orders under 24 pieces always use the 24-47 tier pricing to ensure consistency, then add the LTM fee.
+                        </div>
+                        
+                        <h5 style="color: var(--primary-color); margin-top: 20px;">4. Less Than Minimum (LTM) Fee</h5>
+                        <p>For orders under 24 pieces, an LTM fee is applied:</p>
+                        <ul>
+                            <li><strong>Total LTM Fee:</strong> $50 (fixed)</li>
+                            <li><strong>LTM Fee Per Unit:</strong> $50 ÷ Quantity</li>
+                            <li>Example: 10 shirts = $50 ÷ 10 = $5.00 per shirt</li>
+                            <li>This fee helps cover the fixed costs of setting up and running small production batches</li>
+                            <li>The per-unit fee decreases as quantity increases (up to 24 pieces)</li>
+                        </ul>
+                        
+                        <h5 style="color: var(--primary-color); margin-top: 20px;">5. Rounding Rules</h5>
+                        <p>All unit prices are rounded to the nearest half dollar ($0.50):</p>
+                        <ul>
+                            <li>$15.24 → $15.50</li>
+                            <li>$15.25 → $15.50</li>
+                            <li>$15.74 → $16.00</li>
+                            <li>$15.75 → $16.00</li>
+                        </ul>
+                        <p>This rounding is applied <strong>after</strong> all calculations (margin, print cost, and LTM fee).</p>
+                        
+                        <h5 style="color: var(--primary-color); margin-top: 20px;">Example Calculation</h5>
+                        <div style="background: white; padding: 15px; border-radius: 4px; border: 1px solid #dee2e6;">
+                            <p><strong>Scenario:</strong> 10 shirts, $8 base cost, Left Chest print</p>
+                            <ol style="margin-left: 20px;">
+                                <li>Garment with margin: $8 ÷ 0.6 = $13.33</li>
+                                <li>Print cost (24-47 tier): $6.00</li>
+                                <li>Subtotal: $13.33 + $6.00 = $19.33</li>
+                                <li>LTM fee per unit: $50 ÷ 10 = $5.00</li>
+                                <li>Total before rounding: $19.33 + $5.00 = $24.33</li>
+                                <li><strong>Final unit price: $24.50</strong> (rounded to nearest $0.50)</li>
+                                <li>Total order: $24.50 × 10 = $245.00</li>
+                            </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -451,11 +836,16 @@
                 { min: 12, max: 23, label: '12-23' },
                 { min: 24, max: 47, label: '24-47' },
                 { min: 48, max: 71, label: '48-71' },
-                { min: 72, max: 143, label: '72-143' },
-                { min: 144, max: 287, label: '144-287' },
-                { min: 288, max: 499, label: '288-499' },
-                { min: 500, max: 999, label: '500+' }
-            ]
+                { min: 72, max: 999, label: '72+' }  // API uses '72+' for all quantities 72 and above
+            ],
+            // Fallback print costs if API doesn't have data for a tier
+            fallbackPrintCosts: {
+                'LC': { '72+': 5, '72-143': 5, '144-287': 4, '288-499': 3.5, '500+': 3 },
+                'FF': { '72+': 10, '72-143': 10, '144-287': 8, '288-499': 7, '500+': 6 },
+                'FB': { '72+': 10, '72-143': 10, '144-287': 8, '288-499': 7, '500+': 6 },
+                'JF': { '72+': 12, '72-143': 12, '144-287': 10, '288-499': 9, '500+': 8 },
+                'JB': { '72+': 12, '72-143': 12, '144-287': 10, '288-499': 9, '500+': 8 }
+            }
         };
 
         // API data storage
@@ -486,11 +876,38 @@
                 // Set up event listeners
                 setupEventListeners();
                 
+                // Setup collapsible sections
+                setupCollapsibleSections();
+                
+                // Setup quantity slider
+                setupQuantitySlider();
+                
+                // Setup CTA buttons
+                setupCTAButtons();
+                
                 // Initialize with default values
                 updatePricing();
                 
                 // Hide loading state
                 state.isLoading = false;
+                
+                // Add initial animation to draw attention to base cost field
+                setTimeout(() => {
+                    const basePriceInput = document.getElementById('base-price');
+                    if (basePriceInput && state.basePrice <= 0) {
+                        // Focus the input to draw attention
+                        basePriceInput.focus();
+                        
+                        // Remove the animation after a few seconds
+                        setTimeout(() => {
+                            const baseCostGroup = document.getElementById('base-cost-group');
+                            if (baseCostGroup) {
+                                baseCostGroup.classList.remove('highlight-base-cost');
+                            }
+                            basePriceInput.classList.remove('base-cost-emphasis');
+                        }, 5000);
+                    }
+                }, 500);
             }).catch(error => {
                 console.error('Error loading DTG pricing data:', error);
                 alert('Error loading pricing data. Please try again later.');
@@ -523,6 +940,11 @@
                 console.log('Available print locations in API:');
                 const uniqueLocations = [...new Set(apiData.allDtgCostsR.map(item => item.PrintLocationCode))];
                 console.log(uniqueLocations);
+                
+                // Debug: Check which tiers are available in the API
+                console.log('Available tiers in API:');
+                const uniqueTiers = [...new Set(apiData.tiersR.map(tier => tier.TierLabel))];
+                console.log(uniqueTiers);
                 
                 // Debug: Check costs for each location in the first tier
                 if (apiData.tiersR.length > 0) {
@@ -619,22 +1041,149 @@
                 });
             });
         }
+        
+        // Setup collapsible sections
+        function setupCollapsibleSections() {
+            // Pricing breakdown toggle
+            const breakdownToggle = document.getElementById('breakdown-toggle');
+            const breakdownContent = document.getElementById('breakdown-content');
+            const breakdownIcon = breakdownToggle.querySelector('.toggle-icon');
+            
+            if (breakdownToggle && breakdownContent) {
+                breakdownToggle.addEventListener('click', function() {
+                    breakdownContent.classList.toggle('expanded');
+                    breakdownIcon.classList.toggle('expanded');
+                });
+            }
+            
+            // Pricing explanation toggle
+            const pricingExplanationToggle = document.getElementById('pricing-explanation-toggle');
+            const pricingExplanationContent = document.getElementById('pricing-explanation-content');
+            const pricingExplanationIcon = pricingExplanationToggle?.querySelector('.toggle-icon');
+            
+            if (pricingExplanationToggle && pricingExplanationContent) {
+                pricingExplanationToggle.addEventListener('click', function() {
+                    pricingExplanationContent.classList.toggle('expanded');
+                    pricingExplanationIcon.classList.toggle('expanded');
+                });
+            }
+        }
+        
+        // Setup quantity slider
+        function setupQuantitySlider() {
+            const quantitySlider = document.getElementById('quantity-slider');
+            const sliderQuantity = document.getElementById('slider-quantity');
+            const sliderPrice = document.getElementById('slider-price');
+            const progressBar = document.querySelector('.tier-progress-bar');
+            
+            if (quantitySlider && sliderQuantity && sliderPrice) {
+                // Initialize with current quantity
+                quantitySlider.value = state.quantity;
+                sliderQuantity.textContent = state.quantity + ' items';
+                
+                // Update on slider change
+                quantitySlider.addEventListener('input', function() {
+                    const newQuantity = parseInt(this.value);
+                    sliderQuantity.textContent = newQuantity + ' items';
+                    
+                    // Calculate new price without changing the actual quantity
+                    const currentQty = state.quantity;
+                    state.quantity = newQuantity;
+                    const pricing = calculatePricing();
+                    state.quantity = currentQty;
+                    
+                    // Update slider price
+                    // Only show price if base cost is entered
+                    if (state.basePrice > 0) {
+                        sliderPrice.textContent = state.basePrice > 0 ? formatPrice(pricing.unitPrice) : '--';
+                    } else {
+                        sliderPrice.textContent = '--';
+                    }
+                    
+                    // Update progress bar
+                    const maxQty = parseInt(quantitySlider.max);
+                    const progress = (newQuantity / maxQty) * 100;
+                    progressBar.style.width = Math.min(100, progress) + '%';
+                });
+                
+                // Apply quantity when slider is released
+                quantitySlider.addEventListener('change', function() {
+                    const newQuantity = parseInt(this.value);
+                    state.quantity = newQuantity;
+                    
+                    // Update the quantity input field
+                    const quantityInput = document.getElementById('quantity');
+                    if (quantityInput) {
+                        quantityInput.value = newQuantity;
+                    }
+                    
+                    // Update pricing
+                    updatePricing();
+                });
+            }
+        }
+        
+        // Setup CTA buttons
+        function setupCTAButtons() {
+            const saveQuoteBtn = document.getElementById('save-quote-btn');
+            const getPdfBtn = document.getElementById('get-pdf-btn');
+            
+            if (saveQuoteBtn) {
+                saveQuoteBtn.addEventListener('click', function() {
+                    alert('Quote saved successfully!');
+                    // In a real implementation, this would save the quote to a database or local storage
+                });
+            }
+            
+            if (getPdfBtn) {
+                getPdfBtn.addEventListener('click', function() {
+                    alert('Generating PDF...');
+                    // In a real implementation, this would generate a PDF of the quote
+                });
+            }
+        }
 
         // Get tier for quantity
         function getTierForQuantity(quantity) {
-            for (const tier of DTG_CONFIG.quantityTiers) {
-                if (quantity >= tier.min && quantity <= tier.max) {
-                    return tier.label;
-                }
+            // Check what tiers are actually available from the API
+            if (!apiData.loaded || !apiData.tiersR) {
+                return '24-47'; // Default fallback
             }
-            return DTG_CONFIG.quantityTiers[0].label; // Default to first tier
+            
+            const availableTiers = apiData.tiersR.map(t => t.TierLabel);
+            console.log('Available tiers from API:', availableTiers);
+            
+            // For quantities less than 24, always return 24-47 (business rule)
+            if (quantity < 24) {
+                return '24-47';
+            }
+            
+            // Map quantities to the API's tier structure
+            if (quantity >= 24 && quantity <= 47) {
+                return '24-47';
+            } else if (quantity >= 48 && quantity <= 71) {
+                return '48-71';
+            } else if (quantity >= 72) {
+                // API returns '72+' for all quantities 72 and above
+                return availableTiers.includes('72+') ? '72+' : '72-143';
+            }
+            
+            // Default fallback
+            return '24-47';
         }
 
         // Get tier data from API
         function getTierData(tierLabel) {
             if (!apiData.loaded) return null;
             
-            return apiData.tiersR.find(tier => tier.TierLabel === tierLabel);
+            const tierData = apiData.tiersR.find(tier => tier.TierLabel === tierLabel);
+            
+            // If tier data not found, log warning but continue
+            if (!tierData) {
+                console.warn(`Tier data not found for tier: ${tierLabel}`);
+            }
+            
+            return tierData;
         }
 
         // Get print cost from API
@@ -643,7 +1192,13 @@
             
             // For quantities under 24, always use the 24-47 tier pricing
             // This is the business rule: use 24+ pricing for all orders, then add LTM fee for <24
-            const effectiveTierLabel = quantity < 24 ? '24-47' : tierLabel;
+            let effectiveTierLabel = quantity < 24 ? '24-47' : tierLabel;
+            
+            // Handle the API's '72+' tier naming for quantities 72 and above
+            if (quantity >= 72 && tierLabel === '72+') {
+                effectiveTierLabel = '72+';
+            }
+            
             console.log(`Using tier ${effectiveTierLabel} for print cost (actual quantity: ${quantity})`);
             
             // For combo locations, sum the individual costs
@@ -688,7 +1243,14 @@
                         console.log(`Component ${component} (matched as ${matchedCode}) cost: $${componentCost}`);
                         totalCost += componentCost;
                     } else {
-                        console.warn(`No cost found for component ${component} in tier ${effectiveTierLabel}`);
+                        // Try fallback cost if available
+                        const fallbackCost = DTG_CONFIG.fallbackPrintCosts[component]?.[effectiveTierLabel];
+                        if (fallbackCost !== undefined) {
+                            console.warn(`Using fallback cost for component ${component} in tier ${effectiveTierLabel}: $${fallbackCost}`);
+                            totalCost += fallbackCost;
+                        } else {
+                            console.warn(`No cost found for component ${component} in tier ${effectiveTierLabel}`);
+                        }
                     }
                 }
                 console.log(`Total combo cost for ${locationCode}: $${totalCost}`);
@@ -717,8 +1279,15 @@
             if (costEntry && costEntry.PrintCost !== undefined) {
                 return parseFloat(costEntry.PrintCost);
             } else {
-                console.warn(`No cost found for location ${locationCode} in tier ${effectiveTierLabel}`);
-                return 0;
+                // Try fallback cost if available
+                const fallbackCost = DTG_CONFIG.fallbackPrintCosts[locationCode]?.[effectiveTierLabel];
+                if (fallbackCost !== undefined) {
+                    console.warn(`Using fallback cost for location ${locationCode} in tier ${effectiveTierLabel}: $${fallbackCost}`);
+                    return fallbackCost;
+                } else {
+                    console.warn(`No cost found for location ${locationCode} in tier ${effectiveTierLabel}`);
+                    return 0;
+                }
             }
         }
 
@@ -795,79 +1364,123 @@
         function updatePricing() {
             const pricing = calculatePricing();
             
-            // Update unit price display
-            const unitPriceDisplay = document.getElementById('unit-price-display');
-            if (unitPriceDisplay) {
-                unitPriceDisplay.textContent = formatPrice(pricing.unitPrice);
+            // Get elements
+            const heroSection = document.querySelector('.hero-section');
+            const heroUnitPrice = document.getElementById('hero-unit-price');
+            const heroTotalPrice = document.getElementById('hero-total-price');
+            const heroQuantity = document.getElementById('hero-quantity');
+            const orderSummary = document.getElementById('order-summary');
+            const heroLtmNotice = document.getElementById('hero-ltm-notice');
+            const baseCostGroup = document.getElementById('base-cost-group');
+            const basePriceInput = document.getElementById('base-price');
+            
+            // Check if base price is entered
+            if (state.basePrice <= 0) {
+                // Show placeholder mode
+                if (heroSection) heroSection.classList.add('placeholder-mode');
+                if (heroUnitPrice) {
+                    heroUnitPrice.textContent = 'Enter garment cost';
+                    heroUnitPrice.classList.add('placeholder');
+                }
+                if (heroTotalPrice) {
+                    heroTotalPrice.textContent = 'to see pricing';
+                    heroTotalPrice.classList.add('placeholder');
+                }
+                if (orderSummary) orderSummary.textContent = 'Please enter the garment base cost to calculate pricing';
+                
+                // Keep the emphasis on base cost input
+                if (baseCostGroup) baseCostGroup.classList.add('highlight-base-cost');
+                if (basePriceInput) basePriceInput.classList.add('base-cost-emphasis');
+                
+                // Hide LTM notice
+                if (heroLtmNotice) heroLtmNotice.style.display = 'none';
+            } else {
+                // Show actual pricing
+                if (heroSection) heroSection.classList.remove('placeholder-mode');
+                if (heroUnitPrice) {
+                    heroUnitPrice.textContent = formatPrice(pricing.unitPrice);
+                    heroUnitPrice.classList.remove('placeholder');
+                }
+                if (heroTotalPrice) {
+                    heroTotalPrice.textContent = formatPrice(pricing.totalPrice);
+                    heroTotalPrice.classList.remove('placeholder');
+                }
+                if (orderSummary) orderSummary.textContent = `For ${pricing.quantity} shirts with ${pricing.locationName} print`;
+                
+                // Remove emphasis from base cost input
+                if (baseCostGroup) baseCostGroup.classList.remove('highlight-base-cost');
+                if (basePriceInput) basePriceInput.classList.remove('base-cost-emphasis');
+                
+                // Show/hide LTM notice based on quantity
+                if (heroLtmNotice) {
+                    heroLtmNotice.style.display = pricing.ltmFeePerUnit > 0 ? 'block' : 'none';
+                }
             }
             
+            if (heroQuantity) heroQuantity.textContent = pricing.quantity + ' items';
+            
+            
             // Update breakdown
-            document.getElementById('base-cost-display').textContent = formatPrice(pricing.basePrice);
-            document.getElementById('garment-margin-display').textContent = formatPrice(pricing.garmentWithMargin);
-            document.getElementById('location-display').textContent = pricing.locationName;
-            document.getElementById('print-cost-display').textContent = formatPrice(pricing.printCost);
+            const garmentPriceDisplay = document.getElementById('garment-price-display');
+            const locationDisplay = document.getElementById('location-display');
+            const printCostDisplay = document.getElementById('print-cost-display');
+            
+            // Update breakdown values - show placeholder if no base cost
+            if (state.basePrice <= 0) {
+                if (garmentPriceDisplay) garmentPriceDisplay.textContent = '--';
+                if (locationDisplay) locationDisplay.textContent = pricing.locationName;
+                if (printCostDisplay) printCostDisplay.textContent = '--';
+            } else {
+                // Garment price now combines base cost + markup
+                if (garmentPriceDisplay) garmentPriceDisplay.textContent = formatPrice(pricing.garmentWithMargin);
+                if (locationDisplay) locationDisplay.textContent = pricing.locationName;
+                if (printCostDisplay) printCostDisplay.textContent = formatPrice(pricing.printCost);
+            }
             
             // LTM fee
             const ltmFeeRow = document.getElementById('ltm-fee-row');
-            const ltmNotice = document.getElementById('ltm-notice');
+            const ltmFeeDisplay = document.getElementById('ltm-fee-display');
             if (pricing.ltmFeePerUnit > 0) {
-                document.getElementById('ltm-fee-display').textContent = formatPrice(pricing.ltmFeePerUnit);
-                ltmFeeRow.style.display = 'flex';
-                ltmNotice.style.display = 'flex';
+                if (ltmFeeDisplay) ltmFeeDisplay.textContent = formatPrice(pricing.ltmFeePerUnit);
+                if (ltmFeeRow) ltmFeeRow.style.display = 'flex';
             } else {
-                ltmFeeRow.style.display = 'none';
-                ltmNotice.style.display = 'none';
+                if (ltmFeeRow) ltmFeeRow.style.display = 'none';
             }
             
             // Total prices
-            document.getElementById('total-unit-price').textContent = formatPrice(pricing.unitPrice);
-            document.getElementById('quantity-display').textContent = pricing.quantity;
-            document.getElementById('total-order-price').textContent = formatPrice(pricing.totalPrice);
+            const totalUnitPrice = document.getElementById('total-unit-price');
+            const quantityDisplay = document.getElementById('quantity-display');
+            const totalOrderPrice = document.getElementById('total-order-price');
             
-            // Update pricing table
-            updatePricingTable(pricing);
+            if (state.basePrice <= 0) {
+                if (totalUnitPrice) totalUnitPrice.textContent = '--';
+                if (quantityDisplay) quantityDisplay.textContent = pricing.quantity;
+                if (totalOrderPrice) totalOrderPrice.textContent = '--';
+            } else {
+                if (totalUnitPrice) totalUnitPrice.textContent = formatPrice(pricing.unitPrice);
+                if (quantityDisplay) quantityDisplay.textContent = pricing.quantity;
+                if (totalOrderPrice) totalOrderPrice.textContent = formatPrice(pricing.totalPrice);
+            }
+            
+            // Update quantity slider
+            const quantitySlider = document.getElementById('quantity-slider');
+            const sliderQuantity = document.getElementById('slider-quantity');
+            const sliderPrice = document.getElementById('slider-price');
+            const progressBar = document.querySelector('.tier-progress-bar');
+            
+            if (quantitySlider && sliderQuantity && sliderPrice && progressBar) {
+                quantitySlider.value = pricing.quantity;
+                sliderQuantity.textContent = pricing.quantity + ' items';
+                sliderPrice.textContent = formatPrice(pricing.unitPrice);
+                
+                // Update progress bar
+                const maxQty = parseInt(quantitySlider.max);
+                const progress = (pricing.quantity / maxQty) * 100;
+                progressBar.style.width = Math.min(100, progress) + '%';
+            }
+            
         }
 
-        // Update pricing table
-        function updatePricingTable(currentPricing) {
-            const tableBody = document.querySelector('#pricing-table tbody');
-            if (!tableBody) return;
-            
-            // Clear existing rows
-            tableBody.innerHTML = '';
-            
-            // Add rows for each quantity tier
-            DTG_CONFIG.quantityTiers.forEach(tier => {
-                // Calculate pricing for this tier
-                const midPointQty = Math.floor((tier.min + tier.max) / 2);
-                
-                // Save current state
-                const currentQty = state.quantity;
-                
-                // Temporarily set quantity to mid-point of tier for calculation
-                state.quantity = midPointQty;
-                const tierPricing = calculatePricing();
-                
-                // Restore current quantity
-                state.quantity = currentQty;
-                
-                // Create row
-                const row = document.createElement('tr');
-                
-                // Highlight active tier
-                if (currentPricing.tier === tier.label) {
-                    row.className = 'active-tier';
-                }
-                
-                row.innerHTML = `
-                    <td>${tier.label}</td>
-                    <td>${formatPrice(tierPricing.unitPrice)}</td>
-                    <td>${formatPrice(tierPricing.unitPrice * midPointQty)}</td>
-                `;
-                
-                tableBody.appendChild(row);
-            });
-        }
     </script>
 </body>
 </html>
