@@ -411,6 +411,15 @@
             background: #e9ecef;
         }
         
+        .cta-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .cta-button:disabled:hover {
+            background: inherit;
+        }
+        
         /* Mobile optimization */
         @media (max-width: 768px) {
             .hero-prices {
@@ -590,10 +599,10 @@
                     
                     <!-- CTA Buttons -->
                     <div class="cta-buttons">
-                        <button class="cta-button cta-primary" id="save-quote-btn">
+                        <button class="cta-button cta-primary" id="save-quote-btn" disabled title="Feature coming soon">
                             <i class="fas fa-save"></i> Save Quote
                         </button>
-                        <button class="cta-button cta-secondary" id="get-pdf-btn">
+                        <button class="cta-button cta-secondary" id="get-pdf-btn" disabled title="Feature coming soon">
                             <i class="fas fa-file-pdf"></i> Get PDF
                         </button>
                     </div>
@@ -735,17 +744,14 @@
                 size: '4" × 4"',
                 image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-left-chest-png.png?ver=1',
                 isPopular: true,
-                displayOrder: 1,
-                // Add alternative codes that might be in the API
-                apiCodes: ['LC', 'LEFT_CHEST', 'LEFTCHEST']
+                displayOrder: 1
             },
             'FF': {
                 name: 'Full Front',
                 size: '12" × 16"',
                 image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-full-front.png.png?ver=1',
                 isPopular: true,
-                displayOrder: 2,
-                apiCodes: ['FF', 'FULL_FRONT', 'FULLFRONT']
+                displayOrder: 2
             },
             'LC_FB': {
                 name: 'Left Chest + Full Back',
@@ -754,36 +760,28 @@
                 isPopular: true,
                 displayOrder: 3,
                 isCombo: true,
-                components: ['LC', 'FB'],
-                // Add alternative component codes
-                apiComponents: {
-                    'LC': ['LC', 'LEFT_CHEST', 'LEFTCHEST'],
-                    'FB': ['FB', 'FULL_BACK', 'FULLBACK']
-                }
+                components: ['LC', 'FB']
             },
             'FB': {
                 name: 'Full Back',
                 size: '12" × 16"',
                 image: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9037959',
                 isPopular: false,
-                displayOrder: 4,
-                apiCodes: ['FB', 'FULL_BACK', 'FULLBACK']
+                displayOrder: 4
             },
             'JF': {
                 name: 'Jumbo Front',
                 size: '16" × 20"',
                 image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-jumbo-front.png?ver=1',
                 isPopular: false,
-                displayOrder: 5,
-                apiCodes: ['JF', 'JUMBO_FRONT', 'JUMBOFRONT']
+                displayOrder: 5
             },
             'JB': {
                 name: 'Jumbo Back',
                 size: '16" × 20"',
                 image: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/dtg-location-Jumbo-back.png.png?ver=1',
                 isPopular: false,
-                displayOrder: 6,
-                apiCodes: ['JB', 'JUMBO_BACK', 'JUMBOBACK']
+                displayOrder: 6
             },
             'LC_JB': {
                 name: 'Left Chest + Jumbo Back',
@@ -792,11 +790,7 @@
                 isPopular: false,
                 displayOrder: 7,
                 isCombo: true,
-                components: ['LC', 'JB'],
-                apiComponents: {
-                    'LC': ['LC', 'LEFT_CHEST', 'LEFTCHEST'],
-                    'JB': ['JB', 'JUMBO_BACK', 'JUMBOBACK']
-                }
+                components: ['LC', 'JB']
             },
             'FF_FB': {
                 name: 'Full Front + Full Back',
@@ -805,11 +799,7 @@
                 isPopular: false,
                 displayOrder: 8,
                 isCombo: true,
-                components: ['FF', 'FB'],
-                apiComponents: {
-                    'FF': ['FF', 'FULL_FRONT', 'FULLFRONT'],
-                    'FB': ['FB', 'FULL_BACK', 'FULLBACK']
-                }
+                components: ['FF', 'FB']
             },
             'JF_JB': {
                 name: 'Jumbo Front + Back',
@@ -818,11 +808,7 @@
                 isPopular: false,
                 displayOrder: 9,
                 isCombo: true,
-                components: ['JF', 'JB'],
-                apiComponents: {
-                    'JF': ['JF', 'JUMBO_FRONT', 'JUMBOFRONT'],
-                    'JB': ['JB', 'JUMBO_BACK', 'JUMBOBACK']
-                }
+                components: ['JF', 'JB']
             }
         };
 
@@ -855,6 +841,9 @@
             locations: [],
             loaded: false
         };
+        
+        // Debug mode flag
+        const DEBUG_MODE = false;
 
         // State management
         let state = {
@@ -863,12 +852,15 @@
             selectedLocation: 'LC',
             isLoading: true
         };
+        
+        // Debounce timer
+        let updatePricingTimeout;
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             // Fetch API data first
             fetchApiData().then(() => {
-                console.log('API data loaded:', apiData);
+                if (DEBUG_MODE) console.log('API data loaded:', apiData);
                 
                 // Populate location cards
                 populateLocationCards();
@@ -934,28 +926,18 @@
                 apiData.marginDenominator = data.marginDenominator || 0.6; // Get margin denominator from API, fallback to 0.6
                 apiData.loaded = true;
                 
-                console.log('API data loaded successfully:', apiData);
-                
-                // Debug: Check all available print locations and costs in the API
-                console.log('Available print locations in API:');
-                const uniqueLocations = [...new Set(apiData.allDtgCostsR.map(item => item.PrintLocationCode))];
-                console.log(uniqueLocations);
-                
-                // Debug: Check which tiers are available in the API
-                console.log('Available tiers in API:');
-                const uniqueTiers = [...new Set(apiData.tiersR.map(tier => tier.TierLabel))];
-                console.log(uniqueTiers);
-                
-                // Debug: Check costs for each location in the first tier
-                if (apiData.tiersR.length > 0) {
-                    const firstTier = apiData.tiersR[0].TierLabel;
-                    console.log(`Print costs for tier ${firstTier}:`);
-                    uniqueLocations.forEach(loc => {
-                        const cost = apiData.allDtgCostsR.find(c =>
-                            c.PrintLocationCode === loc && c.TierLabel === firstTier
-                        );
-                        console.log(`${loc}: ${cost ? '$' + cost.PrintCost : 'Not found'}`);
-                    });
+                if (DEBUG_MODE) {
+                    console.log('API data loaded successfully:', apiData);
+                    
+                    // Debug: Check all available print locations and costs in the API
+                    console.log('Available print locations in API:');
+                    const uniqueLocations = [...new Set(apiData.allDtgCostsR.map(item => item.PrintLocationCode))];
+                    console.log(uniqueLocations);
+                    
+                    // Debug: Check which tiers are available in the API
+                    console.log('Available tiers in API:');
+                    const uniqueTiers = [...new Set(apiData.tiersR.map(tier => tier.TierLabel))];
+                    console.log(uniqueTiers);
                 }
                 
                 return data;
@@ -1006,7 +988,7 @@
             if (basePriceInput) {
                 basePriceInput.addEventListener('input', function() {
                     state.basePrice = parseFloat(this.value) || 0;
-                    updatePricing();
+                    updatePricingDebounced();
                 });
             }
             
@@ -1019,7 +1001,7 @@
                         state.quantity = 1;
                         this.value = 1;
                     }
-                    updatePricing();
+                    updatePricingDebounced();
                 });
             }
             
@@ -1128,19 +1110,11 @@
             const saveQuoteBtn = document.getElementById('save-quote-btn');
             const getPdfBtn = document.getElementById('get-pdf-btn');
             
-            if (saveQuoteBtn) {
-                saveQuoteBtn.addEventListener('click', function() {
-                    alert('Quote saved successfully!');
-                    // In a real implementation, this would save the quote to a database or local storage
-                });
-            }
-            
-            if (getPdfBtn) {
-                getPdfBtn.addEventListener('click', function() {
-                    alert('Generating PDF...');
-                    // In a real implementation, this would generate a PDF of the quote
-                });
-            }
+            // Note: Save Quote and PDF features are disabled for now
+            // The buttons remain in the UI but are disabled with a tooltip
+            // Future implementation would include:
+            // - Save Quote: Store quote data to database with unique ID
+            // - Get PDF: Generate downloadable PDF using jsPDF library
         }
 
         // Get tier for quantity
@@ -1151,7 +1125,7 @@
             }
             
             const availableTiers = apiData.tiersR.map(t => t.TierLabel);
-            console.log('Available tiers from API:', availableTiers);
+            if (DEBUG_MODE) console.log('Available tiers from API:', availableTiers);
             
             // For quantities less than 24, always return 24-47 (business rule)
             if (quantity < 24) {
@@ -1199,79 +1173,39 @@
                 effectiveTierLabel = '72+';
             }
             
-            console.log(`Using tier ${effectiveTierLabel} for print cost (actual quantity: ${quantity})`);
+            if (DEBUG_MODE) console.log(`Using tier ${effectiveTierLabel} for print cost (actual quantity: ${quantity})`);
             
             // For combo locations, sum the individual costs
             if (DTG_LOCATIONS[locationCode]?.isCombo && DTG_LOCATIONS[locationCode]?.components) {
                 let totalCost = 0;
-                console.log(`Getting costs for combo location: ${locationCode}, components:`, DTG_LOCATIONS[locationCode].components);
+                if (DEBUG_MODE) console.log(`Getting costs for combo location: ${locationCode}, components:`, DTG_LOCATIONS[locationCode].components);
                 
                 for (const component of DTG_LOCATIONS[locationCode].components) {
-                    // Try to find the cost using alternative API codes
-                    let costEntry = null;
-                    let matchedCode = null;
-                    
-                    // If we have apiComponents defined, use those alternative codes
-                    if (DTG_LOCATIONS[locationCode]?.apiComponents &&
-                        DTG_LOCATIONS[locationCode].apiComponents[component]) {
-                        
-                        const alternativeCodes = DTG_LOCATIONS[locationCode].apiComponents[component];
-                        console.log(`Trying alternative codes for ${component}:`, alternativeCodes);
-                        
-                        // Try each alternative code
-                        for (const code of alternativeCodes) {
-                            const entry = apiData.allDtgCostsR.find(c =>
-                                c.PrintLocationCode === code && c.TierLabel === effectiveTierLabel
-                            );
-                            
-                            if (entry && entry.PrintCost !== undefined) {
-                                costEntry = entry;
-                                matchedCode = code;
-                                break;
-                            }
-                        }
-                    } else {
-                        // Just try the direct component code
-                        costEntry = apiData.allDtgCostsR.find(c =>
-                            c.PrintLocationCode === component && c.TierLabel === effectiveTierLabel
-                        );
-                        matchedCode = component;
-                    }
+                    // Direct lookup using component code
+                    const costEntry = apiData.allDtgCostsR.find(c =>
+                        c.PrintLocationCode === component && c.TierLabel === effectiveTierLabel
+                    );
                     
                     if (costEntry && costEntry.PrintCost !== undefined) {
                         const componentCost = parseFloat(costEntry.PrintCost);
-                        console.log(`Component ${component} (matched as ${matchedCode}) cost: $${componentCost}`);
+                        if (DEBUG_MODE) console.log(`Component ${component} cost: $${componentCost}`);
                         totalCost += componentCost;
                     } else {
                         // Try fallback cost if available
                         const fallbackCost = DTG_CONFIG.fallbackPrintCosts[component]?.[effectiveTierLabel];
                         if (fallbackCost !== undefined) {
-                            console.warn(`Using fallback cost for component ${component} in tier ${effectiveTierLabel}: $${fallbackCost}`);
+                            if (DEBUG_MODE) console.warn(`Using fallback cost for component ${component} in tier ${effectiveTierLabel}: $${fallbackCost}`);
                             totalCost += fallbackCost;
                         } else {
-                            console.warn(`No cost found for component ${component} in tier ${effectiveTierLabel}`);
+                            if (DEBUG_MODE) console.warn(`No cost found for component ${component} in tier ${effectiveTierLabel}`);
                         }
                     }
                 }
-                console.log(`Total combo cost for ${locationCode}: $${totalCost}`);
+                if (DEBUG_MODE) console.log(`Total combo cost for ${locationCode}: $${totalCost}`);
                 return totalCost;
             }
             
-            // For single locations, try alternative codes
-            if (DTG_LOCATIONS[locationCode]?.apiCodes) {
-                for (const code of DTG_LOCATIONS[locationCode].apiCodes) {
-                    const costEntry = apiData.allDtgCostsR.find(c =>
-                        c.PrintLocationCode === code && c.TierLabel === effectiveTierLabel
-                    );
-                    
-                    if (costEntry && costEntry.PrintCost !== undefined) {
-                        console.log(`Found cost for ${locationCode} using code ${code}: $${costEntry.PrintCost}`);
-                        return parseFloat(costEntry.PrintCost);
-                    }
-                }
-            }
-            
-            // Try direct match
+            // For single locations, direct lookup
             const costEntry = apiData.allDtgCostsR.find(c =>
                 c.PrintLocationCode === locationCode && c.TierLabel === effectiveTierLabel
             );
@@ -1282,10 +1216,10 @@
                 // Try fallback cost if available
                 const fallbackCost = DTG_CONFIG.fallbackPrintCosts[locationCode]?.[effectiveTierLabel];
                 if (fallbackCost !== undefined) {
-                    console.warn(`Using fallback cost for location ${locationCode} in tier ${effectiveTierLabel}: $${fallbackCost}`);
+                    if (DEBUG_MODE) console.warn(`Using fallback cost for location ${locationCode} in tier ${effectiveTierLabel}: $${fallbackCost}`);
                     return fallbackCost;
                 } else {
-                    console.warn(`No cost found for location ${locationCode} in tier ${effectiveTierLabel}`);
+                    if (DEBUG_MODE) console.warn(`No cost found for location ${locationCode} in tier ${effectiveTierLabel}`);
                     return 0;
                 }
             }
@@ -1309,39 +1243,39 @@
             
             // Get quantity tier
             const tier = getTierForQuantity(quantity);
-            console.log(`Using tier: ${tier} for quantity: ${quantity}`);
+            if (DEBUG_MODE) console.log(`Using tier: ${tier} for quantity: ${quantity}`);
             
             // Get tier data from API
             const tierData = getTierData(tier);
-            console.log('Tier data:', tierData);
+            if (DEBUG_MODE) console.log('Tier data:', tierData);
             
-            // Use margin denominator from API
-            const marginDenominator = apiData.marginDenominator || 0.6; // Fallback to 0.6 if API data not available
-            console.log(`Using margin denominator: ${marginDenominator}`);
+            // Use tier-specific margin denominator if available, otherwise fall back to global
+            const marginDenominator = tierData?.MarginDenominator || apiData.marginDenominator || 0.6;
+            if (DEBUG_MODE) console.log(`Using margin denominator: ${marginDenominator}`);
             const garmentWithMargin = basePrice / marginDenominator;
             
             // Get print cost for location and tier from API
             const printCost = getPrintCost(locationCode, tier, quantity);
-            console.log(`Print cost for ${locationCode} in tier ${tier}: $${printCost}`);
+            if (DEBUG_MODE) console.log(`Print cost for ${locationCode} in tier ${tier}: $${printCost}`);
             
             // Calculate subtotal
             const subtotal = garmentWithMargin + printCost;
-            console.log(`Subtotal (garment with margin + print cost): $${subtotal}`);
+            if (DEBUG_MODE) console.log(`Subtotal (garment with margin + print cost): $${subtotal}`);
             
             // Apply LTM fee if needed
             let ltmFeePerUnit = 0;
             if (quantity < DTG_CONFIG.ltmThreshold) {
                 ltmFeePerUnit = DTG_CONFIG.ltmFee / quantity;
-                console.log(`LTM fee per unit: $${ltmFeePerUnit} (${DTG_CONFIG.ltmFee} / ${quantity})`);
+                if (DEBUG_MODE) console.log(`LTM fee per unit: $${ltmFeePerUnit} (${DTG_CONFIG.ltmFee} / ${quantity})`);
             }
             
             // Calculate total before rounding
             const totalBeforeRounding = subtotal + ltmFeePerUnit;
-            console.log(`Total before rounding: $${totalBeforeRounding}`);
+            if (DEBUG_MODE) console.log(`Total before rounding: $${totalBeforeRounding}`);
             
             // Calculate final unit price (rounded to nearest half dollar)
             const unitPrice = roundToHalfDollar(totalBeforeRounding);
-            console.log(`Final unit price (rounded): $${unitPrice}`);
+            if (DEBUG_MODE) console.log(`Final unit price (rounded): $${unitPrice}`);
             
             // Calculate total order price
             const totalPrice = unitPrice * quantity;
@@ -1360,6 +1294,14 @@
             };
         }
 
+        // Debounced update pricing
+        function updatePricingDebounced() {
+            clearTimeout(updatePricingTimeout);
+            updatePricingTimeout = setTimeout(() => {
+                updatePricing();
+            }, 300); // 300ms delay
+        }
+        
         // Update pricing display
         function updatePricing() {
             const pricing = calculatePricing();

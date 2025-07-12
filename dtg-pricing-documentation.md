@@ -893,6 +893,58 @@ The page uses modern web development practices including:
 
 These practices ensure a robust and user-friendly experience for calculating DTG pricing.
 
+## Manual DTG Pricing Calculator
+
+In addition to the main DTG pricing system, there is a manual DTG pricing calculator available for special cases where custom garment pricing is needed. This calculator is accessible from the Staff Dashboard and provides a simplified interface for calculating DTG pricing on customer-supplied items.
+
+### Location and Access
+
+- **File**: `/calculators/dtg-manual-pricing.html`
+- **Access**: Via Staff Dashboard under "Manual Pricing Calculators" section
+- **Purpose**: Calculate DTG pricing for customer-supplied garments where base cost needs manual input
+
+### Key Features
+
+1. **Manual Base Cost Input**: Allows staff to enter the exact cost of customer-supplied garments
+2. **API Integration**: Uses the same pricing API endpoint as the main DTG system
+3. **Location Selection**: Visual cards for all DTG print locations including combo options
+4. **Real-time Pricing**: Instant calculation as inputs change
+5. **LTM Fee Handling**: Automatic calculation of Less Than Minimum fees for orders under 24 pieces
+6. **Quantity Slider**: Interactive "what if" slider to show pricing at different quantities
+7. **Detailed Breakdown**: Collapsible section showing all pricing components
+
+### Technical Implementation
+
+The manual calculator uses a single-file architecture with embedded JavaScript that:
+
+- Fetches pricing data from the API endpoint: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTG`
+- Implements the same pricing formulas as the main system:
+  - Base Cost ÷ Margin Denominator (0.6)
+  - Plus print cost based on location and quantity tier
+  - Plus LTM fee if quantity < 24 ($50 divided by quantity)
+  - Rounded to nearest half dollar
+- Uses session storage to cache API responses for 30 minutes
+- Includes debug mode flag for troubleshooting
+
+### Pricing Tiers
+
+The calculator recognizes these quantity tiers from the API:
+- 1-11 (not used in tiersR)
+- 12-23 (exists in print costs only)
+- 24-47
+- 48-71
+- 72+
+
+For quantities under 24, it always uses the 24-47 tier pricing and adds the LTM fee.
+
+### Print Locations
+
+All standard DTG locations are supported:
+- Single locations: LC, FF, FB, JF, JB
+- Combo locations: LC_FB, LC_JB, FF_FB, JF_JB
+
+Combo location pricing is calculated by summing the individual component costs.
+
 ## Caspio Integration and Data Processing
 
 This section provides a detailed explanation of how the DTG pricing application integrates with Caspio to fetch, process, and display pricing data.
