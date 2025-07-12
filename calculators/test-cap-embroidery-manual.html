@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cap Embroidery Manual Pricing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-case {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+        .success {
+            color: green;
+        }
+        .fail {
+            color: red;
+        }
+        .calculation {
+            font-family: monospace;
+            background: #eee;
+            padding: 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cap Embroidery Manual Pricing Test</h1>
+    
+    <div class="test-case">
+        <h3>Test Case: $3.05 blank cost with 8,000 stitches</h3>
+        <div id="test1" class="result"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>Test Case: Pricing breakdown display</h3>
+        <div id="test2" class="result"></div>
+    </div>
+    
+    <script>
+        // Test the pricing logic directly
+        async function testPricing() {
+            // Test 1: Calculate garment cost with margin and rounding
+            const test1 = document.getElementById('test1');
+            
+            const blankCost = 3.05;
+            const marginDenom = 0.6; // From API
+            
+            // Step 1: Apply margin
+            const markedUpBlank = blankCost / marginDenom;
+            test1.innerHTML += `<div>Step 1 - Apply margin: $${blankCost} / ${marginDenom} = <span class="calculation">$${markedUpBlank.toFixed(3)}</span></div>`;
+            
+            // Step 2: Apply CeilDollar rounding
+            const garmentCost = Math.ceil(markedUpBlank);
+            test1.innerHTML += `<div>Step 2 - Round up (CeilDollar): $${markedUpBlank.toFixed(3)} → <span class="calculation success">$${garmentCost.toFixed(2)}</span></div>`;
+            
+            // Step 3: Add embroidery (example for 24-47 tier)
+            const embroideryCost = 11.00; // From API for 8,000 stitches, 24-47 tier
+            const total = garmentCost + embroideryCost;
+            test1.innerHTML += `<div>Step 3 - Add embroidery: $${garmentCost.toFixed(2)} + $${embroideryCost.toFixed(2)} = <span class="calculation success">$${total.toFixed(2)}</span></div>`;
+            
+            // Test 2: Show pricing breakdown
+            const test2 = document.getElementById('test2');
+            test2.innerHTML = `
+                <h4>Expected Pricing Breakdown:</h4>
+                <div>Garment Price: <span class="calculation">$${garmentCost.toFixed(2)}</span></div>
+                <div>Front Logo (8,000 stitches): <span class="calculation">$${embroideryCost.toFixed(2)}</span></div>
+                <div>Total per Garment: <span class="calculation success">$${total.toFixed(2)}</span></div>
+                <br>
+                <h4>Key Changes:</h4>
+                <div>✅ Garment cost is rounded AFTER margin is applied</div>
+                <div>✅ Embroidery is added to the rounded garment cost</div>
+                <div>✅ No additional rounding on the final total</div>
+            `;
+            
+            // Load the actual calculator page in an iframe to test
+            test2.innerHTML += `
+                <br>
+                <h4>Live Calculator Test:</h4>
+                <p>Open <a href="cap-embroidery-manual.html" target="_blank">cap-embroidery-manual.html</a> and enter:</p>
+                <ul>
+                    <li>Blank Cost: $3.05</li>
+                    <li>Quantity: 24</li>
+                    <li>Front Stitches: 8,000</li>
+                </ul>
+                <p>Expected result: $17.00 per piece</p>
+            `;
+        }
+        
+        // Run tests when page loads
+        testPricing();
+    </script>
+</body>
+</html>

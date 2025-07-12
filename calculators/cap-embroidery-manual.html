@@ -15,88 +15,11 @@
     <!-- Quote Service -->
     <script src="cap-embroidery-manual-service.js"></script>
     
+    <!-- Shared Calculator Styles -->
+    <link href="manual-calculator-styles.css" rel="stylesheet">
+    
     <style>
-        /* Root variables - Green Theme for Manual Calculators */
-        :root {
-            --primary-color: #3a7c52;
-            --primary-dark: #2d5f3f;
-            --primary-light: #e8f5e9;
-            --bg-color: #f5f7fa;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --hover-bg: #f3f4f6;
-            --success-bg: #d1fae5;
-            --success-text: #065f46;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        /* Header */
-        .header {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .logo {
-            height: 40px;
-            width: auto;
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .breadcrumb a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .breadcrumb a:hover {
-            color: var(--primary-dark);
-        }
+        /* Cap Embroidery-specific styles - common styles are in manual-calculator-styles.css */
 
         .header-right {
             display: flex;
@@ -123,11 +46,9 @@
             color: var(--text-primary);
         }
 
-        /* Main Container */
+        /* Cap Embroidery uses wider container */
         .main-container {
             max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 20px;
         }
 
         /* Page Title */
@@ -1371,7 +1292,7 @@
                         <h4 class="breakdown-title">Price Breakdown</h4>
                         
                         <div class="price-line">
-                            <span>Cap with Margin (40%):</span>
+                            <span>Garment Price:</span>
                             <span id="blankCostDisplay">$0.00</span>
                         </div>
                         
@@ -1980,6 +1901,15 @@
                 }
             }
 
+            // Calculate garment cost with margin and rounding (matching manual embroidery page)
+            calculateGarmentWithMargin(blankCost, marginDenom) {
+                // Apply margin first
+                const markedUpBlank = blankCost / marginDenom;
+                
+                // Then apply rounding for clean pricing
+                return this.applyRounding(markedUpBlank, roundingMethod);
+            }
+
             // Pricing calculation functions using live API data
             calculateFrontLogoPrice(stitches, blankCost, tierLabel) {
                 // Get live base embroidery cost for 8,000 stitches
@@ -2000,12 +1930,11 @@
                 const tierInfo = tierData.find(t => t.TierLabel === tierLabel);
                 const marginDenom = tierInfo ? tierInfo.MarginDenominator : 0.6;
                 
-                // Apply margin to blank cost only (matching XML logic)
-                const markedUpBlank = blankCost / marginDenom;
-                const totalCost = markedUpBlank + finalEmbCost;
+                // Calculate garment cost with margin and rounding FIRST
+                const garmentCost = this.calculateGarmentWithMargin(blankCost, marginDenom);
                 
-                // Apply live rounding method
-                return this.applyRounding(totalCost, roundingMethod);
+                // Return sum of rounded garment cost + embroidery (no additional rounding)
+                return garmentCost + finalEmbCost;
             }
 
             calculateAdditionalLogoPrice(stitches, tierLabel) {
@@ -2033,8 +1962,21 @@
             calculateTotalPrice() {
                 const tierLabel = this.getQuantityTier(currentQuantity);
                 
-                // Front logo price
-                let totalPrice = this.calculateFrontLogoPrice(currentFrontStitches, manualBlankCost, tierLabel);
+                // Get tier info for margin
+                const tierInfo = tierData.find(t => t.TierLabel === tierLabel);
+                const marginDenom = tierInfo ? tierInfo.MarginDenominator : 0.6;
+                
+                // Calculate garment cost with margin and rounding
+                const garmentCost = this.calculateGarmentWithMargin(manualBlankCost, marginDenom);
+                
+                // Calculate embroidery costs (no rounding)
+                const baseEmbCost = embroideryBaseCosts[tierLabel] || 0;
+                const frontStitchDiff = currentFrontStitches - BASE_STITCHES;
+                const frontStitchAdjustment = (frontStitchDiff / 1000) * PRICE_PER_THOUSAND;
+                const frontEmbroideryTotal = baseEmbCost + frontStitchAdjustment;
+                
+                // Start with garment + front embroidery
+                let totalPrice = garmentCost + frontEmbroideryTotal;
                 
                 // Add additional logos
                 if (backLogoEnabled) {
@@ -2148,10 +2090,12 @@
                     // Calculate individual components
                     const tierInfo = tierData.find(t => t.TierLabel === tierLabel);
                     const marginDenom = tierInfo ? tierInfo.MarginDenominator : 0.6;
-                    const markedUpBlank = manualBlankCost / marginDenom;
                     
-                    // Update blank cost display - show margin-adjusted price
-                    document.getElementById('blankCostDisplay').textContent = `$${markedUpBlank.toFixed(2)}`;
+                    // Calculate garment cost with margin and rounding
+                    const garmentCost = this.calculateGarmentWithMargin(manualBlankCost, marginDenom);
+                    
+                    // Update blank cost display - show rounded garment price
+                    document.getElementById('blankCostDisplay').textContent = `$${garmentCost.toFixed(2)}`;
                     
                     // Calculate embroidery costs
                     const baseEmbCost = embroideryBaseCosts[tierLabel] || 0;
@@ -2193,8 +2137,8 @@
                         document.getElementById('rightLogoLine').style.display = 'none';
                     }
                     
-                    // Calculate subtotal (before LTM)
-                    let subtotal = markedUpBlank + frontEmbroideryTotal;
+                    // Calculate subtotal (before LTM) using rounded garment cost
+                    let subtotal = garmentCost + frontEmbroideryTotal;
                     if (backLogoEnabled) subtotal += this.calculateAdditionalLogoPrice(currentBackStitches, tierLabel);
                     if (leftLogoEnabled) subtotal += this.calculateAdditionalLogoPrice(currentLeftStitches, tierLabel);
                     if (rightLogoEnabled) subtotal += this.calculateAdditionalLogoPrice(currentRightStitches, tierLabel);
@@ -2275,8 +2219,18 @@
                     // Single price column (uniform pricing for caps)
                     const priceCell = document.createElement('td');
                     
-                    // Calculate price for this tier using live API data
-                    let basePrice = this.calculateFrontLogoPrice(currentFrontStitches, manualBlankCost, tier.TierLabel);
+                    // Calculate price for this tier using the same logic as calculateTotalPrice
+                    const marginDenom = tier.MarginDenominator || 0.6;
+                    const garmentCost = this.calculateGarmentWithMargin(manualBlankCost, marginDenom);
+                    
+                    // Calculate embroidery costs
+                    const baseEmbCost = embroideryBaseCosts[tier.TierLabel] || 0;
+                    const frontStitchDiff = currentFrontStitches - BASE_STITCHES;
+                    const frontStitchAdjustment = (frontStitchDiff / 1000) * PRICE_PER_THOUSAND;
+                    const frontEmbroideryTotal = baseEmbCost + frontStitchAdjustment;
+                    
+                    // Start with garment + front embroidery
+                    let basePrice = garmentCost + frontEmbroideryTotal;
                     
                     // Add additional logos
                     if (backLogoEnabled) {
