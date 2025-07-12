@@ -14,37 +14,285 @@
     
     <style>
         /* Screen Print-specific styles */
-        .coming-soon {
-            text-align: center;
-            padding: 3rem;
-            background: var(--primary-lighter);
-            border-radius: 12px;
-            margin: 2rem 0;
+        /* Location sections */
+        .location-section {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
         }
-        
-        .coming-soon-icon {
-            font-size: 4rem;
+
+        .location-header {
+            font-weight: 600;
             color: var(--primary-color);
             margin-bottom: 1rem;
+            font-size: 1.1rem;
         }
-        
-        .coming-soon h2 {
-            color: var(--primary-dark);
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .safety-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .safety-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #ff6b35;
+        }
+
+        .safety-label {
+            color: #ff6b35;
+            font-weight: 600;
+        }
+
+        /* Add location button */
+        .add-location-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .add-location-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .add-location-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Location rows */
+        .location-row {
+            display: grid;
+            grid-template-columns: 180px 140px 40px;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        /* Setup breakdown */
+        .setup-section {
+            background: #f0f7f3;
+            border: 1px solid #d4e8d4;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-top: 1.25rem;
+        }
+
+        .setup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1rem;
         }
-        
-        .coming-soon p {
-            color: var(--text-secondary);
-            font-size: 1.125rem;
+
+        .setup-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
         }
-        
-        .placeholder-section {
-            background: var(--bg-color);
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
+
+        .setup-total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .setup-breakdown {
             color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .setup-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.375rem 0;
+            border-bottom: 1px solid rgba(212, 232, 212, 0.5);
+        }
+
+        .setup-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Order summary */
+        .summary-table {
+            width: 100%;
+            margin-top: 1.25rem;
+        }
+
+        .summary-table td {
+            padding: 0.625rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .summary-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .summary-value {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .summary-divider {
+            border-top: 2px solid var(--primary-color);
+            margin-top: 0.625rem;
+            padding-top: 0.625rem;
+        }
+
+        .summary-total {
+            font-size: 1.15rem;
+            color: var(--primary-color);
+        }
+
+        /* Tier info */
+        .tier-info {
+            background: #e7f5e7;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.25rem;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .tier-label {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Price display adjustments */
+        .price-section {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: linear-gradient(135deg, #f8fafb 0%, #f0f4f6 100%);
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+        }
+
+        .price-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+            line-height: 1;
+        }
+
+        .price-label {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .price-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .location-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .remove-btn {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            .price-display {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Loading state */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Debug mode indicator */
+        .debug-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -71,14 +319,7 @@
             <p>Calculate pricing for screen printing on customer-supplied items</p>
         </div>
 
-        <!-- Coming Soon Notice -->
-        <div class="coming-soon">
-            <i class="fas fa-fill-drip coming-soon-icon"></i>
-            <h2>Coming Soon!</h2>
-            <p>The Manual Screen Print Pricing Calculator is currently under development. Check back soon!</p>
-        </div>
-
-        <!-- Calculator Grid (Placeholder) -->
+        <!-- Calculator Grid -->
         <div class="calculator-grid">
             <!-- Input Section -->
             <div class="card">
@@ -86,19 +327,51 @@
                     <i class="fas fa-palette" style="color: var(--primary-color);"></i>
                     Screen Print Details
                 </h2>
-                
-                <div class="placeholder-section">
-                    <i class="fas fa-cog fa-3x mb-3" style="color: var(--border-color);"></i>
-                    <p>Input fields for manual screen print pricing will appear here</p>
-                    <p class="mt-2 text-muted">Features will include:</p>
-                    <ul style="list-style: none; padding: 0; margin-top: 1rem;">
-                        <li>• Manual garment cost input</li>
-                        <li>• Number of colors per location</li>
-                        <li>• Multiple print locations</li>
-                        <li>• Setup fees calculation</li>
-                        <li>• Quantity-based pricing tiers</li>
-                    </ul>
+
+                <div class="form-group">
+                    <label class="form-label">Quantity <span class="required">*</span></label>
+                    <input type="number" class="form-control" id="quantity" value="48" min="1" required>
+                    <div class="help-text">Minimum order quantity is 24 pieces</div>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">Manual Blank Cost ($) <span class="required">*</span></label>
+                    <input type="number" class="form-control" id="blankCost" value="5.00" min="0" step="0.01" required>
+                    <div class="help-text">Enter the cost of the blank garment</div>
+                </div>
+
+                <!-- Front Location -->
+                <div class="location-section">
+                    <div class="location-header">Front Location (Primary)</div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Number of Colors</label>
+                        <select class="form-control" id="frontColors">
+                            <option value="0">No Print</option>
+                            <option value="1" selected>1 Color</option>
+                            <option value="2">2 Colors</option>
+                            <option value="3">3 Colors</option>
+                            <option value="4">4 Colors</option>
+                            <option value="5">5 Colors</option>
+                            <option value="6">6 Colors</option>
+                        </select>
+                    </div>
+
+                    <div class="safety-checkbox">
+                        <input type="checkbox" id="frontSafety">
+                        <label for="frontSafety" class="safety-label">Add Safety Stripes (+$2.00)</label>
+                    </div>
+                </div>
+
+                <!-- Additional Locations -->
+                <div class="form-group">
+                    <button class="add-location-btn" id="addLocationBtn">
+                        <i class="fas fa-plus"></i> Add Location
+                    </button>
+                    <span class="help-text" style="margin-left: 0.75rem">Max 3 additional locations</span>
+                </div>
+
+                <div id="additionalLocations"></div>
             </div>
 
             <!-- Results Section -->
@@ -106,15 +379,63 @@
                 <div class="results-section">
                     <div class="results-header">
                         <h3 class="card-title">Your Quote</h3>
-                        <div class="price-display prompt">
-                            <i class="fas fa-calculator"></i>
-                            Calculator Loading...
+                        <div class="price-section">
+                            <div class="price-display" id="priceDisplay">$0.00</div>
+                            <div class="price-label">per shirt</div>
+                            <div class="price-subtitle" id="priceSubtitle">Enter details to see pricing</div>
                         </div>
                     </div>
-                    
-                    <div class="placeholder-section mt-3">
-                        <i class="fas fa-file-invoice-dollar fa-3x mb-3" style="color: var(--border-color);"></i>
-                        <p>Pricing breakdown will appear here</p>
+
+                    <div id="tierInfo" class="tier-info" style="display: none;">
+                        <span class="tier-label">Current Tier: </span>
+                        <span id="tierLabel"></span>
+                    </div>
+
+                    <div id="ltmWarning" class="alert alert-warning" style="display: none;">
+                        <i class="fas fa-exclamation-triangle alert-icon"></i>
+                        <div>
+                            <strong>Less Than Minimum Fee Applied</strong><br>
+                            A $50.00 fee has been added for orders under 37 pieces
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <table class="summary-table">
+                        <tbody id="summaryContent">
+                            <tr>
+                                <td class="summary-label">Blank Garment</td>
+                                <td class="summary-value" id="summaryBlank">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="summary-label">Screen Printing</td>
+                                <td class="summary-value" id="summaryPrint">$0.00</td>
+                            </tr>
+                            <tr class="summary-divider">
+                                <td class="summary-label summary-total">Total Per Shirt</td>
+                                <td class="summary-value summary-total" id="summaryTotal">$0.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Setup Fee Breakdown -->
+                    <div id="setupSection" class="setup-section" style="display: none;">
+                        <div class="setup-header">
+                            <span class="setup-title">One-Time Setup Fees</span>
+                            <span class="setup-total" id="setupTotal">$0.00</span>
+                        </div>
+                        <div class="setup-breakdown" id="setupBreakdown"></div>
+                    </div>
+
+                    <!-- Future Features -->
+                    <div class="feature-buttons mt-4">
+                        <button class="btn btn-secondary" disabled title="Feature coming soon">
+                            <i class="fas fa-envelope"></i>
+                            Email Quote
+                        </button>
+                        <button class="btn btn-secondary" disabled title="Feature coming soon">
+                            <i class="fas fa-print"></i>
+                            Print
+                        </button>
                     </div>
                 </div>
             </div>
@@ -129,11 +450,459 @@
             <div class="alert alert-info">
                 <i class="fas fa-lightbulb alert-icon"></i>
                 <div>
-                    <p><strong>What is Manual Screen Print Pricing?</strong></p>
-                    <p>This calculator will help you price screen printing services for customer-supplied garments. It will account for the number of colors, print locations, setup fees, and quantity to provide accurate pricing.</p>
+                    <p><strong>How It Works:</strong></p>
+                    <p>This calculator helps you price screen printing services for customer-supplied garments. Enter your blank garment cost, select the number of colors for each print location, and the calculator will determine the final price including all setup fees and quantity discounts.</p>
+                    <p class="mt-2">
+                        <strong>Includes:</strong> Blank garment with margin + Screen printing costs + Setup fees per color per location.<br>
+                        <strong>Pricing Tiers:</strong> Automatic quantity-based discounts apply.<br>
+                        <strong>Safety Stripes:</strong> Add $2.00 per location when safety stripes are selected.
+                    </p>
                 </div>
             </div>
         </div>
     </main>
+
+    <script>
+        // Configuration
+        const DEBUG_MODE = false;
+        const API_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=ScreenPrint&styleNumber=';
+        const CACHE_KEY = 'screenprint_manual_pricing_data';
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+        // State
+        let state = {
+            quantity: 48,
+            blankCost: 5.00,
+            frontColors: 1,
+            frontSafety: false,
+            additionalLocations: [],
+            masterBundle: null,
+            isLoading: false
+        };
+
+        // DOM Elements
+        const elements = {
+            quantity: document.getElementById('quantity'),
+            blankCost: document.getElementById('blankCost'),
+            frontColors: document.getElementById('frontColors'),
+            frontSafety: document.getElementById('frontSafety'),
+            addLocationBtn: document.getElementById('addLocationBtn'),
+            additionalLocations: document.getElementById('additionalLocations'),
+            priceDisplay: document.getElementById('priceDisplay'),
+            priceSubtitle: document.getElementById('priceSubtitle'),
+            tierInfo: document.getElementById('tierInfo'),
+            tierLabel: document.getElementById('tierLabel'),
+            ltmWarning: document.getElementById('ltmWarning'),
+            summaryBlank: document.getElementById('summaryBlank'),
+            summaryPrint: document.getElementById('summaryPrint'),
+            summaryTotal: document.getElementById('summaryTotal'),
+            setupSection: document.getElementById('setupSection'),
+            setupTotal: document.getElementById('setupTotal'),
+            setupBreakdown: document.getElementById('setupBreakdown')
+        };
+
+        // Initialize
+        async function init() {
+            if (DEBUG_MODE) {
+                document.body.insertAdjacentHTML('beforeend', '<div class="debug-indicator">DEBUG MODE</div>');
+            }
+
+            // Bind events
+            elements.quantity.addEventListener('input', debounce(handleQuantityChange, 300));
+            elements.blankCost.addEventListener('input', debounce(handleBlankCostChange, 300));
+            elements.frontColors.addEventListener('change', handleFrontColorsChange);
+            elements.frontSafety.addEventListener('change', handleFrontSafetyChange);
+            elements.addLocationBtn.addEventListener('click', addLocation);
+
+            // Load pricing data
+            await loadPricingData();
+            
+            // Initial calculation
+            calculatePricing();
+        }
+
+        // Load pricing data
+        async function loadPricingData() {
+            try {
+                // Check cache first
+                const cached = getCachedData();
+                if (cached) {
+                    if (DEBUG_MODE) console.log('[Manual Screen Print] Using cached data');
+                    state.masterBundle = cached;
+                    return;
+                }
+
+                if (DEBUG_MODE) console.log('[Manual Screen Print] Fetching from API');
+                state.isLoading = true;
+                
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                // Transform the API response to the expected format
+                if (data && data.tiersR && data.allScreenprintCostsR) {
+                    const transformedBundle = {
+                        tierData: data.tiersR,
+                        printCosts: transformPrintCosts(data.allScreenprintCostsR),
+                        rules: data.rulesR,
+                        marginDenominator: {} // Will be populated from tierData
+                    };
+                    
+                    // Create marginDenominator lookup for compatibility
+                    transformedBundle.tierData.forEach(tier => {
+                        transformedBundle.marginDenominator[tier.TierLabel] = tier.MarginDenominator;
+                    });
+                    
+                    state.masterBundle = transformedBundle;
+                    setCachedData(transformedBundle);
+                    if (DEBUG_MODE) console.log('[Manual Screen Print] Data loaded:', transformedBundle);
+                } else {
+                    throw new Error('Invalid API response structure');
+                }
+            } catch (error) {
+                console.error('[Manual Screen Print] Error loading data:', error);
+                alert('Error loading pricing data. Please refresh the page.');
+            } finally {
+                state.isLoading = false;
+            }
+        }
+
+        // Transform print costs from API format to expected format
+        function transformPrintCosts(allScreenprintCostsR) {
+            const printCosts = {
+                PrimaryLocation: {},
+                AdditionalLocation: {}
+            };
+            
+            allScreenprintCostsR.forEach(cost => {
+                const location = cost.CostType;
+                const tierLabel = cost.TierLabel;
+                const colorCount = cost.ColorCount;
+                
+                if (!printCosts[location][tierLabel]) {
+                    printCosts[location][tierLabel] = {};
+                }
+                
+                printCosts[location][tierLabel][colorCount] = cost.BasePrintCost;
+            });
+            
+            return printCosts;
+        }
+
+        // Cache management
+        function getCachedData() {
+            try {
+                const cached = sessionStorage.getItem(CACHE_KEY);
+                if (!cached) return null;
+                
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp > CACHE_DURATION) {
+                    sessionStorage.removeItem(CACHE_KEY);
+                    return null;
+                }
+                
+                return data;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function setCachedData(data) {
+            try {
+                sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                    data: data,
+                    timestamp: Date.now()
+                }));
+            } catch (e) {
+                console.warn('[Manual Screen Print] Failed to cache data');
+            }
+        }
+
+        // Event handlers
+        function handleQuantityChange(e) {
+            const value = parseInt(e.target.value) || 0;
+            state.quantity = Math.max(1, value);
+            if (state.quantity !== value) {
+                e.target.value = state.quantity;
+            }
+            calculatePricing();
+        }
+
+        function handleBlankCostChange(e) {
+            const value = parseFloat(e.target.value) || 0;
+            state.blankCost = Math.max(0, value);
+            calculatePricing();
+        }
+
+        function handleFrontColorsChange(e) {
+            state.frontColors = parseInt(e.target.value);
+            calculatePricing();
+        }
+
+        function handleFrontSafetyChange(e) {
+            state.frontSafety = e.target.checked;
+            calculatePricing();
+        }
+
+        // Location management
+        function addLocation() {
+            if (state.additionalLocations.length >= 3) return;
+            
+            const locationIndex = state.additionalLocations.length;
+            const locationOptions = ['Back', 'Left Chest', 'Right Chest', 'Left Sleeve', 'Right Sleeve', 'Other'];
+            
+            state.additionalLocations.push({
+                name: locationOptions[locationIndex] || 'Other',
+                colors: 1,
+                hasSafety: false
+            });
+            
+            renderLocations();
+            calculatePricing();
+            
+            // Disable button if max reached
+            if (state.additionalLocations.length >= 3) {
+                elements.addLocationBtn.disabled = true;
+            }
+        }
+
+        function removeLocation(index) {
+            state.additionalLocations.splice(index, 1);
+            renderLocations();
+            calculatePricing();
+            
+            // Enable add button
+            elements.addLocationBtn.disabled = false;
+        }
+
+        function updateLocation(index, field, value) {
+            if (field === 'colors') {
+                state.additionalLocations[index].colors = parseInt(value);
+            } else if (field === 'safety') {
+                state.additionalLocations[index].hasSafety = value;
+            } else if (field === 'name') {
+                state.additionalLocations[index].name = value;
+            }
+            calculatePricing();
+        }
+
+        function renderLocations() {
+            const html = state.additionalLocations.map((loc, index) => `
+                <div class="location-section">
+                    <div class="location-header">${loc.name} (Additional Location)</div>
+                    <div class="location-row">
+                        <select class="form-control" onchange="updateLocation(${index}, 'name', this.value)">
+                            <option value="Back" ${loc.name === 'Back' ? 'selected' : ''}>Back</option>
+                            <option value="Left Chest" ${loc.name === 'Left Chest' ? 'selected' : ''}>Left Chest</option>
+                            <option value="Right Chest" ${loc.name === 'Right Chest' ? 'selected' : ''}>Right Chest</option>
+                            <option value="Left Sleeve" ${loc.name === 'Left Sleeve' ? 'selected' : ''}>Left Sleeve</option>
+                            <option value="Right Sleeve" ${loc.name === 'Right Sleeve' ? 'selected' : ''}>Right Sleeve</option>
+                            <option value="Other" ${loc.name === 'Other' ? 'selected' : ''}>Other</option>
+                        </select>
+                        <select class="form-control" onchange="updateLocation(${index}, 'colors', this.value)">
+                            <option value="1" ${loc.colors === 1 ? 'selected' : ''}>1 Color</option>
+                            <option value="2" ${loc.colors === 2 ? 'selected' : ''}>2 Colors</option>
+                            <option value="3" ${loc.colors === 3 ? 'selected' : ''}>3 Colors</option>
+                            <option value="4" ${loc.colors === 4 ? 'selected' : ''}>4 Colors</option>
+                            <option value="5" ${loc.colors === 5 ? 'selected' : ''}>5 Colors</option>
+                            <option value="6" ${loc.colors === 6 ? 'selected' : ''}>6 Colors</option>
+                        </select>
+                        <button class="remove-btn" onclick="removeLocation(${index})">×</button>
+                    </div>
+                    <div class="safety-checkbox">
+                        <input type="checkbox" id="safety-${index}" ${loc.hasSafety ? 'checked' : ''} 
+                               onchange="updateLocation(${index}, 'safety', this.checked)">
+                        <label for="safety-${index}" class="safety-label">Add Safety Stripes (+$2.00)</label>
+                    </div>
+                </div>
+            `).join('');
+            
+            elements.additionalLocations.innerHTML = html;
+        }
+
+        // Pricing calculation
+        function calculatePricing() {
+            if (!state.masterBundle || state.isLoading) {
+                elements.priceDisplay.textContent = '$0.00';
+                elements.priceSubtitle.textContent = 'Loading pricing data...';
+                return;
+            }
+
+            const quantity = state.quantity;
+            const blankCost = state.blankCost;
+
+            // Find the appropriate tier
+            const tier = findTier(quantity);
+            if (!tier) {
+                console.error('[Manual Screen Print] No tier found for quantity:', quantity);
+                return;
+            }
+
+            if (DEBUG_MODE) console.log('[Manual Screen Print] Using tier:', tier);
+
+            // Calculate garment cost with margin
+            const garmentSellingPrice = blankCost / tier.MarginDenominator;
+
+            // Calculate print costs
+            let totalPrintCost = 0;
+            let totalSetupFee = 0;
+            let setupBreakdown = [];
+
+            // Front location (primary)
+            if (state.frontColors > 0) {
+                const printCost = getPrintCost('PrimaryLocation', state.frontColors, tier);
+                totalPrintCost += printCost;
+                
+                if (state.frontSafety) {
+                    totalPrintCost += 2.00; // Safety stripe surcharge
+                }
+
+                // Setup fee
+                const frontSetup = 30 * state.frontColors;
+                totalSetupFee += frontSetup;
+                setupBreakdown.push({
+                    location: 'Front',
+                    colors: state.frontColors,
+                    fee: frontSetup
+                });
+            }
+
+            // Additional locations
+            state.additionalLocations.forEach(loc => {
+                if (loc.colors > 0) {
+                    const printCost = getPrintCost('AdditionalLocation', loc.colors, tier);
+                    totalPrintCost += printCost;
+                    
+                    if (loc.hasSafety) {
+                        totalPrintCost += 2.00; // Safety stripe surcharge
+                    }
+
+                    // Setup fee
+                    const locSetup = 30 * loc.colors;
+                    totalSetupFee += locSetup;
+                    setupBreakdown.push({
+                        location: loc.name,
+                        colors: loc.colors,
+                        fee: locSetup
+                    });
+                }
+            });
+
+            // Calculate final price
+            let finalPrice = garmentSellingPrice + totalPrintCost;
+
+            // Apply LTM fee if needed
+            let ltmFeePerUnit = 0;
+            if (quantity < 37) {
+                ltmFeePerUnit = 50 / quantity;
+                finalPrice += ltmFeePerUnit;
+            }
+
+            // Apply half-dollar rounding
+            finalPrice = halfDollarCeil(finalPrice);
+
+            // Update display
+            updateDisplay(finalPrice, garmentSellingPrice, totalPrintCost, tier, ltmFeePerUnit > 0, setupBreakdown, totalSetupFee);
+        }
+
+        function findTier(quantity) {
+            if (!state.masterBundle || !state.masterBundle.tierData) return null;
+            
+            return state.masterBundle.tierData.find(tier => 
+                quantity >= tier.MinQuantity && quantity <= tier.MaxQuantity
+            );
+        }
+
+        function getPrintCost(locationType, colorCount, tier) {
+            if (!state.masterBundle || !state.masterBundle.printCosts) {
+                return 0;
+            }
+
+            const tierLabel = tier.TierLabel;
+            const locationCosts = state.masterBundle.printCosts[locationType];
+            
+            if (!locationCosts || !locationCosts[tierLabel]) {
+                console.warn(`[Manual Screen Print] No ${locationType} costs found for tier ${tierLabel}`);
+                return 0;
+            }
+
+            const cost = locationCosts[tierLabel][colorCount];
+            if (typeof cost !== 'number') {
+                console.warn(`[Manual Screen Print] Invalid cost for ${locationType}, ${tierLabel}, ${colorCount} colors`);
+                return 0;
+            }
+
+            return cost;
+        }
+
+        function halfDollarCeil(value) {
+            return Math.ceil(value * 2) / 2;
+        }
+
+        function updateDisplay(finalPrice, garmentPrice, printCost, tier, hasLTM, setupBreakdown, totalSetupFee) {
+            // Main price display
+            elements.priceDisplay.textContent = `$${finalPrice.toFixed(2)}`;
+            
+            // Calculate total locations and colors
+            let totalLocations = state.frontColors > 0 ? 1 : 0;
+            totalLocations += state.additionalLocations.filter(loc => loc.colors > 0).length;
+            
+            let totalColors = state.frontColors;
+            state.additionalLocations.forEach(loc => totalColors += loc.colors);
+
+            // Price subtitle
+            if (totalLocations === 0) {
+                elements.priceSubtitle.textContent = 'Blank garment only (no printing)';
+            } else {
+                const locText = totalLocations === 1 ? 'location' : 'locations';
+                const colorText = totalColors === 1 ? 'color' : 'colors';
+                elements.priceSubtitle.textContent = `${totalColors} ${colorText} across ${totalLocations} ${locText}`;
+            }
+
+            // Tier info
+            elements.tierInfo.style.display = 'block';
+            elements.tierLabel.textContent = `${tier.TierLabel} (${tier.MinQuantity}-${tier.MaxQuantity} pcs)`;
+
+            // LTM warning
+            elements.ltmWarning.style.display = hasLTM ? 'block' : 'none';
+
+            // Summary
+            elements.summaryBlank.textContent = `$${garmentPrice.toFixed(2)}`;
+            elements.summaryPrint.textContent = `$${printCost.toFixed(2)}`;
+            elements.summaryTotal.textContent = `$${finalPrice.toFixed(2)}`;
+
+            // Setup breakdown
+            if (setupBreakdown.length > 0) {
+                elements.setupSection.style.display = 'block';
+                elements.setupTotal.textContent = `$${totalSetupFee.toFixed(2)}`;
+                
+                const breakdownHTML = setupBreakdown.map(item => `
+                    <div class="setup-item">
+                        <span>${item.location}: ${item.colors} ${item.colors === 1 ? 'color' : 'colors'} × $30</span>
+                        <span>$${item.fee.toFixed(2)}</span>
+                    </div>
+                `).join('');
+                
+                elements.setupBreakdown.innerHTML = breakdownHTML;
+            } else {
+                elements.setupSection.style.display = 'none';
+            }
+        }
+
+        // Utility functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
