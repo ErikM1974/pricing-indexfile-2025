@@ -78,6 +78,7 @@ app.use('/forms', express.static(path.join(__dirname, 'forms'), staticOptions));
 app.use('/guides', express.static(path.join(__dirname, 'guides'), staticOptions));
 app.use('/hr', express.static(path.join(__dirname, 'hr'), staticOptions));
 app.use('/product', express.static(path.join(__dirname, 'product'), staticOptions));
+app.use('/training', express.static(path.join(__dirname, 'training'), staticOptions));
 
 // Serve CSS and JS files from root directory
 app.get('/*.css', (req, res) => {
