@@ -249,6 +249,454 @@
                 padding: 1.5rem;
             }
         }
+
+        /* Industry Wisdom Callouts */
+        .industry-wisdom {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border-left: 4px solid #4caf50;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);
+        }
+
+        .industry-wisdom h4 {
+            color: #2e7d32;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .industry-wisdom p {
+            font-style: italic;
+            color: #1b5e20;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-column {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .comparison-column h5 {
+            margin-top: 0;
+            font-size: 1.25rem;
+        }
+
+        .comparison-column ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .comparison-column li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comparison-column li:last-child {
+            border-bottom: none;
+        }
+
+        /* Two Column List */
+        .two-column-list {
+            margin: 1rem 0;
+        }
+
+        .two-column-list ol {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            counter-reset: list-counter;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .two-column-list li {
+            counter-increment: list-counter;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .two-column-list li::before {
+            content: counter(list-counter) ". ";
+            font-weight: bold;
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        /* Values Container */
+        .values-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .value-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid var(--primary-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .value-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .value-number {
+            background: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .value-card h5 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .value-card > p {
+            color: var(--text-secondary);
+            margin: 1rem 0;
+            line-height: 1.6;
+        }
+
+        .value-examples {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .value-examples strong {
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .value-examples ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .value-examples li {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .value-examples li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Vision Container and Cards */
+        .vision-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .vision-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .vision-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .vision-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .vision-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .vision-card h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .vision-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .vision-details {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .vision-details h5 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .vision-details ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+
+        .vision-details li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .vision-details li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .vision-inspiration {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+        }
+
+        /* Office Team Styles */
+        .role-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .role-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .role-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .role-title h4 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .role-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .role-section {
+            margin-top: 1.5rem;
+        }
+
+        .role-section h5 {
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .workflow-diagram {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .workflow-step {
+            display: inline-block;
+            padding: 1rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            margin: 0.5rem;
+            font-weight: 500;
+        }
+
+        .workflow-arrow {
+            display: inline-block;
+            margin: 0 1rem;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .impact-metric {
+            background: linear-gradient(135deg, var(--success-bg) 0%, #ffffff 100%);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .impact-metric strong {
+            color: var(--primary-color);
+            font-size: 1.125rem;
+        }
+
+        .team-philosophy {
+            background: linear-gradient(135deg, #fff9e6 0%, #fffdf7 100%);
+            border: 1px solid #f0e6d2;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .team-philosophy h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .team-philosophy .philosophy-quote {
+            font-size: 1.125rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            margin: 1rem 0;
+        }
+
+        /* Timeline Styles */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--primary-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.5rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .timeline-date {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-item h5 {
+            margin: 0.5rem 0;
+            color: var(--text-primary);
+        }
+
+        .timeline-item ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .timeline-item li {
+            margin: 0.25rem 0;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .comparison-table {
+                grid-template-columns: 1fr;
+            }
+            
+            .two-column-list ol {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -308,7 +756,7 @@
 
                 <p>Our journey began in 1977, and over more than four decades, we have navigated significant industry shifts, from the rise and fall of local manufacturing to the dawn of the digital age. We have not only survived but thrived by adapting, innovating, and holding fast to our core principles. Our history is a testament to our resilience and expertise, and as a new member of our team, you are now part of that story.</p>
 
-                <p>Our mission is to be more than just a vendor to our clients; we are a marketing partner dedicated to elevating their brand identities through custom imprinted apparel. We achieve this by operating under the principles of Respect, Accountability, Excellence, Compassion, and Honesty. These are not just words on a wall; they are the foundation of our operational procedures, from how we handle a customer complaint to the meticulous quality checks we perform on every order.</p>
+                <p>Our mission is beautifully simple yet profoundly impactful: <strong>We are committed to delivering happiness and creating WOW moments for every customer.</strong> This means we don't just process orders - we create experiences. We don't just meet expectations - we exceed them in ways that surprise and delight. We achieve this through our REACH values - Respect, Excellence, Accountability, Compassion, and Honesty. These five principles guide us in transforming routine transactions into memorable moments that build lasting relationships.</p>
 
                 <p>As you begin your journey with us, we want you to embrace a key philosophy: <strong>"Progress not Perfection."</strong> While we strive for excellence in everything we do, we recognize that growth comes from learning, trying new things, and making small, consistent improvements every day. We don't expect you to know everything on day one. We do expect you to be curious, to ask questions, and to use this manual as a tool to build your expertise.</p>
 
@@ -339,13 +787,114 @@
 
                 <h4>Our Mission Statement</h4>
                 <div class="highlight-box">
-                    <p>"Northwest Custom Apparel is a business-to-business provider, primarily serving the corporate and construction industries. Our mission is to elevate brand identities through custom imprinted apparel and to assist clients in selecting the perfect apparel for their company culture or events. We operate under the principles of Respect, Accountability, Excellence, Compassion, and Honesty, striving to be a beacon of quality and reliability in the custom apparel industry."</p>
+                    <p>"Northwest Custom Apparel is committed to delivering happiness and creating WOW moments for every customer."</p>
                 </div>
 
-                <p>This statement clarifies who we serve (B2B, corporate, construction), what we do (elevate brand identities), and how we do it (through our core values). It is the guiding principle behind every decision we make.</p>
+                <p>This simple yet powerful statement drives everything we do. It's not just about printing logos on shirts - it's about creating experiences that exceed expectations, solve problems creatively, and leave customers saying "WOW!" It means turning routine orders into memorable interactions and transforming challenges into opportunities to amaze.</p>
 
-                <h4>Our Core Values in Action</h4>
-                <p>Our values are not abstract concepts; they are embedded in our daily operational procedures. Understanding this link is key to understanding how to succeed at Northwest Custom Apparel.</p>
+                <h4>What This Mission Means in Practice</h4>
+                <ul>
+                    <li><strong>Delivering Happiness:</strong> Every interaction should leave the customer feeling better than before they contacted us</li>
+                    <li><strong>Creating WOW Moments:</strong> Going beyond expectations in unexpected ways</li>
+                    <li><strong>For EVERY Customer:</strong> No exceptions - from the smallest order to the largest account</li>
+                </ul>
+
+                <div class="highlight-box" style="background: #e8f5e9; border-left: 4px solid #4caf50;">
+                    <h5>Examples of WOW Moments We Create:</h5>
+                    <ul>
+                        <li>Remembering a customer's preferences before they ask</li>
+                        <li>Delivering rush orders ahead of schedule</li>
+                        <li>Sending samples proactively for new products</li>
+                        <li>Following up after delivery to ensure satisfaction</li>
+                        <li>Solving problems they didn't even know they had</li>
+                        <li>Turning mistakes into opportunities to show we care</li>
+                    </ul>
+                </div>
+
+                <h4>Our Core Values: REACH</h4>
+                <p>Our values form the acronym REACH, reminding us to always reach higher in service of our mission. These are not abstract concepts; they are embedded in our daily operational procedures and guide every decision we make.</p>
+
+                <div class="values-container">
+                    <div class="value-card">
+                        <div class="value-number">01</div>
+                        <h5>Respect</h5>
+                        <p>Listen when a customer or coworker speaks, maintaining a professional and approachable tone in all interactions.</p>
+                        <div class="value-examples">
+                            <strong>In Practice:</strong>
+                            <ul>
+                                <li>Give full attention during conversations</li>
+                                <li>Value diverse perspectives and ideas</li>
+                                <li>Use professional language always</li>
+                                <li>Honor commitments and time</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="value-card">
+                        <div class="value-number">02</div>
+                        <h5>Excellence</h5>
+                        <p>Always improving our work through innovation and quality control. We provide quality and service to every customer.</p>
+                        <div class="value-examples">
+                            <strong>In Practice:</strong>
+                            <ul>
+                                <li>Double-check every order for accuracy</li>
+                                <li>Continuously learn new techniques</li>
+                                <li>Suggest process improvements</li>
+                                <li>Exceed quality standards daily</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="value-card">
+                        <div class="value-number">03</div>
+                        <h5>Accountability</h5>
+                        <p>Fully owning the outcomes of our work, including our mistakes, without deflecting or blaming others.</p>
+                        <div class="value-examples">
+                            <strong>In Practice:</strong>
+                            <ul>
+                                <li>Take ownership of customer issues</li>
+                                <li>Follow through on promises</li>
+                                <li>Admit mistakes and fix them fast</li>
+                                <li>Document actions for transparency</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="value-card">
+                        <div class="value-number">04</div>
+                        <h5>Compassion</h5>
+                        <p>Supporting each other with empathy, ensuring everyone feels safe, supported and valued.</p>
+                        <div class="value-examples">
+                            <strong>In Practice:</strong>
+                            <ul>
+                                <li>Help overwhelmed teammates</li>
+                                <li>Show patience with new employees</li>
+                                <li>Understand customer pressures</li>
+                                <li>Create an inclusive environment</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="value-card">
+                        <div class="value-number">05</div>
+                        <h5>Honesty</h5>
+                        <p>Being transparent, ethical, and straightforward in our communication.</p>
+                        <div class="value-examples">
+                            <strong>In Practice:</strong>
+                            <ul>
+                                <li>Give realistic timelines</li>
+                                <li>Communicate challenges early</li>
+                                <li>Provide accurate pricing</li>
+                                <li>Build trust through transparency</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="background: #e8f5e9; border-left: 4px solid #4caf50;">
+                    <h4>Living Our Values = Creating WOW Moments</h4>
+                    <p>When we combine all five REACH values in our daily work, we naturally create the WOW moments our mission promises. Respect builds relationships, Excellence delivers quality, Accountability ensures reliability, Compassion creates connection, and Honesty builds trust. Together, they transform transactions into experiences that deliver happiness.</p>
+                </div>
 
                 <ul>
                     <li><strong>Respect:</strong> We respect our customers by listening to their needs, being honest about our capabilities, and never making promises we can't keep. We respect our team members by fostering a supportive environment where questions are encouraged and everyone has a voice.</li>
@@ -360,6 +909,316 @@
                 </ul>
 
                 <p>By understanding the connection between our values and our procedures, a new hire can see that following our systems is not just about efficiency; it is about living the principles that have made our company a trusted leader for over 40 years.</p>
+
+                <h3>Our Vision: Three Pillars of Excellence</h3>
+                <p>Our vision extends beyond daily operations to encompass the workplace culture we're building, the customer experiences we're creating, and the business success we're achieving. Each pillar reinforces the others, creating a powerful foundation for sustainable growth.</p>
+
+                <div class="vision-container">
+                    <div class="vision-card">
+                        <div class="vision-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4>A Drama-Free Workplace That Delivers WOW</h4>
+                        <p>We're creating a professional, drama-free workplace where communication is respectful, creativity thrives, and WOW moments are born. All ideas are welcomed, questions are encouraged, and everyone feels valued.</p>
+                        <div class="vision-details">
+                            <h5>What This Looks Like:</h5>
+                            <ul>
+                                <li>Open communication without office politics</li>
+                                <li>Constructive feedback given with respect</li>
+                                <li>Team members supporting each other's success</li>
+                                <li>Problems solved collaboratively, not blamed</li>
+                                <li>Celebrating wins together as a family</li>
+                            </ul>
+                            <p class="vision-inspiration"><em>Inspired by companies like Zappos, who prove that happy, respected employees naturally create positive, low-drama environments that deliver exceptional service.</em></p>
+                        </div>
+                    </div>
+
+                    <div class="vision-card">
+                        <div class="vision-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h4>The Heart of Customer Connection</h4>
+                        <p>Our showroom is the heart of customer connection, where we provide personalized service that creates long-lasting customer relationships. Every visit is an experience, not just a transaction.</p>
+                        <div class="vision-details">
+                            <h5>The Experience We Create:</h5>
+                            <ul>
+                                <li>Customers feel welcomed the moment they enter</li>
+                                <li>They can touch, feel, and explore products freely</li>
+                                <li>Expert guidance without pressure</li>
+                                <li>Solutions tailored to their specific needs</li>
+                                <li>Relationships that last for years</li>
+                            </ul>
+                            <p class="vision-inspiration"><em>Like Apple Stores, we encourage customers to engage with products, ask questions, and discover possibilities in a welcoming, pressure-free environment.</em></p>
+                        </div>
+                    </div>
+
+                    <div class="vision-card">
+                        <div class="vision-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4>Building on Our $3.2M Success</h4>
+                        <p>We're raising the bar by making work enjoyable through a culture of professionalism and respect, providing WOW moments from first greeting to final delivery. Our success is measured not just in revenue, but in relationships.</p>
+                        <div class="vision-details">
+                            <h5>How We'll Grow:</h5>
+                            <ul>
+                                <li>Every team member contributes to sales</li>
+                                <li>Quality and service drive repeat business</li>
+                                <li>Happy employees create happy customers</li>
+                                <li>Innovation keeps us ahead of competition</li>
+                                <li>WOW moments generate referrals</li>
+                            </ul>
+                            <p class="vision-inspiration"><em>Our $3.2M foundation proves our model works. Now we're scaling it through culture, not just transactions.</em></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="background: #e8f5e9; border-left: 4px solid #4caf50;">
+                    <h4>Vision to Reality: Your Role</h4>
+                    <p>Each team member plays a crucial role in bringing this vision to life. Whether you're answering phones, processing orders, or working in production, you're contributing to all three pillars. A drama-free workplace enables better customer connections, which drives business success, which creates opportunities for everyone.</p>
+                </div>
+
+                <h3>The Office Team: Your Sales Powerhouse</h3>
+                <p>Our office team operates as an interconnected system designed to capture every opportunity, convert inquiries into orders, and build lasting partnerships that drive sustainable growth. Understanding how these roles work together is essential to our success.</p>
+
+                <div class="team-philosophy">
+                    <h4>Shifting Our Focus from "Busy" to "Productive"</h4>
+                    <p class="philosophy-quote">"Our goal is to create a system where we spend less time on tasks that keep us busy, and more time on strategic work that creates future sales."</p>
+                    <p><strong>- Erik Mickelson, Operations Manager</strong></p>
+                    <p style="margin-top: 1rem; font-size: 1.125rem; color: var(--primary-color); font-weight: 600;">We need to stop losing future sales because of today's 'busyness'.</p>
+                </div>
+
+                <h4>The Two-Tiered Approach: A More Focused Team Structure</h4>
+                <div class="workflow-diagram">
+                    <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px; padding: 1rem;">
+                            <h5 style="color: var(--text-primary); margin-bottom: 1rem;">Key Account Manager</h5>
+                            <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 1rem;">FOCUS:</p>
+                            <ul style="list-style: none; padding: 0; text-align: left;">
+                                <li style="padding: 0.5rem 0;"><i class="fas fa-check-circle" style="color: var(--primary-color); margin-right: 0.5rem;"></i>Strategy</li>
+                                <li style="padding: 0.5rem 0;"><i class="fas fa-check-circle" style="color: var(--primary-color); margin-right: 0.5rem;"></i>Relationships</li>
+                                <li style="padding: 0.5rem 0;"><i class="fas fa-check-circle" style="color: var(--primary-color); margin-right: 0.5rem;"></i>Growth</li>
+                            </ul>
+                        </div>
+                        <div style="flex: 1; min-width: 250px; padding: 1rem;">
+                            <h5 style="color: var(--text-primary); margin-bottom: 1rem;">Sales Coordinator</h5>
+                            <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 1rem;">FOCUS:</p>
+                            <ul style="list-style: none; padding: 0; text-align: left;">
+                                <li style="padding: 0.5rem 0;"><i class="fas fa-check-circle" style="color: var(--primary-color); margin-right: 0.5rem;"></i>Order Processing</li>
+                                <li style="padding: 0.5rem 0;"><i class="fas fa-check-circle" style="color: var(--primary-color); margin-right: 0.5rem;"></i>Admin</li>
+                                <li style="padding: 0.5rem 0;"><i class="fas fa-check-circle" style="color: var(--primary-color); margin-right: 0.5rem;"></i>Support</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p style="margin-top: 2rem; font-style: italic;">This structure allows us to specialize, be more efficient, and provide elite service to all our customers.</p>
+                </div>
+
+                <h4>The Three Roles That Drive Our Success</h4>
+
+                <!-- Office Assistant Role Card -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="role-title">
+                            <h4>Office Assistant</h4>
+                            <div class="role-subtitle">The Opportunity Capturer - Adriyella</div>
+                        </div>
+                    </div>
+                    
+                    <div class="role-section">
+                        <h5>Purpose</h5>
+                        <p>The friendly face and organizational backbone of our office, ensuring smooth operations and capturing every potential opportunity that comes our way.</p>
+                    </div>
+
+                    <div class="role-section">
+                        <h5>Key Responsibilities</h5>
+                        <ul>
+                            <li>Serve as the first point of contact, professionally answering all calls and greeting visitors</li>
+                            <li>Monitor sales@nwcustomapparel.com email inbox for new opportunities</li>
+                            <li>Notify customers when orders are ready (creating reorder opportunities)</li>
+                            <li>Support accounting with invoice and statement preparation</li>
+                            <li>Maintain clean, professional office environment</li>
+                            <li>Provide flexible support to production when needed</li>
+                        </ul>
+                    </div>
+
+                    <div class="role-section">
+                        <h5>Sales Impact</h5>
+                        <p><strong>Every phone call is a potential $5,000+ order.</strong> By answering with warmth and professionalism, Adriyella sets the tone that makes customers WANT to do business with us. Her role ensures we capture 100% of opportunities instead of losing them to competitors.</p>
+                    </div>
+                </div>
+
+                <!-- Sales Coordinator Role Card -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="role-title">
+                            <h4>Sales Coordinator</h4>
+                            <div class="role-subtitle">The Conversion Machine</div>
+                        </div>
+                    </div>
+                    
+                    <div class="role-section">
+                        <h5>Purpose</h5>
+                        <p>The engine of our sales department, converting inquiries into orders and ensuring every customer receives expert guidance through the entire ordering process.</p>
+                    </div>
+
+                    <div class="role-section">
+                        <h5>Key Responsibilities</h5>
+                        <ul>
+                            <li>Primary contact for new and transactional customers</li>
+                            <li>Manage entire order lifecycle in Shopworks with 100% accuracy</li>
+                            <li>Own administrative follow-up (artwork approvals, signed orders, payments)</li>
+                            <li>Serve as communication hub between customers, production, and office</li>
+                            <li>Maintain expert knowledge of all products and services for effective upselling</li>
+                        </ul>
+                    </div>
+
+                    <div class="role-section">
+                        <h5>Sales Impact</h5>
+                        <p><strong>Every transactional customer handled efficiently = more time for strategic growth.</strong> The Sales Coordinator's product expertise means natural upselling ("Did you know embroidery would look amazing on these polos?"). By owning the entire order lifecycle, they ensure promises are kept, creating repeat customers.</p>
+                    </div>
+                </div>
+
+                <!-- Key Account Manager Role Card -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="role-title">
+                            <h4>Key Account Manager</h4>
+                            <div class="role-subtitle">The Revenue Multiplier - Nika</div>
+                        </div>
+                    </div>
+                    
+                    <div class="role-section">
+                        <h5>Purpose</h5>
+                        <p>Strategic partner for our most valuable clients, focusing on long-term relationships, creative solutions, and sustainable revenue growth.</p>
+                    </div>
+
+                    <div class="role-section">
+                        <h5>Key Responsibilities</h5>
+                        <ul>
+                            <li>Develop and execute strategic plans for ~40 "Gold" level clients</li>
+                            <li>Proactive creative consulting (WOW programs, vendor marketing funds)</li>
+                            <li>Design comprehensive solutions (webstores, gift programs, uniform programs)</li>
+                            <li>Cross-sell and up-sell full range of services</li>
+                            <li>Strategic oversight of key account orders (delegating admin to coordinator)</li>
+                        </ul>
+                    </div>
+
+                    <div class="role-section">
+                        <h5>Sales Impact</h5>
+                        <p><strong>While the Coordinator handles today's orders, Nika creates NEXT YEAR's revenue.</strong> One webstore setup could generate $30,000+ annually with minimal ongoing effort. Her creative programs create predictable, recurring revenue that keeps the factory busy year-round.</p>
+                    </div>
+                </div>
+
+                <h4>The Customer Journey & Three Critical Touchpoints</h4>
+                <div class="workflow-diagram">
+                    <div class="workflow-step">Adriyella<br><small>Opportunity Capture</small></div>
+                    <span class="workflow-arrow">→</span>
+                    <div class="workflow-step">Sales Coordinator<br><small>Conversion</small></div>
+                    <span class="workflow-arrow">→</span>
+                    <div class="workflow-step">Nika<br><small>Multiplication</small></div>
+                </div>
+
+                <div class="highlight-box" style="background: #e8f5e9; border-left: 4px solid #4caf50; margin: 2rem 0;">
+                    <h5>Think of it Like a Restaurant:</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.5rem 0;"><strong>Adriyella</strong> = The hostess who seats every guest with a smile</li>
+                        <li style="padding: 0.5rem 0;"><strong>Sales Coordinator</strong> = The efficient server who takes orders and ensures satisfaction</li>
+                        <li style="padding: 0.5rem 0;"><strong>Nika</strong> = The sommelier who builds relationships and creates memorable experiences</li>
+                    </ul>
+                </div>
+
+                <h4>The Multiplication Effect</h4>
+                <p>When our team works in harmony, success multiplies exponentially:</p>
+                
+                <div class="impact-metric">
+                    <strong>Adriyella captures 100% of opportunities</strong> → No missed calls or emails
+                </div>
+                <div class="impact-metric">
+                    <strong>Sales Coordinator converts 80% to orders</strong> → Efficient processing and expert guidance
+                </div>
+                <div class="impact-metric">
+                    <strong>20% identified as potential Gold accounts</strong> → Future growth opportunities
+                </div>
+                <div class="impact-metric">
+                    <strong>Nika develops these into partnerships</strong> → Recurring revenue streams
+                </div>
+                <div class="impact-metric">
+                    <strong>Factory stays at optimal capacity</strong> → Consistent workflow year-round
+                </div>
+
+                <h4>Why Each Role is CRITICAL to Sales Success</h4>
+
+                <div class="industry-wisdom">
+                    <h5>Without Adriyella:</h5>
+                    <ul>
+                        <li>Phones ring unanswered = lost sales</li>
+                        <li>Emails pile up = frustrated customers go to competitors</li>
+                        <li>No pickup notifications = customers don't think about reorders</li>
+                        <li>Sales team drowns in admin work = less time for selling</li>
+                    </ul>
+                </div>
+
+                <div class="industry-wisdom" style="background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%); border-left-color: #f59e0b;">
+                    <h5>Without Sales Coordinator:</h5>
+                    <ul>
+                        <li>Nika wastes time on $200 orders instead of building $20,000 relationships</li>
+                        <li>Order details get missed = unhappy customers = lost future sales</li>
+                        <li>No one to educate transactional customers = missed upsell opportunities</li>
+                        <li>Small customers feel neglected = they never grow into Gold accounts</li>
+                    </ul>
+                </div>
+
+                <div class="industry-wisdom" style="background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%); border-left-color: #ef4444;">
+                    <h5>Without Nika's Strategic Focus:</h5>
+                    <ul>
+                        <li>We become just another vendor, not a partner</li>
+                        <li>No recurring revenue programs = feast or famine for factory</li>
+                        <li>Competitors steal our best accounts with better relationships</li>
+                        <li>Growth stagnates because we're only reactive, never proactive</li>
+                    </ul>
+                </div>
+
+                <h4>The Bottom Line Impact</h4>
+                <p>When these three roles work as designed, the results are transformational:</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                    <div class="impact-metric" style="text-align: center;">
+                        <strong style="display: block; font-size: 2rem;">100%</strong>
+                        Lead Capture Rate<br>
+                        <small>(vs. 60% without dedicated coverage)</small>
+                    </div>
+                    <div class="impact-metric" style="text-align: center;">
+                        <strong style="display: block; font-size: 2rem;">↑35%</strong>
+                        Higher Conversion Rate<br>
+                        <small>(appropriate attention for each customer)</small>
+                    </div>
+                    <div class="impact-metric" style="text-align: center;">
+                        <strong style="display: block; font-size: 2rem;">↑50%</strong>
+                        Average Order Value<br>
+                        <small>(through strategic upselling)</small>
+                    </div>
+                    <div class="impact-metric" style="text-align: center;">
+                        <strong style="display: block; font-size: 2rem;">85%+</strong>
+                        Factory Utilization<br>
+                        <small>(mix of transactional & strategic)</small>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0ea5e9;">
+                    <h4>The Magic Formula</h4>
+                    <p style="font-size: 1.125rem; text-align: center; margin: 1rem 0;">
+                        <strong>Adriyella's First Impressions</strong> × <strong>Coordinator's Efficiency</strong> × <strong>Nika's Strategic Vision</strong> = <strong style="color: var(--primary-color);">Exponential Sales Growth</strong>
+                    </p>
+                    <p>Each role isn't just important - they're INTERDEPENDENT. Remove any one, and the whole system breaks down. Together, they transform Northwest Custom Apparel from a print shop into a strategic partner that customers can't imagine working without.</p>
+                </div>
 
                 <h3>Customer Service Philosophy</h3>
                 <ul>
@@ -382,6 +1241,103 @@
             <section id="chapter2">
                 <h2>Chapter 2: The Decorated Apparel Industry Overview</h2>
                 
+                <div class="industry-wisdom">
+                    <h4>💡 Industry Pioneer Perspective</h4>
+                    <p>"When I started my embroidery business in 1971, everyone thought it was a fad. Today, the decorated apparel industry is a fundamental marketing tool that every business needs. Understanding this evolution helps you appreciate the value we provide." - Mark Venit, Industry Pioneer</p>
+                </div>
+
+                <h3>The Evolution of Our Industry: From Fad to Fundamental</h3>
+                
+                <h4>Timeline of Decorated Apparel</h4>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <span class="timeline-date">1960s-1970s</span>
+                        <h5>The Birth of an Industry</h5>
+                        <ul>
+                            <li>Screen printing emerges for band merchandise and protest shirts</li>
+                            <li>Early embroidery machines require manual operation</li>
+                            <li>Most decoration done by local shops with limited capabilities</li>
+                            <li>Pioneers like Mark Venit see potential beyond "just a fad"</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <span class="timeline-date">1980s</span>
+                        <h5>Corporate Adoption</h5>
+                        <ul>
+                            <li>Companies discover branded apparel as marketing tool</li>
+                            <li>Computerized embroidery revolutionizes production</li>
+                            <li>Trade shows and catalogs expand market reach</li>
+                            <li>Industry associations form to establish standards</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <span class="timeline-date">1990s</span>
+                        <h5>Global Transformation</h5>
+                        <ul>
+                            <li>NAFTA shifts apparel manufacturing offshore</li>
+                            <li>Decorators pivot from manufacturing to marketing</li>
+                            <li>Internet begins changing customer expectations</li>
+                            <li>Digital design tools democratize artwork creation</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <span class="timeline-date">2000s</span>
+                        <h5>Digital Revolution</h5>
+                        <ul>
+                            <li>DTG printing enables photographic designs</li>
+                            <li>Online ordering systems emerge</li>
+                            <li>Fast fashion influences customer expectations</li>
+                            <li>Sustainability becomes customer concern</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <span class="timeline-date">2010s-Present</span>
+                        <h5>Modern Era</h5>
+                        <ul>
+                            <li>On-demand production becomes viable</li>
+                            <li>Social media drives merchandise trends</li>
+                            <li>DTF technology bridges digital and traditional</li>
+                            <li>Industry valued at over $26 billion annually</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Understanding Technology Evolution</h3>
+                
+                <div class="info-box" style="background: #e3f2fd; border-left: 4px solid #2196f3;">
+                    <h4>🔍 Historical Context for Each Decoration Method</h4>
+                    
+                    <h5>Embroidery: 5,000 Years of Excellence</h5>
+                    <ul>
+                        <li><strong>Ancient Origins:</strong> Hand embroidery dates to ancient Egypt and China</li>
+                        <li><strong>Industrial Revolution:</strong> First mechanical embroidery machines in 1800s</li>
+                        <li><strong>Computer Age:</strong> Punched tape systems in 1960s, full digitization by 1980s</li>
+                        <li><strong>Today:</strong> 15+ head machines running at 1,200 stitches per minute</li>
+                        <li><strong>Customer Value:</strong> "You're not just getting stitches - you're getting 5,000 years of craftsmanship perfected by modern technology"</li>
+                    </ul>
+
+                    <h5>Screen Printing: From Ancient Art to Athletic Dominance</h5>
+                    <ul>
+                        <li><strong>Origins:</strong> Chinese stenciling techniques from 960 AD</li>
+                        <li><strong>Modern Birth:</strong> 1960s concert posters and band merchandise</li>
+                        <li><strong>Athletic Boom:</strong> 1980s sports team uniforms drive growth</li>
+                        <li><strong>Technical Evolution:</strong> From 1-color to 12-color automated presses</li>
+                        <li><strong>Customer Value:</strong> "The same technology that creates Super Bowl jerseys creates your company shirts"</li>
+                    </ul>
+
+                    <h5>DTG: The Digital Generation</h5>
+                    <ul>
+                        <li><strong>Birth:</strong> Early 2000s adaptation of inkjet technology</li>
+                        <li><strong>Evolution:</strong> From modified desktop printers to industrial systems</li>
+                        <li><strong>Game Changer:</strong> Enabled photographic prints without screens</li>
+                        <li><strong>Customer Value:</strong> "Print your family reunion photo or complex artwork without setup costs"</li>
+                    </ul>
+                </div>
+
                 <h3>Market Dynamics and Key Trends</h3>
                 <p>The decorated apparel industry is a multi-billion dollar market serving businesses, organizations, schools, sports teams, and events. Understanding the broader industry context helps position our services effectively and anticipate customer needs.</p>
 
@@ -1328,7 +2284,13 @@
                 <h3>Phase 1: Initial Contact & Discovery</h3>
                 
                 <h4>First Impressions Matter</h4>
-                <p>Answer within 3 rings with: "Good [morning/afternoon], Northwest Custom Apparel, this is [your name]. How can I help you create something great today?"</p>
+                <p>Answer within 3 rings with: "Good [morning/afternoon], Northwest Custom Apparel, this is [your name]. How can I create a WOW moment for you today?"</p>
+                <p>Alternative greetings that align with our mission:</p>
+                <ul>
+                    <li>"How can I make your day better?"</li>
+                    <li>"How can I help create something amazing for you?"</li>
+                    <li>"What can we do to exceed your expectations today?"</li>
+                </ul>
 
                 <h4>Essential Discovery Questions</h4>
                 <ul>
@@ -1523,6 +2485,386 @@
 
                 <div class="highlight-box">
                     <p><strong>Remember:</strong> A well-handled problem often creates a more loyal customer than if nothing had gone wrong. It's not about the mistake; it's about the recovery.</p>
+                </div>
+            </section>
+
+                <!-- Mark Venit's CSR Transformation Section -->
+                <h3>Transforming CSRs into Customer Service Salespeople</h3>
+                
+                <div class="industry-wisdom">
+                    <h4>💡 Industry Wisdom from Mark Venit</h4>
+                    <p>"Everyone in your company is in sales. The accountant who calls about an invoice is representing your company. The delivery driver is your brand ambassador. And most importantly, your CSRs are often the primary relationship builders with your customers."</p>
+                </div>
+
+                <h4>The Evolution of Customer Service</h4>
+                <p>Traditional order-taking is dead. In today's competitive decorated apparel industry, CSRs must evolve into proactive sales professionals who:</p>
+                
+                <ul>
+                    <li><strong>Identify Opportunities:</strong> Listen for clues about future needs</li>
+                    <li><strong>Educate Customers:</strong> Share product knowledge to increase order value</li>
+                    <li><strong>Build Relationships:</strong> Create loyalty through exceptional service</li>
+                    <li><strong>Generate Revenue:</strong> Actively contribute to company growth</li>
+                </ul>
+
+                <h4>The "Good Phone" vs. Poor Phone Skills</h4>
+                
+                <div class="comparison-table">
+                    <div class="comparison-column">
+                        <h5>❌ Poor Phone Skills</h5>
+                        <ul>
+                            <li>"Northwest Custom Apparel, please hold." *click*</li>
+                            <li>"What do you want to order?"</li>
+                            <li>"That's not my department."</li>
+                            <li>"We can't do that."</li>
+                            <li>"The price is the price."</li>
+                            <li>"Call back later when [person] is here."</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-column">
+                        <h5>✅ "Good Phone" Excellence</h5>
+                        <ul>
+                            <li>"Good morning! This is Sarah at Northwest Custom Apparel. How can I create a WOW moment for you today?"</li>
+                            <li>"Tell me about your project - I'd love to help make it amazing!"</li>
+                            <li>"Let me connect you with the perfect person to exceed your expectations."</li>
+                            <li>"Here's what we CAN do to make you happy..."</li>
+                            <li>"I have several options that will deliver exactly what you need - and maybe a little extra!"</li>
+                            <li>"I'll personally ensure [person] calls you back within 1 hour - that's my promise to you."</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4>CSR Sales Opportunities Checklist</h4>
+                
+                <div class="highlight-box">
+                    <h5>Every Interaction is a Sales Opportunity:</h5>
+                    <ul>
+                        <li>☐ Customer calling about an invoice? → Ask about upcoming events</li>
+                        <li>☐ Checking on order status? → Mention complementary products</li>
+                        <li>☐ Placing a reorder? → Suggest quantity increase for better pricing</li>
+                        <li>☐ Asking about one product? → Educate about full product line</li>
+                        <li>☐ Complaining about a problem? → Turn recovery into loyalty and future sales</li>
+                    </ul>
+                </div>
+
+                <h4>The CSR Sales Process</h4>
+                
+                <ol>
+                    <li><strong>Listen Actively:</strong> "I hear you need shirts for your company picnic..."</li>
+                    <li><strong>Ask Expanding Questions:</strong> "Do you do other events throughout the year?"</li>
+                    <li><strong>Identify Additional Needs:</strong> "Would matching caps interest you?"</li>
+                    <li><strong>Present Solutions:</strong> "Many of our construction clients also order safety vests..."</li>
+                    <li><strong>Create Urgency:</strong> "If we start your holiday order now, you'll save 15%..."</li>
+                    <li><strong>Follow Through:</strong> "I'll call you next quarter about your spring needs."</li>
+                </ol>
+
+                <h4>CSR Incentive Structure</h4>
+                
+                <div class="info-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Points/Reward</th>
+                                <th>Why It Matters</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Upsell to next quantity break</td>
+                                <td>5 points</td>
+                                <td>Increases order value & customer savings</td>
+                            </tr>
+                            <tr>
+                                <td>Add complementary product</td>
+                                <td>10 points</td>
+                                <td>Expands customer relationship</td>
+                            </tr>
+                            <tr>
+                                <td>Convert quote to order</td>
+                                <td>15 points</td>
+                                <td>Direct revenue impact</td>
+                            </tr>
+                            <tr>
+                                <td>Identify new project opportunity</td>
+                                <td>20 points</td>
+                                <td>Future business development</td>
+                            </tr>
+                            <tr>
+                                <td>Save a cancellation</td>
+                                <td>25 points</td>
+                                <td>Retention is cheaper than acquisition</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>Advanced CSR Sales Techniques</h4>
+                
+                <h5>1. The Assumptive Add-On</h5>
+                <div class="highlight-box">
+                    <p>"I'm adding your company logo to the left chest as usual. Would you also like employee names on the right chest? We're running a special on personalization this month."</p>
+                </div>
+
+                <h5>2. The Inventory Protection Play</h5>
+                <div class="highlight-box">
+                    <p>"I noticed you typically reorder every 3 months. With supply chain uncertainties, many clients are ordering 6-month supplies. Would you like me to quote that for comparison?"</p>
+                </div>
+
+                <h5>3. The Budget Maximizer</h5>
+                <div class="highlight-box">
+                    <p>"You mentioned a $2,000 budget. At your current quantity, you're at $1,750. For just $250 more, you could add 24 matching polos for your office staff. Should I include those?"</p>
+                </div>
+
+                <h5>4. The Seasonal Suggester</h5>
+                <div class="highlight-box">
+                    <p>"Since you're ordering summer shirts, this is perfect timing to plan your fall jackets. Orders placed by August 1st get priority production for September delivery."</p>
+                </div>
+
+                <h4>Tracking CSR Sales Performance</h4>
+                
+                <ul>
+                    <li><strong>Daily Metrics:</strong> Calls handled, quotes generated, upsells achieved</li>
+                    <li><strong>Weekly Reviews:</strong> Conversion rates, average order value increase</li>
+                    <li><strong>Monthly Recognition:</strong> Top performer awards, team achievements</li>
+                    <li><strong>Quarterly Training:</strong> Skills development based on performance gaps</li>
+                </ul>
+
+                <div class="industry-wisdom">
+                    <h4>💡 The Venit Principle</h4>
+                    <p>"A great CSR doesn't just solve today's problem - they prevent tomorrow's crisis and create next month's opportunity. Train them to think like business partners, not just service providers."</p>
+                </div>
+
+                <h3>Lead Generation & Processing Excellence</h3>
+                
+                <h4>The Lead Response Formula</h4>
+                <p>Mark Venit's research shows that responding to leads within 5 minutes increases conversion rates by 400%. Here's our process:</p>
+                
+                <ol>
+                    <li><strong>Immediate Acknowledgment</strong> (within 5 minutes)</li>
+                    <li><strong>Qualification Call</strong> (within 1 hour)</li>
+                    <li><strong>Quote Delivery</strong> (within 4 hours)</li>
+                    <li><strong>First Follow-up</strong> (within 24 hours)</li>
+                    <li><strong>Nurture Sequence</strong> (7, 14, 30 days)</li>
+                </ol>
+
+                <h4>Lead Qualification Script</h4>
+                <div class="highlight-box">
+                    <p><strong>Opening:</strong> "Hi [Name], this is [Your Name] from Northwest Custom Apparel. I just received your inquiry about [specific request]. I'm excited to help you with this project! Do you have 5 minutes to discuss your needs?"</p>
+                    
+                    <p><strong>BANT Qualification:</strong></p>
+                    <ul>
+                        <li><strong>Budget:</strong> "To ensure I provide the most relevant options, what budget range are you working with?"</li>
+                        <li><strong>Authority:</strong> "Are you the decision maker for this project, or will others be involved?"</li>
+                        <li><strong>Need:</strong> "Tell me more about the event/purpose for these items."</li>
+                        <li><strong>Timeline:</strong> "When do you need these in hand?"</li>
+                    </ul>
+                    
+                    <p><strong>Closing:</strong> "Based on what you've told me, I have some great solutions. I'll prepare a detailed quote with options and have it to you within 2 hours. What's the best email for that?"</p>
+                </div>
+
+                <h3>The Art of Pricing Psychology</h3>
+                
+                <div class="industry-wisdom">
+                    <h4>💡 Venit's Pricing Wisdom</h4>
+                    <p>"Price is only an issue in the absence of value. Your job isn't to be the cheapest - it's to help customers understand why you're worth the investment."</p>
+                </div>
+
+                <h4>The Good-Better-Best Presentation</h4>
+                <p>Always present three options to anchor perception and guide choice:</p>
+                
+                <div class="info-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Option</th>
+                                <th>Description</th>
+                                <th>Positioning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Good</strong></td>
+                                <td>Basic solution, meets minimum needs</td>
+                                <td>"This gets the job done within budget"</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Better</strong></td>
+                                <td>Enhanced value, most popular choice</td>
+                                <td>"Most of our clients choose this for the best value"</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Best</strong></td>
+                                <td>Premium solution, maximum impact</td>
+                                <td>"This makes a real statement about your brand"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>Overcoming Price Objections</h4>
+                
+                <p><strong>Customer:</strong> "That's more than I wanted to spend."</p>
+                <div class="highlight-box">
+                    <p><strong>Wrong Response:</strong> "Well, how much did you want to spend?"</p>
+                    <p><strong>Right Response:</strong> "I understand budget is important. Let me show you where the value is in this quote, and then we can explore some options to get closer to your target..."</p>
+                </div>
+
+                <p><strong>Customer:</strong> "XYZ Company quoted me 20% less."</p>
+                <div class="highlight-box">
+                    <p><strong>Response:</strong> "I appreciate you sharing that. Pricing in our industry can vary based on many factors - garment quality, decoration method, service level. May I ask a few questions about their quote to ensure we're comparing apples to apples? Often we find differences in shipping costs, setup fees, or garment brands that explain the variation."</p>
+                </div>
+
+                <h3>Customer Retention Mastery</h3>
+                
+                <h4>The Lifetime Value Mindset</h4>
+                <p>A customer ordering 48 shirts today could mean:</p>
+                <ul>
+                    <li>4 seasonal orders per year = 192 shirts annually</li>
+                    <li>5-year relationship = 960 shirts</li>
+                    <li>Average order value $1,200 = $24,000 lifetime value</li>
+                    <li>Plus referrals = immeasurable additional value</li>
+                </ul>
+
+                <h4>24 Ways to Get Customers to Love You</h4>
+                <p>Adapted from Mark Venit's proven strategies:</p>
+                
+                <div class="two-column-list">
+                    <ol>
+                        <li>Remember their preferences</li>
+                        <li>Call with industry news relevant to them</li>
+                        <li>Send birthday cards to key contacts</li>
+                        <li>Provide free samples of new products</li>
+                        <li>Offer exclusive early access to sales</li>
+                        <li>Create custom catalogs for their needs</li>
+                        <li>Visit their business location</li>
+                        <li>Feature them in success stories</li>
+                        <li>Invite them to VIP events</li>
+                        <li>Solve problems before they ask</li>
+                        <li>Send thank you notes after orders</li>
+                        <li>Remember employee names</li>
+                        <li>Track their busy seasons</li>
+                        <li>Offer storage for bulk orders</li>
+                        <li>Provide industry-specific expertise</li>
+                        <li>Make ordering easy with templates</li>
+                        <li>Celebrate their business milestones</li>
+                        <li>Introduce them to helpful vendors</li>
+                        <li>Share cost-saving opportunities</li>
+                        <li>Be honest about limitations</li>
+                        <li>Respond faster than expected</li>
+                        <li>Fix mistakes generously</li>
+                        <li>Ask for feedback and act on it</li>
+                        <li>Treat them like family, not transactions</li>
+                    </ol>
+                </div>
+
+                <div class="highlight-box" style="background: #fff3cd; border-left: 4px solid #ffc107;">
+                    <h4>⚠️ Dumb Mistake Alert</h4>
+                    <p><strong>Never compete on price alone!</strong> As Venit warns: "The customer who comes to you for price will leave you for price. Build value, relationships, and expertise - those create loyal customers who pay fairly for superior service."</p>
+                </div>
+
+                <h3>Creating WOW Moments: The Northwest Way</h3>
+                
+                <div class="highlight-box" style="background: linear-gradient(135deg, #e1bee7 0%, #f3e5f5 100%); border-left: 4px solid #9c27b0;">
+                    <h4>🌟 The WOW Formula</h4>
+                    <p><strong>W</strong>atch for opportunities to exceed expectations<br>
+                    <strong>O</strong>ffer solutions before they ask<br>
+                    <strong>W</strong>in their loyalty through unexpected delight</p>
+                </div>
+
+                <h4>Practical WOW Moment Strategies</h4>
+                
+                <div class="info-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Situation</th>
+                                <th>Standard Response</th>
+                                <th>WOW Response</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Customer needs rush order</td>
+                                <td>"We can do it for a rush fee"</td>
+                                <td>"Let me check with production right now to see if we can squeeze this in without the rush fee"</td>
+                            </tr>
+                            <tr>
+                                <td>Small quantity order</td>
+                                <td>"We have a minimum"</td>
+                                <td>"While we have minimums, let me see if I can combine with another order to save you money"</td>
+                            </tr>
+                            <tr>
+                                <td>Customer unsure about color</td>
+                                <td>"Here's our color chart"</td>
+                                <td>"I'll send you actual fabric swatches today so you can see exactly how it looks"</td>
+                            </tr>
+                            <tr>
+                                <td>Repeat customer calls</td>
+                                <td>"How can I help?"</td>
+                                <td>"Hi [Name]! I bet you're calling about shirts for your summer event - I have your favorites ready to quote!"</td>
+                            </tr>
+                            <tr>
+                                <td>Problem with order</td>
+                                <td>"We'll fix it"</td>
+                                <td>"I'm so sorry! We'll fix this immediately, and I'm adding a credit to your account for the inconvenience"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>The "Plus One" Principle</h4>
+                <p>Whatever the customer expects, add one more thing:</p>
+                <ul>
+                    <li>They expect a quote? Include a mock-up visual</li>
+                    <li>They expect delivery? Include care instructions</li>
+                    <li>They expect their order? Include samples of new products</li>
+                    <li>They expect a follow-up? Include a thank you note</li>
+                    <li>They expect professionalism? Add genuine warmth</li>
+                </ul>
+
+                <h4>Delivering Happiness Through Problem Resolution</h4>
+                
+                <div class="highlight-box">
+                    <h5>The 5-Step Happiness Recovery Process</h5>
+                    <ol>
+                        <li><strong>Acknowledge with Empathy:</strong> "I completely understand how frustrating this must be"</li>
+                        <li><strong>Apologize Sincerely:</strong> "I'm truly sorry this happened"</li>
+                        <li><strong>Act Immediately:</strong> "Here's what I'm doing right now to fix this"</li>
+                        <li><strong>Add Value:</strong> "And to make up for the inconvenience..."</li>
+                        <li><strong>Assure Future Excellence:</strong> "I've made notes to ensure this never happens again"</li>
+                    </ol>
+                </div>
+
+                <h3>Advanced Sales Strategies</h3>
+                
+                <h4>The Consultative Close</h4>
+                <p>Stop asking "Do you want to place this order?" Instead:</p>
+                
+                <div class="highlight-box">
+                    <p>"Based on your September 15th event date, we should get this order started by August 20th to ensure relaxed production time. I have production slots available the week of August 22nd. Should I reserve that for you?"</p>
+                </div>
+
+                <h4>The Partnership Position</h4>
+                <p>Position yourself as their apparel department:</p>
+                
+                <div class="highlight-box">
+                    <p>"Many of our construction clients treat us as their uniform department. We maintain their size records, monitor inventory levels, and automatically remind them when it's time to reorder. This saves them hours of administrative time. Would this type of partnership be valuable for your company?"</p>
+                </div>
+
+                <h4>The Strategic Upsell</h4>
+                <p>Time upsells strategically in the conversation:</p>
+                
+                <ul>
+                    <li><strong>During Discovery:</strong> Plant seeds about additional products</li>
+                    <li><strong>During Presentation:</strong> Show complementary items naturally</li>
+                    <li><strong>After Agreement:</strong> "Oh, one more thing that might interest you..."</li>
+                    <li><strong>At Delivery:</strong> Include samples of related products</li>
+                    <li><strong>In Follow-up:</strong> Reference seasonal opportunities</li>
+                </ul>
+
+                <div class="industry-wisdom">
+                    <h4>💡 Final Wisdom from Mark Venit</h4>
+                    <p>"The decorated apparel industry has evolved from a 'fad' to a fundamental marketing tool. Today's successful companies don't just take orders - they solve branding problems, create memorable experiences, and build lasting partnerships. Train every employee to think this way, and you'll not only survive but thrive in any market condition."</p>
                 </div>
             </section>
 
@@ -1731,8 +3073,7 @@
                 <ul>
                     <li><strong>Accrual:</strong> Based on length of service</li>
                     <li><strong>Year 1:</strong> 40 hours (5 days)</li>
-                    <li><strong>Years 2-5:</strong> 80 hours (10 days)</li>
-                    <li><strong>Years 6+:</strong> 120 hours (15 days)</li>
+                    <li><strong>Years 2+:</strong> 80 hours (10 days)</li>
                     <li><strong>Request Process:</strong> Submit 2 weeks in advance when possible</li>
                 </ul>
 
@@ -1766,6 +3107,182 @@
                     <li><strong>Confidentiality:</strong> Customer information stays private</li>
                 </ul>
 
+                <h3>Performance Expectations & Goal Setting</h3>
+                
+                <div class="industry-wisdom">
+                    <h4>💡 Performance Philosophy</h4>
+                    <p>"What gets measured gets managed. Set clear goals, track progress daily, and celebrate wins weekly. A CSR without goals is just an order taker. A CSR with goals is a profit center." - Mark Venit</p>
+                </div>
+
+                <h4>CSR Performance Standards</h4>
+                
+                <div class="info-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Minimum Standard</th>
+                                <th>Excellence Standard</th>
+                                <th>Measurement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Phone Answer Speed</td>
+                                <td>Within 3 rings</td>
+                                <td>Within 2 rings</td>
+                                <td>Daily monitoring</td>
+                            </tr>
+                            <tr>
+                                <td>Email Response</td>
+                                <td>Within 4 hours</td>
+                                <td>Within 1 hour</td>
+                                <td>Time stamps</td>
+                            </tr>
+                            <tr>
+                                <td>Quote Conversion</td>
+                                <td>25%</td>
+                                <td>40%+</td>
+                                <td>Monthly report</td>
+                            </tr>
+                            <tr>
+                                <td>Average Order Value</td>
+                                <td>Maintain baseline</td>
+                                <td>5% monthly increase</td>
+                                <td>Monthly analysis</td>
+                            </tr>
+                            <tr>
+                                <td>Customer Satisfaction</td>
+                                <td>No complaints</td>
+                                <td>Positive feedback</td>
+                                <td>Customer surveys</td>
+                            </tr>
+                            <tr>
+                                <td>Product Knowledge</td>
+                                <td>Pass monthly quiz</td>
+                                <td>Train others</td>
+                                <td>Testing & observation</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>Monthly Goal Setting Framework</h4>
+                
+                <ol>
+                    <li><strong>Personal Revenue Goal:</strong> Each CSR should have a monthly revenue target</li>
+                    <li><strong>New Customer Goal:</strong> Acquire X new accounts per month</li>
+                    <li><strong>Reactivation Goal:</strong> Bring back X dormant customers</li>
+                    <li><strong>Learning Goal:</strong> Master one new product line or technique</li>
+                    <li><strong>Efficiency Goal:</strong> Reduce quote time by X%</li>
+                </ol>
+
+                <h4>Commission & Incentive Structure</h4>
+                
+                <div class="highlight-box">
+                    <h5>Base + Performance Model</h5>
+                    <ul>
+                        <li><strong>Base Salary:</strong> Competitive hourly/salary rate</li>
+                        <li><strong>Commission Tier 1:</strong> 1% on sales $10,000-$20,000/month</li>
+                        <li><strong>Commission Tier 2:</strong> 2% on sales $20,001-$30,000/month</li>
+                        <li><strong>Commission Tier 3:</strong> 3% on sales over $30,000/month</li>
+                        <li><strong>Quarterly Bonus:</strong> $500 for top performer</li>
+                        <li><strong>Spiffs:</strong> Special bonuses for promoting specific products</li>
+                    </ul>
+                </div>
+
+                <h3>Business Best Practices</h3>
+                
+                <h4>Positioning & Differentiation</h4>
+                
+                <div class="industry-wisdom">
+                    <h4>💡 The Venit Differentiation Model</h4>
+                    <p>"In a commodity business, the only differentiation is YOU. Your expertise, your service, your follow-through. Make yourself indispensable and price becomes secondary."</p>
+                </div>
+
+                <h5>Our Unique Value Propositions</h5>
+                <ol>
+                    <li><strong>Local Production:</strong> "See your order being made"</li>
+                    <li><strong>Multi-Method Expertise:</strong> "One stop for all decoration needs"</li>
+                    <li><strong>Rush Capability:</strong> "When you need it yesterday"</li>
+                    <li><strong>Personal Service:</strong> "Your dedicated apparel consultant"</li>
+                    <li><strong>Quality Guarantee:</strong> "We fix it or refund it"</li>
+                </ol>
+
+                <h4>Common "Dumb Mistakes" to Avoid</h4>
+                
+                <div class="highlight-box" style="background: #ffebee; border-left: 4px solid #f44336;">
+                    <h5>❌ The Top 10 Profit Killers</h5>
+                    <ol>
+                        <li><strong>Competing on price alone</strong> - You'll always lose to someone cheaper</li>
+                        <li><strong>Not asking for the sale</strong> - Assume they want to buy</li>
+                        <li><strong>Forgetting existing customers</strong> - Costs 5x more to get new ones</li>
+                        <li><strong>Poor phone skills</strong> - First impressions are everything</li>
+                        <li><strong>Not upselling</strong> - Leave money on every order</li>
+                        <li><strong>Slow follow-up</strong> - Speed wins in sales</li>
+                        <li><strong>No systems</strong> - Chaos kills productivity</li>
+                        <li><strong>Accepting rush orders without fees</strong> - Time has value</li>
+                        <li><strong>Not tracking metrics</strong> - Can't improve what you don't measure</li>
+                        <li><strong>Giving up after one "no"</strong> - 80% of sales require 5+ touches</li>
+                    </ol>
+                </div>
+
+                <h4>Profitability Guidelines</h4>
+                
+                <div class="info-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order Type</th>
+                                <th>Target Margin</th>
+                                <th>Minimum Acceptable</th>
+                                <th>Red Flag</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Standard Orders</td>
+                                <td>50-60%</td>
+                                <td>40%</td>
+                                <td>Under 35%</td>
+                            </tr>
+                            <tr>
+                                <td>Rush Orders</td>
+                                <td>60-70%</td>
+                                <td>50%</td>
+                                <td>Under 45%</td>
+                            </tr>
+                            <tr>
+                                <td>Contract/Program</td>
+                                <td>40-50%</td>
+                                <td>35%</td>
+                                <td>Under 30%</td>
+                            </tr>
+                            <tr>
+                                <td>Small Orders (<$250)</td>
+                                <td>60-70%</td>
+                                <td>50%</td>
+                                <td>Under 45%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>The "Progress Not Perfection" Mindset</h4>
+                
+                <ul>
+                    <li><strong>Daily Improvement:</strong> 1% better each day = 365% better in a year</li>
+                    <li><strong>Learn from Mistakes:</strong> Document what went wrong and share solutions</li>
+                    <li><strong>Celebrate Small Wins:</strong> Every upsell, saved order, and happy customer matters</li>
+                    <li><strong>Ask for Help:</strong> The team succeeds together</li>
+                    <li><strong>Stay Curious:</strong> The industry constantly evolves - so should you</li>
+                </ul>
+
+                <div class="industry-wisdom">
+                    <h4>💡 Final Words on Excellence</h4>
+                    <p>"Excellence is not a skill, it's an attitude. It's doing ordinary things extraordinarily well. It's caring more than others think is wise. It's the daily commitment to be better than you were yesterday." - Ralph Marston, adapted for our industry</p>
+                </div>
+
                 <h3>Performance and Development</h3>
                 
                 <h4>Performance Reviews</h4>
@@ -1782,24 +3299,6 @@
                     <li><strong>Ongoing Education:</strong> Monthly skill-building sessions</li>
                     <li><strong>Industry Events:</strong> Trade show attendance for key staff</li>
                     <li><strong>Certification:</strong> Support for relevant certifications</li>
-                </ul>
-
-                <h3>Benefits and Perks</h3>
-                
-                <h4>Health and Wellness</h4>
-                <ul>
-                    <li><strong>Health Insurance:</strong> Company pays 70% of premium</li>
-                    <li><strong>Dental/Vision:</strong> Optional at employee cost</li>
-                    <li><strong>Life Insurance:</strong> $25,000 policy provided</li>
-                    <li><strong>Disability:</strong> Short and long-term options available</li>
-                </ul>
-
-                <h4>Additional Benefits</h4>
-                <ul>
-                    <li><strong>401(k):</strong> Company match up to 3% after 1 year</li>
-                    <li><strong>Employee Discount:</strong> 40% off personal orders</li>
-                    <li><strong>Sample Sales:</strong> Quarterly sales of samples/overruns</li>
-                    <li><strong>Company Events:</strong> Summer BBQ, holiday party</li>
                 </ul>
 
                 <h3>Workplace Safety</h3>
@@ -2559,6 +4058,133 @@
                 <div class="warning-box">
                     <p><strong>Final Thought:</strong> You are the face and voice of Northwest Custom Apparel. Every interaction you have shapes our reputation. Make it count!</p>
                 </div>
+            </section>
+
+            <!-- Conclusion with Mark Venit's Wisdom -->
+            <section id="conclusion">
+                <h2>Conclusion: Your Journey to Excellence</h2>
+                
+                <div class="industry-wisdom">
+                    <h4>💡 A Message from an Industry Legend</h4>
+                    <p>"After 50+ years in this industry, I've learned that success isn't about having the best equipment or the lowest prices. It's about people who care - care about their craft, care about their customers, and care about continuous improvement. You are now part of a noble profession that helps businesses build their brands and create lasting impressions. Take pride in that." - Mark Venit</p>
+                </div>
+
+                <h3>Your Path Forward</h3>
+                
+                <p>This manual has provided you with the foundation, but your real education begins now. Every customer interaction, every order processed, and every challenge overcome adds to your expertise. Remember these key principles as you grow:</p>
+                
+                <div class="highlight-box" style="background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);">
+                    <h4>The Northwest Custom Apparel Success Formula</h4>
+                    <ol>
+                        <li><strong>Knowledge + Application = Expertise</strong><br>
+                        Learn continuously, but more importantly, apply what you learn</li>
+                        
+                        <li><strong>Service + Sales = Success</strong><br>
+                        Great service opens doors; smart selling walks through them</li>
+                        
+                        <li><strong>Problems + Solutions = Opportunities</strong><br>
+                        Every challenge is a chance to prove your value</li>
+                        
+                        <li><strong>Relationships + Results = Retention</strong><br>
+                        Build both and customers stay for life</li>
+                        
+                        <li><strong>Progress + Persistence = Profit</strong><br>
+                        Small daily improvements compound into major achievements</li>
+                    </ol>
+                </div>
+
+                <h3>Industry Wisdom to Live By</h3>
+                
+                <div class="two-column-list">
+                    <ul style="list-style: none; padding: 0;">
+                        <li>📌 "The customer's perception is your reality"</li>
+                        <li>📌 "Speed of response beats perfection of response"</li>
+                        <li>📌 "Educate, don't just quote"</li>
+                        <li>📌 "Sell the hole, not the drill"</li>
+                        <li>📌 "Under-promise and over-deliver"</li>
+                        <li>📌 "Make deposits before withdrawals"</li>
+                        <li>📌 "Listen twice as much as you talk"</li>
+                        <li>📌 "Turn features into benefits"</li>
+                        <li>📌 "Quality is remembered long after price is forgotten"</li>
+                        <li>📌 "Every 'no' gets you closer to 'yes'"</li>
+                    </ul>
+                </div>
+
+                <h3>Your First 90 Days</h3>
+                
+                <div class="info-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Days 1-30</th>
+                                <th>Days 31-60</th>
+                                <th>Days 61-90</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <ul>
+                                        <li>Master phone greetings</li>
+                                        <li>Learn product basics</li>
+                                        <li>Shadow experienced reps</li>
+                                        <li>Practice quote calculators</li>
+                                        <li>Study customer types</li>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <li>Handle simple orders solo</li>
+                                        <li>Build first quotes</li>
+                                        <li>Develop phone confidence</li>
+                                        <li>Learn common objections</li>
+                                        <li>Start building relationships</li>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <li>Manage complex projects</li>
+                                        <li>Achieve sales goals</li>
+                                        <li>Mentor newer staff</li>
+                                        <li>Suggest improvements</li>
+                                        <li>Own customer accounts</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Remember Why We Do This</h3>
+                
+                <p>We're not just decorating apparel. We're:</p>
+                <ul>
+                    <li>Helping a construction company keep workers safe with high-visibility gear</li>
+                    <li>Creating team unity with matching uniforms</li>
+                    <li>Building brand recognition that drives business growth</li>
+                    <li>Commemorating life's special moments with custom designs</li>
+                    <li>Supporting local businesses in our community</li>
+                </ul>
+
+                <div class="highlight-box" style="background: #fff3cd; border-left: 4px solid #ffc107;">
+                    <h4>⚠️ One Final "Dumb Mistake" to Avoid</h4>
+                    <p><strong>Thinking you know it all.</strong> The moment you stop learning is the moment you start falling behind. This industry constantly evolves. New technologies emerge. Customer expectations shift. Stay humble, stay curious, and stay ahead.</p>
+                </div>
+
+                <h3>Welcome to the Team</h3>
+                
+                <p>You've completed this manual, but your journey is just beginning. You're now equipped with knowledge that took decades to accumulate. Use it wisely, share it generously, and add your own chapters to our story.</p>
+                
+                <p>As you interact with customers, remember that you represent not just Northwest Custom Apparel, but an entire industry of craftspeople, artists, and business professionals who help brands come to life through decorated apparel.</p>
+                
+                <div class="industry-wisdom">
+                    <h4>💡 Your Challenge</h4>
+                    <p>"Make every customer interaction so positive, so helpful, and so professional that they wouldn't dream of going anywhere else. Do that, and you'll not only build a career - you'll build a legacy." - Jim Mickelson, Owner</p>
+                </div>
+
+                <p style="text-align: center; font-size: 1.25rem; margin-top: 3rem; color: var(--primary-color);">
+                    <strong>Now go forth and create something great!</strong>
+                </p>
             </section>
         </article>
     </main>

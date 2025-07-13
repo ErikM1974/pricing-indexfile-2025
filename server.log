@@ -7,3 +7,6 @@ Using existing Caspio API for quote functionality:
   Quote Sessions: /api/quote_sessions
   Quote Items: /api/quote_items
   Quote Analytics: /api/quote_analytics
+Serving index.html for root route
+Serving index.html for root route
+Serving index.html for root route
