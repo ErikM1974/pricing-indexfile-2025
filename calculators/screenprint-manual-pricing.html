@@ -294,6 +294,24 @@
             font-size: 0.8rem;
             z-index: 1000;
         }
+
+        /* Fallback data notice */
+        .fallback-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .fallback-notice i {
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -360,6 +378,20 @@
                     <div class="safety-checkbox">
                         <input type="checkbox" id="frontSafety">
                         <label for="frontSafety" class="safety-label">Add Safety Stripes (+$2.00)</label>
+                    </div>
+                </div>
+
+                <!-- Dark Garment Option -->
+                <div class="form-group" style="margin-top: 1rem; padding: 1rem; background: var(--bg-color); border-radius: 6px;">
+                    <div class="safety-checkbox">
+                        <input type="checkbox" id="darkGarment">
+                        <label for="darkGarment" style="font-weight: 600;">
+                            <i class="fas fa-fill-drip" style="color: #666;"></i>
+                            Dark garment (needs white underbase)
+                        </label>
+                    </div>
+                    <div class="help-text" style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        Adds 1 color per location for white underbase ink
                     </div>
                 </div>
 
@@ -474,12 +506,131 @@
         const CACHE_KEY = 'screenprint_manual_pricing_data';
         const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+        // Fallback data for when API is unavailable
+        const FALLBACK_DATA = {
+            version: "2025-01-14",
+            lastUpdated: "January 14, 2025",
+            notice: "Using offline pricing data",
+            tiersR: [
+                {
+                    "PK_ID": 13,
+                    "TierID": 13,
+                    "DecorationMethod": "ScreenPrint",
+                    "TierLabel": "13-36",
+                    "MinQuantity": 13,
+                    "MaxQuantity": 36,
+                    "MarginDenominator": 0.45,
+                    "TargetMargin": 0,
+                    "LTM_Fee": 50
+                },
+                {
+                    "PK_ID": 14,
+                    "TierID": 14,
+                    "DecorationMethod": "ScreenPrint",
+                    "TierLabel": "37-72",
+                    "MinQuantity": 37,
+                    "MaxQuantity": 72,
+                    "MarginDenominator": 0.5,
+                    "TargetMargin": 0,
+                    "LTM_Fee": 0
+                },
+                {
+                    "PK_ID": 15,
+                    "TierID": 15,
+                    "DecorationMethod": "ScreenPrint",
+                    "TierLabel": "73-144",
+                    "MinQuantity": 73,
+                    "MaxQuantity": 144,
+                    "MarginDenominator": 0.55,
+                    "TargetMargin": 0,
+                    "LTM_Fee": 0
+                },
+                {
+                    "PK_ID": 16,
+                    "TierID": 16,
+                    "DecorationMethod": "ScreenPrint",
+                    "TierLabel": "145-576",
+                    "MinQuantity": 145,
+                    "MaxQuantity": 576,
+                    "MarginDenominator": 0.6,
+                    "TargetMargin": 0,
+                    "LTM_Fee": 0
+                }
+            ],
+            rulesR: {
+                "RoundingMethod": "HalfDollarCeil_Final",
+                "FlashCharge": "0.35",
+                "SetupFeePerColor": "30"
+            },
+            locations: [
+                {
+                    "code": "LC",
+                    "name": "Left Chest"
+                },
+                {
+                    "code": "FB",
+                    "name": "Full Back"
+                }
+            ],
+            allScreenprintCostsR: [
+                {"PK_ID": 1, "ScreenPrintCostID": 1, "CostType": "PrimaryLocation", "TierLabel": "13-36", "ColorCount": 1, "BasePrintCost": 2.35},
+                {"PK_ID": 2, "ScreenPrintCostID": 2, "CostType": "PrimaryLocation", "TierLabel": "13-36", "ColorCount": 2, "BasePrintCost": 2.85},
+                {"PK_ID": 3, "ScreenPrintCostID": 3, "CostType": "PrimaryLocation", "TierLabel": "13-36", "ColorCount": 3, "BasePrintCost": 3.15},
+                {"PK_ID": 4, "ScreenPrintCostID": 4, "CostType": "PrimaryLocation", "TierLabel": "13-36", "ColorCount": 4, "BasePrintCost": 3.45},
+                {"PK_ID": 5, "ScreenPrintCostID": 5, "CostType": "PrimaryLocation", "TierLabel": "13-36", "ColorCount": 5, "BasePrintCost": 3.7},
+                {"PK_ID": 6, "ScreenPrintCostID": 6, "CostType": "PrimaryLocation", "TierLabel": "13-36", "ColorCount": 6, "BasePrintCost": 3.95},
+                {"PK_ID": 7, "ScreenPrintCostID": 7, "CostType": "PrimaryLocation", "TierLabel": "37-72", "ColorCount": 1, "BasePrintCost": 2.05},
+                {"PK_ID": 8, "ScreenPrintCostID": 8, "CostType": "PrimaryLocation", "TierLabel": "37-72", "ColorCount": 2, "BasePrintCost": 2.15},
+                {"PK_ID": 9, "ScreenPrintCostID": 9, "CostType": "PrimaryLocation", "TierLabel": "37-72", "ColorCount": 3, "BasePrintCost": 2.35},
+                {"PK_ID": 10, "ScreenPrintCostID": 10, "CostType": "PrimaryLocation", "TierLabel": "37-72", "ColorCount": 4, "BasePrintCost": 2.55},
+                {"PK_ID": 11, "ScreenPrintCostID": 11, "CostType": "PrimaryLocation", "TierLabel": "37-72", "ColorCount": 5, "BasePrintCost": 2.75},
+                {"PK_ID": 12, "ScreenPrintCostID": 12, "CostType": "PrimaryLocation", "TierLabel": "37-72", "ColorCount": 6, "BasePrintCost": 2.9},
+                {"PK_ID": 13, "ScreenPrintCostID": 13, "CostType": "PrimaryLocation", "TierLabel": "73-144", "ColorCount": 1, "BasePrintCost": 1.95},
+                {"PK_ID": 14, "ScreenPrintCostID": 14, "CostType": "PrimaryLocation", "TierLabel": "73-144", "ColorCount": 2, "BasePrintCost": 2},
+                {"PK_ID": 15, "ScreenPrintCostID": 15, "CostType": "PrimaryLocation", "TierLabel": "73-144", "ColorCount": 3, "BasePrintCost": 2.1},
+                {"PK_ID": 16, "ScreenPrintCostID": 16, "CostType": "PrimaryLocation", "TierLabel": "73-144", "ColorCount": 4, "BasePrintCost": 2.2},
+                {"PK_ID": 17, "ScreenPrintCostID": 17, "CostType": "PrimaryLocation", "TierLabel": "73-144", "ColorCount": 5, "BasePrintCost": 2.4},
+                {"PK_ID": 18, "ScreenPrintCostID": 18, "CostType": "PrimaryLocation", "TierLabel": "73-144", "ColorCount": 6, "BasePrintCost": 2.6},
+                {"PK_ID": 19, "ScreenPrintCostID": 19, "CostType": "PrimaryLocation", "TierLabel": "145-576", "ColorCount": 1, "BasePrintCost": 1.8},
+                {"PK_ID": 20, "ScreenPrintCostID": 20, "CostType": "PrimaryLocation", "TierLabel": "145-576", "ColorCount": 2, "BasePrintCost": 1.85},
+                {"PK_ID": 21, "ScreenPrintCostID": 21, "CostType": "PrimaryLocation", "TierLabel": "145-576", "ColorCount": 3, "BasePrintCost": 1.95},
+                {"PK_ID": 22, "ScreenPrintCostID": 22, "CostType": "PrimaryLocation", "TierLabel": "145-576", "ColorCount": 4, "BasePrintCost": 2.05},
+                {"PK_ID": 23, "ScreenPrintCostID": 23, "CostType": "PrimaryLocation", "TierLabel": "145-576", "ColorCount": 5, "BasePrintCost": 2.2},
+                {"PK_ID": 24, "ScreenPrintCostID": 24, "CostType": "PrimaryLocation", "TierLabel": "145-576", "ColorCount": 6, "BasePrintCost": 2.3},
+                {"PK_ID": 25, "ScreenPrintCostID": 25, "CostType": "AdditionalLocation", "TierLabel": "13-36", "ColorCount": 1, "BasePrintCost": 5.5},
+                {"PK_ID": 26, "ScreenPrintCostID": 26, "CostType": "AdditionalLocation", "TierLabel": "13-36", "ColorCount": 2, "BasePrintCost": 6},
+                {"PK_ID": 27, "ScreenPrintCostID": 27, "CostType": "AdditionalLocation", "TierLabel": "13-36", "ColorCount": 3, "BasePrintCost": 7},
+                {"PK_ID": 28, "ScreenPrintCostID": 28, "CostType": "AdditionalLocation", "TierLabel": "13-36", "ColorCount": 4, "BasePrintCost": 7.5},
+                {"PK_ID": 29, "ScreenPrintCostID": 29, "CostType": "AdditionalLocation", "TierLabel": "13-36", "ColorCount": 5, "BasePrintCost": 8},
+                {"PK_ID": 30, "ScreenPrintCostID": 30, "CostType": "AdditionalLocation", "TierLabel": "13-36", "ColorCount": 6, "BasePrintCost": 8.5},
+                {"PK_ID": 31, "ScreenPrintCostID": 31, "CostType": "AdditionalLocation", "TierLabel": "37-72", "ColorCount": 1, "BasePrintCost": 5},
+                {"PK_ID": 32, "ScreenPrintCostID": 32, "CostType": "AdditionalLocation", "TierLabel": "37-72", "ColorCount": 2, "BasePrintCost": 5.5},
+                {"PK_ID": 33, "ScreenPrintCostID": 33, "CostType": "AdditionalLocation", "TierLabel": "37-72", "ColorCount": 3, "BasePrintCost": 6},
+                {"PK_ID": 34, "ScreenPrintCostID": 34, "CostType": "AdditionalLocation", "TierLabel": "37-72", "ColorCount": 4, "BasePrintCost": 6.5},
+                {"PK_ID": 35, "ScreenPrintCostID": 35, "CostType": "AdditionalLocation", "TierLabel": "37-72", "ColorCount": 5, "BasePrintCost": 7},
+                {"PK_ID": 36, "ScreenPrintCostID": 36, "CostType": "AdditionalLocation", "TierLabel": "37-72", "ColorCount": 6, "BasePrintCost": 7.5},
+                {"PK_ID": 37, "ScreenPrintCostID": 37, "CostType": "AdditionalLocation", "TierLabel": "73-144", "ColorCount": 1, "BasePrintCost": 4.5},
+                {"PK_ID": 38, "ScreenPrintCostID": 38, "CostType": "AdditionalLocation", "TierLabel": "73-144", "ColorCount": 2, "BasePrintCost": 5},
+                {"PK_ID": 39, "ScreenPrintCostID": 39, "CostType": "AdditionalLocation", "TierLabel": "73-144", "ColorCount": 3, "BasePrintCost": 5.5},
+                {"PK_ID": 40, "ScreenPrintCostID": 40, "CostType": "AdditionalLocation", "TierLabel": "73-144", "ColorCount": 4, "BasePrintCost": 6},
+                {"PK_ID": 41, "ScreenPrintCostID": 41, "CostType": "AdditionalLocation", "TierLabel": "73-144", "ColorCount": 5, "BasePrintCost": 6.5},
+                {"PK_ID": 42, "ScreenPrintCostID": 42, "CostType": "AdditionalLocation", "TierLabel": "73-144", "ColorCount": 6, "BasePrintCost": 7},
+                {"PK_ID": 43, "ScreenPrintCostID": 43, "CostType": "AdditionalLocation", "TierLabel": "145-576", "ColorCount": 1, "BasePrintCost": 4},
+                {"PK_ID": 44, "ScreenPrintCostID": 44, "CostType": "AdditionalLocation", "TierLabel": "145-576", "ColorCount": 2, "BasePrintCost": 4.5},
+                {"PK_ID": 45, "ScreenPrintCostID": 45, "CostType": "AdditionalLocation", "TierLabel": "145-576", "ColorCount": 3, "BasePrintCost": 5},
+                {"PK_ID": 46, "ScreenPrintCostID": 46, "CostType": "AdditionalLocation", "TierLabel": "145-576", "ColorCount": 4, "BasePrintCost": 5.5},
+                {"PK_ID": 47, "ScreenPrintCostID": 47, "CostType": "AdditionalLocation", "TierLabel": "145-576", "ColorCount": 5, "BasePrintCost": 6},
+                {"PK_ID": 48, "ScreenPrintCostID": 48, "CostType": "AdditionalLocation", "TierLabel": "145-576", "ColorCount": 6, "BasePrintCost": 6.5}
+            ]
+        };
+
         // State
         let state = {
             quantity: 48,
             blankCost: 3.41,
             frontColors: 1,
             frontSafety: false,
+            isDarkGarment: false,
             additionalLocations: [],
             masterBundle: null,
             isLoading: false
@@ -491,6 +642,7 @@
             blankCost: document.getElementById('blankCost'),
             frontColors: document.getElementById('frontColors'),
             frontSafety: document.getElementById('frontSafety'),
+            darkGarment: document.getElementById('darkGarment'),
             addLocationBtn: document.getElementById('addLocationBtn'),
             additionalLocations: document.getElementById('additionalLocations'),
             priceDisplay: document.getElementById('priceDisplay'),
@@ -517,6 +669,7 @@
             elements.blankCost.addEventListener('input', debounce(handleBlankCostChange, 300));
             elements.frontColors.addEventListener('change', handleFrontColorsChange);
             elements.frontSafety.addEventListener('change', handleFrontSafetyChange);
+            elements.darkGarment.addEventListener('change', handleDarkGarmentChange);
             elements.addLocationBtn.addEventListener('click', addLocation);
 
             // Load pricing data
@@ -534,6 +687,7 @@
                 if (cached) {
                     if (DEBUG_MODE) console.log('[Manual Screen Print] Using cached data');
                     state.masterBundle = cached;
+                    hideFallbackNotice(); // Hide notice if we had shown it
                     return;
                 }
 
@@ -541,6 +695,12 @@
                 state.isLoading = true;
                 
                 const response = await fetch(API_URL);
+                
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 // Transform the API response to the expected format
@@ -559,13 +719,31 @@
                     
                     state.masterBundle = transformedBundle;
                     setCachedData(transformedBundle);
-                    if (DEBUG_MODE) console.log('[Manual Screen Print] Data loaded:', transformedBundle);
+                    hideFallbackNotice(); // Hide notice if we had shown it
+                    if (DEBUG_MODE) console.log('[Manual Screen Print] Data loaded from API:', transformedBundle);
                 } else {
                     throw new Error('Invalid API response structure');
                 }
             } catch (error) {
-                console.error('[Manual Screen Print] Error loading data:', error);
-                alert('Error loading pricing data. Please refresh the page.');
+                console.warn('[Manual Screen Print] API failed, using fallback data:', error);
+                
+                // Use fallback data
+                const transformedBundle = {
+                    tierData: FALLBACK_DATA.tiersR,
+                    printCosts: transformPrintCosts(FALLBACK_DATA.allScreenprintCostsR),
+                    rules: FALLBACK_DATA.rulesR,
+                    marginDenominator: {}
+                };
+                
+                // Create marginDenominator lookup
+                transformedBundle.tierData.forEach(tier => {
+                    transformedBundle.marginDenominator[tier.TierLabel] = tier.MarginDenominator;
+                });
+                
+                state.masterBundle = transformedBundle;
+                showFallbackNotice(); // Show visual indicator
+                
+                if (DEBUG_MODE) console.log('[Manual Screen Print] Using fallback data (version ' + FALLBACK_DATA._fallbackVersion + ')');
             } finally {
                 state.isLoading = false;
             }
@@ -622,6 +800,35 @@
             }
         }
 
+        // Fallback notice functions
+        function showFallbackNotice() {
+            // Check if notice already exists
+            if (document.getElementById('fallbackNotice')) return;
+            
+            const notice = document.createElement('div');
+            notice.id = 'fallbackNotice';
+            notice.className = 'fallback-notice';
+            notice.innerHTML = `
+                <i class="fas fa-info-circle"></i>
+                <span>Using offline pricing data (${FALLBACK_DATA._fallbackDate})</span>
+            `;
+            
+            // Insert after header or at top of body
+            const header = document.querySelector('header');
+            if (header) {
+                header.after(notice);
+            } else {
+                document.body.insertBefore(notice, document.body.firstChild);
+            }
+        }
+
+        function hideFallbackNotice() {
+            const notice = document.getElementById('fallbackNotice');
+            if (notice) {
+                notice.remove();
+            }
+        }
+
         // Event handlers
         function handleQuantityChange(e) {
             const value = parseInt(e.target.value) || 0;
@@ -645,6 +852,11 @@
 
         function handleFrontSafetyChange(e) {
             state.frontSafety = e.target.checked;
+            calculatePricing();
+        }
+
+        function handleDarkGarmentChange(e) {
+            state.isDarkGarment = e.target.checked;
             calculatePricing();
         }
 
@@ -724,7 +936,7 @@
             elements.additionalLocations.innerHTML = html;
         }
 
-        // Pricing calculation using modern structure like automated screen print page
+        // Pricing calculation using exact Caspio 3-part logic
         function calculatePricing() {
             if (!state.masterBundle || state.isLoading) {
                 elements.priceDisplay.textContent = '$0.00';
@@ -735,21 +947,32 @@
             const quantity = state.quantity;
             const blankCost = state.blankCost;
 
-            // Use modern pricing structure similar to screenprint-pricing-v2.js
+            // Use exact Caspio 3-part calculation structure
             const pricing = {
                 quantity: quantity,
                 frontColors: state.frontColors,
                 additionalLocations: state.additionalLocations,
                 blankCost: blankCost,
-                basePrice: 0,
-                additionalCost: 0,
-                setupFee: 0,
+                
+                // Part 1: Garment pricing
+                garmentSellingPrice: 0,
+                
+                // Part 2: Print costs
+                frontPrintCost: 0,
+                additionalPrintCosts: [],
+                totalPrintCost: 0,
+                
+                // Part 3: Final assembly
+                subtotal: 0,
                 ltmFee: 0,
                 ltmImpactPerShirt: 0,
-                subtotal: 0,
+                roundedTotal: 0,
                 grandTotal: 0,
-                perShirtTotal: 0,
+                
+                // Setup and breakdown for display
+                setupFee: 0,
                 setupPerShirt: 0,
+                setupBreakdown: [],
                 colorBreakdown: {
                     front: 0,
                     locations: []
@@ -758,90 +981,140 @@
 
             if (quantity === 0) return updateDisplay(0, 0, 0, null, false, [], 0);
 
-            // Get garment cost with margin (use $3.41 cost like PC61 for comparison)
             const tier = findTier(quantity);
             if (!tier) {
                 console.error('[Manual Screen Print] No tier found for quantity:', quantity);
                 return;
             }
 
-            // Calculate garment selling price with margin
-            const garmentSellingPrice = blankCost / tier.MarginDenominator;
-            pricing.basePrice = garmentSellingPrice;
+            // PART 1: Calculate garment selling price with margin (exact Caspio logic)
+            pricing.garmentSellingPrice = blankCost / tier.MarginDenominator;
 
-            if (DEBUG_MODE) console.log('[Manual Screen Print] Using tier:', tier, 'Garment price:', garmentSellingPrice);
+            if (DEBUG_MODE) console.log('[Manual Screen Print] Part 1 - Garment:', {
+                blankCost: blankCost,
+                marginDenom: tier.MarginDenominator,
+                garmentSellingPrice: pricing.garmentSellingPrice
+            });
 
-            // Calculate print costs using modern structure
-            let totalPrintCost = 0;
+            // PART 2: Calculate print costs (exact Caspio logic)
             let totalSetupFee = 0;
-            let setupBreakdown = [];
 
-            // Front location (primary)
+            // Front location (primary) - includes flash charge and margin
             if (state.frontColors > 0) {
-                const frontPrintCost = getPrintCost('PrimaryLocation', state.frontColors, tier);
-                let frontCostWithSafety = frontPrintCost;
+                // Add 1 color for white underbase if dark garment OR safety stripes
+                // Safety stripes are ALWAYS printed on dark garments
+                const needsUnderbase = state.isDarkGarment || state.frontSafety;
+                const effectiveColors = state.frontColors + (needsUnderbase ? 1 : 0);
+                const basePrintCost = getPrintCost('PrimaryLocation', effectiveColors, tier);
                 
+                // Add flash charge ($0.35) as per Caspio logic
+                const totalCost = basePrintCost + 0.35;
+                
+                // Add safety stripe surcharge if applicable
+                let costWithSafety = totalCost;
                 if (state.frontSafety) {
-                    frontCostWithSafety += 2.00; // Safety stripe surcharge
+                    costWithSafety += 2.00;
+                    if (DEBUG_MODE) console.log('[Manual Screen Print] Front safety stripe added: $2.00');
+                }
+                
+                // Apply margin to primary location (exact Caspio logic)
+                pricing.frontPrintCost = costWithSafety / tier.MarginDenominator;
+                pricing.totalPrintCost += pricing.frontPrintCost;
+                
+                if (DEBUG_MODE && state.frontSafety) {
+                    console.log('[Manual Screen Print] Front safety stripe calculation:');
+                    console.log('  - Effective colors (with underbase): ' + effectiveColors);
+                    console.log('  - Base print cost (' + effectiveColors + ' colors): $' + basePrintCost.toFixed(2));
+                    console.log('  - Flash charge: $0.35');
+                    console.log('  - Total before safety: $' + totalCost.toFixed(2));
+                    console.log('  - Safety stripe surcharge: $2.00');
+                    console.log('  - Total with safety: $' + costWithSafety.toFixed(2));
+                    console.log('  - Margin denominator: ' + tier.MarginDenominator);
+                    console.log('  - Final print cost after margin: $' + pricing.frontPrintCost.toFixed(2));
                 }
 
-                // Apply margin to print cost
-                const frontSellingPrice = frontCostWithSafety / tier.MarginDenominator;
-                totalPrintCost += frontSellingPrice;
-
-                // Setup fee
-                const frontSetup = 30 * state.frontColors;
+                // Setup fee - use effective colors for dark garment
+                const frontSetup = 30 * effectiveColors;
                 totalSetupFee += frontSetup;
-                setupBreakdown.push({
+                pricing.setupBreakdown.push({
                     location: 'Front',
-                    colors: state.frontColors,
+                    colors: effectiveColors,
                     fee: frontSetup,
                     hasSafety: state.frontSafety
                 });
 
-                pricing.colorBreakdown.front = state.frontColors;
+                pricing.colorBreakdown.front = effectiveColors;
+
+                if (DEBUG_MODE) console.log('[Manual Screen Print] Front print cost:', {
+                    basePrintCost: basePrintCost,
+                    withFlash: totalCost,
+                    withSafety: costWithSafety,
+                    withMargin: pricing.frontPrintCost
+                });
             }
 
-            // Additional locations
+            // Additional locations - already have margin built in (exact Caspio logic)
             state.additionalLocations.forEach((loc, index) => {
                 if (loc.colors > 0) {
-                    const locPrintCost = getPrintCost('AdditionalLocation', loc.colors, tier);
-                    let locCostWithSafety = locPrintCost;
+                    // Add 1 color for white underbase if dark garment OR safety stripes
+                    // Safety stripes are ALWAYS printed on dark garments
+                    const needsUnderbase = state.isDarkGarment || loc.hasSafety;
+                    const effectiveColors = loc.colors + (needsUnderbase ? 1 : 0);
+                    const basePrintCost = getPrintCost('AdditionalLocation', effectiveColors, tier);
                     
+                    // Additional locations already have margin - use as-is (key insight from user)
+                    let finalCost = basePrintCost;
                     if (loc.hasSafety) {
-                        locCostWithSafety += 2.00; // Safety stripe surcharge
+                        finalCost += 2.00; // Safety stripe surcharge
+                        if (DEBUG_MODE) console.log(`[Manual Screen Print] ${loc.name} safety stripe added: $2.00`);
                     }
-
-                    // Apply margin to additional location print cost
-                    const locSellingPrice = locCostWithSafety / tier.MarginDenominator;
-                    totalPrintCost += locSellingPrice;
-
-                    // Setup fee
-                    const locSetup = 30 * loc.colors;
-                    totalSetupFee += locSetup;
-                    setupBreakdown.push({
+                    
+                    if (DEBUG_MODE && loc.hasSafety) {
+                        console.log(`[Manual Screen Print] ${loc.name} safety stripe calculation:`);
+                        console.log('  - Effective colors (with underbase): ' + effectiveColors);
+                        console.log('  - Base print cost (' + effectiveColors + ' colors): $' + basePrintCost.toFixed(2));
+                        console.log('  - Safety stripe surcharge: $2.00');
+                        console.log('  - Final cost: $' + finalCost.toFixed(2));
+                        console.log('  - Note: No margin applied to additional locations');
+                    }
+                    
+                    pricing.additionalPrintCosts.push({
                         location: loc.name,
-                        colors: loc.colors,
+                        cost: finalCost
+                    });
+                    pricing.totalPrintCost += finalCost;
+
+                    // Setup fee - use effective colors for dark garment
+                    const locSetup = 30 * effectiveColors;
+                    totalSetupFee += locSetup;
+                    pricing.setupBreakdown.push({
+                        location: loc.name,
+                        colors: effectiveColors,
                         fee: locSetup,
                         hasSafety: loc.hasSafety
                     });
 
                     pricing.colorBreakdown.locations.push({
                         name: loc.name,
-                        colors: loc.colors,
+                        colors: effectiveColors,
                         hasSafety: loc.hasSafety
+                    });
+
+                    if (DEBUG_MODE) console.log(`[Manual Screen Print] Additional location ${loc.name}:`, {
+                        baseCost: basePrintCost,
+                        withSafety: finalCost,
+                        note: 'No margin applied - already included'
                     });
                 }
             });
 
-            pricing.additionalCost = totalPrintCost;
             pricing.setupFee = totalSetupFee;
 
-            // Calculate subtotal before LTM
-            pricing.subtotal = garmentSellingPrice + totalPrintCost;
+            // PART 3: Final assembly (exact Caspio logic)
+            pricing.subtotal = pricing.garmentSellingPrice + pricing.totalPrintCost;
 
-            // Apply LTM fee if needed (threshold should be 48 to match automated version)
-            if (quantity < 48) {
+            // Apply LTM fee if needed (threshold is 72 to match automated version)
+            if (quantity < 72) {
                 pricing.ltmFee = 50;
                 pricing.ltmImpactPerShirt = pricing.ltmFee / quantity;
                 pricing.subtotal += pricing.ltmImpactPerShirt;
@@ -852,17 +1125,82 @@
                 pricing.setupPerShirt = totalSetupFee / quantity;
             }
 
-            // Apply half-dollar rounding to match automated version
-            pricing.perShirtTotal = halfDollarCeil(pricing.subtotal);
-            pricing.grandTotal = pricing.perShirtTotal * quantity;
+            // Apply half-dollar ceiling rounding (always round UP as per Caspio)
+            pricing.roundedTotal = halfDollarCeil(pricing.subtotal);
+            pricing.grandTotal = pricing.roundedTotal * quantity;
+
+            // Debug output for the test case - Enhanced for safety stripe debugging
+            if (quantity === 48 && state.frontColors === 3 && 
+                state.additionalLocations.length === 1 && state.additionalLocations[0].colors === 3) {
+                console.log('[Manual Screen Print] SAFETY STRIPE TEST CASE - Full pricing breakdown:', {
+                    configuration: {
+                        quantity: quantity,
+                        frontColors: state.frontColors,
+                        backColors: state.additionalLocations[0].colors,
+                        isDarkGarment: state.isDarkGarment,
+                        frontSafety: state.frontSafety,
+                        backSafety: state.additionalLocations[0].hasSafety
+                    },
+                    tier: {
+                        label: tier.TierLabel,
+                        marginDenom: tier.MarginDenominator
+                    },
+                    part1_garment: {
+                        blankCost: blankCost,
+                        sellingPrice: pricing.garmentSellingPrice
+                    },
+                    part2_print: {
+                        front: {
+                            effectiveColors: pricing.colorBreakdown.front,
+                            baseCost: getPrintCost('PrimaryLocation', pricing.colorBreakdown.front, tier),
+                            withFlash: getPrintCost('PrimaryLocation', pricing.colorBreakdown.front, tier) + 0.35,
+                            withSafety: getPrintCost('PrimaryLocation', pricing.colorBreakdown.front, tier) + 0.35 + (state.frontSafety ? 2 : 0),
+                            finalCost: pricing.frontPrintCost
+                        },
+                        back: {
+                            effectiveColors: pricing.colorBreakdown.locations[0]?.colors,
+                            baseCost: getPrintCost('AdditionalLocation', pricing.colorBreakdown.locations[0]?.colors || 0, tier),
+                            withSafety: getPrintCost('AdditionalLocation', pricing.colorBreakdown.locations[0]?.colors || 0, tier) + (state.additionalLocations[0].hasSafety ? 2 : 0),
+                            finalCost: pricing.additionalPrintCosts[0]?.cost
+                        },
+                        totalPrintCost: pricing.totalPrintCost
+                    },
+                    part3_final: {
+                        subtotal: pricing.subtotal,
+                        roundedTotal: pricing.roundedTotal,
+                        perShirtPrice: pricing.roundedTotal
+                    }
+                });
+            }
 
             if (DEBUG_MODE) {
-                console.log('[Manual Screen Print] Pricing breakdown:', pricing);
-                console.log('[Manual Screen Print] Comparison - Use PC61 at $3.41 cost to verify against automated pricing');
+                console.log('[Manual Screen Print] Part 3 - Final assembly:');
+                console.log('  - Garment price: $' + pricing.garmentSellingPrice.toFixed(2));
+                console.log('  - Total print cost: $' + pricing.totalPrintCost.toFixed(2));
+                console.log('  - Subtotal: $' + pricing.subtotal.toFixed(2));
+                console.log('  - LTM impact per shirt: $' + pricing.ltmImpactPerShirt.toFixed(2));
+                console.log('  - Rounded total: $' + pricing.roundedTotal.toFixed(2));
+                console.log('  - Grand total (x' + quantity + '): $' + pricing.grandTotal.toFixed(2));
+                
+                // Special debug for safety stripe scenarios
+                const hasSafetyStripes = state.frontSafety || state.additionalLocations.some(loc => loc.hasSafety);
+                if (hasSafetyStripes) {
+                    console.log('[Manual Screen Print] SAFETY STRIPE SUMMARY:', {
+                        frontSafety: state.frontSafety,
+                        backSafety: state.additionalLocations[0]?.hasSafety || false,
+                        totalSafetyStripeSurcharges: (state.frontSafety ? 1 : 0) + state.additionalLocations.filter(loc => loc.hasSafety).length,
+                        expectedSafetyStripeImpact: ((state.frontSafety ? 1 : 0) + state.additionalLocations.filter(loc => loc.hasSafety).length) * 2.00,
+                        finalPerShirtPrice: pricing.roundedTotal,
+                        expectedAutomatedPrice: 23.50,
+                        difference: pricing.roundedTotal - 23.50
+                    });
+                }
+                
+                console.log('[Manual Screen Print] COMPARISON TEST - Use PC61 at $3.41 cost to verify against automated pricing');
             }
 
             // Update display with new pricing structure
-            updateDisplayModern(pricing, tier, setupBreakdown);
+            updateDisplayModern(pricing, tier, pricing.setupBreakdown);
         }
         function findTier(quantity) {
             if (!state.masterBundle || !state.masterBundle.tierData) return null;
@@ -899,8 +1237,8 @@
         }
 
         function updateDisplayModern(pricing, tier, setupBreakdown) {
-            // Main price display
-            elements.priceDisplay.textContent = `$${pricing.perShirtTotal.toFixed(2)}`;
+            // Main price display - use rounded total from 3-part calculation
+            elements.priceDisplay.textContent = `$${pricing.roundedTotal.toFixed(2)}`;
             
             // Calculate total locations and colors
             let totalLocations = pricing.frontColors > 0 ? 1 : 0;
@@ -909,25 +1247,47 @@
             let totalColors = pricing.frontColors;
             pricing.additionalLocations.forEach(loc => totalColors += loc.colors);
 
-            // Price subtitle with modern structure
+            // Price subtitle with detailed breakdown showing 3-part calculation
             if (totalLocations === 0) {
                 elements.priceSubtitle.textContent = 'Blank garment only (no printing)';
             } else {
-                const locText = totalLocations === 1 ? 'location' : 'locations';
-                const colorText = totalColors === 1 ? 'color' : 'colors';
-                let subtitle = `${totalColors} ${colorText} across ${totalLocations} ${locText}`;
+                // Adjust display for dark garment or safety stripes
+                let displayText = '';
+                // Check if any location has safety stripes
+                const hasSafetyStripes = state.frontSafety || state.additionalLocations.some(loc => loc.hasSafety);
                 
-                // Add cost breakdown info to match automated version
+                if (state.isDarkGarment || hasSafetyStripes) {
+                    const actualFrontColors = state.frontColors;
+                    const actualAdditionalColors = pricing.additionalLocations.reduce((sum, loc) => sum + loc.colors, 0);
+                    const actualTotalColors = actualFrontColors + actualAdditionalColors;
+                    
+                    const locText = totalLocations === 1 ? 'location' : 'locations';
+                    const colorText = actualTotalColors === 1 ? 'color' : 'colors';
+                    
+                    if (hasSafetyStripes && !state.isDarkGarment) {
+                        displayText = `${actualTotalColors} ${colorText} + white underbase (safety stripes) across ${totalLocations} ${locText}`;
+                    } else {
+                        displayText = `${actualTotalColors} ${colorText} + white underbase across ${totalLocations} ${locText}`;
+                    }
+                } else {
+                    const locText = totalLocations === 1 ? 'location' : 'locations';
+                    const colorText = totalColors === 1 ? 'color' : 'colors';
+                    displayText = `${totalColors} ${colorText} across ${totalLocations} ${locText}`;
+                }
+                
+                // Add detailed cost breakdown showing exact 3-part Caspio calculation
                 const breakdownParts = [];
-                if (pricing.basePrice > 0) breakdownParts.push(`Garment: $${pricing.basePrice.toFixed(2)}`);
-                if (pricing.additionalCost > 0) breakdownParts.push(`Print: $${pricing.additionalCost.toFixed(2)}`);
+                if (pricing.garmentSellingPrice > 0) breakdownParts.push(`Garment: $${pricing.garmentSellingPrice.toFixed(2)}`);
+                if (pricing.totalPrintCost > 0) breakdownParts.push(`Print: $${pricing.totalPrintCost.toFixed(2)}`);
                 if (pricing.ltmImpactPerShirt > 0) breakdownParts.push(`LTM: +$${pricing.ltmImpactPerShirt.toFixed(2)}`);
                 
                 if (breakdownParts.length > 0) {
-                    subtitle += ` (${breakdownParts.join(', ')})`;
+                    const subtotalText = `Subtotal: $${pricing.subtotal.toFixed(2)}`;
+                    const roundedText = `Rounded: $${pricing.roundedTotal.toFixed(2)}`;
+                    displayText += ` | ${breakdownParts.join(' + ')} = ${subtotalText} → ${roundedText}`;
                 }
                 
-                elements.priceSubtitle.textContent = subtitle;
+                elements.priceSubtitle.textContent = displayText;
             }
 
             // Tier info
@@ -939,10 +1299,10 @@
             // LTM warning - updated threshold to 48
             elements.ltmWarning.style.display = pricing.ltmFee > 0 ? 'block' : 'none';
 
-            // Summary with modern structure
-            elements.summaryBlank.textContent = `$${pricing.basePrice.toFixed(2)}`;
-            elements.summaryPrint.textContent = `$${pricing.additionalCost.toFixed(2)}`;
-            elements.summaryTotal.textContent = `$${pricing.perShirtTotal.toFixed(2)}`;
+            // Summary with updated structure matching 3-part calculation
+            elements.summaryBlank.textContent = `$${pricing.garmentSellingPrice.toFixed(2)}`;
+            elements.summaryPrint.textContent = `$${pricing.totalPrintCost.toFixed(2)}`;
+            elements.summaryTotal.textContent = `$${pricing.roundedTotal.toFixed(2)}`;
 
             // Setup breakdown with safety stripe indicators
             if (setupBreakdown.length > 0) {
