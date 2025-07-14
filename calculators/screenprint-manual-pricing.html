@@ -383,6 +383,61 @@
             border: 1px dashed rgba(76, 179, 84, 0.2);
         }
 
+        /* Quick fill buttons */
+        .quick-fill-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-fill-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .quick-fill-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-fill-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .quick-fill-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Required field indicator */
+        .required-indicator {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        /* Invalid input styling */
+        .form-control.invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        /* Empty state messages */
+        .empty-state-message {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.875rem;
+        }
+
         /* Pricing details toggle */
         .pricing-details-toggle {
             margin-top: 0.5rem;
@@ -564,11 +619,15 @@
                         <label for="blankCost" class="blank-cost-title">
                             <i class="fas fa-tshirt"></i> Manual Blank Cost ($)
                         </label>
-                        <span class="blank-cost-help">Required</span>
+                        <span class="blank-cost-help required-indicator">Required</span>
                     </div>
-                    <input type="number" class="form-control" id="blankCost" value="3.41" min="0" step="0.01" required>
-                    <div class="blank-cost-example">
-                        <strong>Common Examples:</strong> PC61 = $3.41 | PC54 = $4.50 | G500 = $4.75
+                    <input type="number" class="form-control" id="blankCost" min="0" step="0.01" placeholder="e.g., 3.41" required>
+                    <div class="quick-fill-buttons">
+                        <span class="quick-fill-label">Quick fill:</span>
+                        <button type="button" class="quick-fill-btn" onclick="setBlankCost(3.41, 'PC61')" title="Port & Company PC61">PC61 ($3.41)</button>
+                        <button type="button" class="quick-fill-btn" onclick="setBlankCost(4.50, 'PC54')" title="Port & Company PC54">PC54 ($4.50)</button>
+                        <button type="button" class="quick-fill-btn" onclick="setBlankCost(4.75, 'G500')" title="Gildan G500">G500 ($4.75)</button>
+                        <button type="button" class="quick-fill-btn" onclick="setBlankCost(5.25, 'G200')" title="Gildan G200">G200 ($5.25)</button>
                     </div>
                 </div>
 
@@ -627,9 +686,9 @@
                         <h3 class="card-title">Your Quote</h3>
                         <div class="price-section">
                             <div class="price-display" id="priceDisplay">$0.00</div>
-                            <div class="price-label">per shirt</div>
-                            <div class="price-subtitle" id="priceSubtitle">Enter details to see pricing</div>
-                            <div class="pricing-details-toggle">
+                            <div class="price-label" id="priceLabel">per shirt</div>
+                            <div class="price-subtitle" id="priceSubtitle">Enter blank cost to calculate pricing</div>
+                            <div class="pricing-details-toggle" id="pricingDetailsToggle" style="display: none;">
                                 <button class="toggle-details-btn" onclick="togglePricingDetails()">
                                     <i class="fas fa-info-circle"></i> Show calculation details
                                 </button>
@@ -855,7 +914,7 @@
         // State
         let state = {
             quantity: 48,
-            blankCost: 3.41,
+            blankCost: 0,
             frontColors: 1,
             frontSafety: false,
             isDarkGarment: false,
@@ -1068,8 +1127,17 @@
         }
 
         function handleBlankCostChange(e) {
-            const value = parseFloat(e.target.value) || 0;
+            const input = e.target;
+            const value = parseFloat(input.value) || 0;
             state.blankCost = Math.max(0, value);
+            
+            // Add/remove validation styling
+            if (input.value === '' || value === 0) {
+                input.classList.add('invalid');
+            } else {
+                input.classList.remove('invalid');
+            }
+            
             calculatePricing();
         }
 
@@ -1174,6 +1242,21 @@
 
             const quantity = state.quantity;
             const blankCost = state.blankCost;
+            
+            // Check if blank cost is empty
+            if (blankCost === 0) {
+                elements.priceDisplay.textContent = '$0.00';
+                elements.priceSubtitle.textContent = 'Enter blank cost to calculate pricing';
+                elements.priceSubtitle.className = 'price-subtitle empty-state-message';
+                
+                // Hide tier info and clear summary
+                elements.tierInfo.style.display = 'none';
+                elements.summaryBlank.textContent = '$0.00';
+                elements.summaryPrint.textContent = '$0.00';
+                elements.summaryTotal.textContent = '$0.00';
+                elements.setupSection.style.display = 'none';
+                return;
+            }
 
             // Use exact Caspio 3-part calculation structure
             const pricing = {
@@ -1476,6 +1559,8 @@
             pricing.additionalLocations.forEach(loc => totalColors += loc.colors);
 
             // Price subtitle with detailed breakdown showing 3-part calculation
+            elements.priceSubtitle.className = 'price-subtitle'; // Reset class
+            
             if (totalLocations === 0) {
                 elements.priceSubtitle.textContent = 'Blank garment only (no printing)';
             } else {
@@ -1503,18 +1588,7 @@
                     displayText = `${totalColors} ${colorText} across ${totalLocations} ${locText}`;
                 }
                 
-                // Add detailed cost breakdown showing exact 3-part Caspio calculation
-                const breakdownParts = [];
-                if (pricing.garmentSellingPrice > 0) breakdownParts.push(`Garment: $${pricing.garmentSellingPrice.toFixed(2)}`);
-                if (pricing.totalPrintCost > 0) breakdownParts.push(`Print: $${pricing.totalPrintCost.toFixed(2)}`);
-                if (pricing.ltmImpactPerShirt > 0) breakdownParts.push(`LTM: +$${pricing.ltmImpactPerShirt.toFixed(2)}`);
-                
-                if (breakdownParts.length > 0) {
-                    const subtotalText = `Subtotal: $${pricing.subtotal.toFixed(2)}`;
-                    const roundedText = `Rounded: $${pricing.roundedTotal.toFixed(2)}`;
-                    displayText += ` | ${breakdownParts.join(' + ')} = ${subtotalText} → ${roundedText}`;
-                }
-                
+                // Simple display text
                 elements.priceSubtitle.textContent = displayText;
             }
 
@@ -1596,6 +1670,48 @@
             };
         }
 
+        // Toggle pricing details
+        function togglePricingDetails() {
+            const details = document.getElementById('pricingDetails');
+            const button = document.querySelector('.toggle-details-btn');
+            if (details && button) {
+                details.classList.toggle('show');
+                const icon = button.querySelector('i');
+                if (details.classList.contains('show')) {
+                    icon.className = 'fas fa-chevron-up';
+                    button.innerHTML = '<i class="fas fa-chevron-up"></i> Hide pricing breakdown';
+                } else {
+                    icon.className = 'fas fa-chevron-down';
+                    button.innerHTML = '<i class="fas fa-chevron-down"></i> Show pricing breakdown';
+                }
+            }
+        }
+        
+        // Quick-fill button handler
+        function setBlankCost(cost, style) {
+            elements.blankCost.value = cost.toFixed(2);
+            state.blankCost = cost;
+            
+            // Remove invalid class if present
+            elements.blankCost.classList.remove('invalid');
+            
+            // Show a brief visual feedback
+            elements.blankCost.style.backgroundColor = 'rgba(76, 179, 84, 0.1)';
+            setTimeout(() => {
+                elements.blankCost.style.backgroundColor = '';
+            }, 300);
+            
+            calculatePricing();
+            
+            if (DEBUG_MODE) {
+                console.log(`[Manual Screen Print] Quick-filled ${style} at $${cost.toFixed(2)}`);
+            }
+        }
+
+        // Make functions available globally for onclick handlers
+        window.setBlankCost = setBlankCost;
+        window.togglePricingDetails = togglePricingDetails;
+        
         // Initialize on load
         document.addEventListener('DOMContentLoaded', init);
     </script>
