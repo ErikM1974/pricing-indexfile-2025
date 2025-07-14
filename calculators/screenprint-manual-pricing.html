@@ -14,6 +14,52 @@
     
     <style>
         /* Screen Print-specific styles */
+        /* Accordion styles */
+        .accordion-item {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .accordion-header {
+            padding: 1.25rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .accordion-header:hover {
+            background: var(--hover-bg);
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+            color: var(--primary-color);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: var(--card-bg);
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 5000px; /* Large enough for all content */
+        }
+
+        .accordion-body {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+
         /* Location sections */
         .location-section {
             background: var(--bg-color);
@@ -716,27 +762,218 @@
             </div>
         </div>
 
-        <!-- Information Section -->
+        <!-- Manual Calculation Guide -->
         <div class="card">
-            <h3 class="card-title">
-                <i class="fas fa-info-circle" style="color: var(--primary-color);"></i>
-                About Manual Screen Print Pricing
-            </h3>
-            <div class="alert alert-info">
-                <i class="fas fa-lightbulb alert-icon"></i>
-                <div>
-                    <p><strong>How It Works:</strong></p>
-                    <p>This calculator uses the same pricing logic as the automated screen print pricing page, but allows you to input manual garment costs. Use the same cost as your product (e.g., PC61 = $3.41) to verify pricing consistency between manual and automated calculations.</p>
-                    <p class="mt-2">
-                        <strong>Includes:</strong> Blank garment with margin + Screen printing costs + Setup fees per color per location.<br>
-                        <strong>Pricing Tiers:</strong> Automatic quantity-based discounts apply (same as automated version).<br>
-                        <strong>LTM Fee:</strong> $50 fee applies for orders under 48 pieces (updated to match automated version).<br>
-                        <strong>Safety Stripes:</strong> Add $2.00 per location when safety stripes are selected.
-                    </p>
-                    <p class="mt-2" style="background: #e8f5e8; padding: 0.75rem; border-radius: 6px; font-size: 0.9rem;">
-                        <strong>🔗 Comparison Test:</strong> Set cost to $3.41 and compare results with 
-                        <a href="/pricing/screen-print?StyleNumber=PC61&COLOR=Deep%20Marine" target="_blank" style="color: var(--primary-color);">automated PC61 pricing</a>
-                    </p>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this.parentElement)">
+                    <div>
+                        <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-calculator" style="color: var(--primary-color);"></i>
+                            Manual Screen Print Pricing Guide
+                        </h3>
+                        <p style="color: var(--text-secondary); margin: 0.5rem 0 0 0; font-style: italic; font-size: 0.9rem;">Calculate screen print pricing with just a calculator, pen, and paper</p>
+                    </div>
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+
+            <!-- Step-by-Step Formula -->
+            <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid var(--primary-color);">
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;"><i class="fas fa-list-ol"></i> Step-by-Step Formula</h4>
+                <div style="font-family: 'Courier New', monospace; background: white; padding: 1rem; border-radius: 6px; line-height: 1.8;">
+                    <strong style="color: #d63384;">STEP 1:</strong> Calculate Garment Cost with Margin<br>
+                    &nbsp;&nbsp;&nbsp;<code>Garment Total = Blank Cost ÷ Margin Denominator</code><br><br>
+                    
+                    <strong style="color: #d63384;">STEP 2:</strong> Calculate Screen Print Costs<br>
+                    &nbsp;&nbsp;&nbsp;<code>Print Cost = (Base Cost + Flash Charge) × Total Colors × Locations</code><br><br>
+                    
+                    <strong style="color: #d63384;">STEP 3:</strong> Add Setup Fees<br>
+                    &nbsp;&nbsp;&nbsp;<code>Setup Total = $30 × Total Colors × Locations</code><br><br>
+                    
+                    <strong style="color: #d63384;">STEP 4:</strong> Apply Special Charges<br>
+                    &nbsp;&nbsp;&nbsp;<code>Safety Stripe Surcharge = $2.00 × Stripe Locations</code><br><br>
+                    
+                    <strong style="color: #d63384;">STEP 5:</strong> Add LTM Fee (if quantity < 48)<br>
+                    &nbsp;&nbsp;&nbsp;<code>LTM Fee = $50.00 (flat fee)</code><br><br>
+                    
+                    <strong style="color: #d63384;">STEP 6:</strong> Apply Half-Dollar Ceiling<br>
+                    &nbsp;&nbsp;&nbsp;<code>Final Price = CEILING(Total, $0.50)</code>
+                </div>
+            </div>
+
+            <!-- Margin Denominators Table -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="background: white; border: 2px solid #e3f2fd; border-radius: 8px; padding: 1.25rem;">
+                    <h5 style="color: #1976d2; margin-bottom: 1rem; text-align: center;"><i class="fas fa-percent"></i> Margin Denominators</h5>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <tr style="background: #f5f5f5; font-weight: 600;">
+                            <td style="padding: 0.5rem; border: 1px solid #ddd;">Quantity</td>
+                            <td style="padding: 0.5rem; border: 1px solid #ddd; text-align: center;">Denominator</td>
+                        </tr>
+                        <tr><td style="padding: 0.5rem; border: 1px solid #ddd;">1-47</td><td style="padding: 0.5rem; border: 1px solid #ddd; text-align: center;">0.45</td></tr>
+                        <tr><td style="padding: 0.5rem; border: 1px solid #ddd;">48-143</td><td style="padding: 0.5rem; border: 1px solid #ddd; text-align: center;">0.50</td></tr>
+                        <tr><td style="padding: 0.5rem; border: 1px solid #ddd;">144-287</td><td style="padding: 0.5rem; border: 1px solid #ddd; text-align: center;">0.55</td></tr>
+                        <tr><td style="padding: 0.5rem; border: 1px solid #ddd;">288+</td><td style="padding: 0.5rem; border: 1px solid #ddd; text-align: center;">0.60</td></tr>
+                    </table>
+                </div>
+
+                <!-- Screen Print Cost Tables -->
+                <div style="background: white; border: 2px solid #e8f5e8; border-radius: 8px; padding: 1.25rem;">
+                    <h5 style="color: var(--primary-color); margin-bottom: 1rem; text-align: center;"><i class="fas fa-paint-brush"></i> Screen Print Costs</h5>
+                    <div style="font-size: 0.85rem;">
+                        <div style="margin-bottom: 0.75rem;">
+                            <strong>Tier 1 (1-47 pieces):</strong><br>
+                            Base: $2.45 | Flash: $0.35
+                        </div>
+                        <div style="margin-bottom: 0.75rem;">
+                            <strong>Tier 2 (48-143 pieces):</strong><br>
+                            Base: $1.85 | Flash: $0.35
+                        </div>
+                        <div style="margin-bottom: 0.75rem;">
+                            <strong>Tier 3 (144-287 pieces):</strong><br>
+                            Base: $1.45 | Flash: $0.35
+                        </div>
+                        <div>
+                            <strong>Tier 4 (288+ pieces):</strong><br>
+                            Base: $1.25 | Flash: $0.35
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Special Charges Reference -->
+            <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1.25rem; margin-bottom: 2rem;">
+                <h5 style="color: #856404; margin-bottom: 1rem;"><i class="fas fa-exclamation-triangle"></i> Special Charges & Rules</h5>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+                    <div>
+                        <strong style="color: #856404;">Setup Fees:</strong><br>
+                        $30.00 per color per location<br><br>
+                        <strong style="color: #856404;">Flash Charge:</strong><br>
+                        $0.35 per piece (primary locations only)<br><br>
+                        <strong style="color: #856404;">LTM Fee:</strong><br>
+                        $50.00 flat fee (orders under 48 pieces)
+                    </div>
+                    <div>
+                        <strong style="color: #856404;">Safety Stripes:</strong><br>
+                        • Adds +1 color for white underbase<br>
+                        • $2.00 surcharge per stripe location<br><br>
+                        <strong style="color: #856404;">Rounding:</strong><br>
+                        Round UP to nearest $0.50<br>
+                        (e.g., $12.01 → $12.50)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Calculation Worksheet -->
+            <div style="background: white; border: 2px solid var(--primary-color); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+                <h5 style="color: var(--primary-color); margin-bottom: 1.5rem; text-align: center;"><i class="fas fa-clipboard-check"></i> Manual Calculation Worksheet</h5>
+                <div style="font-family: 'Courier New', monospace; line-height: 2; background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                    <strong>Order Details:</strong><br>
+                    Quantity: _________ pieces<br>
+                    Blank Cost: $_________ each<br>
+                    Primary Location Colors: _________<br>
+                    Additional Location Colors: _________<br>
+                    Safety Stripe Locations: _________<br><br>
+                    
+                    <strong>Calculations:</strong><br>
+                    1. Margin Denominator: _________<br>
+                    2. Garment w/ Margin: $_________ ÷ _________ = $_________ each<br>
+                    3. Print Base Cost: $_________<br>
+                    4. Flash Charge: $0.35 (if primary location)<br>
+                    5. Total Print Cost: (_________ + _________) × _________ colors × _________ locations = $_________<br>
+                    6. Setup Fees: $30 × _________ colors × _________ locations = $_________<br>
+                    7. Safety Stripe Surcharge: $2.00 × _________ locations = $_________<br>
+                    8. Subtotal: _________ × $_________ + $_________ + $_________ = $_________<br>
+                    9. LTM Fee (if < 48 pcs): $_________<br>
+                    10. Before Rounding: $_________<br>
+                    11. Final Price (round up to $0.50): $_________
+                </div>
+            </div>
+
+            <!-- Worked Examples -->
+            <div style="background: #e8f5e8; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+                <h5 style="color: var(--primary-color); margin-bottom: 1.5rem; text-align: center;"><i class="fas fa-lightbulb"></i> Worked Examples</h5>
+                
+                <!-- Example 1 -->
+                <div style="background: white; border-radius: 6px; padding: 1rem; margin-bottom: 1rem;">
+                    <h6 style="color: var(--primary-color); margin-bottom: 0.75rem;">Example 1: Basic Order (24 pieces, 1 color, front only)</h6>
+                    <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.6;">
+                        Order: 24 pieces @ $4.00 blank cost<br>
+                        1. Margin: $4.00 ÷ 0.45 = $8.89 each<br>
+                        2. Print: ($2.45 + $0.35) × 1 color × 1 location = $2.80<br>
+                        3. Setup: $30 × 1 color × 1 location = $30.00<br>
+                        4. Subtotal: 24 × $8.89 + $2.80 + $30.00 = $246.16<br>
+                        5. No LTM (≥24 pieces), No safety stripes<br>
+                        6. Round up: $246.16 → <strong>$246.50</strong>
+                    </div>
+                </div>
+
+                <!-- Example 2 -->
+                <div style="background: white; border-radius: 6px; padding: 1rem; margin-bottom: 1rem;">
+                    <h6 style="color: var(--primary-color); margin-bottom: 0.75rem;">Example 2: LTM Order with Safety Stripes (12 pieces, 2 colors, front + back)</h6>
+                    <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.6;">
+                        Order: 12 pieces @ $3.50 blank, front (2 colors + safety) + back (1 color)<br>
+                        1. Margin: $3.50 ÷ 0.45 = $7.78 each<br>
+                        2. Safety adds +1 color: Front = 3 colors, Back = 1 color<br>
+                        3. Print: ($2.45 + $0.35) × 3 × 1 + ($2.45 + $0.00) × 1 × 1 = $10.85<br>
+                        4. Setup: $30 × (3 + 1) = $120.00<br>
+                        5. Safety surcharge: $2.00 × 1 location = $2.00<br>
+                        6. Subtotal: 12 × $7.78 + $10.85 + $120.00 + $2.00 = $226.21<br>
+                        7. LTM Fee: +$50.00 (< 48 pieces)<br>
+                        8. Round up: $276.21 → <strong>$276.50</strong>
+                    </div>
+                </div>
+
+                <!-- Example 3 -->
+                <div style="background: white; border-radius: 6px; padding: 1rem;">
+                    <h6 style="color: var(--primary-color); margin-bottom: 0.75rem;">Example 3: Large Order (200 pieces, 3 colors, front only)</h6>
+                    <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.6;">
+                        Order: 200 pieces @ $5.25 blank cost<br>
+                        1. Margin: $5.25 ÷ 0.55 = $9.55 each<br>
+                        2. Print: ($1.45 + $0.35) × 3 colors × 1 location = $5.40<br>
+                        3. Setup: $30 × 3 colors × 1 location = $90.00<br>
+                        4. Subtotal: 200 × $9.55 + $5.40 + $90.00 = $2005.40<br>
+                        5. No LTM (≥48 pieces), No safety stripes<br>
+                        6. Round up: $2005.40 → <strong>$2005.50</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Reference Card -->
+            <div style="background: linear-gradient(45deg, var(--primary-color), var(--primary-dark)); color: white; border-radius: 8px; padding: 1.5rem;">
+                <h5 style="color: white; margin-bottom: 1rem; text-align: center;"><i class="fas fa-bookmark"></i> Quick Reference Card</h5>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.85rem;">
+                    <div>
+                        <strong>Key Numbers:</strong><br>
+                        • Setup: $30/color/location<br>
+                        • Flash: $0.35 (primary only)<br>
+                        • LTM: $50 (under 48 pcs)<br>
+                        • Safety: +$2/location
+                    </div>
+                    <div>
+                        <strong>Print Costs:</strong><br>
+                        • 1-47: $2.45 base<br>
+                        • 48-143: $1.85 base<br>
+                        • 144-287: $1.45 base<br>
+                        • 288+: $1.25 base
+                    </div>
+                    <div>
+                        <strong>Margins:</strong><br>
+                        • 1-47: ÷ 0.45<br>
+                        • 48-143: ÷ 0.50<br>
+                        • 144-287: ÷ 0.55<br>
+                        • 288+: ÷ 0.60
+                    </div>
+                    <div>
+                        <strong>Remember:</strong><br>
+                        • Round UP to $0.50<br>
+                        • Safety adds +1 color<br>
+                        • Flash on primary only<br>
+                        • LTM applies under 48
+                    </div>
+                </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1644,8 +1881,14 @@
             }
         }
         
+        // Accordion toggle function
+        function toggleAccordion(item) {
+            item.classList.toggle('active');
+        }
+        
         // Make functions available globally for onclick handlers
         window.togglePricingDetails = togglePricingDetails;
+        window.toggleAccordion = toggleAccordion;
         
         // Initialize on load
         document.addEventListener('DOMContentLoaded', init);
