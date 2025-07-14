@@ -383,42 +383,6 @@
             border: 1px dashed rgba(76, 179, 84, 0.2);
         }
 
-        /* Quick fill buttons */
-        .quick-fill-buttons {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .quick-fill-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .quick-fill-btn {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .quick-fill-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .quick-fill-btn:active {
-            transform: scale(0.95);
-        }
-
         /* Required field indicator */
         .required-indicator {
             color: #dc3545;
@@ -622,13 +586,6 @@
                         <span class="blank-cost-help required-indicator">Required</span>
                     </div>
                     <input type="number" class="form-control" id="blankCost" min="0" step="0.01" placeholder="e.g., 3.41" required>
-                    <div class="quick-fill-buttons">
-                        <span class="quick-fill-label">Quick fill:</span>
-                        <button type="button" class="quick-fill-btn" onclick="setBlankCost(3.41, 'PC61')" title="Port & Company PC61">PC61 ($3.41)</button>
-                        <button type="button" class="quick-fill-btn" onclick="setBlankCost(4.50, 'PC54')" title="Port & Company PC54">PC54 ($4.50)</button>
-                        <button type="button" class="quick-fill-btn" onclick="setBlankCost(4.75, 'G500')" title="Gildan G500">G500 ($4.75)</button>
-                        <button type="button" class="quick-fill-btn" onclick="setBlankCost(5.25, 'G200')" title="Gildan G200">G200 ($5.25)</button>
-                    </div>
                 </div>
 
                 <!-- Front Location -->
@@ -1687,29 +1644,7 @@
             }
         }
         
-        // Quick-fill button handler
-        function setBlankCost(cost, style) {
-            elements.blankCost.value = cost.toFixed(2);
-            state.blankCost = cost;
-            
-            // Remove invalid class if present
-            elements.blankCost.classList.remove('invalid');
-            
-            // Show a brief visual feedback
-            elements.blankCost.style.backgroundColor = 'rgba(76, 179, 84, 0.1)';
-            setTimeout(() => {
-                elements.blankCost.style.backgroundColor = '';
-            }, 300);
-            
-            calculatePricing();
-            
-            if (DEBUG_MODE) {
-                console.log(`[Manual Screen Print] Quick-filled ${style} at $${cost.toFixed(2)}`);
-            }
-        }
-
         // Make functions available globally for onclick handlers
-        window.setBlankCost = setBlankCost;
         window.togglePricingDetails = togglePricingDetails;
         
         // Initialize on load
