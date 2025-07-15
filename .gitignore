@@ -6,3 +6,6 @@ shared_components/js/dtg-page-setup-diagnostic.js
 test-dtg-diagnostic.html
 dtg-pricing-old.html
 .gitignore
+staff-dashboard-backup-*.html
+staff-dashboard-integrated.html
+staff-dashboard-old.html
