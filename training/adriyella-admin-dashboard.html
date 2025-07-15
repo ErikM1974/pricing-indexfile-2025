@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Task Management Admin | Adriyella's Performance System</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Services -->
+    <script src="adriyella-task-service.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --danger-bg: #fee;
+            --danger-text: #dc2626;
+            --info-bg: #dbeafe;
+            --info-text: #1e40af;
+            --gold: #f59e0b;
+            --gold-light: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .btn-danger {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: white;
+        }
+
+        .btn-gold:hover {
+            background: var(--gold-light);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Task Types Grid */
+        .task-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .task-type-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .task-type-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-type-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .task-type-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .task-type-category {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .task-type-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .task-type-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .billing-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .billing-rate {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .billing-type {
+            background: var(--info-bg);
+            color: var(--info-text);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .task-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .stat-icon.primary {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .stat-icon.gold {
+            background: #fef3c7;
+            color: var(--gold);
+        }
+
+        .stat-icon.info {
+            background: var(--info-bg);
+            color: var(--info-text);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            max-width: 600px;
+            margin: 50px auto;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            background: var(--bg-color);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Billing Type Selector */
+        .billing-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .billing-option {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .billing-option.selected {
+            border-color: var(--primary-color);
+            background: var(--success-bg);
+        }
+
+        .billing-option-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .billing-option-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .task-types-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <div>
+                    <h1 class="page-title">Task Management Admin</h1>
+                    <nav class="breadcrumb">
+                        <a href="/staff-dashboard.html">Dashboard</a>
+                        <span>/</span>
+                        <a href="adriyella-daily-tasks.html">Adriyella Tasks</a>
+                        <span>/</span>
+                        <span>Admin</span>
+                    </nav>
+                </div>
+            </div>
+            <div class="header-right">
+                <a href="adriyella-task-history.html" class="btn btn-secondary">
+                    <i class="fas fa-history"></i>
+                    View History
+                </a>
+                <a href="adriyella-billing-dashboard.html" class="btn btn-gold">
+                    <i class="fas fa-dollar-sign"></i>
+                    Billing Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Performance Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stat-value" id="totalTaskTypes">0</div>
+                <div class="stat-label">Active Task Types</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon gold">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-value" id="totalBonusPotential">$0</div>
+                <div class="stat-label">Monthly Bonus Potential</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon info">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value" id="avgHourlyRate">$0</div>
+                <div class="stat-label">Average Hourly Rate</div>
+            </div>
+        </div>
+
+        <!-- Task Types Management -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Task Types & Billing Rates</h2>
+                <button class="btn btn-primary" onclick="showCreateTaskModal()">
+                    <i class="fas fa-plus"></i>
+                    Add New Task Type
+                </button>
+            </div>
+
+            <div class="task-types-grid" id="taskTypesGrid">
+                <div class="loading" style="grid-column: 1 / -1; justify-self: center;"></div>
+            </div>
+        </div>
+
+        <!-- Current Month Performance -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">This Month's Performance</h2>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="refreshPerformanceData()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div id="performanceContent">
+                <div class="loading"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create/Edit Task Modal -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Add New Task Type</h3>
+                <button class="modal-close" onclick="hideTaskModal()">×</button>
+            </div>
+            <form id="taskForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Task Name *</label>
+                        <input type="text" class="form-control" id="taskName" 
+                               placeholder="e.g., Follow-up on Account Executive's Art Approval" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-control" id="taskCategory">
+                            <option value="customer-service">Customer Service</option>
+                            <option value="sales-support">Sales Support</option>
+                            <option value="follow-up">Follow-up Activities</option>
+                            <option value="administrative">Administrative</option>
+                            <option value="special-projects">Special Projects</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="taskDescription" rows="3"
+                                  placeholder="Brief description of what this task involves..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Billing Type *</label>
+                        <div class="billing-type-selector">
+                            <div class="billing-option" onclick="selectBillingType('flat')" id="flatRateOption">
+                                <div class="billing-option-title">
+                                    <i class="fas fa-dollar-sign"></i> Flat Rate
+                                </div>
+                                <div class="billing-option-desc">Fixed amount per completion</div>
+                            </div>
+                            <div class="billing-option" onclick="selectBillingType('hourly')" id="hourlyOption">
+                                <div class="billing-option-title">
+                                    <i class="fas fa-clock"></i> Hourly + Timer
+                                </div>
+                                <div class="billing-option-desc">Rate per hour with timer tracking</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" id="flatRateGroup" style="display: none;">
+                            <label class="form-label">Flat Rate Amount *</label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">$</span>
+                                <input type="number" class="form-control" id="flatRate" 
+                                       style="padding-left: 30px;" placeholder="25.00" step="0.01" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="hourlyRateGroup" style="display: none;">
+                            <label class="form-label">Hourly Rate *</label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">$</span>
+                                <input type="number" class="form-control" id="hourlyRate" 
+                                       style="padding-left: 30px;" placeholder="30.50" step="0.01" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Expected Frequency</label>
+                            <select class="form-control" id="frequency">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="as-needed">As Needed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Bonus Eligible</label>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="bonusEligible" checked>
+                            <span style="font-size: 0.875rem; color: var(--text-secondary);">
+                                Include in monthly bonus calculation (up to $400)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Instructions for Adriyella</label>
+                        <textarea class="form-control" id="instructions" rows="3"
+                                  placeholder="Step-by-step instructions on how to complete this task..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="hideTaskModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveTaskBtn">
+                        <i class="fas fa-save"></i>
+                        Save Task Type
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let taskService;
+        let currentTaskTypes = [];
+        let editingTaskId = null;
+        let selectedBillingType = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            taskService = new TaskTrackingService();
+            loadTaskTypes();
+            loadPerformanceData();
+        });
+
+        // Load task types
+        async function loadTaskTypes() {
+            try {
+                // For now, we'll load from localStorage
+                // In a real implementation, this would come from the database
+                const savedTypes = localStorage.getItem('adriyella_task_types');
+                currentTaskTypes = savedTypes ? JSON.parse(savedTypes) : getDefaultTaskTypes();
+                
+                renderTaskTypes();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading task types:', error);
+            }
+        }
+
+        // Get default task types (current ones)
+        function getDefaultTaskTypes() {
+            return [
+                {
+                    id: '1',
+                    name: 'Customer Completed Order Notifications',
+                    category: 'customer-service',
+                    description: 'Call customers to notify them their orders are complete and ready for pickup',
+                    billingType: 'hourly',
+                    hourlyRate: 23.00,
+                    frequency: 'daily',
+                    bonusEligible: true,
+                    instructions: '1. Check completed orders list\n2. Call customers using contact info\n3. Inform them order is ready\n4. Log call completion',
+                    isDefault: true
+                },
+                {
+                    id: '2',
+                    name: 'Thank You Notes',
+                    category: 'customer-service',
+                    description: 'Write and send personalized thank you cards to customers',
+                    billingType: 'hourly',
+                    hourlyRate: 30.50,
+                    frequency: 'weekly',
+                    bonusEligible: true,
+                    instructions: '1. Review recent orders\n2. Write personalized thank you messages\n3. Address and mail cards\n4. Log completion',
+                    isDefault: true
+                },
+                {
+                    id: '3',
+                    name: 'Sample Management',
+                    category: 'administrative',
+                    description: 'Organize and maintain sample inventory',
+                    billingType: 'flat',
+                    flatRate: 30.00,
+                    frequency: 'weekly',
+                    bonusEligible: true,
+                    instructions: '1. Check sample inventory\n2. Organize by category\n3. Update tracking system\n4. Note any needed restocks',
+                    isDefault: true
+                }
+            ];
+        }
+
+        // Render task types
+        function renderTaskTypes() {
+            const grid = document.getElementById('taskTypesGrid');
+            
+            if (currentTaskTypes.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary);">No task types configured yet.</p>';
+                return;
+            }
+
+            grid.innerHTML = currentTaskTypes.map(task => `
+                <div class="task-type-card">
+                    <div class="task-type-header">
+                        <div>
+                            <div class="task-type-title">${task.name}</div>
+                            <div class="task-type-category">${task.category.replace('-', ' ')}</div>
+                        </div>
+                        <div class="task-type-actions">
+                            <button class="btn btn-secondary" onclick="editTask('${task.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            ${!task.isDefault ? `
+                                <button class="btn btn-danger" onclick="deleteTask('${task.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="task-type-meta">
+                        <div class="billing-info">
+                            <span class="billing-type">${task.billingType}</span>
+                            <span class="billing-rate">
+                                ${task.billingType === 'flat' 
+                                    ? `$${task.flatRate?.toFixed(2) || '0.00'} per completion`
+                                    : `$${task.hourlyRate?.toFixed(2) || '0.00'}/hour`
+                                }
+                            </span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                            <i class="fas fa-calendar"></i> ${task.frequency} • 
+                            <i class="fas fa-${task.bonusEligible ? 'check text-success' : 'times text-danger'}"></i>
+                            ${task.bonusEligible ? 'Bonus Eligible' : 'Not Bonus Eligible'}
+                        </div>
+                    </div>
+                    
+                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('totalTaskTypes').textContent = currentTaskTypes.length;
+            
+            // Calculate potential bonus (rough estimate)
+            const bonusEligible = currentTaskTypes.filter(t => t.bonusEligible);
+            const estimatedMonthlyValue = bonusEligible.reduce((sum, task) => {
+                if (task.billingType === 'flat') {
+                    // Estimate based on frequency
+                    const multiplier = {
+                        'daily': 22, // working days
+                        'weekly': 4,
+                        'monthly': 1,
+                        'as-needed': 2
+                    }[task.frequency] || 1;
+                    return sum + (task.flatRate * multiplier);
+                } else {
+                    // Estimate 1 hour per day for hourly tasks
+                    return sum + (task.hourlyRate * 22);
+                }
+            }, 0);
+            
+            document.getElementById('totalBonusPotential').textContent = `$${Math.min(400, estimatedMonthlyValue).toFixed(0)}`;
+            
+            // Calculate average hourly rate
+            const hourlyTasks = currentTaskTypes.filter(t => t.billingType === 'hourly');
+            const avgRate = hourlyTasks.length > 0 
+                ? hourlyTasks.reduce((sum, t) => sum + t.hourlyRate, 0) / hourlyTasks.length
+                : 20.50; // Base rate
+            document.getElementById('avgHourlyRate').textContent = `$${avgRate.toFixed(2)}`;
+        }
+
+        // Show create task modal
+        function showCreateTaskModal() {
+            editingTaskId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Task Type';
+            document.getElementById('taskForm').reset();
+            selectedBillingType = null;
+            document.querySelectorAll('.billing-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('flatRateGroup').style.display = 'none';
+            document.getElementById('hourlyRateGroup').style.display = 'none';
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        // Edit task
+        function editTask(taskId) {
+            const task = currentTaskTypes.find(t => t.id === taskId);
+            if (!task) return;
+
+            editingTaskId = taskId;
+            document.getElementById('modalTitle').textContent = 'Edit Task Type';
+            
+            // Populate form
+            document.getElementById('taskName').value = task.name;
+            document.getElementById('taskCategory').value = task.category;
+            document.getElementById('taskDescription').value = task.description || '';
+            document.getElementById('frequency').value = task.frequency;
+            document.getElementById('bonusEligible').checked = task.bonusEligible;
+            document.getElementById('instructions').value = task.instructions || '';
+            
+            // Set billing type
+            selectBillingType(task.billingType);
+            if (task.billingType === 'flat') {
+                document.getElementById('flatRate').value = task.flatRate;
+            } else {
+                document.getElementById('hourlyRate').value = task.hourlyRate;
+            }
+            
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        // Delete task
+        function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task type?')) {
+                currentTaskTypes = currentTaskTypes.filter(t => t.id !== taskId);
+                saveTaskTypes();
+                renderTaskTypes();
+                updateStats();
+            }
+        }
+
+        // Hide task modal
+        function hideTaskModal() {
+            document.getElementById('taskModal').classList.remove('active');
+        }
+
+        // Select billing type
+        function selectBillingType(type) {
+            selectedBillingType = type;
+            
+            // Update UI
+            document.querySelectorAll('.billing-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById(type === 'flat' ? 'flatRateOption' : 'hourlyOption').classList.add('selected');
+            
+            // Show/hide rate fields
+            document.getElementById('flatRateGroup').style.display = type === 'flat' ? 'block' : 'none';
+            document.getElementById('hourlyRateGroup').style.display = type === 'hourly' ? 'block' : 'none';
+        }
+
+        // Handle form submission
+        document.getElementById('taskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!selectedBillingType) {
+                alert('Please select a billing type');
+                return;
+            }
+            
+            const formData = {
+                id: editingTaskId || Date.now().toString(),
+                name: document.getElementById('taskName').value.trim(),
+                category: document.getElementById('taskCategory').value,
+                description: document.getElementById('taskDescription').value.trim(),
+                billingType: selectedBillingType,
+                frequency: document.getElementById('frequency').value,
+                bonusEligible: document.getElementById('bonusEligible').checked,
+                instructions: document.getElementById('instructions').value.trim()
+            };
+            
+            if (selectedBillingType === 'flat') {
+                formData.flatRate = parseFloat(document.getElementById('flatRate').value) || 0;
+            } else {
+                formData.hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            }
+            
+            // Validate
+            if (!formData.name) {
+                alert('Task name is required');
+                return;
+            }
+            
+            if (selectedBillingType === 'flat' && formData.flatRate <= 0) {
+                alert('Flat rate must be greater than 0');
+                return;
+            }
+            
+            if (selectedBillingType === 'hourly' && formData.hourlyRate <= 0) {
+                alert('Hourly rate must be greater than 0');
+                return;
+            }
+            
+            // Save
+            if (editingTaskId) {
+                const index = currentTaskTypes.findIndex(t => t.id === editingTaskId);
+                currentTaskTypes[index] = formData;
+            } else {
+                currentTaskTypes.push(formData);
+            }
+            
+            saveTaskTypes();
+            renderTaskTypes();
+            updateStats();
+            hideTaskModal();
+        });
+
+        // Save task types to localStorage (in real app, this would be API call)
+        function saveTaskTypes() {
+            localStorage.setItem('adriyella_task_types', JSON.stringify(currentTaskTypes));
+        }
+
+        // Load performance data
+        async function loadPerformanceData() {
+            const content = document.getElementById('performanceContent');
+            content.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 1.5rem; margin-bottom: 1rem;">🚧</div>
+                    <h3>Performance Dashboard Coming Soon</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        This will show Adriyella's monthly performance, bonus calculations, and earnings breakdown.
+                    </p>
+                    <div style="background: var(--info-bg); padding: 1rem; border-radius: 6px; margin-top: 1rem;">
+                        <strong>Features in development:</strong>
+                        <ul style="text-align: left; margin-top: 0.5rem;">
+                            <li>Monthly bonus calculation (up to $400)</li>
+                            <li>Task completion rates by type</li>
+                            <li>Time tracking and efficiency metrics</li>
+                            <li>Revenue impact of activities</li>
+                            <li>Progress toward bonus goals</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Refresh performance data
+        function refreshPerformanceData() {
+            loadPerformanceData();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Task History & Management | Adriyella's Dashboard</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Task Service -->
+    <script src="adriyella-task-service.js"></script>
+    
+    <style>
+        :root {
+            /* NWCA Green Theme for consistency */
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --danger-bg: #fee;
+            --danger-text: #dc2626;
+            --info-bg: #dbeafe;
+            --info-text: #1e40af;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: var(--card-bg);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filters-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: var(--danger-text);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-warning {
+            background: var(--warning-text);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #78350f;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Table Section */
+        .table-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+            background: var(--hover-bg);
+        }
+
+        td {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+        tbody tr.selected {
+            background: var(--info-bg);
+        }
+
+        .task-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .task-time {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .task-count {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            gap: 0.25rem;
+        }
+
+        .status-badge.completed {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .status-badge.deleted {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+        }
+
+        .status-badge.in-progress {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .checkbox-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            max-width: 600px;
+            margin: 50px auto;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            background: var(--hover-bg);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Loading and Empty States */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            color: var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filters-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .table-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <div>
+                    <h1 class="page-title">Task History & Management</h1>
+                    <nav class="breadcrumb">
+                        <a href="/staff-dashboard.html">Dashboard</a>
+                        <span>/</span>
+                        <a href="adriyella-daily-tasks.html">Daily Tasks</a>
+                        <span>/</span>
+                        <span>History</span>
+                    </nav>
+                </div>
+            </div>
+            <div>
+                <a href="adriyella-daily-tasks.html" class="btn btn-primary">
+                    <i class="fas fa-tasks"></i>
+                    Back to Daily Tasks
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Filters -->
+    <section class="filters-section">
+        <div class="filters-container">
+            <div class="filter-group">
+                <label class="filter-label">Date From</label>
+                <input type="date" id="dateFrom" class="form-control">
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Date To</label>
+                <input type="date" id="dateTo" class="form-control">
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Task Type</label>
+                <select id="taskType" class="form-control">
+                    <option value="">All Tasks</option>
+                    <option value="1">Customer Completed Order Notifications</option>
+                    <option value="2">Thank You Notes</option>
+                    <option value="3">Sample Management</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Status</label>
+                <select id="statusFilter" class="form-control">
+                    <option value="">All (except deleted)</option>
+                    <option value="completed">Completed</option>
+                    <option value="active">In Progress</option>
+                    <option value="deleted">Deleted</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" onclick="loadTasks()">
+                <i class="fas fa-search"></i>
+                Search
+            </button>
+            
+            <button class="btn btn-secondary" onclick="exportTasks()">
+                <i class="fas fa-download"></i>
+                Export CSV
+            </button>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalTasks">0</div>
+                <div class="stat-label">Total Tasks</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value" id="completedTasks">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value" id="totalTime">0</div>
+                <div class="stat-label">Total Time (min)</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value" id="avgTime">0</div>
+                <div class="stat-label">Avg Time (min)</div>
+            </div>
+        </div>
+
+        <!-- Task History Table -->
+        <div class="table-section">
+            <div class="section-header">
+                <h2 class="section-title">Task History</h2>
+                <div class="table-actions">
+                    <button class="btn btn-warning btn-sm" onclick="bulkEdit()" id="bulkEditBtn" disabled>
+                        <i class="fas fa-edit"></i>
+                        Edit Selected
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="bulkDelete()" id="bulkDeleteBtn" disabled>
+                        <i class="fas fa-trash"></i>
+                        Delete Selected
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="selectAll()">
+                        <i class="fas fa-check-square"></i>
+                        Select All
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="clearSelection()">
+                        <i class="fas fa-square"></i>
+                        Clear Selection
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table id="tasksTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                            </th>
+                            <th>Date</th>
+                            <th>Task</th>
+                            <th>Count</th>
+                            <th>Time</th>
+                            <th>Sessions</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasksTableBody">
+                        <tr>
+                            <td colspan="9" class="loading-container">
+                                <div class="loading-spinner"></div>
+                                <p class="loading-text">Loading task history...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Task Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Task</h3>
+                <button class="modal-close" onclick="closeEditModal()">×</button>
+            </div>
+            <form id="editForm">
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Task Name</label>
+                            <input type="text" id="editTaskName" class="form-control" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Count</label>
+                            <input type="number" id="editCount" class="form-control" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Time (minutes)</label>
+                            <input type="number" id="editTime" class="form-control" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select id="editStatus" class="form-control" required>
+                                <option value="Completed">Completed</option>
+                                <option value="In Progress">In Progress</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <textarea id="editNotes" class="form-control" rows="3" placeholder="Task notes..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveEditBtn">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the service
+        let taskService;
+        let currentTasks = [];
+        let selectedTasks = new Set();
+        let currentEditingTaskId = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            taskService = new TaskTrackingService();
+            initializeDateFilters();
+            loadTasks();
+            
+            // Bind edit form
+            document.getElementById('editForm').addEventListener('submit', handleEditSubmit);
+        });
+
+        // Initialize date filters with defaults (last 30 days)
+        function initializeDateFilters() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+
+            document.getElementById('dateFrom').value = formatDateForInput(startDate);
+            document.getElementById('dateTo').value = formatDateForInput(endDate);
+        }
+
+        // Format date for input field
+        function formatDateForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Load tasks with current filters
+        async function loadTasks() {
+            try {
+                showLoading();
+                
+                const filters = {
+                    dateFrom: document.getElementById('dateFrom').value,
+                    dateTo: document.getElementById('dateTo').value,
+                    taskType: document.getElementById('taskType').value,
+                    status: document.getElementById('statusFilter').value
+                };
+
+                console.log('[TaskHistory] Loading tasks with filters:', filters);
+                currentTasks = await taskService.getTasksWithFilters(filters);
+                console.log('[TaskHistory] Loaded tasks:', currentTasks);
+                
+                updateStats();
+                renderTasksTable();
+                clearSelection();
+            } catch (error) {
+                console.error('[TaskHistory] Error loading tasks:', error);
+                showError('Failed to load task history');
+            }
+        }
+
+        // Show loading state
+        function showLoading() {
+            const tbody = document.getElementById('tasksTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <p class="loading-text">Loading task history...</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Update stats cards
+        function updateStats() {
+            const total = currentTasks.length;
+            const completed = currentTasks.filter(task => task.Color === 'Completed').length;
+            const totalTimeMinutes = currentTasks.reduce((sum, task) => {
+                return sum + Math.round((task.LineTotal || 0) / 60);
+            }, 0);
+            const avgTime = total > 0 ? Math.round(totalTimeMinutes / total) : 0;
+
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('totalTime').textContent = totalTimeMinutes;
+            document.getElementById('avgTime').textContent = avgTime;
+        }
+
+        // Render tasks table
+        function renderTasksTable() {
+            const tbody = document.getElementById('tasksTableBody');
+            
+            if (currentTasks.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="empty-state">
+                            <i class="fas fa-inbox empty-icon"></i>
+                            <p>No tasks found for the selected criteria</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const taskNames = {
+                '1': 'Customer Completed Order Notifications',
+                '2': 'Thank You Notes',
+                '3': 'Sample Management'
+            };
+
+            tbody.innerHTML = currentTasks.map(task => {
+                let timerData = {};
+                try {
+                    timerData = JSON.parse(task.TimerData_ || '{}');
+                } catch (e) {
+                    // Fallback to old ColorCode field
+                    try {
+                        timerData = JSON.parse(task.ColorCode || '{}');
+                    } catch (e2) {
+                        timerData = {};
+                    }
+                }
+
+                const timeMinutes = Math.round((task.LineTotal || 0) / 60);
+                const sessions = timerData.timerSessions ? timerData.timerSessions.length : 1;
+                const notes = timerData.notes || '';
+                const statusClass = task.Color === 'Completed' ? 'completed' : 
+                                  task.Color === 'Deleted' ? 'deleted' : 'in-progress';
+
+                return `
+                    <tr class="${selectedTasks.has(task.PK_ID) ? 'selected' : ''}">
+                        <td>
+                            <input type="checkbox" class="task-checkbox" 
+                                   value="${task.PK_ID}" 
+                                   ${selectedTasks.has(task.PK_ID) ? 'checked' : ''}
+                                   onchange="toggleTaskSelection(${task.PK_ID})">
+                        </td>
+                        <td>${formatDate(task.SessionDate)}</td>
+                        <td class="task-name">${taskNames[task.StyleNumber] || task.ProductName}</td>
+                        <td>
+                            <span class="task-count">${task.Quantity}</span>
+                        </td>
+                        <td class="task-time">
+                            <i class="fas fa-clock"></i>
+                            ${timeMinutes} min
+                        </td>
+                        <td>${sessions}</td>
+                        <td>
+                            <span class="status-badge ${statusClass}">
+                                <i class="fas fa-${statusClass === 'completed' ? 'check-circle' : 
+                                                   statusClass === 'deleted' ? 'trash' : 'clock'}"></i>
+                                ${task.Color}
+                            </span>
+                        </td>
+                        <td title="${notes}" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${notes || '-'}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-warning btn-sm" onclick="editTask(${task.PK_ID})" 
+                                        title="Edit Task">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteTask(${task.PK_ID})" 
+                                        title="Delete Task"
+                                        ${task.Color === 'Deleted' ? 'disabled' : ''}>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Toggle task selection
+        function toggleTaskSelection(taskId) {
+            if (selectedTasks.has(taskId)) {
+                selectedTasks.delete(taskId);
+            } else {
+                selectedTasks.add(taskId);
+            }
+            updateSelectionUI();
+        }
+
+        // Toggle select all
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (selectAllCheckbox.checked) {
+                selectAll();
+            } else {
+                clearSelection();
+            }
+        }
+
+        // Select all tasks
+        function selectAll() {
+            selectedTasks.clear();
+            currentTasks.forEach(task => selectedTasks.add(task.PK_ID));
+            updateSelectionUI();
+            renderTasksTable();
+        }
+
+        // Clear selection
+        function clearSelection() {
+            selectedTasks.clear();
+            updateSelectionUI();
+            renderTasksTable();
+        }
+
+        // Update selection UI
+        function updateSelectionUI() {
+            const selectedCount = selectedTasks.size;
+            const bulkEditBtn = document.getElementById('bulkEditBtn');
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+
+            // Enable/disable bulk action buttons
+            bulkEditBtn.disabled = selectedCount === 0;
+            bulkDeleteBtn.disabled = selectedCount === 0;
+
+            // Update select all checkbox
+            if (selectedCount === 0) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = false;
+            } else if (selectedCount === currentTasks.length) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.indeterminate = true;
+                selectAllCheckbox.checked = false;
+            }
+
+            // Update button text
+            if (selectedCount > 0) {
+                bulkEditBtn.innerHTML = `<i class="fas fa-edit"></i> Edit Selected (${selectedCount})`;
+                bulkDeleteBtn.innerHTML = `<i class="fas fa-trash"></i> Delete Selected (${selectedCount})`;
+            } else {
+                bulkEditBtn.innerHTML = `<i class="fas fa-edit"></i> Edit Selected`;
+                bulkDeleteBtn.innerHTML = `<i class="fas fa-trash"></i> Delete Selected`;
+            }
+        }
+
+        // Edit single task
+        function editTask(taskId) {
+            const task = currentTasks.find(t => t.PK_ID === taskId);
+            if (!task) return;
+
+            let timerData = {};
+            try {
+                timerData = JSON.parse(task.TimerData_ || '{}');
+            } catch (e) {
+                try {
+                    timerData = JSON.parse(task.ColorCode || '{}');
+                } catch (e2) {
+                    timerData = {};
+                }
+            }
+
+            const taskNames = {
+                '1': 'Customer Completed Order Notifications',
+                '2': 'Thank You Notes',
+                '3': 'Sample Management'
+            };
+
+            // Populate edit form
+            document.getElementById('editTaskName').value = taskNames[task.StyleNumber] || task.ProductName;
+            document.getElementById('editCount').value = task.Quantity;
+            document.getElementById('editTime').value = Math.round((task.LineTotal || 0) / 60);
+            document.getElementById('editStatus').value = task.Color;
+            document.getElementById('editNotes').value = timerData.notes || '';
+
+            currentEditingTaskId = taskId;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Handle edit form submission
+        async function handleEditSubmit(e) {
+            e.preventDefault();
+            
+            if (!currentEditingTaskId) return;
+
+            const submitBtn = document.getElementById('saveEditBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="loading-spinner" style="width: 16px; height: 16px;"></span> Saving...';
+            submitBtn.disabled = true;
+
+            try {
+                const updates = {
+                    count: parseInt(document.getElementById('editCount').value),
+                    totalSeconds: parseInt(document.getElementById('editTime').value) * 60,
+                    completed: document.getElementById('editStatus').value === 'Completed',
+                    notes: document.getElementById('editNotes').value
+                };
+
+                await taskService.updateTaskCompletion(currentEditingTaskId, updates);
+                
+                closeEditModal();
+                await loadTasks(); // Reload to show changes
+                showSuccess('Task updated successfully');
+            } catch (error) {
+                console.error('[TaskHistory] Error updating task:', error);
+                showError('Failed to update task');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            currentEditingTaskId = null;
+            document.getElementById('editForm').reset();
+        }
+
+        // Delete single task
+        async function deleteTask(taskId) {
+            if (!confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                await taskService.deleteTask(taskId);
+                await loadTasks(); // Reload to show changes
+                showSuccess('Task deleted successfully');
+            } catch (error) {
+                console.error('[TaskHistory] Error deleting task:', error);
+                showError('Failed to delete task');
+            }
+        }
+
+        // Bulk edit tasks
+        function bulkEdit() {
+            if (selectedTasks.size === 0) return;
+
+            const selectedIds = Array.from(selectedTasks);
+            if (selectedIds.length === 1) {
+                editTask(selectedIds[0]);
+                return;
+            }
+
+            // For multiple tasks, show a simplified bulk edit form
+            const newStatus = prompt('Enter new status for selected tasks (Completed/In Progress):');
+            if (!newStatus || !['Completed', 'In Progress'].includes(newStatus)) {
+                return;
+            }
+
+            const newNotes = prompt('Enter notes for selected tasks (optional):');
+
+            performBulkEdit(selectedIds, {
+                completed: newStatus === 'Completed',
+                notes: newNotes || ''
+            });
+        }
+
+        // Perform bulk edit
+        async function performBulkEdit(taskIds, updates) {
+            try {
+                showLoading();
+                const result = await taskService.bulkUpdateTasks(taskIds, updates);
+                
+                await loadTasks(); // Reload to show changes
+                clearSelection();
+                
+                showSuccess(`${result.success.length} tasks updated successfully. ${result.failed.length} failed.`);
+            } catch (error) {
+                console.error('[TaskHistory] Error in bulk edit:', error);
+                showError('Failed to update tasks');
+            }
+        }
+
+        // Bulk delete tasks
+        async function bulkDelete() {
+            if (selectedTasks.size === 0) return;
+
+            if (!confirm(`Are you sure you want to delete ${selectedTasks.size} selected tasks? This action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                showLoading();
+                const selectedIds = Array.from(selectedTasks);
+                const result = await taskService.bulkDeleteTasks(selectedIds);
+                
+                await loadTasks(); // Reload to show changes
+                clearSelection();
+                
+                showSuccess(`${result.success.length} tasks deleted successfully. ${result.failed.length} failed.`);
+            } catch (error) {
+                console.error('[TaskHistory] Error in bulk delete:', error);
+                showError('Failed to delete tasks');
+            }
+        }
+
+        // Export tasks to CSV
+        async function exportTasks() {
+            try {
+                const filters = {
+                    dateFrom: document.getElementById('dateFrom').value,
+                    dateTo: document.getElementById('dateTo').value,
+                    taskType: document.getElementById('taskType').value,
+                    status: document.getElementById('statusFilter').value
+                };
+
+                const csvContent = await taskService.exportTasksToCSV(filters);
+                
+                // Download CSV
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `adriyella-task-history-${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showSuccess('Task history exported successfully');
+            } catch (error) {
+                console.error('[TaskHistory] Error exporting tasks:', error);
+                showError('Failed to export task history');
+            }
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            // Simple alert for now - you could implement a toast notification
+            alert('✅ ' + message);
+        }
+
+        // Show error message
+        function showError(message) {
+            // Simple alert for now - you could implement a toast notification
+            alert('❌ ' + message);
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeEditModal();
+            }
+        });
+    </script>
+</body>
+</html>

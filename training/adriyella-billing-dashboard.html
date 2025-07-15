@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Billing & Performance Dashboard | Adriyella's Bonus System</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <!-- Services -->
+    <script src="adriyella-task-service.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --danger-bg: #fee;
+            --danger-text: #dc2626;
+            --info-bg: #dbeafe;
+            --info-text: #1e40af;
+            --gold: #f59e0b;
+            --gold-light: #fbbf24;
+            --gold-bg: #fef3c7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: white;
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/><circle cx="25" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: -1rem auto 2rem;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Earnings Summary Card */
+        .earnings-summary {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border-top: 4px solid var(--gold);
+        }
+
+        .earnings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .earnings-item {
+            text-align: center;
+        }
+
+        .earnings-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .earnings-icon.primary {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .earnings-icon.gold {
+            background: var(--gold-bg);
+            color: var(--gold);
+        }
+
+        .earnings-icon.info {
+            background: var(--info-bg);
+            color: var(--info-text);
+        }
+
+        .earnings-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .earnings-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .earnings-change {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .earnings-change.positive {
+            color: var(--success-text);
+        }
+
+        .earnings-change.negative {
+            color: var(--danger-text);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Bonus Progress */
+        .bonus-progress {
+            background: linear-gradient(135deg, var(--gold-bg) 0%, #fff 100%);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bonus-progress::before {
+            content: '💰';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        .bonus-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .bonus-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .bonus-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .progress-bar-container {
+            position: relative;
+            height: 20px;
+            background: rgba(249, 115, 22, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Task Performance Grid */
+        .task-performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .task-performance-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .task-performance-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .task-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .task-stat {
+            text-align: center;
+        }
+
+        .task-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .task-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .task-earnings {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--success-bg);
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .task-earnings-label {
+            font-size: 0.875rem;
+            color: var(--success-text);
+            font-weight: 500;
+        }
+
+        .task-earnings-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--success-text);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Time Period Selector */
+        .period-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .period-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .period-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .earnings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .task-performance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bonus-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-top">
+                <div class="header-left">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                         alt="Northwest Custom Apparel" class="logo">
+                    <div>
+                        <h1 class="page-title">Adriyella's Performance Dashboard</h1>
+                        <p class="page-subtitle">Freelancer-Style Billing & Bonus System</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="breadcrumb">
+                        <a href="/staff-dashboard.html">Dashboard</a>
+                        <span>/</span>
+                        <a href="adriyella-daily-tasks.html">Tasks</a>
+                        <span>/</span>
+                        <a href="adriyella-admin-dashboard.html">Admin</a>
+                        <span>/</span>
+                        <span>Billing</span>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Monthly Earnings Summary -->
+        <div class="earnings-summary">
+            <div class="earnings-grid">
+                <div class="earnings-item">
+                    <div class="earnings-icon primary">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="earnings-value" id="baseEarnings">$0</div>
+                    <div class="earnings-label">Base Earnings</div>
+                    <div class="earnings-change" id="baseEarningsChange">$20.50/hour × hours worked</div>
+                </div>
+                
+                <div class="earnings-item">
+                    <div class="earnings-icon gold">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="earnings-value" id="bonusEarnings">$0</div>
+                    <div class="earnings-label">Bonus Earnings</div>
+                    <div class="earnings-change positive" id="bonusEarningsChange">+$0 this month</div>
+                </div>
+                
+                <div class="earnings-item">
+                    <div class="earnings-icon info">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="earnings-value" id="totalEarnings">$0</div>
+                    <div class="earnings-label">Total Earnings</div>
+                    <div class="earnings-change" id="totalEarningsChange">Monthly total</div>
+                </div>
+                
+                <div class="earnings-item">
+                    <div class="earnings-icon primary">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="earnings-value" id="totalHours">0</div>
+                    <div class="earnings-label">Total Hours</div>
+                    <div class="earnings-change" id="totalHoursChange">Billable time tracked</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bonus Progress -->
+        <div class="bonus-progress">
+            <div class="bonus-header">
+                <div>
+                    <div class="bonus-title">Monthly Bonus Progress</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                        Maximum: $400/month for revenue-generating activities
+                    </div>
+                </div>
+                <div class="bonus-amount" id="bonusProgress">$0 / $400</div>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="bonusProgressBar" style="width: 0%"></div>
+            </div>
+            
+            <div class="progress-info">
+                <span id="bonusPercentage">0% of monthly goal</span>
+                <span id="bonusRemaining">$400 remaining</span>
+            </div>
+        </div>
+
+        <!-- Time Period Selector -->
+        <div class="period-selector">
+            <button class="period-btn active" onclick="selectPeriod('current', this)">Current Month</button>
+            <button class="period-btn" onclick="selectPeriod('last', this)">Last Month</button>
+            <button class="period-btn" onclick="selectPeriod('quarter', this)">This Quarter</button>
+        </div>
+
+        <!-- Task Performance -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Task Performance & Earnings</h2>
+                <button class="btn btn-primary" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh Data
+                </button>
+            </div>
+
+            <div class="task-performance-grid" id="taskPerformanceGrid">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading performance data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings Chart -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Daily Earnings Breakdown</h2>
+                <select id="chartType" class="btn btn-secondary" onchange="updateChart()">
+                    <option value="earnings">Earnings</option>
+                    <option value="hours">Hours</option>
+                    <option value="tasks">Tasks Completed</option>
+                </select>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="earningsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Actions</h2>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="adriyella-daily-tasks.html" class="btn btn-primary">
+                    <i class="fas fa-play"></i>
+                    Start Daily Tasks
+                </a>
+                <a href="adriyella-task-history.html" class="btn btn-secondary">
+                    <i class="fas fa-history"></i>
+                    View Full History
+                </a>
+                <button class="btn btn-gold" onclick="generateInvoice()">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    Generate Invoice
+                </button>
+                <button class="btn btn-secondary" onclick="exportData()">
+                    <i class="fas fa-download"></i>
+                    Export Data
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Global variables
+        let taskService;
+        let earningsChart;
+        let currentPeriod = 'current';
+        let performanceData = {};
+
+        // Billing rates
+        const BILLING_RATES = {
+            base: 20.50,
+            maxBonus: 400,
+            taskRates: {
+                '1': { type: 'hourly', rate: 23.00 }, // Customer notifications
+                '2': { type: 'hourly', rate: 30.50 }, // Thank you notes
+                '3': { type: 'flat', rate: 30.00 }    // Sample management
+            }
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            taskService = new TaskTrackingService();
+            initializeChart();
+            loadPerformanceData();
+        });
+
+        // Initialize Chart.js
+        function initializeChart() {
+            const ctx = document.getElementById('earningsChart').getContext('2d');
+            earningsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Daily Earnings',
+                        data: [],
+                        backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                        borderColor: '#f59e0b',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load performance data
+        async function loadPerformanceData() {
+            try {
+                // Get task types from localStorage
+                const taskTypes = JSON.parse(localStorage.getItem('adriyella_task_types') || '[]');
+                
+                // Get current month's data
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                
+                // Get task history for the period
+                const sessions = await taskService.getTasksWithFilters({
+                    dateFrom: startOfMonth.toISOString().split('T')[0],
+                    dateTo: endOfMonth.toISOString().split('T')[0]
+                });
+
+                // Calculate earnings
+                performanceData = calculateEarnings(sessions, taskTypes);
+                
+                // Update UI
+                updateEarningsSummary(performanceData);
+                updateBonusProgress(performanceData);
+                updateTaskPerformance(performanceData);
+                updateChart(performanceData);
+                
+            } catch (error) {
+                console.error('Error loading performance data:', error);
+                showError('Failed to load performance data');
+            }
+        }
+
+        // Calculate earnings from task data
+        function calculateEarnings(sessions, taskTypes) {
+            const earnings = {
+                base: 0,
+                bonus: 0,
+                total: 0,
+                hours: 0,
+                tasks: [],
+                daily: {}
+            };
+
+            // Group tasks by type
+            const tasksByType = {};
+            
+            sessions.forEach(session => {
+                const date = new Date(session.SessionDate).toDateString();
+                
+                if (!earnings.daily[date]) {
+                    earnings.daily[date] = {
+                        base: 0,
+                        bonus: 0,
+                        total: 0,
+                        hours: 0,
+                        tasksCompleted: 0
+                    };
+                }
+
+                // Parse timer data
+                let timerData = {};
+                try {
+                    timerData = JSON.parse(session.TimerData_ || '{}');
+                } catch (e) {
+                    try {
+                        timerData = JSON.parse(session.ColorCode || '{}');
+                    } catch (e2) {
+                        timerData = {};
+                    }
+                }
+
+                const taskTypeId = session.StyleNumber;
+                const hours = (timerData.totalSeconds || 0) / 3600;
+                const taskType = taskTypes.find(t => t.id === taskTypeId);
+                
+                if (!tasksByType[taskTypeId]) {
+                    tasksByType[taskTypeId] = {
+                        name: session.ProductName,
+                        type: taskType?.billingType || 'hourly',
+                        rate: taskType?.hourlyRate || taskType?.flatRate || BILLING_RATES.base,
+                        hours: 0,
+                        completions: 0,
+                        earnings: 0
+                    };
+                }
+
+                // Calculate earnings based on task type
+                let taskEarnings = 0;
+                if (taskType?.billingType === 'flat') {
+                    taskEarnings = taskType.flatRate || 0;
+                    tasksByType[taskTypeId].completions++;
+                } else {
+                    // Hourly rate
+                    const rate = taskType?.hourlyRate || BILLING_RATES.base;
+                    taskEarnings = hours * rate;
+                    tasksByType[taskTypeId].hours += hours;
+                }
+
+                tasksByType[taskTypeId].earnings += taskEarnings;
+                
+                // Add to daily totals
+                earnings.daily[date].hours += hours;
+                earnings.daily[date].tasksCompleted++;
+                
+                // Determine if it's base pay or bonus
+                if (taskType?.bonusEligible && taskType.hourlyRate > BILLING_RATES.base) {
+                    // This is bonus work
+                    const baseEarnings = hours * BILLING_RATES.base;
+                    const bonusEarnings = taskEarnings - baseEarnings;
+                    earnings.daily[date].base += baseEarnings;
+                    earnings.daily[date].bonus += bonusEarnings;
+                } else {
+                    earnings.daily[date].base += taskEarnings;
+                }
+                
+                earnings.daily[date].total = earnings.daily[date].base + earnings.daily[date].bonus;
+            });
+
+            // Calculate totals
+            Object.values(earnings.daily).forEach(day => {
+                earnings.base += day.base;
+                earnings.bonus += day.bonus;
+                earnings.hours += day.hours;
+            });
+            
+            // Cap bonus at $400
+            earnings.bonus = Math.min(earnings.bonus, BILLING_RATES.maxBonus);
+            earnings.total = earnings.base + earnings.bonus;
+            
+            // Convert task data to array
+            earnings.tasks = Object.entries(tasksByType).map(([id, data]) => ({
+                id,
+                ...data
+            }));
+
+            return earnings;
+        }
+
+        // Update earnings summary
+        function updateEarningsSummary(data) {
+            document.getElementById('baseEarnings').textContent = `$${data.base.toFixed(2)}`;
+            document.getElementById('bonusEarnings').textContent = `$${data.bonus.toFixed(2)}`;
+            document.getElementById('totalEarnings').textContent = `$${data.total.toFixed(2)}`;
+            document.getElementById('totalHours').textContent = data.hours.toFixed(1);
+            
+            // Update change indicators
+            document.getElementById('baseEarningsChange').textContent = `$${BILLING_RATES.base.toFixed(2)}/hour × ${data.hours.toFixed(1)} hours`;
+            document.getElementById('bonusEarningsChange').textContent = `+$${data.bonus.toFixed(2)} this month`;
+            document.getElementById('totalHoursChange').textContent = `${data.hours.toFixed(1)} billable hours tracked`;
+        }
+
+        // Update bonus progress
+        function updateBonusProgress(data) {
+            const percentage = (data.bonus / BILLING_RATES.maxBonus) * 100;
+            const remaining = BILLING_RATES.maxBonus - data.bonus;
+            
+            document.getElementById('bonusProgress').textContent = `$${data.bonus.toFixed(2)} / $${BILLING_RATES.maxBonus}`;
+            document.getElementById('bonusProgressBar').style.width = `${Math.min(percentage, 100)}%`;
+            document.getElementById('bonusPercentage').textContent = `${percentage.toFixed(1)}% of monthly goal`;
+            document.getElementById('bonusRemaining').textContent = `$${Math.max(remaining, 0).toFixed(2)} remaining`;
+        }
+
+        // Update task performance grid
+        function updateTaskPerformance(data) {
+            const grid = document.getElementById('taskPerformanceGrid');
+            
+            if (data.tasks.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                        <p>No task data available for this period</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = data.tasks.map(task => `
+                <div class="task-performance-card">
+                    <div class="task-name">${task.name}</div>
+                    
+                    <div class="task-stats">
+                        <div class="task-stat">
+                            <div class="task-stat-value">${task.hours.toFixed(1)}</div>
+                            <div class="task-stat-label">Hours</div>
+                        </div>
+                        <div class="task-stat">
+                            <div class="task-stat-value">${task.completions}</div>
+                            <div class="task-stat-label">Completions</div>
+                        </div>
+                    </div>
+                    
+                    <div class="task-earnings">
+                        <span class="task-earnings-label">
+                            ${task.type === 'flat' ? 'Flat Rate' : 'Hourly'} Earnings
+                        </span>
+                        <span class="task-earnings-value">$${task.earnings.toFixed(2)}</span>
+                    </div>
+                    
+                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
+                        Rate: ${task.type === 'flat' ? `$${task.rate}/completion` : `$${task.rate}/hour`}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update chart
+        function updateChart(data) {
+            const chartType = document.getElementById('chartType').value;
+            const dailyData = Object.entries(data.daily).sort(([a], [b]) => new Date(a) - new Date(b));
+            
+            const labels = dailyData.map(([date]) => {
+                const d = new Date(date);
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+            
+            let chartData;
+            let label;
+            let color;
+            
+            switch (chartType) {
+                case 'earnings':
+                    chartData = dailyData.map(([, day]) => day.total);
+                    label = 'Daily Earnings';
+                    color = '#f59e0b';
+                    break;
+                case 'hours':
+                    chartData = dailyData.map(([, day]) => day.hours);
+                    label = 'Daily Hours';
+                    color = '#4cb354';
+                    break;
+                case 'tasks':
+                    chartData = dailyData.map(([, day]) => day.tasksCompleted);
+                    label = 'Tasks Completed';
+                    color = '#3b82f6';
+                    break;
+            }
+            
+            earningsChart.data.labels = labels;
+            earningsChart.data.datasets[0].data = chartData;
+            earningsChart.data.datasets[0].label = label;
+            earningsChart.data.datasets[0].backgroundColor = color + '80';
+            earningsChart.data.datasets[0].borderColor = color;
+            
+            // Update y-axis formatting
+            if (chartType === 'earnings') {
+                earningsChart.options.scales.y.ticks.callback = function(value) {
+                    return '$' + value.toFixed(2);
+                };
+            } else {
+                earningsChart.options.scales.y.ticks.callback = function(value) {
+                    return value;
+                };
+            }
+            
+            earningsChart.update();
+        }
+
+        // Select time period
+        function selectPeriod(period, element) {
+            currentPeriod = period;
+            
+            // Update active button
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            
+            // TODO: Reload data for selected period
+            console.log('Selected period:', period);
+        }
+
+        // Refresh data
+        function refreshData() {
+            loadPerformanceData();
+        }
+
+        // Generate invoice
+        function generateInvoice() {
+            if (!performanceData.total) {
+                alert('No earnings data available to generate invoice');
+                return;
+            }
+            
+            const invoice = generateInvoiceHTML(performanceData);
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(invoice);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Generate invoice HTML
+        function generateInvoiceHTML(data) {
+            const now = new Date();
+            const invoiceDate = now.toLocaleDateString();
+            const invoiceNumber = `ADR-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+            
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Invoice ${invoiceNumber}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #f59e0b; padding-bottom: 20px; }
+                        .invoice-details { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+                        th { background: #f8f9fa; font-weight: 600; }
+                        .total-row { font-weight: bold; background: #f8f9fa; }
+                        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Performance Invoice</h1>
+                        <h2>Northwest Custom Apparel</h2>
+                    </div>
+                    
+                    <div class="invoice-details">
+                        <div>
+                            <h3>Invoice To:</h3>
+                            <p><strong>Adriyella</strong><br>
+                            Office Assistant<br>
+                            adriyella@nwcustomapparel.com</p>
+                        </div>
+                        <div>
+                            <h3>Invoice Details:</h3>
+                            <p><strong>Invoice #:</strong> ${invoiceNumber}<br>
+                            <strong>Date:</strong> ${invoiceDate}<br>
+                            <strong>Period:</strong> ${now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Hours/Qty</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Base Hours (Regular Office Work)</td>
+                                <td>${data.hours.toFixed(1)} hours</td>
+                                <td>$${BILLING_RATES.base.toFixed(2)}/hour</td>
+                                <td>$${data.base.toFixed(2)}</td>
+                            </tr>
+                            ${data.tasks.map(task => `
+                                <tr>
+                                    <td>${task.name}</td>
+                                    <td>${task.type === 'flat' ? `${task.completions} completions` : `${task.hours.toFixed(1)} hours`}</td>
+                                    <td>$${task.rate.toFixed(2)}/${task.type === 'flat' ? 'completion' : 'hour'}</td>
+                                    <td>$${task.earnings.toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td colspan="3">Subtotal:</td>
+                                <td>$${(data.base + data.bonus).toFixed(2)}</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="3">Performance Bonus (Max $400):</td>
+                                <td>$${data.bonus.toFixed(2)}</td>
+                            </tr>
+                            <tr class="total-row" style="font-size: 1.2em;">
+                                <td colspan="3"><strong>Total Amount:</strong></td>
+                                <td><strong>$${data.total.toFixed(2)}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    <div class="footer">
+                        <p>Generated on ${new Date().toLocaleString()}</p>
+                        <p>Northwest Custom Apparel - Internal Performance Tracking</p>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+
+        // Export data
+        function exportData() {
+            if (!performanceData.tasks) {
+                alert('No data available to export');
+                return;
+            }
+            
+            // Create CSV content
+            let csv = 'Date,Task,Hours,Completions,Rate,Earnings,Type\n';
+            
+            Object.entries(performanceData.daily).forEach(([date, dayData]) => {
+                performanceData.tasks.forEach(task => {
+                    csv += `${new Date(date).toLocaleDateString()},${task.name},${task.hours.toFixed(2)},${task.completions},$${task.rate.toFixed(2)},$${task.earnings.toFixed(2)},${task.type}\n`;
+                });
+            });
+            
+            // Download CSV
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `adriyella-performance-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        // Show error message
+        function showError(message) {
+            console.error(message);
+            // You could implement a toast notification here
+        }
+    </script>
+</body>
+</html>
