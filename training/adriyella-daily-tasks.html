@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Adriyella's Task Tracker | NW Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Task Service -->
+    <script src="adriyella-task-service.js"></script>
+    
+    <style>
+        :root {
+            /* Modern color palette */
+            --primary-gradient: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            --accent-mint: #4ECDC4;
+            --accent-mint-light: #7FE5DF;
+            --bg-purple: #F7F3FF;
+            --card-white: #FFFFFF;
+            --text-dark: #2D3436;
+            --text-gray: #636E72;
+            --success-green: #00B894;
+            --warning-orange: #FDCB6E;
+            --danger-red: #FF6B6B;
+            --error-bg: #fee;
+            --error-text: #c33;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --shadow-glow: 0 0 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-purple);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Background decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+            z-index: -1;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--card-white);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-gray);
+            font-size: 0.875rem;
+        }
+        
+        .breadcrumb a {
+            color: var(--danger-red);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .date-time {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Error Message */
+        .error-message {
+            background: var(--error-bg);
+            border: 1px solid var(--error-text);
+            color: var(--error-text);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .loading-overlay.show {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--danger-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+        
+        .welcome-greeting {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-subtitle {
+            color: var(--text-gray);
+            font-size: 1.125rem;
+        }
+        
+        .streak-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--warning-orange);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 24px;
+            font-weight: 600;
+            margin-top: 1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Daily Summary */
+        .daily-summary {
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Progress Bar */
+        .progress-section {
+            margin-bottom: 2rem;
+        }
+        
+        .progress-bar {
+            background: #F3F4F6;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.5rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: var(--text-gray);
+            font-size: 0.875rem;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: #F9FAFB;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+        
+        /* Tasks Grid */
+        .tasks-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        /* Task Card */
+        .task-card {
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .task-card.active {
+            border-color: var(--danger-red);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .task-card.completed {
+            opacity: 0.9;
+            background: #F0FDF4;
+            border-color: var(--success-green);
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .task-info {
+            flex: 1;
+        }
+        
+        .task-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .task-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .task-description {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+        
+        .task-status {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #F3F4F6;
+            color: var(--text-gray);
+        }
+        
+        .status-active {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .status-completed {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        /* Timer Section */
+        .timer-section {
+            text-align: center;
+        }
+        
+        .timer-display {
+            font-size: 3rem;
+            font-weight: 700;
+            font-family: 'Monaco', monospace;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+        
+        .timer-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background: var(--danger-red);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #E5E7EB;
+            color: var(--text-dark);
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: #D1D5DB;
+        }
+        
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+        }
+        
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.3);
+        }
+        
+        /* Task Details */
+        .task-details {
+            border-top: 1px solid #E5E7EB;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: var(--text-gray);
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .quick-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .input-number {
+            width: 80px;
+            padding: 0.5rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .quick-btn {
+            padding: 0.5rem 0.75rem;
+            background: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .quick-btn:hover {
+            background: #E5E7EB;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--danger-red);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: var(--card-white);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            text-align: center;
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .celebration-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-subtitle {
+            color: var(--text-gray);
+        }
+        
+        /* Quick Buttons in Modal */
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .quick-buttons .quick-btn {
+            background: var(--accent-mint);
+            color: white;
+            border: none;
+        }
+        
+        .quick-buttons .quick-btn:hover {
+            background: var(--accent-mint-light);
+        }
+        
+        /* Animations */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .timer-display {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .timer-controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <div class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>→</span>
+                    <span>Task Tracker</span>
+                </div>
+            </div>
+            <div class="header-right" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="adriyella-task-history.html" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                    <i class="fas fa-history"></i>
+                    Task History
+                </a>
+                <a href="adriyella-admin-dashboard.html" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                    <i class="fas fa-cog"></i>
+                    Admin
+                </a>
+                <a href="adriyella-billing-dashboard.html" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem; background: var(--warning-orange); border: none;">
+                    <i class="fas fa-dollar-sign"></i>
+                    Billing
+                </a>
+                <a href="training-progress-dashboard.html" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                    <i class="fas fa-chart-line"></i>
+                    Progress
+                </a>
+            </div>
+            <div>
+                <h1 class="header-title">Adriyella's Task Tracker</h1>
+                <div class="date-time" id="dateTime"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h2 class="welcome-greeting" id="welcomeGreeting">Good morning, Adriyella! 🌟</h2>
+            <p class="welcome-subtitle">Let's make today productive and fun!</p>
+            <div class="streak-badge" id="streakBadge" style="display: none;">
+                🔥 <span id="streakCount">0</span> Day Streak!
+            </div>
+        </div>
+
+        <!-- Daily Summary -->
+        <div class="daily-summary">
+            <div class="summary-header">
+                <h3 class="summary-title">
+                    <span>📊</span>
+                    Today's Progress
+                </h3>
+                <span id="summaryDate"></span>
+            </div>
+            
+            <div class="progress-section">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="tasksCompleted">0</span> of <span id="totalTasks">0</span> Tasks Complete
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTime">0:00</div>
+                    <div class="stat-label">Total Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalContacts">0</div>
+                    <div class="stat-label">Contacts Made</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="productivityScore">0%</div>
+                    <div class="stat-label">Productivity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="todayStreak">🔥</div>
+                    <div class="stat-label">On Fire!</div>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Daily Reflection</label>
+                <textarea class="form-control" id="dailyReflection" rows="2" 
+                    placeholder="How was your day? Any wins to celebrate? 🎉"></textarea>
+            </div>
+            
+            <button class="btn btn-success" onclick="submitDailyReport()" style="width: 100%; margin-top: 1rem;">
+                <i class="fas fa-check-circle"></i>
+                Submit Daily Report
+            </button>
+        </div>
+
+        <!-- Tasks Grid -->
+        <div class="tasks-grid" id="tasksGrid">
+            <!-- Dynamic task cards will be loaded here -->
+            <div style="text-align: center; padding: 2rem;" id="loadingTasks">
+                <div class="loading-spinner"></div>
+                <p style="margin-top: 1rem; color: var(--text-gray);">Loading your tasks...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Completion Modal -->
+    <div class="modal-overlay" id="completionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="celebration-icon">🎉</div>
+                <h3 class="modal-title" id="modalTitle">Task Complete!</h3>
+                <p class="modal-subtitle" id="modalSubtitle">Great job!</p>
+            </div>
+            
+            <form id="completionForm" style="padding: 2rem;">
+                <div class="form-group">
+                    <label class="form-label" id="modalCountLabel">How many?</label>
+                    <input type="number" class="form-control" id="modalCount" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Quick Summary</label>
+                    <textarea class="form-control" id="modalNotes" rows="3" 
+                        placeholder="Add any details you want to remember..."></textarea>
+                    <div class="quick-buttons" id="quickButtons">
+                        <!-- Dynamic quick buttons -->
+                    </div>
+                </div>
+                
+                <div class="timer-controls" style="margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeCompletionModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success" id="saveTaskBtn">
+                        <i class="fas fa-save"></i>
+                        Save & Continue
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Edit Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="celebration-icon">✏️</div>
+                <h3 class="modal-title" id="editModalTitle">Edit Task</h3>
+                <p class="modal-subtitle" id="editModalSubtitle">Make any needed changes</p>
+            </div>
+            
+            <form id="editForm" style="padding: 2rem;">
+                <div class="form-group">
+                    <label class="form-label" id="editCountLabel">Count</label>
+                    <input type="number" class="form-control" id="editCount" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-control" id="editNotes" rows="3" 
+                        placeholder="Update any details..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Time Spent (minutes)</label>
+                    <input type="number" class="form-control" id="editTimeMinutes" min="0" step="1">
+                    <small class="form-text">Adjust if the timer wasn't accurate</small>
+                </div>
+                
+                <div class="timer-controls" style="margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="restartTask()" style="margin-right: auto;">
+                        <i class="fas fa-redo"></i>
+                        Restart Timer
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="updateTaskBtn">
+                        <i class="fas fa-save"></i>
+                        Update Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Timer class for each task
+        class TaskTimer {
+            constructor(taskId) {
+                this.taskId = taskId;
+                this.startTime = null;
+                this.elapsedTime = 0;
+                this.interval = null;
+                this.isRunning = false;
+                this.sessions = [];
+            }
+            
+            start() {
+                if (!this.isRunning) {
+                    this.startTime = Date.now();
+                    this.isRunning = true;
+                    this.interval = setInterval(() => {
+                        this.updateDisplay();
+                    }, 100);
+                    
+                    // Add session start
+                    this.sessions.push({
+                        start: new Date().toISOString(),
+                        end: null,
+                        duration: 0
+                    });
+                }
+            }
+            
+            pause() {
+                if (this.isRunning) {
+                    this.isRunning = false;
+                    clearInterval(this.interval);
+                    const sessionTime = Date.now() - this.startTime;
+                    this.elapsedTime += sessionTime;
+                    
+                    // Update last session
+                    const lastSession = this.sessions[this.sessions.length - 1];
+                    if (lastSession) {
+                        lastSession.end = new Date().toISOString();
+                        lastSession.duration = Math.round(sessionTime / 1000);
+                    }
+                }
+            }
+            
+            stop() {
+                this.pause();
+                const totalSeconds = Math.round(this.elapsedTime / 1000);
+                return {
+                    totalSeconds,
+                    totalMinutes: Math.round(totalSeconds / 60),
+                    sessions: this.sessions
+                };
+            }
+            
+            updateDisplay() {
+                const total = this.elapsedTime + (this.isRunning ? Date.now() - this.startTime : 0);
+                const seconds = Math.floor(total / 1000) % 60;
+                const minutes = Math.floor(total / 60000);
+                
+                const timerElement = document.getElementById(`timer-${this.taskId}`);
+                if (timerElement) {
+                    timerElement.textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+                    
+                // Update time spent display
+                const timeSpentElement = document.getElementById(`timeSpent-${this.taskId}`);
+                if (timeSpentElement) {
+                    timeSpentElement.textContent = 
+                        `${Math.round(total / 60000)} minutes`;
+                }
+            }
+            
+            reset() {
+                this.pause();
+                this.elapsedTime = 0;
+                this.sessions = [];
+                this.updateDisplay();
+            }
+            
+            setElapsedTime(seconds) {
+                this.elapsedTime = seconds * 1000;
+                this.updateDisplay();
+            }
+        }
+
+        // Initialize
+        let taskService = null;
+        let timers = {};
+        let currentTask = null;
+        let todaysTasks = [];
+        let taskTypes = [];  // Dynamic task types from admin dashboard
+
+        // Error handling
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+                setTimeout(() => {
+                    errorElement.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        // Loading state
+        function showLoading(show = true) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                if (show) {
+                    loadingOverlay.classList.add('show');
+                } else {
+                    loadingOverlay.classList.remove('show');
+                }
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                taskService = new TaskTrackingService();
+                updateDateTime();
+                setInterval(updateDateTime, 60000);
+                updateGreeting();
+                checkFridayReminder();
+                
+                // Load task types and render dynamic tasks
+                await loadTaskTypes();
+                
+                // Load today's tasks
+                await loadTodaysTasks();
+                
+                // Calculate streak
+                try {
+                    const streak = await taskService.calculateStreak();
+                    if (streak > 0) {
+                        const streakBadge = document.getElementById('streakBadge');
+                        const streakCount = document.getElementById('streakCount');
+                        if (streakBadge && streakCount) {
+                            streakBadge.style.display = 'inline-flex';
+                            streakCount.textContent = streak;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error calculating streak:', error);
+                }
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize. Please refresh the page.');
+            }
+        });
+
+        // Update date/time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            
+            const dateTimeElement = document.getElementById('dateTime');
+            if (dateTimeElement) {
+                dateTimeElement.textContent = now.toLocaleDateString('en-US', options);
+            }
+            
+            const summaryDateElement = document.getElementById('summaryDate');
+            if (summaryDateElement) {
+                summaryDateElement.textContent = now.toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+            }
+        }
+
+        // Update greeting based on time
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = 'Good morning';
+            let emoji = '🌟';
+            
+            if (hour >= 12 && hour < 17) {
+                greeting = 'Good afternoon';
+                emoji = '☀️';
+            } else if (hour >= 17) {
+                greeting = 'Good evening';
+                emoji = '🌙';
+            }
+            
+            const greetingElement = document.getElementById('welcomeGreeting');
+            if (greetingElement) {
+                greetingElement.textContent = `${greeting}, Adriyella! ${emoji}`;
+            }
+        }
+
+        // Check if it's Friday
+        function checkFridayReminder() {
+            const today = new Date();
+            if (today.getDay() === 5) { // Friday
+                const fridayReminder = document.getElementById('fridayReminder');
+                if (fridayReminder) {
+                    fridayReminder.style.display = 'flex';
+                }
+                
+                // Highlight administrative tasks on Friday (like Sample Management)
+                taskTypes.forEach(task => {
+                    if (task.category === 'administrative') {
+                        const taskElement = document.getElementById(`task-${task.id}`);
+                        if (taskElement) {
+                            taskElement.style.borderColor = 'var(--warning-orange)';
+                        }
+                    }
+                });
+            }
+        }
+
+        // Load task types from localStorage (same as admin dashboard)
+        async function loadTaskTypes() {
+            try {
+                const savedTypes = localStorage.getItem('adriyella_task_types');
+                taskTypes = savedTypes ? JSON.parse(savedTypes) : getDefaultTaskTypes();
+                
+                // Initialize timers for dynamic tasks
+                timers = {};
+                taskTypes.forEach(task => {
+                    timers[task.id] = new TaskTimer(task.id);
+                });
+                
+                // Update total tasks count
+                const totalTasksElement = document.getElementById('totalTasks');
+                if (totalTasksElement) {
+                    totalTasksElement.textContent = taskTypes.length;
+                }
+                
+                renderTaskCards();
+            } catch (error) {
+                console.error('Error loading task types:', error);
+                showError('Failed to load task configuration.');
+            }
+        }
+
+        // Get default task types (matching admin dashboard)
+        function getDefaultTaskTypes() {
+            return [
+                {
+                    id: '1',
+                    name: 'Customer Completed Order Notifications',
+                    category: 'customer-service',
+                    description: 'Call customers to notify them their orders are complete and ready for pickup',
+                    billingType: 'hourly',
+                    hourlyRate: 23.00,
+                    frequency: 'daily',
+                    bonusEligible: true,
+                    instructions: '1. Check completed orders list\n2. Call customers using contact info\n3. Inform them order is ready\n4. Log call completion',
+                    isDefault: true
+                },
+                {
+                    id: '2',
+                    name: 'Thank You Notes',
+                    category: 'customer-service',
+                    description: 'Write and send personalized thank you cards to customers',
+                    billingType: 'hourly',
+                    hourlyRate: 30.50,
+                    frequency: 'weekly',
+                    bonusEligible: true,
+                    instructions: '1. Review recent orders\n2. Write personalized thank you messages\n3. Address and mail cards\n4. Log completion',
+                    isDefault: true
+                },
+                {
+                    id: '3',
+                    name: 'Sample Management',
+                    category: 'administrative',
+                    description: 'Organize and maintain sample inventory',
+                    billingType: 'flat',
+                    flatRate: 30.00,
+                    frequency: 'weekly',
+                    bonusEligible: true,
+                    instructions: '1. Check sample inventory\n2. Organize by category\n3. Update tracking system\n4. Note any needed restocks',
+                    isDefault: true
+                }
+            ];
+        }
+
+        // Render dynamic task cards
+        function renderTaskCards() {
+            const tasksGrid = document.getElementById('tasksGrid');
+            if (!tasksGrid) return;
+
+            tasksGrid.innerHTML = taskTypes.map(task => {
+                const rateBadge = task.billingType === 'flat' 
+                    ? `$${task.flatRate?.toFixed(2) || '0.00'} per completion`
+                    : `$${task.hourlyRate?.toFixed(2) || '0.00'}/hour`;
+                    
+                return `
+                    <div class="task-card" id="task-${task.id}">
+                        <div class="task-header">
+                            <div class="task-info">
+                                <h3 class="task-title">${task.name}</h3>
+                                <div class="task-meta">
+                                    <span class="task-category">${task.category.replace('-', ' ')}</span>
+                                    <span class="rate-badge">${rateBadge}</span>
+                                </div>
+                            </div>
+                            <div class="task-status" id="status-${task.id}">Not Started</div>
+                        </div>
+                        
+                        <div class="task-description">
+                            ${task.description}
+                        </div>
+                        
+                        <div class="timer-section">
+                            <div class="timer-display" id="timer-${task.id}">00:00</div>
+                            <div class="timer-controls">
+                                <button class="btn btn-primary" id="timerBtn-${task.id}" onclick="toggleTimer('${task.id}')">
+                                    <i class="fas fa-play"></i> Start Timer
+                                </button>
+                                <button class="btn btn-success" id="completeBtn-${task.id}" onclick="completeTask('${task.id}')" style="display: none;">
+                                    <i class="fas fa-check"></i> Complete
+                                </button>
+                                <button class="btn btn-warning" id="editBtn-${task.id}" onclick="editTask('${task.id}', null)" style="display: none;">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="task-details" id="details-${task.id}" style="display: none;">
+                            <div class="detail-row">
+                                <span class="detail-label">Time Spent:</span>
+                                <span class="detail-value" id="timeSpent-${task.id}">0 minutes</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Count:</span>
+                                <input type="number" id="count-${task.id}" min="0" value="0" readonly>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Load today's tasks from database
+        async function loadTodaysTasks() {
+            try {
+                showLoading(true);
+                const session = await taskService.getTodaySession();
+                todaysTasks = await taskService.getTodayTasks();
+                
+                let completedCount = 0;
+                let totalTime = 0;
+                let totalContacts = 0;
+                
+                // Create a mapping from taskNumber to database pkId for edit functionality
+                const taskIdMapping = {};
+                
+                todaysTasks.forEach(task => {
+                    if (task.completed) {
+                        completedCount++;
+                        totalTime += task.totalSeconds || 0;
+                        totalContacts += task.count || 0;
+                        
+                        // Find the matching task type by LineNumber
+                        const matchingTaskType = taskTypes.find(t => {
+                            // Match by old system (1, 2, 3) or by finding task with matching name
+                            if (task.taskNumber <= 3) {
+                                // Old hardcoded tasks
+                                const oldTaskMapping = {
+                                    1: 'customer-service',
+                                    2: 'sales-support', 
+                                    3: 'administrative'
+                                };
+                                return t.category === oldTaskMapping[task.taskNumber];
+                            }
+                            // For new dynamic tasks, match by name
+                            return t.name === task.taskName;
+                        });
+                        
+                        if (matchingTaskType) {
+                            const taskId = matchingTaskType.id;
+                            
+                            // Store the mapping from UI task ID to database pk
+                            taskIdMapping[taskId] = task.pkId;
+                            
+                            // Update UI
+                            const card = document.getElementById(`task-${taskId}`);
+                            if (card) {
+                                card.classList.add('completed');
+                                // Store pkId as data attribute for edit functionality
+                                card.setAttribute('data-pk-id', task.pkId);
+                            }
+                            
+                            const status = document.getElementById(`status-${taskId}`);
+                            if (status) {
+                                status.textContent = 'Completed';
+                                status.className = 'task-status status-completed';
+                            }
+                            
+                            const countInput = document.getElementById(`count-${taskId}`);
+                            if (countInput) {
+                                countInput.value = task.count;
+                            }
+                            
+                            // Show time spent
+                            const minutes = Math.round(task.totalSeconds / 60);
+                            const timeSpent = document.getElementById(`timeSpent-${taskId}`);
+                            if (timeSpent) {
+                                timeSpent.textContent = `${minutes} minutes`;
+                            }
+                            
+                            // Update timer display
+                            if (timers[taskId]) {
+                                timers[taskId].setElapsedTime(task.totalSeconds);
+                            }
+                            
+                            // Disable timer button and show edit button
+                            const timerBtn = document.getElementById(`timerBtn-${taskId}`);
+                            if (timerBtn) {
+                                timerBtn.disabled = true;
+                                timerBtn.innerHTML = '<i class="fas fa-check"></i> Completed';
+                            }
+                            
+                            const editBtn = document.getElementById(`editBtn-${taskId}`);
+                            if (editBtn) {
+                                editBtn.style.display = 'inline-flex';
+                                // Update onclick to use the database pkId
+                                editBtn.setAttribute('onclick', `editTask('${taskId}', ${task.pkId})`);
+                            }
+                        }
+                    }
+                });
+                
+                // Store the mapping globally for access in other functions
+                window.taskIdMapping = taskIdMapping;
+                
+                updateSummary(completedCount, totalTime, totalContacts);
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                showError('Failed to load today\'s tasks. Working offline.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Toggle timer
+        function toggleTimer(taskId) {
+            try {
+                const timer = timers[taskId];
+                const btn = document.getElementById(`timerBtn-${taskId}`);
+                const completeBtn = document.getElementById(`completeBtn-${taskId}`);
+                const card = document.getElementById(`task-${taskId}`);
+                const status = document.getElementById(`status-${taskId}`);
+                const details = document.getElementById(`details-${taskId}`);
+                
+                if (!timer || !btn) return;
+                
+                if (timer.isRunning) {
+                    // Pause
+                    timer.pause();
+                    btn.innerHTML = '<i class="fas fa-play"></i> Resume';
+                    btn.classList.remove('btn-secondary');
+                    btn.classList.add('btn-primary');
+                    if (card) card.classList.remove('active');
+                    if (status) status.classList.remove('status-active');
+                } else {
+                    // Start/Resume
+                    // Pause other timers
+                    Object.keys(timers).forEach(id => {
+                        if (id !== taskId.toString() && timers[id].isRunning) {
+                            toggleTimer(parseInt(id));
+                        }
+                    });
+                    
+                    timer.start();
+                    btn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-secondary');
+                    if (completeBtn) completeBtn.style.display = 'inline-flex';
+                    if (card) card.classList.add('active');
+                    if (status) {
+                        status.textContent = 'Active';
+                        status.className = 'task-status status-active';
+                    }
+                    if (details) details.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error toggling timer:', error);
+                showError('Failed to toggle timer. Please try again.');
+            }
+        }
+
+        // Complete task
+        function completeTask(taskId) {
+            try {
+                currentTask = taskId;
+                const timer = timers[taskId];
+                if (!timer) return;
+                
+                const timeData = timer.stop();
+                
+                // Find the task from dynamic taskTypes
+                const task = taskTypes.find(t => t.id === taskId);
+                if (!task) {
+                    showError('Task not found');
+                    return;
+                }
+                
+                const modalTitle = document.getElementById('modalTitle');
+                if (modalTitle) {
+                    modalTitle.textContent = `${task.name} Complete!`;
+                }
+                
+                const modalSubtitle = document.getElementById('modalSubtitle');
+                if (modalSubtitle) {
+                    modalSubtitle.textContent = 
+                        `You worked for ${timeData.totalMinutes} minutes. Amazing! 🎉`;
+                }
+                
+                // Generate dynamic count label based on task category
+                const countLabels = {
+                    'customer-service': 'How many customers did you help?',
+                    'sales-support': 'How many sales activities did you complete?',
+                    'follow-up': 'How many follow-ups did you complete?',
+                    'administrative': 'How many items did you process?',
+                    'special-projects': 'How many project tasks did you complete?'
+                };
+                
+                const modalCountLabel = document.getElementById('modalCountLabel');
+                if (modalCountLabel) {
+                    modalCountLabel.textContent = countLabels[task.category] || 'How many items did you complete?';
+                }
+                
+                // Set quick buttons based on task
+                setQuickButtons(taskId);
+                
+                // Pre-fill count if already entered
+                const currentCount = document.getElementById(`count-${taskId}`);
+                const modalCount = document.getElementById('modalCount');
+                if (currentCount && modalCount) {
+                    modalCount.value = currentCount.value || '';
+                }
+                
+                const completionModal = document.getElementById('completionModal');
+                if (completionModal) {
+                    completionModal.classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error completing task:', error);
+                showError('Failed to complete task. Please try again.');
+            }
+        }
+
+        // Set quick buttons for modal
+        function setQuickButtons(taskId) {
+            const container = document.getElementById('quickButtons');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Find the task from dynamic taskTypes
+            const task = taskTypes.find(t => t.id === taskId);
+            if (!task) return;
+            
+            // Generate quick options based on task category
+            const quickOptionsByCategory = {
+                'customer-service': ['Called - VM', 'Texted', 'Emailed', 'Spoke directly'],
+                'sales-support': ['Quote sent', 'Follow-up call', 'Meeting scheduled', 'Proposal delivered'],
+                'follow-up': ['Email sent', 'Call completed', 'Meeting held', 'Action items assigned'],
+                'administrative': ['Filed', 'Updated', 'Organized', 'Processed'],
+                'special-projects': ['Research completed', 'Draft created', 'Review conducted', 'Task completed']
+            };
+            
+            const options = quickOptionsByCategory[task.category] || ['Completed', 'In Progress', 'Reviewed', 'Updated'];
+            
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'quick-btn';
+                btn.textContent = option;
+                btn.onclick = () => {
+                    const notes = document.getElementById('modalNotes');
+                    if (notes) {
+                        notes.value += (notes.value ? ', ' : '') + option;
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // Handle completion form
+        const completionForm = document.getElementById('completionForm');
+        if (completionForm) {
+            completionForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const saveBtn = document.getElementById('saveTaskBtn');
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                }
+                
+                try {
+                    const count = document.getElementById('modalCount').value;
+                    const notes = document.getElementById('modalNotes').value;
+                    const timer = timers[currentTask];
+                    const timeData = timer.stop();
+                    
+                    // Prepare task data
+                    const taskData = {
+                        count: parseInt(count),
+                        notes: notes,
+                        totalSeconds: timeData.totalSeconds,
+                        startTime: timeData.sessions[0]?.start,
+                        endTime: new Date().toISOString(),
+                        timerSessions: timeData.sessions,
+                        details: {
+                            count: count,
+                            notes: notes,
+                            completedAt: new Date().toLocaleTimeString()
+                        }
+                    };
+                    
+                    // Save to database
+                    const success = await taskService.saveTaskCompletion(currentTask, taskData);
+                    
+                    if (success) {
+                        // Update UI
+                        const card = document.getElementById(`task-${currentTask}`);
+                        if (card) card.classList.add('completed');
+                        
+                        const status = document.getElementById(`status-${currentTask}`);
+                        if (status) {
+                            status.textContent = 'Completed';
+                            status.className = 'task-status status-completed';
+                        }
+                        
+                        const countInput = document.getElementById(`count-${currentTask}`);
+                        if (countInput) countInput.value = count;
+                        
+                        const timerBtn = document.getElementById(`timerBtn-${currentTask}`);
+                        if (timerBtn) {
+                            timerBtn.disabled = true;
+                            timerBtn.innerHTML = '<i class="fas fa-check"></i> Completed';
+                        }
+                        
+                        const completeBtn = document.getElementById(`completeBtn-${currentTask}`);
+                        if (completeBtn) completeBtn.style.display = 'none';
+                        
+                        // Celebrate!
+                        showCelebration();
+                        
+                        // Update summary
+                        await updateDailySummary();
+                    } else {
+                        showError('Failed to save task. Please try again.');
+                    }
+                    
+                    closeCompletionModal();
+                } catch (error) {
+                    console.error('Error saving task:', error);
+                    showError('Failed to save task. Please try again.');
+                } finally {
+                    if (saveBtn) {
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save & Continue';
+                    }
+                }
+            });
+        }
+
+        // Update daily summary
+        async function updateDailySummary() {
+            try {
+                const tasks = await taskService.getTodayTasks();
+                let completedCount = 0;
+                let totalTime = 0;
+                let totalContacts = 0;
+                
+                tasks.forEach(task => {
+                    if (task.completed) {
+                        completedCount++;
+                        totalTime += task.totalSeconds || 0;
+                        totalContacts += task.count || 0;
+                    }
+                });
+                
+                updateSummary(completedCount, totalTime, totalContacts);
+            } catch (error) {
+                console.error('Error updating summary:', error);
+            }
+        }
+
+        // Update summary display
+        function updateSummary(completed, totalSeconds, contacts) {
+            const totalTasks = taskTypes.length;
+            
+            // Progress - now dynamic based on actual task count
+            const progress = totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill) {
+                progressFill.style.width = `${progress}%`;
+            }
+            
+            const tasksCompleted = document.getElementById('tasksCompleted');
+            if (tasksCompleted) {
+                tasksCompleted.textContent = completed;
+            }
+            
+            // Time
+            const minutes = Math.floor(totalSeconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            const totalTime = document.getElementById('totalTime');
+            if (totalTime) {
+                totalTime.textContent = 
+                    hours > 0 ? `${hours}:${mins.toString().padStart(2, '0')}` : `${mins}:00`;
+            }
+            
+            // Contacts
+            const totalContactsElement = document.getElementById('totalContacts');
+            if (totalContactsElement) {
+                totalContactsElement.textContent = contacts;
+            }
+            
+            // Productivity score - calculate based on task billing rates
+            let expectedMinutes = 0;
+            taskTypes.forEach(task => {
+                if (task.billingType === 'hourly') {
+                    expectedMinutes += 30; // Assume 30 min for hourly tasks
+                } else {
+                    expectedMinutes += 15; // 15 min for flat rate tasks
+                }
+            });
+            expectedMinutes = Math.round((expectedMinutes / totalTasks) * completed);
+            
+            const actualMinutes = Math.round(totalSeconds / 60);
+            const productivity = actualMinutes > 0 
+                ? Math.min(100, Math.round((expectedMinutes / actualMinutes) * 100))
+                : 0;
+            const productivityScore = document.getElementById('productivityScore');
+            if (productivityScore) {
+                productivityScore.textContent = `${productivity}%`;
+            }
+            
+            // Update streak display - dynamic based on completion percentage
+            const todayStreak = document.getElementById('todayStreak');
+            if (todayStreak) {
+                const streakEmojis = '🔥'.repeat(Math.min(3, Math.ceil((completed / totalTasks) * 3)));
+                todayStreak.textContent = streakEmojis || '';
+            }
+        }
+
+        // Show celebration animation
+        function showCelebration() {
+            // Simple celebration - could add confetti library later
+            const card = document.getElementById(`task-${currentTask}`);
+            if (card) {
+                card.style.animation = 'bounce 0.5s ease';
+                setTimeout(() => {
+                    card.style.animation = '';
+                }, 500);
+            }
+        }
+
+        // Close completion modal
+        function closeCompletionModal() {
+            const modal = document.getElementById('completionModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            
+            const form = document.getElementById('completionForm');
+            if (form) {
+                form.reset();
+            }
+        }
+
+        // Submit daily report
+        async function submitDailyReport() {
+            try {
+                const reflection = document.getElementById('dailyReflection').value;
+                const tasks = await taskService.getTodayTasks();
+                
+                if (tasks.filter(t => t.completed).length === 0) {
+                    showError('Please complete at least one task before submitting your daily report.');
+                    return;
+                }
+                
+                showLoading(true);
+                const success = await taskService.submitDailyReport(reflection);
+                
+                if (success) {
+                    alert('Daily report submitted! Great job today! 🎉');
+                    // Could redirect or show a success screen
+                } else {
+                    showError('Failed to submit report. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error submitting report:', error);
+                showError('Failed to submit report. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Quick note function
+        function addQuickNote(taskId) {
+            const note = prompt('Add a quick note:');
+            if (note) {
+                // Could save to a notes field or append to existing notes
+                console.log(`Note for task ${taskId}: ${note}`);
+            }
+        }
+
+        // Show templates (placeholder)
+        function showTemplates() {
+            alert('Thank you note templates:\n\n1. First-Time Customer\n2. Repeat Customer\n3. With Upsell Suggestion\n\nTemplates coming soon to the modal!');
+        }
+
+        // Edit task functionality
+        let editingTaskId = null;
+        let editingPkId = null;
+
+        // Edit task function
+        async function editTask(taskId, pkId) {
+            try {
+                // If pkId is not provided, show an error
+                if (!pkId) {
+                    showError('Cannot edit task. Please reload the page and try again.');
+                    return;
+                }
+                
+                editingTaskId = taskId;
+                editingPkId = pkId;
+                
+                // Get task data from the database using the pkId
+                const taskData = await taskService.getTaskData(pkId);
+                
+                if (!taskData) {
+                    showError('Task data not found. Cannot edit.');
+                    return;
+                }
+                
+                // Find the task type from dynamic taskTypes
+                const taskType = taskTypes.find(t => t.id === taskId);
+                if (!taskType) {
+                    showError('Task type not found.');
+                    return;
+                }
+                
+                // Parse timer data to get notes and other details
+                let timerData = {};
+                try {
+                    timerData = JSON.parse(taskData.TimerData_ || '{}');
+                } catch (e) {
+                    console.error('Error parsing timer data:', e);
+                    timerData = {};
+                }
+                
+                // Update modal title
+                document.getElementById('editModalTitle').textContent = `Edit ${taskType.name}`;
+                document.getElementById('editModalSubtitle').textContent = 'Make any needed changes';
+                
+                // Update count label based on task category
+                const countLabels = {
+                    'customer-service': 'Number of customers helped',
+                    'sales-support': 'Number of sales activities',
+                    'follow-up': 'Number of follow-ups completed',
+                    'administrative': 'Number of items processed',
+                    'special-projects': 'Number of project tasks'
+                };
+                document.getElementById('editCountLabel').textContent = countLabels[taskType.category] || 'Count';
+                
+                // Populate form with current data
+                document.getElementById('editCount').value = taskData.Quantity || 0;
+                document.getElementById('editNotes').value = timerData.notes || '';
+                document.getElementById('editTimeMinutes').value = Math.round((taskData.LineTotal || 0) / 60);
+                
+                // Show edit modal
+                document.getElementById('editModal').classList.add('active');
+                
+            } catch (error) {
+                console.error('Error opening edit modal:', error);
+                showError('Failed to open edit dialog. Please try again.');
+            }
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            document.getElementById('editForm').reset();
+            editingTaskId = null;
+        }
+
+        // Restart task function
+        async function restartTask() {
+            if (!editingTaskId) return;
+            
+            try {
+                if (confirm('This will reset the task and clear all timer data. Are you sure?')) {
+                    // Reset the timer
+                    if (timers[editingTaskId]) {
+                        timers[editingTaskId].reset();
+                    }
+                    
+                    // Reset task data in database
+                    await taskService.resetTask(editingPkId);
+                    
+                    // Update UI to show task as not started
+                    const card = document.getElementById(`task-${editingTaskId}`);
+                    if (card) {
+                        card.classList.remove('completed', 'active');
+                    }
+                    
+                    const status = document.getElementById(`status-${editingTaskId}`);
+                    if (status) {
+                        status.textContent = 'Not Started';
+                        status.className = 'task-status';
+                    }
+                    
+                    const countInput = document.getElementById(`count-${editingTaskId}`);
+                    if (countInput) {
+                        countInput.value = 0;
+                    }
+                    
+                    const timeSpent = document.getElementById(`timeSpent-${editingTaskId}`);
+                    if (timeSpent) {
+                        timeSpent.textContent = '0 minutes';
+                    }
+                    
+                    // Reset timer button
+                    const timerBtn = document.getElementById(`timerBtn-${editingTaskId}`);
+                    if (timerBtn) {
+                        timerBtn.disabled = false;
+                        timerBtn.innerHTML = '<i class="fas fa-play"></i> Start Timer';
+                        timerBtn.classList.remove('btn-secondary');
+                        timerBtn.classList.add('btn-primary');
+                    }
+                    
+                    // Hide edit button
+                    const editBtn = document.getElementById(`editBtn-${editingTaskId}`);
+                    if (editBtn) {
+                        editBtn.style.display = 'none';
+                    }
+                    
+                    // Hide complete button
+                    const completeBtn = document.getElementById(`completeBtn-${editingTaskId}`);
+                    if (completeBtn) {
+                        completeBtn.style.display = 'none';
+                    }
+                    
+                    // Close edit modal
+                    closeEditModal();
+                    
+                    // Update summary
+                    await updateDailySummary();
+                    
+                    alert('Task has been reset! You can now start fresh. 🔄');
+                }
+            } catch (error) {
+                console.error('Error restarting task:', error);
+                showError('Failed to restart task. Please try again.');
+            }
+        }
+
+        // Handle edit form submission
+        const editForm = document.getElementById('editForm');
+        if (editForm) {
+            editForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!editingTaskId) return;
+                
+                const updateBtn = document.getElementById('updateTaskBtn');
+                if (updateBtn) {
+                    updateBtn.disabled = true;
+                    updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                }
+                
+                try {
+                    // Get form data
+                    const count = parseInt(document.getElementById('editCount').value) || 0;
+                    const notes = document.getElementById('editNotes').value.trim();
+                    const timeMinutes = parseInt(document.getElementById('editTimeMinutes').value) || 0;
+                    const totalSeconds = timeMinutes * 60;
+                    
+                    // Prepare updated task data
+                    const updatedData = {
+                        count: count,
+                        notes: notes,
+                        totalSeconds: totalSeconds,
+                        endTime: new Date().toISOString(),
+                        details: {
+                            count: count,
+                            notes: notes,
+                            lastEdited: new Date().toLocaleTimeString(),
+                            editedFields: []
+                        }
+                    };
+                    
+                    // Track what was edited
+                    const originalData = await taskService.getTaskData(editingPkId);
+                    if (originalData) {
+                        if (originalData.count !== count) updatedData.details.editedFields.push('count');
+                        if (originalData.notes !== notes) updatedData.details.editedFields.push('notes');
+                        if (Math.abs((originalData.totalSeconds || 0) - totalSeconds) > 30) updatedData.details.editedFields.push('time');
+                    }
+                    
+                    // Update in database
+                    const success = await taskService.updateTaskCompletion(editingPkId, updatedData);
+                    
+                    if (success) {
+                        // Update UI with new values
+                        const countInput = document.getElementById(`count-${editingTaskId}`);
+                        if (countInput) {
+                            countInput.value = count;
+                        }
+                        
+                        const timeSpent = document.getElementById(`timeSpent-${editingTaskId}`);
+                        if (timeSpent) {
+                            timeSpent.textContent = `${timeMinutes} minutes`;
+                        }
+                        
+                        // Update timer display
+                        if (timers[editingTaskId]) {
+                            timers[editingTaskId].setElapsedTime(totalSeconds);
+                        }
+                        
+                        // Update summary
+                        await updateDailySummary();
+                        
+                        // Close modal
+                        closeEditModal();
+                        
+                        // Show success message
+                        const editedFieldsText = updatedData.details.editedFields.length > 0 
+                            ? ` (${updatedData.details.editedFields.join(', ')} updated)`
+                            : '';
+                        alert(`Task updated successfully!${editedFieldsText} ✅`);
+                        
+                    } else {
+                        showError('Failed to update task. Please try again.');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error updating task:', error);
+                    showError('Failed to update task. Please try again.');
+                } finally {
+                    if (updateBtn) {
+                        updateBtn.disabled = false;
+                        updateBtn.innerHTML = '<i class="fas fa-save"></i> Update Task';
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
