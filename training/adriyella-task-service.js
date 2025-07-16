@@ -1747,8 +1747,85 @@ class AdriyellaTaService {
             artApproval: tasks.artApproval,
             artAmount: (tasks.artApproval * 10).toFixed(2),
             dailyTotal: tasks.dailyTotal.toFixed(2),
-            monthlyTotal: monthResult.success ? monthResult.data.monthlyTotal.toFixed(2) : '0.00'
+            monthlyTotal: monthResult.success ? (monthResult.data.cappedMonthlyTotal || monthResult.data.monthlyTotal).toFixed(2) : '0.00',
+            monthlyRawTotal: monthResult.success ? (monthResult.data.rawMonthlyTotal || monthResult.data.monthlyTotal).toFixed(2) : '0.00',
+            capStatus: monthResult.success ? monthResult.data.capStatus || 'under_cap' : 'under_cap',
+            isAtCap: monthResult.success ? (monthResult.data.capStatus === 'at_cap') : false
         };
+    }
+
+    /**
+     * Get tasks for a date range (for dashboard summary widgets)
+     * @param {string} startDate - Start date in YYYY-MM-DD format
+     * @param {string} endDate - End date in YYYY-MM-DD format
+     * @returns {Object} Result with array of daily task data
+     */
+    async getTasksInRange(startDate, endDate) {
+        console.log(`[AdriyellaTaService] Getting tasks for range: ${startDate} to ${endDate}`);
+        
+        try {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const dailyData = [];
+            
+            // Iterate through each day in the range
+            const currentDate = new Date(start);
+            while (currentDate <= end) {
+                const dateStr = currentDate.toISOString().split('T')[0];
+                
+                try {
+                    const dayResult = await this.getDailyTasks(dateStr);
+                    if (dayResult.success && dayResult.data) {
+                        dailyData.push({
+                            date: dateStr,
+                            thankYouCards: dayResult.data.thankYouCards || 0,
+                            leadSheets: dayResult.data.leadSheets || 0,
+                            googleReviews: dayResult.data.googleReviews || 0,
+                            artApproval: dayResult.data.artApproval || 0,
+                            dailyTotal: dayResult.data.dailyTotal || 0
+                        });
+                    } else {
+                        // Add zero data for days with no tasks
+                        dailyData.push({
+                            date: dateStr,
+                            thankYouCards: 0,
+                            leadSheets: 0,
+                            googleReviews: 0,
+                            artApproval: 0,
+                            dailyTotal: 0
+                        });
+                    }
+                } catch (dayError) {
+                    console.warn(`[AdriyellaTaService] Error getting data for ${dateStr}:`, dayError);
+                    // Add zero data for error days
+                    dailyData.push({
+                        date: dateStr,
+                        thankYouCards: 0,
+                        leadSheets: 0,
+                        googleReviews: 0,
+                        artApproval: 0,
+                        dailyTotal: 0
+                    });
+                }
+                
+                // Move to next day
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            console.log(`[AdriyellaTaService] Retrieved ${dailyData.length} days of data`);
+            
+            return {
+                success: true,
+                data: dailyData
+            };
+            
+        } catch (error) {
+            console.error('[AdriyellaTaService] Error getting tasks in range:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
     }
 }
 

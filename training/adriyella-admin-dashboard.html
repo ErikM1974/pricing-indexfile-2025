@@ -579,6 +579,23 @@
                 <div class="loading"></div>
             </div>
         </div>
+
+        <!-- Task History -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Task Session History</h2>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="loadTaskHistory()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div id="taskHistoryContent">
+                <div class="loading"></div>
+            </div>
+        </div>
     </main>
 
     <!-- Create/Edit Task Modal -->
@@ -695,12 +712,15 @@
         let currentTaskTypes = [];
         let editingTaskId = null;
         let selectedBillingType = null;
+        let adriyellaTaskService; // For task deletion
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             taskService = new TaskTrackingService();
+            adriyellaTaskService = new AdriyellaTaService(); // Initialize task service
             loadTaskTypes();
             loadPerformanceData();
+            loadTaskHistory(); // Load task history on page load
         });
 
         // Load task types
@@ -997,6 +1017,176 @@
         // Refresh performance data
         function refreshPerformanceData() {
             loadPerformanceData();
+        }
+
+        // Load task history
+        async function loadTaskHistory() {
+            const content = document.getElementById('taskHistoryContent');
+            content.innerHTML = '<div class="loading"></div>';
+            
+            try {
+                // Get current month and year
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth() + 1;
+                
+                // Load monthly tasks
+                const result = await adriyellaTaskService.getMonthlyTasks(year, month);
+                
+                if (result.success && result.data.tasks.length > 0) {
+                    let html = `
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: var(--bg-color); border-bottom: 2px solid var(--border-color);">
+                                        <th style="padding: 0.75rem; text-align: left;">Date</th>
+                                        <th style="padding: 0.75rem; text-align: left;">Quote ID</th>
+                                        <th style="padding: 0.75rem; text-align: center;">Tasks</th>
+                                        <th style="padding: 0.75rem; text-align: right;">Daily Total</th>
+                                        <th style="padding: 0.75rem; text-align: center;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    
+                    result.data.tasks.forEach(task => {
+                        const taskDate = new Date(task.date);
+                        const formattedDate = taskDate.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            weekday: 'short'
+                        });
+                        
+                        const taskSummary = [];
+                        if (task.thankYouCards > 0) taskSummary.push(`${task.thankYouCards} Thank You`);
+                        if (task.leadSheets > 0) taskSummary.push(`${task.leadSheets} Leads`);
+                        if (task.googleReviews > 0) taskSummary.push(`${task.googleReviews} Reviews`);
+                        if (task.artApproval > 0) taskSummary.push(`${task.artApproval} Art`);
+                        
+                        html += `
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 0.75rem;">${formattedDate}</td>
+                                <td style="padding: 0.75rem; font-family: monospace; color: var(--primary-color);">${task.quoteID}</td>
+                                <td style="padding: 0.75rem; text-align: center; font-size: 0.875rem; color: var(--text-secondary);">
+                                    ${taskSummary.join(', ') || 'No tasks'}
+                                </td>
+                                <td style="padding: 0.75rem; text-align: right; font-weight: 600;">$${task.dailyTotal.toFixed(2)}</td>
+                                <td style="padding: 0.75rem; text-align: center;">
+                                    <button class="btn btn-danger" onclick="deleteTaskSession(event, '${task.date}', '${task.quoteID}')" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += `
+                                </tbody>
+                                <tfoot>
+                                    <tr style="background: var(--bg-color); border-top: 2px solid var(--border-color);">
+                                        <td colspan="3" style="padding: 0.75rem; font-weight: 600;">Monthly Total</td>
+                                        <td style="padding: 0.75rem; text-align: right; font-weight: 600; color: var(--primary-color);">$${result.data.monthlyTotal.toFixed(2)}</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    `;
+                    
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            <i class="fas fa-clipboard-list" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>No task sessions found for this month.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading task history:', error);
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--danger-text);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Error loading task history. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Delete task session
+        async function deleteTaskSession(event, date, quoteID) {
+            if (!confirm(`Are you sure you want to delete the task session for ${date}?\n\nThis will permanently delete:\n- Quote ID: ${quoteID}\n- All tasks for that day\n\nThis action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                // Show loading state
+                const button = event.target.closest('button');
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                button.disabled = true;
+                
+                // First, get the session to find its PK_ID
+                const sessionResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?quoteID=${quoteID}`);
+                if (!sessionResponse.ok) {
+                    throw new Error('Failed to find session');
+                }
+                
+                const sessions = await sessionResponse.json();
+                if (sessions.length === 0) {
+                    throw new Error('Session not found');
+                }
+                
+                const session = sessions[0];
+                
+                // Delete all quote items first
+                const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${quoteID}`);
+                if (itemsResponse.ok) {
+                    const items = await itemsResponse.json();
+                    
+                    // Delete each item
+                    for (const item of items) {
+                        try {
+                            await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items/${item.PK_ID}`, {
+                                method: 'DELETE'
+                            });
+                        } catch (error) {
+                            console.warn('Failed to delete item:', item.PK_ID, error);
+                        }
+                    }
+                }
+                
+                // Delete the session
+                const deleteResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions/${session.PK_ID}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!deleteResponse.ok) {
+                    throw new Error('Failed to delete session');
+                }
+                
+                // Clear any cached data
+                if (sessionStorage.getItem(`adr_session_${date}`)) {
+                    sessionStorage.removeItem(`adr_session_${date}`);
+                }
+                
+                // Show success message
+                alert(`Successfully deleted task session for ${date}`);
+                
+                // Reload the task history
+                loadTaskHistory();
+                
+            } catch (error) {
+                console.error('Error deleting task session:', error);
+                alert('Failed to delete task session. Please try again.');
+                
+                // Restore button state
+                const button = event.target.closest('button');
+                if (button) {
+                    button.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                    button.disabled = false;
+                }
+            }
         }
     </script>
 </body>

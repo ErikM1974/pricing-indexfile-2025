@@ -385,6 +385,13 @@
             Auto-saves every 5 seconds
             <span class="save-status" id="saveStatus"></span>
         </div>
+
+        <!-- Test Email Button (for development) -->
+        <div style="text-align: center; margin-top: 15px;">
+            <button onclick="manualSendReport()" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                📧 Test Email Report
+            </button>
+        </div>
     </div>
 
 
@@ -713,16 +720,22 @@
                 
                 // Task data
                 date: reportData.date,
-                thankYouCards: reportData.thankYouCards,
-                thankYouAmount: reportData.thankYouAmount,
-                leadSheets: reportData.leadSheets,
-                leadAmount: reportData.leadAmount,
-                googleReviews: reportData.googleReviews,
-                reviewAmount: reportData.reviewAmount,
-                artApproval: reportData.artApproval,
-                artAmount: reportData.artAmount,
-                dailyTotal: reportData.dailyTotal,
-                monthlyTotal: reportData.monthlyTotal
+                thankYouCards: reportData.thankYouCards || 0,
+                thankYouAmount: reportData.thankYouAmount || '0.00',
+                leadSheets: reportData.leadSheets || 0,
+                leadAmount: reportData.leadAmount || '0.00',
+                googleReviews: reportData.googleReviews || 0,
+                reviewAmount: reportData.reviewAmount || '0.00',
+                artApproval: reportData.artApproval || 0,
+                artAmount: reportData.artAmount || '0.00',
+                dailyTotal: reportData.dailyTotal || '0.00',
+                monthlyTotal: reportData.monthlyTotal || '0.00',
+                
+                // Cap information
+                monthlyRawTotal: reportData.monthlyRawTotal || '0.00',
+                capStatus: reportData.capStatus || 'under_cap',
+                isAtCap: reportData.isAtCap || false,
+                capWarning: reportData.isAtCap ? 'Monthly cap of $400 has been reached' : ''
             };
             
             try {

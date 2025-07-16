@@ -11,6 +11,8 @@ class TrainingProgressService {
             '2': 'Thank You Notes',
             '3': 'Sample Management'
         };
+        this.cache = new Map();
+        this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }
 
     /**
@@ -55,6 +57,14 @@ class TrainingProgressService {
      */
     async getTaskSessions(email = null, startDate = null, endDate = null) {
         try {
+            // Check cache first
+            const cacheKey = `sessions_${email || 'all'}_${startDate}_${endDate}`;
+            const cached = this.getFromCache(cacheKey);
+            if (cached) {
+                console.log('Using cached session data');
+                return cached;
+            }
+            
             // Build query parameters
             const params = new URLSearchParams();
             if (email) {
@@ -88,6 +98,9 @@ class TrainingProgressService {
                 })
             );
             
+            // Cache the result
+            this.setCache(cacheKey, sessionsWithItems);
+            
             return sessionsWithItems;
         } catch (error) {
             console.error('Error fetching task sessions:', error);
@@ -100,12 +113,24 @@ class TrainingProgressService {
      */
     async getSessionItems(quoteID) {
         try {
+            // Check cache first
+            const cacheKey = `items_${quoteID}`;
+            const cached = this.getFromCache(cacheKey);
+            if (cached) {
+                return cached;
+            }
+            
             const response = await fetch(`${this.baseURL}/quote_items?quoteID=${quoteID}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch items: ${response.status}`);
             }
             
-            return await response.json();
+            const items = await response.json();
+            
+            // Cache the result
+            this.setCache(cacheKey, items);
+            
+            return items;
         } catch (error) {
             console.error('Error fetching session items:', error);
             return [];
@@ -275,17 +300,17 @@ class TrainingProgressService {
                     
                     try {
                         // Parse timer data from the new dedicated TimerData_ field
-                    let taskData = {};
-                    try {
-                        taskData = JSON.parse(item.TimerData_ || '{}');
-                    } catch (e) {
-                        // Fallback to old ColorCode field for backward compatibility
+                        let taskData = {};
                         try {
-                            taskData = JSON.parse(item.ColorCode || '{}');
-                        } catch (e2) {
-                            taskData = {};
+                            taskData = JSON.parse(item.TimerData_ || '{}');
+                        } catch (e) {
+                            // Fallback to old ColorCode field for backward compatibility
+                            try {
+                                taskData = JSON.parse(item.ColorCode || '{}');
+                            } catch (e2) {
+                                taskData = {};
+                            }
                         }
-                    }
                         if (taskData.totalSeconds) {
                             breakdown[taskId].totalTime += taskData.totalSeconds / 60; // Convert to minutes
                         }
@@ -325,17 +350,17 @@ class TrainingProgressService {
                     
                     try {
                         // Parse timer data from the new dedicated TimerData_ field
-                    let taskData = {};
-                    try {
-                        taskData = JSON.parse(item.TimerData_ || '{}');
-                    } catch (e) {
-                        // Fallback to old ColorCode field for backward compatibility
+                        let taskData = {};
                         try {
-                            taskData = JSON.parse(item.ColorCode || '{}');
-                        } catch (e2) {
-                            taskData = {};
+                            taskData = JSON.parse(item.TimerData_ || '{}');
+                        } catch (e) {
+                            // Fallback to old ColorCode field for backward compatibility
+                            try {
+                                taskData = JSON.parse(item.ColorCode || '{}');
+                            } catch (e2) {
+                                taskData = {};
+                            }
                         }
-                    }
                         if (taskData.totalSeconds) {
                             dailyData[date].totalMinutes += taskData.totalSeconds / 60;
                         }
@@ -487,6 +512,57 @@ class TrainingProgressService {
         });
 
         return recommendations;
+    }
+    
+    /**
+     * Cache management methods
+     */
+    getFromCache(key) {
+        const cached = this.cache.get(key);
+        if (!cached) return null;
+        
+        // Check if cache is expired
+        if (Date.now() - cached.timestamp > this.cacheTimeout) {
+            this.cache.delete(key);
+            return null;
+        }
+        
+        return cached.data;
+    }
+    
+    setCache(key, data) {
+        this.cache.set(key, {
+            data: data,
+            timestamp: Date.now()
+        });
+    }
+    
+    clearCache() {
+        this.cache.clear();
+    }
+    
+    /**
+     * Batch fetch sessions for multiple users
+     */
+    async batchGetUserSessions(emails, startDate, endDate) {
+        const promises = emails.map(email => 
+            this.getUserTrainingHistory(email, startDate, endDate)
+        );
+        
+        try {
+            const results = await Promise.allSettled(promises);
+            return results.map((result, index) => {
+                if (result.status === 'fulfilled') {
+                    return result.value;
+                } else {
+                    console.error(`Failed to load data for ${emails[index]}:`, result.reason);
+                    return null;
+                }
+            }).filter(Boolean);
+        } catch (error) {
+            console.error('Batch fetch error:', error);
+            throw error;
+        }
     }
 }
 

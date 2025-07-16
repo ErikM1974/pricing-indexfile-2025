@@ -176,6 +176,88 @@
 
         .btn-secondary:hover {
             background: var(--border-color);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Quick filter buttons */
+        .quick-filters {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .quick-filter-btn {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quick-filter-btn:hover {
+            background: var(--hover-bg);
+        }
+        
+        .quick-filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* Last updated indicator */
+        .last-updated {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .refresh-indicator {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Tooltip styles */
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tooltip-wrapper:hover .tooltip {
+            opacity: 1;
+        }
+        
+        /* Loading skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         /* Main Container */
@@ -482,8 +564,76 @@
             background: var(--hover-bg);
         }
 
+        /* Compare view styles */
+        .compare-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .user-comparison-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .user-comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .user-stats {
+            display: grid;
+            gap: 0.5rem;
+        }
+        
+        .user-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+        }
+        
+        .user-stat-label {
+            color: var(--text-secondary);
+        }
+        
+        .user-stat-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+            }
+            
+            .header-right {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .header-right .btn {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.75rem;
+            }
+            
+            .header-right .btn span {
+                display: none;
+            }
+            
             .filters-container {
                 flex-direction: column;
                 gap: 1rem;
@@ -492,6 +642,11 @@
             .filter-group {
                 width: 100%;
             }
+            
+            .quick-filters {
+                width: 100%;
+                overflow-x: auto;
+            }
 
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -499,6 +654,25 @@
 
             .chart-container {
                 height: 200px;
+            }
+            
+            .table-wrapper {
+                font-size: 0.75rem;
+            }
+            
+            .export-button {
+                position: static;
+            }
+            
+            .export-dropdown {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: 0;
+                border-radius: 8px 8px 0 0;
+                box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
             }
         }
     </style>
@@ -519,12 +693,40 @@
                     </nav>
                 </div>
             </div>
+            <div class="header-right" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="adriyella-daily-tasks-v2.html" class="btn btn-secondary">
+                    <i class="fas fa-tasks"></i>
+                    Daily Tasks
+                </a>
+                <a href="adriyella-task-history.html" class="btn btn-secondary">
+                    <i class="fas fa-history"></i>
+                    Task History
+                </a>
+                <a href="adriyella-billing-dashboard.html" class="btn btn-secondary" style="background: #f59e0b; color: white; border-color: #f59e0b;">
+                    <i class="fas fa-dollar-sign"></i>
+                    Billing
+                </a>
+                <a href="adriyella-admin-dashboard.html" class="btn btn-secondary">
+                    <i class="fas fa-cog"></i>
+                    Admin
+                </a>
+                <a href="adriyella-bonus-report.html" class="btn btn-secondary" style="background: #10b981; color: white; border-color: #10b981;">
+                    <i class="fas fa-trophy"></i>
+                    Bonus Report
+                </a>
+            </div>
         </div>
     </header>
 
     <!-- Filters -->
     <section class="filters-section">
         <div class="filters-container">
+            <div class="quick-filters">
+                <span style="font-size: 0.875rem; color: var(--text-secondary);">Quick:</span>
+                <button class="quick-filter-btn" onclick="setQuickFilter('today')">Today</button>
+                <button class="quick-filter-btn" onclick="setQuickFilter('week')">This Week</button>
+                <button class="quick-filter-btn" onclick="setQuickFilter('month')">This Month</button>
+            </div>
             <div class="filter-group" style="flex: 2;">
                 <label class="filter-label">Select Trainee</label>
                 <select id="userSelect" class="form-control">
@@ -550,10 +752,15 @@
                 <input type="date" id="endDate" class="form-control">
             </div>
             
-            <button class="btn btn-primary" onclick="loadTrainingData()">
-                <i class="fas fa-sync-alt"></i>
+            <button class="btn btn-primary" onclick="loadTrainingData()" id="refreshBtn">
+                <i class="fas fa-sync-alt" id="refreshIcon"></i>
                 Refresh
             </button>
+            
+            <div class="last-updated">
+                <i class="fas fa-clock"></i>
+                <span id="lastUpdated">Never</span>
+            </div>
             
             <div class="export-button">
                 <button class="btn btn-secondary" onclick="toggleExportMenu()">
@@ -579,8 +786,11 @@
             <div class="stat-card">
                 <div class="stat-header">
                     <h3 class="stat-title">Training Days</h3>
-                    <div class="stat-icon blue">
-                        <i class="fas fa-calendar-check"></i>
+                    <div class="tooltip-wrapper">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <span class="tooltip">Total days with completed training tasks</span>
                     </div>
                 </div>
                 <div class="stat-value" id="trainingDays">0</div>
@@ -590,8 +800,11 @@
             <div class="stat-card">
                 <div class="stat-header">
                     <h3 class="stat-title">Completion Rate</h3>
-                    <div class="stat-icon green">
-                        <i class="fas fa-percentage"></i>
+                    <div class="tooltip-wrapper">
+                        <div class="stat-icon green">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <span class="tooltip">Percentage of assigned tasks completed</span>
                     </div>
                 </div>
                 <div class="stat-value" id="completionRate">0%</div>
@@ -601,8 +814,11 @@
             <div class="stat-card">
                 <div class="stat-header">
                     <h3 class="stat-title">Average Time</h3>
-                    <div class="stat-icon yellow">
-                        <i class="fas fa-clock"></i>
+                    <div class="tooltip-wrapper">
+                        <div class="stat-icon yellow">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <span class="tooltip">Average time spent per task</span>
                     </div>
                 </div>
                 <div class="stat-value" id="avgTime">0 min</div>
@@ -612,8 +828,11 @@
             <div class="stat-card">
                 <div class="stat-header">
                     <h3 class="stat-title">Current Streak</h3>
-                    <div class="stat-icon red">
-                        <i class="fas fa-fire"></i>
+                    <div class="tooltip-wrapper">
+                        <div class="stat-icon red">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <span class="tooltip">Consecutive days with completed tasks</span>
                     </div>
                 </div>
                 <div class="stat-value" id="currentStreak">0 days</div>
@@ -625,11 +844,17 @@
         <div class="chart-section">
             <div class="section-header">
                 <h2 class="section-title">Training Progress Over Time</h2>
-                <select id="chartView" class="form-control" style="width: 150px;" onchange="updateChart()">
-                    <option value="completion">Completion Rate</option>
-                    <option value="time">Time Spent</option>
-                    <option value="tasks">Tasks Completed</option>
-                </select>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <select id="chartView" class="form-control" style="width: 150px;" onchange="updateChart()">
+                        <option value="completion">Completion Rate</option>
+                        <option value="time">Time Spent</option>
+                        <option value="tasks">Tasks Completed</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="toggleCompareView()" id="compareBtn">
+                        <i class="fas fa-users"></i>
+                        <span>Compare</span>
+                    </button>
+                </div>
             </div>
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
@@ -687,6 +912,9 @@
         let progressService;
         let progressChart;
         let currentData = null;
+        let refreshInterval = null;
+        let lastUpdateTime = null;
+        let loadDataDebounce = null;
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
@@ -694,6 +922,19 @@
             initializeDateFilters();
             initializeChart();
             loadTrainingData();
+            
+            // Set up auto-refresh every 5 minutes
+            refreshInterval = setInterval(() => {
+                loadTrainingData(true);
+            }, 5 * 60 * 1000);
+            
+            // Add debouncing to user select
+            document.getElementById('userSelect').addEventListener('change', () => {
+                clearTimeout(loadDataDebounce);
+                loadDataDebounce = setTimeout(() => {
+                    loadTrainingData();
+                }, 300);
+            });
         });
 
         // Initialize date filters with defaults
@@ -915,18 +1156,8 @@
 
             sessions.forEach(session => {
                 session.items.forEach(item => {
-                    // Parse timer data from the new dedicated TimerData_ field
-                    let taskData = {};
-                    try {
-                        taskData = JSON.parse(item.TimerData_ || '{}');
-                    } catch (e) {
-                        // Fallback to old ColorCode field for backward compatibility
-                        try {
-                            taskData = JSON.parse(item.ColorCode || '{}');
-                        } catch (e2) {
-                            taskData = {};
-                        }
-                    }
+                    // Use utility function to parse timer data
+                    const taskData = parseTimerData(item);
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${formatDate(session.CreatedAt)}</td>
@@ -982,18 +1213,8 @@
 
             sessions.forEach(session => {
                 session.items.forEach(item => {
-                    // Parse timer data from the new dedicated TimerData_ field
-                    let taskData = {};
-                    try {
-                        taskData = JSON.parse(item.TimerData_ || '{}');
-                    } catch (e) {
-                        // Fallback to old ColorCode field for backward compatibility
-                        try {
-                            taskData = JSON.parse(item.ColorCode || '{}');
-                        } catch (e2) {
-                            taskData = {};
-                        }
-                    }
+                    // Use utility function to parse timer data
+                    const taskData = parseTimerData(item);
                     csv += `${formatDate(session.CreatedAt)},${session.CustomerName},${item.ProductName},${Math.round(taskData.totalSeconds / 60)},${taskData.timerSessions?.length || 1},Complete,"${taskData.notes || ''}"\n`;
                 });
             });
@@ -1015,11 +1236,6 @@
             toggleExportMenu();
         }
 
-        // Show error message
-        function showError(message) {
-            // You can implement a toast notification here
-            console.error(message);
-        }
 
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
@@ -1027,6 +1243,103 @@
                 document.getElementById('exportDropdown').classList.remove('show');
             }
         });
+        
+        // Toggle compare view
+        let compareMode = false;
+        function toggleCompareView() {
+            compareMode = !compareMode;
+            const compareBtn = document.getElementById('compareBtn');
+            
+            if (compareMode) {
+                compareBtn.classList.add('btn-primary');
+                compareBtn.classList.remove('btn-secondary');
+                showCompareView();
+            } else {
+                compareBtn.classList.remove('btn-primary');
+                compareBtn.classList.add('btn-secondary');
+                hideCompareView();
+            }
+        }
+        
+        // Show compare view
+        async function showCompareView() {
+            const chartSection = document.querySelector('.chart-section');
+            
+            // Load data for multiple users
+            const topUsers = ['adriyella@nwcustomapparel.com', 'ruth@nwcustomapparel.com', 'taylar@nwcustomapparel.com', 'nika@nwcustomapparel.com'];
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            try {
+                // Create compare container
+                const compareDiv = document.createElement('div');
+                compareDiv.id = 'compareView';
+                compareDiv.className = 'chart-section';
+                compareDiv.innerHTML = `
+                    <div class="section-header">
+                        <h2 class="section-title">User Comparison</h2>
+                    </div>
+                    <div class="compare-container" id="compareContainer">
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                            <p class="loading-text">Loading comparison data...</p>
+                        </div>
+                    </div>
+                `;
+                
+                chartSection.parentNode.insertBefore(compareDiv, chartSection.nextSibling);
+                chartSection.style.display = 'none';
+                
+                // Load user data
+                const userData = await progressService.batchGetUserSessions(topUsers, startDate, endDate);
+                
+                // Render comparison cards
+                const container = document.getElementById('compareContainer');
+                container.innerHTML = userData.map(user => `
+                    <div class="user-comparison-card">
+                        <div class="user-comparison-header">
+                            <span class="user-name">${user.email.split('@')[0]}</span>
+                            <span class="status-badge ${user.currentStreak > 0 ? 'complete' : 'incomplete'}">
+                                ${user.currentStreak > 0 ? 'Active' : 'Inactive'}
+                            </span>
+                        </div>
+                        <div class="user-stats">
+                            <div class="user-stat-row">
+                                <span class="user-stat-label">Completion Rate</span>
+                                <span class="user-stat-value">${user.completionRate}%</span>
+                            </div>
+                            <div class="user-stat-row">
+                                <span class="user-stat-label">Avg Time</span>
+                                <span class="user-stat-value">${user.avgTimeMinutes} min</span>
+                            </div>
+                            <div class="user-stat-row">
+                                <span class="user-stat-label">Current Streak</span>
+                                <span class="user-stat-value">${user.currentStreak} days</span>
+                            </div>
+                            <div class="user-stat-row">
+                                <span class="user-stat-label">Total Days</span>
+                                <span class="user-stat-value">${user.totalDays}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading compare view:', error);
+                showError('Failed to load comparison data');
+            }
+        }
+        
+        // Hide compare view
+        function hideCompareView() {
+            const compareDiv = document.getElementById('compareView');
+            if (compareDiv) {
+                compareDiv.remove();
+            }
+            
+            const chartSection = document.querySelector('.chart-section');
+            chartSection.style.display = 'block';
+        }
     </script>
 </body>
 </html>
