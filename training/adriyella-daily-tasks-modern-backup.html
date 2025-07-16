@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#FF6B6B">
+    <title>Adriyella's Tasks ✨ | NW Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Task Service -->
+    <script src="adriyella-task-service.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #2A2D3A;
+            --light: #F7F7FF;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --success: #00D9A5;
+            --shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--light);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Animated Background */
+        .bg-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        .shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 5s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+        
+        /* Main App Container */
+        .app-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Header */
+        .app-header {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .greeting {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #FFE66D, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .streak-badge {
+            background: linear-gradient(135deg, #FF6B6B, #FFE66D);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Earnings Display */
+        .earnings-ticker {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1rem;
+            margin: 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .earnings-ticker::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #FFE66D);
+            border-radius: 15px;
+            z-index: -1;
+            animation: gradient-border 3s linear infinite;
+        }
+        
+        @keyframes gradient-border {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .earnings-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .earnings-amount {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #FFE66D, #00D9A5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+        
+        .earnings-detail {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
+        
+        /* Task Cards Container */
+        .tasks-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            padding-bottom: 100px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Task Card */
+        .task-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transform: translateY(0);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .task-card.active {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .task-card.completed {
+            opacity: 0.7;
+            transform: scale(0.98);
+        }
+        
+        .task-card.completed::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 40%, rgba(0, 217, 165, 0.3) 100%);
+            pointer-events: none;
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .task-icon {
+            font-size: 2.5rem;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .task-info {
+            flex: 1;
+            margin-left: 1rem;
+        }
+        
+        .task-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .task-rate {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .action-btn {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .action-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .action-btn.secondary {
+            background: var(--glass);
+            color: var(--light);
+            border: 1px solid var(--glass-border);
+        }
+        
+        /* Counter Input */
+        .counter-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .counter-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .counter-btn:active {
+            transform: scale(0.9);
+            background: var(--primary);
+        }
+        
+        .counter-value {
+            font-size: 3rem;
+            font-weight: 700;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        /* Timer Display */
+        .timer-display {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            padding: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 2rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+        }
+        
+        .timer-display.active {
+            animation: timer-pulse 1s infinite;
+        }
+        
+        @keyframes timer-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Bottom Action Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 10;
+        }
+        
+        .fab {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .fab:active {
+            transform: scale(0.95);
+        }
+        
+        .fab.secondary {
+            background: var(--glass);
+            color: var(--light);
+            border: 1px solid var(--glass-border);
+        }
+        
+        /* Success Animation Overlay */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 217, 165, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        .success-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .success-content {
+            text-align: center;
+            animation: scaleIn 0.5s ease;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        
+        .success-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: rotate 0.5s ease;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(-360deg); }
+            to { transform: rotate(0); }
+        }
+        
+        .success-message {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .success-earnings {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        
+        /* Error Message */
+        .error-toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+        
+        .error-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Loading State */
+        .loading-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .loading-container.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .loading-content {
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Pull to Refresh */
+        .pull-to-refresh {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .pull-to-refresh.show {
+            top: 20px;
+        }
+        
+        .pull-to-refresh i {
+            font-size: 1.5rem;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Responsive */
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 428px;
+                margin: 0 auto;
+                height: 100vh;
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+            }
+        }
+        
+        /* Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --glass: rgba(255, 255, 255, 0.05);
+                --glass-border: rgba(255, 255, 255, 0.1);
+            }
+        }
+        
+        /* Slide-up Drawer */
+        .bonus-drawer {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            background: var(--dark);
+            border-radius: 30px 30px 0 0;
+            padding: 2rem;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 90;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .bonus-drawer.show {
+            transform: translateY(-100%);
+        }
+        
+        .drawer-handle {
+            width: 50px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .bonus-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .bonus-item {
+            background: var(--glass);
+            padding: 1rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .bonus-item-label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+        
+        .bonus-item-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Shapes -->
+    <div class="bg-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Pull to Refresh -->
+        <div class="pull-to-refresh" id="pullToRefresh">
+            <i class="fas fa-sync"></i>
+        </div>
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="greeting" id="greeting">Hey Adriyella! 👋</h1>
+                <div class="header-stats">
+                    <div class="streak-badge" id="streakBadge" style="display: none;">
+                        <i class="fas fa-fire"></i>
+                        <span id="streakCount">0</span> days
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Earnings Ticker -->
+        <div class="earnings-ticker" onclick="toggleBonusDrawer()">
+            <div class="earnings-label">Today's Earnings</div>
+            <div class="earnings-amount" id="todayEarnings">$0.00</div>
+            <div class="earnings-detail" id="earningsDetail">Tap for details ↓</div>
+        </div>
+
+        <!-- Tasks Container -->
+        <div class="tasks-container" id="tasksContainer">
+            <!-- Task 1: Customer Notifications -->
+            <div class="task-card" id="task-1" data-task-id="1">
+                <div class="task-header">
+                    <div class="task-icon">📞</div>
+                    <div class="task-info">
+                        <div class="task-name">Customer Order Calls</div>
+                        <div class="task-rate">$2.00 each</div>
+                    </div>
+                </div>
+                <div class="counter-container">
+                    <button class="counter-btn" onclick="decrementCount(1)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <div class="counter-value" id="count-1">0</div>
+                    <button class="counter-btn" onclick="incrementCount(1)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="timer-display" id="timer-1" style="display: none;">00:00</div>
+                <div class="quick-actions">
+                    <button class="action-btn" id="timer-btn-1" onclick="toggleTimer(1)">
+                        <i class="fas fa-play"></i> Start Timer
+                    </button>
+                    <button class="action-btn secondary" onclick="completeTask(1)">
+                        <i class="fas fa-check"></i> Complete
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task 2: Thank You Notes -->
+            <div class="task-card" id="task-2" data-task-id="2">
+                <div class="task-header">
+                    <div class="task-icon">💌</div>
+                    <div class="task-info">
+                        <div class="task-name">Thank You Notes</div>
+                        <div class="task-rate">$1.50 each</div>
+                    </div>
+                </div>
+                <div class="counter-container">
+                    <button class="counter-btn" onclick="decrementCount(2)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <div class="counter-value" id="count-2">0</div>
+                    <button class="counter-btn" onclick="incrementCount(2)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="timer-display" id="timer-2" style="display: none;">00:00</div>
+                <div class="quick-actions">
+                    <button class="action-btn" id="timer-btn-2" onclick="toggleTimer(2)">
+                        <i class="fas fa-play"></i> Start Timer
+                    </button>
+                    <button class="action-btn secondary" onclick="completeTask(2)">
+                        <i class="fas fa-check"></i> Complete
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task 3: Sample Management -->
+            <div class="task-card" id="task-3" data-task-id="3">
+                <div class="task-header">
+                    <div class="task-icon">👔</div>
+                    <div class="task-info">
+                        <div class="task-name">Sample Management</div>
+                        <div class="task-rate">$3.00 each</div>
+                    </div>
+                </div>
+                <div class="counter-container">
+                    <button class="counter-btn" onclick="decrementCount(3)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <div class="counter-value" id="count-3">0</div>
+                    <button class="counter-btn" onclick="incrementCount(3)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="timer-display" id="timer-3" style="display: none;">00:00</div>
+                <div class="quick-actions">
+                    <button class="action-btn" id="timer-btn-3" onclick="toggleTimer(3)">
+                        <i class="fas fa-play"></i> Start Timer
+                    </button>
+                    <button class="action-btn secondary" onclick="completeTask(3)">
+                        <i class="fas fa-check"></i> Complete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="bottom-bar">
+            <button class="fab secondary" onclick="window.location.href='adriyella-task-history.html'">
+                <i class="fas fa-clock-rotate-left"></i> History
+            </button>
+            <button class="fab" onclick="window.location.href='adriyella-bonus-report.html'">
+                <i class="fas fa-chart-line"></i> Bonus Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Bonus Drawer -->
+    <div class="bonus-drawer" id="bonusDrawer">
+        <div class="drawer-handle"></div>
+        <h2 style="text-align: center; margin-bottom: 1rem;">💰 Your Earnings</h2>
+        <div class="bonus-grid">
+            <div class="bonus-item">
+                <div class="bonus-item-label">Today</div>
+                <div class="bonus-item-value" id="drawerToday">$0.00</div>
+            </div>
+            <div class="bonus-item">
+                <div class="bonus-item-label">This Week</div>
+                <div class="bonus-item-value" id="drawerWeek">$0.00</div>
+            </div>
+            <div class="bonus-item">
+                <div class="bonus-item-label">This Month</div>
+                <div class="bonus-item-value" id="drawerMonth">$0.00</div>
+            </div>
+            <div class="bonus-item">
+                <div class="bonus-item-label">Goal Progress</div>
+                <div class="bonus-item-value" id="drawerGoal">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Overlay -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <div class="success-icon">🎉</div>
+            <div class="success-message">Nice Work!</div>
+            <div class="success-earnings" id="successEarnings">+$0.00</div>
+        </div>
+    </div>
+
+    <!-- Error Toast -->
+    <div class="error-toast" id="errorToast"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-container" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div>Loading your tasks...</div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let taskService;
+        let timers = {};
+        let counts = { 1: 0, 2: 0, 3: 0 };
+        let todaysTasks = [];
+        let bonusRates = {
+            1: 2.00, // Customer notifications
+            2: 1.50, // Thank you notes
+            3: 3.00  // Sample management
+        };
+        let taskNames = {
+            1: 'Customer Completed Order Notifications',
+            2: 'Thank You Notes',
+            3: 'Sample Management'
+        };
+
+        // Initialize app
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                taskService = new TaskTrackingService();
+                updateGreeting();
+                await loadTodaysTasks();
+                await updateEarnings();
+                await updateStreak();
+                setupPullToRefresh();
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize. Please refresh the page.');
+            }
+        });
+
+        // Update greeting based on time
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const greetingEl = document.getElementById('greeting');
+            
+            if (hour < 12) {
+                greetingEl.textContent = 'Good morning, Adriyella! ☀️';
+            } else if (hour < 17) {
+                greetingEl.textContent = 'Hey Adriyella! 👋';
+            } else {
+                greetingEl.textContent = 'Evening, Adriyella! 🌙';
+            }
+        }
+
+        // Load today's tasks
+        async function loadTodaysTasks() {
+            showLoading(true);
+            try {
+                const session = await taskService.getTodaySession();
+                todaysTasks = await taskService.getTodayTasks();
+                
+                todaysTasks.forEach(task => {
+                    if (task.completed) {
+                        counts[task.taskNumber] = task.count || 0;
+                        updateCountDisplay(task.taskNumber);
+                        markTaskCompleted(task.taskNumber);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                showError('Failed to load tasks. Working offline.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Update earnings display
+        async function updateEarnings() {
+            try {
+                let todayEarnings = 0;
+                
+                todaysTasks.forEach(task => {
+                    if (task.completed) {
+                        todayEarnings += (task.count || 0) * (bonusRates[task.taskNumber] || 0);
+                    }
+                });
+                
+                document.getElementById('todayEarnings').textContent = `$${todayEarnings.toFixed(2)}`;
+                document.getElementById('drawerToday').textContent = `$${todayEarnings.toFixed(2)}`;
+                
+                // Update month earnings
+                const monthData = await taskService.getMonthlyEarnings();
+                document.getElementById('drawerMonth').textContent = `$${monthData.totalEarnings.toFixed(2)}`;
+                
+                // Calculate goal progress
+                const goalProgress = Math.round((monthData.totalEarnings / 500) * 100);
+                document.getElementById('drawerGoal').textContent = `${goalProgress}%`;
+                
+            } catch (error) {
+                console.error('Error updating earnings:', error);
+            }
+        }
+
+        // Update streak display
+        async function updateStreak() {
+            try {
+                const streakData = await taskService.calculateStreakWithBonus();
+                if (streakData.streak > 0) {
+                    const streakBadge = document.getElementById('streakBadge');
+                    const streakCount = document.getElementById('streakCount');
+                    streakBadge.style.display = 'flex';
+                    streakCount.textContent = streakData.streak;
+                }
+            } catch (error) {
+                console.error('Error updating streak:', error);
+            }
+        }
+
+        // Counter functions
+        function incrementCount(taskId) {
+            counts[taskId]++;
+            updateCountDisplay(taskId);
+            vibrateDevice();
+        }
+
+        function decrementCount(taskId) {
+            if (counts[taskId] > 0) {
+                counts[taskId]--;
+                updateCountDisplay(taskId);
+                vibrateDevice();
+            }
+        }
+
+        function updateCountDisplay(taskId) {
+            document.getElementById(`count-${taskId}`).textContent = counts[taskId];
+        }
+
+        // Timer functions
+        function toggleTimer(taskId) {
+            const timerBtn = document.getElementById(`timer-btn-${taskId}`);
+            const timerDisplay = document.getElementById(`timer-${taskId}`);
+            
+            if (timers[taskId]) {
+                // Stop timer
+                clearInterval(timers[taskId].interval);
+                timers[taskId] = null;
+                timerBtn.innerHTML = '<i class="fas fa-play"></i> Start Timer';
+                timerDisplay.classList.remove('active');
+            } else {
+                // Start timer
+                const startTime = Date.now();
+                timerDisplay.style.display = 'block';
+                timerDisplay.classList.add('active');
+                timerBtn.innerHTML = '<i class="fas fa-pause"></i> Pause Timer';
+                
+                timers[taskId] = {
+                    startTime: startTime,
+                    interval: setInterval(() => {
+                        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                        const minutes = Math.floor(elapsed / 60);
+                        const seconds = elapsed % 60;
+                        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }, 1000)
+                };
+            }
+            
+            vibrateDevice();
+        }
+
+        // Complete task
+        async function completeTask(taskId) {
+            if (counts[taskId] === 0) {
+                showError('Please add at least one count!');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const taskData = {
+                    count: counts[taskId],
+                    taskName: taskNames[taskId],
+                    startTime: timers[taskId]?.startTime || Date.now(),
+                    endTime: Date.now(),
+                    totalSeconds: timers[taskId] ? Math.floor((Date.now() - timers[taskId].startTime) / 1000) : 0
+                };
+                
+                const success = await taskService.saveTaskCompletion(taskId, taskData);
+                
+                if (success) {
+                    markTaskCompleted(taskId);
+                    showSuccessAnimation(counts[taskId] * bonusRates[taskId]);
+                    await updateEarnings();
+                    
+                    // Clear timer if running
+                    if (timers[taskId]) {
+                        clearInterval(timers[taskId].interval);
+                        timers[taskId] = null;
+                    }
+                } else {
+                    showError('Failed to save task. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error completing task:', error);
+                showError('Failed to complete task. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Mark task as completed
+        function markTaskCompleted(taskId) {
+            const card = document.getElementById(`task-${taskId}`);
+            card.classList.add('completed');
+            
+            // Update button
+            const actions = card.querySelector('.quick-actions');
+            actions.innerHTML = `
+                <button class="action-btn secondary" style="width: 100%;">
+                    <i class="fas fa-check-circle"></i> Completed!
+                </button>
+            `;
+        }
+
+        // Show success animation
+        function showSuccessAnimation(earnings) {
+            const overlay = document.getElementById('successOverlay');
+            const earningsEl = document.getElementById('successEarnings');
+            
+            earningsEl.textContent = `+$${earnings.toFixed(2)}`;
+            overlay.classList.add('show');
+            
+            vibrateDevice(200);
+            
+            setTimeout(() => {
+                overlay.classList.remove('show');
+            }, 2000);
+        }
+
+        // Toggle bonus drawer
+        function toggleBonusDrawer() {
+            const drawer = document.getElementById('bonusDrawer');
+            drawer.classList.toggle('show');
+            vibrateDevice();
+        }
+
+        // Setup pull to refresh
+        function setupPullToRefresh() {
+            let startY = 0;
+            let currentY = 0;
+            let pulling = false;
+            
+            const container = document.querySelector('.tasks-container');
+            const pullIndicator = document.getElementById('pullToRefresh');
+            
+            container.addEventListener('touchstart', (e) => {
+                if (container.scrollTop === 0) {
+                    startY = e.touches[0].clientY;
+                    pulling = true;
+                }
+            });
+            
+            container.addEventListener('touchmove', (e) => {
+                if (!pulling) return;
+                
+                currentY = e.touches[0].clientY;
+                const diff = currentY - startY;
+                
+                if (diff > 0 && diff < 150) {
+                    pullIndicator.classList.add('show');
+                    pullIndicator.style.transform = `translateX(-50%) rotate(${diff * 3}deg)`;
+                }
+            });
+            
+            container.addEventListener('touchend', async () => {
+                if (!pulling) return;
+                
+                const diff = currentY - startY;
+                if (diff > 100) {
+                    await refreshTasks();
+                }
+                
+                pullIndicator.classList.remove('show');
+                pulling = false;
+            });
+        }
+
+        // Refresh tasks
+        async function refreshTasks() {
+            vibrateDevice();
+            await loadTodaysTasks();
+            await updateEarnings();
+            await updateStreak();
+        }
+
+        // Show loading
+        function showLoading(show = true) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('show');
+            } else {
+                overlay.classList.remove('show');
+            }
+        }
+
+        // Show error
+        function showError(message) {
+            const toast = document.getElementById('errorToast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Vibrate device (if supported)
+        function vibrateDevice(duration = 50) {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(duration);
+            }
+        }
+
+        // Add swipe gestures for task cards
+        document.querySelectorAll('.task-card').forEach(card => {
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+            
+            card.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                isDragging = true;
+                card.classList.add('active');
+            });
+            
+            card.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                
+                currentX = e.touches[0].clientX;
+                const diff = currentX - startX;
+                
+                if (Math.abs(diff) > 20) {
+                    card.style.transform = `translateX(${diff * 0.3}px) scale(1.02)`;
+                }
+            });
+            
+            card.addEventListener('touchend', () => {
+                isDragging = false;
+                card.classList.remove('active');
+                card.style.transform = '';
+                
+                const diff = currentX - startX;
+                if (Math.abs(diff) > 100) {
+                    // Could add swipe actions here
+                    vibrateDevice();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

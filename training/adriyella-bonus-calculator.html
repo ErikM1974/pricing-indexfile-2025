@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriyella's Bonus Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            color: #6b7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .date {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .earnings-display {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .earnings-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .earnings-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .task-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .task-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .task-icon.thank-you {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .task-icon.calls {
+            background: #fecaca;
+            color: #ef4444;
+        }
+
+        .task-icon.samples {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+
+        .task-rate {
+            font-size: 14px;
+            color: #10b981;
+        }
+
+        .task-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .counter-btn {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #374151;
+            transition: all 0.2s;
+        }
+
+        .counter-btn:hover {
+            background: #e5e7eb;
+            transform: scale(1.05);
+        }
+
+        .counter-btn:active {
+            transform: scale(0.95);
+        }
+
+        .task-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .task-total {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .monthly-total {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .monthly-amount {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .monthly-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .auto-save-indicator {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .auto-save-indicator::before {
+            content: "💾";
+            font-size: 14px;
+        }
+
+        .save-status {
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        /* Contact Info Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .modal-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: #ef4444;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #ef4444;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        @media (max-width: 480px) {
+            .calculator-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .earnings-amount {
+                font-size: 32px;
+            }
+            
+            .counter-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .modal {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <button class="back-button" onclick="goToDashboard()">
+            ← Back to Dashboard
+        </button>
+
+        <div class="header">
+            <div class="greeting">Hey Adriyella! 👋</div>
+            <div class="date" id="currentDate"></div>
+        </div>
+
+        <div class="earnings-display">
+            <div class="earnings-amount" id="todaysEarnings">$0.00</div>
+            <div class="earnings-label">Today's Earnings</div>
+        </div>
+
+        <!-- Thank You Cards -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-icon thank-you">💝</div>
+                <div class="task-info">
+                    <div class="task-name">Thank You Cards</div>
+                    <div class="task-rate">$1.50 each</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <div class="counter-controls">
+                    <button class="counter-btn" onclick="adjustCount('thankYou', 1)">+1</button>
+                    <button class="counter-btn" onclick="adjustCount('thankYou', 5)">+5</button>
+                    <button class="counter-btn" onclick="adjustCount('thankYou', 10)">+10</button>
+                </div>
+                <div class="task-count" id="thankYouCount">0</div>
+                <div class="task-total" id="thankYouTotal">= $0.00</div>
+            </div>
+        </div>
+
+        <!-- Customer Order Calls -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-icon calls">📞</div>
+                <div class="task-info">
+                    <div class="task-name">Customer Order Calls</div>
+                    <div class="task-rate">$2.00 each</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <div class="counter-controls">
+                    <button class="counter-btn" onclick="adjustCount('calls', 1)">+1</button>
+                    <button class="counter-btn" onclick="adjustCount('calls', 5)">+5</button>
+                    <button class="counter-btn" onclick="adjustCount('calls', 10)">+10</button>
+                </div>
+                <div class="task-count" id="callsCount">0</div>
+                <div class="task-total" id="callsTotal">= $0.00</div>
+            </div>
+        </div>
+
+        <!-- Sample Management -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-icon samples">📦</div>
+                <div class="task-info">
+                    <div class="task-name">Sample Management</div>
+                    <div class="task-rate">$3.00 each</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <div class="counter-controls">
+                    <button class="counter-btn" onclick="adjustCount('samples', 1)">+1</button>
+                    <button class="counter-btn" onclick="adjustCount('samples', 2)">+2</button>
+                    <button class="counter-btn" onclick="adjustCount('samples', 5)">+5</button>
+                </div>
+                <div class="task-count" id="samplesCount">0</div>
+                <div class="task-total" id="samplesTotal">= $0.00</div>
+            </div>
+        </div>
+
+        <div class="monthly-total">
+            <div class="monthly-amount" id="monthlyTotal">$0.00</div>
+            <div class="monthly-label">This Month's Total</div>
+        </div>
+
+        <div class="auto-save-indicator">
+            Auto-saves every 5 seconds
+            <span class="save-status" id="saveStatus"></span>
+        </div>
+    </div>
+
+    <!-- Contact Info Modal -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Sample Information</div>
+                <div class="modal-subtitle">Who received this sample?</div>
+            </div>
+            
+            <form id="contactForm">
+                <div class="form-group">
+                    <label class="form-label required" for="customerName">Customer Name</label>
+                    <input type="text" id="customerName" class="form-input" placeholder="Enter customer name" required>
+                    <div class="error-message" id="customerNameError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="companyName">Company Name</label>
+                    <input type="text" id="companyName" class="form-input" placeholder="Enter company name (optional)">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label required" for="customerEmail">Email Address</label>
+                    <input type="email" id="customerEmail" class="form-input" placeholder="Enter email address" required>
+                    <div class="error-message" id="customerEmailError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="customerPhone">Phone Number</label>
+                    <input type="tel" id="customerPhone" class="form-input" placeholder="Enter phone number (optional)">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeContactModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Sample</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Task rates
+        const RATES = {
+            thankYou: 1.50,
+            calls: 2.00,
+            samples: 3.00
+        };
+
+        // Current counts
+        let counts = {
+            thankYou: 0,
+            calls: 0,
+            samples: 0
+        };
+
+        // Sample contact information
+        let sampleContacts = [];
+
+        // Initialize the app
+        function initializeApp() {
+            updateCurrentDate();
+            loadTodaysCounts();
+            updateAllDisplays();
+            startAutoSave();
+        }
+
+        // Update current date display
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Adjust task count
+        function adjustCount(taskType, increment) {
+            // For samples, show contact modal for each increment
+            if (taskType === 'samples') {
+                showContactModal(increment);
+                return;
+            }
+            
+            counts[taskType] = Math.max(0, counts[taskType] + increment);
+            updateAllDisplays();
+            
+            // Visual feedback
+            const countElement = document.getElementById(taskType + 'Count');
+            countElement.style.transform = 'scale(1.2)';
+            countElement.style.color = '#10b981';
+            setTimeout(() => {
+                countElement.style.transform = 'scale(1)';
+                countElement.style.color = '#1f2937';
+            }, 200);
+        }
+
+        // Show contact info modal for samples
+        function showContactModal(increment) {
+            window.pendingSampleIncrement = increment;
+            document.getElementById('contactModal').classList.add('active');
+            document.getElementById('customerName').focus();
+        }
+
+        // Close contact modal
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.remove('active');
+            clearContactForm();
+        }
+
+        // Clear contact form
+        function clearContactForm() {
+            document.getElementById('contactForm').reset();
+            document.querySelectorAll('.form-input').forEach(input => {
+                input.classList.remove('error');
+            });
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.textContent = '';
+            });
+        }
+
+        // Validate contact form
+        function validateContactForm() {
+            const customerName = document.getElementById('customerName');
+            const customerEmail = document.getElementById('customerEmail');
+            let isValid = true;
+
+            // Clear previous errors
+            document.querySelectorAll('.form-input').forEach(input => {
+                input.classList.remove('error');
+            });
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.textContent = '';
+            });
+
+            // Validate customer name
+            if (!customerName.value.trim()) {
+                customerName.classList.add('error');
+                document.getElementById('customerNameError').textContent = 'Customer name is required';
+                isValid = false;
+            }
+
+            // Validate email
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!customerEmail.value.trim()) {
+                customerEmail.classList.add('error');
+                document.getElementById('customerEmailError').textContent = 'Email address is required';
+                isValid = false;
+            } else if (!emailPattern.test(customerEmail.value.trim())) {
+                customerEmail.classList.add('error');
+                document.getElementById('customerEmailError').textContent = 'Please enter a valid email address';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Handle contact form submission
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            
+            if (!validateContactForm()) {
+                return;
+            }
+
+            // Get form data
+            const contactInfo = {
+                customerName: document.getElementById('customerName').value.trim(),
+                companyName: document.getElementById('companyName').value.trim(),
+                customerEmail: document.getElementById('customerEmail').value.trim(),
+                customerPhone: document.getElementById('customerPhone').value.trim(),
+                timestamp: new Date().toISOString()
+            };
+
+            // Add contact info for each sample in the increment
+            for (let i = 0; i < window.pendingSampleIncrement; i++) {
+                sampleContacts.push({...contactInfo});
+            }
+
+            // Update sample count
+            counts.samples = Math.max(0, counts.samples + window.pendingSampleIncrement);
+            updateAllDisplays();
+
+            // Visual feedback
+            const countElement = document.getElementById('samplesCount');
+            countElement.style.transform = 'scale(1.2)';
+            countElement.style.color = '#10b981';
+            setTimeout(() => {
+                countElement.style.transform = 'scale(1)';
+                countElement.style.color = '#1f2937';
+            }, 200);
+
+            // Close modal
+            closeContactModal();
+
+            // Clear pending increment
+            window.pendingSampleIncrement = 0;
+        }
+
+        // Update all displays
+        function updateAllDisplays() {
+            // Update individual task displays
+            Object.keys(counts).forEach(taskType => {
+                const count = counts[taskType];
+                const rate = RATES[taskType];
+                const total = count * rate;
+                
+                document.getElementById(taskType + 'Count').textContent = count;
+                document.getElementById(taskType + 'Total').textContent = `= $${total.toFixed(2)}`;
+            });
+            
+            // Update today's total earnings
+            const todaysTotal = Object.keys(counts).reduce((sum, taskType) => {
+                return sum + (counts[taskType] * RATES[taskType]);
+            }, 0);
+            
+            document.getElementById('todaysEarnings').textContent = `$${todaysTotal.toFixed(2)}`;
+            
+            // Update monthly total (placeholder - would need API integration)
+            updateMonthlyTotal();
+        }
+
+        // Update monthly total (placeholder implementation)
+        function updateMonthlyTotal() {
+            // This would normally fetch from API
+            // For now, using a placeholder
+            const monthlyAmount = 150.00; // Placeholder
+            document.getElementById('monthlyTotal').textContent = `$${monthlyAmount.toFixed(2)}`;
+        }
+
+        // Load today's counts from storage
+        function loadTodaysCounts() {
+            const today = new Date().toISOString().split('T')[0];
+            const savedData = localStorage.getItem(`adriyella_tasks_${today}`);
+            const savedContacts = localStorage.getItem(`adriyella_contacts_${today}`);
+            
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                counts = { ...counts, ...parsed };
+            }
+            
+            if (savedContacts) {
+                sampleContacts = JSON.parse(savedContacts);
+            }
+        }
+
+        // Save counts to storage
+        function saveCounts() {
+            const today = new Date().toISOString().split('T')[0];
+            localStorage.setItem(`adriyella_tasks_${today}`, JSON.stringify(counts));
+            localStorage.setItem(`adriyella_contacts_${today}`, JSON.stringify(sampleContacts));
+            
+            // Show save status
+            document.getElementById('saveStatus').textContent = 'Saved ✅';
+            setTimeout(() => {
+                document.getElementById('saveStatus').textContent = '';
+            }, 2000);
+            
+            // Here you would also save to the API
+            saveToAPI();
+        }
+
+        // Save to API (placeholder implementation)
+        async function saveToAPI() {
+            // This would integrate with the existing quote system
+            // Using TASK format: TASK0716-1
+            const today = new Date();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const day = today.getDate().toString().padStart(2, '0');
+            const taskId = `TASK${month}${day}-1`;
+            
+            console.log('Saving to API:', {
+                taskId,
+                counts,
+                sampleContacts,
+                date: today.toISOString()
+            });
+            
+            // Actual API integration would go here
+        }
+
+        // Start auto-save
+        function startAutoSave() {
+            setInterval(saveCounts, 5000); // Save every 5 seconds
+        }
+
+        // Go back to dashboard
+        function goToDashboard() {
+            window.location.href = '/staff-dashboard.html';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+            
+            // Add contact form event listener
+            document.getElementById('contactForm').addEventListener('submit', handleContactSubmit);
+            
+            // Close modal when clicking outside
+            document.getElementById('contactModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('contactModal')) {
+                    closeContactModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

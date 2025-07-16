@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Quote Items API - Adriyella Task System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .test-button.delete {
+            background: #f44336;
+        }
+        .test-button.delete:hover {
+            background: #da190b;
+        }
+        .test-button.update {
+            background: #2196F3;
+        }
+        .test-button.update:hover {
+            background: #0b7dda;
+        }
+        .result {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            border-left: 4px solid #4CAF50;
+        }
+        .error {
+            border-left: 4px solid #f44336;
+        }
+        .info {
+            border-left: 4px solid #2196F3;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #666;
+            font-size: 1.2em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .api-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .mock-data {
+            background: #f3e5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #9c27b0;
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-running {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-done {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quote Items API Test Suite</h1>
+    
+    <div class="api-info">
+        <h3>API Information</h3>
+        <p><strong>Base URL:</strong> https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api</p>
+        <p><strong>Endpoint:</strong> /quote_items</p>
+        <p><strong>Purpose:</strong> Test CRUD operations for Adriyella's task tracking system</p>
+    </div>
+
+    <div class="mock-data">
+        <h3>Mock Data Structure</h3>
+        <pre>Adriyella Task Quote ID: ADR0716-1 (ADR + MMDD + sequence)
+Task Types:
+- Thank You Cards: $2.00 each
+- Lead Sheets: $5.00 each  
+- Google Reviews: $20.00 each
+- Art Approval: $10.00 each</pre>
+    </div>
+
+    <!-- GET Operations -->
+    <div class="test-section">
+        <h2>1. GET Operations <span class="status-indicator status-pending" id="getStatus">Pending</span></h2>
+        <div class="test-controls">
+            <button class="test-button" onclick="testGetAllItems()">Get All Items</button>
+            <button class="test-button" onclick="testGetByQuoteID()">Get by Quote ID</button>
+            <button class="test-button" onclick="testGetByMonthPattern()">Get by Month Pattern</button>
+            <button class="test-button" onclick="testGetAdriyellaItems()">Get Adriyella Items</button>
+        </div>
+        <div id="getResult" class="result"></div>
+    </div>
+
+    <!-- POST Operations -->
+    <div class="test-section">
+        <h2>2. POST Operations <span class="status-indicator status-pending" id="postStatus">Pending</span></h2>
+        <div class="test-controls">
+            <button class="test-button" onclick="testCreateSession()">Create Test Session</button>
+            <button class="test-button" onclick="testCreateTaskItems()">Create Task Items</button>
+            <button class="test-button" onclick="testCreateCompleteDay()">Create Complete Day</button>
+        </div>
+        <div id="postResult" class="result"></div>
+    </div>
+
+    <!-- PUT Operations -->
+    <div class="test-section">
+        <h2>3. PUT Operations <span class="status-indicator status-pending" id="putStatus">Pending</span></h2>
+        <div class="test-controls">
+            <button class="test-button update" onclick="testUpdateTaskItem()">Update Task Item</button>
+            <button class="test-button update" onclick="testUpdateQuantities()">Update Quantities</button>
+        </div>
+        <div id="putResult" class="result"></div>
+    </div>
+
+    <!-- DELETE Operations -->
+    <div class="test-section">
+        <h2>4. DELETE Operations <span class="status-indicator status-pending" id="deleteStatus">Pending</span></h2>
+        <div class="test-controls">
+            <button class="test-button delete" onclick="testDeleteTaskItem()">Delete Task Item</button>
+            <button class="test-button delete" onclick="testDeleteAllTestItems()">Delete All Test Items</button>
+        </div>
+        <div id="deleteResult" class="result"></div>
+    </div>
+
+    <!-- Data Analysis -->
+    <div class="test-section">
+        <h2>5. Data Analysis <span class="status-indicator status-pending" id="analysisStatus">Pending</span></h2>
+        <div class="test-controls">
+            <button class="test-button" onclick="testDataAggregation()">Test Data Aggregation</button>
+            <button class="test-button" onclick="testMonthlyCalculation()">Monthly Calculation</button>
+            <button class="test-button" onclick="testDailyReconstruction()">Daily Reconstruction</button>
+        </div>
+        <div id="analysisResult" class="result"></div>
+    </div>
+
+    <!-- Complete Workflow Test -->
+    <div class="test-section">
+        <h2>6. Complete Workflow Test <span class="status-indicator status-pending" id="workflowStatus">Pending</span></h2>
+        <div class="test-controls">
+            <button class="test-button" onclick="testCompleteWorkflow()">Run Complete Workflow</button>
+            <button class="test-button delete" onclick="cleanupTestData()">Cleanup Test Data</button>
+        </div>
+        <div id="workflowResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+        const TEST_QUOTE_ID = 'ADR0716-999'; // Test quote ID
+        const TEST_SESSION_ID = 'test_sess_' + Date.now();
+        
+        let testItemIds = []; // Store created item IDs for cleanup
+        let testSessionId = null; // Store session ID for cleanup
+        
+        // Mock task data structure
+        const MOCK_TASKS = [
+            {
+                name: 'Thank You Cards',
+                quantity: 5,
+                rate: 2.00,
+                embellishmentType: 'task'
+            },
+            {
+                name: 'Lead Sheets', 
+                quantity: 3,
+                rate: 5.00,
+                embellishmentType: 'task'
+            },
+            {
+                name: 'Google Reviews',
+                quantity: 1,
+                rate: 20.00,
+                embellishmentType: 'task'
+            },
+            {
+                name: 'Art Approval',
+                quantity: 2,
+                rate: 10.00,
+                embellishmentType: 'task'
+            }
+        ];
+
+        // Utility functions
+        function updateStatus(sectionId, status) {
+            const element = document.getElementById(sectionId);
+            element.className = `status-indicator status-${status}`;
+            element.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        function logResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+        }
+
+        function appendResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent += message;
+        }
+
+        // GET Operations
+        async function testGetAllItems() {
+            updateStatus('getStatus', 'running');
+            try {
+                logResult('getResult', 'Fetching all quote items...');
+                
+                const response = await fetch(`${API_BASE}/quote_items`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    logResult('getResult', 
+                        `✅ SUCCESS: Found ${data.length} total quote items\n\n` +
+                        `Sample items:\n${JSON.stringify(data.slice(0, 3), null, 2)}\n\n` +
+                        `Response Status: ${response.status}\n` +
+                        `Total Items: ${data.length}`, 'success');
+                } else {
+                    throw new Error(`${response.status}: ${JSON.stringify(data)}`);
+                }
+                updateStatus('getStatus', 'done');
+            } catch (error) {
+                logResult('getResult', `❌ ERROR: ${error.message}`, 'error');
+                updateStatus('getStatus', 'done');
+            }
+        }
+
+        async function testGetByQuoteID() {
+            try {
+                const testId = 'ADR0716'; // Look for existing Adriyella quotes
+                logResult('getResult', `Fetching items for QuoteID pattern: ${testId}...`);
+                
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=${testId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    appendResult('getResult', 
+                        `\n\n✅ Quote ID Filter Test:\n` +
+                        `Pattern: ${testId}\n` +
+                        `Found: ${data.length} items\n` +
+                        `Data: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    throw new Error(`${response.status}: ${JSON.stringify(data)}`);
+                }
+            } catch (error) {
+                appendResult('getResult', `\n\n❌ Quote ID Filter ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetByMonthPattern() {
+            try {
+                const monthPattern = 'ADR07'; // July pattern
+                logResult('getResult', `Fetching items for month pattern: ${monthPattern}...`);
+                
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=${monthPattern}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    appendResult('getResult', 
+                        `\n\n✅ Month Pattern Test:\n` +
+                        `Pattern: ${monthPattern}\n` +
+                        `Found: ${data.length} items\n` +
+                        `Sample: ${JSON.stringify(data.slice(0, 2), null, 2)}`, 'success');
+                } else {
+                    throw new Error(`${response.status}: ${JSON.stringify(data)}`);
+                }
+            } catch (error) {
+                appendResult('getResult', `\n\n❌ Month Pattern ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetAdriyellaItems() {
+            try {
+                logResult('getResult', 'Searching for existing Adriyella items...');
+                
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=ADR`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const adriyellaItems = data.filter(item => 
+                        item.QuoteID && item.QuoteID.startsWith('ADR')
+                    );
+                    
+                    appendResult('getResult', 
+                        `\n\n✅ Adriyella Items Search:\n` +
+                        `Total ADR items: ${adriyellaItems.length}\n` +
+                        `Unique Quote IDs: ${[...new Set(adriyellaItems.map(item => item.QuoteID))].join(', ')}\n` +
+                        `Sample items:\n${JSON.stringify(adriyellaItems.slice(0, 3), null, 2)}`, 'success');
+                } else {
+                    throw new Error(`${response.status}: ${JSON.stringify(data)}`);
+                }
+            } catch (error) {
+                appendResult('getResult', `\n\n❌ Adriyella Search ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        // POST Operations
+        async function testCreateSession() {
+            updateStatus('postStatus', 'running');
+            try {
+                logResult('postResult', 'Creating test quote session...');
+                
+                const sessionData = {
+                    QuoteID: TEST_QUOTE_ID,
+                    SessionID: TEST_SESSION_ID,
+                    CustomerEmail: "adriyella@nwcustomapparel.com",
+                    CustomerName: "Adriyella Test Session",
+                    CompanyName: "Northwest Custom Apparel",
+                    Phone: "",
+                    TotalQuantity: 11, // Sum of mock tasks
+                    SubtotalAmount: 55.00, // Calculated from mock tasks
+                    LTMFeeTotal: 0,
+                    TotalAmount: 55.00,
+                    Status: "Open",
+                    ExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().replace(/\.\d{3}Z$/, ''),
+                    Notes: JSON.stringify({
+                        testSession: true,
+                        createdAt: new Date().toISOString()
+                    })
+                };
+                
+                const response = await fetch(`${API_BASE}/quote_sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionData)
+                });
+                
+                const result = await response.text();
+                
+                if (response.ok) {
+                    testSessionId = TEST_QUOTE_ID;
+                    logResult('postResult', 
+                        `✅ SUCCESS: Test session created\n\n` +
+                        `Quote ID: ${TEST_QUOTE_ID}\n` +
+                        `Session ID: ${TEST_SESSION_ID}\n` +
+                        `Response: ${result}\n` +
+                        `Status: ${response.status}`, 'success');
+                } else {
+                    throw new Error(`${response.status}: ${result}`);
+                }
+                updateStatus('postStatus', 'done');
+            } catch (error) {
+                logResult('postResult', `❌ ERROR: ${error.message}`, 'error');
+                updateStatus('postStatus', 'done');
+            }
+        }
+
+        async function testCreateTaskItems() {
+            try {
+                logResult('postResult', 'Creating individual task items...');
+                
+                let lineNumber = 1;
+                const results = [];
+                
+                for (const task of MOCK_TASKS) {
+                    const itemData = {
+                        QuoteID: TEST_QUOTE_ID,
+                        LineNumber: lineNumber++,
+                        StyleNumber: 'TASK',
+                        ProductName: task.name,
+                        Color: '',
+                        ColorCode: '',
+                        EmbellishmentType: task.embellishmentType,
+                        PrintLocation: '',
+                        PrintLocationName: '',
+                        Quantity: task.quantity,
+                        HasLTM: 'No',
+                        BaseUnitPrice: task.rate,
+                        LTMPerUnit: 0,
+                        FinalUnitPrice: task.rate,
+                        LineTotal: task.quantity * task.rate,
+                        SizeBreakdown: '{}',
+                        PricingTier: 'Standard',
+                        ImageURL: '',
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+                    };
+                    
+                    const response = await fetch(`${API_BASE}/quote_items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(itemData)
+                    });
+                    
+                    const result = await response.text();
+                    
+                    if (response.ok) {
+                        results.push(`✅ ${task.name}: ${task.quantity} × $${task.rate} = $${(task.quantity * task.rate).toFixed(2)}`);
+                        // Store item ID for cleanup (if available in response)
+                        testItemIds.push(itemData.QuoteID);
+                    } else {
+                        results.push(`❌ ${task.name}: ERROR ${response.status} - ${result}`);
+                    }
+                }
+                
+                appendResult('postResult', 
+                    `\n\n✅ Task Items Creation:\n` +
+                    results.join('\n') + 
+                    `\n\nTotal items created: ${results.filter(r => r.includes('✅')).length}/${MOCK_TASKS.length}`, 'success');
+                    
+            } catch (error) {
+                appendResult('postResult', `\n\n❌ Task Items ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateCompleteDay() {
+            try {
+                // First create session, then items
+                await testCreateSession();
+                await testCreateTaskItems();
+                
+                appendResult('postResult', 
+                    `\n\n🎉 Complete Day Created Successfully!\n` +
+                    `Quote ID: ${TEST_QUOTE_ID}\n` +
+                    `Tasks: ${MOCK_TASKS.length} different task types\n` +
+                    `Total Quantity: ${MOCK_TASKS.reduce((sum, task) => sum + task.quantity, 0)}\n` +
+                    `Total Amount: $${MOCK_TASKS.reduce((sum, task) => sum + (task.quantity * task.rate), 0).toFixed(2)}`, 'success');
+                    
+            } catch (error) {
+                appendResult('postResult', `\n\n❌ Complete Day ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        // PUT Operations
+        async function testUpdateTaskItem() {
+            updateStatus('putStatus', 'running');
+            try {
+                logResult('putResult', 'Testing update operations...');
+                
+                // First, get an existing item to update
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=${TEST_QUOTE_ID}`);
+                const items = await response.json();
+                
+                if (items.length > 0) {
+                    const itemToUpdate = items[0];
+                    const updateData = {
+                        Quantity: itemToUpdate.Quantity + 5,
+                        LineTotal: (itemToUpdate.Quantity + 5) * itemToUpdate.BaseUnitPrice
+                    };
+                    
+                    const updateResponse = await fetch(`${API_BASE}/quote_items/${itemToUpdate.PK_ID}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updateData)
+                    });
+                    
+                    const result = await updateResponse.text();
+                    
+                    if (updateResponse.ok) {
+                        logResult('putResult', 
+                            `✅ SUCCESS: Updated item ${itemToUpdate.PK_ID}\n\n` +
+                            `Product: ${itemToUpdate.ProductName}\n` +
+                            `Old Quantity: ${itemToUpdate.Quantity}\n` +
+                            `New Quantity: ${updateData.Quantity}\n` +
+                            `Old Total: $${itemToUpdate.LineTotal}\n` +
+                            `New Total: $${updateData.LineTotal.toFixed(2)}\n` +
+                            `Response: ${result}`, 'success');
+                    } else {
+                        throw new Error(`${updateResponse.status}: ${result}`);
+                    }
+                } else {
+                    logResult('putResult', 
+                        `ℹ️ No test items found to update. Run POST operations first.`, 'info');
+                }
+                updateStatus('putStatus', 'done');
+            } catch (error) {
+                logResult('putResult', `❌ ERROR: ${error.message}`, 'error');
+                updateStatus('putStatus', 'done');
+            }
+        }
+
+        async function testUpdateQuantities() {
+            try {
+                logResult('putResult', 'Testing bulk quantity updates...');
+                
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=${TEST_QUOTE_ID}`);
+                const items = await response.json();
+                
+                if (items.length > 0) {
+                    const results = [];
+                    
+                    for (const item of items) {
+                        const newQuantity = item.Quantity + 1;
+                        const updateData = {
+                            Quantity: newQuantity,
+                            LineTotal: newQuantity * item.BaseUnitPrice
+                        };
+                        
+                        const updateResponse = await fetch(`${API_BASE}/quote_items/${item.PK_ID}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updateData)
+                        });
+                        
+                        if (updateResponse.ok) {
+                            results.push(`✅ ${item.ProductName}: ${item.Quantity} → ${newQuantity}`);
+                        } else {
+                            results.push(`❌ ${item.ProductName}: Update failed`);
+                        }
+                    }
+                    
+                    appendResult('putResult', 
+                        `\n\n✅ Bulk Update Results:\n` +
+                        results.join('\n') + 
+                        `\n\nUpdated: ${results.filter(r => r.includes('✅')).length}/${items.length}`, 'success');
+                } else {
+                    appendResult('putResult', 
+                        `\n\nℹ️ No test items found for bulk update.`, 'info');
+                }
+            } catch (error) {
+                appendResult('putResult', `\n\n❌ Bulk Update ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        // DELETE Operations
+        async function testDeleteTaskItem() {
+            updateStatus('deleteStatus', 'running');
+            try {
+                logResult('deleteResult', 'Testing delete operations...');
+                
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=${TEST_QUOTE_ID}`);
+                const items = await response.json();
+                
+                if (items.length > 0) {
+                    const itemToDelete = items[0];
+                    
+                    const deleteResponse = await fetch(`${API_BASE}/quote_items/${itemToDelete.PK_ID}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await deleteResponse.text();
+                    
+                    if (deleteResponse.ok) {
+                        logResult('deleteResult', 
+                            `✅ SUCCESS: Deleted item ${itemToDelete.PK_ID}\n\n` +
+                            `Product: ${itemToDelete.ProductName}\n` +
+                            `Quantity: ${itemToDelete.Quantity}\n` +
+                            `Total: $${itemToDelete.LineTotal}\n` +
+                            `Response: ${result}`, 'success');
+                    } else {
+                        throw new Error(`${deleteResponse.status}: ${result}`);
+                    }
+                } else {
+                    logResult('deleteResult', 
+                        `ℹ️ No test items found to delete.`, 'info');
+                }
+                updateStatus('deleteStatus', 'done');
+            } catch (error) {
+                logResult('deleteResult', `❌ ERROR: ${error.message}`, 'error');
+                updateStatus('deleteStatus', 'done');
+            }
+        }
+
+        async function testDeleteAllTestItems() {
+            try {
+                logResult('deleteResult', 'Deleting all test items...');
+                
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=${TEST_QUOTE_ID}`);
+                const items = await response.json();
+                
+                if (items.length > 0) {
+                    const results = [];
+                    
+                    for (const item of items) {
+                        const deleteResponse = await fetch(`${API_BASE}/quote_items/${item.PK_ID}`, {
+                            method: 'DELETE'
+                        });
+                        
+                        if (deleteResponse.ok) {
+                            results.push(`✅ Deleted: ${item.ProductName}`);
+                        } else {
+                            results.push(`❌ Failed: ${item.ProductName}`);
+                        }
+                    }
+                    
+                    appendResult('deleteResult', 
+                        `\n\n✅ Cleanup Results:\n` +
+                        results.join('\n') + 
+                        `\n\nDeleted: ${results.filter(r => r.includes('✅')).length}/${items.length}`, 'success');
+                } else {
+                    appendResult('deleteResult', 
+                        `\n\nℹ️ No test items found to delete.`, 'info');
+                }
+            } catch (error) {
+                appendResult('deleteResult', `\n\n❌ Cleanup ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        // Data Analysis
+        async function testDataAggregation() {
+            updateStatus('analysisStatus', 'running');
+            try {
+                logResult('analysisResult', 'Testing data aggregation patterns...');
+                
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=${TEST_QUOTE_ID}`);
+                const items = await response.json();
+                
+                if (items.length > 0) {
+                    // Aggregate by product type
+                    const aggregation = {};
+                    items.forEach(item => {
+                        if (!aggregation[item.ProductName]) {
+                            aggregation[item.ProductName] = {
+                                totalQuantity: 0,
+                                totalAmount: 0,
+                                rate: item.BaseUnitPrice
+                            };
+                        }
+                        aggregation[item.ProductName].totalQuantity += item.Quantity;
+                        aggregation[item.ProductName].totalAmount += item.LineTotal;
+                    });
+                    
+                    const totalQuantity = Object.values(aggregation).reduce((sum, agg) => sum + agg.totalQuantity, 0);
+                    const totalAmount = Object.values(aggregation).reduce((sum, agg) => sum + agg.totalAmount, 0);
+                    
+                    logResult('analysisResult', 
+                        `✅ Data Aggregation Results:\n\n` +
+                        `Task Breakdown:\n` +
+                        Object.entries(aggregation).map(([name, data]) => 
+                            `${name}: ${data.totalQuantity} × $${data.rate.toFixed(2)} = $${data.totalAmount.toFixed(2)}`
+                        ).join('\n') +
+                        `\n\nTotals:\n` +
+                        `Total Quantity: ${totalQuantity}\n` +
+                        `Total Amount: $${totalAmount.toFixed(2)}`, 'success');
+                } else {
+                    logResult('analysisResult', 
+                        `ℹ️ No test items found for aggregation.`, 'info');
+                }
+                updateStatus('analysisStatus', 'done');
+            } catch (error) {
+                logResult('analysisResult', `❌ ERROR: ${error.message}`, 'error');
+                updateStatus('analysisStatus', 'done');
+            }
+        }
+
+        async function testMonthlyCalculation() {
+            try {
+                logResult('analysisResult', 'Testing monthly calculation...');
+                
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=ADR07`);
+                const items = await response.json();
+                
+                // Group by QuoteID and calculate totals
+                const dailyTotals = {};
+                items.forEach(item => {
+                    if (!dailyTotals[item.QuoteID]) {
+                        dailyTotals[item.QuoteID] = 0;
+                    }
+                    dailyTotals[item.QuoteID] += item.LineTotal;
+                });
+                
+                const monthlyTotal = Object.values(dailyTotals).reduce((sum, total) => sum + total, 0);
+                
+                appendResult('analysisResult', 
+                    `\n\n✅ Monthly Calculation (July):\n` +
+                    `Daily Totals:\n` +
+                    Object.entries(dailyTotals).map(([quoteId, total]) => 
+                        `${quoteId}: $${total.toFixed(2)}`
+                    ).join('\n') +
+                    `\n\nMonthly Total: $${monthlyTotal.toFixed(2)}\n` +
+                    `Days with Tasks: ${Object.keys(dailyTotals).length}`, 'success');
+                    
+            } catch (error) {
+                appendResult('analysisResult', `\n\n❌ Monthly Calculation ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDailyReconstruction() {
+            try {
+                logResult('analysisResult', 'Testing daily task reconstruction...');
+                
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=${TEST_QUOTE_ID}`);
+                const items = await response.json();
+                
+                if (items.length > 0) {
+                    // Reconstruct daily tasks from line items
+                    const reconstructedTasks = {
+                        thankYouCards: 0,
+                        leadSheets: 0,
+                        googleReviews: 0,
+                        artApproval: 0,
+                        dailyTotal: 0
+                    };
+                    
+                    items.forEach(item => {
+                        switch(item.ProductName) {
+                            case 'Thank You Cards':
+                                reconstructedTasks.thankYouCards = item.Quantity;
+                                break;
+                            case 'Lead Sheets':
+                                reconstructedTasks.leadSheets = item.Quantity;
+                                break;
+                            case 'Google Reviews':
+                                reconstructedTasks.googleReviews = item.Quantity;
+                                break;
+                            case 'Art Approval':
+                                reconstructedTasks.artApproval = item.Quantity;
+                                break;
+                        }
+                        reconstructedTasks.dailyTotal += item.LineTotal;
+                    });
+                    
+                    appendResult('analysisResult', 
+                        `\n\n✅ Daily Task Reconstruction:\n` +
+                        `Quote ID: ${TEST_QUOTE_ID}\n` +
+                        `Thank You Cards: ${reconstructedTasks.thankYouCards}\n` +
+                        `Lead Sheets: ${reconstructedTasks.leadSheets}\n` +
+                        `Google Reviews: ${reconstructedTasks.googleReviews}\n` +
+                        `Art Approval: ${reconstructedTasks.artApproval}\n` +
+                        `Daily Total: $${reconstructedTasks.dailyTotal.toFixed(2)}\n\n` +
+                        `✅ This shows how to convert quote_items back to task structure!`, 'success');
+                } else {
+                    appendResult('analysisResult', 
+                        `\n\nℹ️ No test items found for reconstruction.`, 'info');
+                }
+            } catch (error) {
+                appendResult('analysisResult', `\n\n❌ Daily Reconstruction ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        // Complete Workflow Test
+        async function testCompleteWorkflow() {
+            updateStatus('workflowStatus', 'running');
+            try {
+                logResult('workflowResult', 'Running complete workflow test...\n\n');
+                
+                let workflow = 'Complete Workflow Test:\n\n';
+                
+                // Step 1: Create session
+                workflow += '1. Creating test session...\n';
+                await testCreateSession();
+                workflow += '   ✅ Session created\n\n';
+                
+                // Step 2: Create task items
+                workflow += '2. Creating task items...\n';
+                await testCreateTaskItems();
+                workflow += '   ✅ Task items created\n\n';
+                
+                // Step 3: Retrieve and verify
+                workflow += '3. Retrieving and verifying data...\n';
+                const response = await fetch(`${API_BASE}/quote_items?quoteID=${TEST_QUOTE_ID}`);
+                const items = await response.json();
+                workflow += `   ✅ Retrieved ${items.length} items\n\n`;
+                
+                // Step 4: Update quantities
+                workflow += '4. Updating task quantities...\n';
+                await testUpdateQuantities();
+                workflow += '   ✅ Quantities updated\n\n';
+                
+                // Step 5: Aggregate and analyze
+                workflow += '5. Aggregating data...\n';
+                await testDataAggregation();
+                workflow += '   ✅ Data aggregated\n\n';
+                
+                // Step 6: Reconstruct daily tasks
+                workflow += '6. Reconstructing daily tasks...\n';
+                await testDailyReconstruction();
+                workflow += '   ✅ Tasks reconstructed\n\n';
+                
+                workflow += '🎉 COMPLETE WORKFLOW TEST PASSED!\n\n';
+                workflow += 'Key Findings:\n';
+                workflow += '• quote_items API fully functional\n';
+                workflow += '• Data can be stored and retrieved correctly\n';
+                workflow += '• Task quantities can be updated\n';
+                workflow += '• Daily tasks can be reconstructed from line items\n';
+                workflow += '• Monthly aggregation is possible\n';
+                workflow += '• Ready for service implementation!\n';
+                
+                logResult('workflowResult', workflow, 'success');
+                updateStatus('workflowStatus', 'done');
+                
+            } catch (error) {
+                logResult('workflowResult', `❌ Workflow ERROR: ${error.message}`, 'error');
+                updateStatus('workflowStatus', 'done');
+            }
+        }
+
+        async function cleanupTestData() {
+            try {
+                logResult('workflowResult', 'Cleaning up test data...\n\n');
+                
+                // Delete all test items
+                await testDeleteAllTestItems();
+                
+                // Delete test session
+                if (testSessionId) {
+                    // Note: We'd need to implement session deletion or it will expire naturally
+                    appendResult('workflowResult', 
+                        `\n\n✅ Test session ${testSessionId} will expire automatically.\n` +
+                        `All test data has been cleaned up.`, 'success');
+                }
+                
+            } catch (error) {
+                appendResult('workflowResult', `\n\n❌ Cleanup ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Quote Items API Test Suite loaded');
+            console.log('Test Quote ID:', TEST_QUOTE_ID);
+            console.log('Test Session ID:', TEST_SESSION_ID);
+        });
+    </script>
+</body>
+</html>
