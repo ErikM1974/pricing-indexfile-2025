@@ -741,6 +741,49 @@ class TaskTrackingService {
     }
 
     /**
+     * Get tasks for a specific quote (needed for earnings display)
+     */
+    async getTasksForQuote(quoteID) {
+        try {
+            const response = await fetch(`${this.baseURL}/api/quote_items?quoteID=${quoteID}`);
+            const items = await response.json();
+            
+            // Parse and return task data in consistent format
+            return items.map(item => {
+                let timerData = {};
+                try {
+                    // Parse timer data from the new dedicated TimerData_ field
+                    timerData = JSON.parse(item.TimerData_ || '{}');
+                } catch (e) {
+                    console.error('Error parsing timer data from TimerData_ field:', e);
+                    // Fallback: try old ColorCode field for backward compatibility
+                    try {
+                        timerData = JSON.parse(item.ColorCode || '{}');
+                        console.log('[TaskService] Fell back to ColorCode field for task', item.LineNumber);
+                    } catch (e2) {
+                        timerData = {};
+                    }
+                }
+                
+                return {
+                    ...item, // Include all original fields for bonus calculation
+                    taskNumber: item.LineNumber,
+                    taskName: item.ProductName,
+                    completed: item.Color === 'Completed',
+                    count: item.Quantity,
+                    totalSeconds: item.LineTotal,
+                    totalMinutes: Math.round(item.LineTotal / 60),
+                    details: timerData,
+                    pkId: item.PK_ID
+                };
+            });
+        } catch (error) {
+            console.error('[TaskService] Error getting tasks for quote:', error);
+            return [];
+        }
+    }
+
+    /**
      * RESET: Reset task to incomplete state and clear timer data
      */
     async resetTask(taskId) {

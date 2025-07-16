@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Adriyella's Task Tracker | NW Custom Apparel</title>
+    <title>Adriyella's Task & Bonus Tracker | NW Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -15,7 +15,7 @@
     <style>
         :root {
             /* Modern color palette */
-            --primary-gradient: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            --primary-gradient: linear-gradient(135deg, #4cb354 0%, #5bc85f 100%);
             --accent-mint: #4ECDC4;
             --accent-mint-light: #7FE5DF;
             --bg-purple: #F7F3FF;
@@ -27,12 +27,16 @@
             --danger-red: #FF6B6B;
             --error-bg: #fee;
             --error-text: #c33;
+            --bonus-gold: #f59e0b;
+            --bonus-gold-light: #fbbf24;
+            --earnings-bg: #10b981;
+            --earnings-text: #ffffff;
             
             /* Shadows */
             --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-            --shadow-glow: 0 0 20px rgba(255, 107, 107, 0.3);
+            --shadow-glow: 0 0 20px rgba(76, 179, 84, 0.3);
         }
         
         * {
@@ -624,6 +628,239 @@
             background: var(--accent-mint-light);
         }
         
+        /* Earnings Display */
+        .earnings-display {
+            background: var(--earnings-bg);
+            color: var(--earnings-text);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .earnings-header {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .earnings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .earnings-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+        
+        .earnings-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+        
+        .earnings-amount {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        
+        .earnings-progress {
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .earnings-progress-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.5s ease;
+        }
+        
+        /* Task Type Cards */
+        .task-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .task-type-card {
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .task-type-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .task-type-card.bonus-active {
+            border: 2px solid var(--bonus-gold);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+        
+        .bonus-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bonus-gold);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        
+        .task-type-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .task-type-icon {
+            font-size: 1.5rem;
+        }
+        
+        .task-type-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .task-type-pricing {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .task-type-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        .task-type-count {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .task-type-bonus-hint {
+            color: var(--bonus-gold);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .complete-task-btn {
+            width: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .complete-task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .complete-task-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Daily Opportunities */
+        .opportunities-card {
+            background: var(--bg-purple);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px dashed var(--primary-color);
+        }
+        
+        .opportunities-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .opportunity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .opportunity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .opportunity-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .opportunity-value {
+            font-weight: 600;
+            color: var(--success-green);
+        }
+        
+        /* Achievement Notification */
+        .achievement-notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--bonus-gold);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1001;
+            animation: slideInRight 0.5s ease;
+        }
+        
+        .achievement-notification.show {
+            display: flex;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
         /* Animations */
         @keyframes bounce {
             0%, 100% {
@@ -716,7 +953,7 @@
                 </a>
             </div>
             <div>
-                <h1 class="header-title">Adriyella's Task Tracker</h1>
+                <h1 class="header-title">Adriyella's Task & Bonus Tracker</h1>
                 <div class="date-time" id="dateTime"></div>
             </div>
         </div>
@@ -731,8 +968,55 @@
         <div class="welcome-section">
             <h2 class="welcome-greeting" id="welcomeGreeting">Good morning, Adriyella! 🌟</h2>
             <p class="welcome-subtitle">Let's make today productive and fun!</p>
-            <div class="streak-badge" id="streakBadge" style="display: none;">
-                🔥 <span id="streakCount">0</span> Day Streak!
+        </div>
+
+        <!-- Earnings Display -->
+        <div class="earnings-display">
+            <h3 class="earnings-header">💰 Your Bonus Earnings</h3>
+            <div class="earnings-grid">
+                <div class="earnings-item">
+                    <div class="earnings-label">Today</div>
+                    <div class="earnings-amount" id="todayEarnings">$0.00</div>
+                </div>
+                <div class="earnings-item">
+                    <div class="earnings-label">This Week</div>
+                    <div class="earnings-amount" id="weekEarnings">$0.00</div>
+                </div>
+                <div class="earnings-item">
+                    <div class="earnings-label">This Month</div>
+                    <div class="earnings-amount" id="monthEarnings">$0.00</div>
+                </div>
+            </div>
+            <div class="earnings-progress">
+                <div class="earnings-progress-fill" id="earningsProgressFill" style="width: 0%"></div>
+            </div>
+            <div style="text-align: center; margin-top: 0.5rem; font-size: 0.875rem; opacity: 0.9;">
+                <span id="monthEarningsProgress">$0</span> / $400 monthly goal
+            </div>
+        </div>
+
+        <!-- Daily Opportunities -->
+        <div class="opportunities-card">
+            <h3 class="opportunities-title">
+                <i class="fas fa-lightbulb"></i>
+                Today's Best Opportunities
+            </h3>
+            <div id="opportunitiesList">
+                <!-- Dynamic opportunities will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Task Types -->
+        <div class="task-types-grid" id="taskTypesGrid">
+            <!-- Dynamic task type cards will be loaded here -->
+        </div>
+
+        <!-- Achievement Notification -->
+        <div class="achievement-notification" id="achievementNotification">
+            <i class="fas fa-trophy" style="font-size: 1.5rem;"></i>
+            <div>
+                <div style="font-weight: 600;" id="achievementTitle">Achievement Unlocked!</div>
+                <div style="font-size: 0.875rem;" id="achievementMessage">Great job!</div>
             </div>
         </div>
 
@@ -1010,6 +1294,9 @@
                 // Load today's tasks
                 await loadTodaysTasks();
                 
+                // Update earnings display
+                await updateEarningsDisplay();
+                
                 // Calculate streak
                 try {
                     const streak = await taskService.calculateStreak();
@@ -1023,6 +1310,26 @@
                     }
                 } catch (error) {
                     console.error('Error calculating streak:', error);
+                }
+                
+                // Reset monthly counts on the 1st
+                const today = new Date();
+                if (today.getDate() === 1) {
+                    const lastReset = localStorage.getItem('adriyella_last_monthly_reset');
+                    const thisMonth = `${today.getFullYear()}-${today.getMonth() + 1}`;
+                    
+                    if (lastReset !== thisMonth) {
+                        // Reset monthly counts
+                        taskTypes.forEach(task => {
+                            task.monthlyCount = 0;
+                        });
+                        localStorage.setItem('adriyella_task_types', JSON.stringify(taskTypes));
+                        localStorage.setItem('adriyella_last_monthly_reset', thisMonth);
+                        localStorage.removeItem('adriyella_last_achievement');
+                        
+                        // Re-render
+                        renderTaskCards();
+                    }
                 }
             } catch (error) {
                 console.error('Initialization error:', error);
@@ -1123,103 +1430,200 @@
             }
         }
 
-        // Get default task types (matching admin dashboard)
+        // Get default task types (new bonus system)
         function getDefaultTaskTypes() {
             return [
                 {
-                    id: '1',
-                    name: 'Customer Completed Order Notifications',
-                    category: 'customer-service',
-                    description: 'Call customers to notify them their orders are complete and ready for pickup',
-                    billingType: 'hourly',
-                    hourlyRate: 23.00,
-                    frequency: 'daily',
-                    bonusEligible: true,
-                    instructions: '1. Check completed orders list\n2. Call customers using contact info\n3. Inform them order is ready\n4. Log call completion',
-                    isDefault: true
-                },
-                {
-                    id: '2',
-                    name: 'Thank You Notes',
-                    category: 'customer-service',
+                    id: 'thank-you-cards',
+                    name: 'Thank You Cards',
+                    icon: '📧',
+                    category: 'customer-retention',
                     description: 'Write and send personalized thank you cards to customers',
-                    billingType: 'hourly',
-                    hourlyRate: 30.50,
-                    frequency: 'weekly',
-                    bonusEligible: true,
-                    instructions: '1. Review recent orders\n2. Write personalized thank you messages\n3. Address and mail cards\n4. Log completion',
-                    isDefault: true
+                    billingType: 'per-task',
+                    baseRate: 2.00,
+                    bonusThreshold: 30,
+                    bonusAmount: 25.00,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'daily',
+                    priority: 'high',
+                    instructions: '1. After customer pickup call\n2. Write personalized message\n3. Address and mail card\n4. Log completion'
                 },
                 {
-                    id: '3',
-                    name: 'Sample Management',
-                    category: 'administrative',
-                    description: 'Organize and maintain sample inventory',
-                    billingType: 'flat',
-                    flatRate: 30.00,
+                    id: 'wow-gift-boxes',
+                    name: 'WOW Gift Boxes',
+                    icon: '🎁',
+                    category: 'customer-retention',
+                    description: 'Create special gift packages for VIP customers',
+                    billingType: 'per-task',
+                    baseRate: 25.00,
+                    bonusRate: 50.00,
+                    bonusStartsAfter: 4,
+                    currentCount: 0,
+                    monthlyCount: 0,
                     frequency: 'weekly',
-                    bonusEligible: true,
-                    instructions: '1. Check sample inventory\n2. Organize by category\n3. Update tracking system\n4. Note any needed restocks',
-                    isDefault: true
+                    priority: 'high',
+                    instructions: '1. Select customer from VIP list\n2. Choose appropriate gift items\n3. Package beautifully\n4. Include personalized note'
+                },
+                {
+                    id: 'google-reviews',
+                    name: 'Google Review Follow-up',
+                    icon: '⭐',
+                    category: 'marketing',
+                    description: 'Follow up with customers to request Google reviews',
+                    billingType: 'per-task',
+                    baseRate: 10.00,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'weekly',
+                    priority: 'medium',
+                    instructions: '1. Contact recent happy customers\n2. Send review link\n3. Thank them for feedback\n4. Log response'
+                },
+                {
+                    id: 'art-approvals',
+                    name: 'Art Approval Coordination',
+                    icon: '🎨',
+                    category: 'production',
+                    description: 'Coordinate art approvals with customers',
+                    billingType: 'per-task',
+                    baseRate: 5.00,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'daily',
+                    priority: 'medium',
+                    instructions: '1. Check pending art approvals\n2. Send to customers\n3. Follow up if needed\n4. Update production'
+                },
+                {
+                    id: 'lead-sheets',
+                    name: 'Fill Lead Sheets',
+                    icon: '📋',
+                    category: 'administrative',
+                    description: 'Enter lead information into tracking system',
+                    billingType: 'per-task',
+                    baseRate: 3.00,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'daily',
+                    priority: 'low',
+                    instructions: '1. Gather lead info\n2. Enter into system\n3. Assign to sales rep\n4. Mark complete'
+                },
+                {
+                    id: 'appointments',
+                    name: 'Schedule Appointments',
+                    icon: '📅',
+                    category: 'sales-support',
+                    description: 'Schedule customer appointments for sales team',
+                    billingType: 'per-task',
+                    baseRate: 10.00,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'weekly',
+                    priority: 'medium',
+                    instructions: '1. Contact customer\n2. Find mutual time\n3. Add to calendar\n4. Send confirmation'
                 }
             ];
         }
 
-        // Render dynamic task cards
+        // Render new bonus task type cards
         function renderTaskCards() {
-            const tasksGrid = document.getElementById('tasksGrid');
-            if (!tasksGrid) return;
+            const taskTypesGrid = document.getElementById('taskTypesGrid');
+            if (!taskTypesGrid) return;
 
-            tasksGrid.innerHTML = taskTypes.map(task => {
-                const rateBadge = task.billingType === 'flat' 
-                    ? `$${task.flatRate?.toFixed(2) || '0.00'} per completion`
-                    : `$${task.hourlyRate?.toFixed(2) || '0.00'}/hour`;
+            taskTypesGrid.innerHTML = taskTypes.map(task => {
+                // Ensure all required properties have defaults
+                const safeTask = {
+                    baseRate: 0,
+                    bonusRate: 0,
+                    bonusAmount: 0,
+                    monthlyCount: 0,
+                    bonusThreshold: null,
+                    bonusStartsAfter: null,
+                    ...task
+                };
+                
+                const isBonus = safeTask.bonusThreshold && safeTask.monthlyCount >= safeTask.bonusThreshold;
+                const isBonusRate = safeTask.bonusStartsAfter && safeTask.monthlyCount >= safeTask.bonusStartsAfter;
+                
+                let pricingText = `$${safeTask.baseRate.toFixed(2)} each`;
+                let bonusHint = '';
+                
+                if (safeTask.bonusThreshold) {
+                    bonusHint = safeTask.monthlyCount >= safeTask.bonusThreshold 
+                        ? '✨ Bonus unlocked!' 
+                        : `${safeTask.bonusThreshold - safeTask.monthlyCount} more for $${safeTask.bonusAmount.toFixed(2)} bonus!`;
+                }
+                
+                if (safeTask.bonusStartsAfter) {
+                    if (safeTask.monthlyCount >= safeTask.bonusStartsAfter) {
+                        pricingText = `$${safeTask.bonusRate.toFixed(2)} each (Bonus rate!)`;
+                    } else {
+                        bonusHint = `${safeTask.bonusStartsAfter - safeTask.monthlyCount} more for $${safeTask.bonusRate.toFixed(2)} each!`;
+                    }
+                }
                     
                 return `
-                    <div class="task-card" id="task-${task.id}">
-                        <div class="task-header">
-                            <div class="task-info">
-                                <h3 class="task-title">${task.name}</h3>
-                                <div class="task-meta">
-                                    <span class="task-category">${task.category.replace('-', ' ')}</span>
-                                    <span class="rate-badge">${rateBadge}</span>
-                                </div>
-                            </div>
-                            <div class="task-status" id="status-${task.id}">Not Started</div>
+                    <div class="task-type-card ${isBonus || isBonusRate ? 'bonus-active' : ''}" id="task-${safeTask.id}">
+                        ${isBonus || isBonusRate ? '<div class="bonus-badge">BONUS ACTIVE!</div>' : ''}
+                        <div class="task-type-header">
+                            <span class="task-type-icon">${safeTask.icon || '📋'}</span>
+                            <span class="task-type-name">${safeTask.name || 'Task'}</span>
                         </div>
-                        
-                        <div class="task-description">
-                            ${task.description}
+                        <div class="task-type-pricing">${pricingText}</div>
+                        <div class="task-type-progress">
+                            <span class="task-type-count">${safeTask.monthlyCount} done this month</span>
                         </div>
-                        
-                        <div class="timer-section">
-                            <div class="timer-display" id="timer-${task.id}">00:00</div>
-                            <div class="timer-controls">
-                                <button class="btn btn-primary" id="timerBtn-${task.id}" onclick="toggleTimer('${task.id}')">
-                                    <i class="fas fa-play"></i> Start Timer
-                                </button>
-                                <button class="btn btn-success" id="completeBtn-${task.id}" onclick="completeTask('${task.id}')" style="display: none;">
-                                    <i class="fas fa-check"></i> Complete
-                                </button>
-                                <button class="btn btn-warning" id="editBtn-${task.id}" onclick="editTask('${task.id}', null)" style="display: none;">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="task-details" id="details-${task.id}" style="display: none;">
-                            <div class="detail-row">
-                                <span class="detail-label">Time Spent:</span>
-                                <span class="detail-value" id="timeSpent-${task.id}">0 minutes</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Count:</span>
-                                <input type="number" id="count-${task.id}" min="0" value="0" readonly>
-                            </div>
-                        </div>
+                        ${bonusHint ? `<div class="task-type-bonus-hint">${bonusHint}</div>` : ''}
+                        <button class="complete-task-btn" onclick="quickCompleteTask('${safeTask.id}')">
+                            Complete Task
+                        </button>
                     </div>
                 `;
             }).join('');
+            
+            // Also update opportunities
+            updateOpportunities();
+        }
+        
+        // Calculate and display today's opportunities
+        function updateOpportunities() {
+            const opportunitiesList = document.getElementById('opportunitiesList');
+            if (!opportunitiesList) return;
+            
+            const opportunities = [];
+            
+            taskTypes.forEach(task => {
+                let value = 0;
+                let text = '';
+                
+                if (task.id === 'wow-gift-boxes' && task.monthlyCount >= task.bonusStartsAfter) {
+                    value = task.bonusRate;
+                    text = `1 WOW Box at bonus rate`;
+                } else if (task.id === 'thank-you-cards' && task.monthlyCount < task.bonusThreshold) {
+                    const remaining = task.bonusThreshold - task.monthlyCount;
+                    value = remaining * task.baseRate + task.bonusAmount;
+                    text = `Complete ${remaining} Thank You Cards for bonus`;
+                } else {
+                    value = task.baseRate;
+                    text = `1 ${task.name}`;
+                }
+                
+                if (value > 0) {
+                    opportunities.push({ text, value, icon: task.icon });
+                }
+            });
+            
+            // Sort by value
+            opportunities.sort((a, b) => b.value - a.value);
+            
+            // Display top 3
+            opportunitiesList.innerHTML = opportunities.slice(0, 3).map(opp => `
+                <div class="opportunity-item">
+                    <span class="opportunity-text">
+                        ${opp.icon} ${opp.text}
+                    </span>
+                    <span class="opportunity-value">$${opp.value.toFixed(2)}</span>
+                </div>
+            `).join('');
         }
 
         // Load today's tasks from database
@@ -1482,54 +1886,81 @@
                 }
                 
                 try {
-                    const count = document.getElementById('modalCount').value;
+                    const count = parseInt(document.getElementById('modalCount').value) || 1;
                     const notes = document.getElementById('modalNotes').value;
-                    const timer = timers[currentTask];
-                    const timeData = timer.stop();
                     
-                    // Prepare task data
+                    // Find the task type
+                    const task = taskTypes.find(t => t.id === currentTask);
+                    if (!task) {
+                        showError('Task not found');
+                        return;
+                    }
+                    
+                    // Calculate earnings for this completion
+                    const earnings = calculateTaskEarnings(task, count);
+                    
+                    // For bonus tasks, we don't need timer data
+                    let timeData = { totalSeconds: 0, totalMinutes: 0, sessions: [] };
+                    if (timers[currentTask] && timers[currentTask].isRunning) {
+                        timeData = timers[currentTask].stop();
+                    }
+                    
+                    // Prepare task data with earnings
                     const taskData = {
-                        count: parseInt(count),
+                        count: count,
                         notes: notes,
-                        totalSeconds: timeData.totalSeconds,
-                        startTime: timeData.sessions[0]?.start,
+                        taskName: task.name,
+                        totalSeconds: earnings * 100, // Store earnings as "seconds" for compatibility
+                        startTime: new Date().toISOString(),
                         endTime: new Date().toISOString(),
                         timerSessions: timeData.sessions,
                         details: {
                             count: count,
                             notes: notes,
-                            completedAt: new Date().toLocaleTimeString()
+                            completedAt: new Date().toLocaleTimeString(),
+                            earnings: earnings,
+                            baseRate: task.baseRate,
+                            bonusRate: task.bonusRate || 0,
+                            bonusTriggered: false
                         }
                     };
+                    
+                    // Check if bonus was triggered
+                    if (task.bonusThreshold) {
+                        const beforeCount = task.monthlyCount;
+                        const afterCount = task.monthlyCount + count;
+                        if (beforeCount < task.bonusThreshold && afterCount >= task.bonusThreshold) {
+                            taskData.details.bonusTriggered = true;
+                            taskData.details.bonusAmount = task.bonusAmount;
+                        }
+                    }
                     
                     // Save to database
                     const success = await taskService.saveTaskCompletion(currentTask, taskData);
                     
                     if (success) {
-                        // Update UI
-                        const card = document.getElementById(`task-${currentTask}`);
-                        if (card) card.classList.add('completed');
+                        // Update task counts
+                        task.monthlyCount = (task.monthlyCount || 0) + count;
+                        task.currentCount = (task.currentCount || 0) + count;
                         
-                        const status = document.getElementById(`status-${currentTask}`);
-                        if (status) {
-                            status.textContent = 'Completed';
-                            status.className = 'task-status status-completed';
-                        }
+                        // Save updated counts to localStorage
+                        localStorage.setItem('adriyella_task_types', JSON.stringify(taskTypes));
                         
-                        const countInput = document.getElementById(`count-${currentTask}`);
-                        if (countInput) countInput.value = count;
+                        // Re-render task cards to update displays
+                        renderTaskCards();
                         
-                        const timerBtn = document.getElementById(`timerBtn-${currentTask}`);
-                        if (timerBtn) {
-                            timerBtn.disabled = true;
-                            timerBtn.innerHTML = '<i class="fas fa-check"></i> Completed';
-                        }
-                        
-                        const completeBtn = document.getElementById(`completeBtn-${currentTask}`);
-                        if (completeBtn) completeBtn.style.display = 'none';
+                        // Update earnings display
+                        await updateEarningsDisplay();
                         
                         // Celebrate!
                         showCelebration();
+                        
+                        // Show earnings message
+                        if (taskData.details.bonusTriggered) {
+                            showAchievement('Bonus Unlocked!', `You earned $${earnings.toFixed(2)} including a $${task.bonusAmount} bonus!`);
+                        } else {
+                            showAchievement('Task Complete!', `You earned $${earnings.toFixed(2)}!`);
+                        }
                         
                         // Update summary
                         await updateDailySummary();
@@ -1697,6 +2128,220 @@
         // Show templates (placeholder)
         function showTemplates() {
             alert('Thank you note templates:\n\n1. First-Time Customer\n2. Repeat Customer\n3. With Upsell Suggestion\n\nTemplates coming soon to the modal!');
+        }
+
+        // Quick complete task (for bonus system)
+        async function quickCompleteTask(taskId) {
+            try {
+                currentTask = taskId;
+                const task = taskTypes.find(t => t.id === taskId);
+                if (!task) {
+                    showError('Task not found');
+                    return;
+                }
+                
+                // For bonus tasks, we'll show the completion modal
+                const modalTitle = document.getElementById('modalTitle');
+                if (modalTitle) {
+                    modalTitle.textContent = `${task.name} Complete!`;
+                }
+                
+                const modalSubtitle = document.getElementById('modalSubtitle');
+                if (modalSubtitle) {
+                    modalSubtitle.textContent = `${task.icon} Great job! You've earned $${calculateTaskEarnings(task).toFixed(2)}!`;
+                }
+                
+                const modalCountLabel = document.getElementById('modalCountLabel');
+                if (modalCountLabel) {
+                    modalCountLabel.textContent = 'How many did you complete?';
+                }
+                
+                // Set appropriate quick buttons
+                const quickButtonOptions = {
+                    'thank-you-cards': ['Hand-written', 'Personalized', 'Mailed', 'With gift card'],
+                    'wow-gift-boxes': ['VIP customer', 'New customer', 'Thank you gift', 'Holiday special'],
+                    'google-reviews': ['Review received', 'Link sent', 'Follow-up made', 'Customer responded'],
+                    'art-approvals': ['Approved', 'Revisions requested', 'Customer contacted', 'Rush order'],
+                    'lead-sheets': ['Entered', 'Assigned to rep', 'Follow-up scheduled', 'High priority'],
+                    'appointments': ['Scheduled', 'Confirmed', 'Rescheduled', 'Sales meeting']
+                };
+                
+                const container = document.getElementById('quickButtons');
+                if (container) {
+                    container.innerHTML = '';
+                    const options = quickButtonOptions[taskId] || ['Completed'];
+                    
+                    options.forEach(option => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'quick-btn';
+                        btn.textContent = option;
+                        btn.onclick = () => {
+                            const notes = document.getElementById('modalNotes');
+                            if (notes) {
+                                notes.value += (notes.value ? ', ' : '') + option;
+                            }
+                        };
+                        container.appendChild(btn);
+                    });
+                }
+                
+                // Pre-fill with 1 as default
+                const modalCount = document.getElementById('modalCount');
+                if (modalCount) {
+                    modalCount.value = '1';
+                }
+                
+                const completionModal = document.getElementById('completionModal');
+                if (completionModal) {
+                    completionModal.classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error in quickCompleteTask:', error);
+                showError('Failed to open completion dialog. Please try again.');
+            }
+        }
+        
+        // Calculate earnings for a task
+        function calculateTaskEarnings(task, count = 1) {
+            // Ensure task has safe defaults
+            const safeTask = {
+                baseRate: 0,
+                bonusRate: 0,
+                bonusAmount: 0,
+                monthlyCount: 0,
+                bonusThreshold: null,
+                bonusStartsAfter: null,
+                ...task
+            };
+            
+            let earnings = 0;
+            
+            if (safeTask.bonusStartsAfter && safeTask.monthlyCount >= safeTask.bonusStartsAfter) {
+                // Use bonus rate for all new completions
+                earnings = safeTask.bonusRate * count;
+            } else {
+                // Use base rate
+                earnings = safeTask.baseRate * count;
+            }
+            
+            // Check if this completion triggers a threshold bonus
+            if (safeTask.bonusThreshold) {
+                const beforeCount = safeTask.monthlyCount;
+                const afterCount = safeTask.monthlyCount + count;
+                
+                // If we cross the threshold with this completion
+                if (beforeCount < safeTask.bonusThreshold && afterCount >= safeTask.bonusThreshold) {
+                    earnings += safeTask.bonusAmount;
+                }
+            }
+            
+            return earnings;
+        }
+        
+        // Update earnings displays
+        async function updateEarningsDisplay() {
+            try {
+                // Calculate today's earnings
+                let todayEarnings = 0;
+                let weekEarnings = 0;
+                let monthEarnings = 0;
+                
+                const today = new Date();
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - today.getDay());
+                startOfWeek.setHours(0, 0, 0, 0);
+                
+                const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                
+                // Get all task items from this month
+                const history = await taskService.getTaskHistory(30);
+                
+                for (const session of history) {
+                    const sessionDate = new Date(session.CreatedAt);
+                    
+                    // Get items for this session
+                    try {
+                        const items = await taskService.getTasksForQuote(session.QuoteID);
+                        
+                        items.forEach(item => {
+                            // LineTotal stores earnings * 100
+                            const earnings = parseFloat(item.LineTotal || 0) / 100;
+                            
+                            if (sessionDate.toDateString() === today.toDateString()) {
+                                todayEarnings += earnings;
+                            }
+                            
+                            if (sessionDate >= startOfWeek) {
+                                weekEarnings += earnings;
+                            }
+                            
+                            if (sessionDate >= startOfMonth) {
+                                monthEarnings += earnings;
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error getting items for session:', session.QuoteID, error);
+                    }
+                }
+                
+                // Update displays
+                document.getElementById('todayEarnings').textContent = `$${todayEarnings.toFixed(2)}`;
+                document.getElementById('weekEarnings').textContent = `$${weekEarnings.toFixed(2)}`;
+                document.getElementById('monthEarnings').textContent = `$${monthEarnings.toFixed(2)}`;
+                document.getElementById('monthEarningsProgress').textContent = `$${monthEarnings.toFixed(0)}`;
+                
+                // Update progress bar (max $400/month)
+                const progressPercent = Math.min(100, (monthEarnings / 400) * 100);
+                const progressFill = document.getElementById('earningsProgressFill');
+                if (progressFill) {
+                    progressFill.style.width = `${progressPercent}%`;
+                }
+                
+                // Check for achievements
+                checkEarningsAchievements(monthEarnings);
+                
+            } catch (error) {
+                console.error('Error updating earnings display:', error);
+            }
+        }
+        
+        // Check for earnings achievements
+        function checkEarningsAchievements(monthEarnings) {
+            const achievements = [
+                { amount: 50, title: 'Great Start!', message: 'You\'ve earned your first $50!' },
+                { amount: 100, title: 'Century Club!', message: '$100 in bonuses this month!' },
+                { amount: 200, title: 'Halfway There!', message: '$200 earned - keep it up!' },
+                { amount: 300, title: 'Super Star!', message: '$300 in bonuses - amazing!' },
+                { amount: 400, title: 'MAX BONUS!', message: 'You\'ve earned the full $400!' }
+            ];
+            
+            const lastAchievement = localStorage.getItem('adriyella_last_achievement') || 0;
+            
+            for (const achievement of achievements) {
+                if (monthEarnings >= achievement.amount && lastAchievement < achievement.amount) {
+                    showAchievement(achievement.title, achievement.message);
+                    localStorage.setItem('adriyella_last_achievement', achievement.amount);
+                    break;
+                }
+            }
+        }
+        
+        // Show achievement notification
+        function showAchievement(title, message) {
+            const notification = document.getElementById('achievementNotification');
+            const titleEl = document.getElementById('achievementTitle');
+            const messageEl = document.getElementById('achievementMessage');
+            
+            if (notification && titleEl && messageEl) {
+                titleEl.textContent = title;
+                messageEl.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+            }
         }
 
         // Edit task functionality
