@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erik's Bonus Policy 📋</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Navigation Styles */
+        .nav-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-bottom: 2px solid #ff6b6b;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .back-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .daily-report-link {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .daily-report-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in;
+        }
+        
+        h2 {
+            color: #4ecdc4;
+            border-bottom: 2px solid #45b7af;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+        }
+        
+        .intro-section {
+            background: #fff0f0;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .signature {
+            margin-top: 40px;
+            text-align: center;
+            font-style: italic;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        
+        @media (max-width: 768px) { 
+            .container { 
+                margin: 20px; 
+                padding: 15px; 
+            }
+            .nav-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <div class="nav-header">
+        <button class="back-button" onclick="goToDashboard()">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </button>
+        
+        <a href="/training/adriyella-daily-report.html" class="daily-report-link">
+            <i class="fas fa-chart-line"></i>
+            Daily Report
+        </a>
+    </div>
+
+    <div class="container">
+        <h1>Erik's Bonus Policy <i class="fas fa-file-contract"></i></h1>
+        
+        <div class="intro-section">
+            <p><strong>Effective Date:</strong> July 17, 2025</p>
+            <p><strong>Introduction:</strong> Bonuses are an exciting way to reward your hard work and contributions to Northwest Custom Apparel's growth. By excelling in these tasks, you can earn up to $400 per month in additional compensation—potentially adding thousands to your annual income. This program recognizes proactive efforts that drive revenue, such as generating leads and securing customer approvals, while allowing you to boost your earnings beyond your base pay.</p>
+            <p><strong>Purpose:</strong> This policy outlines the bonus program for tasks that exceed standard job responsibilities and contribute to revenue and operational efficiency at Northwest Custom Apparel. Bonuses are discretionary incentives, separate from regular compensation, and are not guaranteed. They are awarded based on verified performance and may be adjusted or withheld at management's discretion. Bonuses are disbursed monthly following verification. Participation implies acceptance of these terms.</p>
+        </div>
+
+        <h2>General Rules</h2>
+        <ul>
+            <li><strong>Eligibility:</strong> Bonuses are earned only for fully completed and verified tasks documented in Shopworks (the CRM system). Incomplete, inaccurate, or misrepresented entries will disqualify the bonus and may result in deductions.</li>
+            <li><strong>Verification & Audit:</strong> All claims are reviewed at the end of each month through Shopworks logs and other relevant data. Payouts occur only after approval; disputes are resolved according to this policy.</li>
+            <li><strong>Caps & Limits:</strong> There is no limit on the number of qualifying tasks, but total bonuses are capped at $400 per month and do not carry over.</li>
+            <li><strong>Performance Expectations:</strong> A minimum of $200 in bonuses per month is expected to demonstrate consistent effort. Falling short may result in no payout for that month and a performance review to support improvement.</li>
+            <li><strong>Non-Compliance & Penalties:</strong> Attempts to manipulate the system (e.g., fabricating entries) or failure to adhere to procedures will result in bonus forfeiture and potential deductions. Omissions due to forgetfulness or lack of effort (e.g., skipping eligible thank you cards or incomplete lead sheets) will incur deductions equal to the missed bonus value. Repeated violations may lead to disciplinary measures, including written warnings. Deductions are limited to earned bonuses for the month and will not result in negative balances or affect regular compensation.</li>
+            <li><strong>Task Routing:</strong> Employees must actively ensure tasks are routed appropriately; failure to do so (e.g., AEs handling art approvals independently after August 15) will result in deductions as specified. It is your responsibility to remind AEs to hand off tasks and notify Erik immediately of any resistance.</li>
+            <li><strong>No Negative Balances:</strong> Deductions are limited to earned bonuses for the month and will not result in negative balances or affect regular compensation.</li>
+            <li><strong>Payment:</strong> Bonuses are added to the biweekly paycheck that aligns with the end of the bonus month (e.g., July bonuses on the first eligible August paycheck).</li>
+            <li><strong>Amendments:</strong> This policy may be updated; employees will be notified in writing. Acknowledgment below confirms understanding.</li>
+            <li><strong>Confidentiality:</strong> Bonus structures and earnings are private matters between you and Erik; do not discuss with coworkers.</li>
+        </ul>
+
+        <h2>Bonus Details by Task</h2>
+        <ol>
+            <li><strong>Thank You Cards ($2 each)</strong><br>
+                - <strong>Qualifying Criteria:</strong> Personalized, handwritten cards sent post-order, with no duplicates within 30 days. Must be logged in Shopworks with a content summary and signature details.<br>
+                - <strong>Requirements:</strong> Use varied templates linked to actual customer interactions.<br>
+                - <strong>Prevention of Misuse:</strong> Subject to spot-checks; duplicates or unsubstantiated logs result in a $2 deduction per instance.</li>
+            <li><strong>Google Reviews ($20 each)</strong><br>
+                - <strong>Qualifying Criteria:</strong> Verified 5-star reviews from customers, documented with screenshots in Shopworks. Must stem from proactive requests during interactions.<br>
+                - <strong>Requirements:</strong> Limited to positive experiences with appropriate follow-up.<br>
+                - <strong>Attribution & Sharing:</strong> If Adriyella or Mikalah can demonstrate sole responsibility through Shopworks logs, they receive the full $20. In cases of uncertainty or shared contribution, the bonus is split equally ($10 each). Unclaimed reviews receive $0. Disputes regarding attribution result in $0 for both parties. AEs may secure reviews but are not eligible for bonuses.<br>
+                - <strong>Prevention of Misuse:</strong> Unverified or substandard reviews (e.g., below 5 stars) do not qualify; inappropriate solicitation results in a $20 deduction.</li>
+            <li><strong>Lead Sheets ($5 each)</strong><br>
+                - <strong>Qualifying Criteria:</strong> Complete lead sheets from inquiries, with all fields accurately filled and handed off to the AE.<br>
+                - <strong>Requirements:</strong> Gather information naturally to support viable leads.<br>
+                - <strong>Prevention of Misuse:</strong> AEs verify lead quality; incomplete or fabricated sheets result in a $5 deduction. Subject to spot-checks.</li>
+            <li><strong>Art Approvals ($10 each)</strong><br>
+                - <strong>Qualifying Criteria:</strong> Complete management from AE handoff through coordination with Steve and Ruthie to final customer approval, fully logged in Shopworks. All artwork creation by Steve or digitizing by Ruthie must initiate with Adriyella via the designated form—no exceptions.<br>
+                - <strong>Requirements:</strong> Utilize the designated art form exclusively (no email or Slack); handle all revisions.<br>
+                - <strong>Prevention of Misuse:</strong> After August 15, if an AE processes artwork independently without involvement, a $10 deduction applies per instance (responsibility lies in securing the handoff and notifying Erik of any resistance). Incomplete workflows do not qualify; audited via logs.</li>
+        </ol>
+
+        <div class="highlight">
+            <h3><i class="fas fa-trophy"></i> Stretch Incentives</h3>
+            <p>The $400 cap applies to standard bonuses. Exceptional performance exceeding expectations may qualify for additional discretionary incentives (e.g., over $400), determined solely by management based on overall impact and quality.</p>
+        </div>
+
+        <h2>Payment & Resolution of Disputes</h2>
+        <ul>
+            <li><strong>Payout Process:</strong> Bonuses are incorporated into the biweekly paycheck corresponding to the bonus month's end, following audit.</li>
+            <li><strong>Disputes:</strong> Concerns must be submitted in writing within 3 days of month-end; resolutions are based solely on this policy—no exceptions.</li>
+            <li><strong>Discretionary Nature:</strong> Bonuses are incentives for superior performance and may be modified or denied based on overall business considerations (e.g., quality or impact).</li>
+        </ul>
+
+        <div class="signature">
+            <p><strong>Acknowledgment:</strong> I, Adriyella, have read, understand, and agree to abide by this policy.</p>
+            <p>Signature: ___________________ Date: ___________________</p>
+        </div>
+
+        <p style="text-align: center; font-style: italic; margin-top: 20px;">For any clarification, please consult with Erik directly.</p>
+    </div>
+
+    <script>
+        function goToDashboard() {
+            window.location.href = '/staff-dashboard.html';
+        }
+    </script>
+</body>
+</html>
