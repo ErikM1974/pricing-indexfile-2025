@@ -781,8 +781,13 @@
         </button>
         
         <!-- Test button to verify onclick handlers work -->
-        <button onclick="console.log('[TEST] Direct onclick works!'); alert('Test button clicked!');" style="position: absolute; top: 10px; right: 10px; padding: 5px 10px; background: #ff6b9d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        <button onclick="console.log('[TEST] Direct onclick works!'); alert('Test button clicked!');" style="position: absolute; top: 10px; right: 120px; padding: 5px 10px; background: #ff6b9d; color: white; border: none; border-radius: 5px; cursor: pointer;">
             Test Click
+        </button>
+        
+        <!-- Test button to verify adjustCount function -->
+        <button onclick="console.log('[TEST] Calling adjustCount directly...'); try { adjustCount('thankYou', 1); alert('adjustCount call completed! Check console.'); } catch(e) { alert('adjustCount failed: ' + e.message); console.error('[TEST] adjustCount error:', e); }" style="position: absolute; top: 10px; right: 10px; padding: 5px 10px; background: #10b981; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Test adjustCount
         </button>
 
         <div class="header">
@@ -805,9 +810,9 @@
                 </div>
             </div>
             <div class="task-controls">
-                <button class="counter-btn" onclick="adjustCount('thankYou', -1)">−</button>
+                <button class="counter-btn" onclick="adjustCount('thankYou', -1)" style="position: relative; z-index: 999;">−</button>
                 <div class="task-count" id="thankYouCount">0</div>
-                <button class="counter-btn" onclick="adjustCount('thankYou', 1)">+</button>
+                <button class="counter-btn" onclick="adjustCount('thankYou', 1)" style="position: relative; z-index: 999;">+</button>
                 <div class="task-total" id="thankYouTotal">= $0.00</div>
             </div>
         </div>
@@ -822,9 +827,9 @@
                 </div>
             </div>
             <div class="task-controls">
-                <button class="counter-btn" onclick="adjustCount('leadSheets', -1)">−</button>
+                <button class="counter-btn" onclick="adjustCount('leadSheets', -1)" style="position: relative; z-index: 999;">−</button>
                 <div class="task-count" id="leadSheetsCount">0</div>
-                <button class="counter-btn" onclick="adjustCount('leadSheets', 1)">+</button>
+                <button class="counter-btn" onclick="adjustCount('leadSheets', 1)" style="position: relative; z-index: 999;">+</button>
                 <div class="task-total" id="leadSheetsTotal">= $0.00</div>
             </div>
         </div>
@@ -839,9 +844,9 @@
                 </div>
             </div>
             <div class="task-controls">
-                <button class="counter-btn" onclick="adjustCount('googleReviews', -1)">−</button>
+                <button class="counter-btn" onclick="adjustCount('googleReviews', -1)" style="position: relative; z-index: 999;">−</button>
                 <div class="task-count" id="googleReviewsCount">0</div>
-                <button class="counter-btn" onclick="adjustCount('googleReviews', 1)">+</button>
+                <button class="counter-btn" onclick="adjustCount('googleReviews', 1)" style="position: relative; z-index: 999;">+</button>
                 <div class="task-total" id="googleReviewsTotal">= $0.00</div>
             </div>
         </div>
@@ -856,9 +861,9 @@
                 </div>
             </div>
             <div class="task-controls">
-                <button class="counter-btn" onclick="adjustCount('artApproval', -1)">−</button>
+                <button class="counter-btn" onclick="adjustCount('artApproval', -1)" style="position: relative; z-index: 999;">−</button>
                 <div class="task-count" id="artApprovalCount">0</div>
-                <button class="counter-btn" onclick="adjustCount('artApproval', 1)">+</button>
+                <button class="counter-btn" onclick="adjustCount('artApproval', 1)" style="position: relative; z-index: 999;">+</button>
                 <div class="task-total" id="artApprovalTotal">= $0.00</div>
             </div>
         </div>
@@ -911,7 +916,6 @@
 
 
     <script>
-        console.log('[Daily Report] Script starting...');
         
         // Task rates
         const RATES = {
@@ -942,7 +946,6 @@
 
         // Initialize the app
         async function initializeApp() {
-            console.log('[Daily Report] Initializing app...');
             
             // Initialize EmailJS
             emailjs.init('4qSbDO-SQs19TbP80');
@@ -950,7 +953,6 @@
             // Initialize task service with error handling
             try {
                 taskService = new AdriyellaTaService();
-                console.log('[Daily Report] Task service initialized successfully');
             } catch (error) {
                 console.error('[Daily Report] Error initializing task service:', error);
                 // Create a minimal fallback service
@@ -969,47 +971,8 @@
             
             // Check if daily report should be sent
             checkDailyReport();
-            
-            // Verify functions are accessible
-            console.log('[Daily Report] Functions available:', {
-                adjustCount: typeof adjustCount,
-                updateAllDisplays: typeof updateAllDisplays,
-                saveCounts: typeof saveCounts
-            });
-            
-            // Add fallback event listeners for buttons
-            setTimeout(() => {
-                const buttons = document.querySelectorAll('.counter-btn');
-                console.log('[Daily Report] Found', buttons.length, 'counter buttons');
-                
-                buttons.forEach((btn, index) => {
-                    // Get the onclick attribute value
-                    const onclickAttr = btn.getAttribute('onclick');
-                    console.log(`[Daily Report] Button ${index} onclick attribute:`, onclickAttr);
-                    
-                    // Add click event listener as fallback
-                    btn.addEventListener('click', function(e) {
-                        console.log('[Daily Report] Button clicked via event listener:', onclickAttr);
-                        
-                        // Extract the function call from onclick attribute
-                        if (onclickAttr && onclickAttr.includes('adjustCount')) {
-                            // Use a safer method to extract parameters
-                            const match = onclickAttr.match(/adjustCount\(['"]([^'"]+)['"],\s*(-?\d+)\)/);
-                            if (match) {
-                                const taskType = match[1];
-                                const increment = parseInt(match[2]);
-                                console.log('[Daily Report] Calling adjustCount:', taskType, increment);
-                                adjustCount(taskType, increment);
-                            }
-                        }
-                    });
-                });
-                
-                // Also make adjustCount globally accessible as a backup
-                window.adjustCount = adjustCount;
-                console.log('[Daily Report] Made adjustCount globally accessible');
-            }, 100); // Small delay to ensure DOM is fully ready
         }
+
 
         // Update current date display
         function updateCurrentDate() {
@@ -1023,42 +986,126 @@
             document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
         }
 
-        // Adjust task count
+        // Adjust task count with comprehensive error handling
         function adjustCount(taskType, increment) {
-            console.log('[Daily Report] adjustCount called:', taskType, increment);
+            console.log('🔧 [DEBUG] adjustCount called:', taskType, increment);
+            console.log('🔧 [DEBUG] Function availability check:');
+            console.log('  - updateAllDisplays:', typeof updateAllDisplays);
+            console.log('  - celebrateEarnings:', typeof celebrateEarnings);
+            console.log('  - showMilestone:', typeof showMilestone);
+            console.log('  - counts object:', counts);
+            console.log('  - RATES object:', RATES);
             
-            const previousTotal = Object.keys(counts).reduce((sum, type) => {
-                return sum + (counts[type] * (RATES[type] || 0));
-            }, 0);
-            
-            counts[taskType] = Math.max(0, counts[taskType] + increment);
-            updateAllDisplays();
-            
-            const newTotal = Object.keys(counts).reduce((sum, type) => {
-                return sum + (counts[type] * (RATES[type] || 0));
-            }, 0);
-            
-            // Visual feedback
-            const countElement = document.getElementById(taskType + 'Count');
-            countElement.style.transform = 'scale(1.2)';
-            countElement.style.color = '#ff6b9d';
-            setTimeout(() => {
-                countElement.style.transform = 'scale(1)';
-                countElement.style.color = '#1e293b';
-            }, 200);
-            
-            // Celebrate earnings increase
-            if (newTotal > previousTotal) {
-                celebrateEarnings();
+            try {
+                console.log('🔧 [DEBUG] Starting adjustCount execution...');
                 
-                // Special celebrations for milestones
-                if (newTotal >= 50 && previousTotal < 50) {
-                    showMilestone("$50 reached! 🎉");
-                } else if (newTotal >= 100 && previousTotal < 100) {
-                    showMilestone("$100 reached! You're crushing it! 🚀");
-                } else if (newTotal >= 200 && previousTotal < 200) {
-                    showMilestone("$200! Amazing work Adriyella! 🌟");
+                // Check if required objects exist
+                if (!counts) {
+                    throw new Error('counts object is undefined');
                 }
+                if (!RATES) {
+                    throw new Error('RATES object is undefined');
+                }
+                if (typeof updateAllDisplays !== 'function') {
+                    throw new Error('updateAllDisplays function is not available');
+                }
+                
+                console.log('🔧 [DEBUG] Calculating previous total...');
+                const previousTotal = Object.keys(counts).reduce((sum, type) => {
+                    return sum + (counts[type] * (RATES[type] || 0));
+                }, 0);
+                console.log('🔧 [DEBUG] Previous total:', previousTotal);
+                
+                console.log('🔧 [DEBUG] Updating count for', taskType, 'from', counts[taskType], 'by', increment);
+                counts[taskType] = Math.max(0, counts[taskType] + increment);
+                console.log('🔧 [DEBUG] New count for', taskType, ':', counts[taskType]);
+                
+                console.log('🔧 [DEBUG] Calling updateAllDisplays...');
+                updateAllDisplays();
+                console.log('🔧 [DEBUG] updateAllDisplays completed successfully');
+                
+                console.log('🔧 [DEBUG] Calculating new total...');
+                const newTotal = Object.keys(counts).reduce((sum, type) => {
+                    return sum + (counts[type] * (RATES[type] || 0));
+                }, 0);
+                console.log('🔧 [DEBUG] New total:', newTotal);
+                
+                // Visual feedback
+                console.log('🔧 [DEBUG] Applying visual feedback...');
+                const countElement = document.getElementById(taskType + 'Count');
+                if (countElement) {
+                    countElement.style.transform = 'scale(1.2)';
+                    countElement.style.color = '#ff6b9d';
+                    setTimeout(() => {
+                        countElement.style.transform = 'scale(1)';
+                        countElement.style.color = '#1e293b';
+                    }, 200);
+                    console.log('🔧 [DEBUG] Visual feedback applied to', taskType + 'Count');
+                } else {
+                    console.warn('🔧 [DEBUG] Element not found:', taskType + 'Count');
+                }
+                
+                // Celebrate earnings increase
+                if (newTotal > previousTotal) {
+                    console.log('🔧 [DEBUG] Earnings increased, celebrating...');
+                    
+                    if (typeof celebrateEarnings === 'function') {
+                        celebrateEarnings();
+                        console.log('🔧 [DEBUG] celebrateEarnings completed');
+                    } else {
+                        console.warn('🔧 [DEBUG] celebrateEarnings function not available');
+                    }
+                    
+                    // Special celebrations for milestones
+                    if (newTotal >= 50 && previousTotal < 50) {
+                        console.log('🔧 [DEBUG] $50 milestone reached');
+                        if (typeof showMilestone === 'function') {
+                            showMilestone("$50 reached! 🎉");
+                        }
+                    } else if (newTotal >= 100 && previousTotal < 100) {
+                        console.log('🔧 [DEBUG] $100 milestone reached');
+                        if (typeof showMilestone === 'function') {
+                            showMilestone("$100 reached! You're crushing it! 🚀");
+                        }
+                    } else if (newTotal >= 200 && previousTotal < 200) {
+                        console.log('🔧 [DEBUG] $200 milestone reached');
+                        if (typeof showMilestone === 'function') {
+                            showMilestone("$200! Amazing work Adriyella! 🌟");
+                        }
+                    }
+                }
+                
+                console.log('🔧 [DEBUG] adjustCount completed successfully');
+                
+            } catch (error) {
+                console.error('🚨 [ERROR] adjustCount failed:', error);
+                console.error('🚨 [ERROR] Stack trace:', error.stack);
+                
+                // Show visible error to user
+                alert('Button click failed! Error: ' + error.message + '\n\nCheck console for details.');
+                
+                // Try to show error in the page if possible
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = `
+                    position: fixed;
+                    top: 10px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #ff4757;
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    z-index: 9999;
+                    font-weight: bold;
+                `;
+                errorDiv.textContent = 'Button Error: ' + error.message;
+                document.body.appendChild(errorDiv);
+                
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.parentNode.removeChild(errorDiv);
+                    }
+                }, 5000);
             }
         }
         
@@ -1949,23 +1996,45 @@ Debug Info:
             }
         }
 
+
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initializeApp);
         
-        console.log('[Daily Report] Script loaded successfully');
-        console.log('[Daily Report] adjustCount function defined:', typeof adjustCount === 'function');
-        
-        // Immediately make adjustCount available globally
+        // Make adjustCount globally available
         window.adjustCount = adjustCount;
         
-        // Test if we can call it directly
-        console.log('[Daily Report] Testing direct call to adjustCount...');
-        try {
-            // This should trigger the console log inside adjustCount
-            window.adjustCount('test', 0);
-        } catch (error) {
-            console.error('[Daily Report] Error calling adjustCount:', error);
-        }
+        // Verify function availability for debugging
+        console.log('🔍 [FUNCTION CHECK] Script loaded, verifying function availability:');
+        console.log('  - adjustCount (local):', typeof adjustCount);
+        console.log('  - window.adjustCount:', typeof window.adjustCount);
+        console.log('  - updateAllDisplays:', typeof updateAllDisplays);
+        console.log('  - celebrateEarnings:', typeof celebrateEarnings);
+        console.log('  - showMilestone:', typeof showMilestone);
+        console.log('  - initializeApp:', typeof initializeApp);
+        console.log('  - counts:', typeof counts !== 'undefined' ? counts : 'undefined');
+        console.log('  - RATES:', typeof RATES !== 'undefined' ? RATES : 'undefined');
+        
+        // Test if adjustCount can be called programmatically
+        setTimeout(() => {
+            console.log('🔍 [DELAYED CHECK] Checking functions after 1 second:');
+            console.log('  - window.adjustCount available:', typeof window.adjustCount === 'function');
+            console.log('  - Can access adjustCount from window:', 'adjustCount' in window);
+            
+            // Try to call adjustCount programmatically to test availability
+            try {
+                console.log('🧪 [PROGRAMMATIC TEST] Attempting to call adjustCount(thankYou, 0)...');
+                if (typeof window.adjustCount === 'function') {
+                    // This should trigger our debug logging
+                    window.adjustCount('thankYou', 0);
+                    console.log('✅ [PROGRAMMATIC TEST] adjustCount call succeeded');
+                } else {
+                    console.error('❌ [PROGRAMMATIC TEST] window.adjustCount is not a function');
+                }
+            } catch (error) {
+                console.error('❌ [PROGRAMMATIC TEST] adjustCount call failed:', error);
+            }
+        }, 1000);
+        
     </script>
 </body>
 </html>
