@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Training Progress Dashboard - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <!-- Training Progress Service -->
+    <script src="../services/training-progress-service.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --danger-bg: #fee;
+            --danger-text: #dc2626;
+            --info-bg: #dbeafe;
+            --info-text: #1e40af;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: var(--card-bg);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filters-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Quick filter buttons */
+        .quick-filters {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .quick-filter-btn {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quick-filter-btn:hover {
+            background: var(--hover-bg);
+        }
+        
+        .quick-filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* Last updated indicator */
+        .last-updated {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .refresh-indicator {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Tooltip styles */
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tooltip-wrapper:hover .tooltip {
+            opacity: 1;
+        }
+        
+        /* Loading skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon.blue {
+            background: var(--info-bg);
+            color: var(--info-text);
+        }
+
+        .stat-icon.green {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .stat-icon.yellow {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .stat-icon.red {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-change.positive {
+            color: var(--success-text);
+        }
+
+        .stat-change.negative {
+            color: var(--danger-text);
+        }
+
+        /* Charts Section */
+        .chart-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Progress Bars */
+        .progress-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .progress-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .progress-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Table Section */
+        .table-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--hover-bg);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.complete {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .status-badge.incomplete {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            color: var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Export Button */
+        .export-button {
+            position: relative;
+        }
+
+        .export-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 0.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            min-width: 150px;
+        }
+
+        .export-dropdown.show {
+            display: block;
+        }
+
+        .export-option {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 1rem;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            transition: background 0.2s;
+        }
+
+        .export-option:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Compare view styles */
+        .compare-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .user-comparison-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .user-comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .user-stats {
+            display: grid;
+            gap: 0.5rem;
+        }
+        
+        .user-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+        }
+        
+        .user-stat-label {
+            color: var(--text-secondary);
+        }
+        
+        .user-stat-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+            }
+            
+            .header-right {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .header-right .btn {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.75rem;
+            }
+            
+            .header-right .btn span {
+                display: none;
+            }
+            
+            .filters-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+            
+            .quick-filters {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 200px;
+            }
+            
+            .table-wrapper {
+                font-size: 0.75rem;
+            }
+            
+            .export-button {
+                position: static;
+            }
+            
+            .export-dropdown {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: 0;
+                border-radius: 8px 8px 0 0;
+                box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <div>
+                    <h1 class="page-title">Training Progress Dashboard</h1>
+                    <nav class="breadcrumb">
+                        <a href="/staff-dashboard.html">Dashboard</a>
+                        <span>/</span>
+                        <span>Training Progress</span>
+                    </nav>
+                </div>
+            </div>
+            <div class="header-right" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="adriyella-daily-tasks-v2.html" class="btn btn-secondary">
+                    <i class="fas fa-tasks"></i>
+                    Daily Tasks
+                </a>
+                <a href="adriyella-task-history.html" class="btn btn-secondary">
+                    <i class="fas fa-history"></i>
+                    Task History
+                </a>
+                <a href="adriyella-billing-dashboard.html" class="btn btn-secondary" style="background: #f59e0b; color: white; border-color: #f59e0b;">
+                    <i class="fas fa-dollar-sign"></i>
+                    Billing
+                </a>
+                <a href="adriyella-admin-dashboard.html" class="btn btn-secondary">
+                    <i class="fas fa-cog"></i>
+                    Admin
+                </a>
+                <a href="adriyella-bonus-report.html" class="btn btn-secondary" style="background: #10b981; color: white; border-color: #10b981;">
+                    <i class="fas fa-trophy"></i>
+                    Bonus Report
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Filters -->
+    <section class="filters-section">
+        <div class="filters-container">
+            <div class="quick-filters">
+                <span style="font-size: 0.875rem; color: var(--text-secondary);">Quick:</span>
+                <button class="quick-filter-btn" onclick="setQuickFilter('today')">Today</button>
+                <button class="quick-filter-btn" onclick="setQuickFilter('week')">This Week</button>
+                <button class="quick-filter-btn" onclick="setQuickFilter('month')">This Month</button>
+            </div>
+            <div class="filter-group" style="flex: 2;">
+                <label class="filter-label">Select Trainee</label>
+                <select id="userSelect" class="form-control">
+                    <option value="">All Trainees</option>
+                    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                    <option value="taylar@nwcustomapparel.com">Taylar Hanson</option>
+                    <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                    <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                    <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                    <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                    <option value="art@nwcustomapparel.com">Steve Deland</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Start Date</label>
+                <input type="date" id="startDate" class="form-control">
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">End Date</label>
+                <input type="date" id="endDate" class="form-control">
+            </div>
+            
+            <button class="btn btn-primary" onclick="loadTrainingData()" id="refreshBtn">
+                <i class="fas fa-sync-alt" id="refreshIcon"></i>
+                Refresh
+            </button>
+            
+            <div class="last-updated">
+                <i class="fas fa-clock"></i>
+                <span id="lastUpdated">Never</span>
+            </div>
+            
+            <div class="export-button">
+                <button class="btn btn-secondary" onclick="toggleExportMenu()">
+                    <i class="fas fa-download"></i>
+                    Export
+                </button>
+                <div id="exportDropdown" class="export-dropdown">
+                    <button class="export-option" onclick="exportToCSV()">
+                        <i class="fas fa-file-csv"></i> Export to CSV
+                    </button>
+                    <button class="export-option" onclick="printReport()">
+                        <i class="fas fa-print"></i> Print Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Training Days</h3>
+                    <div class="tooltip-wrapper">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <span class="tooltip">Total days with completed training tasks</span>
+                    </div>
+                </div>
+                <div class="stat-value" id="trainingDays">0</div>
+                <div class="stat-change" id="trainingDaysChange">Loading...</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Completion Rate</h3>
+                    <div class="tooltip-wrapper">
+                        <div class="stat-icon green">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <span class="tooltip">Percentage of assigned tasks completed</span>
+                    </div>
+                </div>
+                <div class="stat-value" id="completionRate">0%</div>
+                <div class="stat-change" id="completionRateChange">Loading...</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Average Time</h3>
+                    <div class="tooltip-wrapper">
+                        <div class="stat-icon yellow">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <span class="tooltip">Average time spent per task</span>
+                    </div>
+                </div>
+                <div class="stat-value" id="avgTime">0 min</div>
+                <div class="stat-change" id="avgTimeChange">Loading...</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Current Streak</h3>
+                    <div class="tooltip-wrapper">
+                        <div class="stat-icon red">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <span class="tooltip">Consecutive days with completed tasks</span>
+                    </div>
+                </div>
+                <div class="stat-value" id="currentStreak">0 days</div>
+                <div class="stat-change" id="streakChange">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Progress Chart -->
+        <div class="chart-section">
+            <div class="section-header">
+                <h2 class="section-title">Training Progress Over Time</h2>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <select id="chartView" class="form-control" style="width: 150px;" onchange="updateChart()">
+                        <option value="completion">Completion Rate</option>
+                        <option value="time">Time Spent</option>
+                        <option value="tasks">Tasks Completed</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="toggleCompareView()" id="compareBtn">
+                        <i class="fas fa-users"></i>
+                        <span>Compare</span>
+                    </button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="progressChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Task Breakdown -->
+        <div class="progress-section">
+            <div class="section-header">
+                <h2 class="section-title">Task Breakdown</h2>
+            </div>
+            <div id="taskBreakdown">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Loading task data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed History -->
+        <div class="table-section">
+            <div class="section-header">
+                <h2 class="section-title">Detailed Training History</h2>
+            </div>
+            <div class="table-wrapper">
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>User</th>
+                            <th>Task</th>
+                            <th>Time Spent</th>
+                            <th>Sessions</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="loading-container">
+                                    <div class="loading-spinner"></div>
+                                    <p class="loading-text">Loading history...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize the service
+        let progressService;
+        let progressChart;
+        let currentData = null;
+        let refreshInterval = null;
+        let lastUpdateTime = null;
+        let loadDataDebounce = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            progressService = new TrainingProgressService();
+            initializeDateFilters();
+            initializeChart();
+            loadTrainingData();
+            
+            // Set up auto-refresh every 5 minutes
+            refreshInterval = setInterval(() => {
+                loadTrainingData(true);
+            }, 5 * 60 * 1000);
+            
+            // Add debouncing to user select
+            document.getElementById('userSelect').addEventListener('change', () => {
+                clearTimeout(loadDataDebounce);
+                loadDataDebounce = setTimeout(() => {
+                    loadTrainingData();
+                }, 300);
+            });
+        });
+
+        // Initialize date filters with defaults
+        function initializeDateFilters() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+
+            document.getElementById('startDate').value = formatDateForInput(startDate);
+            document.getElementById('endDate').value = formatDateForInput(endDate);
+        }
+
+        // Format date for input field
+        function formatDateForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Initialize Chart.js
+        function initializeChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Completion Rate',
+                        data: [],
+                        borderColor: '#4cb354',
+                        backgroundColor: 'rgba(76, 179, 84, 0.1)',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load training data
+        async function loadTrainingData() {
+            const userEmail = document.getElementById('userSelect').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            try {
+                if (userEmail) {
+                    // Load single user data
+                    currentData = await progressService.getUserTrainingHistory(userEmail, startDate, endDate);
+                    updateDashboard(currentData);
+                } else {
+                    // Load all users data
+                    currentData = await progressService.getAllUsersProgress(startDate, endDate);
+                    updateDashboardAllUsers(currentData);
+                }
+            } catch (error) {
+                console.error('Error loading training data:', error);
+                showError('Failed to load training data');
+            }
+        }
+
+        // Update dashboard for single user
+        function updateDashboard(data) {
+            // Update stats
+            document.getElementById('trainingDays').textContent = data.totalDays;
+            document.getElementById('completionRate').textContent = `${data.completionRate}%`;
+            document.getElementById('avgTime').textContent = `${data.avgTimeMinutes} min`;
+            document.getElementById('currentStreak').textContent = `${data.currentStreak} day${data.currentStreak !== 1 ? 's' : ''}`;
+
+            // Update task breakdown
+            updateTaskBreakdown(data.taskBreakdown);
+
+            // Update chart
+            updateChartData(data.dailyProgress);
+
+            // Update history table
+            updateHistoryTable(data.sessions);
+        }
+
+        // Update dashboard for all users
+        function updateDashboardAllUsers(data) {
+            // Aggregate stats
+            const totalDays = data.reduce((sum, user) => sum + user.totalDays, 0);
+            const avgCompletion = data.reduce((sum, user) => sum + user.completionRate, 0) / data.length;
+            const avgTime = data.reduce((sum, user) => sum + user.avgTimeMinutes, 0) / data.length;
+            const maxStreak = Math.max(...data.map(user => user.currentStreak));
+
+            document.getElementById('trainingDays').textContent = totalDays;
+            document.getElementById('completionRate').textContent = `${Math.round(avgCompletion)}%`;
+            document.getElementById('avgTime').textContent = `${Math.round(avgTime)} min`;
+            document.getElementById('currentStreak').textContent = `${maxStreak} day${maxStreak !== 1 ? 's' : ''}`;
+
+            // Aggregate task breakdown
+            const aggregatedBreakdown = aggregateTaskBreakdown(data);
+            updateTaskBreakdown(aggregatedBreakdown);
+
+            // Show all users in history
+            const allSessions = data.flatMap(user => user.sessions);
+            updateHistoryTable(allSessions);
+        }
+
+        // Aggregate task breakdown across users
+        function aggregateTaskBreakdown(userData) {
+            const breakdown = {};
+            
+            userData.forEach(user => {
+                Object.entries(user.taskBreakdown).forEach(([taskName, taskData]) => {
+                    if (!breakdown[taskName]) {
+                        breakdown[taskName] = {
+                            completedCount: 0,
+                            totalCount: 0,
+                            totalTime: 0
+                        };
+                    }
+                    breakdown[taskName].completedCount += taskData.completedCount;
+                    breakdown[taskName].totalCount += taskData.totalCount;
+                    breakdown[taskName].totalTime += taskData.totalTime;
+                });
+            });
+
+            return breakdown;
+        }
+
+        // Update task breakdown section
+        function updateTaskBreakdown(breakdown) {
+            const container = document.getElementById('taskBreakdown');
+            container.innerHTML = '';
+
+            const taskNames = {
+                '1': 'Customer Completed Order Notifications',
+                '2': 'Thank You Notes',
+                '3': 'Sample Management'
+            };
+
+            Object.entries(breakdown).forEach(([taskId, data]) => {
+                const percentage = data.totalCount > 0 ? Math.round((data.completedCount / data.totalCount) * 100) : 0;
+                const avgTime = data.completedCount > 0 ? Math.round(data.totalTime / data.completedCount) : 0;
+
+                const progressItem = document.createElement('div');
+                progressItem.className = 'progress-item';
+                progressItem.innerHTML = `
+                    <div class="progress-header">
+                        <span class="progress-label">${taskNames[taskId] || `Task ${taskId}`}</span>
+                        <span class="progress-value">${percentage}% (${avgTime} min avg)</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                container.appendChild(progressItem);
+            });
+        }
+
+        // Update chart data
+        function updateChartData(dailyProgress) {
+            const chartView = document.getElementById('chartView').value;
+            const labels = dailyProgress.map(d => formatDate(d.date));
+            let data;
+
+            switch (chartView) {
+                case 'completion':
+                    data = dailyProgress.map(d => d.completionRate);
+                    progressChart.data.datasets[0].label = 'Completion Rate (%)';
+                    progressChart.options.scales.y.max = 100;
+                    break;
+                case 'time':
+                    data = dailyProgress.map(d => d.totalMinutes);
+                    progressChart.data.datasets[0].label = 'Time Spent (minutes)';
+                    progressChart.options.scales.y.max = undefined;
+                    break;
+                case 'tasks':
+                    data = dailyProgress.map(d => d.tasksCompleted);
+                    progressChart.data.datasets[0].label = 'Tasks Completed';
+                    progressChart.options.scales.y.max = undefined;
+                    break;
+            }
+
+            progressChart.data.labels = labels;
+            progressChart.data.datasets[0].data = data;
+            progressChart.update();
+        }
+
+        // Update history table
+        function updateHistoryTable(sessions) {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            if (sessions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <i class="fas fa-inbox empty-icon"></i>
+                            <p>No training data found for the selected period</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const taskNames = {
+                '1': 'Customer Completed Order Notifications',
+                '2': 'Thank You Notes',
+                '3': 'Sample Management'
+            };
+
+            sessions.forEach(session => {
+                session.items.forEach(item => {
+                    // Use utility function to parse timer data
+                    const taskData = parseTimerData(item);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${formatDate(session.CreatedAt)}</td>
+                        <td>${session.CustomerName}</td>
+                        <td>${taskNames[item.StyleNumber] || item.ProductName}</td>
+                        <td>${Math.round(taskData.totalSeconds / 60)} min</td>
+                        <td>${taskData.timerSessions?.length || 1}</td>
+                        <td>
+                            <span class="status-badge complete">
+                                <i class="fas fa-check-circle"></i> Complete
+                            </span>
+                        </td>
+                        <td>${taskData.notes || '-'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Update chart view
+        function updateChart() {
+            if (currentData) {
+                const dailyProgress = currentData.dailyProgress || 
+                    (currentData[0] ? aggregateDailyProgress(currentData) : []);
+                updateChartData(dailyProgress);
+            }
+        }
+
+        // Toggle export menu
+        function toggleExportMenu() {
+            const dropdown = document.getElementById('exportDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            if (!currentData) return;
+
+            let csv = 'Date,User,Task,Time (min),Sessions,Status,Notes\n';
+            
+            const sessions = currentData.sessions || 
+                (currentData[0] ? currentData.flatMap(u => u.sessions) : []);
+
+            sessions.forEach(session => {
+                session.items.forEach(item => {
+                    // Use utility function to parse timer data
+                    const taskData = parseTimerData(item);
+                    csv += `${formatDate(session.CreatedAt)},${session.CustomerName},${item.ProductName},${Math.round(taskData.totalSeconds / 60)},${taskData.timerSessions?.length || 1},Complete,"${taskData.notes || ''}"\n`;
+                });
+            });
+
+            // Download CSV
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `training-progress-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            
+            toggleExportMenu();
+        }
+
+        // Print report
+        function printReport() {
+            window.print();
+            toggleExportMenu();
+        }
+
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.export-button')) {
+                document.getElementById('exportDropdown').classList.remove('show');
+            }
+        });
+        
+        // Toggle compare view
+        let compareMode = false;
+        function toggleCompareView() {
+            compareMode = !compareMode;
+            const compareBtn = document.getElementById('compareBtn');
+            
+            if (compareMode) {
+                compareBtn.classList.add('btn-primary');
+                compareBtn.classList.remove('btn-secondary');
+                showCompareView();
+            } else {
+                compareBtn.classList.remove('btn-primary');
+                compareBtn.classList.add('btn-secondary');
+                hideCompareView();
+            }
+        }
+        
+        // Show compare view
+        async function showCompareView() {
+            const chartSection = document.querySelector('.chart-section');
+            
+            // Load data for multiple users
+            const topUsers = ['adriyella@nwcustomapparel.com', 'ruth@nwcustomapparel.com', 'taylar@nwcustomapparel.com', 'nika@nwcustomapparel.com'];
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            try {
+                // Create compare container
+                const compareDiv = document.createElement('div');
+                compareDiv.id = 'compareView';
+                compareDiv.className = 'chart-section';
+                compareDiv.innerHTML = `
+                    <div class="section-header">
+                        <h2 class="section-title">User Comparison</h2>
+                    </div>
+                    <div class="compare-container" id="compareContainer">
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                            <p class="loading-text">Loading comparison data...</p>
+                        </div>
+                    </div>
+                `;
+                
+                chartSection.parentNode.insertBefore(compareDiv, chartSection.nextSibling);
+                chartSection.style.display = 'none';
+                
+                // Load user data
+                const userData = await progressService.batchGetUserSessions(topUsers, startDate, endDate);
+                
+                // Render comparison cards
+                const container = document.getElementById('compareContainer');
+                container.innerHTML = userData.map(user => `
+                    <div class="user-comparison-card">
+                        <div class="user-comparison-header">
+                            <span class="user-name">${user.email.split('@')[0]}</span>
+                            <span class="status-badge ${user.currentStreak > 0 ? 'complete' : 'incomplete'}">
+                                ${user.currentStreak > 0 ? 'Active' : 'Inactive'}
+                            </span>
+                        </div>
+                        <div class="user-stats">
+                            <div class="user-stat-row">
+                                <span class="user-stat-label">Completion Rate</span>
+                                <span class="user-stat-value">${user.completionRate}%</span>
+                            </div>
+                            <div class="user-stat-row">
+                                <span class="user-stat-label">Avg Time</span>
+                                <span class="user-stat-value">${user.avgTimeMinutes} min</span>
+                            </div>
+                            <div class="user-stat-row">
+                                <span class="user-stat-label">Current Streak</span>
+                                <span class="user-stat-value">${user.currentStreak} days</span>
+                            </div>
+                            <div class="user-stat-row">
+                                <span class="user-stat-label">Total Days</span>
+                                <span class="user-stat-value">${user.totalDays}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading compare view:', error);
+                showError('Failed to load comparison data');
+            }
+        }
+        
+        // Hide compare view
+        function hideCompareView() {
+            const compareDiv = document.getElementById('compareView');
+            if (compareDiv) {
+                compareDiv.remove();
+            }
+            
+            const chartSection = document.querySelector('.chart-section');
+            chartSection.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

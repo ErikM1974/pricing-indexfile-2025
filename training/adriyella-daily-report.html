@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriyella's Daily Report</title>
+    <script src="adriyella-task-service.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            color: #6b7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .date {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .earnings-display {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .earnings-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .earnings-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .task-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .task-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .task-icon.thank-you {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .task-icon.calls {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+
+        .task-icon.samples {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+
+        .task-rate {
+            font-size: 14px;
+            color: #10b981;
+        }
+
+        .task-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .counter-btn {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #374151;
+            transition: all 0.2s;
+        }
+
+        .counter-btn:hover {
+            background: #e5e7eb;
+            transform: scale(1.05);
+        }
+
+        .counter-btn:active {
+            transform: scale(0.95);
+        }
+
+        .task-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .task-total {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-left: auto;
+        }
+
+        .monthly-total {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .monthly-total.at-cap {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .monthly-total.approaching-cap {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .monthly-amount {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .monthly-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .cap-info {
+            margin-top: 10px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .cap-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin: 10px 0 5px 0;
+            overflow: hidden;
+        }
+
+        .cap-progress-bar {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .cap-status {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .auto-save-indicator {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .auto-save-indicator::before {
+            content: "💾";
+            font-size: 14px;
+        }
+
+        .save-status {
+            color: #10b981;
+            font-weight: 500;
+        }
+
+
+        @media (max-width: 480px) {
+            .calculator-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .earnings-amount {
+                font-size: 32px;
+            }
+            
+            .counter-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <button class="back-button" onclick="goToDashboard()">
+            ← Back to Dashboard
+        </button>
+
+        <div class="header">
+            <div class="greeting">Hey Adriyella! 👋</div>
+            <div class="date" id="currentDate"></div>
+        </div>
+
+        <div class="earnings-display">
+            <div class="earnings-amount" id="todaysEarnings">$0.00</div>
+            <div class="earnings-label">Today's Earnings</div>
+        </div>
+
+        <!-- Thank You Cards -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-icon thank-you">💝</div>
+                <div class="task-info">
+                    <div class="task-name">Thank You Cards</div>
+                    <div class="task-rate">$2.00 each</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="counter-btn" onclick="adjustCount('thankYou', -1)">−</button>
+                <div class="task-count" id="thankYouCount">0</div>
+                <button class="counter-btn" onclick="adjustCount('thankYou', 1)">+</button>
+                <div class="task-total" id="thankYouTotal">= $0.00</div>
+            </div>
+        </div>
+
+        <!-- Lead Sheets -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-icon calls">📋</div>
+                <div class="task-info">
+                    <div class="task-name">Lead Sheets</div>
+                    <div class="task-rate">$5.00 each</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="counter-btn" onclick="adjustCount('leadSheets', -1)">−</button>
+                <div class="task-count" id="leadSheetsCount">0</div>
+                <button class="counter-btn" onclick="adjustCount('leadSheets', 1)">+</button>
+                <div class="task-total" id="leadSheetsTotal">= $0.00</div>
+            </div>
+        </div>
+
+        <!-- Google Reviews -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-icon samples">⭐</div>
+                <div class="task-info">
+                    <div class="task-name">Google Reviews</div>
+                    <div class="task-rate">$20.00 each</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="counter-btn" onclick="adjustCount('googleReviews', -1)">−</button>
+                <div class="task-count" id="googleReviewsCount">0</div>
+                <button class="counter-btn" onclick="adjustCount('googleReviews', 1)">+</button>
+                <div class="task-total" id="googleReviewsTotal">= $0.00</div>
+            </div>
+        </div>
+
+        <!-- Art Approval -->
+        <div class="task-card">
+            <div class="task-header">
+                <div class="task-icon" style="background: #e9d5ff; color: #9333ea;">🎨</div>
+                <div class="task-info">
+                    <div class="task-name">Art Approval</div>
+                    <div class="task-rate">$10.00 each</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="counter-btn" onclick="adjustCount('artApproval', -1)">−</button>
+                <div class="task-count" id="artApprovalCount">0</div>
+                <button class="counter-btn" onclick="adjustCount('artApproval', 1)">+</button>
+                <div class="task-total" id="artApprovalTotal">= $0.00</div>
+            </div>
+        </div>
+
+        <div class="monthly-total" id="monthlyTotalContainer">
+            <div class="monthly-amount" id="monthlyTotal">$88.00</div>
+            <div class="monthly-label">This Month's Total</div>
+            <div class="cap-progress" id="capProgress">
+                <div class="cap-progress-bar" id="capProgressBar" style="width: 0%"></div>
+            </div>
+            <div class="cap-info" id="capInfo">of $400.00 monthly cap</div>
+            <div class="cap-status" id="capStatus" style="display: none;"></div>
+        </div>
+
+        <div class="auto-save-indicator">
+            Auto-saves every 5 seconds
+            <span class="save-status" id="saveStatus"></span>
+        </div>
+
+        <!-- Test Email Button (for development) -->
+        <div style="text-align: center; margin-top: 15px;">
+            <button onclick="manualSendReport()" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                📧 Test Email Report
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        // Task rates
+        const RATES = {
+            thankYou: 2.00,
+            leadSheets: 5.00,
+            googleReviews: 20.00,
+            artApproval: 10.00
+        };
+
+        // Current counts
+        let counts = {
+            thankYou: 0,
+            leadSheets: 0,
+            googleReviews: 0,
+            artApproval: 0
+        };
+
+        // Last saved counts (to detect changes)
+        let lastSavedCounts = {
+            thankYou: 0,
+            leadSheets: 0,
+            googleReviews: 0,
+            artApproval: 0
+        };
+
+        // Task service instance
+        let taskService;
+
+        // Initialize the app
+        async function initializeApp() {
+            // Initialize EmailJS
+            emailjs.init('4qSbDO-SQs19TbP80');
+            
+            taskService = new AdriyellaTaService();
+            updateCurrentDate();
+            await loadTodaysCounts();
+            updateAllDisplays();
+            updateMonthlyTotal();
+            startAutoSave();
+            
+            // Check if daily report should be sent
+            checkDailyReport();
+        }
+
+        // Update current date display
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Adjust task count
+        function adjustCount(taskType, increment) {
+            counts[taskType] = Math.max(0, counts[taskType] + increment);
+            updateAllDisplays();
+            
+            // Visual feedback
+            const countElement = document.getElementById(taskType + 'Count');
+            countElement.style.transform = 'scale(1.2)';
+            countElement.style.color = '#10b981';
+            setTimeout(() => {
+                countElement.style.transform = 'scale(1)';
+                countElement.style.color = '#1f2937';
+            }, 200);
+        }
+
+        // Update all displays
+        function updateAllDisplays() {
+            // Update individual task displays
+            Object.keys(counts).forEach(taskType => {
+                const countElement = document.getElementById(taskType + 'Count');
+                const totalElement = document.getElementById(taskType + 'Total');
+                
+                if (countElement && totalElement && RATES[taskType]) {
+                    const count = counts[taskType];
+                    const rate = RATES[taskType];
+                    const total = count * rate;
+                    
+                    countElement.textContent = count;
+                    totalElement.textContent = `= $${total.toFixed(2)}`;
+                }
+            });
+            
+            // Update today's total earnings
+            const todaysTotal = Object.keys(counts).reduce((sum, taskType) => {
+                // Only include tasks that have a rate defined
+                if (RATES[taskType]) {
+                    return sum + (counts[taskType] * RATES[taskType]);
+                }
+                return sum;
+            }, 0);
+            
+            document.getElementById('todaysEarnings').textContent = `$${todaysTotal.toFixed(2)}`;
+        }
+
+        // Update monthly total from real data with cap information
+        async function updateMonthlyTotal() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            
+            console.log(`[Monthly Total] Fetching monthly data for ${year}-${month}`);
+            
+            try {
+                const result = await taskService.getMonthlyTasks(year, month);
+                console.log(`[Monthly Total] API result:`, result);
+                
+                if (result.success) {
+                    const data = result.data;
+                    const cappedTotal = data.cappedMonthlyTotal || data.monthlyTotal;
+                    const rawTotal = data.rawMonthlyTotal || data.monthlyTotal;
+                    const capStatus = data.capStatus || 'under_cap';
+                    const remainingCapacity = data.remainingCapacity || 0;
+                    const excessAmount = data.excessAmount || 0;
+                    const progressPercent = data.progressTowardCap || 0;
+                    
+                    console.log(`[Monthly Total] Cap data:`, {
+                        cappedTotal,
+                        rawTotal,
+                        capStatus,
+                        remainingCapacity,
+                        excessAmount,
+                        progressPercent
+                    });
+                    
+                    // Update the display
+                    updateCapDisplay(cappedTotal, rawTotal, capStatus, remainingCapacity, excessAmount, progressPercent);
+                } else {
+                    console.error('[Monthly Total] Failed to get monthly data:', result);
+                    // Fallback: Calculate from current day's data
+                    const todaysTotal = Object.keys(counts).reduce((sum, taskType) => {
+                        if (RATES[taskType]) {
+                            return sum + (counts[taskType] * RATES[taskType]);
+                        }
+                        return sum;
+                    }, 0);
+                    
+                    console.log(`[Monthly Total] Using fallback calculation: $${todaysTotal.toFixed(2)}`);
+                    updateCapDisplay(todaysTotal, todaysTotal, 'under_cap', 400 - todaysTotal, 0, (todaysTotal / 400) * 100);
+                }
+            } catch (error) {
+                console.error('[Monthly Total] Error fetching monthly data:', error);
+                // Fallback: Calculate from current day's data
+                const todaysTotal = Object.keys(counts).reduce((sum, taskType) => {
+                    if (RATES[taskType]) {
+                        return sum + (counts[taskType] * RATES[taskType]);
+                    }
+                    return sum;
+                }, 0);
+                
+                console.log(`[Monthly Total] Using error fallback: $${todaysTotal.toFixed(2)}`);
+                updateCapDisplay(todaysTotal, todaysTotal, 'under_cap', 400 - todaysTotal, 0, (todaysTotal / 400) * 100);
+            }
+        }
+
+        // Update the cap display with visual indicators
+        function updateCapDisplay(cappedTotal, rawTotal, capStatus, remainingCapacity, excessAmount, progressPercent) {
+            const monthlyTotalElement = document.getElementById('monthlyTotal');
+            const monthlyContainer = document.getElementById('monthlyTotalContainer');
+            const capInfoElement = document.getElementById('capInfo');
+            const capStatusElement = document.getElementById('capStatus');
+            const progressBar = document.getElementById('capProgressBar');
+            
+            // Update the main amount display
+            monthlyTotalElement.textContent = `$${cappedTotal.toFixed(2)}`;
+            
+            // Update progress bar
+            const displayPercent = Math.min(progressPercent, 100);
+            progressBar.style.width = `${displayPercent}%`;
+            
+            // Update container styling based on cap status
+            monthlyContainer.className = `monthly-total ${capStatus.replace('_', '-')}`;
+            
+            // Update cap info text
+            if (capStatus === 'at_cap') {
+                capInfoElement.textContent = 'Monthly cap reached ($400.00)';
+                if (excessAmount > 0) {
+                    capStatusElement.textContent = `Excess earnings: $${excessAmount.toFixed(2)} (will roll to next month)`;
+                    capStatusElement.style.display = 'block';
+                } else {
+                    capStatusElement.style.display = 'none';
+                }
+            } else if (capStatus === 'approaching_cap') {
+                capInfoElement.textContent = `$${remainingCapacity.toFixed(2)} remaining of $400.00 cap`;
+                capStatusElement.textContent = 'Approaching monthly cap';
+                capStatusElement.style.display = 'block';
+            } else {
+                capInfoElement.textContent = `$${remainingCapacity.toFixed(2)} remaining of $400.00 cap`;
+                capStatusElement.style.display = 'none';
+            }
+            
+            // Show raw vs capped if there's a difference
+            if (rawTotal > cappedTotal) {
+                const diffElement = document.createElement('div');
+                diffElement.className = 'cap-status';
+                diffElement.textContent = `Raw total: $${rawTotal.toFixed(2)} (capped at $${cappedTotal.toFixed(2)})`;
+                diffElement.style.fontSize = '10px';
+                diffElement.style.marginTop = '5px';
+                
+                // Remove any existing diff display
+                const existingDiff = monthlyContainer.querySelector('.raw-total-info');
+                if (existingDiff) {
+                    existingDiff.remove();
+                }
+                
+                diffElement.classList.add('raw-total-info');
+                monthlyContainer.appendChild(diffElement);
+            }
+        }
+
+
+        // Load today's counts from API
+        async function loadTodaysCounts() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            try {
+                const result = await taskService.getDailyTasks(today);
+                if (result.success) {
+                    const data = result.data;
+                    // Map API data to our counts structure
+                    counts.thankYou = data.thankYouCards || 0;
+                    counts.leadSheets = data.leadSheets || 0;
+                    counts.googleReviews = data.googleReviews || 0;
+                    counts.artApproval = data.artApproval || 0;
+                    
+                    // Update last saved counts to match loaded data
+                    lastSavedCounts = {...counts};
+                }
+            } catch (error) {
+                console.error('Failed to load today\'s counts:', error);
+                // Keep counts at 0 if API fails
+            }
+        }
+
+        // Check if counts have changed since last save
+        function countsHaveChanged() {
+            return (
+                counts.thankYou !== lastSavedCounts.thankYou ||
+                counts.leadSheets !== lastSavedCounts.leadSheets ||
+                counts.googleReviews !== lastSavedCounts.googleReviews ||
+                counts.artApproval !== lastSavedCounts.artApproval
+            );
+        }
+
+        // Save counts to storage
+        async function saveCounts() {
+            // Only save if counts have actually changed
+            if (!countsHaveChanged()) {
+                console.log('[Auto-save] No changes detected, skipping save');
+                return;
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            console.log('[Auto-save] Changes detected, saving:', counts);
+            
+            // Save using the service
+            const result = await taskService.saveDailyTasks(today, counts);
+            
+            if (result.success) {
+                // Update last saved counts to current values
+                lastSavedCounts = {...counts};
+                
+                // Show save status
+                document.getElementById('saveStatus').textContent = 'Saved ✅';
+                setTimeout(() => {
+                    document.getElementById('saveStatus').textContent = '';
+                }, 2000);
+                
+                // Update monthly total after save with small delay to ensure API processing
+                setTimeout(async () => {
+                    await updateMonthlyTotal();
+                }, 500);
+            }
+        }
+
+
+        // Start auto-save
+        function startAutoSave() {
+            setInterval(saveCounts, 5000); // Save every 5 seconds
+        }
+
+        // Go back to dashboard
+        function goToDashboard() {
+            window.location.href = '/staff-dashboard.html';
+        }
+
+        // Check if daily report should be sent
+        function checkDailyReport() {
+            const now = new Date();
+            const hour = now.getHours();
+            
+            // Check if it's 6 PM (18:00)
+            if (hour === 18) {
+                const today = now.toISOString().split('T')[0];
+                const reportKey = `adriyella_report_sent_${today}`;
+                
+                // Check if report was already sent today
+                if (!localStorage.getItem(reportKey)) {
+                    sendDailyReport();
+                    localStorage.setItem(reportKey, 'true');
+                }
+            }
+        }
+
+        // Send daily report via EmailJS
+        async function sendDailyReport() {
+            const today = new Date().toISOString().split('T')[0];
+            const reportData = await taskService.getDailyReportData(today);
+            
+            if (!reportData) return;
+            
+            const emailData = {
+                to_email: 'erik@nwcustomapparel.com',
+                cc_email: 'adriyella@nwcustomapparel.com',
+                from_name: 'Northwest Custom Apparel',
+                subject: `Adriyella's Daily Tasks - ${reportData.date}`,
+                
+                // Task data
+                date: reportData.date,
+                thankYouCards: reportData.thankYouCards || 0,
+                thankYouAmount: reportData.thankYouAmount || '0.00',
+                leadSheets: reportData.leadSheets || 0,
+                leadAmount: reportData.leadAmount || '0.00',
+                googleReviews: reportData.googleReviews || 0,
+                reviewAmount: reportData.reviewAmount || '0.00',
+                artApproval: reportData.artApproval || 0,
+                artAmount: reportData.artAmount || '0.00',
+                dailyTotal: reportData.dailyTotal || '0.00',
+                monthlyTotal: reportData.monthlyTotal || '0.00',
+                
+                // Cap information
+                monthlyRawTotal: reportData.monthlyRawTotal || '0.00',
+                capStatus: reportData.capStatus || 'under_cap',
+                isAtCap: reportData.isAtCap || false,
+                capWarning: reportData.isAtCap ? 'Monthly cap of $400 has been reached' : ''
+            };
+            
+            try {
+                // Note: You'll need to create this template in EmailJS
+                // Template ID: 'adriyella_daily_report'
+                await emailjs.send('service_1c4k67j', 'adriyella_daily_report', emailData);
+                console.log('Daily report sent successfully');
+            } catch (error) {
+                console.error('Failed to send daily report:', error);
+            }
+        }
+
+        // Manual send daily report button (for testing)
+        function manualSendReport() {
+            sendDailyReport();
+            alert('Daily report sent!');
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

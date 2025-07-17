@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriyella's Task Tracker - Test Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #FF6B6B;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #4ECDC4;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .test-step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #FF6B6B;
+        }
+        
+        .success {
+            color: #00D9A5;
+            font-weight: 600;
+        }
+        
+        .note {
+            background: #FFE66D;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #333;
+        }
+        
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .button-example {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #FF6B6B;
+            color: white;
+            border-radius: 25px;
+            text-decoration: none;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Task Tracker Testing Guide for Adriyella</h1>
+        <p>Let's test your new task tracker to make sure everything works perfectly!</p>
+        
+        <h2>📱 Quick Test Steps</h2>
+        
+        <div class="test-step">
+            <h3>1. Starting a Task</h3>
+            <ol>
+                <li>Click on <strong>"Customer Completed Order Notifications"</strong></li>
+                <li>You should see the timer start automatically</li>
+                <li>The card should expand showing the timer running</li>
+                <li>The background should turn a soft pink color</li>
+            </ol>
+        </div>
+        
+        <div class="test-step">
+            <h3>2. Completing a Task</h3>
+            <ol>
+                <li>Let the timer run for at least 5 seconds</li>
+                <li>Click the <strong>"Complete Task ✓"</strong> button</li>
+                <li>You should see confetti animation! 🎉</li>
+                <li>Your earnings should update from $0.00 to $2.00</li>
+                <li>The "Tasks done today" should show 1</li>
+            </ol>
+        </div>
+        
+        <div class="test-step">
+            <h3>3. Checking Your Bonus</h3>
+            <ol>
+                <li>Swipe up from the bottom (or click) on the black bonus bar</li>
+                <li>You should see a detailed breakdown of your earnings</li>
+                <li>It should show: 1 notification × $2.00 = $2.00</li>
+                <li>Swipe down or click outside to close it</li>
+            </ol>
+        </div>
+        
+        <div class="test-step">
+            <h3>4. Testing Different Task Types</h3>
+            <ol>
+                <li>Try completing a "Thank You Note" ($1.50)</li>
+                <li>Try completing "Sample Management" ($3.00)</li>
+                <li>Each should update your total earnings correctly</li>
+            </ol>
+        </div>
+        
+        <div class="note">
+            <strong>💡 Pro Tips:</strong>
+            <ul>
+                <li>The app saves automatically - no need to click save!</li>
+                <li>Your daily tasks reset at midnight</li>
+                <li>Complete 5+ days in a row for streak bonuses!</li>
+                <li>The app works on your phone - try it!</li>
+            </ul>
+        </div>
+        
+        <h2>✅ What Success Looks Like</h2>
+        <ul>
+            <li class="success">✓ Tasks start and stop smoothly</li>
+            <li class="success">✓ Earnings calculate correctly ($2.00, $1.50, or $3.00 per task)</li>
+            <li class="success">✓ Confetti appears when completing tasks</li>
+            <li class="success">✓ Bonus drawer slides up/down smoothly</li>
+            <li class="success">✓ Daily total updates in real-time</li>
+            <li class="success">✓ Progress bar fills as you complete tasks</li>
+        </ul>
+        
+        <h2>🐛 Troubleshooting</h2>
+        <p>If something doesn't work:</p>
+        <ol>
+            <li>Refresh the page (Ctrl+R or Cmd+R)</li>
+            <li>Check your internet connection</li>
+            <li>Try a different browser (Chrome/Safari recommended)</li>
+            <li>Clear your browser cache</li>
+        </ol>
+        
+        <h2>📊 Viewing Your Monthly Report</h2>
+        <p>To see your full monthly bonus breakdown:</p>
+        <a href="adriyella-bonus-report.html" class="button-example">View Monthly Bonus Report →</a>
+        
+        <div class="note">
+            <strong>Need Help?</strong> Contact Erik at erik@nwcustomapparel.com or call 253-922-5793
+        </div>
+    </div>
+</body>
+</html>

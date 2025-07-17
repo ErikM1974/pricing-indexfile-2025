@@ -9,3 +9,13 @@ dtg-pricing-old.html
 staff-dashboard-backup-*.html
 staff-dashboard-integrated.html
 staff-dashboard-old.html
+
+# Development and test files
+training/server.js
+training/simple-server.js
+training/test-*.js
+training/test-*.md
+training/api-test-runner.html
+
+# Backup/version files
+training/*-v2.html

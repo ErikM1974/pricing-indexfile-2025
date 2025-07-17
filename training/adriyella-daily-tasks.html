@@ -1,0 +1,2585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Adriyella's Task & Bonus Tracker | NW Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Task Service -->
+    <script src="adriyella-task-service.js"></script>
+    
+    <style>
+        :root {
+            /* Modern color palette */
+            --primary-gradient: linear-gradient(135deg, #4cb354 0%, #5bc85f 100%);
+            --accent-mint: #4ECDC4;
+            --accent-mint-light: #7FE5DF;
+            --bg-purple: #F7F3FF;
+            --card-white: #FFFFFF;
+            --text-dark: #2D3436;
+            --text-gray: #636E72;
+            --success-green: #00B894;
+            --warning-orange: #FDCB6E;
+            --danger-red: #FF6B6B;
+            --error-bg: #fee;
+            --error-text: #c33;
+            --bonus-gold: #f59e0b;
+            --bonus-gold-light: #fbbf24;
+            --earnings-bg: #10b981;
+            --earnings-text: #ffffff;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --shadow-glow: 0 0 20px rgba(76, 179, 84, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-purple);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Background decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+            z-index: -1;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--card-white);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-gray);
+            font-size: 0.875rem;
+        }
+        
+        .breadcrumb a {
+            color: var(--danger-red);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .date-time {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Error Message */
+        .error-message {
+            background: var(--error-bg);
+            border: 1px solid var(--error-text);
+            color: var(--error-text);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .loading-overlay.show {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--danger-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+        
+        .welcome-greeting {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-subtitle {
+            color: var(--text-gray);
+            font-size: 1.125rem;
+        }
+        
+        .streak-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--warning-orange);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 24px;
+            font-weight: 600;
+            margin-top: 1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Daily Summary */
+        .daily-summary {
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Progress Bar */
+        .progress-section {
+            margin-bottom: 2rem;
+        }
+        
+        .progress-bar {
+            background: #F3F4F6;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.5rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: var(--text-gray);
+            font-size: 0.875rem;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: #F9FAFB;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+        
+        /* Tasks Grid */
+        .tasks-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        /* Task Card */
+        .task-card {
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .task-card.active {
+            border-color: var(--danger-red);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .task-card.completed {
+            opacity: 0.9;
+            background: #F0FDF4;
+            border-color: var(--success-green);
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .task-info {
+            flex: 1;
+        }
+        
+        .task-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .task-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .task-description {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+        
+        .task-status {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #F3F4F6;
+            color: var(--text-gray);
+        }
+        
+        .status-active {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .status-completed {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        /* Timer Section */
+        .timer-section {
+            text-align: center;
+        }
+        
+        .timer-display {
+            font-size: 3rem;
+            font-weight: 700;
+            font-family: 'Monaco', monospace;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+        
+        .timer-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background: var(--danger-red);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #E5E7EB;
+            color: var(--text-dark);
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: #D1D5DB;
+        }
+        
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+        }
+        
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.3);
+        }
+        
+        /* Task Details */
+        .task-details {
+            border-top: 1px solid #E5E7EB;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: var(--text-gray);
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .quick-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .input-number {
+            width: 80px;
+            padding: 0.5rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .quick-btn {
+            padding: 0.5rem 0.75rem;
+            background: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .quick-btn:hover {
+            background: #E5E7EB;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--danger-red);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: var(--card-white);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            text-align: center;
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .celebration-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-subtitle {
+            color: var(--text-gray);
+        }
+        
+        /* Quick Buttons in Modal */
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .quick-buttons .quick-btn {
+            background: var(--accent-mint);
+            color: white;
+            border: none;
+        }
+        
+        .quick-buttons .quick-btn:hover {
+            background: var(--accent-mint-light);
+        }
+        
+        /* Earnings Display */
+        .earnings-display {
+            background: var(--earnings-bg);
+            color: var(--earnings-text);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .earnings-header {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .earnings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .earnings-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+        
+        .earnings-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+        
+        .earnings-amount {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        
+        .earnings-progress {
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .earnings-progress-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.5s ease;
+        }
+        
+        /* Task Type Cards */
+        .task-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .task-type-card {
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .task-type-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .task-type-card.bonus-active {
+            border: 2px solid var(--bonus-gold);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+        
+        .bonus-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bonus-gold);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        
+        .task-type-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .task-type-icon {
+            font-size: 1.5rem;
+        }
+        
+        .task-type-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .task-type-pricing {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .task-type-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        .task-type-count {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .task-type-bonus-hint {
+            color: var(--bonus-gold);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .complete-task-btn {
+            width: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .complete-task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .complete-task-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Daily Opportunities */
+        .opportunities-card {
+            background: var(--bg-purple);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px dashed var(--primary-color);
+        }
+        
+        .opportunities-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .opportunity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .opportunity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .opportunity-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .opportunity-value {
+            font-weight: 600;
+            color: var(--success-green);
+        }
+        
+        /* Achievement Notification */
+        .achievement-notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--bonus-gold);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1001;
+            animation: slideInRight 0.5s ease;
+        }
+        
+        .achievement-notification.show {
+            display: flex;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Animations */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .timer-display {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .timer-controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <div class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>→</span>
+                    <span>Task Tracker</span>
+                </div>
+            </div>
+            <div class="header-right" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="adriyella-task-history.html" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                    <i class="fas fa-history"></i>
+                    Task History
+                </a>
+                <a href="adriyella-admin-dashboard.html" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                    <i class="fas fa-cog"></i>
+                    Admin
+                </a>
+                <a href="adriyella-billing-dashboard.html" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem; background: var(--warning-orange); border: none;">
+                    <i class="fas fa-dollar-sign"></i>
+                    Billing
+                </a>
+                <a href="training-progress-dashboard.html" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                    <i class="fas fa-chart-line"></i>
+                    Progress
+                </a>
+            </div>
+            <div>
+                <h1 class="header-title">Adriyella's Task & Bonus Tracker</h1>
+                <div class="date-time" id="dateTime"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h2 class="welcome-greeting" id="welcomeGreeting">Good morning, Adriyella! 🌟</h2>
+            <p class="welcome-subtitle">Let's make today productive and fun!</p>
+        </div>
+
+        <!-- Earnings Display -->
+        <div class="earnings-display">
+            <h3 class="earnings-header">💰 Your Bonus Earnings</h3>
+            <div class="earnings-grid">
+                <div class="earnings-item">
+                    <div class="earnings-label">Today</div>
+                    <div class="earnings-amount" id="todayEarnings">$0.00</div>
+                </div>
+                <div class="earnings-item">
+                    <div class="earnings-label">This Week</div>
+                    <div class="earnings-amount" id="weekEarnings">$0.00</div>
+                </div>
+                <div class="earnings-item">
+                    <div class="earnings-label">This Month</div>
+                    <div class="earnings-amount" id="monthEarnings">$0.00</div>
+                </div>
+            </div>
+            <div class="earnings-progress">
+                <div class="earnings-progress-fill" id="earningsProgressFill" style="width: 0%"></div>
+            </div>
+            <div style="text-align: center; margin-top: 0.5rem; font-size: 0.875rem; opacity: 0.9;">
+                <span id="monthEarningsProgress">$0</span> / $400 monthly goal
+            </div>
+        </div>
+
+        <!-- Daily Opportunities -->
+        <div class="opportunities-card">
+            <h3 class="opportunities-title">
+                <i class="fas fa-lightbulb"></i>
+                Today's Best Opportunities
+            </h3>
+            <div id="opportunitiesList">
+                <!-- Dynamic opportunities will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Task Types -->
+        <div class="task-types-grid" id="taskTypesGrid">
+            <!-- Dynamic task type cards will be loaded here -->
+        </div>
+
+        <!-- Achievement Notification -->
+        <div class="achievement-notification" id="achievementNotification">
+            <i class="fas fa-trophy" style="font-size: 1.5rem;"></i>
+            <div>
+                <div style="font-weight: 600;" id="achievementTitle">Achievement Unlocked!</div>
+                <div style="font-size: 0.875rem;" id="achievementMessage">Great job!</div>
+            </div>
+        </div>
+
+        <!-- Daily Summary -->
+        <div class="daily-summary">
+            <div class="summary-header">
+                <h3 class="summary-title">
+                    <span>📊</span>
+                    Today's Progress
+                </h3>
+                <span id="summaryDate"></span>
+            </div>
+            
+            <div class="progress-section">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="tasksCompleted">0</span> of <span id="totalTasks">0</span> Tasks Complete
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTime">0:00</div>
+                    <div class="stat-label">Total Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalContacts">0</div>
+                    <div class="stat-label">Contacts Made</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="productivityScore">0%</div>
+                    <div class="stat-label">Productivity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="todayStreak">🔥</div>
+                    <div class="stat-label">On Fire!</div>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Daily Reflection</label>
+                <textarea class="form-control" id="dailyReflection" rows="2" 
+                    placeholder="How was your day? Any wins to celebrate? 🎉"></textarea>
+            </div>
+            
+            <button class="btn btn-success" onclick="submitDailyReport()" style="width: 100%; margin-top: 1rem;">
+                <i class="fas fa-check-circle"></i>
+                Submit Daily Report
+            </button>
+        </div>
+
+        <!-- Tasks Grid -->
+        <div class="tasks-grid" id="tasksGrid">
+            <!-- Dynamic task cards will be loaded here -->
+            <div style="text-align: center; padding: 2rem;" id="loadingTasks">
+                <div class="loading-spinner"></div>
+                <p style="margin-top: 1rem; color: var(--text-gray);">Loading your tasks...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Completion Modal -->
+    <div class="modal-overlay" id="completionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="celebration-icon">🎉</div>
+                <h3 class="modal-title" id="modalTitle">Task Complete!</h3>
+                <p class="modal-subtitle" id="modalSubtitle">Great job!</p>
+            </div>
+            
+            <form id="completionForm" style="padding: 2rem;">
+                <div class="form-group">
+                    <label class="form-label" id="modalCountLabel">How many?</label>
+                    <input type="number" class="form-control" id="modalCount" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Quick Summary</label>
+                    <textarea class="form-control" id="modalNotes" rows="3" 
+                        placeholder="Add any details you want to remember..."></textarea>
+                    <div class="quick-buttons" id="quickButtons">
+                        <!-- Dynamic quick buttons -->
+                    </div>
+                </div>
+                
+                <div class="timer-controls" style="margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeCompletionModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success" id="saveTaskBtn">
+                        <i class="fas fa-save"></i>
+                        Save & Continue
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Edit Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="celebration-icon">✏️</div>
+                <h3 class="modal-title" id="editModalTitle">Edit Task</h3>
+                <p class="modal-subtitle" id="editModalSubtitle">Make any needed changes</p>
+            </div>
+            
+            <form id="editForm" style="padding: 2rem;">
+                <div class="form-group">
+                    <label class="form-label" id="editCountLabel">Count</label>
+                    <input type="number" class="form-control" id="editCount" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-control" id="editNotes" rows="3" 
+                        placeholder="Update any details..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Time Spent (minutes)</label>
+                    <input type="number" class="form-control" id="editTimeMinutes" min="0" step="1">
+                    <small class="form-text">Adjust if the timer wasn't accurate</small>
+                </div>
+                
+                <div class="timer-controls" style="margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="restartTask()" style="margin-right: auto;">
+                        <i class="fas fa-redo"></i>
+                        Restart Timer
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="updateTaskBtn">
+                        <i class="fas fa-save"></i>
+                        Update Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Timer class for each task
+        class TaskTimer {
+            constructor(taskId) {
+                this.taskId = taskId;
+                this.startTime = null;
+                this.elapsedTime = 0;
+                this.interval = null;
+                this.isRunning = false;
+                this.sessions = [];
+            }
+            
+            start() {
+                if (!this.isRunning) {
+                    this.startTime = Date.now();
+                    this.isRunning = true;
+                    this.interval = setInterval(() => {
+                        this.updateDisplay();
+                    }, 100);
+                    
+                    // Add session start
+                    this.sessions.push({
+                        start: new Date().toISOString(),
+                        end: null,
+                        duration: 0
+                    });
+                }
+            }
+            
+            pause() {
+                if (this.isRunning) {
+                    this.isRunning = false;
+                    clearInterval(this.interval);
+                    const sessionTime = Date.now() - this.startTime;
+                    this.elapsedTime += sessionTime;
+                    
+                    // Update last session
+                    const lastSession = this.sessions[this.sessions.length - 1];
+                    if (lastSession) {
+                        lastSession.end = new Date().toISOString();
+                        lastSession.duration = Math.round(sessionTime / 1000);
+                    }
+                }
+            }
+            
+            stop() {
+                this.pause();
+                const totalSeconds = Math.round(this.elapsedTime / 1000);
+                return {
+                    totalSeconds,
+                    totalMinutes: Math.round(totalSeconds / 60),
+                    sessions: this.sessions
+                };
+            }
+            
+            updateDisplay() {
+                const total = this.elapsedTime + (this.isRunning ? Date.now() - this.startTime : 0);
+                const seconds = Math.floor(total / 1000) % 60;
+                const minutes = Math.floor(total / 60000);
+                
+                const timerElement = document.getElementById(`timer-${this.taskId}`);
+                if (timerElement) {
+                    timerElement.textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+                    
+                // Update time spent display
+                const timeSpentElement = document.getElementById(`timeSpent-${this.taskId}`);
+                if (timeSpentElement) {
+                    timeSpentElement.textContent = 
+                        `${Math.round(total / 60000)} minutes`;
+                }
+            }
+            
+            reset() {
+                this.pause();
+                this.elapsedTime = 0;
+                this.sessions = [];
+                this.updateDisplay();
+            }
+            
+            setElapsedTime(seconds) {
+                this.elapsedTime = seconds * 1000;
+                this.updateDisplay();
+            }
+        }
+
+        // Initialize
+        let taskService = null;
+        let timers = {};
+        let currentTask = null;
+        let todaysTasks = [];
+        let taskTypes = [];  // Dynamic task types from admin dashboard
+
+        // Error handling
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+                setTimeout(() => {
+                    errorElement.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        // Loading state
+        function showLoading(show = true) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                if (show) {
+                    loadingOverlay.classList.add('show');
+                } else {
+                    loadingOverlay.classList.remove('show');
+                }
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                taskService = new TaskTrackingService();
+                updateDateTime();
+                setInterval(updateDateTime, 60000);
+                updateGreeting();
+                checkFridayReminder();
+                
+                // Load task types and render dynamic tasks
+                await loadTaskTypes();
+                
+                // Load today's tasks
+                await loadTodaysTasks();
+                
+                // Update earnings display
+                await updateEarningsDisplay();
+                
+                // Calculate streak
+                try {
+                    const streak = await taskService.calculateStreak();
+                    if (streak > 0) {
+                        const streakBadge = document.getElementById('streakBadge');
+                        const streakCount = document.getElementById('streakCount');
+                        if (streakBadge && streakCount) {
+                            streakBadge.style.display = 'inline-flex';
+                            streakCount.textContent = streak;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error calculating streak:', error);
+                }
+                
+                // Reset monthly counts on the 1st
+                const today = new Date();
+                if (today.getDate() === 1) {
+                    const lastReset = localStorage.getItem('adriyella_last_monthly_reset');
+                    const thisMonth = `${today.getFullYear()}-${today.getMonth() + 1}`;
+                    
+                    if (lastReset !== thisMonth) {
+                        // Reset monthly counts
+                        taskTypes.forEach(task => {
+                            task.monthlyCount = 0;
+                        });
+                        localStorage.setItem('adriyella_task_types', JSON.stringify(taskTypes));
+                        localStorage.setItem('adriyella_last_monthly_reset', thisMonth);
+                        localStorage.removeItem('adriyella_last_achievement');
+                        
+                        // Re-render
+                        renderTaskCards();
+                    }
+                }
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize. Please refresh the page.');
+            }
+        });
+
+        // Update date/time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            
+            const dateTimeElement = document.getElementById('dateTime');
+            if (dateTimeElement) {
+                dateTimeElement.textContent = now.toLocaleDateString('en-US', options);
+            }
+            
+            const summaryDateElement = document.getElementById('summaryDate');
+            if (summaryDateElement) {
+                summaryDateElement.textContent = now.toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+            }
+        }
+
+        // Update greeting based on time
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = 'Good morning';
+            let emoji = '🌟';
+            
+            if (hour >= 12 && hour < 17) {
+                greeting = 'Good afternoon';
+                emoji = '☀️';
+            } else if (hour >= 17) {
+                greeting = 'Good evening';
+                emoji = '🌙';
+            }
+            
+            const greetingElement = document.getElementById('welcomeGreeting');
+            if (greetingElement) {
+                greetingElement.textContent = `${greeting}, Adriyella! ${emoji}`;
+            }
+        }
+
+        // Check if it's Friday
+        function checkFridayReminder() {
+            const today = new Date();
+            if (today.getDay() === 5) { // Friday
+                const fridayReminder = document.getElementById('fridayReminder');
+                if (fridayReminder) {
+                    fridayReminder.style.display = 'flex';
+                }
+                
+                // Highlight administrative tasks on Friday (like Sample Management)
+                taskTypes.forEach(task => {
+                    if (task.category === 'administrative') {
+                        const taskElement = document.getElementById(`task-${task.id}`);
+                        if (taskElement) {
+                            taskElement.style.borderColor = 'var(--warning-orange)';
+                        }
+                    }
+                });
+            }
+        }
+
+        // Load task types from localStorage (same as admin dashboard)
+        async function loadTaskTypes() {
+            try {
+                const savedTypes = localStorage.getItem('adriyella_task_types');
+                taskTypes = savedTypes ? JSON.parse(savedTypes) : getDefaultTaskTypes();
+                
+                // Initialize timers for dynamic tasks
+                timers = {};
+                taskTypes.forEach(task => {
+                    timers[task.id] = new TaskTimer(task.id);
+                });
+                
+                // Update total tasks count
+                const totalTasksElement = document.getElementById('totalTasks');
+                if (totalTasksElement) {
+                    totalTasksElement.textContent = taskTypes.length;
+                }
+                
+                renderTaskCards();
+            } catch (error) {
+                console.error('Error loading task types:', error);
+                showError('Failed to load task configuration.');
+            }
+        }
+
+        // Get default task types (new bonus system)
+        function getDefaultTaskTypes() {
+            return [
+                {
+                    id: 'thank-you-cards',
+                    name: 'Thank You Cards',
+                    icon: '📧',
+                    category: 'customer-retention',
+                    description: 'Write and send personalized thank you cards to customers',
+                    billingType: 'per-task',
+                    baseRate: 2.00,
+                    bonusThreshold: 30,
+                    bonusAmount: 25.00,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'daily',
+                    priority: 'high',
+                    instructions: '1. After customer pickup call\n2. Write personalized message\n3. Address and mail card\n4. Log completion'
+                },
+                {
+                    id: 'wow-gift-boxes',
+                    name: 'WOW Gift Boxes',
+                    icon: '🎁',
+                    category: 'customer-retention',
+                    description: 'Create special gift packages for VIP customers',
+                    billingType: 'per-task',
+                    baseRate: 25.00,
+                    bonusRate: 50.00,
+                    bonusStartsAfter: 4,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'weekly',
+                    priority: 'high',
+                    instructions: '1. Select customer from VIP list\n2. Choose appropriate gift items\n3. Package beautifully\n4. Include personalized note'
+                },
+                {
+                    id: 'google-reviews',
+                    name: 'Google Review Follow-up',
+                    icon: '⭐',
+                    category: 'marketing',
+                    description: 'Follow up with customers to request Google reviews',
+                    billingType: 'per-task',
+                    baseRate: 10.00,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'weekly',
+                    priority: 'medium',
+                    instructions: '1. Contact recent happy customers\n2. Send review link\n3. Thank them for feedback\n4. Log response'
+                },
+                {
+                    id: 'art-approvals',
+                    name: 'Art Approval Coordination',
+                    icon: '🎨',
+                    category: 'production',
+                    description: 'Coordinate art approvals with customers',
+                    billingType: 'per-task',
+                    baseRate: 5.00,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'daily',
+                    priority: 'medium',
+                    instructions: '1. Check pending art approvals\n2. Send to customers\n3. Follow up if needed\n4. Update production'
+                },
+                {
+                    id: 'lead-sheets',
+                    name: 'Fill Lead Sheets',
+                    icon: '📋',
+                    category: 'administrative',
+                    description: 'Enter lead information into tracking system',
+                    billingType: 'per-task',
+                    baseRate: 3.00,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'daily',
+                    priority: 'low',
+                    instructions: '1. Gather lead info\n2. Enter into system\n3. Assign to sales rep\n4. Mark complete'
+                },
+                {
+                    id: 'appointments',
+                    name: 'Schedule Appointments',
+                    icon: '📅',
+                    category: 'sales-support',
+                    description: 'Schedule customer appointments for sales team',
+                    billingType: 'per-task',
+                    baseRate: 10.00,
+                    currentCount: 0,
+                    monthlyCount: 0,
+                    frequency: 'weekly',
+                    priority: 'medium',
+                    instructions: '1. Contact customer\n2. Find mutual time\n3. Add to calendar\n4. Send confirmation'
+                }
+            ];
+        }
+
+        // Render new bonus task type cards
+        function renderTaskCards() {
+            const taskTypesGrid = document.getElementById('taskTypesGrid');
+            if (!taskTypesGrid) return;
+
+            taskTypesGrid.innerHTML = taskTypes.map(task => {
+                // Ensure all required properties have defaults
+                const safeTask = {
+                    baseRate: 0,
+                    bonusRate: 0,
+                    bonusAmount: 0,
+                    monthlyCount: 0,
+                    bonusThreshold: null,
+                    bonusStartsAfter: null,
+                    ...task
+                };
+                
+                const isBonus = safeTask.bonusThreshold && safeTask.monthlyCount >= safeTask.bonusThreshold;
+                const isBonusRate = safeTask.bonusStartsAfter && safeTask.monthlyCount >= safeTask.bonusStartsAfter;
+                
+                let pricingText = `$${safeTask.baseRate.toFixed(2)} each`;
+                let bonusHint = '';
+                
+                if (safeTask.bonusThreshold) {
+                    bonusHint = safeTask.monthlyCount >= safeTask.bonusThreshold 
+                        ? '✨ Bonus unlocked!' 
+                        : `${safeTask.bonusThreshold - safeTask.monthlyCount} more for $${safeTask.bonusAmount.toFixed(2)} bonus!`;
+                }
+                
+                if (safeTask.bonusStartsAfter) {
+                    if (safeTask.monthlyCount >= safeTask.bonusStartsAfter) {
+                        pricingText = `$${safeTask.bonusRate.toFixed(2)} each (Bonus rate!)`;
+                    } else {
+                        bonusHint = `${safeTask.bonusStartsAfter - safeTask.monthlyCount} more for $${safeTask.bonusRate.toFixed(2)} each!`;
+                    }
+                }
+                    
+                return `
+                    <div class="task-type-card ${isBonus || isBonusRate ? 'bonus-active' : ''}" id="task-${safeTask.id}">
+                        ${isBonus || isBonusRate ? '<div class="bonus-badge">BONUS ACTIVE!</div>' : ''}
+                        <div class="task-type-header">
+                            <span class="task-type-icon">${safeTask.icon || '📋'}</span>
+                            <span class="task-type-name">${safeTask.name || 'Task'}</span>
+                        </div>
+                        <div class="task-type-pricing">${pricingText}</div>
+                        <div class="task-type-progress">
+                            <span class="task-type-count">${safeTask.monthlyCount} done this month</span>
+                        </div>
+                        ${bonusHint ? `<div class="task-type-bonus-hint">${bonusHint}</div>` : ''}
+                        <button class="complete-task-btn" onclick="quickCompleteTask('${safeTask.id}')">
+                            Complete Task
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            
+            // Also update opportunities
+            updateOpportunities();
+        }
+        
+        // Calculate and display today's opportunities
+        function updateOpportunities() {
+            const opportunitiesList = document.getElementById('opportunitiesList');
+            if (!opportunitiesList) return;
+            
+            const opportunities = [];
+            
+            taskTypes.forEach(task => {
+                let value = 0;
+                let text = '';
+                
+                if (task.id === 'wow-gift-boxes' && task.monthlyCount >= task.bonusStartsAfter) {
+                    value = task.bonusRate;
+                    text = `1 WOW Box at bonus rate`;
+                } else if (task.id === 'thank-you-cards' && task.monthlyCount < task.bonusThreshold) {
+                    const remaining = task.bonusThreshold - task.monthlyCount;
+                    value = remaining * task.baseRate + task.bonusAmount;
+                    text = `Complete ${remaining} Thank You Cards for bonus`;
+                } else {
+                    value = task.baseRate;
+                    text = `1 ${task.name}`;
+                }
+                
+                if (value > 0) {
+                    opportunities.push({ text, value, icon: task.icon });
+                }
+            });
+            
+            // Sort by value
+            opportunities.sort((a, b) => b.value - a.value);
+            
+            // Display top 3
+            opportunitiesList.innerHTML = opportunities.slice(0, 3).map(opp => `
+                <div class="opportunity-item">
+                    <span class="opportunity-text">
+                        ${opp.icon} ${opp.text}
+                    </span>
+                    <span class="opportunity-value">$${opp.value.toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+
+        // Load today's tasks from database
+        async function loadTodaysTasks() {
+            try {
+                showLoading(true);
+                const session = await taskService.getTodaySession();
+                todaysTasks = await taskService.getTodayTasks();
+                
+                let completedCount = 0;
+                let totalTime = 0;
+                let totalContacts = 0;
+                
+                // Create a mapping from taskNumber to database pkId for edit functionality
+                const taskIdMapping = {};
+                
+                todaysTasks.forEach(task => {
+                    if (task.completed) {
+                        completedCount++;
+                        totalTime += task.totalSeconds || 0;
+                        totalContacts += task.count || 0;
+                        
+                        // Find the matching task type by LineNumber
+                        const matchingTaskType = taskTypes.find(t => {
+                            // Match by old system (1, 2, 3) or by finding task with matching name
+                            if (task.taskNumber <= 3) {
+                                // Old hardcoded tasks
+                                const oldTaskMapping = {
+                                    1: 'customer-service',
+                                    2: 'sales-support', 
+                                    3: 'administrative'
+                                };
+                                return t.category === oldTaskMapping[task.taskNumber];
+                            }
+                            // For new dynamic tasks, match by name
+                            return t.name === task.taskName;
+                        });
+                        
+                        if (matchingTaskType) {
+                            const taskId = matchingTaskType.id;
+                            
+                            // Store the mapping from UI task ID to database pk
+                            taskIdMapping[taskId] = task.pkId;
+                            
+                            // Update UI
+                            const card = document.getElementById(`task-${taskId}`);
+                            if (card) {
+                                card.classList.add('completed');
+                                // Store pkId as data attribute for edit functionality
+                                card.setAttribute('data-pk-id', task.pkId);
+                            }
+                            
+                            const status = document.getElementById(`status-${taskId}`);
+                            if (status) {
+                                status.textContent = 'Completed';
+                                status.className = 'task-status status-completed';
+                            }
+                            
+                            const countInput = document.getElementById(`count-${taskId}`);
+                            if (countInput) {
+                                countInput.value = task.count;
+                            }
+                            
+                            // Show time spent
+                            const minutes = Math.round(task.totalSeconds / 60);
+                            const timeSpent = document.getElementById(`timeSpent-${taskId}`);
+                            if (timeSpent) {
+                                timeSpent.textContent = `${minutes} minutes`;
+                            }
+                            
+                            // Update timer display
+                            if (timers[taskId]) {
+                                timers[taskId].setElapsedTime(task.totalSeconds);
+                            }
+                            
+                            // Disable timer button and show edit button
+                            const timerBtn = document.getElementById(`timerBtn-${taskId}`);
+                            if (timerBtn) {
+                                timerBtn.disabled = true;
+                                timerBtn.innerHTML = '<i class="fas fa-check"></i> Completed';
+                            }
+                            
+                            const editBtn = document.getElementById(`editBtn-${taskId}`);
+                            if (editBtn) {
+                                editBtn.style.display = 'inline-flex';
+                                // Update onclick to use the database pkId
+                                editBtn.setAttribute('onclick', `editTask('${taskId}', ${task.pkId})`);
+                            }
+                        }
+                    }
+                });
+                
+                // Store the mapping globally for access in other functions
+                window.taskIdMapping = taskIdMapping;
+                
+                updateSummary(completedCount, totalTime, totalContacts);
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                showError('Failed to load today\'s tasks. Working offline.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Toggle timer
+        function toggleTimer(taskId) {
+            try {
+                const timer = timers[taskId];
+                const btn = document.getElementById(`timerBtn-${taskId}`);
+                const completeBtn = document.getElementById(`completeBtn-${taskId}`);
+                const card = document.getElementById(`task-${taskId}`);
+                const status = document.getElementById(`status-${taskId}`);
+                const details = document.getElementById(`details-${taskId}`);
+                
+                if (!timer || !btn) return;
+                
+                if (timer.isRunning) {
+                    // Pause
+                    timer.pause();
+                    btn.innerHTML = '<i class="fas fa-play"></i> Resume';
+                    btn.classList.remove('btn-secondary');
+                    btn.classList.add('btn-primary');
+                    if (card) card.classList.remove('active');
+                    if (status) status.classList.remove('status-active');
+                } else {
+                    // Start/Resume
+                    // Pause other timers
+                    Object.keys(timers).forEach(id => {
+                        if (id !== taskId.toString() && timers[id].isRunning) {
+                            toggleTimer(parseInt(id));
+                        }
+                    });
+                    
+                    timer.start();
+                    btn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-secondary');
+                    if (completeBtn) completeBtn.style.display = 'inline-flex';
+                    if (card) card.classList.add('active');
+                    if (status) {
+                        status.textContent = 'Active';
+                        status.className = 'task-status status-active';
+                    }
+                    if (details) details.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error toggling timer:', error);
+                showError('Failed to toggle timer. Please try again.');
+            }
+        }
+
+        // Complete task
+        function completeTask(taskId) {
+            try {
+                currentTask = taskId;
+                const timer = timers[taskId];
+                if (!timer) return;
+                
+                const timeData = timer.stop();
+                
+                // Find the task from dynamic taskTypes
+                const task = taskTypes.find(t => t.id === taskId);
+                if (!task) {
+                    showError('Task not found');
+                    return;
+                }
+                
+                const modalTitle = document.getElementById('modalTitle');
+                if (modalTitle) {
+                    modalTitle.textContent = `${task.name} Complete!`;
+                }
+                
+                const modalSubtitle = document.getElementById('modalSubtitle');
+                if (modalSubtitle) {
+                    modalSubtitle.textContent = 
+                        `You worked for ${timeData.totalMinutes} minutes. Amazing! 🎉`;
+                }
+                
+                // Generate dynamic count label based on task category
+                const countLabels = {
+                    'customer-service': 'How many customers did you help?',
+                    'sales-support': 'How many sales activities did you complete?',
+                    'follow-up': 'How many follow-ups did you complete?',
+                    'administrative': 'How many items did you process?',
+                    'special-projects': 'How many project tasks did you complete?'
+                };
+                
+                const modalCountLabel = document.getElementById('modalCountLabel');
+                if (modalCountLabel) {
+                    modalCountLabel.textContent = countLabels[task.category] || 'How many items did you complete?';
+                }
+                
+                // Set quick buttons based on task
+                setQuickButtons(taskId);
+                
+                // Pre-fill count if already entered
+                const currentCount = document.getElementById(`count-${taskId}`);
+                const modalCount = document.getElementById('modalCount');
+                if (currentCount && modalCount) {
+                    modalCount.value = currentCount.value || '';
+                }
+                
+                const completionModal = document.getElementById('completionModal');
+                if (completionModal) {
+                    completionModal.classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error completing task:', error);
+                showError('Failed to complete task. Please try again.');
+            }
+        }
+
+        // Set quick buttons for modal
+        function setQuickButtons(taskId) {
+            const container = document.getElementById('quickButtons');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Find the task from dynamic taskTypes
+            const task = taskTypes.find(t => t.id === taskId);
+            if (!task) return;
+            
+            // Generate quick options based on task category
+            const quickOptionsByCategory = {
+                'customer-service': ['Called - VM', 'Texted', 'Emailed', 'Spoke directly'],
+                'sales-support': ['Quote sent', 'Follow-up call', 'Meeting scheduled', 'Proposal delivered'],
+                'follow-up': ['Email sent', 'Call completed', 'Meeting held', 'Action items assigned'],
+                'administrative': ['Filed', 'Updated', 'Organized', 'Processed'],
+                'special-projects': ['Research completed', 'Draft created', 'Review conducted', 'Task completed']
+            };
+            
+            const options = quickOptionsByCategory[task.category] || ['Completed', 'In Progress', 'Reviewed', 'Updated'];
+            
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'quick-btn';
+                btn.textContent = option;
+                btn.onclick = () => {
+                    const notes = document.getElementById('modalNotes');
+                    if (notes) {
+                        notes.value += (notes.value ? ', ' : '') + option;
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // Handle completion form
+        const completionForm = document.getElementById('completionForm');
+        if (completionForm) {
+            completionForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const saveBtn = document.getElementById('saveTaskBtn');
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                }
+                
+                try {
+                    const count = parseInt(document.getElementById('modalCount').value) || 1;
+                    const notes = document.getElementById('modalNotes').value;
+                    
+                    // Find the task type
+                    const task = taskTypes.find(t => t.id === currentTask);
+                    if (!task) {
+                        showError('Task not found');
+                        return;
+                    }
+                    
+                    // Calculate earnings for this completion
+                    const earnings = calculateTaskEarnings(task, count);
+                    
+                    // For bonus tasks, we don't need timer data
+                    let timeData = { totalSeconds: 0, totalMinutes: 0, sessions: [] };
+                    if (timers[currentTask] && timers[currentTask].isRunning) {
+                        timeData = timers[currentTask].stop();
+                    }
+                    
+                    // Prepare task data with earnings
+                    const taskData = {
+                        count: count,
+                        notes: notes,
+                        taskName: task.name,
+                        totalSeconds: earnings * 100, // Store earnings as "seconds" for compatibility
+                        startTime: new Date().toISOString(),
+                        endTime: new Date().toISOString(),
+                        timerSessions: timeData.sessions,
+                        details: {
+                            count: count,
+                            notes: notes,
+                            completedAt: new Date().toLocaleTimeString(),
+                            earnings: earnings,
+                            baseRate: task.baseRate,
+                            bonusRate: task.bonusRate || 0,
+                            bonusTriggered: false
+                        }
+                    };
+                    
+                    // Check if bonus was triggered
+                    if (task.bonusThreshold) {
+                        const beforeCount = task.monthlyCount;
+                        const afterCount = task.monthlyCount + count;
+                        if (beforeCount < task.bonusThreshold && afterCount >= task.bonusThreshold) {
+                            taskData.details.bonusTriggered = true;
+                            taskData.details.bonusAmount = task.bonusAmount;
+                        }
+                    }
+                    
+                    // Save to database
+                    const success = await taskService.saveTaskCompletion(currentTask, taskData);
+                    
+                    if (success) {
+                        // Update task counts
+                        task.monthlyCount = (task.monthlyCount || 0) + count;
+                        task.currentCount = (task.currentCount || 0) + count;
+                        
+                        // Save updated counts to localStorage
+                        localStorage.setItem('adriyella_task_types', JSON.stringify(taskTypes));
+                        
+                        // Re-render task cards to update displays
+                        renderTaskCards();
+                        
+                        // Update earnings display
+                        await updateEarningsDisplay();
+                        
+                        // Celebrate!
+                        showCelebration();
+                        
+                        // Show earnings message
+                        if (taskData.details.bonusTriggered) {
+                            showAchievement('Bonus Unlocked!', `You earned $${earnings.toFixed(2)} including a $${task.bonusAmount} bonus!`);
+                        } else {
+                            showAchievement('Task Complete!', `You earned $${earnings.toFixed(2)}!`);
+                        }
+                        
+                        // Update summary
+                        await updateDailySummary();
+                    } else {
+                        showError('Failed to save task. Please try again.');
+                    }
+                    
+                    closeCompletionModal();
+                } catch (error) {
+                    console.error('Error saving task:', error);
+                    showError('Failed to save task. Please try again.');
+                } finally {
+                    if (saveBtn) {
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save & Continue';
+                    }
+                }
+            });
+        }
+
+        // Update daily summary
+        async function updateDailySummary() {
+            try {
+                const tasks = await taskService.getTodayTasks();
+                let completedCount = 0;
+                let totalTime = 0;
+                let totalContacts = 0;
+                
+                tasks.forEach(task => {
+                    if (task.completed) {
+                        completedCount++;
+                        totalTime += task.totalSeconds || 0;
+                        totalContacts += task.count || 0;
+                    }
+                });
+                
+                updateSummary(completedCount, totalTime, totalContacts);
+            } catch (error) {
+                console.error('Error updating summary:', error);
+            }
+        }
+
+        // Update summary display
+        function updateSummary(completed, totalSeconds, contacts) {
+            const totalTasks = taskTypes.length;
+            
+            // Progress - now dynamic based on actual task count
+            const progress = totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill) {
+                progressFill.style.width = `${progress}%`;
+            }
+            
+            const tasksCompleted = document.getElementById('tasksCompleted');
+            if (tasksCompleted) {
+                tasksCompleted.textContent = completed;
+            }
+            
+            // Time
+            const minutes = Math.floor(totalSeconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            const totalTime = document.getElementById('totalTime');
+            if (totalTime) {
+                totalTime.textContent = 
+                    hours > 0 ? `${hours}:${mins.toString().padStart(2, '0')}` : `${mins}:00`;
+            }
+            
+            // Contacts
+            const totalContactsElement = document.getElementById('totalContacts');
+            if (totalContactsElement) {
+                totalContactsElement.textContent = contacts;
+            }
+            
+            // Productivity score - calculate based on task billing rates
+            let expectedMinutes = 0;
+            taskTypes.forEach(task => {
+                if (task.billingType === 'hourly') {
+                    expectedMinutes += 30; // Assume 30 min for hourly tasks
+                } else {
+                    expectedMinutes += 15; // 15 min for flat rate tasks
+                }
+            });
+            expectedMinutes = Math.round((expectedMinutes / totalTasks) * completed);
+            
+            const actualMinutes = Math.round(totalSeconds / 60);
+            const productivity = actualMinutes > 0 
+                ? Math.min(100, Math.round((expectedMinutes / actualMinutes) * 100))
+                : 0;
+            const productivityScore = document.getElementById('productivityScore');
+            if (productivityScore) {
+                productivityScore.textContent = `${productivity}%`;
+            }
+            
+            // Update streak display - dynamic based on completion percentage
+            const todayStreak = document.getElementById('todayStreak');
+            if (todayStreak) {
+                const streakEmojis = '🔥'.repeat(Math.min(3, Math.ceil((completed / totalTasks) * 3)));
+                todayStreak.textContent = streakEmojis || '';
+            }
+        }
+
+        // Show celebration animation
+        function showCelebration() {
+            // Simple celebration - could add confetti library later
+            const card = document.getElementById(`task-${currentTask}`);
+            if (card) {
+                card.style.animation = 'bounce 0.5s ease';
+                setTimeout(() => {
+                    card.style.animation = '';
+                }, 500);
+            }
+        }
+
+        // Close completion modal
+        function closeCompletionModal() {
+            const modal = document.getElementById('completionModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            
+            const form = document.getElementById('completionForm');
+            if (form) {
+                form.reset();
+            }
+        }
+
+        // Submit daily report
+        async function submitDailyReport() {
+            try {
+                const reflection = document.getElementById('dailyReflection').value;
+                const tasks = await taskService.getTodayTasks();
+                
+                if (tasks.filter(t => t.completed).length === 0) {
+                    showError('Please complete at least one task before submitting your daily report.');
+                    return;
+                }
+                
+                showLoading(true);
+                const success = await taskService.submitDailyReport(reflection);
+                
+                if (success) {
+                    alert('Daily report submitted! Great job today! 🎉');
+                    // Could redirect or show a success screen
+                } else {
+                    showError('Failed to submit report. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error submitting report:', error);
+                showError('Failed to submit report. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Quick note function
+        function addQuickNote(taskId) {
+            const note = prompt('Add a quick note:');
+            if (note) {
+                // Could save to a notes field or append to existing notes
+                console.log(`Note for task ${taskId}: ${note}`);
+            }
+        }
+
+        // Show templates (placeholder)
+        function showTemplates() {
+            alert('Thank you note templates:\n\n1. First-Time Customer\n2. Repeat Customer\n3. With Upsell Suggestion\n\nTemplates coming soon to the modal!');
+        }
+
+        // Quick complete task (for bonus system)
+        async function quickCompleteTask(taskId) {
+            try {
+                currentTask = taskId;
+                const task = taskTypes.find(t => t.id === taskId);
+                if (!task) {
+                    showError('Task not found');
+                    return;
+                }
+                
+                // For bonus tasks, we'll show the completion modal
+                const modalTitle = document.getElementById('modalTitle');
+                if (modalTitle) {
+                    modalTitle.textContent = `${task.name} Complete!`;
+                }
+                
+                const modalSubtitle = document.getElementById('modalSubtitle');
+                if (modalSubtitle) {
+                    modalSubtitle.textContent = `${task.icon} Great job! You've earned $${calculateTaskEarnings(task).toFixed(2)}!`;
+                }
+                
+                const modalCountLabel = document.getElementById('modalCountLabel');
+                if (modalCountLabel) {
+                    modalCountLabel.textContent = 'How many did you complete?';
+                }
+                
+                // Set appropriate quick buttons
+                const quickButtonOptions = {
+                    'thank-you-cards': ['Hand-written', 'Personalized', 'Mailed', 'With gift card'],
+                    'wow-gift-boxes': ['VIP customer', 'New customer', 'Thank you gift', 'Holiday special'],
+                    'google-reviews': ['Review received', 'Link sent', 'Follow-up made', 'Customer responded'],
+                    'art-approvals': ['Approved', 'Revisions requested', 'Customer contacted', 'Rush order'],
+                    'lead-sheets': ['Entered', 'Assigned to rep', 'Follow-up scheduled', 'High priority'],
+                    'appointments': ['Scheduled', 'Confirmed', 'Rescheduled', 'Sales meeting']
+                };
+                
+                const container = document.getElementById('quickButtons');
+                if (container) {
+                    container.innerHTML = '';
+                    const options = quickButtonOptions[taskId] || ['Completed'];
+                    
+                    options.forEach(option => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'quick-btn';
+                        btn.textContent = option;
+                        btn.onclick = () => {
+                            const notes = document.getElementById('modalNotes');
+                            if (notes) {
+                                notes.value += (notes.value ? ', ' : '') + option;
+                            }
+                        };
+                        container.appendChild(btn);
+                    });
+                }
+                
+                // Pre-fill with 1 as default
+                const modalCount = document.getElementById('modalCount');
+                if (modalCount) {
+                    modalCount.value = '1';
+                }
+                
+                const completionModal = document.getElementById('completionModal');
+                if (completionModal) {
+                    completionModal.classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error in quickCompleteTask:', error);
+                showError('Failed to open completion dialog. Please try again.');
+            }
+        }
+        
+        // Calculate earnings for a task
+        function calculateTaskEarnings(task, count = 1) {
+            // Ensure task has safe defaults
+            const safeTask = {
+                baseRate: 0,
+                bonusRate: 0,
+                bonusAmount: 0,
+                monthlyCount: 0,
+                bonusThreshold: null,
+                bonusStartsAfter: null,
+                ...task
+            };
+            
+            let earnings = 0;
+            
+            if (safeTask.bonusStartsAfter && safeTask.monthlyCount >= safeTask.bonusStartsAfter) {
+                // Use bonus rate for all new completions
+                earnings = safeTask.bonusRate * count;
+            } else {
+                // Use base rate
+                earnings = safeTask.baseRate * count;
+            }
+            
+            // Check if this completion triggers a threshold bonus
+            if (safeTask.bonusThreshold) {
+                const beforeCount = safeTask.monthlyCount;
+                const afterCount = safeTask.monthlyCount + count;
+                
+                // If we cross the threshold with this completion
+                if (beforeCount < safeTask.bonusThreshold && afterCount >= safeTask.bonusThreshold) {
+                    earnings += safeTask.bonusAmount;
+                }
+            }
+            
+            return earnings;
+        }
+        
+        // Update earnings displays
+        async function updateEarningsDisplay() {
+            try {
+                // Calculate today's earnings
+                let todayEarnings = 0;
+                let weekEarnings = 0;
+                let monthEarnings = 0;
+                
+                const today = new Date();
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - today.getDay());
+                startOfWeek.setHours(0, 0, 0, 0);
+                
+                const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                
+                // Get all task items from this month
+                const history = await taskService.getTaskHistory(30);
+                
+                for (const session of history) {
+                    const sessionDate = new Date(session.CreatedAt);
+                    
+                    // Get items for this session
+                    try {
+                        const items = await taskService.getTasksForQuote(session.QuoteID);
+                        
+                        items.forEach(item => {
+                            // LineTotal stores earnings * 100
+                            const earnings = parseFloat(item.LineTotal || 0) / 100;
+                            
+                            if (sessionDate.toDateString() === today.toDateString()) {
+                                todayEarnings += earnings;
+                            }
+                            
+                            if (sessionDate >= startOfWeek) {
+                                weekEarnings += earnings;
+                            }
+                            
+                            if (sessionDate >= startOfMonth) {
+                                monthEarnings += earnings;
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error getting items for session:', session.QuoteID, error);
+                    }
+                }
+                
+                // Update displays
+                document.getElementById('todayEarnings').textContent = `$${todayEarnings.toFixed(2)}`;
+                document.getElementById('weekEarnings').textContent = `$${weekEarnings.toFixed(2)}`;
+                document.getElementById('monthEarnings').textContent = `$${monthEarnings.toFixed(2)}`;
+                document.getElementById('monthEarningsProgress').textContent = `$${monthEarnings.toFixed(0)}`;
+                
+                // Update progress bar (max $400/month)
+                const progressPercent = Math.min(100, (monthEarnings / 400) * 100);
+                const progressFill = document.getElementById('earningsProgressFill');
+                if (progressFill) {
+                    progressFill.style.width = `${progressPercent}%`;
+                }
+                
+                // Check for achievements
+                checkEarningsAchievements(monthEarnings);
+                
+            } catch (error) {
+                console.error('Error updating earnings display:', error);
+            }
+        }
+        
+        // Check for earnings achievements
+        function checkEarningsAchievements(monthEarnings) {
+            const achievements = [
+                { amount: 50, title: 'Great Start!', message: 'You\'ve earned your first $50!' },
+                { amount: 100, title: 'Century Club!', message: '$100 in bonuses this month!' },
+                { amount: 200, title: 'Halfway There!', message: '$200 earned - keep it up!' },
+                { amount: 300, title: 'Super Star!', message: '$300 in bonuses - amazing!' },
+                { amount: 400, title: 'MAX BONUS!', message: 'You\'ve earned the full $400!' }
+            ];
+            
+            const lastAchievement = localStorage.getItem('adriyella_last_achievement') || 0;
+            
+            for (const achievement of achievements) {
+                if (monthEarnings >= achievement.amount && lastAchievement < achievement.amount) {
+                    showAchievement(achievement.title, achievement.message);
+                    localStorage.setItem('adriyella_last_achievement', achievement.amount);
+                    break;
+                }
+            }
+        }
+        
+        // Show achievement notification
+        function showAchievement(title, message) {
+            const notification = document.getElementById('achievementNotification');
+            const titleEl = document.getElementById('achievementTitle');
+            const messageEl = document.getElementById('achievementMessage');
+            
+            if (notification && titleEl && messageEl) {
+                titleEl.textContent = title;
+                messageEl.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        // Edit task functionality
+        let editingTaskId = null;
+        let editingPkId = null;
+
+        // Edit task function
+        async function editTask(taskId, pkId) {
+            try {
+                // If pkId is not provided, show an error
+                if (!pkId) {
+                    showError('Cannot edit task. Please reload the page and try again.');
+                    return;
+                }
+                
+                editingTaskId = taskId;
+                editingPkId = pkId;
+                
+                // Get task data from the database using the pkId
+                const taskData = await taskService.getTaskData(pkId);
+                
+                if (!taskData) {
+                    showError('Task data not found. Cannot edit.');
+                    return;
+                }
+                
+                // Find the task type from dynamic taskTypes
+                const taskType = taskTypes.find(t => t.id === taskId);
+                if (!taskType) {
+                    showError('Task type not found.');
+                    return;
+                }
+                
+                // Parse timer data to get notes and other details
+                let timerData = {};
+                try {
+                    timerData = JSON.parse(taskData.TimerData_ || '{}');
+                } catch (e) {
+                    console.error('Error parsing timer data:', e);
+                    timerData = {};
+                }
+                
+                // Update modal title
+                document.getElementById('editModalTitle').textContent = `Edit ${taskType.name}`;
+                document.getElementById('editModalSubtitle').textContent = 'Make any needed changes';
+                
+                // Update count label based on task category
+                const countLabels = {
+                    'customer-service': 'Number of customers helped',
+                    'sales-support': 'Number of sales activities',
+                    'follow-up': 'Number of follow-ups completed',
+                    'administrative': 'Number of items processed',
+                    'special-projects': 'Number of project tasks'
+                };
+                document.getElementById('editCountLabel').textContent = countLabels[taskType.category] || 'Count';
+                
+                // Populate form with current data
+                document.getElementById('editCount').value = taskData.Quantity || 0;
+                document.getElementById('editNotes').value = timerData.notes || '';
+                document.getElementById('editTimeMinutes').value = Math.round((taskData.LineTotal || 0) / 60);
+                
+                // Show edit modal
+                document.getElementById('editModal').classList.add('active');
+                
+            } catch (error) {
+                console.error('Error opening edit modal:', error);
+                showError('Failed to open edit dialog. Please try again.');
+            }
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            document.getElementById('editForm').reset();
+            editingTaskId = null;
+        }
+
+        // Restart task function
+        async function restartTask() {
+            if (!editingTaskId) return;
+            
+            try {
+                if (confirm('This will reset the task and clear all timer data. Are you sure?')) {
+                    // Reset the timer
+                    if (timers[editingTaskId]) {
+                        timers[editingTaskId].reset();
+                    }
+                    
+                    // Reset task data in database
+                    await taskService.resetTask(editingPkId);
+                    
+                    // Update UI to show task as not started
+                    const card = document.getElementById(`task-${editingTaskId}`);
+                    if (card) {
+                        card.classList.remove('completed', 'active');
+                    }
+                    
+                    const status = document.getElementById(`status-${editingTaskId}`);
+                    if (status) {
+                        status.textContent = 'Not Started';
+                        status.className = 'task-status';
+                    }
+                    
+                    const countInput = document.getElementById(`count-${editingTaskId}`);
+                    if (countInput) {
+                        countInput.value = 0;
+                    }
+                    
+                    const timeSpent = document.getElementById(`timeSpent-${editingTaskId}`);
+                    if (timeSpent) {
+                        timeSpent.textContent = '0 minutes';
+                    }
+                    
+                    // Reset timer button
+                    const timerBtn = document.getElementById(`timerBtn-${editingTaskId}`);
+                    if (timerBtn) {
+                        timerBtn.disabled = false;
+                        timerBtn.innerHTML = '<i class="fas fa-play"></i> Start Timer';
+                        timerBtn.classList.remove('btn-secondary');
+                        timerBtn.classList.add('btn-primary');
+                    }
+                    
+                    // Hide edit button
+                    const editBtn = document.getElementById(`editBtn-${editingTaskId}`);
+                    if (editBtn) {
+                        editBtn.style.display = 'none';
+                    }
+                    
+                    // Hide complete button
+                    const completeBtn = document.getElementById(`completeBtn-${editingTaskId}`);
+                    if (completeBtn) {
+                        completeBtn.style.display = 'none';
+                    }
+                    
+                    // Close edit modal
+                    closeEditModal();
+                    
+                    // Update summary
+                    await updateDailySummary();
+                    
+                    alert('Task has been reset! You can now start fresh. 🔄');
+                }
+            } catch (error) {
+                console.error('Error restarting task:', error);
+                showError('Failed to restart task. Please try again.');
+            }
+        }
+
+        // Handle edit form submission
+        const editForm = document.getElementById('editForm');
+        if (editForm) {
+            editForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!editingTaskId) return;
+                
+                const updateBtn = document.getElementById('updateTaskBtn');
+                if (updateBtn) {
+                    updateBtn.disabled = true;
+                    updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                }
+                
+                try {
+                    // Get form data
+                    const count = parseInt(document.getElementById('editCount').value) || 0;
+                    const notes = document.getElementById('editNotes').value.trim();
+                    const timeMinutes = parseInt(document.getElementById('editTimeMinutes').value) || 0;
+                    const totalSeconds = timeMinutes * 60;
+                    
+                    // Prepare updated task data
+                    const updatedData = {
+                        count: count,
+                        notes: notes,
+                        totalSeconds: totalSeconds,
+                        endTime: new Date().toISOString(),
+                        details: {
+                            count: count,
+                            notes: notes,
+                            lastEdited: new Date().toLocaleTimeString(),
+                            editedFields: []
+                        }
+                    };
+                    
+                    // Track what was edited
+                    const originalData = await taskService.getTaskData(editingPkId);
+                    if (originalData) {
+                        if (originalData.count !== count) updatedData.details.editedFields.push('count');
+                        if (originalData.notes !== notes) updatedData.details.editedFields.push('notes');
+                        if (Math.abs((originalData.totalSeconds || 0) - totalSeconds) > 30) updatedData.details.editedFields.push('time');
+                    }
+                    
+                    // Update in database
+                    const success = await taskService.updateTaskCompletion(editingPkId, updatedData);
+                    
+                    if (success) {
+                        // Update UI with new values
+                        const countInput = document.getElementById(`count-${editingTaskId}`);
+                        if (countInput) {
+                            countInput.value = count;
+                        }
+                        
+                        const timeSpent = document.getElementById(`timeSpent-${editingTaskId}`);
+                        if (timeSpent) {
+                            timeSpent.textContent = `${timeMinutes} minutes`;
+                        }
+                        
+                        // Update timer display
+                        if (timers[editingTaskId]) {
+                            timers[editingTaskId].setElapsedTime(totalSeconds);
+                        }
+                        
+                        // Update summary
+                        await updateDailySummary();
+                        
+                        // Close modal
+                        closeEditModal();
+                        
+                        // Show success message
+                        const editedFieldsText = updatedData.details.editedFields.length > 0 
+                            ? ` (${updatedData.details.editedFields.join(', ')} updated)`
+                            : '';
+                        alert(`Task updated successfully!${editedFieldsText} ✅`);
+                        
+                    } else {
+                        showError('Failed to update task. Please try again.');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error updating task:', error);
+                    showError('Failed to update task. Please try again.');
+                } finally {
+                    if (updateBtn) {
+                        updateBtn.disabled = false;
+                        updateBtn.innerHTML = '<i class="fas fa-save"></i> Update Task';
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

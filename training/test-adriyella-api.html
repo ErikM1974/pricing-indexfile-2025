@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Adriyella API Integration</title>
+    <script src="adriyella-task-service.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .result {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            border-left: 4px solid #4CAF50;
+        }
+        .error {
+            border-left: 4px solid #f44336;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #666;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Adriyella API Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Quote ID Generation</h2>
+        <button class="test-button" onclick="testQuoteID()">Generate Quote ID</button>
+        <div id="quoteIDResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Save Daily Tasks</h2>
+        <button class="test-button" onclick="testSaveTasks()">Save Test Tasks</button>
+        <div id="saveResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Get Daily Tasks</h2>
+        <button class="test-button" onclick="testGetTasks()">Get Today's Tasks</button>
+        <div id="getResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Test Get Monthly Tasks</h2>
+        <button class="test-button" onclick="testMonthlyTasks()">Get This Month's Tasks</button>
+        <div id="monthlyResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Test Update Existing Session</h2>
+        <button class="test-button" onclick="testUpdateSession()">Update Today's Tasks</button>
+        <div id="updateResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Test API Error Handling</h2>
+        <button class="test-button" onclick="testAPIError()">Test API Failure</button>
+        <div id="errorResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>7. Test Complete Workflow</h2>
+        <button class="test-button" onclick="testCompleteWorkflow()">Run Complete Test</button>
+        <div id="workflowResult" class="result"></div>
+    </div>
+
+    <script>
+        let taskService;
+
+        // Initialize service
+        window.addEventListener('DOMContentLoaded', () => {
+            taskService = new AdriyellaTaService();
+            console.log('Task service initialized');
+        });
+
+        // Test Quote ID Generation
+        function testQuoteID() {
+            const result = document.getElementById('quoteIDResult');
+            try {
+                const date = new Date().toISOString().split('T')[0];
+                const quoteID = taskService.generateQuoteID(date);
+                result.className = 'result success';
+                result.textContent = `Generated Quote ID: ${quoteID}\nFormat: ADR{MMDD}-{sequence}\nDate: ${date}`;
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Test Save Tasks
+        async function testSaveTasks() {
+            const result = document.getElementById('saveResult');
+            result.textContent = 'Saving tasks...';
+            
+            try {
+                const date = new Date().toISOString().split('T')[0];
+                const tasks = {
+                    thankYou: 5,
+                    leadSheets: 3,
+                    googleReviews: 1,
+                    artApproval: 2
+                };
+                
+                const saveResult = await taskService.saveDailyTasks(date, tasks);
+                
+                if (saveResult.success) {
+                    result.className = 'result success';
+                    result.textContent = `Tasks saved successfully!\n\n` +
+                        `Date: ${date}\n` +
+                        `Quote ID: ${saveResult.data.quoteID || 'N/A'}\n` +
+                        `Thank You Cards: ${tasks.thankYou} × $2.00 = $${(tasks.thankYou * 2).toFixed(2)}\n` +
+                        `Lead Sheets: ${tasks.leadSheets} × $5.00 = $${(tasks.leadSheets * 5).toFixed(2)}\n` +
+                        `Google Reviews: ${tasks.googleReviews} × $20.00 = $${(tasks.googleReviews * 20).toFixed(2)}\n` +
+                        `Art Approval: ${tasks.artApproval} × $10.00 = $${(tasks.artApproval * 10).toFixed(2)}\n` +
+                        `Daily Total: $${saveResult.data.dailyTotal.toFixed(2)}\n\n` +
+                        `Check console for API calls`;
+                } else {
+                    throw new Error('Save failed');
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Test Get Tasks
+        async function testGetTasks() {
+            const result = document.getElementById('getResult');
+            result.textContent = 'Fetching today\'s tasks...';
+            
+            try {
+                const date = new Date().toISOString().split('T')[0];
+                const getResult = await taskService.getDailyTasks(date);
+                
+                if (getResult.success) {
+                    result.className = 'result success';
+                    result.textContent = `Today's tasks retrieved:\n\n` +
+                        `Date: ${date}\n` +
+                        `Quote ID: ${getResult.data.quoteID || 'N/A'}\n` +
+                        `Thank You Cards: ${getResult.data.thankYouCards}\n` +
+                        `Lead Sheets: ${getResult.data.leadSheets}\n` +
+                        `Google Reviews: ${getResult.data.googleReviews}\n` +
+                        `Art Approval: ${getResult.data.artApproval}\n` +
+                        `Daily Total: $${getResult.data.dailyTotal.toFixed(2)}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Test Monthly Tasks
+        async function testMonthlyTasks() {
+            const result = document.getElementById('monthlyResult');
+            result.textContent = 'Fetching monthly tasks...';
+            
+            try {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth() + 1;
+                
+                const monthlyResult = await taskService.getMonthlyTasks(year, month);
+                
+                if (monthlyResult.success) {
+                    result.className = 'result success';
+                    result.textContent = `Monthly tasks for ${month}/${year}:\n\n` +
+                        `Total Days with Tasks: ${monthlyResult.data.taskCount}\n` +
+                        `Monthly Total: $${monthlyResult.data.monthlyTotal.toFixed(2)}\n\n` +
+                        `Daily Breakdown:\n` +
+                        monthlyResult.data.tasks.map(task => 
+                            `${task.date}: $${task.dailyTotal.toFixed(2)} (Quote: ${task.quoteID || 'N/A'})`
+                        ).join('\n');
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Test Update Session
+        async function testUpdateSession() {
+            const result = document.getElementById('updateResult');
+            result.textContent = 'Updating today\'s tasks...';
+            
+            try {
+                const date = new Date().toISOString().split('T')[0];
+                const tasks = {
+                    thankYou: 10,  // Increased from test
+                    leadSheets: 5, // Increased from test
+                    googleReviews: 2,
+                    artApproval: 4
+                };
+                
+                const saveResult = await taskService.saveDailyTasks(date, tasks);
+                
+                if (saveResult.success) {
+                    result.className = 'result success';
+                    result.textContent = `Tasks updated successfully!\n\n` +
+                        `This should update the existing session, not create a new one.\n` +
+                        `Updated totals:\n` +
+                        `Thank You Cards: ${tasks.thankYou} × $2.00 = $${(tasks.thankYou * 2).toFixed(2)}\n` +
+                        `Lead Sheets: ${tasks.leadSheets} × $5.00 = $${(tasks.leadSheets * 5).toFixed(2)}\n` +
+                        `Google Reviews: ${tasks.googleReviews} × $20.00 = $${(tasks.googleReviews * 20).toFixed(2)}\n` +
+                        `Art Approval: ${tasks.artApproval} × $10.00 = $${(tasks.artApproval * 10).toFixed(2)}\n` +
+                        `New Daily Total: $${saveResult.data.dailyTotal.toFixed(2)}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Test API Error Handling
+        async function testAPIError() {
+            const result = document.getElementById('errorResult');
+            result.textContent = 'Testing API error handling...';
+            
+            try {
+                // Try to get tasks for an invalid date to test error handling
+                const invalidDate = '2025-13-45'; // Invalid date
+                const getResult = await taskService.getDailyTasks(invalidDate);
+                
+                result.className = 'result error';
+                result.textContent = `Expected error, but got: ${JSON.stringify(getResult)}`;
+            } catch (error) {
+                result.className = 'result success';
+                result.textContent = `✅ API error handling works correctly!\n\n` +
+                    `Error caught: ${error.message}\n\n` +
+                    `This confirms the API throws errors instead of falling back to localStorage.`;
+            }
+        }
+
+        // Test Complete Workflow
+        async function testCompleteWorkflow() {
+            const result = document.getElementById('workflowResult');
+            result.textContent = 'Running complete workflow test...';
+            
+            try {
+                const date = new Date().toISOString().split('T')[0];
+                const testTasks = {
+                    thankYou: 8,
+                    leadSheets: 4,
+                    googleReviews: 1,
+                    artApproval: 3
+                };
+                
+                let workflowLog = 'Complete Workflow Test:\n\n';
+                
+                // Step 1: Save tasks
+                workflowLog += '1. Saving tasks...\n';
+                const saveResult = await taskService.saveDailyTasks(date, testTasks);
+                if (saveResult.success) {
+                    workflowLog += `   ✅ Tasks saved with Quote ID: ${saveResult.data.quoteID}\n`;
+                } else {
+                    throw new Error('Failed to save tasks');
+                }
+                
+                // Step 2: Retrieve tasks
+                workflowLog += '2. Retrieving tasks...\n';
+                const getResult = await taskService.getDailyTasks(date);
+                if (getResult.success) {
+                    workflowLog += `   ✅ Tasks retrieved: ${JSON.stringify(getResult.data)}\n`;
+                } else {
+                    throw new Error('Failed to retrieve tasks');
+                }
+                
+                // Step 3: Get monthly summary
+                workflowLog += '3. Getting monthly summary...\n';
+                const now = new Date();
+                const monthlyResult = await taskService.getMonthlyTasks(now.getFullYear(), now.getMonth() + 1);
+                if (monthlyResult.success) {
+                    workflowLog += `   ✅ Monthly total: $${monthlyResult.data.monthlyTotal.toFixed(2)} (${monthlyResult.data.taskCount} days)\n`;
+                } else {
+                    throw new Error('Failed to get monthly summary');
+                }
+                
+                // Step 4: Update tasks
+                workflowLog += '4. Updating tasks...\n';
+                const updatedTasks = {
+                    thankYou: 12,
+                    leadSheets: 6,
+                    googleReviews: 2,
+                    artApproval: 5
+                };
+                const updateResult = await taskService.saveDailyTasks(date, updatedTasks);
+                if (updateResult.success) {
+                    workflowLog += `   ✅ Tasks updated: New total $${updateResult.data.dailyTotal.toFixed(2)}\n`;
+                } else {
+                    throw new Error('Failed to update tasks');
+                }
+                
+                workflowLog += '\n🎉 Complete workflow test PASSED!';
+                workflowLog += '\n\nAll API operations worked without localStorage fallbacks.';
+                
+                result.className = 'result success';
+                result.textContent = workflowLog;
+                
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `Workflow failed: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

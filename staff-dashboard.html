@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="training/adriyella-task-service.js"></script>
     
     <style>
         :root {
@@ -956,6 +957,15 @@
                     </a>
                 </div>
                 
+                <!-- Personal Dashboard -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Personal Dashboard</div>
+                    <a href="/training/adriyella-daily-report.html" class="nav-link">
+                        <i class="fas fa-coins"></i>
+                        <span>💰 Adriyella's Bonus Tracker</span>
+                    </a>
+                </div>
+                
                 <!-- Art & Invoices -->
                 <div class="nav-section">
                     <div class="nav-section-title">Art & Invoices</div>
@@ -993,11 +1003,19 @@
                         <i class="fas fa-graduation-cap"></i>
                         <span>Customer Service</span>
                     </a>
+                    <a href="/training/training-progress-dashboard.html" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Training Progress</span>
+                    </a>
                 </div>
                 
                 <!-- Admin -->
                 <div class="nav-section">
                     <div class="nav-section-title">Admin</div>
+                    <a href="/training/adriyella-admin.html" class="nav-link">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Adriyella Task Admin</span>
+                    </a>
                     <a href="#" class="nav-link" onclick="handleLogout(); return false;">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Logout</span>
@@ -1023,6 +1041,24 @@
                     <div class="yoy-widget">
                         <span>YTD vs Last Year:</span>
                         <span class="yoy-value" id="yoyGrowth">Loading...</span>
+                    </div>
+                    
+                    <div class="yoy-widget" id="adriyellaWidget">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--gray-700); font-weight: 500;">Adriyella (30 days):</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.8125rem;">
+                                <div style="display: flex; align-items: center; gap: 0.25rem;" title="Thank You Cards">
+                                    <span>💝</span>
+                                    <span id="adriyellaThankYou" style="font-weight: 600; color: var(--info);">-</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.25rem;" title="Google Reviews">
+                                    <span>⭐</span>
+                                    <span id="adriyellaReviews" style="font-weight: 600; color: var(--success);">-</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1241,6 +1277,18 @@
                             <i class="fas fa-headset process-icon"></i>
                             <h3 class="process-title">Customer Service</h3>
                             <p class="process-description">Customer interaction guidelines and communication standards.</p>
+                        </div>
+                        
+                        <div class="process-card" onclick="window.location.href='/training/adriyella-daily-report.html'">
+                            <i class="fas fa-tasks process-icon"></i>
+                            <h3 class="process-title">Adriyella's Daily Report</h3>
+                            <p class="process-description">Simple daily task entry for Adriyella to record thank you cards, customer calls, and sample management with automatic bonus calculation.</p>
+                        </div>
+                        
+                        <div class="process-card" onclick="window.location.href='/training-progress-dashboard.html'">
+                            <i class="fas fa-chart-line process-icon"></i>
+                            <h3 class="process-title">Training Progress Dashboard</h3>
+                            <p class="process-description">View and track training progress for all staff members learning manual calculator systems.</p>
                         </div>
                     </div>
                 </div>
@@ -1979,6 +2027,74 @@
             console.log('Opening process:', processType);
         }
         
+        // Load Adriyella 30-day task summary
+        async function loadAdriyellaSummary() {
+            console.log('[Dashboard] Loading Adriyella summary...');
+            
+            try {
+                // Initialize the task service if not already available
+                if (typeof AdriyellaTaService === 'undefined') {
+                    console.warn('[Dashboard] AdriyellaTaService not available, skipping Adriyella widget');
+                    return;
+                }
+                
+                const taskService = new AdriyellaTaService();
+                
+                // Get 30-day data
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(endDate.getDate() - 30);
+                
+                // Get daily tasks for the past 30 days
+                const result = await taskService.getTasksInRange(
+                    startDate.toISOString().split('T')[0],
+                    endDate.toISOString().split('T')[0]
+                );
+                
+                if (result.success && result.data) {
+                    const data = result.data;
+                    
+                    // Calculate totals
+                    const totalThankYou = data.reduce((sum, day) => sum + (day.thankYouCards || 0), 0);
+                    const totalReviews = data.reduce((sum, day) => sum + (day.googleReviews || 0), 0);
+                    
+                    // Update display
+                    const thankYouElement = document.getElementById('adriyellaThankYou');
+                    const reviewsElement = document.getElementById('adriyellaReviews');
+                    const widget = document.getElementById('adriyellaWidget');
+                    
+                    if (thankYouElement) {
+                        thankYouElement.textContent = totalThankYou;
+                    }
+                    
+                    if (reviewsElement) {
+                        reviewsElement.textContent = totalReviews;
+                    }
+                    
+                    // Show the widget if we have data
+                    if (widget && (totalThankYou > 0 || totalReviews > 0)) {
+                        widget.style.display = 'block';
+                    }
+                    
+                    console.log('[Dashboard] Adriyella summary loaded:', { totalThankYou, totalReviews });
+                } else {
+                    console.warn('[Dashboard] Failed to load Adriyella data:', result);
+                    // Hide widget if no data
+                    const widget = document.getElementById('adriyellaWidget');
+                    if (widget) {
+                        widget.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('[Dashboard] Error loading Adriyella summary:', error);
+                // Hide widget on error
+                const widget = document.getElementById('adriyellaWidget');
+                if (widget) {
+                    widget.style.display = 'none';
+                }
+            }
+        }
+        
         // Initialize dashboard on DOM load
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Dashboard initializing...');
@@ -1990,7 +2106,8 @@
                 loadProductionSchedule(),
                 loadYearOverYear(),
                 loadOrderTypesBreakdown(),
-                loadAnnouncements()
+                loadAnnouncements(),
+                loadAdriyellaSummary()
             ]);
             
             console.log('Dashboard initialized successfully');
@@ -2001,7 +2118,8 @@
                     loadRevenueData(),
                     loadSalesTeamPerformance(),
                     loadProductionSchedule(),
-                    loadOrderTypesBreakdown()
+                    loadOrderTypesBreakdown(),
+                    loadAdriyellaSummary()
                 ]);
             }, API_CONFIG.refreshInterval);
         });
