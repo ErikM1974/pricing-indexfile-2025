@@ -52,10 +52,18 @@
         
         body {
             font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(-45deg, #FF006E, #8338EC, #3A86FF, #06FFB4);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             color: var(--text-dark);
             line-height: 1.6;
             min-height: 100vh;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         /* Header */
@@ -116,12 +124,20 @@
         }
         
         .summary-card {
-            background: var(--card-white);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             position: relative;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(31, 38, 135, 0.3);
         }
         
         .summary-card::before {
@@ -134,19 +150,19 @@
         }
         
         .earnings-card::before {
-            background: var(--success-green);
+            background: linear-gradient(135deg, #06FFB4 0%, #3A86FF 100%);
         }
         
         .tasks-card::before {
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #FF006E 0%, #8338EC 100%);
         }
         
         .streak-card::before {
-            background: var(--warning-orange);
+            background: linear-gradient(135deg, #FFE66D 0%, #FF6B6B 100%);
         }
         
         .goal-card::before {
-            background: var(--accent-mint);
+            background: linear-gradient(135deg, #8338EC 0%, #06FFB4 100%);
         }
         
         .summary-icon {
@@ -158,6 +174,12 @@
             justify-content: center;
             font-size: 1.5rem;
             margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         
         .earnings-card .summary-icon {
@@ -183,7 +205,10 @@
         .summary-value {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--text-dark);
+            background: linear-gradient(135deg, #FF006E 0%, #8338EC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 0.25rem;
         }
         
@@ -210,10 +235,12 @@
         
         /* Chart Section */
         .chart-section {
-            background: var(--card-white);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 16px;
             padding: 2rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             margin-bottom: 2rem;
         }
         
@@ -249,17 +276,20 @@
         }
         
         .chart-btn.active {
-            background: var(--danger-red);
+            background: linear-gradient(135deg, #FF006E 0%, #8338EC 100%);
             color: white;
-            border-color: var(--danger-red);
+            border: none;
+            box-shadow: 0 4px 12px rgba(131, 56, 236, 0.3);
         }
         
         /* Task Breakdown */
         .breakdown-section {
-            background: var(--card-white);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 16px;
             padding: 2rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             margin-bottom: 2rem;
         }
         
@@ -270,15 +300,30 @@
         }
         
         .task-breakdown {
-            background: #F9FAFB;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
             padding: 1.5rem;
             border-radius: 12px;
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .task-breakdown:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(31, 38, 135, 0.15);
         }
         
         .task-icon {
             font-size: 2.5rem;
             margin-bottom: 1rem;
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         
         .task-name {
@@ -300,10 +345,12 @@
         
         /* Detailed Table */
         .table-section {
-            background: var(--card-white);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 16px;
             padding: 2rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .table-header {
@@ -315,7 +362,7 @@
         
         .export-btn {
             padding: 0.75rem 1.5rem;
-            background: var(--accent-mint);
+            background: linear-gradient(135deg, #06FFB4 0%, #3A86FF 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -324,12 +371,29 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .export-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
         }
         
         .export-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(6, 255, 180, 0.4);
+        }
+        
+        .export-btn:hover::before {
+            left: 100%;
         }
         
         .data-table {
@@ -417,8 +481,8 @@
                     <span>Bonus Report</span>
                 </div>
             </div>
-            <h1 style="font-size: 1.5rem; font-weight: 700; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                Monthly Bonus Report
+            <h1 style="font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #FF006E 0%, #8338EC 50%, #06FFB4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                ✨ Adriyella's Amazing Bonus Report ✨
             </h1>
         </div>
     </div>
@@ -491,24 +555,24 @@
             <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem;">Task Performance Breakdown</h2>
             <div class="breakdown-grid">
                 <div class="task-breakdown">
-                    <div class="task-icon">📞</div>
-                    <div class="task-name">Customer Notifications</div>
-                    <div class="task-stats" id="notificationStats">0 completed @ $2.00 each</div>
-                    <div class="task-earnings" id="notificationEarnings">$0.00</div>
-                </div>
-                
-                <div class="task-breakdown">
                     <div class="task-icon">💌</div>
-                    <div class="task-name">Thank You Notes</div>
-                    <div class="task-stats" id="noteStats">0 completed @ $1.50 each</div>
-                    <div class="task-earnings" id="noteEarnings">$0.00</div>
+                    <div class="task-name">Thank You Cards</div>
+                    <div class="task-stats" id="thankYouStats">0 completed @ $1.00 each</div>
+                    <div class="task-earnings" id="thankYouEarnings">$0.00</div>
                 </div>
                 
                 <div class="task-breakdown">
-                    <div class="task-icon">👔</div>
-                    <div class="task-name">Sample Management</div>
-                    <div class="task-stats" id="sampleStats">0 completed @ $3.00 each</div>
-                    <div class="task-earnings" id="sampleEarnings">$0.00</div>
+                    <div class="task-icon">📋</div>
+                    <div class="task-name">Lead Sheets</div>
+                    <div class="task-stats" id="leadStats">0 completed @ $2.00 each</div>
+                    <div class="task-earnings" id="leadEarnings">$0.00</div>
+                </div>
+                
+                <div class="task-breakdown">
+                    <div class="task-icon">⭐</div>
+                    <div class="task-name">Google Reviews</div>
+                    <div class="task-stats" id="googleStats">0 completed @ $20.00 each</div>
+                    <div class="task-earnings" id="googleEarnings">$0.00</div>
                 </div>
             </div>
         </div>
@@ -525,18 +589,19 @@
             <div id="tableContainer">
                 <div class="loading">
                     <div class="loading-spinner"></div>
-                    <p>Loading your bonus data...</p>
+                    <p style="background: linear-gradient(135deg, #FF006E 0%, #8338EC 50%, #06FFB4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 600;">Loading your amazing achievements... 🌟</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Bonus rates
-        const bonusRates = {
-            'Customer Completed Order Notifications': 2.00,
-            'Thank You Notes': 1.50,
-            'Sample Management': 3.00
+        // Task rates
+        const taskRates = {
+            'thankYouCards': 1.00,
+            'leadSheets': 2.00,
+            'googleReviews': 20.00,
+            'artApproval': 5.00
         };
         
         // Chart instance
@@ -561,51 +626,78 @@
                 // Initialize counters
                 let totalEarnings = 0;
                 let taskCounts = {
-                    'Customer Completed Order Notifications': 0,
-                    'Thank You Notes': 0,
-                    'Sample Management': 0
+                    'thankYouCards': 0,
+                    'leadSheets': 0,
+                    'googleReviews': 0,
+                    'artApproval': 0
                 };
                 let dailyEarnings = {};
                 let detailedHistory = [];
                 
-                // Get sessions for the current month
-                const sessions = await taskService.getTaskHistory(31);
+                // Get monthly data from task service
+                const monthlyData = await taskService.getMonthlyTasks(currentYear, currentMonth + 1);
                 
-                // Process each session
-                for (const session of sessions) {
-                    const sessionDate = new Date(session.CreatedAt);
-                    
-                    if (sessionDate.getMonth() === currentMonth && sessionDate.getFullYear() === currentYear) {
-                        const tasks = await taskService.getTasksForQuote(session.QuoteID);
-                        const dateKey = sessionDate.toLocaleDateString();
+                if (monthlyData.success && monthlyData.data && monthlyData.data.tasks) {
+                    // Process each day's tasks
+                    monthlyData.data.tasks.forEach(dayTask => {
+                        const date = new Date(dayTask.date);
+                        const dateKey = date.toLocaleDateString();
                         
                         if (!dailyEarnings[dateKey]) {
                             dailyEarnings[dateKey] = 0;
                         }
                         
-                        tasks.forEach(task => {
-                            if (task.completed && bonusRates[task.ProductName]) {
-                                const earnings = task.Quantity * bonusRates[task.ProductName];
+                        // Aggregate task counts
+                        Object.keys(taskRates).forEach(taskType => {
+                            const count = dayTask[taskType] || 0;
+                            if (count > 0) {
+                                const rate = taskRates[taskType];
+                                const earnings = count * rate;
+                                
+                                taskCounts[taskType] += count;
                                 totalEarnings += earnings;
                                 dailyEarnings[dateKey] += earnings;
-                                taskCounts[task.ProductName] += task.Quantity;
                                 
                                 // Add to detailed history
                                 detailedHistory.push({
-                                    date: sessionDate,
-                                    task: task.ProductName,
-                                    count: task.Quantity,
-                                    rate: bonusRates[task.ProductName],
+                                    date: date,
+                                    task: getTaskDisplayName(taskType),
+                                    count: count,
+                                    rate: rate,
                                     earnings: earnings,
-                                    time: Math.round(task.LineTotal / 60) // Convert seconds to minutes
+                                    time: count * 2 // Estimate 2 minutes per task
                                 });
                             }
                         });
+                    });
+                    
+                    // Use the monthly total from API
+                    if (monthlyData.data.cappedMonthlyTotal !== undefined) {
+                        totalEarnings = monthlyData.data.cappedMonthlyTotal;
                     }
                 }
                 
-                // Calculate streak
-                const streakData = await taskService.calculateStreakWithBonus();
+                // Calculate streak - for now just show current streak
+                const today = new Date();
+                let currentStreak = 0;
+                
+                // Check backwards from today for consecutive days with tasks
+                for (let i = 0; i < 30; i++) {
+                    const checkDate = new Date(today);
+                    checkDate.setDate(today.getDate() - i);
+                    const dateKey = checkDate.toLocaleDateString();
+                    
+                    if (dailyEarnings[dateKey] && dailyEarnings[dateKey] > 0) {
+                        currentStreak++;
+                    } else if (i > 0) { // Don't break on today if no tasks yet
+                        break;
+                    }
+                }
+                
+                const streakData = {
+                    streak: currentStreak,
+                    bonusPercentage: currentStreak >= 5 ? 10 : 0
+                };
                 
                 // Update UI
                 updateSummaryCards(totalEarnings, taskCounts, streakData);
@@ -647,23 +739,34 @@
         
         // Update task breakdown
         function updateTaskBreakdown(taskCounts) {
-            // Customer notifications
-            const notificationCount = taskCounts['Customer Completed Order Notifications'];
-            const notificationEarnings = notificationCount * 2.00;
-            document.getElementById('notificationStats').textContent = `${notificationCount} completed @ $2.00 each`;
-            document.getElementById('notificationEarnings').textContent = `$${notificationEarnings.toFixed(2)}`;
+            // Thank you cards
+            const thankYouCount = taskCounts['thankYouCards'] || 0;
+            const thankYouEarnings = thankYouCount * taskRates.thankYouCards;
+            document.getElementById('thankYouStats').textContent = `${thankYouCount} completed @ $${taskRates.thankYouCards.toFixed(2)} each`;
+            document.getElementById('thankYouEarnings').textContent = `$${thankYouEarnings.toFixed(2)}`;
             
-            // Thank you notes
-            const noteCount = taskCounts['Thank You Notes'];
-            const noteEarnings = noteCount * 1.50;
-            document.getElementById('noteStats').textContent = `${noteCount} completed @ $1.50 each`;
-            document.getElementById('noteEarnings').textContent = `$${noteEarnings.toFixed(2)}`;
+            // Lead sheets
+            const leadCount = taskCounts['leadSheets'] || 0;
+            const leadEarnings = leadCount * taskRates.leadSheets;
+            document.getElementById('leadStats').textContent = `${leadCount} completed @ $${taskRates.leadSheets.toFixed(2)} each`;
+            document.getElementById('leadEarnings').textContent = `$${leadEarnings.toFixed(2)}`;
             
-            // Sample management
-            const sampleCount = taskCounts['Sample Management'];
-            const sampleEarnings = sampleCount * 3.00;
-            document.getElementById('sampleStats').textContent = `${sampleCount} completed @ $3.00 each`;
-            document.getElementById('sampleEarnings').textContent = `$${sampleEarnings.toFixed(2)}`;
+            // Google reviews
+            const googleCount = taskCounts['googleReviews'] || 0;
+            const googleEarnings = googleCount * taskRates.googleReviews;
+            document.getElementById('googleStats').textContent = `${googleCount} completed @ $${taskRates.googleReviews.toFixed(2)} each`;
+            document.getElementById('googleEarnings').textContent = `$${googleEarnings.toFixed(2)}`;
+        }
+        
+        // Helper function to get display name
+        function getTaskDisplayName(taskType) {
+            const names = {
+                'thankYouCards': 'Thank You Cards',
+                'leadSheets': 'Lead Sheets',
+                'googleReviews': 'Google Reviews',
+                'artApproval': 'Art Approval'
+            };
+            return names[taskType] || taskType;
         }
         
         // Initialize chart
@@ -720,9 +823,31 @@
             });
             const data = sortedDates.map(date => dailyEarnings[date]);
             
+            // Update chart with gradient colors
             earningsChart.data.labels = labels;
-            earningsChart.data.datasets[0].data = data;
+            earningsChart.data.datasets[0] = {
+                label: 'Daily Earnings',
+                data: data,
+                borderColor: '#FF006E',
+                backgroundColor: createGradient(earningsChart.ctx),
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#FF006E',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            };
             earningsChart.update();
+        }
+        
+        // Create gradient for chart
+        function createGradient(ctx) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(255, 0, 110, 0.3)');
+            gradient.addColorStop(0.5, 'rgba(131, 56, 236, 0.2)');
+            gradient.addColorStop(1, 'rgba(6, 255, 180, 0.1)');
+            return gradient;
         }
         
         // Update chart period
@@ -771,8 +896,29 @@
         
         // Export to CSV
         function exportToCSV() {
-            // TODO: Implement CSV export
-            alert('CSV export feature coming soon! For now, you can copy the data from the table.');
+            const table = document.querySelector('.data-table');
+            if (!table) {
+                alert('No data to export!');
+                return;
+            }
+            
+            let csv = [];
+            const rows = table.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td, th');
+                const rowData = Array.from(cols).map(col => col.textContent);
+                csv.push(rowData.join(','));
+            });
+            
+            const csvContent = csv.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `adriyella_bonus_report_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
         }
         
         // Show error

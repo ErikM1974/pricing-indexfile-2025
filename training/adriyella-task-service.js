@@ -1077,20 +1077,87 @@ class AdriyellaTaService {
         
         console.log(`[AdriyellaTaService] Fetching monthly tasks for ${year}-${monthStr} with pattern: ${monthPattern}`);
         
-        // Get all quote items and filter on client side
-        const response = await fetch(`${this.baseURL}/api/quote_items`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch monthly tasks: ${response.status}`);
-        }
-        
-        const allItems = await response.json();
-        
-        // Filter items that match our month pattern (ADR0715-X, ADR0716-X, etc.)
-        const items = allItems.filter(item => 
-            item.QuoteID && item.QuoteID.startsWith(monthPattern) && item.QuoteID.includes('-')
-        );
-        
-        console.log(`[AdriyellaTaService] Found ${items.length} items for month ${monthStr} (from ${allItems.length} total items)`);
+        try {
+            // Get all quote items and filter on client side
+            const response = await fetch(`${this.baseURL}/api/quote_items`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch monthly tasks: ${response.status}`);
+            }
+            
+            const allItems = await response.json();
+            console.log(`[AdriyellaTaService] Retrieved ${allItems.length} total items from API`);
+            
+            // Debug: Show sample QuoteIDs to understand the patterns
+            if (allItems.length > 0) {
+                const sampleAdrItems = allItems.filter(item => 
+                    item.QuoteID && item.QuoteID.startsWith('ADR')
+                ).slice(0, 15);
+                console.log(`[AdriyellaTaService] Sample ADR QuoteIDs in database:`, 
+                    sampleAdrItems.map(item => item.QuoteID));
+                    
+                // Show unique date patterns in the database
+                const uniquePatterns = [...new Set(sampleAdrItems
+                    .map(item => item.QuoteID.substring(0, 7)) // Get ADR + MMDD part
+                    .filter(pattern => pattern.length === 7)
+                )].sort();
+                console.log(`[AdriyellaTaService] Unique ADR date patterns found:`, uniquePatterns);
+            }
+            
+            // FIXED: Correct filtering logic for ADRMMDD pattern
+            // The QuoteIDs are in format ADR{MMDD}-{sequence}, so for July 2025:
+            // ADR0701-1, ADR0702-1, ADR0703-1, etc.
+            // We need to filter for items where QuoteID starts with ADR{month}
+            const items = allItems.filter(item => {
+                if (!item.QuoteID || !item.QuoteID.includes('-')) {
+                    return false;
+                }
+                
+                // Extract the MMDD part from ADRMMDD-X format
+                const quoteIdParts = item.QuoteID.split('-');
+                if (quoteIdParts.length < 2 || !quoteIdParts[0].startsWith('ADR')) {
+                    return false;
+                }
+                
+                const datePattern = quoteIdParts[0]; // Should be ADRMMDD
+                if (datePattern.length !== 7) { // ADR + MMDD = 7 characters
+                    return false;
+                }
+                
+                const extractedMonth = datePattern.substring(3, 5); // Extract MM from ADRMMDD
+                const matchesMonth = extractedMonth === monthStr;
+                
+                if (matchesMonth) {
+                    console.log(`[AdriyellaTaService] MATCH: ${item.QuoteID} - extracted month: ${extractedMonth}, looking for: ${monthStr}`);
+                }
+                
+                return matchesMonth;
+            });
+            
+            console.log(`[AdriyellaTaService] Found ${items.length} items for month ${monthStr} (from ${allItems.length} total items)`);
+            
+            // If no items found, let's also check for any ADR items that might be there
+            if (items.length === 0) {
+                const allAdrItems = allItems.filter(item => 
+                    item.QuoteID && item.QuoteID.startsWith('ADR')
+                );
+                console.warn(`[AdriyellaTaService] No items found for month ${monthStr}, but found ${allAdrItems.length} total ADR items`);
+                
+                if (allAdrItems.length > 0) {
+                    // Show what months ARE available
+                    const availableMonths = [...new Set(allAdrItems
+                        .map(item => {
+                            const parts = item.QuoteID.split('-');
+                            if (parts[0] && parts[0].length === 7 && parts[0].startsWith('ADR')) {
+                                return parts[0].substring(3, 5); // Extract MM
+                            }
+                            return null;
+                        })
+                        .filter(month => month !== null)
+                    )].sort();
+                    console.warn(`[AdriyellaTaService] Available months in database:`, availableMonths);
+                    console.warn(`[AdriyellaTaService] Looking for month: ${monthStr}`);
+                }
+            }
         
         if (items.length > 0) {
             console.log(`[AdriyellaTaService] Sample items:`, items.slice(0, 3));
@@ -1258,6 +1325,27 @@ class AdriyellaTaService {
                 taskCount: tasks.length
             }
         };
+        
+        } catch (error) {
+            console.error(`[AdriyellaTaService] Error in getMonthlyTasks for ${year}-${month}:`, error);
+            return {
+                success: false,
+                error: error.message,
+                data: {
+                    tasks: [],
+                    monthlyTotal: 0,
+                    rawMonthlyTotal: 0,
+                    cappedMonthlyTotal: 0,
+                    monthlyCap: 400.00,
+                    isAtCap: false,
+                    excessAmount: 0,
+                    remainingCapacity: 400.00,
+                    capStatus: 'under',
+                    capStatusMessage: 'No data available',
+                    taskCount: 0
+                }
+            };
+        }
     }
 
     /**
@@ -1728,36 +1816,84 @@ class AdriyellaTaService {
      * Generate daily report data for EmailJS
      */
     async getDailyReportData(date) {
-        const result = await this.getDailyTasks(date);
-        if (!result.success) return null;
+        console.log(`[AdriyellaTaService] Generating daily report data for ${date}`);
         
-        const tasks = result.data;
-        const monthResult = await this.getMonthlyTasks(
-            new Date(date).getFullYear(),
-            new Date(date).getMonth() + 1
-        );
-        
-        return {
-            date: new Date(date).toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            }),
-            thankYouCards: tasks.thankYouCards,
-            thankYouAmount: (tasks.thankYouCards * 2).toFixed(2),
-            leadSheets: tasks.leadSheets,
-            leadAmount: (tasks.leadSheets * 5).toFixed(2),
-            googleReviews: tasks.googleReviews,
-            reviewAmount: (tasks.googleReviews * 20).toFixed(2),
-            artApproval: tasks.artApproval,
-            artAmount: (tasks.artApproval * 10).toFixed(2),
-            dailyTotal: tasks.dailyTotal.toFixed(2),
-            monthlyTotal: monthResult.success ? (monthResult.data.cappedMonthlyTotal || monthResult.data.monthlyTotal).toFixed(2) : '0.00',
-            monthlyRawTotal: monthResult.success ? (monthResult.data.rawMonthlyTotal || monthResult.data.monthlyTotal).toFixed(2) : '0.00',
-            capStatus: monthResult.success ? monthResult.data.capStatus || 'under_cap' : 'under_cap',
-            isAtCap: monthResult.success ? (monthResult.data.capStatus === 'at_cap') : false
-        };
+        try {
+            const result = await this.getDailyTasks(date);
+            if (!result.success) {
+                console.error(`[AdriyellaTaService] Failed to get daily tasks for ${date}:`, result.error);
+                return null;
+            }
+            
+            const tasks = result.data;
+            console.log(`[AdriyellaTaService] Daily tasks retrieved:`, tasks);
+            
+            // Fix: Ensure proper date parsing for monthly calculation
+            const reportDate = new Date(date);
+            const year = reportDate.getFullYear();
+            const month = reportDate.getMonth() + 1; // JavaScript months are 0-based, so add 1
+            
+            console.log(`[AdriyellaTaService] Getting monthly tasks for year=${year}, month=${month}`);
+            
+            const monthResult = await this.getMonthlyTasks(year, month);
+            
+            if (!monthResult.success) {
+                console.error(`[AdriyellaTaService] Failed to get monthly tasks:`, monthResult.error || 'Unknown error');
+            } else {
+                console.log(`[AdriyellaTaService] Monthly result:`, {
+                    taskCount: monthResult.data.taskCount,
+                    rawTotal: monthResult.data.rawMonthlyTotal,
+                    cappedTotal: monthResult.data.cappedMonthlyTotal,
+                    capStatus: monthResult.data.capStatus
+                });
+            }
+            
+            // Build report data with enhanced error handling
+            const reportData = {
+                date: reportDate.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }),
+                thankYouCards: tasks.thankYouCards || 0,
+                thankYouAmount: ((tasks.thankYouCards || 0) * 2).toFixed(2),
+                leadSheets: tasks.leadSheets || 0,
+                leadAmount: ((tasks.leadSheets || 0) * 5).toFixed(2),
+                googleReviews: tasks.googleReviews || 0,
+                reviewAmount: ((tasks.googleReviews || 0) * 20).toFixed(2),
+                artApproval: tasks.artApproval || 0,
+                artAmount: ((tasks.artApproval || 0) * 10).toFixed(2),
+                dailyTotal: (tasks.dailyTotal || 0).toFixed(2),
+                
+                // Enhanced monthly data handling
+                monthlyTotal: monthResult.success ? 
+                    (monthResult.data.cappedMonthlyTotal || monthResult.data.monthlyTotal || 0).toFixed(2) : '0.00',
+                monthlyRawTotal: monthResult.success ? 
+                    (monthResult.data.rawMonthlyTotal || monthResult.data.monthlyTotal || 0).toFixed(2) : '0.00',
+                capStatus: monthResult.success ? 
+                    (monthResult.data.capStatus || 'under_cap') : 'under_cap',
+                isAtCap: monthResult.success ? 
+                    (monthResult.data.capStatus === 'at_cap') : false,
+                
+                // Add debug information
+                debug: {
+                    requestedDate: date,
+                    parsedYear: year,
+                    parsedMonth: month,
+                    dailyTasksFound: !!result.success,
+                    monthlyTasksFound: !!monthResult.success,
+                    monthlyTaskCount: monthResult.success ? monthResult.data.taskCount : 0
+                }
+            };
+            
+            console.log(`[AdriyellaTaService] Final report data:`, reportData);
+            return reportData;
+            
+        } catch (error) {
+            console.error(`[AdriyellaTaService] Error generating daily report data:`, error);
+            return null;
+        }
     }
 
     /**
