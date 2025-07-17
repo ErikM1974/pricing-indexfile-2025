@@ -13,22 +13,44 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(-45deg, #FF006E, #8338EC, #3A86FF, #06FFB4);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
         .calculator-container {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
             border-radius: 20px;
             padding: 30px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 0, 110, 0.05), rgba(131, 56, 236, 0.05), rgba(6, 255, 180, 0.05));
+            pointer-events: none;
         }
 
         .back-button {
@@ -53,9 +75,18 @@
 
         .greeting {
             font-size: 24px;
-            font-weight: 600;
-            color: #1f2937;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FF006E 0%, #8338EC 50%, #06FFB4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 5px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .date {
@@ -65,18 +96,45 @@
         }
 
         .earnings-display {
-            background: linear-gradient(135deg, #10b981, #34d399);
+            background: linear-gradient(135deg, #06FFB4 0%, #3A86FF 100%);
             color: white;
             padding: 25px;
             border-radius: 15px;
             text-align: center;
             margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        .earnings-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shine 2s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
         .earnings-amount {
             font-size: 36px;
             font-weight: 700;
             margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
         }
 
         .earnings-label {
@@ -85,11 +143,20 @@
         }
 
         .task-card {
-            background: #f9fafb;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 15px;
-            border: 1px solid #e5e7eb;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .task-header {
@@ -110,18 +177,26 @@
         }
 
         .task-icon.thank-you {
-            background: #fef3c7;
-            color: #f59e0b;
+            background: linear-gradient(135deg, #FFE66D 0%, #FF6B6B 100%);
+            color: white;
+            animation: bounce 2s ease-in-out infinite;
         }
 
         .task-icon.calls {
-            background: #fecaca;
-            color: #ef4444;
+            background: linear-gradient(135deg, #FF006E 0%, #8338EC 100%);
+            color: white;
+            animation: bounce 2s ease-in-out infinite 0.2s;
         }
 
         .task-icon.samples {
-            background: #dbeafe;
-            color: #3b82f6;
+            background: linear-gradient(135deg, #3A86FF 0%, #06FFB4 100%);
+            color: white;
+            animation: bounce 2s ease-in-out infinite 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
         .task-info {
@@ -136,7 +211,11 @@
 
         .task-rate {
             font-size: 14px;
-            color: #10b981;
+            background: linear-gradient(135deg, #06FFB4 0%, #3A86FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
         }
 
         .task-controls {
@@ -153,8 +232,9 @@
         }
 
         .counter-btn {
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 8px;
             width: 36px;
             height: 36px;
@@ -164,12 +244,40 @@
             cursor: pointer;
             font-weight: 600;
             color: #374151;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-
+        
+        .counter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #FF006E 0%, #8338EC 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .counter-btn span {
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+        
         .counter-btn:hover {
-            background: #e5e7eb;
-            transform: scale(1.05);
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 0, 110, 0.3);
+        }
+        
+        .counter-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .counter-btn:hover span {
+            color: white;
         }
 
         .counter-btn:active {
@@ -179,9 +287,18 @@
         .task-count {
             font-size: 24px;
             font-weight: 700;
-            color: #1f2937;
+            background: linear-gradient(135deg, #FF006E 0%, #8338EC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             min-width: 40px;
             text-align: center;
+            animation: countPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes countPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .task-total {
@@ -191,18 +308,45 @@
         }
 
         .monthly-total {
-            background: linear-gradient(135deg, #f59e0b, #f97316);
+            background: linear-gradient(135deg, #8338EC 0%, #FF006E 100%);
             color: white;
             padding: 20px;
             border-radius: 15px;
             text-align: center;
             margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: glow 3s ease-in-out infinite;
+        }
+        
+        .monthly-total::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: sweep 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(131, 56, 236, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 110, 0.5); }
+        }
+        
+        @keyframes sweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
         .monthly-amount {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
         }
 
         .monthly-label {
@@ -227,8 +371,11 @@
         }
 
         .save-status {
-            color: #10b981;
-            font-weight: 500;
+            background: linear-gradient(135deg, #06FFB4 0%, #3A86FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
         }
 
         /* Contact Info Modal */
@@ -393,7 +540,7 @@
         </button>
 
         <div class="header">
-            <div class="greeting">Hey Adriyella! 👋</div>
+            <div class="greeting">Hey Adriyella! ✨💖</div>
             <div class="date" id="currentDate"></div>
         </div>
 
@@ -408,14 +555,14 @@
                 <div class="task-icon thank-you">💝</div>
                 <div class="task-info">
                     <div class="task-name">Thank You Cards</div>
-                    <div class="task-rate">$1.50 each</div>
+                    <div class="task-rate">$1.00 each</div>
                 </div>
             </div>
             <div class="task-controls">
                 <div class="counter-controls">
-                    <button class="counter-btn" onclick="adjustCount('thankYou', 1)">+1</button>
-                    <button class="counter-btn" onclick="adjustCount('thankYou', 5)">+5</button>
-                    <button class="counter-btn" onclick="adjustCount('thankYou', 10)">+10</button>
+                    <button class="counter-btn" onclick="adjustCount('thankYou', 1)"><span>+1</span></button>
+                    <button class="counter-btn" onclick="adjustCount('thankYou', 5)"><span>+5</span></button>
+                    <button class="counter-btn" onclick="adjustCount('thankYou', 10)"><span>+10</span></button>
                 </div>
                 <div class="task-count" id="thankYouCount">0</div>
                 <div class="task-total" id="thankYouTotal">= $0.00</div>
@@ -433,9 +580,9 @@
             </div>
             <div class="task-controls">
                 <div class="counter-controls">
-                    <button class="counter-btn" onclick="adjustCount('calls', 1)">+1</button>
-                    <button class="counter-btn" onclick="adjustCount('calls', 5)">+5</button>
-                    <button class="counter-btn" onclick="adjustCount('calls', 10)">+10</button>
+                    <button class="counter-btn" onclick="adjustCount('calls', 1)"><span>+1</span></button>
+                    <button class="counter-btn" onclick="adjustCount('calls', 5)"><span>+5</span></button>
+                    <button class="counter-btn" onclick="adjustCount('calls', 10)"><span>+10</span></button>
                 </div>
                 <div class="task-count" id="callsCount">0</div>
                 <div class="task-total" id="callsTotal">= $0.00</div>
@@ -453,9 +600,9 @@
             </div>
             <div class="task-controls">
                 <div class="counter-controls">
-                    <button class="counter-btn" onclick="adjustCount('samples', 1)">+1</button>
-                    <button class="counter-btn" onclick="adjustCount('samples', 2)">+2</button>
-                    <button class="counter-btn" onclick="adjustCount('samples', 5)">+5</button>
+                    <button class="counter-btn" onclick="adjustCount('samples', 1)"><span>+1</span></button>
+                    <button class="counter-btn" onclick="adjustCount('samples', 2)"><span>+2</span></button>
+                    <button class="counter-btn" onclick="adjustCount('samples', 5)"><span>+5</span></button>
                 </div>
                 <div class="task-count" id="samplesCount">0</div>
                 <div class="task-total" id="samplesTotal">= $0.00</div>
@@ -515,7 +662,7 @@
     <script>
         // Task rates
         const RATES = {
-            thankYou: 1.50,
+            thankYou: 1.00,
             calls: 2.00,
             samples: 3.00
         };

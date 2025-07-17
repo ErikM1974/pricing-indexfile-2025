@@ -15,115 +15,292 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(120deg, #ff6b9d 0%, #feca57 50%, #48dbfb 100%);
+            background-size: 200% 200%;
+            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            animation: gradientDance 15s ease infinite;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Floating decorative elements */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        body::before {
+            width: 300px;
+            height: 300px;
+            background: #ff6b9d;
+            top: -150px;
+            right: -150px;
+        }
+        
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: #48dbfb;
+            bottom: -200px;
+            left: -200px;
+            animation-delay: -10s;
+        }
+        
+        @keyframes gradientDance {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
         }
 
         .calculator-container {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 35px 30px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 420px;
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.08),
+                0 0 0 1px rgba(255,255,255,0.5) inset,
+                0 0 80px rgba(255,107,157,0.15);
             position: relative;
+            z-index: 1;
+            animation: slideIn 0.6s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .back-button {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            background: none;
-            border: none;
+            top: 25px;
+            left: 25px;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,0,0,0.05);
+            padding: 8px 16px;
+            border-radius: 20px;
             font-size: 14px;
-            color: #6b7280;
+            color: #374151;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 5px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .back-button:hover {
+            background: white;
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            margin-top: 20px;
+            margin-bottom: 35px;
+            margin-top: 30px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .greeting {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 5px;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
         .date {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 20px;
+            font-size: 15px;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 25px;
         }
 
         .earnings-display {
-            background: linear-gradient(135deg, #10b981, #34d399);
+            background: linear-gradient(135deg, #ff6b9d, #ff8787);
             color: white;
-            padding: 25px;
-            border-radius: 15px;
+            padding: 30px;
+            border-radius: 25px;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(255,107,157,0.3);
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+        
+        .earnings-display::before {
+            content: '💰';
+            position: absolute;
+            font-size: 80px;
+            opacity: 0.1;
+            right: -20px;
+            top: -20px;
+            transform: rotate(-15deg);
+        }
+        
+        .earnings-display::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
         .earnings-amount {
-            font-size: 36px;
-            font-weight: 700;
+            font-size: 42px;
+            font-weight: 800;
             margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .earnings-amount:hover {
+            transform: scale(1.05);
         }
 
         .earnings-label {
-            font-size: 16px;
-            opacity: 0.9;
+            font-size: 17px;
+            font-weight: 600;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
         }
 
         .task-card {
-            background: #f9fafb;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 18px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out both;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .task-card:nth-child(3) { animation-delay: 0.6s; }
+        .task-card:nth-child(4) { animation-delay: 0.8s; }
+        .task-card:nth-child(5) { animation-delay: 1s; }
+        .task-card:nth-child(6) { animation-delay: 1.2s; }
+        
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border-color: rgba(255,107,157,0.2);
+        }
+        
+        .task-card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, transparent, rgba(255,107,157,0.3), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .task-card:hover::before {
+            opacity: 1;
         }
 
         .task-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .task-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 24px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .task-icon:hover {
+            transform: rotate(-10deg) scale(1.1);
         }
 
         .task-icon.thank-you {
-            background: #fef3c7;
-            color: #f59e0b;
+            background: linear-gradient(135deg, #ff6b9d, #ff8787);
+            box-shadow: 0 8px 16px rgba(255,107,157,0.3);
         }
 
         .task-icon.calls {
-            background: #dbeafe;
-            color: #3b82f6;
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            box-shadow: 0 8px 16px rgba(72,219,251,0.3);
         }
 
         .task-icon.samples {
-            background: #fef3c7;
-            color: #f59e0b;
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+            box-shadow: 0 8px 16px rgba(254,202,87,0.3);
         }
 
         .task-info {
@@ -131,41 +308,51 @@
         }
 
         .task-name {
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 2px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+            font-size: 17px;
         }
 
         .task-rate {
-            font-size: 14px;
-            color: #10b981;
+            font-size: 15px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .task-controls {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-top: 15px;
+            gap: 20px;
+            margin-top: 20px;
         }
 
         .counter-btn {
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            width: 36px;
-            height: 36px;
+            background: linear-gradient(135deg, #f0f0f0, #ffffff);
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-weight: 600;
-            color: #374151;
-            transition: all 0.2s;
+            font-weight: 700;
+            font-size: 20px;
+            color: #475569;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .counter-btn:hover {
-            background: #e5e7eb;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #ff6b9d, #ff8787);
+            color: white;
+            transform: scale(1.1);
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(255,107,157,0.3);
         }
 
         .counter-btn:active {
@@ -173,116 +360,415 @@
         }
 
         .task-count {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1f2937;
-            min-width: 40px;
+            font-size: 32px;
+            font-weight: 800;
+            color: #1e293b;
+            min-width: 50px;
             text-align: center;
+            transition: all 0.3s ease;
         }
 
         .task-total {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2937;
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-left: auto;
+            transition: all 0.3s ease;
         }
 
         .monthly-total {
-            background: linear-gradient(135deg, #f59e0b, #f97316);
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
             color: white;
-            padding: 20px;
-            border-radius: 15px;
+            padding: 25px;
+            border-radius: 25px;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
             position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(254,202,87,0.3);
+            animation: fadeInUp 0.8s ease-out 1.4s both;
+        }
+        
+        .monthly-total::before {
+            content: '🎯';
+            position: absolute;
+            font-size: 60px;
+            opacity: 0.1;
+            left: -15px;
+            bottom: -15px;
+            transform: rotate(15deg);
         }
 
         .monthly-total.at-cap {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: linear-gradient(135deg, #ff6b9d, #ff4757);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 10px 30px rgba(255,71,87,0.3); }
+            50% { box-shadow: 0 10px 40px rgba(255,71,87,0.5); }
         }
 
         .monthly-total.approaching-cap {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
+            background: linear-gradient(135deg, #ff9ff3, #feca57);
         }
 
         .monthly-amount {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 32px;
+            font-weight: 800;
             margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .monthly-label {
-            font-size: 14px;
-            opacity: 0.9;
+            font-size: 16px;
+            font-weight: 600;
+            opacity: 0.95;
         }
 
         .cap-info {
-            margin-top: 10px;
-            font-size: 12px;
-            opacity: 0.8;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.9;
         }
 
         .cap-progress {
             width: 100%;
-            height: 4px;
+            height: 8px;
             background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-            margin: 10px 0 5px 0;
+            border-radius: 10px;
+            margin: 15px 0 8px 0;
             overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .cap-progress-bar {
             height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 2px;
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(255,255,255,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cap-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
         }
 
         .cap-status {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 10px 16px;
+            border-radius: 15px;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Monthly Breakdown Styles */
+        .monthly-breakdown {
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            animation: fadeInUp 0.8s ease-out 1.5s both;
+            border: 2px solid rgba(255,107,157,0.1);
+        }
+        
+        .breakdown-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .breakdown-icon {
+            font-size: 24px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .breakdown-items {
+            margin-bottom: 20px;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+            animation: slideInLeft 0.5s ease-out;
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .breakdown-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .breakdown-item-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .breakdown-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .breakdown-item-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 15px;
+        }
+        
+        .breakdown-item-amount {
+            font-weight: 700;
+            font-size: 16px;
+            background: linear-gradient(135deg, #ff6b9d, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .breakdown-progress-container {
+            width: 100%;
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .breakdown-progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .breakdown-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        .breakdown-item-percentage {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            margin-left: 10px;
+        }
+        
+        .breakdown-item-badge {
+            background: linear-gradient(135deg, #ff6b9d, #ff8787);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
             font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        .breakdown-insights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f3f4f6;
+        }
+        
+        .insight-card {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 5px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .insight-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .insight-icon {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .insight-label {
+            font-size: 12px;
+            color: #64748b;
             font-weight: 500;
+        }
+        
+        .insight-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .top-performer .insight-value {
+            background: linear-gradient(135deg, #ff6b9d, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .auto-save-indicator {
             text-align: center;
-            margin-top: 15px;
-            font-size: 12px;
-            color: #6b7280;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #64748b;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 8px;
+            font-weight: 500;
+            animation: fadeInUp 0.8s ease-out 1.6s both;
         }
 
         .auto-save-indicator::before {
-            content: "💾";
-            font-size: 14px;
+            content: "✨";
+            font-size: 16px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
 
         .save-status {
             color: #10b981;
-            font-weight: 500;
+            font-weight: 600;
         }
-
+        
+        /* Email Report Button */
+        .email-report-section {
+            text-align: center;
+            margin-top: 20px;
+            animation: fadeInUp 0.8s ease-out 1.8s both;
+        }
+        
+        .email-report-btn {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(72,219,251,0.3);
+        }
+        
+        .email-report-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72,219,251,0.4);
+        }
+        
+        /* Celebration animation for earnings increase */
+        @keyframes celebrate {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        .celebrating {
+            animation: celebrate 0.5s ease-out;
+        }
 
         @media (max-width: 480px) {
             .calculator-container {
-                padding: 20px;
+                padding: 25px 20px;
                 margin: 10px;
+                border-radius: 25px;
+            }
+            
+            .greeting {
+                font-size: 24px;
             }
             
             .earnings-amount {
-                font-size: 32px;
+                font-size: 36px;
+            }
+            
+            .task-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
             }
             
             .counter-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 12px;
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
+            }
+            
+            .task-count {
+                font-size: 28px;
+            }
+        }
+
+        /* Reduced motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
             }
         }
     </style>
@@ -373,7 +859,7 @@
 
         <div class="monthly-total" id="monthlyTotalContainer">
             <div class="monthly-amount" id="monthlyTotal">$88.00</div>
-            <div class="monthly-label">This Month's Total</div>
+            <div class="monthly-label" id="monthlyLabel">This Month's Total</div>
             <div class="cap-progress" id="capProgress">
                 <div class="cap-progress-bar" id="capProgressBar" style="width: 0%"></div>
             </div>
@@ -381,15 +867,38 @@
             <div class="cap-status" id="capStatus" style="display: none;"></div>
         </div>
 
+        <!-- Monthly Breakdown Section -->
+        <div class="monthly-breakdown" id="monthlyBreakdown" style="display: none;">
+            <h3 class="breakdown-title">
+                <span class="breakdown-icon">📊</span>
+                <span id="breakdownMonthName">Monthly</span> Breakdown
+            </h3>
+            <div class="breakdown-items" id="breakdownItems">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="breakdown-insights">
+                <div class="insight-card top-performer">
+                    <span class="insight-icon">🏆</span>
+                    <span class="insight-label">Top Performer:</span>
+                    <span class="insight-value" id="topPerformer">-</span>
+                </div>
+                <div class="insight-card best-day">
+                    <span class="insight-icon">📅</span>
+                    <span class="insight-label">Best Day:</span>
+                    <span class="insight-value" id="bestDay">-</span>
+                </div>
+            </div>
+        </div>
+
         <div class="auto-save-indicator">
             Auto-saves every 5 seconds
             <span class="save-status" id="saveStatus"></span>
         </div>
 
-        <!-- Test Email Button (for development) -->
-        <div style="text-align: center; margin-top: 15px;">
-            <button onclick="manualSendReport()" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">
-                📧 Test Email Report
+        <!-- Email Report Button -->
+        <div class="email-report-section">
+            <button onclick="manualSendReport()" class="email-report-btn">
+                📧 Email Report
             </button>
         </div>
     </div>
@@ -453,17 +962,205 @@
 
         // Adjust task count
         function adjustCount(taskType, increment) {
+            const previousTotal = Object.keys(counts).reduce((sum, type) => {
+                return sum + (counts[type] * (RATES[type] || 0));
+            }, 0);
+            
             counts[taskType] = Math.max(0, counts[taskType] + increment);
             updateAllDisplays();
+            
+            const newTotal = Object.keys(counts).reduce((sum, type) => {
+                return sum + (counts[type] * (RATES[type] || 0));
+            }, 0);
             
             // Visual feedback
             const countElement = document.getElementById(taskType + 'Count');
             countElement.style.transform = 'scale(1.2)';
-            countElement.style.color = '#10b981';
+            countElement.style.color = '#ff6b9d';
             setTimeout(() => {
                 countElement.style.transform = 'scale(1)';
-                countElement.style.color = '#1f2937';
+                countElement.style.color = '#1e293b';
             }, 200);
+            
+            // Celebrate earnings increase
+            if (newTotal > previousTotal) {
+                celebrateEarnings();
+                
+                // Special celebrations for milestones
+                if (newTotal >= 50 && previousTotal < 50) {
+                    showMilestone("$50 reached! 🎉");
+                } else if (newTotal >= 100 && previousTotal < 100) {
+                    showMilestone("$100 reached! You're crushing it! 🚀");
+                } else if (newTotal >= 200 && previousTotal < 200) {
+                    showMilestone("$200! Amazing work Adriyella! 🌟");
+                }
+            }
+        }
+        
+        // Optimize confetti for performance (limit particles)
+        function createConfetti() {
+            const colors = ['#ff6b9d', '#feca57', '#48dbfb', '#ff9ff3', '#10b981'];
+            const confettiCount = 20; // Reduced from 30
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        width: ${Math.random() * 10 + 5}px;
+                        height: ${Math.random() * 10 + 5}px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        left: ${Math.random() * 100}%;
+                        top: -10px;
+                        border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                        animation: confettiFall ${1.5 + Math.random() * 1}s ease-out forwards;
+                        z-index: 999;
+                    `;
+                    
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 2500);
+                }, i * 30); // Slower spawn for better perf
+            }
+        }
+        
+        // Celebrate earnings animation
+        function celebrateEarnings() {
+            const earningsElement = document.getElementById('todaysEarnings');
+            earningsElement.classList.add('celebrating');
+            
+            // Create floating money emoji
+            createFloatingEmoji('💵');
+            
+            setTimeout(() => {
+                earningsElement.classList.remove('celebrating');
+            }, 500);
+        }
+        
+        // Create floating emoji effect
+        function createFloatingEmoji(emoji) {
+            const container = document.querySelector('.earnings-display');
+            const floater = document.createElement('div');
+            floater.textContent = emoji;
+            floater.style.cssText = `
+                position: absolute;
+                font-size: 30px;
+                animation: floatUp 2s ease-out forwards;
+                pointer-events: none;
+                left: ${Math.random() * 80 + 10}%;
+                bottom: 20px;
+                z-index: 100;
+            `;
+            
+            // Add floating animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes floatUp {
+                    0% {
+                        opacity: 1;
+                        transform: translateY(0) scale(0.5);
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: translateY(-100px) scale(1.5);
+                    }
+                }
+            `;
+            if (!document.querySelector('#floatAnimation')) {
+                style.id = 'floatAnimation';
+                document.head.appendChild(style);
+            }
+            
+            container.appendChild(floater);
+            setTimeout(() => floater.remove(), 2000);
+        }
+        
+        // Show milestone achievement
+        function showMilestone(message) {
+            const milestone = document.createElement('div');
+            milestone.className = 'milestone-celebration';
+            milestone.textContent = message;
+            milestone.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0);
+                background: linear-gradient(135deg, #ff6b9d, #feca57);
+                color: white;
+                padding: 20px 40px;
+                border-radius: 30px;
+                font-size: 24px;
+                font-weight: 700;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: milestoneAnimation 2s ease-out forwards;
+            `;
+            
+            // Add milestone animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes milestoneAnimation {
+                    0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
+                    50% { transform: translate(-50%, -50%) scale(1.2) rotate(5deg); }
+                    70% { transform: translate(-50%, -50%) scale(0.9) rotate(-2deg); }
+                    100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 0; }
+                }
+            `;
+            if (!document.querySelector('#milestoneAnimation')) {
+                style.id = 'milestoneAnimation';
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(milestone);
+            
+            // Create confetti effect
+            createConfetti();
+            
+            setTimeout(() => milestone.remove(), 2000);
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#ff6b9d', '#feca57', '#48dbfb', '#ff9ff3', '#10b981'];
+            const confettiCount = 30;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        width: 10px;
+                        height: 10px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        left: ${Math.random() * 100}%;
+                        top: -10px;
+                        border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                        animation: confettiFall ${2 + Math.random() * 2}s ease-out forwards;
+                        z-index: 999;
+                    `;
+                    
+                    // Add confetti animation
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @keyframes confettiFall {
+                            0% {
+                                transform: translateY(0) rotate(0deg);
+                                opacity: 1;
+                            }
+                            100% {
+                                transform: translateY(100vh) rotate(${Math.random() * 720 - 360}deg);
+                                opacity: 0;
+                            }
+                        }
+                    `;
+                    if (!document.querySelector('#confettiAnimation')) {
+                        style.id = 'confettiAnimation';
+                        document.head.appendChild(style);
+                    }
+                    
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 50);
+            }
         }
 
         // Update all displays
@@ -495,6 +1192,35 @@
             document.getElementById('todaysEarnings').textContent = `$${todaysTotal.toFixed(2)}`;
         }
 
+        // Get month name
+        function getMonthName() {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            return months[new Date().getMonth()];
+        }
+        
+        // Update monthly label with month name
+        function updateMonthlyLabel() {
+            const monthName = getMonthName();
+            const now = new Date();
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const currentDay = now.getDate();
+            const daysRemaining = daysInMonth - currentDay;
+            
+            document.getElementById('monthlyLabel').textContent = `${monthName} Totals`;
+            document.getElementById('breakdownMonthName').textContent = monthName;
+            
+            // Add progress info as a subtitle
+            const progressInfo = document.createElement('div');
+            progressInfo.style.cssText = 'font-size: 12px; opacity: 0.8; margin-top: 5px;';
+            progressInfo.textContent = `Day ${currentDay} of ${daysInMonth} • ${daysRemaining} days to go`;
+            
+            const monthlyLabel = document.getElementById('monthlyLabel');
+            if (!monthlyLabel.querySelector('div')) {
+                monthlyLabel.appendChild(progressInfo);
+            }
+        }
+
         // Update monthly total from real data with cap information
         async function updateMonthlyTotal() {
             const now = new Date();
@@ -503,9 +1229,20 @@
             
             console.log(`[Monthly Total] Fetching monthly data for ${year}-${month}`);
             
+            // Update month label
+            updateMonthlyLabel();
+            
             try {
                 const result = await taskService.getMonthlyTasks(year, month);
-                console.log(`[Monthly Total] API result:`, result);
+                console.log(`[Monthly Total] Full API result:`, result);
+                console.log('[Monthly Total] Data details:', {
+                    hasData: result.success,
+                    tasks: result.data?.tasks,
+                    taskCount: result.data?.tasks?.length,
+                    monthlyTotal: result.data?.monthlyTotal,
+                    cappedTotal: result.data?.cappedMonthlyTotal,
+                    rawTotal: result.data?.rawMonthlyTotal
+                });
                 
                 if (result.success) {
                     const data = result.data;
@@ -527,6 +1264,83 @@
                     
                     // Update the display
                     updateCapDisplay(cappedTotal, rawTotal, capStatus, remainingCapacity, excessAmount, progressPercent);
+                    
+                    // Create task breakdown from monthly tasks
+                    // The API returns an array of daily tasks, so we need to aggregate them
+                    const monthlyTasks = {
+                        thankYouCards: 0,
+                        leadSheets: 0,
+                        googleReviews: 0,
+                        artApproval: 0
+                    };
+                    
+                    // Aggregate tasks from all days
+                    if (data.tasks && Array.isArray(data.tasks)) {
+                        data.tasks.forEach(dayTask => {
+                            monthlyTasks.thankYouCards += dayTask.thankYouCards || 0;
+                            monthlyTasks.leadSheets += dayTask.leadSheets || 0;
+                            monthlyTasks.googleReviews += dayTask.googleReviews || 0;
+                            monthlyTasks.artApproval += dayTask.artApproval || 0;
+                        });
+                    }
+                    
+                    console.log('[Monthly Total] Aggregated monthly tasks:', monthlyTasks);
+                    
+                    const taskBreakdown = {
+                        thankYouCards: {
+                            count: monthlyTasks.thankYouCards,
+                            total: monthlyTasks.thankYouCards * RATES.thankYou
+                        },
+                        leadSheets: {
+                            count: monthlyTasks.leadSheets,
+                            total: monthlyTasks.leadSheets * RATES.leadSheets
+                        },
+                        googleReviews: {
+                            count: monthlyTasks.googleReviews,
+                            total: monthlyTasks.googleReviews * RATES.googleReviews
+                        },
+                        artApproval: {
+                            count: monthlyTasks.artApproval,
+                            total: monthlyTasks.artApproval * RATES.artApproval
+                        }
+                    };
+                    
+                    console.log('[Monthly Total] Task breakdown created:', {
+                        thankYouCards: taskBreakdown.thankYouCards,
+                        leadSheets: taskBreakdown.leadSheets,
+                        googleReviews: taskBreakdown.googleReviews,
+                        artApproval: taskBreakdown.artApproval,
+                        cappedTotal
+                    });
+                    
+                    // Update breakdown display
+                    updateMonthlyBreakdown(taskBreakdown, cappedTotal);
+                    
+                    // Calculate and update best day from tasks array
+                    if (data.tasks && Array.isArray(data.tasks) && data.tasks.length > 0) {
+                        let bestDay = null;
+                        let bestDayTotal = 0;
+                        
+                        data.tasks.forEach(dayTask => {
+                            if (dayTask.dailyTotal > bestDayTotal) {
+                                bestDayTotal = dayTask.dailyTotal;
+                                bestDay = {
+                                    date: dayTask.date,
+                                    total: dayTask.dailyTotal
+                                };
+                            }
+                        });
+                        
+                        if (bestDay) {
+                            const date = new Date(bestDay.date);
+                            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                            const shortDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            const bestDayElement = document.getElementById('bestDay');
+                            if (bestDayElement) {
+                                bestDayElement.textContent = `${dayName}, ${shortDate} - $${bestDay.total.toFixed(2)}`;
+                            }
+                        }
+                    }
                 } else {
                     console.error('[Monthly Total] Failed to get monthly data:', result);
                     // Fallback: Calculate from current day's data
@@ -552,6 +1366,182 @@
                 
                 console.log(`[Monthly Total] Using error fallback: $${todaysTotal.toFixed(2)}`);
                 updateCapDisplay(todaysTotal, todaysTotal, 'under_cap', 400 - todaysTotal, 0, (todaysTotal / 400) * 100);
+            }
+        }
+        
+        // Update monthly breakdown display
+        function updateMonthlyBreakdown(taskBreakdown, monthlyTotal) {
+            console.log('[Monthly Breakdown] Input data:', {
+                taskBreakdown,
+                monthlyTotal
+            });
+            
+            const breakdownContainer = document.getElementById('monthlyBreakdown');
+            const breakdownItems = document.getElementById('breakdownItems');
+            
+            // Show breakdown even if there's minimal data (like just 1 task)
+            if (!taskBreakdown) {
+                console.log('[Monthly Breakdown] No breakdown data provided');
+                breakdownContainer.style.display = 'none';
+                return;
+            }
+            
+            // Always show if there's any monthly total (even $0 at start of month could be useful)
+            console.log('[Monthly Breakdown] Monthly total:', monthlyTotal);
+            
+            // Clear existing items
+            breakdownItems.innerHTML = '';
+            
+            // Task configurations
+            const taskConfig = {
+                thankYouCards: {
+                    name: 'Thank You Cards',
+                    icon: '💝',
+                    gradient: 'linear-gradient(135deg, #ff6b9d, #ff8787)',
+                    rate: 2.00
+                },
+                leadSheets: {
+                    name: 'Lead Sheets',
+                    icon: '📋',
+                    gradient: 'linear-gradient(135deg, #48dbfb, #0abde3)',
+                    rate: 5.00
+                },
+                googleReviews: {
+                    name: 'Google Reviews',
+                    icon: '⭐',
+                    gradient: 'linear-gradient(135deg, #feca57, #ff9ff3)',
+                    rate: 20.00
+                },
+                artApproval: {
+                    name: 'Art Approval',
+                    icon: '🎨',
+                    gradient: 'linear-gradient(135deg, #a78bfa, #8b5cf6)',
+                    rate: 10.00
+                }
+            };
+            
+            // Find top performer
+            let topPerformer = '';
+            let topAmount = 0;
+            let hasAnyData = false;
+            let taskCount = 0;
+            
+            console.log('[Monthly Breakdown] Processing task entries...');
+            
+            // Create breakdown items
+            Object.entries(taskBreakdown).forEach(([taskType, data], index) => {
+                console.log(`[Monthly Breakdown] Processing ${taskType}:`, data);
+                
+                const config = taskConfig[taskType];
+                if (!config) {
+                    console.log(`[Monthly Breakdown] No config for ${taskType}, skipping`);
+                    return;
+                }
+                
+                // Include tasks even with 0 count if we want to show all task types
+                // For now, only show tasks with actual data
+                if (!data.count || data.count === 0) {
+                    console.log(`[Monthly Breakdown] Zero count for ${taskType}, skipping`);
+                    return;
+                }
+                
+                hasAnyData = true;
+                taskCount++;
+                
+                // Calculate percentage - handle edge cases
+                const percentage = monthlyTotal > 0 ? (data.total / monthlyTotal * 100).toFixed(1) : '100.0';
+                
+                // For single task or when this is the highest earning task
+                const isTop = data.total > topAmount || taskCount === 1;
+                
+                console.log(`[Monthly Breakdown] ${taskType} - count: ${data.count}, total: $${data.total}, percentage: ${percentage}%, isTop: ${isTop}`);
+                
+                if (isTop) {
+                    topAmount = data.total;
+                    topPerformer = config.name;
+                    console.log(`[Monthly Breakdown] New top performer: ${topPerformer} with $${topAmount}`);
+                }
+                
+                const itemHTML = `
+                    <div class="breakdown-item" style="animation-delay: ${index * 0.1}s">
+                        <div class="breakdown-item-icon" style="background: ${config.gradient}; color: white;">
+                            ${config.icon}
+                        </div>
+                        <div class="breakdown-item-details">
+                            <div class="breakdown-item-header">
+                                <span class="breakdown-item-name">
+                                    ${config.name}
+                                    <span class="breakdown-item-percentage">${percentage}%</span>
+                                    ${isTop ? '<span class="breakdown-item-badge">Top!</span>' : ''}
+                                </span>
+                                <span class="breakdown-item-amount">$${data.total.toFixed(2)}</span>
+                            </div>
+                            <div class="breakdown-progress-container">
+                                <div class="breakdown-progress-bar" style="width: ${percentage}%; background: ${config.gradient};"></div>
+                            </div>
+                            <div style="font-size: 11px; color: #64748b; margin-top: 3px;">
+                                ${data.count} completed • $${config.rate || (taskType === 'thankYouCards' ? 2 : taskType === 'leadSheets' ? 5 : taskType === 'googleReviews' ? 20 : 10)} each
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                breakdownItems.insertAdjacentHTML('beforeend', itemHTML);
+            });
+            
+            console.log(`[Monthly Breakdown] Final top performer: ${topPerformer}, hasAnyData: ${hasAnyData}, taskCount: ${taskCount}`);
+            
+            // Update insights
+            document.getElementById('topPerformer').textContent = topPerformer || 'Getting started';
+            
+            // Special handling for single task - still show it as top performer
+            if (taskCount === 1 && topPerformer) {
+                console.log(`[Monthly Breakdown] Single task scenario - showing ${topPerformer} as top performer`);
+            }
+            
+            // Show the breakdown section if we have any data OR any monthly total
+            const shouldShow = hasAnyData || monthlyTotal > 0 || taskCount > 0;
+            console.log(`[Monthly Breakdown] Setting display to: ${shouldShow ? 'block' : 'none'} (hasAnyData: ${hasAnyData}, monthlyTotal: ${monthlyTotal}, taskCount: ${taskCount})`);
+            
+            // Only show "no tasks" message if we truly have no data
+            if (!hasAnyData && taskCount === 0 && monthlyTotal === 0) {
+                breakdownItems.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #64748b;">
+                        <i class="fas fa-chart-line" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                        <p>No completed tasks yet this month. Start tracking to see your breakdown!</p>
+                    </div>
+                `;
+            }
+            
+            // Always show the container if shouldShow is true
+            breakdownContainer.style.display = shouldShow ? 'block' : 'none';
+        }
+        
+        // Update best day display
+        function updateBestDay(dailyTotals) {
+            if (!dailyTotals || Object.keys(dailyTotals).length === 0) {
+                document.getElementById('bestDay').textContent = 'No data yet';
+                return;
+            }
+            
+            let bestDay = null;
+            let bestAmount = 0;
+            
+            Object.entries(dailyTotals).forEach(([date, data]) => {
+                const dailyTotal = data.total || 0;
+                if (dailyTotal > bestAmount) {
+                    bestAmount = dailyTotal;
+                    bestDay = date;
+                }
+            });
+            
+            if (bestDay) {
+                const dateObj = new Date(bestDay);
+                const dayName = dateObj.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                document.getElementById('bestDay').textContent = `${dayName} ($${bestAmount.toFixed(2)})`;
             }
         }
 
@@ -752,6 +1742,146 @@
         function manualSendReport() {
             sendDailyReport();
             alert('Daily report sent!');
+        }
+        
+        // Debug function to test calculations
+        async function debugEmailCalculations() {
+            console.log('=== DEBUG: Email Report Calculations (Fixed) ===');
+            
+            const today = new Date().toISOString().split('T')[0];
+            console.log(`Testing calculations for date: ${today}`);
+            
+            try {
+                // Test daily tasks retrieval
+                console.log('1. Testing daily tasks retrieval...');
+                const dailyResult = await taskService.getDailyTasks(today);
+                console.log('Daily tasks result:', dailyResult);
+                
+                if (dailyResult.success && dailyResult.data) {
+                    console.log('   Daily tasks breakdown:');
+                    console.log(`     - Thank You Cards: ${dailyResult.data.thankYouCards}`);
+                    console.log(`     - Lead Sheets: ${dailyResult.data.leadSheets}`);
+                    console.log(`     - Google Reviews: ${dailyResult.data.googleReviews}`);
+                    console.log(`     - Art Approval: ${dailyResult.data.artApproval}`);
+                    console.log(`     - Daily Total: $${dailyResult.data.dailyTotal.toFixed(2)}`);
+                }
+                
+                // Test monthly tasks retrieval with FIXED pattern matching
+                console.log('2. Testing monthly tasks retrieval with FIXED pattern matching...');
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth() + 1; // JavaScript months are 0-based
+                console.log(`   Looking for year=${year}, month=${month} (expecting ADR${month.toString().padStart(2, '0')}XX patterns)`);
+                
+                const monthResult = await taskService.getMonthlyTasks(year, month);
+                console.log('Monthly tasks result:', monthResult);
+                
+                if (monthResult.success && monthResult.data) {
+                    console.log('   Monthly tasks breakdown:');
+                    console.log(`     - Days with tasks: ${monthResult.data.taskCount}`);
+                    console.log(`     - Raw monthly total: $${monthResult.data.rawMonthlyTotal.toFixed(2)}`);
+                    console.log(`     - Capped monthly total: $${monthResult.data.cappedMonthlyTotal.toFixed(2)}`);
+                    console.log(`     - Cap status: ${monthResult.data.capStatus}`);
+                    console.log(`     - Tasks array length: ${monthResult.data.tasks.length}`);
+                    
+                    if (monthResult.data.tasks.length > 0) {
+                        console.log('   Sample monthly tasks:');
+                        monthResult.data.tasks.slice(0, 3).forEach(task => {
+                            console.log(`     ${task.date}: ${task.quoteID} = $${task.dailyTotal.toFixed(2)}`);
+                        });
+                    }
+                } else {
+                    console.error('   Monthly tasks failed:', monthResult.error);
+                }
+                
+                // Test full report data generation
+                console.log('3. Testing full report data generation...');
+                const reportData = await taskService.getDailyReportData(today);
+                console.log('Report data:', reportData);
+                
+                // Show results in alert for easy viewing
+                if (reportData) {
+                    const summary = `
+DEBUG RESULTS:
+Date: ${reportData.date}
+Daily Total: $${reportData.dailyTotal}
+Monthly Total: $${reportData.monthlyTotal}
+Monthly Raw: $${reportData.monthlyRawTotal}
+Cap Status: ${reportData.capStatus}
+
+Debug Info:
+- Daily tasks found: ${reportData.debug.dailyTasksFound}
+- Monthly tasks found: ${reportData.debug.monthlyTasksFound}
+- Monthly task count: ${reportData.debug.monthlyTaskCount}
+- Year: ${reportData.debug.parsedYear}
+- Month: ${reportData.debug.parsedMonth}
+                    `;
+                    alert(summary);
+                } else {
+                    alert('ERROR: Failed to generate report data!');
+                }
+                
+                console.log('=== END DEBUG ===');
+                
+            } catch (error) {
+                console.error('Debug test failed:', error);
+                alert(`Debug test failed: ${error.message}`);
+            }
+        }
+        
+        // Test email sending with debug data
+        async function testEmailWithDebug() {
+            console.log('=== TESTING EMAIL SEND WITH DEBUG ===');
+            
+            const today = new Date().toISOString().split('T')[0];
+            const reportData = await taskService.getDailyReportData(today);
+            
+            if (!reportData) {
+                alert('Failed to get report data for email test!');
+                return;
+            }
+            
+            // Log what we're about to send
+            console.log('About to send email with this data:', reportData);
+            
+            const emailData = {
+                to_email: 'erik@nwcustomapparel.com',
+                cc_email: 'adriyella@nwcustomapparel.com',
+                from_name: 'Northwest Custom Apparel',
+                subject: `[DEBUG] Adriyella's Daily Tasks - ${reportData.date}`,
+                
+                // Task data
+                date: reportData.date,
+                thankYouCards: reportData.thankYouCards || 0,
+                thankYouAmount: reportData.thankYouAmount || '0.00',
+                leadSheets: reportData.leadSheets || 0,
+                leadAmount: reportData.leadAmount || '0.00',
+                googleReviews: reportData.googleReviews || 0,
+                reviewAmount: reportData.reviewAmount || '0.00',
+                artApproval: reportData.artApproval || 0,
+                artAmount: reportData.artAmount || '0.00',
+                dailyTotal: reportData.dailyTotal || '0.00',
+                monthlyTotal: reportData.monthlyTotal || '0.00',
+                
+                // Cap information
+                monthlyRawTotal: reportData.monthlyRawTotal || '0.00',
+                capStatus: reportData.capStatus || 'under_cap',
+                isAtCap: reportData.isAtCap || false,
+                capWarning: reportData.isAtCap ? 'Monthly cap of $400 has been reached' : '',
+                
+                // Debug info
+                debugInfo: JSON.stringify(reportData.debug, null, 2)
+            };
+            
+            console.log('Email data being sent:', emailData);
+            
+            try {
+                await emailjs.send('service_1c4k67j', 'adriyella_daily_report', emailData);
+                alert('DEBUG email sent successfully! Check console for details.');
+            } catch (error) {
+                console.error('Failed to send DEBUG email:', error);
+                alert(`Failed to send email: ${error.message}`);
+            }
         }
 
         // Initialize when page loads
