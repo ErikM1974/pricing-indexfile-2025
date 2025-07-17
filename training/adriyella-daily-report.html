@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adriyella's Daily Report</title>
     <script src="adriyella-task-service.js"></script>
+    <script src="adriyella-performance-utils.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * {
@@ -905,6 +906,8 @@
 
 
     <script>
+        console.log('[Daily Report] Script starting...');
+        
         // Task rates
         const RATES = {
             thankYou: 2.00,
@@ -934,10 +937,25 @@
 
         // Initialize the app
         async function initializeApp() {
+            console.log('[Daily Report] Initializing app...');
+            
             // Initialize EmailJS
             emailjs.init('4qSbDO-SQs19TbP80');
             
-            taskService = new AdriyellaTaService();
+            // Initialize task service with error handling
+            try {
+                taskService = new AdriyellaTaService();
+                console.log('[Daily Report] Task service initialized successfully');
+            } catch (error) {
+                console.error('[Daily Report] Error initializing task service:', error);
+                // Create a minimal fallback service
+                taskService = {
+                    saveTasksOptimized: async () => ({ success: false }),
+                    getMonthlyTasks: async () => ({ success: false, data: { tasks: [] } }),
+                    getDailyReportData: async () => ({ success: false })
+                };
+            }
+            
             updateCurrentDate();
             await loadTodaysCounts();
             updateAllDisplays();
@@ -946,6 +964,13 @@
             
             // Check if daily report should be sent
             checkDailyReport();
+            
+            // Verify functions are accessible
+            console.log('[Daily Report] Functions available:', {
+                adjustCount: typeof adjustCount,
+                updateAllDisplays: typeof updateAllDisplays,
+                saveCounts: typeof saveCounts
+            });
         }
 
         // Update current date display
@@ -962,6 +987,8 @@
 
         // Adjust task count
         function adjustCount(taskType, increment) {
+            console.log('[Daily Report] adjustCount called:', taskType, increment);
+            
             const previousTotal = Object.keys(counts).reduce((sum, type) => {
                 return sum + (counts[type] * (RATES[type] || 0));
             }, 0);
@@ -1886,6 +1913,9 @@ Debug Info:
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initializeApp);
+        
+        console.log('[Daily Report] Script loaded successfully');
+        console.log('[Daily Report] adjustCount function defined:', typeof adjustCount === 'function');
     </script>
 </body>
 </html>
