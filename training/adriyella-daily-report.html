@@ -779,6 +779,11 @@
         <button class="back-button" onclick="goToDashboard()">
             ← Back to Dashboard
         </button>
+        
+        <!-- Test button to verify onclick handlers work -->
+        <button onclick="console.log('[TEST] Direct onclick works!'); alert('Test button clicked!');" style="position: absolute; top: 10px; right: 10px; padding: 5px 10px; background: #ff6b9d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Test Click
+        </button>
 
         <div class="header">
             <div class="greeting">Hey Adriyella! 👋</div>
@@ -971,6 +976,39 @@
                 updateAllDisplays: typeof updateAllDisplays,
                 saveCounts: typeof saveCounts
             });
+            
+            // Add fallback event listeners for buttons
+            setTimeout(() => {
+                const buttons = document.querySelectorAll('.counter-btn');
+                console.log('[Daily Report] Found', buttons.length, 'counter buttons');
+                
+                buttons.forEach((btn, index) => {
+                    // Get the onclick attribute value
+                    const onclickAttr = btn.getAttribute('onclick');
+                    console.log(`[Daily Report] Button ${index} onclick attribute:`, onclickAttr);
+                    
+                    // Add click event listener as fallback
+                    btn.addEventListener('click', function(e) {
+                        console.log('[Daily Report] Button clicked via event listener:', onclickAttr);
+                        
+                        // Extract the function call from onclick attribute
+                        if (onclickAttr && onclickAttr.includes('adjustCount')) {
+                            // Use a safer method to extract parameters
+                            const match = onclickAttr.match(/adjustCount\(['"]([^'"]+)['"],\s*(-?\d+)\)/);
+                            if (match) {
+                                const taskType = match[1];
+                                const increment = parseInt(match[2]);
+                                console.log('[Daily Report] Calling adjustCount:', taskType, increment);
+                                adjustCount(taskType, increment);
+                            }
+                        }
+                    });
+                });
+                
+                // Also make adjustCount globally accessible as a backup
+                window.adjustCount = adjustCount;
+                console.log('[Daily Report] Made adjustCount globally accessible');
+            }, 100); // Small delay to ensure DOM is fully ready
         }
 
         // Update current date display
@@ -1916,6 +1954,18 @@ Debug Info:
         
         console.log('[Daily Report] Script loaded successfully');
         console.log('[Daily Report] adjustCount function defined:', typeof adjustCount === 'function');
+        
+        // Immediately make adjustCount available globally
+        window.adjustCount = adjustCount;
+        
+        // Test if we can call it directly
+        console.log('[Daily Report] Testing direct call to adjustCount...');
+        try {
+            // This should trigger the console log inside adjustCount
+            window.adjustCount('test', 0);
+        } catch (error) {
+            console.error('[Daily Report] Error calling adjustCount:', error);
+        }
     </script>
 </body>
 </html>
