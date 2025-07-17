@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriyella's Lead Sheet Guide 📋</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Navigation Styles */
+        .nav-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-bottom: 2px solid #ff6b6b;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .back-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .daily-report-link {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .daily-report-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in;
+        }
+        h2 {
+            color: #4ecdc4;
+            border-bottom: 2px solid #45b7af;
+            padding-bottom: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        h2:hover { color: #ff6b6b; }
+        section { margin-bottom: 40px; }
+        .field-example {
+            position: relative;
+            width: 80%;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .field-example:hover {
+            transform: translateY(-5px);
+        }
+        .field-example p {
+            font-family: 'Caveat', cursive;
+            font-size: 1.2em;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #4ecdc4;
+            color: white;
+        }
+        ol { padding-left: 20px; }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .intro-message {
+            background: #fff0f0;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 30px;
+            font-style: italic;
+            color: #d62828;
+            text-align: center;
+        }
+        .accordion-content {
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+        .active + .accordion-content { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { height: 0; opacity: 0; } to { height: auto; opacity: 1; } }
+        @media (max-width: 768px) { 
+            .container { margin: 20px; padding: 15px; } 
+            .field-example { width: 100%; }
+            .nav-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Hover Tooltip Styles */
+        .form-field {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        .form-field .tooltip {
+            visibility: hidden;
+            width: 250px;
+            background-color: #4ecdc4;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the field */
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .form-field:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .form-field .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%; /* Arrow at bottom */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #4ecdc4 transparent transparent transparent;
+        }
+        .tooltip ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .lead-form {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .lead-form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .lead-form input, .lead-form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <div class="nav-header">
+        <button class="back-button" onclick="goToDashboard()">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </button>
+        
+        <a href="/training/adriyella-daily-report.html" class="daily-report-link">
+            <i class="fas fa-chart-line"></i>
+            Daily Report
+        </a>
+    </div>
+
+    <div class="container">
+        <h1>Adriyella's Lead Sheet Guide <i class="fas fa-file-alt"></i></h1>
+        <div class="intro-message">
+            <p>Hey Adriyella! Erik here—this guide breaks down filling out our Lead Sheets to snag those $5 bonuses. It's straightforward, but let's test and tweak it together—your input from real calls/walk-ins will perfect it!</p>
+        </div>
+        <p style="text-align: center; font-size: 1.2em;">Capture every detail from incoming calls or walk-ins—turns leads into revenue! Update your bonus app after completing. 📈</p>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-list-ol"></i> How to Fill Out Lead Sheets</h2>
+            <div class="accordion-content">
+                <ol>
+                    <li><strong>When to Use:</strong> For every incoming phone call or walk-in customer inquiry—grab all info before handing off to sales.</li>
+                    <li><strong>Process:</strong> Ask questions naturally during the convo: How they heard about us, what they're looking for, contact details.</li>
+                    <li><strong>Field by Field:</strong> See below for what goes where—be thorough for better leads!</li>
+                    <li><strong>After Filling:</strong> Update your bonus app for $5.</li>
+                    <li><strong>Hand Off:</strong> Pass to the Service Rep noted—keep the momentum going!</li>
+                </ol>
+                <p><strong>Goal:</strong> Complete 2-3 per day—accurate info means more sales and bonuses!</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-info-circle"></i> Field Guide: What Goes Where</h2>
+            <div class="accordion-content">
+                <p>Hover over each field label for tips on what to enter and examples! Below is pre-filled with a real customer example (Brianna Gillespie from Region 6 Systems Integration, referred by Hart's Service).</p>
+                <div class="lead-form">
+                    <h3>ADRIYELLA NEW CONTACT FORM</h3>
+
+                    <h4>Contact Information</h4>
+                    
+                    <div class="form-field">
+                        <label for="contact_owner">Contact Owner:</label>
+                        <input type="text" id="contact_owner" value="Brianna Gillespie">
+                        <span class="tooltip">The main decision-maker or person inquiring (if company, the rep's name). Example: "Brianna Gillespie" – If unknown, use "Primary Contact".</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="first_name">First Name:</label>
+                        <input type="text" id="first_name" value="Brianna">
+                        <span class="tooltip">Customer's first name. Example: "Brianna" – Ask politely if not given.</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="last_name">Last Name:</label>
+                        <input type="text" id="last_name" value="Gillespie">
+                        <span class="tooltip">Customer's last name. Example: "Gillespie" – Essential for follow-ups.</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="company_name">Company Name:</label>
+                        <input type="text" id="company_name" value="Region 6 Systems Integration">
+                        <span class="tooltip">Business name if applicable. Example: "Region 6 Systems Integration" – Leave blank for individuals.</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="email">Email:</label>
+                        <input type="text" id="email" value="Brianna@region6systems.com">
+                        <span class="tooltip">Customer's email address. Example: "Brianna@region6systems.com" – Verify spelling.</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="phone">Phone:</label>
+                        <input type="text" id="phone" value="253-222-2382">
+                        <span class="tooltip">Customer's phone number. Example: "253-222-2382" – Include extension if any.</span>
+                    </div>
+
+                    <h4>Mailing Address</h4>
+                    
+                    <div class="form-field">
+                        <label for="street_address">Street Address:</label>
+                        <input type="text" id="street_address" value="1700 Westlake Ave N Suite 200">
+                        <span class="tooltip">Full street address. Example: "1700 Westlake Ave N Suite 200" – For shipping quotes.</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="city">City:</label>
+                        <input type="text" id="city" value="Seattle">
+                        <span class="tooltip">City name. Example: "Seattle" – Double-check.</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="state">State:</label>
+                        <input type="text" id="state" value="WA">
+                        <span class="tooltip">State abbreviation. Example: "WA" – Use 2-letter code.</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="zip">Zip:</label>
+                        <input type="text" id="zip" value="98109">
+                        <span class="tooltip">Zip code. Example: "98109" – For location-based leads.</span>
+                    </div>
+
+                    <h4>Lead Details</h4>
+                    
+                    <div class="form-field">
+                        <label for="service_rep">Service Rep:</label>
+                        <input type="text" id="service_rep" value="Nika Lao">
+                        <span class="tooltip">Assigned sales rep (e.g., who to hand off to). Example: "Nika Lao" – Based on rotation or expertise.</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="lead_source">Lead Source:</label>
+                        <input type="text" id="lead_source" value="Referral from Hart's Service">
+                        <span class="tooltip">How they heard about us (e.g., Google, referral). Example: "Referral from Hart's Service" – Crucial for marketing insights.</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="google_search_terms">Google Search Terms:</label>
+                        <input type="text" id="google_search_terms" value="">
+                        <span class="tooltip">Specific terms if from Google. Example: "custom t-shirts Seattle" – Ask: "What did you search for?" Leave blank if not applicable.</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="customer_type">Customer Type:</label>
+                        <input type="text" id="customer_type" value="Corporate">
+                        <span class="tooltip">Type of customer (e.g., new, repeat, business). Choose from: Alaska Charter, AMC, Construction, Contract, Corporate, Dead, Emblem, Events, Fire/Police, Food Service, Landscaper, Medical, Military, Retail, School. Example: "Corporate" – Helps prioritize.</span>
+                    </div>
+
+                    <h4>Notes</h4>
+                    
+                    <div class="form-field">
+                        <label for="notes">Notes:</label>
+                        <textarea id="notes" rows="4">Referred by Hart's Service for potential apparel needs.</textarea>
+                        <span class="tooltip">Any extra details: What they're looking for, budget, timeline, etc. Example: "Referred by Hart's Service for potential apparel needs." – Be detailed!</span>
+                    </div>
+
+                    <h4>Sign Off</h4>
+                    
+                    <div class="form-field">
+                        <label>Date: _________________     Processed by: _________________</label>
+                        <span class="tooltip">Today's date and your name. Example: "July 17, 2025" & "Adriyella" – Sign off at the end.</span>
+                    </div>
+                </div>
+                <p><strong>Tip:</strong> If info is missing, note it (e.g., "Email TBD") and follow up. Accuracy = better conversions!</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function toggleAccordion(element) {
+            element.classList.toggle('active');
+        }
+        
+        function goToDashboard() {
+            window.location.href = '/staff-dashboard.html';
+        }
+    </script>
+</body>
+</html>
