@@ -10,6 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- Task Service -->
+    <script src="adriyella-performance-utils.js"></script>
     <script src="adriyella-task-service.js"></script>
     
     <style>
@@ -891,6 +892,207 @@
                 transform: translateX(100%);
             }
         }
+
+        /* Loading States and Skeleton Screens */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .skeleton-text {
+            height: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .skeleton-text.wide {
+            width: 80%;
+        }
+
+        .skeleton-text.medium {
+            width: 60%;
+        }
+
+        .skeleton-text.narrow {
+            width: 40%;
+        }
+
+        .skeleton-earnings {
+            height: 2rem;
+            width: 120px;
+            margin: 0.25rem 0;
+        }
+
+        .skeleton-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border-left: 4px solid var(--success-green);
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            border-left-color: var(--error-red);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning-orange);
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+            color: var(--success-green);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--error-red);
+        }
+
+        .toast.warning .toast-icon {
+            color: var(--warning-orange);
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-dark);
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-gray);
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .toast-close:hover {
+            color: var(--text-dark);
+        }
+
+        /* Progress Indicators */
+        .progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+
+        .progress-overlay.show {
+            display: flex;
+        }
+
+        .progress-content {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            max-width: 300px;
+        }
+
+        .progress-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .progress-text {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        /* Optimistic Update States */
+        .optimistic-update {
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .optimistic-success {
+            opacity: 1;
+            animation: optimistic-flash 0.5s ease;
+        }
+
+        .optimistic-error {
+            opacity: 1;
+            animation: optimistic-error 0.5s ease;
+        }
+
+        @keyframes optimistic-flash {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(34, 197, 94, 0.1); }
+            100% { background-color: transparent; }
+        }
+
+        @keyframes optimistic-error {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(239, 68, 68, 0.1); }
+            100% { background-color: transparent; }
+        }
         
         /* Mobile Responsive */
         @media (max-width: 768px) {
@@ -920,6 +1122,17 @@
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Progress Overlay -->
+    <div class="progress-overlay" id="progressOverlay">
+        <div class="progress-content">
+            <div class="progress-spinner"></div>
+            <div class="progress-text" id="progressText">Processing...</div>
+        </div>
     </div>
 
     <!-- Header -->
@@ -2580,6 +2793,260 @@
                 }
             });
         }
+        
+        // ===============================
+        // PERFORMANCE & UX ENHANCEMENTS
+        // ===============================
+        
+        // Toast Notification System
+        function showToast(message, type = 'success', duration = 4000) {
+            const toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                console.error('Toast container not found');
+                return;
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            const iconMap = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle', 
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas ${iconMap[type]} toast-icon"></i>
+                    <div class="toast-text">${message}</div>
+                </div>
+                <button class="toast-close" onclick="hideToast(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Trigger entrance animation
+            requestAnimationFrame(() => {
+                toast.style.transform = 'translateX(0)';
+                toast.style.opacity = '1';
+            });
+            
+            // Auto-hide after duration
+            if (duration > 0) {
+                setTimeout(() => {
+                    hideToast(toast.querySelector('.toast-close'));
+                }, duration);
+            }
+            
+            return toast;
+        }
+        
+        function hideToast(closeButton) {
+            const toast = closeButton.closest('.toast');
+            if (!toast) return;
+            
+            toast.style.transform = 'translateX(400px)';
+            toast.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }
+        
+        // Progress overlay functions  
+        function showProgress(message = 'Processing...') {
+            const overlay = document.querySelector('.progress-overlay');
+            const text = document.querySelector('.progress-text');
+            
+            if (overlay && text) {
+                text.textContent = message;
+                overlay.style.display = 'flex';
+                
+                // Trigger fade-in
+                requestAnimationFrame(() => {
+                    overlay.style.opacity = '1';
+                });
+            }
+        }
+        
+        function hideProgress() {
+            const overlay = document.querySelector('.progress-overlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        // Enhanced earnings update with optimistic UI
+        async function updateEarningsDisplayOptimistic() {
+            if (!window.adriyellaPerfUtils) return updateEarningsDisplay(); // Fallback
+            
+            const earningsElement = adriyellaPerfUtils.getElement('todaysEarnings');
+            if (!earningsElement) return;
+            
+            const previousValue = earningsElement.textContent;
+            
+            try {
+                // Show loading state
+                adriyellaPerfUtils.batchDOMUpdate(() => {
+                    earningsElement.classList.add('skeleton');
+                }, 'high');
+                
+                // Get batch earnings data using performance utils
+                const earningsData = await window.taskService.getBatchEarningsData();
+                
+                // Update UI with new data
+                const newValue = `$${earningsData.todaysEarnings.toFixed(2)}`;
+                
+                adriyellaPerfUtils.batchDOMUpdate(() => {
+                    earningsElement.textContent = newValue;
+                    earningsElement.classList.remove('skeleton');
+                    
+                    // Add success animation
+                    earningsElement.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        earningsElement.style.transform = 'scale(1)';
+                    }, 200);
+                }, 'high');
+                
+                console.log('[TaskSystem] Earnings updated optimistically:', newValue);
+                
+            } catch (error) {
+                console.error('[TaskSystem] Failed to update earnings:', error);
+                
+                // Rollback to previous value
+                adriyellaPerfUtils.batchDOMUpdate(() => {
+                    earningsElement.textContent = previousValue;
+                    earningsElement.classList.remove('skeleton');
+                }, 'high');
+                
+                // Show error toast instead of alert
+                showToast('Failed to update earnings. Please try again.', 'error');
+            }
+        }
+        
+        // Enhanced task completion with optimistic updates
+        function optimisticTaskCompletion(taskElement, originalHandler) {
+            return async function(event) {
+                if (originalHandler) {
+                    return originalHandler.call(this, event);
+                }
+                
+                event.preventDefault();
+                
+                const taskId = taskElement.dataset.taskId;
+                const bonusAmount = parseFloat(taskElement.dataset.bonusAmount) || 0;
+                
+                // Optimistic UI update for earnings
+                if (window.adriyellaPerfUtils) {
+                    const earningsElement = adriyellaPerfUtils.getElement('todaysEarnings');
+                    if (earningsElement) {
+                        const currentEarnings = parseFloat(earningsElement.textContent.replace('$', '')) || 0;
+                        const newEarnings = currentEarnings + bonusAmount;
+                        
+                        try {
+                            // Update task UI immediately
+                            adriyellaPerfUtils.batchDOMUpdate(() => {
+                                taskElement.classList.add('task-completed');
+                                taskElement.style.opacity = '0.7';
+                            }, 'high');
+                            
+                            // Show optimistic earnings update
+                            adriyellaPerfUtils.optimisticUpdate(
+                                earningsElement,
+                                `$${newEarnings.toFixed(2)}`,
+                                `$${currentEarnings.toFixed(2)}`,
+                                window.taskService.saveTaskCompletionOptimized(taskId, {
+                                    bonusAmount: bonusAmount,
+                                    completedAt: new Date().toISOString()
+                                })
+                            );
+                            
+                            // Show success toast
+                            showToast(`Task completed! +$${bonusAmount.toFixed(2)}`, 'success');
+                            
+                        } catch (error) {
+                            console.error('[TaskSystem] Task completion failed:', error);
+                            showToast('Failed to complete task. Please try again.', 'error');
+                        }
+                    }
+                }
+            };
+        }
+        
+        // Initialize performance optimizations when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[TaskSystem] Initializing performance optimizations...');
+            
+            // Initialize performance utils if not already done
+            if (!window.adriyellaPerfUtils) {
+                console.log('[TaskSystem] Performance utils not found, using fallback mode');
+                return;
+            }
+            
+            // Replace existing updateEarningsDisplay if it exists
+            if (typeof updateEarningsDisplay === 'function') {
+                window.originalUpdateEarningsDisplay = updateEarningsDisplay;
+                window.updateEarningsDisplay = updateEarningsDisplayOptimistic;
+                console.log('[TaskSystem] Enhanced earnings display function');
+            }
+            
+            // Replace alert functions with toast notifications
+            const originalAlert = window.alert;
+            window.alert = function(message) {
+                // Determine toast type based on message content
+                let type = 'info';
+                if (message.toLowerCase().includes('error') || message.toLowerCase().includes('failed')) {
+                    type = 'error';
+                } else if (message.toLowerCase().includes('success') || message.toLowerCase().includes('completed') || message.includes('✅')) {
+                    type = 'success';
+                } else if (message.toLowerCase().includes('warning') || message.toLowerCase().includes('caution')) {
+                    type = 'warning';
+                }
+                
+                showToast(message, type);
+            };
+            
+            // Enhance existing task completion handlers
+            document.querySelectorAll('.task-item').forEach(taskElement => {
+                const completeButton = taskElement.querySelector('.complete-task-btn');
+                if (completeButton && !completeButton.dataset.optimized) {
+                    const originalHandler = completeButton.onclick;
+                    completeButton.onclick = optimisticTaskCompletion(taskElement, originalHandler);
+                    completeButton.dataset.optimized = 'true';
+                }
+            });
+            
+            // Schedule periodic earnings refresh (only when page is visible)
+            setInterval(() => {
+                if (document.visibilityState === 'visible' && typeof updateEarningsDisplayOptimistic === 'function') {
+                    updateEarningsDisplayOptimistic();
+                }
+            }, 30000); // Every 30 seconds when page is visible
+            
+            console.log('[TaskSystem] Performance optimizations initialized');
+        });
+        
+        // Performance monitoring
+        if (window.adriyellaPerfUtils) {
+            setInterval(() => {
+                const metrics = adriyellaPerfUtils.getMetrics();
+                console.log('[PerfMonitor] Metrics:', metrics);
+                
+                // Show performance warning if needed
+                if (metrics.cacheHitRatio < 0.5 && metrics.apiCalls > 10) {
+                    console.warn('[PerfMonitor] Low cache hit ratio detected:', metrics.cacheHitRatio);
+                }
+            }, 60000); // Every minute
+        }
+        
     </script>
 </body>
 </html>

@@ -55,6 +55,12 @@ class AdriyellaTaService {
             }
         }
         
+        // Initialize performance utilities integration
+        if (typeof window !== 'undefined' && window.adriyellaPerfUtils) {
+            this.perfUtils = window.adriyellaPerfUtils;
+            console.log('[AdriyellaTaService] Performance utilities integrated');
+        }
+        
         console.log('[AdriyellaTaService] Session cache initialized');
     }
 
@@ -1826,6 +1832,203 @@ class AdriyellaTaService {
                 error: error.message
             };
         }
+    }
+
+    /**
+     * PERFORMANCE OPTIMIZATION: Batch earnings calculation
+     * Replaces the inefficient individual API calls with batched operations
+     */
+    async getBatchEarningsData(days = 30) {
+        const cacheKey = `earnings_batch_${days}`;
+        
+        // Check cache first (with TTL)
+        if (this.perfUtils) {
+            const cached = this.perfUtils.getCacheWithTTL(cacheKey);
+            if (cached) {
+                console.log(`[AdriyellaTaService] Returning cached earnings data for ${days} days`);
+                return cached;
+            }
+        }
+
+        try {
+            const startTime = performance.now();
+            console.log(`[AdriyellaTaService] Starting batch earnings calculation for ${days} days`);
+
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            const startOfPeriod = new Date(today);
+            startOfPeriod.setDate(today.getDate() - days);
+
+            // Single API call to get all sessions in range
+            const sessionsResponse = await fetch(`${this.baseURL}/api/quote_sessions`);
+            if (!sessionsResponse.ok) {
+                throw new Error(`Failed to fetch sessions: ${sessionsResponse.status}`);
+            }
+
+            const allSessions = await sessionsResponse.json();
+            
+            // Filter for Adriyella sessions (ADR pattern) within date range
+            const relevantSessions = allSessions.filter(session => {
+                if (!session.QuoteID || !session.QuoteID.startsWith('ADR')) {
+                    return false;
+                }
+                
+                const sessionDate = new Date(session.CreatedAt);
+                return sessionDate >= startOfPeriod;
+            });
+
+            console.log(`[AdriyellaTaService] Found ${relevantSessions.length} relevant sessions`);
+
+            // Batch API call to get all quote items for these sessions
+            const quoteIds = relevantSessions.map(s => s.QuoteID);
+            const itemsPromises = quoteIds.map(async (quoteId) => {
+                try {
+                    const response = await fetch(`${this.baseURL}/api/quote_items?quoteID=${quoteId}`);
+                    if (response.ok) {
+                        const items = await response.json();
+                        return { quoteId, items, success: true };
+                    }
+                    return { quoteId, items: [], success: false };
+                } catch (error) {
+                    console.warn(`[AdriyellaTaService] Failed to get items for ${quoteId}:`, error);
+                    return { quoteId, items: [], success: false };
+                }
+            });
+
+            // Process all items in parallel (with concurrency limit)
+            let allResults;
+            if (this.perfUtils) {
+                allResults = await this.perfUtils.batchApiCall(
+                    itemsPromises.map(p => () => p),
+                    { concurrent: 5, maxRetries: 2 }
+                );
+            } else {
+                allResults = await Promise.all(itemsPromises);
+            }
+
+            // Calculate earnings by time period
+            let todayEarnings = 0;
+            let weekEarnings = 0; 
+            let monthEarnings = 0;
+            let totalEarnings = 0;
+
+            const todayStr = today.toDateString();
+
+            for (const session of relevantSessions) {
+                const sessionDate = new Date(session.CreatedAt);
+                const sessionResults = allResults.find(r => r.quoteId === session.QuoteID);
+                
+                if (!sessionResults || !sessionResults.success) {
+                    continue;
+                }
+
+                for (const item of sessionResults.items) {
+                    // LineTotal stores earnings * 100 for compatibility
+                    const earnings = parseFloat(item.LineTotal || 0) / 100;
+                    
+                    totalEarnings += earnings;
+                    
+                    if (sessionDate.toDateString() === todayStr) {
+                        todayEarnings += earnings;
+                    }
+                    
+                    if (sessionDate >= startOfWeek) {
+                        weekEarnings += earnings;
+                    }
+                    
+                    if (sessionDate >= startOfMonth) {
+                        monthEarnings += earnings;
+                    }
+                }
+            }
+
+            const earningsData = {
+                today: todayEarnings,
+                week: weekEarnings,
+                month: monthEarnings,
+                total: totalEarnings,
+                monthlyProgress: Math.min(100, (monthEarnings / 400) * 100),
+                monthlyRemaining: Math.max(0, 400 - monthEarnings),
+                calculatedAt: Date.now(),
+                sessionsProcessed: relevantSessions.length
+            };
+
+            const endTime = performance.now();
+            console.log(`[AdriyellaTaService] Batch earnings calculation completed in ${(endTime - startTime).toFixed(2)}ms`);
+            console.log(`[AdriyellaTaService] Earnings summary:`, earningsData);
+
+            // Cache the results (30 second TTL)
+            if (this.perfUtils) {
+                this.perfUtils.setCacheWithTTL(cacheKey, earningsData, 30000);
+            }
+
+            return earningsData;
+
+        } catch (error) {
+            console.error('[AdriyellaTaService] Error in batch earnings calculation:', error);
+            
+            // Return fallback data structure
+            return {
+                today: 0,
+                week: 0,
+                month: 0,
+                total: 0,
+                monthlyProgress: 0,
+                monthlyRemaining: 400,
+                calculatedAt: Date.now(),
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * PERFORMANCE OPTIMIZATION: Debounced task completion save
+     * Prevents overwhelming the API with rapid saves
+     */
+    saveTaskCompletionOptimized(taskId, taskData) {
+        if (!this.perfUtils) {
+            // Fallback to regular save if perf utils not available
+            return this.saveTaskCompletion(taskId, taskData);
+        }
+
+        // Use debounced save with 300ms delay
+        const debouncedSave = this.perfUtils.debounce(
+            () => this.saveTaskCompletion(taskId, taskData),
+            300,
+            `save-task-${taskId}`
+        );
+
+        return debouncedSave();
+    }
+
+    /**
+     * PERFORMANCE OPTIMIZATION: Optimistic UI updates for earnings
+     * Updates UI immediately while saving in background
+     */
+    async updateEarningsOptimistic(element, newEarnings, savePromise) {
+        if (!this.perfUtils) {
+            // Fallback to regular update
+            const result = await savePromise;
+            if (element) {
+                element.textContent = `$${newEarnings.toFixed(2)}`;
+            }
+            return result;
+        }
+
+        const currentText = element ? element.textContent : '$0.00';
+        
+        this.perfUtils.optimisticUpdate(
+            element,
+            `$${newEarnings.toFixed(2)}`,
+            currentText,
+            savePromise
+        );
+
+        return savePromise;
     }
 }
 
