@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriyella's Thank-You Card Hub 🚀</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .back-button:hover {
+            background: white;
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .daily-report-link {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: rgba(255, 107, 157, 0.9);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .daily-report-link:hover {
+            background: rgba(255, 107, 157, 1);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in;
+        }
+        h2 {
+            color: #4ecdc4;
+            border-bottom: 2px solid #45b7af;
+            padding-bottom: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        h2:hover { color: #ff6b6b; }
+        section { margin-bottom: 40px; }
+        .template {
+            position: relative;
+            width: 80%;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fffaf0; /* Soft card background */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 0 10px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .template:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .template::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent 0%, #ddd 50%, transparent 100%); /* Simulated fold line */
+            transform: translateX(-50%);
+        }
+        .template p {
+            font-family: 'Caveat', cursive; /* Handwritten font */
+            font-size: 1.2em;
+            color: #333;
+            margin: 0;
+            white-space: pre-wrap; /* Preserve line breaks */
+        }
+        .template h3 {
+            font-family: 'Poppins', sans-serif; /* Keep title clean */
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .placeholder {
+            font-family: 'Poppins', sans-serif; /* Placeholders in typed font for clarity */
+            color: #888;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #4ecdc4;
+            color: white;
+        }
+        ol { padding-left: 20px; }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .intro-message {
+            position: relative;
+            width: 80%;
+            max-width: 500px;
+            margin: 20px auto 30px;
+            padding: 20px;
+            background: #fffaf0; /* Soft card background */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 0 10px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+            text-align: left;
+        }
+        .intro-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent 0%, #ddd 50%, transparent 100%); /* Simulated fold line */
+            transform: translateX(-50%);
+        }
+        .intro-message p {
+            font-family: 'Caveat', cursive; /* Handwritten font */
+            font-size: 1.3em;
+            color: #d62828;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .accordion-content {
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+        .active + .accordion-content { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { height: 0; opacity: 0; } to { height: auto; opacity: 1; } }
+        @media (max-width: 768px) { .container { margin: 20px; padding: 15px; } .template, .intro-message { width: 100%; } }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="goToDashboard()">
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+    </button>
+    
+    <a href="/training/adriyella-daily-report.html" class="daily-report-link">
+        <i class="fas fa-chart-line"></i>
+        Daily Report
+    </a>
+    
+    <div class="container">
+        <h1>Adriyella's Thank-You Card Hub <i class="fas fa-heart"></i></h1>
+        <div class="intro-message">
+            <p>Hey Adriyella!<br><br>
+This is Erik here—I've put this guide together to kick off our thank-you card process, but I know it's not perfect since I threw it together in my office without testing it out in the real world with you. And hey, I mess up sometimes (who doesn't?), but that's why we're a team! Let's collaborate to make this even better—your hands-on experience is what will really make it shine. If you spot anything off, have ideas to improve it, or see tweaks needed after trying it live, please let me know right away. I'm excited to work on this with you and iterate based on what actually works. You've got great insights—let's make this process awesome together! 🚀</p>
+        </div>
+        <p style="text-align: center; font-size: 1.2em;">Hey Adriyella! Let's make customers smile with these cards. Follow the guide, log in Shopworks, and track your wins. You've got this! 🌟</p>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-list-ol"></i> Daily Process for Thank-You Cards</h2>
+            <div class="accordion-content">
+                <ol>
+                    <li><strong>Late Afternoon (Around 4 PM):</strong> Grab the stack of completed invoices from Bradley. Scan and sort them quickly (e.g., by type). Prep for tomorrow—no writing yet!</li>
+                    <li><strong>Next Morning (Around 9-11 AM):</strong> Handle notifications first: Call, text, or email for pickups/shipments. Log as "Order Notification" in Shopworks with who you contacted and details.</li>
+                    <li><strong>Prep Cards:</strong> Check rules to see who gets one. Pick a template, handwrite & personalize (fill <<placeholders>>, add custom touches). Sign based on guidelines.</li>
+                    <li><strong>Send It:</strong> Mail or hand off for pickup.</li>
+                    <li><strong>Log Immediately:</strong> In Shopworks, add "Thank You Sent" activity. Note template, content summary, signer, date/method—for your $2 bonus!</li>
+                    <li><strong>Bonus Time:</strong> Update your app.</li>
+                    <li><strong>Wrap Up:</strong> Finish stack by noon; carry over if needed.</li>
+                </ol>
+                <p><strong>Pro Tip:</strong> Batch like tasks for speed. High volume? Prioritize big orders.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-ruler"></i> Rules for Who Gets a Card</h2>
+            <div class="accordion-content">
+                <p>Send to most everyone—except individual webstore employee orders (main contact only for milestones). When in doubt, send!</p>
+                <table>
+                    <tr><th>Scenario</th><th>Send?</th><th>To Whom?</th><th>Why?</th></tr>
+                    <tr><td>In-person/phone orders</td><td>Yes!</td><td>Main contact.</td><td>Boosts loyalty.</td></tr>
+                    <tr><td>Non-webstore online</td><td>Yes.</td><td>Buyer.</td><td>Encourages repeats.</td></tr>
+                    <tr><td>Webstore orders</td><td>No to employees; Yes to main for milestones.</td><td>HR/admin contact.</td><td>Target decision-makers.</td></tr>
+                    <tr><td>High-value/milestone</td><td>Yes, top priority.</td><td>Main contact.</td><td>Maximizes growth.</td></tr>
+                    <tr><td>Exceptions (returns, etc.)</td><td>No, unless positive.</td><td>N/A</td><td>Focus on wins.</td></tr>
+                </table>
+                <p><strong>Avoid Duplicates:</strong> Check Shopworks for recent cards (30-60 days). Limit 1 per 30 days. Note "Card #X".</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-signature"></i> Signature Guidelines</h2>
+            <div class="accordion-content">
+                <table>
+                    <tr><th>Scenario</th><th>Who Signs?</th><th>Why?</th></tr>
+                    <tr><td>AE-handled (repeats, sales)</td><td>AE (get their quick sign-off).</td><td>Keeps client bond strong.</td></tr>
+                    <tr><td>General/your interaction</td><td>You (Adriyella or "team").</td><td>Fast & empowering.</td></tr>
+                    <tr><td>Upsell cards</td><td>AE if they lead; else you.</td><td>Links to sales.</td></tr>
+                </table>
+                <p>Fallback: Your sign with "From the Team". Log in Shopworks.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-envelope-open-text"></i> Card Templates</h2>
+            <div class="accordion-content">
+                <p>Handwrite & personalize! Vary for repeats. Add review nudge: "If thrilled, share a Google review!"</p>
+                
+                <div class="template">
+                    <h3>First Time Basic <i class="fas fa-star"></i></h3>
+                    <p>Dear <span class="placeholder"><<Contact First Name>></span>,<br><br>
+                    Thank you for choosing NW Custom Apparel for your recent order #<span class="placeholder"><<Order Number>></span>! We're thrilled with how your custom [item, e.g., t-shirts] turned out and hope you're loving them. Your business means a lot to us—welcome to the family!<br><br>
+                    If you have questions, reach out anytime at 1-800-851-3671.<br><br>
+                    Yours sincerely,<br>
+                    Adriyella (on behalf of the team)</p>
+                </div>
+                
+                <div class="template">
+                    <h3>First Time Upsell <i class="fas fa-rocket"></i></h3>
+                    <p>Dear <span class="placeholder"><<Contact First Name>></span>,<br><br>
+                    Thanks so much for your order #<span class="placeholder"><<Order Number>></span> with NW Custom Apparel! We enjoyed creating your [item, e.g., embroidered hats] and hope they exceeded your expectations. As a new customer, we'd love to help with more—check out our DTG printing for vibrant designs next time!<br><br>
+                    We're here for you—call 1-800-851-3671 with any ideas.<br><br>
+                    Best regards,<br>
+                    Adriyella</p>
+                </div>
+                
+                <div class="template">
+                    <h3>Repeat Loyalty <i class="fas fa-heart"></i></h3>
+                    <p>Dear <span class="placeholder"><<Contact First Name>></span>,<br><br>
+                    Thank you for another order #<span class="placeholder"><<Order Number>></span> with NW Custom Apparel—your continued support keeps us going! We appreciate your loyalty and loved working on your latest [item, e.g., screen-printed tees]. Here's to many more!<br><br>
+                    Questions? Give us a call at 1-800-851-3671.<br><br>
+                    Warmly,<br>
+                    Adriyella</p>
+                </div>
+                
+                <div class="template">
+                    <h3>Repeat Upsell <i class="fas fa-shopping-cart"></i></h3>
+                    <p>Dear <span class="placeholder"><<Contact First Name>></span>,<br><br>
+                    We're grateful for your repeat business with order #<span class="placeholder"><<Order Number>></span> at NW Custom Apparel! Building on your previous [past item, e.g., uniforms], we think you'd love our new custom gift packages for teams—let us know if we can help.<br><br>
+                    Always happy to help—reach out at 1-800-851-3671.<br><br>
+                    Cheers,<br>
+                    Adriyella</p>
+                </div>
+                
+                <div class="template">
+                    <h3>Repeat Milestone <i class="fas fa-trophy"></i></h3>
+                    <p>Dear <span class="placeholder"><<Contact First Name>></span>,<br><br>
+                    Celebrating your [milestone, e.g., 5th order] #<span class="placeholder"><<Order Number>></span> with NW Custom Apparel—thank you for your ongoing trust! It's been a pleasure creating your custom apparel time after time. Excited for what's next!<br><br>
+                    Contact us anytime at 1-800-851-3671.<br><br>
+                    Best,<br>
+                    Adriyella</p>
+                </div>
+                
+                <div class="template">
+                    <h3>Repeat Fun <i class="fas fa-grin-stars"></i></h3>
+                    <p>Dear <span class="placeholder"><<Contact First Name>></span>,<br><br>
+                    Woohoo—thanks for coming back for order #<span class="placeholder"><<Order Number>></span> at NW Custom Apparel! Your loyalty makes our day, and we're stoked about your latest [item, e.g., promotional products]. Let's keep the custom vibes going!<br><br>
+                    Questions? Hit us up at 1-800-851-3671. □<br><br>
+                    Thanks again,<br>
+                    Adriyella</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-desktop"></i> How to Add an Activity in Shopworks</h2>
+            <div class="accordion-content">
+                <p>Follow these steps to log activities like "Thank You Sent" or "Order Notification". Use the Quick Add from the customer screen for fast entry!</p>
+                <h3>Step 1: Quick Add from Customer Screen</h3>
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Quick%20Add%20from%20Customer%20Screen%20Shopworks.png?ver=1" alt="Quick Add from Customer Screen">
+                
+                <h3>Step 2: Enter Activity Details</h3>
+                <p>Fill in the activity type (e.g., Thank You Sent), contact, date/time, notes (e.g., "Adriyella - Card sent using Repeat Loyalty template"), and mark as completed.</p>
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Activity%20shopworks.png?ver=1" alt="Activity Entry Window">
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function toggleAccordion(element) {
+            element.classList.toggle('active');
+        }
+        
+        function goToDashboard() {
+            window.location.href = '/staff-dashboard.html';
+        }
+    </script>
+</body>
+</html>

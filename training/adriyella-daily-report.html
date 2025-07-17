@@ -120,6 +120,34 @@
             transform: translateX(-5px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+        
+        .guide-link {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(255, 192, 203, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #be185d;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .guide-link:hover {
+            background: rgba(255, 182, 193, 1);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+            color: #be185d;
+            text-decoration: none;
+        }
 
         .header {
             text-align: center;
@@ -780,16 +808,10 @@
             ← Back to Dashboard
         </button>
         
-        <!-- Test button to verify onclick handlers work -->
-        <button onclick="console.log('[TEST] Direct onclick works!'); alert('Test button clicked!');" style="position: absolute; top: 10px; right: 120px; padding: 5px 10px; background: #ff6b9d; color: white; border: none; border-radius: 5px; cursor: pointer;">
-            Test Click
-        </button>
+        <a href="/training/thank-you-card-guide.html" class="guide-link">
+            💝 Thank You Guide
+        </a>
         
-        <!-- Test button to verify adjustCount function -->
-        <button onclick="console.log('[TEST] Calling adjustCount directly...'); try { adjustCount('thankYou', 1); alert('adjustCount call completed! Check console.'); } catch(e) { alert('adjustCount failed: ' + e.message); console.error('[TEST] adjustCount error:', e); }" style="position: absolute; top: 10px; right: 10px; padding: 5px 10px; background: #10b981; color: white; border: none; border-radius: 5px; cursor: pointer;">
-            Test adjustCount
-        </button>
-
         <div class="header">
             <div class="greeting">Hey Adriyella! 👋</div>
             <div class="date" id="currentDate"></div>
