@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriyella's Art Approval Guide 🎨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Navigation Styles */
+        .nav-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-bottom: 2px solid #ff6b6b;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .back-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .daily-report-link {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .daily-report-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in;
+        }
+        h2 {
+            color: #4ecdc4;
+            border-bottom: 2px solid #45b7af;
+            padding-bottom: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        h2:hover { color: #ff6b6b; }
+        section { margin-bottom: 40px; }
+        .step-example {
+            position: relative;
+            width: 80%;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .step-example:hover {
+            transform: translateY(-5px);
+        }
+        .step-example p {
+            font-family: 'Caveat', cursive;
+            font-size: 1.2em;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #4ecdc4;
+            color: white;
+        }
+        ol { padding-left: 20px; }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .intro-message {
+            background: #fff0f0;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 30px;
+            font-style: italic;
+            color: #d62828;
+            text-align: center;
+        }
+        .accordion-content {
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+        .active + .accordion-content { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { height: 0; opacity: 0; } to { height: auto; opacity: 1; } }
+        @media (max-width: 768px) { 
+            .container { margin: 20px; padding: 15px; } 
+            .step-example { width: 100%; }
+            .nav-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <div class="nav-header">
+        <button class="back-button" onclick="goToDashboard()">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </button>
+        
+        <a href="/training/adriyella-daily-report.html" class="daily-report-link">
+            <i class="fas fa-chart-line"></i>
+            Daily Report
+        </a>
+    </div>
+
+    <div class="container">
+        <h1>Adriyella's Art Approval Guide <i class="fas fa-paint-brush"></i></h1>
+        <div class="intro-message">
+            <p>Hey Adriyella! Erik here—taking on art approvals is huge because it frees up Nika and the AEs to focus on what they do best: selling and growing our business. By owning this from start to customer sign-off, you keep things moving smoothly and earn your $10 bonus each time. Remember, it's key to remind AEs to hand off artwork to you—otherwise, if they handle it themselves, it impacts your bonuses (deducted $10 per piece). Let's stay proactive and team-oriented to make this win-win!</p>
+        </div>
+        <p style="text-align: center; font-size: 1.2em;">Streamline the process, free up the AE, and speed up production—win-win! Update your bonus app after each approval. 🎉</p>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-list-ol"></i> How to Handle Art Approvals</h2>
+            <div class="accordion-content">
+                <ol>
+                    <li><strong>Receive from AE:</strong> When a new artwork or mockup comes in, the AE hands it off to you (via email, Shopworks, or in-person).</li>
+                    <li><strong>Coordinate with Team:</strong> Send to Steve (graphic artist) for design tweaks, then Ruthie (digitizing/plant manager) for production prep.</li>
+                    <li><strong>Customer Approval:</strong> Share the final mockup with the customer (email/call), get their sign-off.</li>
+                    <li><strong>Log & Bonus:</strong> Update Shopworks as "Art Approval Completed" with notes, then claim your $10 in the app.</li>
+                    <li><strong>Hand Back:</strong> Notify the AE it's approved and ready to go.</li>
+                </ol>
+                <p><strong>Goal:</strong> 1-2 approvals per week—faster process means happier customers and team!</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-ruler"></i> Step-by-Step Workflow</h2>
+            <div class="accordion-content">
+                <table>
+                    <tr><th>Step</th><th>What to Do</th><th>Tips/Examples</th></tr>
+                    <tr><td>1. Get Artwork from AE</td><td>Review the order details/mockup provided by AE.</td><td>Ask: "Any specific instructions?" Log start in Shopworks.</td></tr>
+                    <tr><td>2. Send to Steve (Graphics)</td><td>Email/assign to Steve for artwork creation or edits.</td><td>Subject: "Art for Order #[Number] - [Customer]". Follow up if needed.</td></tr>
+                    <tr><td>3. Forward to Ruthie (Digitizing)</td><td>Once Steve's done, pass to Ruthie for digitizing/production check.</td><td>Include notes: "Ready for digitizing—customer needs [embroidery/screen print]."</td></tr>
+                    <tr><td>4. Get Customer Approval</td><td>Share final mockup via email/call: "Here's the art—approve or changes?"</td><td>Script: "Hi [Name], attached is the mockup for your order. Looks good? Reply 'Approved'!"</td></tr>
+                    <tr><td>5. Handle Revisions</td><td>If changes, loop back to Steve/Ruthie until approved.</td><td>Track revisions in notes to avoid delays.</td></tr>
+                    <tr><td>6. Finalize & Log</td><td>Once approved, notify AE and log in Shopworks.</td><td>Notes: "Approved by customer on [Date]; sent to production."</td></tr>
+                </table>
+                <p><strong>Tip:</strong> Use Shopworks for all tracking—keeps everyone in the loop. If stuck, ping the team!</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-comment-dots"></i> Communication Scripts</h2>
+            <div class="accordion-content">
+                <p>Keep it pro and clear—examples for team and customers.</p>
+                
+                <div class="step-example">
+                    <h3>To Steve/Ruthie <i class="fas fa-envelope"></i></h3>
+                    <p>"Hey Steve, attached is the art for Order #[Number] - [Customer]. Needs [edits]. Let me know when ready!"</p>
+                </div>
+                
+                <div class="step-example">
+                    <h3>To Customer for Approval <i class="fas fa-phone"></i></h3>
+                    <p>"Hi [Name], your mockup is ready! Check the attachment—reply 'Approved' or with changes. Excited to get this printed!"</p>
+                </div>
+                
+                <div class="step-example">
+                    <h3>Follow-Up if Needed <i class="fas fa-clock"></i></h3>
+                    <p>"Just checking in on the art approval for your order. Any thoughts? We're here to tweak!"</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function toggleAccordion(element) {
+            element.classList.toggle('active');
+        }
+        
+        function goToDashboard() {
+            window.location.href = '/staff-dashboard.html';
+        }
+    </script>
+</body>
+</html>
