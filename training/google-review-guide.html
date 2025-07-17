@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriyella's Google Review Guide 🌟</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Navigation Styles */
+        .nav-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-bottom: 2px solid #ff6b6b;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .back-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .daily-report-link {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .daily-report-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in;
+        }
+        h2 {
+            color: #4ecdc4;
+            border-bottom: 2px solid #45b7af;
+            padding-bottom: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        h2:hover { color: #ff6b6b; }
+        section { margin-bottom: 40px; }
+        .script-example {
+            position: relative;
+            width: 80%;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .script-example:hover {
+            transform: translateY(-5px);
+        }
+        .script-example p {
+            font-family: 'Caveat', cursive;
+            font-size: 1.2em;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #4ecdc4;
+            color: white;
+        }
+        ol { padding-left: 20px; }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .intro-message {
+            background: #fff0f0;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 30px;
+            font-style: italic;
+            color: #d62828;
+            text-align: center;
+        }
+        .accordion-content {
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+        .active + .accordion-content { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { height: 0; opacity: 0; } to { height: auto; opacity: 1; } }
+        @media (max-width: 768px) { 
+            .container { margin: 20px; padding: 15px; } 
+            .script-example { width: 100%; }
+            .nav-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <div class="nav-header">
+        <button class="back-button" onclick="goToDashboard()">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </button>
+        
+        <a href="/training/adriyella-daily-report.html" class="daily-report-link">
+            <i class="fas fa-chart-line"></i>
+            Daily Report
+        </a>
+    </div>
+
+    <div class="container">
+        <h1>Adriyella's Google Review Guide <i class="fas fa-star"></i></h1>
+        <div class="intro-message">
+            <p>Hey Adriyella! Erik here—this guide is your key to nailing those $20 bonuses for Google Reviews. We'll keep it simple, fun, and effective. Let's team up to refine it as you try it out—your feedback will make it gold!</p>
+        </div>
+        <p style="text-align: center; font-size: 1.2em;">Pro tip: Aim for genuine chats—happy customers love sharing! Track your wins in the bonus app. 🚀</p>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-list-ol"></i> Asking for the Review (In-Person Pickup)</h2>
+            <div class="accordion-content">
+                <ol>
+                    <li><strong>Present the Google Review Card:</strong> When the customer arrives to pick up their completed apparel, have the review card ready.</li>
+                    <li><strong>Explain the Free Tumbler Offer:</strong> Briefly say: "Would you mind leaving us a quick Google review? We'll give you a free custom tumbler—scan this code!"</li>
+                    <li><strong>Show the Tumbler:</strong> Highlight the awesome custom tumbler they'll get with their logo.</li>
+                </ol>
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/112%20and%20tumbler.jpg?ver=1" alt="Custom Tumbler Example">
+            </div>
+        </section>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-check-circle"></i> Ensure They Leave a Review</h2>
+            <div class="accordion-content">
+                <ol>
+                    <li><strong>Encourage On-the-Spot:</strong> Suggest they do it right there via the QR code, or later from their phone.</li>
+                    <li><strong>Logo Instructions:</strong> Explain they must email their logo to sales@nwcustomapparel.com and mention their review for the free Tumbler.</li>
+                </ol>
+                <p><strong>Script Example:</strong> "Scan this QR to leave your review—it's super quick! Then email your logo to sales@nwcustomapparel.com saying 'Reviewed for Tumbler' and we'll get it customized for you."</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-search"></i> Confirming the Google Review</h2>
+            <div class="accordion-content">
+                <ol>
+                    <li><strong>Check Google Reviews:</strong> Once they say they've submitted a 5-star review, head to our Google Business Profile and verify it's posted.</li>
+                    <li><strong>Follow Up if Needed:</strong> If no review shows, politely reach out by phone or email: "Hey [Name], just checking on that review for your free Tumbler—let me know if you need help!"</li>
+                </ol>
+                <p><strong>Tip:</strong> Only proceed with the Tumbler once confirmed. Log the review in Shopworks for your bonus!</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 onclick="toggleAccordion(this)"><i class="fas fa-desktop"></i> How to Log in Shopworks</h2>
+            <div class="accordion-content">
+                <p>Log every successful review for bonuses.</p>
+                <h3>Step 1: Quick Add from Customer Screen</h3>
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Quick%20Add%20from%20Customer%20Screen%20Shopworks.png?ver=1" alt="Quick Add from Customer Screen">
+                
+                <h3>Step 2: Enter Details</h3>
+                <p>Type: "Google Review Obtained". Notes: Customer name, review date, Tumbler offer confirmed.</p>
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Activity%20shopworks.png?ver=1" alt="Activity Entry Window">
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function toggleAccordion(element) {
+            element.classList.toggle('active');
+        }
+        
+        function goToDashboard() {
+            window.location.href = '/staff-dashboard.html';
+        }
+    </script>
+</body>
+</html>
