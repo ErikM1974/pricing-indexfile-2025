@@ -251,9 +251,28 @@
             color: var(--primary-dark);
         }
 
-        .user-welcome {
-            color: var(--text-secondary);
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .help-btn {
+            background: var(--hover-bg);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            color: var(--text-primary);
             font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .help-btn:hover {
+            background: var(--border-color);
         }
 
         /* Main Container */
@@ -467,6 +486,15 @@
             background: #059669;
         }
 
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
         .btn-fullwidth {
             width: 100%;
             justify-content: center;
@@ -605,6 +633,317 @@
             align-items: center;
             gap: 0.5rem;
             margin-bottom: 1rem;
+        }
+
+        /* Professional Quote Layout Styles */
+        .quote-section {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .quote-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .section-header i {
+            color: var(--primary-green);
+            font-size: 1.25rem;
+        }
+
+        /* Quote overview section */
+        .quote-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--hover-bg);
+            border-radius: 6px;
+        }
+
+        .overview-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .overview-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .overview-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Products section */
+        .products-section {
+            background: white;
+        }
+
+        .products-subtotal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            font-weight: 600;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .products-subtotal-label {
+            color: var(--text-primary);
+        }
+
+        .products-subtotal-amount {
+            font-size: 1.125rem;
+            color: var(--text-primary);
+        }
+
+        /* Setup fees section */
+        .setup-fees-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .fee-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .fee-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .fee-label {
+            color: var(--text-primary);
+        }
+
+        .fee-amount {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .fees-subtotal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 2px solid #dee2e6;
+            font-weight: 600;
+        }
+
+        /* Grand total section */
+        .grand-total-section {
+            background: linear-gradient(135deg, #f0f7f1 0%, #e8f4ea 100%);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(76, 179, 84, 0.1);
+        }
+
+        .grand-total-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .grand-total-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        /* Notes section */
+        .notes-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .notes-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 0.5rem;
+        }
+
+        .notes-content {
+            color: #856404;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        /* Professional Hover Effects and Enhancements */
+        .quote-section {
+            transition: background-color 0.2s ease;
+        }
+        
+        .quote-section:hover {
+            background-color: rgba(248, 249, 250, 0.5);
+        }
+        
+        .section-header i {
+            transition: transform 0.2s ease;
+        }
+        
+        .quote-section:hover .section-header i {
+            transform: scale(1.1);
+        }
+        
+        .quote-overview {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s ease;
+        }
+        
+        .quote-overview:hover {
+            box-shadow: 0 2px 8px rgba(76, 179, 84, 0.1);
+        }
+        
+        .overview-item {
+            transition: transform 0.2s ease;
+        }
+        
+        .overview-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .products-subtotal {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .products-subtotal:hover {
+            background: linear-gradient(to right, var(--bg-color), #f0f7f1);
+            box-shadow: 0 2px 8px rgba(76, 179, 84, 0.1);
+        }
+        
+        .setup-fees-container {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .setup-fees-container:hover {
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.1);
+            border-color: rgba(76, 179, 84, 0.3);
+        }
+        
+        .setup-fee-item {
+            transition: padding 0.2s ease;
+        }
+        
+        .setup-fee-item:hover {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        
+        .grand-total-section {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .grand-total-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            transform: rotate(45deg);
+            transition: transform 0.6s ease;
+            pointer-events: none;
+        }
+        
+        .grand-total-section:hover {
+            box-shadow: 0 8px 16px rgba(76, 179, 84, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .grand-total-section:hover::before {
+            transform: rotate(45deg) translate(20%, 20%);
+        }
+        
+        .grand-total-amount {
+            transition: transform 0.2s ease;
+        }
+        
+        .grand-total-section:hover .grand-total-amount {
+            transform: scale(1.05);
+        }
+        
+        .notes-section {
+            box-shadow: 0 1px 3px rgba(252, 196, 25, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .notes-section:hover {
+            box-shadow: 0 3px 8px rgba(252, 196, 25, 0.15);
+            border-color: #ffc107;
+        }
+        
+        /* Enhanced button hover effects */
+        .btn-primary, .btn-secondary {
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        /* Table row hover effects */
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background-color: rgba(76, 179, 84, 0.05);
+        }
+
+        /* Updated results display */
+        .results-display {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .results-display.hidden {
+            display: none;
         }
 
         /* Modal */
@@ -790,21 +1129,215 @@
             }
         }
 
-        /* Print Styles */
+        /* Additional Fee Styles */
+        .additional-fee-item {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .additional-fee-item input {
+            flex: 1;
+        }
+
+        .remove-fee-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .remove-fee-btn:hover {
+            background: #c82333;
+        }
+
+        /* Print Styles - Simplified for proper page printing */
         @media print {
-            body * {
-                visibility: hidden;
+            .header,
+            .email-modal,
+            .btn,
+            .help-btn {
+                display: none !important;
             }
             
-            #printContent, #printContent * {
-                visibility: visible;
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
             }
             
-            #printContent {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
+            @page {
+                margin: 0.5in;
+                size: letter;
+            }
+        }
+
+        /* Quote ID Banner */
+        .quote-id-banner {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-color));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+            display: none;
+        }
+
+        .quote-id-banner.show {
+            display: block;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .quote-id-banner h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .quote-id-display {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .quote-id-copy {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        /* Quote Status Banner */
+        .quote-status-banner {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.15);
+        }
+
+        .quote-status-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quote-status-text {
+            flex: 1;
+        }
+
+        .quote-status-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+
+        .quote-status-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .quote-status-value.saved {
+            color: white;
+        }
+
+        .quote-status-value.emailed {
+            color: #fbbf24;
+        }
+
+        /* Generating state */
+        .generating-state {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--primary-green);
+            font-weight: 500;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .generating-state.show {
+            display: flex;
+        }
+
+        .generating-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary-light);
+            border-top: 2px solid var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Button states */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #e5e7eb;
+            color: #9ca3af;
+        }
+
+        .btn:disabled:hover {
+            background-color: #e5e7eb;
+            transform: none;
+        }
+
+        .btn-primary:disabled {
+            background-color: #e5e7eb;
+            border-color: #e5e7eb;
+        }
+
+        .btn-secondary:disabled {
+            background-color: #f3f4f6;
+            border-color: #e5e7eb;
+        }
+
+        /* Action buttons container */
+        .quote-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .quote-actions .btn {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        /* Animation keyframes */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments for new elements */
+        @media (max-width: 768px) {
+            .quote-id-display {
+                font-size: 1.5rem;
+            }
+            
+            .quote-actions {
+                flex-direction: column;
+            }
+            
+            .quote-actions .btn {
+                min-width: unset;
             }
         }
     </style>
@@ -814,15 +1347,18 @@
     <header class="header">
         <div class="header-container">
             <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NW%20Custom%20Logo%20Official%20White%20Outline.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
                 <nav class="breadcrumb">
                     <a href="/staff-dashboard.html">Dashboard</a>
                     <span>/</span>
                     <span>Richardson Cap Pricing</span>
                 </nav>
             </div>
-            <div class="user-welcome">
-                Richardson Cap Quote Builder
+            <div class="header-right">
+                <button class="help-btn" onclick="if(window.richardsonCalculator && window.richardsonCalculator.currentQuote) { window.richardsonCalculator.printQuote(); } else { alert('Please generate a quote first'); }">
+                    <i class="fas fa-print"></i>
+                    Print Quote
+                </button>
             </div>
         </div>
     </header>
@@ -857,6 +1393,22 @@
                         <input type="text" id="projectName" class="form-input" placeholder="e.g., Milton Wildcats Caps">
                     </div>
 
+                    <!-- Sales Representative -->
+                    <div class="form-group">
+                        <label class="form-label" for="mainSalesRep">Sales Representative *</label>
+                        <select id="mainSalesRep" class="form-select" required>
+                            <option value="sales@nwcustomapparel.com" selected>General Sales: sales@nwcustomapparel.com</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong: ruth@nwcustomapparel.com</option>
+                            <option value="taylar@nwcustomapparel.com">Taylar Hanson: taylar@nwcustomapparel.com</option>
+                            <option value="nika@nwcustomapparel.com">Nika Lao: nika@nwcustomapparel.com</option>
+                            <option value="erik@nwcustomapparel.com">Erik Mickelson: erik@nwcustomapparel.com</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella: adriyella@nwcustomapparel.com</option>
+                            <option value="bradley@nwcustomapparel.com">Bradley Wright: bradley@nwcustomapparel.com</option>
+                            <option value="jim@nwcustomapparel.com">Jim Mickelson: jim@nwcustomapparel.com</option>
+                            <option value="art@nwcustomapparel.com">Steve Deland: art@nwcustomapparel.com</option>
+                        </select>
+                    </div>
+
                     <!-- Embellishment Type -->
                     <div class="form-group">
                         <label class="form-label">Embellishment Type</label>
@@ -888,17 +1440,71 @@
                         <div id="lineItemsContainer" class="line-items-container">
                             <!-- Dynamic line items will be added here -->
                         </div>
+                        <button type="button" id="addStyleBtn" class="btn btn-secondary" style="margin-top: 0.75rem; width: auto;">
+                            <i class="fas fa-plus"></i>
+                            Add Another Style
+                        </button>
+                    </div>
+
+                    <!-- Setup Fees Section -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-dollar-sign"></i>
+                            Setup Fees (Optional)
+                        </label>
+                        <div class="setup-fees-container" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                            <!-- Digitizing Fee -->
+                            <div class="checkbox-group" style="margin-bottom: 1rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="digitizingFee" value="100">
+                                    <span>Digitizing Fee - $100.00</span>
+                                </label>
+                            </div>
+                            
+                            <!-- Graphic Design Fee -->
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label class="form-label" style="font-size: 0.875rem;">Graphic Design Fee</label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <select id="graphicDesignFee" class="form-select" style="flex: 1;">
+                                        <option value="0">None</option>
+                                        <option value="50">$50.00</option>
+                                        <option value="75">$75.00</option>
+                                        <option value="custom">Custom Amount</option>
+                                    </select>
+                                    <input type="number" id="graphicDesignCustom" class="form-input" placeholder="Amount" 
+                                           style="display: none; width: 120px;" min="0" step="0.01">
+                                </div>
+                            </div>
+                            
+                            <!-- Additional Fees -->
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" style="font-size: 0.875rem;">Additional Fees</label>
+                                <div id="additionalFeesContainer">
+                                    <!-- Dynamic fees will be added here -->
+                                </div>
+                                <button type="button" id="addFeeBtn" class="btn btn-secondary" style="margin-top: 0.5rem; font-size: 0.875rem;">
+                                    <i class="fas fa-plus"></i>
+                                    Add Fee
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes Section -->
+                    <div class="form-group">
+                        <label class="form-label" for="quoteNotes">
+                            <i class="fas fa-sticky-note"></i>
+                            Quote Notes (Optional)
+                        </label>
+                        <textarea id="quoteNotes" class="form-input" rows="3" 
+                                  placeholder="Add any special notes or instructions for this quote..."></textarea>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="button-container">
-                        <button type="button" id="addStyleBtn" class="btn btn-secondary btn-fullwidth">
-                            <i class="fas fa-plus"></i>
-                            Add Style
-                        </button>
                         <button type="submit" class="btn btn-primary btn-fullwidth">
-                            <i class="fas fa-calculator"></i>
-                            Calculate Quote
+                            <i class="fas fa-save"></i>
+                            Generate Quote
                         </button>
                     </div>
                 </form>
@@ -1009,20 +1615,24 @@
     <div id="quoteModal" class="modal-backdrop">
         <div class="modal">
             <div class="modal-header">
-                <h2 class="modal-title">Send Quote</h2>
+                <h2 class="modal-title">Email Quote</h2>
                 <button type="button" class="modal-close" id="modalClose">&times;</button>
             </div>
+
+            <p style="margin: 1rem 0; padding: 0.75rem; background: #f0f7f1; border-radius: 6px; font-size: 0.875rem; color: #155724;">
+                <i class="fas fa-info-circle"></i> Emailing your saved quote. No changes will be made to the quote in our system.
+            </p>
 
             <!-- Sales Rep Selection -->
             <div class="form-group">
                 <label class="form-label" for="salesRep">Sales Representative</label>
                 <select id="salesRep" class="form-select" required>
                     <option value="">Select a sales rep...</option>
+                    <option value="sales@nwcustomapparel.com" selected>General Sales</option>
                     <option value="taylar@nwcustomapparel.com">Taylar</option>
                     <option value="nika@nwcustomapparel.com">Nika</option>
                     <option value="erik@nwcustomapparel.com">Erik</option>
                     <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                    <option value="sales@nwcustomapparel.com">General Sales</option>
                 </select>
             </div>
 
@@ -1052,10 +1662,6 @@
                     <textarea id="notes" class="form-input" rows="3" placeholder="Any special instructions or notes..."></textarea>
                 </div>
 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="saveToDatabase" checked>
-                    <label for="saveToDatabase">Save quote to database</label>
-                </div>
 
                 <div id="quotePreview" class="quote-summary">
                     <!-- Quote preview will be shown here -->
@@ -1080,8 +1686,6 @@
         </div>
     </div>
 
-    <!-- Hidden print content -->
-    <div id="printContent" style="display: none;"></div>
 
     <script>
         // Richardson cap data
@@ -1285,11 +1889,21 @@
                 this.form = document.getElementById('pricingForm');
                 this.customerNameInput = document.getElementById('customerName');
                 this.projectNameInput = document.getElementById('projectName');
+                this.mainSalesRep = document.getElementById('mainSalesRep');
                 this.stitchCountSelect = document.getElementById('stitchCount');
                 this.stitchCountGroup = document.getElementById('stitchCountGroup');
                 this.lineItemsContainer = document.getElementById('lineItemsContainer');
                 this.addStyleBtn = document.getElementById('addStyleBtn');
                 this.embellishmentRadios = document.querySelectorAll('input[name="embellishment"]');
+                
+                // Setup fee elements
+                this.digitizingFeeCheckbox = document.getElementById('digitizingFee');
+                this.graphicDesignFeeSelect = document.getElementById('graphicDesignFee');
+                this.graphicDesignCustomInput = document.getElementById('graphicDesignCustom');
+                this.additionalFeesContainer = document.getElementById('additionalFeesContainer');
+                this.addFeeBtn = document.getElementById('addFeeBtn');
+                this.quoteNotesTextarea = document.getElementById('quoteNotes');
+                this.additionalFees = [];
                 
                 // Results elements
                 this.emptyState = document.getElementById('emptyState');
@@ -1305,7 +1919,6 @@
                 this.companyName = document.getElementById('companyName');
                 this.salesRep = document.getElementById('salesRep');
                 this.notes = document.getElementById('notes');
-                this.saveToDatabase = document.getElementById('saveToDatabase');
                 this.quotePreview = document.getElementById('quotePreview');
                 this.successMessage = document.getElementById('successMessage');
                 this.errorMessage = document.getElementById('errorMessage');
@@ -1333,10 +1946,87 @@
                         this.stitchCountGroup.style.display = isEmbroidery ? 'block' : 'none';
                     });
                 });
+                
+                // Handle graphic design fee change
+                this.graphicDesignFeeSelect.addEventListener('change', () => {
+                    const isCustom = this.graphicDesignFeeSelect.value === 'custom';
+                    this.graphicDesignCustomInput.style.display = isCustom ? 'block' : 'none';
+                    if (!isCustom) {
+                        this.graphicDesignCustomInput.value = '';
+                    }
+                });
+                
+                // Handle add fee button
+                this.addFeeBtn.addEventListener('click', () => this.addAdditionalFee());
             }
 
             addInitialLineItem() {
                 this.addLineItem();
+            }
+            
+            addAdditionalFee() {
+                const feeId = `fee_${Date.now()}`;
+                const feeHtml = `
+                    <div class="additional-fee-item" data-fee-id="${feeId}">
+                        <input type="text" class="form-input" placeholder="Fee name" data-fee-name>
+                        <input type="number" class="form-input" placeholder="Amount" data-fee-amount min="0" step="0.01">
+                        <button type="button" class="remove-fee-btn" onclick="window.richardsonCalculator.removeAdditionalFee('${feeId}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                this.additionalFeesContainer.insertAdjacentHTML('beforeend', feeHtml);
+            }
+            
+            removeAdditionalFee(feeId) {
+                const feeElement = this.additionalFeesContainer.querySelector(`[data-fee-id="${feeId}"]`);
+                if (feeElement) {
+                    feeElement.remove();
+                }
+            }
+            
+            calculateSetupFees() {
+                const fees = {
+                    digitizing: 0,
+                    graphicDesign: 0,
+                    additional: [],
+                    total: 0
+                };
+                
+                // Digitizing fee
+                if (this.digitizingFeeCheckbox.checked) {
+                    fees.digitizing = 100.00;
+                }
+                
+                // Graphic design fee
+                const graphicDesignValue = this.graphicDesignFeeSelect.value;
+                if (graphicDesignValue === 'custom') {
+                    fees.graphicDesign = parseFloat(this.graphicDesignCustomInput.value) || 0;
+                } else {
+                    fees.graphicDesign = parseFloat(graphicDesignValue) || 0;
+                }
+                
+                // Additional fees
+                const additionalFeeElements = this.additionalFeesContainer.querySelectorAll('.additional-fee-item');
+                additionalFeeElements.forEach(element => {
+                    const nameInput = element.querySelector('[data-fee-name]');
+                    const amountInput = element.querySelector('[data-fee-amount]');
+                    const name = nameInput.value.trim();
+                    const amount = parseFloat(amountInput.value) || 0;
+                    
+                    if (name && amount > 0) {
+                        fees.additional.push({ name, amount });
+                    }
+                });
+                
+                // Calculate total
+                fees.total = fees.digitizing + fees.graphicDesign;
+                fees.additional.forEach(fee => {
+                    fees.total += fee.amount;
+                });
+                
+                return fees;
             }
 
             addLineItem() {
@@ -1534,7 +2224,7 @@
                 
                 // Calculate pricing for each item
                 const marginDenominator = 0.6;
-                let grandTotal = 0;
+                let subtotal = 0;
                 
                 lineItems.forEach(item => {
                     const markedUpGarment = item.capPrice / marginDenominator;
@@ -1548,8 +2238,19 @@
                     item.lineTotal = lineTotal;
                     item.ltmPerUnit = ltmPerUnit;
                     
-                    grandTotal += lineTotal;
+                    subtotal += lineTotal;
                 });
+                
+                // Calculate setup fees
+                const setupFees = this.calculateSetupFees();
+                const grandTotal = subtotal + setupFees.total;
+                
+                // Get sales rep information
+                const salesRepEmail = this.mainSalesRep.value;
+                const salesRepName = this.mainSalesRep.options[this.mainSalesRep.selectedIndex].text.split(':')[0].trim();
+                
+                // Get notes
+                const notes = this.quoteNotesTextarea.value.trim();
                 
                 // Store quote data
                 this.currentQuote = {
@@ -1561,17 +2262,22 @@
                     items: lineItems,
                     totalQuantity,
                     ltmFeeTotal,
-                    grandTotal
+                    subtotal,
+                    setupFees,
+                    grandTotal,
+                    salesRepEmail,
+                    salesRepName,
+                    notes
                 };
                 
-                // Display results
-                this.displayResults();
+                // Save quote to database immediately
+                this.saveQuoteToDatabase();
             }
 
             displayResults() {
                 if (!this.currentQuote) return;
                 
-                const { items, totalQuantity, stitchCountText, embellishmentType, ltmFeeTotal, grandTotal } = this.currentQuote;
+                const { items, totalQuantity, stitchCountText, embellishmentType, ltmFeeTotal, subtotal, setupFees, grandTotal, notes, projectName } = this.currentQuote;
                 
                 // Build items table
                 let itemsHtml = '';
@@ -1597,57 +2303,140 @@
                     embellishmentDisplay = 'Leatherette Patch: 4" x 2.5"';
                 }
                 
-                // Build complete results HTML
+                // Build complete results HTML with professional sections
                 let resultsHtml = `
-                    <h2 class="section-title">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        Quote Summary
-                    </h2>
-                    
-                    <div class="quote-summary">
-                        <div class="summary-row">
-                            <span class="summary-label">Total Quantity:</span>
-                            <span class="summary-value">${totalQuantity} pieces</span>
+                    <!-- Quote Overview Section -->
+                    <div class="quote-section">
+                        <div class="section-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h3>Quote Overview</h3>
                         </div>
-                        <div class="summary-row">
-                            <span class="summary-label">Embellishment:</span>
-                            <span class="summary-value">${embellishmentDisplay}</span>
+                        <div class="quote-overview">
+                            <div class="overview-item">
+                                <span class="overview-label">Total Quantity</span>
+                                <span class="overview-value">${totalQuantity} pieces</span>
+                            </div>
+                            <div class="overview-item">
+                                <span class="overview-label">Embellishment Type</span>
+                                <span class="overview-value">${embellishmentDisplay}</span>
+                            </div>
+                            ${projectName ? `
+                                <div class="overview-item">
+                                    <span class="overview-label">Project Name</span>
+                                    <span class="overview-value">${projectName}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                        ${ltmFeeTotal > 0 ? `
+                            <div class="ltm-warning" style="margin-top: 1rem;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Less than minimum charge of $${ltmFeeTotal.toFixed(2)} has been applied ($${(ltmFeeTotal/totalQuantity).toFixed(2)}/piece)</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Products Section -->
+                    <div class="quote-section products-section">
+                        <div class="section-header">
+                            <i class="fas fa-tshirt"></i>
+                            <h3>Cap Pricing Details</h3>
+                        </div>
+                        <table class="quote-table">
+                            <thead>
+                                <tr>
+                                    <th>Style</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-right">Each</th>
+                                    <th class="text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemsHtml}
+                            </tbody>
+                        </table>
+                        <div class="products-subtotal">
+                            <span class="products-subtotal-label">Products Subtotal:</span>
+                            <span class="products-subtotal-amount">$${subtotal.toFixed(2)}</span>
                         </div>
                     </div>
                 `;
                 
-                if (ltmFeeTotal > 0) {
+                // Add setup fees section if any
+                if (setupFees.total > 0) {
                     resultsHtml += `
-                        <div class="ltm-warning">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Less than minimum charge of $${ltmFeeTotal.toFixed(2)} has been applied ($${(ltmFeeTotal/totalQuantity).toFixed(2)}/piece)</span>
+                        <!-- Setup Fees Section -->
+                        <div class="quote-section">
+                            <div class="section-header">
+                                <i class="fas fa-cogs"></i>
+                                <h3>Setup & Additional Fees</h3>
+                            </div>
+                            <div class="setup-fees-section">
+                    `;
+                    
+                    if (setupFees.digitizing > 0) {
+                        resultsHtml += `
+                            <div class="fee-item">
+                                <span class="fee-label">Digitizing Fee</span>
+                                <span class="fee-amount">$${setupFees.digitizing.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    if (setupFees.graphicDesign > 0) {
+                        resultsHtml += `
+                            <div class="fee-item">
+                                <span class="fee-label">Graphic Design Fee</span>
+                                <span class="fee-amount">$${setupFees.graphicDesign.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    setupFees.additional.forEach(fee => {
+                        resultsHtml += `
+                            <div class="fee-item">
+                                <span class="fee-label">${fee.name}</span>
+                                <span class="fee-amount">$${fee.amount.toFixed(2)}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    resultsHtml += `
+                                <div class="fees-subtotal">
+                                    <span>Setup Fees Total:</span>
+                                    <span>$${setupFees.total.toFixed(2)}</span>
+                                </div>
+                            </div>
                         </div>
                     `;
                 }
                 
+                // Add notes section if any
+                if (notes) {
+                    resultsHtml += `
+                        <!-- Notes Section -->
+                        <div class="quote-section">
+                            <div class="notes-section">
+                                <div class="notes-header">
+                                    <i class="fas fa-sticky-note"></i>
+                                    <span>Notes</span>
+                                </div>
+                                <div class="notes-content">${notes}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Grand Total Section
                 resultsHtml += `
-                    <table class="quote-table">
-                        <thead>
-                            <tr>
-                                <th>Style</th>
-                                <th class="text-center">Qty</th>
-                                <th class="text-right">Each</th>
-                                <th class="text-right">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHtml}
-                        </tbody>
-                    </table>
-                    
-                    <div class="total-section">
-                        <div class="total-row">
-                            <span class="total-label">Order Total:</span>
-                            <span class="total-amount">$${grandTotal.toFixed(2)}</span>
+                    <!-- Grand Total Section -->
+                    <div class="quote-section">
+                        <div class="grand-total-section">
+                            <div class="grand-total-label">Your Total Quote Amount</div>
+                            <div class="grand-total-amount">$${grandTotal.toFixed(2)}</div>
                         </div>
                         
                         <div class="button-container">
-                            <button type="button" class="btn btn-secondary" onclick="window.print()">
+                            <button type="button" class="btn btn-secondary" onclick="if(window.richardsonCalculator && window.richardsonCalculator.currentQuote) { window.richardsonCalculator.printQuote(); } else { alert('Please generate a quote first'); }">
                                 <i class="fas fa-print"></i>
                                 Print Quote
                             </button>
@@ -1670,9 +2459,614 @@
                 });
             }
 
+            async saveQuoteToDatabase() {
+                if (!this.currentQuote) return;
+                
+                try {
+                    // Show loading state
+                    this.showGeneratingState();
+                    
+                    // Build quote data for database
+                    const quoteData = {
+                        customerName: this.currentQuote.customerName,
+                        customerEmail: this.customerNameInput.value, // Will be filled from form
+                        companyName: '', // Will be filled from form
+                        customerPhone: '', // Will be filled from form
+                        projectName: this.currentQuote.projectName,
+                        items: this.currentQuote.items,
+                        totalQuantity: this.currentQuote.totalQuantity,
+                        subtotal: this.currentQuote.subtotal,
+                        setupFees: this.currentQuote.setupFees,
+                        ltmFeeTotal: this.currentQuote.ltmFeeTotal,
+                        grandTotal: this.currentQuote.grandTotal,
+                        embellishmentType: this.currentQuote.embellishmentType,
+                        stitchCount: this.currentQuote.stitchCount,
+                        notes: this.currentQuote.notes,
+                        salesRepEmail: this.currentQuote.salesRepEmail,
+                        salesRepName: this.currentQuote.salesRepName
+                    };
+                    
+                    // Save to database
+                    const saveResult = await this.quoteService.saveQuote(quoteData);
+                    
+                    if (saveResult.success) {
+                        // Store quote ID
+                        this.currentQuote.quoteId = saveResult.quoteID;
+                        
+                        // Update display with quote ID
+                        this.displayResultsWithQuoteId();
+                        
+                        // Update button states
+                        this.enableQuoteActions();
+                        
+                        console.log('Quote saved successfully with ID:', saveResult.quoteID);
+                    } else {
+                        console.error('Failed to save quote:', saveResult.error);
+                        this.showError('Failed to save quote. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error saving quote:', error);
+                    this.showError('Error saving quote. Please try again.');
+                }
+            }
+
+            showGeneratingState() {
+                // Show loading state in results
+                this.resultsDisplay.innerHTML = `
+                    <div class="generating-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <h3>Generating Quote...</h3>
+                        <p>Calculating pricing and saving to database</p>
+                    </div>
+                `;
+                this.resultsDisplay.classList.remove('hidden');
+                this.emptyState.classList.add('hidden');
+            }
+
+            displayResultsWithQuoteId() {
+                if (!this.currentQuote) return;
+                
+                const { items, totalQuantity, stitchCountText, embellishmentType, ltmFeeTotal, subtotal, setupFees, grandTotal, notes, projectName, quoteId } = this.currentQuote;
+                
+                // Build items table
+                let itemsHtml = '';
+                items.forEach(item => {
+                    itemsHtml += `
+                        <tr>
+                            <td>
+                                <div class="style-info">${item.styleNumber}</div>
+                                <div class="style-description">${item.description}</div>
+                            </td>
+                            <td class="text-center">${item.quantity}</td>
+                            <td class="text-right">$${item.pricePerPiece.toFixed(2)}</td>
+                            <td class="text-right">$${item.lineTotal.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+
+                // Build setup fees HTML
+                let setupFeesHtml = '';
+                if (setupFees && setupFees.total > 0) {
+                    setupFeesHtml += `
+                        <div class="quote-section">
+                            <h3 class="section-title">Setup & Additional Fees</h3>
+                            <div class="setup-fees-breakdown">
+                    `;
+                    
+                    if (setupFees.digitizing > 0) {
+                        setupFeesHtml += `
+                            <div class="fee-item">
+                                <span>Digitizing Fee</span>
+                                <span>$${setupFees.digitizing.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    if (setupFees.graphicDesign > 0) {
+                        setupFeesHtml += `
+                            <div class="fee-item">
+                                <span>Graphic Design Fee</span>
+                                <span>$${setupFees.graphicDesign.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    if (setupFees.additional && setupFees.additional.length > 0) {
+                        setupFees.additional.forEach(fee => {
+                            setupFeesHtml += `
+                                <div class="fee-item">
+                                    <span>${fee.name}</span>
+                                    <span>$${fee.amount.toFixed(2)}</span>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    setupFeesHtml += `
+                                <div class="fee-total">
+                                    <span>Setup Fees Total</span>
+                                    <span>$${setupFees.total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Build notes HTML
+                let notesHtml = '';
+                if (notes) {
+                    notesHtml = `
+                        <div class="quote-section">
+                            <h3 class="section-title">Notes</h3>
+                            <div class="notes-content">
+                                ${notes}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Build complete results HTML
+                const resultsHtml = `
+                    <!-- Quote ID Banner -->
+                    <div class="quote-id-banner">
+                        <div class="quote-id-content">
+                            <i class="fas fa-file-alt"></i>
+                            <div class="quote-id-text">
+                                <div class="quote-id-label">Quote Generated</div>
+                                <div class="quote-id-value">${quoteId}</div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="navigator.clipboard.writeText('${quoteId}')">
+                                <i class="fas fa-copy"></i>
+                                Copy ID
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quote Status -->
+                    <div class="quote-status-banner">
+                        <div class="quote-status-content">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="quote-status-text">
+                                <div class="quote-status-label">Status</div>
+                                <div class="quote-status-value saved" id="quoteStatus">Saved to Database</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quote Overview -->
+                    <div class="quote-section">
+                        <div class="quote-header">
+                            <h3 class="section-title">Quote Overview</h3>
+                            <div class="quote-meta">
+                                <span>Total Quantity: <strong>${totalQuantity} pieces</strong></span>
+                                <span>Embellishment: <strong>${embellishmentType === 'embroidery' ? stitchCountText : 'Leatherette Patch'}</strong></span>
+                                ${projectName ? `<span>Project: <strong>${projectName}</strong></span>` : ''}
+                            </div>
+                        </div>
+
+                        ${ltmFeeTotal > 0 ? `
+                            <div class="ltm-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Less than minimum charge of $${ltmFeeTotal.toFixed(2)} has been applied ($${(ltmFeeTotal/totalQuantity).toFixed(2)}/piece)</span>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Cap Pricing Details -->
+                    <div class="quote-section">
+                        <h3 class="section-title">Cap Pricing Details</h3>
+                        <div class="pricing-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Style</th>
+                                        <th>Qty</th>
+                                        <th>Each</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${itemsHtml}
+                                </tbody>
+                            </table>
+                            <div class="pricing-summary">
+                                <div class="summary-row">
+                                    <span>Products Subtotal:</span>
+                                    <span>$${subtotal.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${setupFeesHtml}
+                    ${notesHtml}
+
+                    <!-- Grand Total Section -->
+                    <div class="quote-section">
+                        <div class="grand-total-section">
+                            <div class="grand-total-label">Your Total Quote Amount</div>
+                            <div class="grand-total-amount">$${grandTotal.toFixed(2)}</div>
+                        </div>
+                        
+                        <div class="button-container">
+                            <button type="button" class="btn btn-secondary" id="printQuoteBtn" disabled>
+                                <i class="fas fa-print"></i>
+                                Print Quote ${quoteId}
+                            </button>
+                            <button type="button" class="btn btn-success" id="sendQuoteBtn" disabled>
+                                <i class="fas fa-paper-plane"></i>
+                                Send Quote ${quoteId}
+                            </button>
+                            <button type="button" class="btn btn-warning" id="newQuoteBtn" disabled>
+                                <i class="fas fa-plus"></i>
+                                New Quote
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Update display
+                this.resultsDisplay.innerHTML = resultsHtml;
+                this.resultsDisplay.classList.remove('hidden');
+                this.emptyState.classList.add('hidden');
+                
+                // Bind quote action buttons (will be enabled after quote is generated)
+                document.getElementById('printQuoteBtn').addEventListener('click', () => {
+                    this.printQuote();
+                });
+                document.getElementById('sendQuoteBtn').addEventListener('click', () => {
+                    this.openModal();
+                });
+                document.getElementById('newQuoteBtn').addEventListener('click', () => {
+                    this.startNewQuote();
+                });
+            }
+
+            enableQuoteActions() {
+                // Enable the print, send, and new quote buttons
+                const printBtn = document.getElementById('printQuoteBtn');
+                const sendBtn = document.getElementById('sendQuoteBtn');
+                const newBtn = document.getElementById('newQuoteBtn');
+                
+                if (printBtn) {
+                    printBtn.disabled = false;
+                    printBtn.classList.remove('btn-disabled');
+                }
+                
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.classList.remove('btn-disabled');
+                }
+                
+                if (newBtn) {
+                    newBtn.disabled = false;
+                    newBtn.classList.remove('btn-disabled');
+                }
+            }
+
+            printQuote() {
+                if (!this.currentQuote || !this.currentQuote.quoteId) {
+                    alert('Please generate a quote first');
+                    return;
+                }
+                
+                // Create a new window for printing
+                const printWindow = window.open('', '_blank');
+                const quote = this.currentQuote;
+                const quoteID = quote.quoteId;
+                
+                // Calculate pricing details
+                const hasLTM = quote.totalQuantity < 24;
+                let basePricePerCap = 0;
+                let ltmPerUnit = 0;
+                
+                if (hasLTM && quote.items.length > 0) {
+                    ltmPerUnit = quote.items[0].ltmPerUnit || 0;
+                    basePricePerCap = quote.items[0].pricePerPiece - ltmPerUnit;
+                }
+
+                // Generate items HTML
+                const itemsHtml = quote.items.map(item => `
+                    <tr>
+                        <td><strong>${item.styleNumber}</strong> - ${item.description}</td>
+                        <td style="text-align: center;">${item.quantity}</td>
+                        <td style="text-align: right;">$${item.pricePerPiece.toFixed(2)}</td>
+                        <td style="text-align: right;">$${item.lineTotal.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+
+                // Setup fees in table rows
+                let setupFeesRows = '';
+                if (quote.setupFees && quote.setupFees.total > 0) {
+                    if (quote.setupFees.digitizing > 0) {
+                        setupFeesRows += `
+                            <tr>
+                                <td colspan="3" style="text-align: right;">Digitizing Fee:</td>
+                                <td style="text-align: right;">$${quote.setupFees.digitizing.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }
+                    if (quote.setupFees.graphicDesign > 0) {
+                        setupFeesRows += `
+                            <tr>
+                                <td colspan="3" style="text-align: right;">Graphic Design Fee:</td>
+                                <td style="text-align: right;">$${quote.setupFees.graphicDesign.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }
+                    quote.setupFees.additional.forEach(fee => {
+                        setupFeesRows += `
+                            <tr>
+                                <td colspan="3" style="text-align: right;">${fee.name}:</td>
+                                <td style="text-align: right;">$${fee.amount.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                // LTM info for notes
+                let ltmNote = '';
+                if (hasLTM) {
+                    ltmNote = `Price includes $${ltmPerUnit.toFixed(2)} per unit minimum order adjustment. `;
+                }
+
+                // Notes text
+                let notesText = ltmNote;
+                if (quote.notes) {
+                    notesText += quote.notes;
+                }
+                
+                // Build compact invoice-style HTML
+                const printHTML = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Quote ${quoteID} - Northwest Custom Apparel</title>
+                        <style>
+                            @page { 
+                                margin: 0.5in;
+                                size: letter;
+                            }
+                            body { 
+                                font-family: Arial, sans-serif; 
+                                font-size: 12px;
+                                line-height: 1.4; 
+                                color: #333;
+                                margin: 0;
+                            }
+                            /* Compact header */
+                            .invoice-header {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-start;
+                                margin-bottom: 20px;
+                                padding-bottom: 10px;
+                                border-bottom: 2px solid #4cb354;
+                            }
+                            .company-info {
+                                flex: 1;
+                            }
+                            .logo {
+                                max-width: 150px;
+                                height: auto;
+                                margin-bottom: 5px;
+                            }
+                            .company-info p {
+                                margin: 2px 0;
+                                font-size: 11px;
+                                color: #555;
+                            }
+                            .invoice-title {
+                                text-align: right;
+                                flex: 1;
+                            }
+                            .invoice-title h1 {
+                                margin: 0;
+                                font-size: 24px;
+                                color: #333;
+                            }
+                            .invoice-title .quote-id {
+                                font-size: 16px;
+                                color: #4cb354;
+                                margin: 5px 0;
+                            }
+                            .invoice-title p {
+                                margin: 2px 0;
+                                font-size: 11px;
+                                color: #555;
+                            }
+                            
+                            /* Customer info box */
+                            .info-row {
+                                display: flex;
+                                gap: 20px;
+                                margin-bottom: 20px;
+                            }
+                            .info-box {
+                                flex: 1;
+                                background: #f8f9fa;
+                                padding: 10px;
+                                border-radius: 4px;
+                            }
+                            .info-box h3 {
+                                margin: 0 0 5px 0;
+                                font-size: 12px;
+                                color: #4cb354;
+                                text-transform: uppercase;
+                            }
+                            .info-box p {
+                                margin: 2px 0;
+                                font-size: 11px;
+                            }
+                            
+                            /* Compact table */
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 20px;
+                            }
+                            th, td {
+                                padding: 6px 8px;
+                                text-align: left;
+                                border: 1px solid #ddd;
+                                font-size: 11px;
+                            }
+                            th {
+                                background: #4cb354;
+                                color: white;
+                                font-weight: bold;
+                                text-transform: uppercase;
+                            }
+                            .subtotal-row td {
+                                border-top: 2px solid #ddd;
+                                font-weight: bold;
+                            }
+                            .total-row td {
+                                background: #f8f9fa;
+                                font-weight: bold;
+                                font-size: 13px;
+                                border-top: 2px solid #4cb354;
+                            }
+                            
+                            /* Notes section */
+                            .notes-section {
+                                background: #fff3cd;
+                                border: 1px solid #ffeaa7;
+                                padding: 8px;
+                                border-radius: 4px;
+                                margin-bottom: 20px;
+                                font-size: 11px;
+                            }
+                            .notes-section h4 {
+                                margin: 0 0 4px 0;
+                                font-size: 12px;
+                                color: #856404;
+                            }
+                            
+                            /* Compact footer */
+                            .footer {
+                                text-align: center;
+                                font-size: 10px;
+                                color: #666;
+                                border-top: 1px solid #ddd;
+                                padding-top: 10px;
+                            }
+                            .footer p {
+                                margin: 2px 0;
+                            }
+                            
+                            @media print {
+                                body { 
+                                    print-color-adjust: exact; 
+                                    -webkit-print-color-adjust: exact; 
+                                }
+                                .invoice-header {
+                                    break-after: avoid;
+                                }
+                                table {
+                                    break-inside: avoid;
+                                }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <!-- Compact header with logo and invoice info side by side -->
+                        <div class="invoice-header">
+                            <div class="company-info">
+                                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                                     alt="Northwest Custom Apparel" class="logo">
+                                <p>2025 Freeman Road East, Milton, WA 98354</p>
+                                <p>Phone: 253-922-5793 | sales@nwcustomapparel.com</p>
+                            </div>
+                            <div class="invoice-title">
+                                <h1>QUOTE</h1>
+                                <div class="quote-id">${quoteID}</div>
+                                <p>Date: ${new Date().toLocaleDateString()}</p>
+                                <p>Valid for: 30 days</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Customer info in compact box -->
+                        <div class="info-row">
+                            <div class="info-box">
+                                <h3>Bill To</h3>
+                                <p><strong>${quote.customerName || 'Customer'}</strong></p>
+                                ${quote.companyName ? `<p>${quote.companyName}</p>` : ''}
+                                ${quote.customerEmail ? `<p>${quote.customerEmail}</p>` : ''}
+                                ${quote.customerPhone ? `<p>${quote.customerPhone}</p>` : ''}
+                            </div>
+                            ${quote.projectName ? `
+                            <div class="info-box">
+                                <h3>Project</h3>
+                                <p>${quote.projectName}</p>
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        <!-- Compact pricing table -->
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 50%;">Description</th>
+                                    <th style="width: 15%; text-align: center;">Qty</th>
+                                    <th style="width: 17.5%; text-align: right;">Unit Price</th>
+                                    <th style="width: 17.5%; text-align: right;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemsHtml}
+                                <tr class="subtotal-row">
+                                    <td colspan="3" style="text-align: right;">Products Subtotal:</td>
+                                    <td style="text-align: right;">$${quote.subtotal.toFixed(2)}</td>
+                                </tr>
+                                ${setupFeesRows}
+                                <tr class="total-row">
+                                    <td colspan="3" style="text-align: right;">GRAND TOTAL:</td>
+                                    <td style="text-align: right;">$${quote.grandTotal.toFixed(2)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        ${notesText ? `
+                        <div class="notes-section">
+                            <h4>Notes</h4>
+                            <p>${notesText}</p>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="footer">
+                            <p><strong>Northwest Custom Apparel</strong> | Family Owned & Operated Since 1977</p>
+                            <p>www.nwcustomapparel.com</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                printWindow.document.write(printHTML);
+                printWindow.document.close();
+                
+                // Wait for content to load then print
+                printWindow.onload = function() {
+                    printWindow.print();
+                    // Close the window after printing
+                    printWindow.onafterprint = function() {
+                        printWindow.close();
+                    };
+                };
+            }
+
+            showError(message) {
+                alert(message); // Simple error handling for now
+            }
+
             openModal() {
                 // Pre-fill customer name
                 this.quoteCustomerName.value = this.customerNameInput.value;
+                
+                // Pre-fill sales rep from main form
+                if (this.mainSalesRep && this.salesRep) {
+                    this.salesRep.value = this.mainSalesRep.value;
+                }
                 
                 // Show quote preview
                 this.updateQuotePreview();
@@ -1721,10 +3115,51 @@
                 `;
             }
 
+            generateSetupFeesHTML(setupFees) {
+                if (!setupFees || setupFees.total === 0) return '';
+                
+                let html = '<div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">';
+                html += '<h4 style="margin: 0 0 10px 0; font-size: 16px;">Setup Fees</h4>';
+                
+                if (setupFees.digitizing > 0) {
+                    html += `<div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>Digitizing Fee:</span>
+                        <span>$${setupFees.digitizing.toFixed(2)}</span>
+                    </div>`;
+                }
+                
+                if (setupFees.graphicDesign > 0) {
+                    html += `<div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>Graphic Design Fee:</span>
+                        <span>$${setupFees.graphicDesign.toFixed(2)}</span>
+                    </div>`;
+                }
+                
+                if (setupFees.additional && setupFees.additional.length > 0) {
+                    setupFees.additional.forEach(fee => {
+                        html += `<div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>${fee.name}:</span>
+                            <span>$${fee.amount.toFixed(2)}</span>
+                        </div>`;
+                    });
+                }
+                
+                html += `<div style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #dee2e6; font-weight: bold;">
+                    <span>Setup Fees Total:</span>
+                    <span>$${setupFees.total.toFixed(2)}</span>
+                </div>`;
+                
+                html += '</div>';
+                return html;
+            }
+
             async handleQuoteSubmit(e) {
                 e.preventDefault();
                 
-                if (!this.currentQuote) return;
+                if (!this.currentQuote || !this.currentQuote.quoteId) {
+                    alert('Please generate a quote first before emailing');
+                    return;
+                }
                 
                 // Show loading state
                 const submitBtn = this.quoteForm.querySelector('button[type="submit"]');
@@ -1748,7 +3183,7 @@
                         'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
                     };
                     
-                    // Prepare quote data
+                    // Use existing saved quote - no need to save again
                     const quoteData = {
                         ...this.currentQuote,
                         customerEmail: this.customerEmail.value,
@@ -1759,15 +3194,6 @@
                         salesRepEmail: selectedRep,
                         salesRepName: salesRepNames[selectedRep]
                     };
-                    
-                    // Save to database if checked
-                    let saveResult = null;
-                    if (this.saveToDatabase.checked) {
-                        saveResult = await this.quoteService.saveQuote(quoteData);
-                        if (!saveResult.success) {
-                            console.error('Database save failed:', saveResult.error);
-                        }
-                    }
                     
                     // Build items table for email
                     let itemsHtml = '';
@@ -1793,26 +3219,67 @@
                         embellishmentSummary = `${this.currentQuote.totalQuantity} pieces with leatherette patch`;
                     }
                     
-                    // Prepare email data
+                    // Build price breakdown HTML for email
+                    let priceBreakdownHtml = '';
+                    if (this.currentQuote.totalQuantity < 24 && this.currentQuote.items.length > 0) {
+                        const ltmPerUnit = this.currentQuote.items[0].ltmPerUnit || 0;
+                        const basePricePerCap = this.currentQuote.items[0].pricePerPiece - ltmPerUnit;
+                        
+                        priceBreakdownHtml = `
+                            <div style="background-color: #f0f7f1; padding: 15px; margin: 20px 0; border: 1px solid #c6e9d0; border-radius: 6px;">
+                                <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #1f2937;">Price Breakdown:</h4>
+                                <table style="width: 100%; font-size: 13px;">
+                                    <tr>
+                                        <td>Base cap with ${this.currentQuote.embellishmentType === 'embroidery' ? 'embroidery' : 'leatherette patch'}:</td>
+                                        <td style="text-align: right;">$${basePricePerCap.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Minimum order adjustment:</td>
+                                        <td style="text-align: right;">$${ltmPerUnit.toFixed(2)}</td>
+                                    </tr>
+                                    <tr style="font-weight: bold; border-top: 1px solid #c6e9d0;">
+                                        <td style="padding-top: 5px;">Your price per cap:</td>
+                                        <td style="text-align: right; padding-top: 5px;">$${this.currentQuote.items[0].pricePerPiece.toFixed(2)}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        `;
+                    }
+                    
+                    // Prepare email data using existing quote ID
                     const emailData = {
                         to_email: this.customerEmail.value,
                         reply_to: quoteData.salesRepEmail,
+                        from_name: 'Northwest Custom Apparel',
                         customer_name: this.quoteCustomerName.value,
+                        company_name: this.companyName.value || '',
+                        customer_email: this.customerEmail.value,
+                        customer_phone: this.customerPhone.value || '',
                         project_name: this.currentQuote.projectName || 'Richardson Cap Quote',
-                        quote_id: saveResult?.quoteID || `TEMP-${Date.now()}`,
+                        quote_id: this.currentQuote.quoteId, // Use existing quote ID
                         quote_date: new Date().toLocaleDateString(),
                         quote_type: 'Richardson Caps',
+                        total_quantity: this.currentQuote.totalQuantity,
                         embellishment_type: this.currentQuote.embellishmentType === 'embroidery' ? 'Embroidery' : 'Leatherette Patch',
+                        stitch_count: this.currentQuote.stitchCountText || '',
                         quote_summary: embellishmentSummary,
                         quote_items_html: itemsHtml,
-                        subtotal: `$${this.currentQuote.grandTotal.toFixed(2)}`,
+                        products_subtotal: `$${this.currentQuote.subtotal.toFixed(2)}`,
+                        subtotal: `$${this.currentQuote.subtotal.toFixed(2)}`,
+                        ltm_fee_total: this.currentQuote.ltmFeeTotal > 0 ? `$${this.currentQuote.ltmFeeTotal.toFixed(2)}` : '',
                         ltm_note: this.currentQuote.ltmFeeTotal > 0 ? `*Includes less than minimum charge of $${this.currentQuote.ltmFeeTotal.toFixed(2)} ($${(this.currentQuote.ltmFeeTotal/this.currentQuote.totalQuantity).toFixed(2)}/piece)` : '',
+                        setup_fees_html: this.generateSetupFeesHTML(this.currentQuote.setupFees),
+                        setup_fees_total: this.currentQuote.setupFees?.total > 0 ? `$${this.currentQuote.setupFees.total.toFixed(2)}` : '',
+                        digitizing_fee: this.currentQuote.setupFees?.digitizing > 0 ? `$${this.currentQuote.setupFees.digitizing.toFixed(2)}` : '',
+                        graphic_design_fee: this.currentQuote.setupFees?.graphicDesign > 0 ? `$${this.currentQuote.setupFees.graphicDesign.toFixed(2)}` : '',
+                        price_breakdown_html: priceBreakdownHtml,
                         grand_total: `$${this.currentQuote.grandTotal.toFixed(2)}`,
                         sales_rep_name: quoteData.salesRepName,
                         sales_rep_email: quoteData.salesRepEmail,
                         sales_rep_phone: '253-922-5793',
                         company_year: '1977',
-                        notes: this.notes.value || 'No special notes for this order'
+                        notes: this.notes.value || 'No special notes for this order',
+                        valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
                     };
                     
                     // Send email
@@ -1826,18 +3293,17 @@
                     this.successMessage.classList.remove('hidden');
                     this.errorMessage.classList.add('hidden');
                     
-                    // Display quote ID if available
-                    const quoteIdDisplay = document.getElementById('quoteIdDisplay');
-                    if (quoteIdDisplay && saveResult?.quoteID) {
-                        quoteIdDisplay.textContent = `Quote ID: ${saveResult.quoteID}`;
-                        quoteIdDisplay.style.display = 'block';
-                    }
+                    // Update success message to show quote ID
+                    const successText = this.successMessage.querySelector('p') || this.successMessage;
+                    successText.innerHTML = `Quote sent successfully!<br><strong>Quote ID: ${this.currentQuote.quoteId}</strong>`;
+                    
+                    // Update quote status to show it was emailed
+                    this.updateQuoteStatus('emailed', `Emailed to ${this.customerEmail.value}`);
                     
                     // Reset form after delay
                     setTimeout(() => {
                         this.closeModal();
                         this.quoteForm.reset();
-                        this.saveToDatabase.checked = true;
                     }, 3000);
                     
                 } catch (error) {
@@ -1851,85 +3317,83 @@
                     submitBtn.disabled = false;
                 }
             }
+
+            startNewQuote() {
+                // Confirm if the user wants to start a new quote
+                if (confirm('Are you sure you want to start a new quote? This will clear your current quote and reset the form.')) {
+                    // Reset the current quote
+                    this.currentQuote = null;
+                    
+                    // Reset the form
+                    this.calculatorForm.reset();
+                    
+                    // Clear the results display
+                    this.resultsDisplay.innerHTML = '';
+                    this.resultsDisplay.classList.add('hidden');
+                    this.emptyState.classList.remove('hidden');
+                    
+                    // Reset line items to just one
+                    this.lineItems = [];
+                    this.addInitialLineItem();
+                    
+                    // Reset customer name
+                    this.customerNameInput.value = '';
+                    
+                    // Reset project name
+                    this.projectName.value = '';
+                    
+                    // Reset sales rep
+                    this.mainSalesRep.value = '';
+                    
+                    // Show success message
+                    const notification = document.createElement('div');
+                    notification.className = 'notification success';
+                    notification.innerHTML = '<i class="fas fa-check-circle"></i> New quote started! You can now enter new quote details.';
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #d4edda;
+                        color: #155724;
+                        padding: 1rem 1.5rem;
+                        border-radius: 6px;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        z-index: 1000;
+                        max-width: 300px;
+                        border: 1px solid #c3e6cb;
+                    `;
+                    
+                    document.body.appendChild(notification);
+                    
+                    // Remove notification after 3 seconds
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+                }
+            }
+
+            updateQuoteStatus(status, message) {
+                const statusElement = document.getElementById('quoteStatus');
+                if (statusElement) {
+                    statusElement.className = `quote-status-value ${status}`;
+                    statusElement.textContent = message;
+                    
+                    // Update the icon based on status
+                    const statusIcon = statusElement.closest('.quote-status-content').querySelector('i');
+                    if (statusIcon) {
+                        statusIcon.className = status === 'emailed' ? 'fas fa-envelope' : 'fas fa-check-circle';
+                    }
+                }
+            }
         }
 
         // Initialize calculator when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            new RichardsonCalculator();
+            window.richardsonCalculator = new RichardsonCalculator();
         });
 
-        // Print functionality
-        window.addEventListener('beforeprint', () => {
-            if (!window.richardsonCalculator?.currentQuote) return;
-            
-            const quote = window.richardsonCalculator.currentQuote;
-            const printContent = document.getElementById('printContent');
-            
-            // Build print-friendly content
-            let itemsHtml = '';
-            quote.items.forEach(item => {
-                itemsHtml += `
-                    <tr>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                            <strong>${item.styleNumber}</strong><br>
-                            ${item.description}
-                        </td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${item.pricePerPiece.toFixed(2)}</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${item.lineTotal.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-            
-            printContent.innerHTML = `
-                <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="margin: 0;">Northwest Custom Apparel</h1>
-                        <p style="margin: 5px 0;">Richardson Cap Quote</p>
-                        <p style="margin: 5px 0;">Date: ${new Date().toLocaleDateString()}</p>
-                    </div>
-                    
-                    <div style="margin-bottom: 30px;">
-                        <h3>Quote For:</h3>
-                        <p><strong>${quote.customerName || 'Customer'}</strong></p>
-                        ${quote.projectName ? `<p>Project: ${quote.projectName}</p>` : ''}
-                    </div>
-                    
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-                        <thead>
-                            <tr>
-                                <th style="padding: 8px; border-bottom: 2px solid #333; text-align: left;">Item</th>
-                                <th style="padding: 8px; border-bottom: 2px solid #333; text-align: center;">Qty</th>
-                                <th style="padding: 8px; border-bottom: 2px solid #333; text-align: right;">Each</th>
-                                <th style="padding: 8px; border-bottom: 2px solid #333; text-align: right;">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHtml}
-                        </tbody>
-                    </table>
-                    
-                    <div style="text-align: right; margin-bottom: 20px;">
-                        <p>Embellishment: ${quote.embellishmentType === 'embroidery' ? `Embroidery - ${quote.stitchCountText}` : 'Leatherette Patch - 4" x 2.5"'}</p>
-                        <p>Total Quantity: ${quote.totalQuantity} pieces</p>
-                        ${quote.ltmFeeTotal > 0 ? `<p>Less Than Minimum Fee: $${quote.ltmFeeTotal.toFixed(2)}</p>` : ''}
-                        <h3>Total: $${quote.grandTotal.toFixed(2)}</h3>
-                    </div>
-                    
-                    <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #666;">
-                        <p>Thank you for your business!</p>
-                        <p>Prices valid for 30 days</p>
-                        <p>Contact: Ruthie Nhoung | 253-922-5793 | sales@nwcustomapparel.com</p>
-                    </div>
-                </div>
-            `;
-            
-            printContent.style.display = 'block';
-        });
-
-        window.addEventListener('afterprint', () => {
-            document.getElementById('printContent').style.display = 'none';
-        });
+        // Note: Print functionality now uses direct window.open() method
+        // Old beforeprint/afterprint event listeners removed in favor of generatePrintInvoice()
 
     </script>
 </body>

@@ -112,6 +112,10 @@ app.get('/webstore-info.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'webstore-info.html'));
 });
 
+app.get('/universal-records-admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'universal-records-admin.html'));
+});
+
 app.get('/announcements-create.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'announcements-create.html'));
 });
