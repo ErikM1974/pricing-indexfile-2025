@@ -61,6 +61,33 @@ class RichardsonQuoteService {
     }
 
     /**
+     * Build setup fees note for database storage
+     */
+    buildSetupFeesNote(setupFees) {
+        if (!setupFees || setupFees.total === 0) return '';
+        
+        let note = 'SETUP FEES:\n';
+        
+        if (setupFees.digitizing > 0) {
+            note += `- Digitizing Fee: $${setupFees.digitizing.toFixed(2)}\n`;
+        }
+        
+        if (setupFees.graphicDesign > 0) {
+            note += `- Graphic Design Fee: $${setupFees.graphicDesign.toFixed(2)}\n`;
+        }
+        
+        if (setupFees.additional && setupFees.additional.length > 0) {
+            setupFees.additional.forEach(fee => {
+                note += `- ${fee.name}: $${fee.amount.toFixed(2)}\n`;
+            });
+        }
+        
+        note += `Setup Fees Total: $${setupFees.total.toFixed(2)}`;
+        
+        return note;
+    }
+
+    /**
      * Save Richardson quote (session + multiple items)
      */
     async saveQuote(quoteData) {
@@ -77,8 +104,16 @@ class RichardsonQuoteService {
             // Calculate total quantity across all items
             const totalQuantity = quoteData.items.reduce((sum, item) => sum + item.quantity, 0);
             
-            // Calculate total amount
-            const totalAmount = quoteData.items.reduce((sum, item) => sum + item.lineTotal, 0);
+            // Calculate total amount including setup fees
+            const totalAmount = quoteData.grandTotal || quoteData.items.reduce((sum, item) => sum + item.lineTotal, 0);
+            const subtotalAmount = quoteData.subtotal || quoteData.items.reduce((sum, item) => sum + item.lineTotal, 0);
+            
+            // Build notes with setup fees if present
+            let notesContent = quoteData.notes || '';
+            if (quoteData.setupFees && quoteData.setupFees.total > 0) {
+                const setupFeesNote = this.buildSetupFeesNote(quoteData.setupFees);
+                notesContent = notesContent ? `${notesContent}\n\n${setupFeesNote}` : setupFeesNote;
+            }
             
             const sessionData = {
                 QuoteID: quoteID,
@@ -88,12 +123,15 @@ class RichardsonQuoteService {
                 CompanyName: quoteData.companyName || 'Not Provided',
                 Phone: quoteData.customerPhone || '',
                 TotalQuantity: totalQuantity,
-                SubtotalAmount: parseFloat(totalAmount.toFixed(2)),
+                SubtotalAmount: parseFloat(subtotalAmount.toFixed(2)),
                 LTMFeeTotal: quoteData.ltmFeeTotal || 0,
                 TotalAmount: parseFloat(totalAmount.toFixed(2)),
                 Status: 'Open',
                 ExpiresAt: formattedExpiresAt,
-                Notes: quoteData.notes || ''
+                Notes: notesContent,
+                SalesRepEmail: quoteData.salesRepEmail || 'sales@nwcustomapparel.com',
+                SalesRepName: quoteData.salesRepName || 'General Sales',
+                ProjectName: quoteData.projectName || ''
             };
 
             console.log('[RichardsonQuoteService] Session data:', sessionData);
@@ -160,7 +198,8 @@ class RichardsonQuoteService {
                             capBasePrice: item.capPrice,
                             embellishmentPrice: item.embellishmentPrice,
                             embellishmentType: quoteData.embellishmentType
-                        }
+                        },
+                        setupFees: quoteData.setupFees || null
                     }),
                     PricingTier: this.getPricingTier(totalQuantity),
                     ImageURL: '',

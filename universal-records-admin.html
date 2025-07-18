@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Universal Records Admin Panel - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Root Variables */
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --info-bg: #dbeafe;
+            --info-text: #1e40af;
+            --success-color: #065f46;
+            --error-color: #991b1b;
+            --info-color: #1e40af;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-description {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .stat-change.positive {
+            color: var(--success-text);
+        }
+
+        .stat-change.negative {
+            color: var(--error-text);
+        }
+
+        /* Filters */
+        .filters {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .filter-control {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+        }
+
+        .filter-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .table-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .records-table th,
+        .records-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .records-table th {
+            background: var(--bg-color);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .records-table td {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .records-table tr:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Quote Type Badges */
+        .quote-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .quote-type.dtg {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .quote-type.rich {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .quote-type.emb {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .quote-type.embc {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .quote-type.lt {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .quote-type.patch {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .quote-type.spc {
+            background: #fff8e1;
+            color: #f9a825;
+        }
+
+        .quote-type.ssc {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .quote-type.web {
+            background: #e1f5fe;
+            color: #0288d1;
+        }
+        
+        .quote-type.adr {
+            background: #f0e4ff;
+            color: #6a0dad;
+        }
+
+        /* Status Badges */
+        .status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status.open {
+            background: var(--info-bg);
+            color: var(--info-text);
+        }
+
+        .status.sent {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .status.converted {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .status.expired {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+        
+        .status.cancelled {
+            background: #fee;
+            color: #c33;
+        }
+        
+        /* Status dropdown styling */
+        .status-select {
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: transparent;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 7.5L2.25 3.75h7.5L6 7.5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            padding-right: 2rem;
+            width: 120px;
+        }
+        
+        .status-select.open {
+            background-color: var(--info-bg);
+            color: var(--info-text);
+        }
+        
+        .status-select.sent {
+            background-color: var(--warning-bg);
+            color: var(--warning-text);
+        }
+        
+        .status-select.converted {
+            background-color: var(--success-bg);
+            color: var(--success-text);
+        }
+        
+        .status-select.expired {
+            background-color: var(--error-bg);
+            color: var(--error-text);
+        }
+        
+        .status-select.cancelled {
+            background-color: #fee;
+            color: #c33;
+        }
+        
+        .status-select:hover {
+            opacity: 0.85;
+        }
+        
+        .status-select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-right: 1rem;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-primary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--hover-bg);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-container {
+                padding: 0 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+            </div>
+            <nav class="breadcrumb">
+                <a href="/staff-dashboard.html">Staff Dashboard</a>
+                <span>/</span>
+                <span>Universal Records Admin</span>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Universal Records Admin Panel</h1>
+            <p class="page-description">Comprehensive view of all quotes, bonuses, and analytics across all calculator types</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Quote Type</label>
+                    <select class="filter-control" id="quoteTypeFilter">
+                        <option value="">All Types</option>
+                        <option value="DTG">DTG Contract</option>
+                        <option value="RICH">Richardson Caps</option>
+                        <option value="EMB">Embroidery Contract</option>
+                        <option value="EMBC">Customer Embroidery</option>
+                        <option value="LT">Laser Tumblers</option>
+                        <option value="PATCH">Embroidered Emblems</option>
+                        <option value="SPC">Customer Screen Print</option>
+                        <option value="SSC">Safety Stripe Creator</option>
+                        <option value="WEB">Webstore Setup</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-control" id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="Open">Open</option>
+                        <option value="Sent">Sent</option>
+                        <option value="Converted">Converted</option>
+                        <option value="Expired">Expired</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Date From</label>
+                    <input type="date" class="filter-control" id="dateFromFilter">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Date To</label>
+                    <input type="date" class="filter-control" id="dateToFilter">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Customer</label>
+                    <input type="text" class="filter-control" id="customerFilter" placeholder="Search by name or email">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Min Amount</label>
+                    <input type="number" class="filter-control" id="minAmountFilter" placeholder="$0.00">
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button class="btn btn-primary" onclick="applyFilters()">
+                    <i class="fas fa-search"></i>
+                    Apply Filters
+                </button>
+                <button class="btn btn-secondary" onclick="clearFilters()">
+                    <i class="fas fa-times"></i>
+                    Clear All
+                </button>
+                <button class="btn btn-secondary" onclick="exportData()">
+                    <i class="fas fa-download"></i>
+                    Export CSV
+                </button>
+                <button class="btn btn-secondary" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Records Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">All Quote Records</h2>
+                <div class="pagination-info" id="recordsCount">Loading...</div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="records-table">
+                    <thead>
+                        <tr>
+                            <th>Quote ID</th>
+                            <th>Type</th>
+                            <th>Customer</th>
+                            <th>Company</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTableBody">
+                        <tr>
+                            <td colspan="8" class="loading">
+                                <div class="spinner"></div>
+                                Loading records...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <div class="pagination-info" id="paginationInfo">Loading...</div>
+                <button class="pagination-btn" id="prevBtn" onclick="changePage('prev')" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                    Previous
+                </button>
+                <div id="pageNumbers"></div>
+                <button class="pagination-btn" id="nextBtn" onclick="changePage('next')" disabled>
+                    Next
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /**
+         * Universal Records Admin Panel
+         * Manages all quote types and provides analytics
+         */
+        class UniversalRecordsAdmin {
+            constructor() {
+                this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+                this.currentPage = 1;
+                this.recordsPerPage = 50;
+                this.totalRecords = 0;
+                this.allRecords = [];
+                this.filteredRecords = [];
+                
+                this.initializeEventListeners();
+                this.loadInitialData();
+            }
+
+            initializeEventListeners() {
+                // Auto-refresh every 5 minutes
+                setInterval(() => this.loadInitialData(), 5 * 60 * 1000);
+                
+                // Filter change listeners
+                document.getElementById('quoteTypeFilter').addEventListener('change', () => this.applyFilters());
+                document.getElementById('statusFilter').addEventListener('change', () => this.applyFilters());
+                document.getElementById('customerFilter').addEventListener('input', () => this.debouncedFilter());
+                
+                // Set default date range (last 30 days)
+                const today = new Date();
+                const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                
+                document.getElementById('dateToFilter').value = today.toISOString().split('T')[0];
+                document.getElementById('dateFromFilter').value = thirtyDaysAgo.toISOString().split('T')[0];
+            }
+
+            // Debounced filter for search input
+            debouncedFilter = this.debounce(() => this.applyFilters(), 300);
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            async loadInitialData() {
+                try {
+                    console.log('[UniversalRecordsAdmin] Loading initial data...');
+                    
+                    // Load all quote sessions
+                    const response = await fetch(`${this.baseURL}/api/quote_sessions`);
+                    const quotes = await response.json();
+                    
+                    console.log('[UniversalRecordsAdmin] Loaded quotes:', quotes.length);
+                    
+                    // Filter out ADR quotes (Adriyella has a separate management system)
+                    this.allRecords = quotes.filter(quote => !quote.QuoteID.startsWith('ADR'));
+                    console.log('[UniversalRecordsAdmin] After filtering ADR quotes:', this.allRecords.length);
+                    
+                    // Stats calculation removed - no longer displaying stats section
+                    // this.calculateStats();
+                    this.applyFilters();
+                    
+                } catch (error) {
+                    console.error('[UniversalRecordsAdmin] Error loading data:', error);
+                    this.showError('Failed to load quote data');
+                }
+            }
+
+            // Stats calculation method - commented out since stats section was removed
+            /*
+            calculateStats() {
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                
+                // Total quotes
+                const totalQuotes = this.allRecords.length;
+                
+                // Total value
+                const totalValue = this.allRecords.reduce((sum, quote) => sum + (quote.TotalAmount || 0), 0);
+                
+                // This month's quotes
+                const thisMonthQuotes = this.allRecords.filter(quote => {
+                    const quoteDate = new Date(quote.CreatedAt);
+                    return quoteDate >= startOfMonth;
+                });
+                
+                // Last month's quotes for comparison
+                const lastMonthQuotes = this.allRecords.filter(quote => {
+                    const quoteDate = new Date(quote.CreatedAt);
+                    return quoteDate >= lastMonth && quoteDate <= endOfLastMonth;
+                });
+                
+                // Conversion rate
+                const convertedQuotes = this.allRecords.filter(quote => quote.Status === 'Converted');
+                const conversionRate = totalQuotes > 0 ? (convertedQuotes.length / totalQuotes * 100) : 0;
+                
+                // Calculate changes
+                const monthlyChange = lastMonthQuotes.length > 0 ? 
+                    ((thisMonthQuotes.length - lastMonthQuotes.length) / lastMonthQuotes.length * 100) : 0;
+                
+                // Update UI
+                document.getElementById('totalQuotes').textContent = totalQuotes.toLocaleString();
+                document.getElementById('totalValue').textContent = `$${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                document.getElementById('monthlyQuotes').textContent = thisMonthQuotes.length.toLocaleString();
+                document.getElementById('conversionRate').textContent = `${conversionRate.toFixed(1)}%`;
+                
+                // Update change indicators
+                const quotesChangeEl = document.getElementById('quotesChange');
+                quotesChangeEl.textContent = `${Math.abs(monthlyChange).toFixed(1)}% ${monthlyChange >= 0 ? 'increase' : 'decrease'} from last month`;
+                quotesChangeEl.className = `stat-change ${monthlyChange >= 0 ? 'positive' : 'negative'}`;
+                
+                // Placeholder for other changes
+                document.getElementById('valueChange').textContent = 'vs last month';
+                document.getElementById('monthlyChange').textContent = `${thisMonthQuotes.length} quotes this month`;
+                document.getElementById('conversionChange').textContent = `${convertedQuotes.length} converted`;
+            }
+            */
+
+            applyFilters() {
+                const typeFilter = document.getElementById('quoteTypeFilter').value;
+                const statusFilter = document.getElementById('statusFilter').value;
+                const dateFromFilter = document.getElementById('dateFromFilter').value;
+                const dateToFilter = document.getElementById('dateToFilter').value;
+                const customerFilter = document.getElementById('customerFilter').value.toLowerCase();
+                const minAmountFilter = parseFloat(document.getElementById('minAmountFilter').value) || 0;
+                
+                this.filteredRecords = this.allRecords.filter(quote => {
+                    // Exclude ADR quotes (they have a separate management system)
+                    if (quote.QuoteID.startsWith('ADR')) {
+                        return false;
+                    }
+                    
+                    // Type filter
+                    if (typeFilter && !quote.QuoteID.startsWith(typeFilter)) {
+                        return false;
+                    }
+                    
+                    // Status filter
+                    if (statusFilter && quote.Status !== statusFilter) {
+                        return false;
+                    }
+                    
+                    // Date filters
+                    const quoteDate = new Date(quote.CreatedAt);
+                    if (dateFromFilter && quoteDate < new Date(dateFromFilter)) {
+                        return false;
+                    }
+                    if (dateToFilter && quoteDate > new Date(dateToFilter + 'T23:59:59')) {
+                        return false;
+                    }
+                    
+                    // Customer filter
+                    if (customerFilter) {
+                        const customerName = (quote.CustomerName || '').toLowerCase();
+                        const customerEmail = (quote.CustomerEmail || '').toLowerCase();
+                        const companyName = (quote.CompanyName || '').toLowerCase();
+                        
+                        if (!customerName.includes(customerFilter) && 
+                            !customerEmail.includes(customerFilter) && 
+                            !companyName.includes(customerFilter)) {
+                            return false;
+                        }
+                    }
+                    
+                    // Amount filter
+                    if (minAmountFilter > 0 && (quote.TotalAmount || 0) < minAmountFilter) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                this.currentPage = 1;
+                this.renderTable();
+                this.updatePagination();
+            }
+
+            renderTable() {
+                const startIndex = (this.currentPage - 1) * this.recordsPerPage;
+                const endIndex = startIndex + this.recordsPerPage;
+                const pageRecords = this.filteredRecords.slice(startIndex, endIndex);
+                
+                const tbody = document.getElementById('recordsTableBody');
+                
+                if (pageRecords.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                No records found matching your criteria
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = pageRecords.map(quote => `
+                    <tr>
+                        <td>
+                            <strong>${quote.QuoteID}</strong>
+                        </td>
+                        <td>
+                            <span class="quote-type ${this.getQuoteTypeClass(quote.QuoteID)}">
+                                ${this.getQuoteTypeName(quote.QuoteID)}
+                            </span>
+                        </td>
+                        <td>
+                            <div>
+                                <strong>${quote.CustomerName || 'Unknown'}</strong>
+                                <br>
+                                <small style="color: var(--text-secondary);">${quote.CustomerEmail || ''}</small>
+                            </div>
+                        </td>
+                        <td>${quote.CompanyName || 'N/A'}</td>
+                        <td>
+                            <strong>$${(quote.TotalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong>
+                        </td>
+                        <td>
+                            <select class="status-select ${quote.Status.toLowerCase()}" 
+                                    data-quote-id="${quote.QuoteID}"
+                                    data-pk-id="${quote.PK_ID}"
+                                    onchange="updateQuoteStatus('${quote.QuoteID}', '${quote.PK_ID}', this.value)">
+                                <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>
+                                <option value="Sent" ${quote.Status === 'Sent' ? 'selected' : ''}>Sent</option>
+                                <option value="Converted" ${quote.Status === 'Converted' ? 'selected' : ''}>Converted</option>
+                                <option value="Expired" ${quote.Status === 'Expired' ? 'selected' : ''}>Expired</option>
+                                <option value="Cancelled" ${quote.Status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div>
+                                ${new Date(quote.CreatedAt).toLocaleDateString()}
+                                <br>
+                                <small style="color: var(--text-secondary);">
+                                    ${new Date(quote.CreatedAt).toLocaleTimeString()}
+                                </small>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.25rem;">
+                                <button class="btn btn-sm btn-secondary" onclick="viewQuote('${quote.QuoteID}')" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-primary" onclick="editQuote('${quote.QuoteID}', '${quote.PK_ID}')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="duplicateQuote('${quote.QuoteID}')" title="Duplicate">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="exportQuote('${quote.QuoteID}')" title="Export">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary" style="background: #fee2e2; color: #991b1b; border-color: #fecaca;" onclick="deleteQuote('${quote.QuoteID}', '${quote.PK_ID}')" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                // Update record count
+                document.getElementById('recordsCount').textContent = 
+                    `Showing ${startIndex + 1}-${Math.min(endIndex, this.filteredRecords.length)} of ${this.filteredRecords.length} records`;
+            }
+
+            getQuoteTypeClass(quoteID) {
+                const type = quoteID.split(/[0-9]/)[0];
+                switch(type) {
+                    case 'DTG': return 'dtg';
+                    case 'RICH': return 'rich';
+                    case 'EMB': return 'emb';
+                    case 'EMBC': return 'embc';
+                    case 'LT': return 'lt';
+                    case 'PATCH': return 'patch';
+                    case 'SPC': return 'spc';
+                    case 'SSC': return 'ssc';
+                    case 'WEB': return 'web';
+                    case 'ADR': return 'adr';
+                    default: return 'dtg';
+                }
+            }
+
+            getQuoteTypeName(quoteID) {
+                const type = quoteID.split(/[0-9]/)[0];
+                switch(type) {
+                    case 'DTG': return 'DTG';
+                    case 'RICH': return 'Richardson';
+                    case 'EMB': return 'Embroidery';
+                    case 'EMBC': return 'Cust. Emb.';
+                    case 'LT': return 'Laser';
+                    case 'PATCH': return 'Patch';
+                    case 'SPC': return 'Screen Print';
+                    case 'SSC': return 'Safety';
+                    case 'WEB': return 'Webstore';
+                    case 'ADR': return 'Adriyella';
+                    default: return 'Unknown';
+                }
+            }
+
+            updatePagination() {
+                const totalPages = Math.ceil(this.filteredRecords.length / this.recordsPerPage);
+                
+                document.getElementById('paginationInfo').textContent = 
+                    `Page ${this.currentPage} of ${totalPages}`;
+                
+                document.getElementById('prevBtn').disabled = this.currentPage <= 1;
+                document.getElementById('nextBtn').disabled = this.currentPage >= totalPages;
+                
+                // Generate page numbers
+                const pageNumbers = document.getElementById('pageNumbers');
+                pageNumbers.innerHTML = '';
+                
+                const startPage = Math.max(1, this.currentPage - 2);
+                const endPage = Math.min(totalPages, this.currentPage + 2);
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `pagination-btn ${i === this.currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = i;
+                    pageBtn.onclick = () => this.changePage(i);
+                    pageNumbers.appendChild(pageBtn);
+                }
+            }
+
+            changePage(direction) {
+                if (direction === 'prev' && this.currentPage > 1) {
+                    this.currentPage--;
+                } else if (direction === 'next') {
+                    const totalPages = Math.ceil(this.filteredRecords.length / this.recordsPerPage);
+                    if (this.currentPage < totalPages) {
+                        this.currentPage++;
+                    }
+                } else if (typeof direction === 'number') {
+                    this.currentPage = direction;
+                }
+                
+                this.renderTable();
+                this.updatePagination();
+            }
+
+            clearFilters() {
+                document.getElementById('quoteTypeFilter').value = '';
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('dateFromFilter').value = '';
+                document.getElementById('dateToFilter').value = '';
+                document.getElementById('customerFilter').value = '';
+                document.getElementById('minAmountFilter').value = '';
+                
+                this.applyFilters();
+            }
+
+            exportData() {
+                const csvContent = this.generateCSV(this.filteredRecords);
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `quote_records_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            generateCSV(records) {
+                const headers = ['Quote ID', 'Type', 'Customer Name', 'Customer Email', 'Company Name', 'Total Amount', 'Status', 'Created Date', 'Notes'];
+                
+                const csvRows = [headers.join(',')];
+                
+                records.forEach(quote => {
+                    const row = [
+                        quote.QuoteID,
+                        this.getQuoteTypeName(quote.QuoteID),
+                        `"${quote.CustomerName || ''}"`,
+                        quote.CustomerEmail || '',
+                        `"${quote.CompanyName || ''}"`,
+                        quote.TotalAmount || 0,
+                        quote.Status,
+                        new Date(quote.CreatedAt).toLocaleDateString(),
+                        `"${(quote.Notes || '').replace(/"/g, '""')}"`
+                    ];
+                    csvRows.push(row.join(','));
+                });
+                
+                return csvRows.join('\n');
+            }
+
+            refreshData() {
+                this.loadInitialData();
+            }
+
+            showError(message) {
+                // Could implement a toast notification here
+                console.error('[UniversalRecordsAdmin] Error:', message);
+            }
+        }
+
+        // Initialize the admin panel
+        let adminPanel;
+        document.addEventListener('DOMContentLoaded', () => {
+            adminPanel = new UniversalRecordsAdmin();
+        });
+
+        // Global functions for UI interactions
+        function applyFilters() {
+            adminPanel.applyFilters();
+        }
+
+        function clearFilters() {
+            adminPanel.clearFilters();
+        }
+
+        function exportData() {
+            adminPanel.exportData();
+        }
+
+        function refreshData() {
+            adminPanel.refreshData();
+        }
+
+        function changePage(direction) {
+            adminPanel.changePage(direction);
+        }
+
+        async function updateQuoteStatus(quoteID, pkID, newStatus) {
+            try {
+                // Update the dropdown immediately for responsive UI
+                const dropdown = document.querySelector(`select[data-quote-id="${quoteID}"]`);
+                const originalStatus = dropdown.getAttribute('data-original-status') || dropdown.value;
+                
+                // Store original status for rollback if needed
+                dropdown.setAttribute('data-original-status', originalStatus);
+                
+                // Update UI optimistically
+                dropdown.className = `status-select ${newStatus.toLowerCase()}`;
+                dropdown.disabled = true;
+                
+                // Make API call using PK_ID
+                const response = await fetch(`${adminPanel.baseURL}/api/quote_sessions/${pkID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        Status: newStatus
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to update status: ${response.status}`);
+                }
+                
+                // Update local data
+                const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
+                if (quote) {
+                    quote.Status = newStatus;
+                }
+                
+                // Show success message
+                showToast('Status updated successfully', 'success');
+                
+                dropdown.disabled = false;
+                dropdown.removeAttribute('data-original-status');
+                
+            } catch (error) {
+                console.error('[UniversalRecordsAdmin] Error updating status:', error);
+                
+                // Rollback on error
+                const dropdown = document.querySelector(`select[data-quote-id="${quoteID}"]`);
+                const originalStatus = dropdown.getAttribute('data-original-status');
+                if (originalStatus) {
+                    dropdown.value = originalStatus;
+                    dropdown.className = `status-select ${originalStatus.toLowerCase()}`;
+                }
+                dropdown.disabled = false;
+                
+                showToast('Failed to update status. Please try again.', 'error');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            // Add to body
+            document.body.appendChild(toast);
+            
+            // Add styles if not already present
+            if (!document.getElementById('toast-styles')) {
+                const style = document.createElement('style');
+                style.id = 'toast-styles';
+                style.textContent = `
+                    .toast {
+                        position: fixed;
+                        bottom: 2rem;
+                        right: 2rem;
+                        background: var(--card-bg);
+                        padding: 1rem 1.5rem;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+                        font-size: 0.875rem;
+                        z-index: 1000;
+                        animation: slideIn 0.3s ease-out;
+                    }
+                    
+                    .toast-success {
+                        border-left: 4px solid var(--success-color);
+                        color: var(--success-text);
+                    }
+                    
+                    .toast-error {
+                        border-left: 4px solid var(--error-color);
+                        color: var(--error-text);
+                    }
+                    
+                    .toast-info {
+                        border-left: 4px solid var(--info-color);
+                        color: var(--info-text);
+                    }
+                    
+                    @keyframes slideIn {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-in forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        async function viewQuote(quoteID) {
+            try {
+                // Find the quote in our data
+                const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
+                if (!quote) {
+                    alert('Quote not found');
+                    return;
+                }
+
+                // Get quote items
+                const itemsResponse = await fetch(`${adminPanel.baseURL}/api/quote_items?quoteID=${quoteID}`);
+                const items = await itemsResponse.json();
+
+                // Create modal to display quote details
+                const modal = document.createElement('div');
+                modal.className = 'quote-view-modal';
+                modal.innerHTML = `
+                    <div class="modal-overlay" onclick="document.querySelector('.quote-view-modal').remove()">
+                        <div class="modal-content" onclick="event.stopPropagation()">
+                            <div class="modal-header">
+                                <h2>Quote Details - ${quoteID}</h2>
+                                <button class="close-btn" onclick="document.querySelector('.quote-view-modal').remove()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="quote-info-grid">
+                                    <div class="info-section">
+                                        <h3>Customer Information</h3>
+                                        <p><strong>Name:</strong> ${quote.CustomerName || 'N/A'}</p>
+                                        <p><strong>Email:</strong> ${quote.CustomerEmail || 'N/A'}</p>
+                                        <p><strong>Company:</strong> ${quote.CompanyName || 'N/A'}</p>
+                                        <p><strong>Phone:</strong> ${quote.Phone || 'N/A'}</p>
+                                    </div>
+                                    <div class="info-section">
+                                        <h3>Quote Information</h3>
+                                        <p><strong>Status:</strong> <span class="status ${quote.Status.toLowerCase()}">${quote.Status}</span></p>
+                                        <p><strong>Created:</strong> ${new Date(quote.CreatedAt).toLocaleDateString()}</p>
+                                        <p><strong>Expires:</strong> ${new Date(quote.ExpiresAt).toLocaleDateString()}</p>
+                                        <p><strong>Total:</strong> $${quote.TotalAmount.toFixed(2)}</p>
+                                    </div>
+                                </div>
+                                
+                                ${quote.Notes ? `
+                                    <div class="notes-section">
+                                        <h3>Notes</h3>
+                                        <p>${quote.Notes.replace(/\n/g, '<br>')}</p>
+                                    </div>
+                                ` : ''}
+                                
+                                ${items.length > 0 ? `
+                                    <div class="items-section">
+                                        <h3>Quote Items</h3>
+                                        <table class="items-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Item</th>
+                                                    <th>Product</th>
+                                                    <th>Quantity</th>
+                                                    <th>Unit Price</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${items.map(item => `
+                                                    <tr>
+                                                        <td>${item.LineNumber}</td>
+                                                        <td>${item.ProductName}<br><small>${item.StyleNumber}</small></td>
+                                                        <td>${item.Quantity}</td>
+                                                        <td>$${item.FinalUnitPrice.toFixed(2)}</td>
+                                                        <td>$${item.LineTotal.toFixed(2)}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" onclick="exportQuote('${quoteID}')">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                                <button class="btn btn-primary" onclick="duplicateQuote('${quoteID}')">
+                                    <i class="fas fa-copy"></i> Duplicate
+                                </button>
+                                <button class="btn" onclick="document.querySelector('.quote-view-modal').remove()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Add styles
+                if (!document.querySelector('#quote-modal-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'quote-modal-styles';
+                    style.textContent = `
+                        .quote-view-modal {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            z-index: 1000;
+                        }
+                        
+                        .modal-overlay {
+                            width: 100%;
+                            height: 100%;
+                            background: rgba(0, 0, 0, 0.5);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        
+                        .modal-content {
+                            background: white;
+                            border-radius: 8px;
+                            width: 90%;
+                            max-width: 800px;
+                            max-height: 90vh;
+                            overflow: hidden;
+                            display: flex;
+                            flex-direction: column;
+                        }
+                        
+                        .modal-header {
+                            padding: 1.5rem;
+                            border-bottom: 1px solid #e5e7eb;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+                        
+                        .modal-header h2 {
+                            margin: 0;
+                            color: #1f2937;
+                        }
+                        
+                        .close-btn {
+                            background: none;
+                            border: none;
+                            font-size: 1.5rem;
+                            cursor: pointer;
+                            color: #6b7280;
+                        }
+                        
+                        .modal-body {
+                            padding: 1.5rem;
+                            overflow-y: auto;
+                            flex: 1;
+                        }
+                        
+                        .quote-info-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                            gap: 2rem;
+                            margin-bottom: 2rem;
+                        }
+                        
+                        .info-section h3 {
+                            margin: 0 0 1rem 0;
+                            color: #374151;
+                            font-size: 1.125rem;
+                        }
+                        
+                        .info-section p {
+                            margin: 0.5rem 0;
+                        }
+                        
+                        .notes-section {
+                            background: #f9fafb;
+                            padding: 1rem;
+                            border-radius: 6px;
+                            margin-bottom: 2rem;
+                        }
+                        
+                        .items-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        
+                        .items-table th,
+                        .items-table td {
+                            padding: 0.75rem;
+                            text-align: left;
+                            border-bottom: 1px solid #e5e7eb;
+                        }
+                        
+                        .items-table th {
+                            background: #f9fafb;
+                            font-weight: 600;
+                            color: #374151;
+                        }
+                        
+                        .modal-footer {
+                            padding: 1.5rem;
+                            border-top: 1px solid #e5e7eb;
+                            display: flex;
+                            gap: 1rem;
+                            justify-content: flex-end;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                document.body.appendChild(modal);
+                
+            } catch (error) {
+                console.error('Error viewing quote:', error);
+                alert('Error loading quote details');
+            }
+        }
+
+        async function duplicateQuote(quoteID) {
+            if (!confirm(`Are you sure you want to duplicate quote ${quoteID}?`)) {
+                return;
+            }
+            
+            try {
+                // Get the original quote
+                const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
+                if (!quote) {
+                    alert('Quote not found');
+                    return;
+                }
+                
+                // Get quote items
+                const itemsResponse = await fetch(`${adminPanel.baseURL}/api/quote_items?quoteID=${quoteID}`);
+                const items = await itemsResponse.json();
+                
+                // Generate new quote ID
+                const prefix = quoteID.split(/\d/)[0]; // Extract prefix
+                const today = new Date();
+                const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                const day = today.getDate().toString().padStart(2, '0');
+                const dateKey = `${month}${day}`;
+                
+                // Get sequence from sessionStorage
+                const storageKey = `${prefix.toLowerCase()}_quote_sequence_${dateKey}`;
+                let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
+                sessionStorage.setItem(storageKey, sequence.toString());
+                
+                const newQuoteId = `${prefix}${dateKey}-${sequence}`;
+                
+                // Create new quote session
+                const newQuoteData = {
+                    QuoteID: newQuoteId,
+                    SessionID: `${prefix.toLowerCase()}_sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    CustomerEmail: quote.CustomerEmail,
+                    CustomerName: quote.CustomerName,
+                    CompanyName: quote.CompanyName,
+                    Phone: quote.Phone,
+                    TotalQuantity: quote.TotalQuantity,
+                    SubtotalAmount: quote.SubtotalAmount,
+                    LTMFeeTotal: quote.LTMFeeTotal,
+                    TotalAmount: quote.TotalAmount,
+                    Status: 'Open',
+                    ExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().replace(/\.\d{3}Z$/, ''),
+                    Notes: quote.Notes ? `Duplicated from ${quoteID}\n\n${quote.Notes}` : `Duplicated from ${quoteID}`
+                };
+                
+                // Save new quote session
+                const sessionResponse = await fetch(`${adminPanel.baseURL}/api/quote_sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newQuoteData)
+                });
+                
+                if (!sessionResponse.ok) {
+                    throw new Error('Failed to create new quote');
+                }
+                
+                // Duplicate items
+                for (const item of items) {
+                    const newItemData = {
+                        QuoteID: newQuoteId,
+                        LineNumber: item.LineNumber,
+                        StyleNumber: item.StyleNumber,
+                        ProductName: item.ProductName,
+                        Color: item.Color,
+                        ColorCode: item.ColorCode,
+                        EmbellishmentType: item.EmbellishmentType,
+                        PrintLocation: item.PrintLocation,
+                        PrintLocationName: item.PrintLocationName,
+                        Quantity: item.Quantity,
+                        HasLTM: item.HasLTM,
+                        BaseUnitPrice: item.BaseUnitPrice,
+                        LTMPerUnit: item.LTMPerUnit,
+                        FinalUnitPrice: item.FinalUnitPrice,
+                        LineTotal: item.LineTotal,
+                        SizeBreakdown: item.SizeBreakdown,
+                        PricingTier: item.PricingTier,
+                        ImageURL: item.ImageURL,
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+                    };
+                    
+                    await fetch(`${adminPanel.baseURL}/api/quote_items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newItemData)
+                    });
+                }
+                
+                alert(`Quote duplicated successfully!\nNew Quote ID: ${newQuoteId}`);
+                
+                // Refresh the data
+                adminPanel.loadInitialData();
+                
+            } catch (error) {
+                console.error('Error duplicating quote:', error);
+                alert('Error duplicating quote');
+            }
+        }
+
+        function exportQuote(quoteID) {
+            try {
+                // Find the quote in our data
+                const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
+                if (!quote) {
+                    alert('Quote not found');
+                    return;
+                }
+                
+                // Create CSV content
+                const headers = Object.keys(quote);
+                const values = headers.map(h => quote[h]);
+                
+                let csvContent = headers.join(',') + '\n';
+                csvContent += values.map(v => {
+                    // Handle values that might contain commas
+                    if (typeof v === 'string' && (v.includes(',') || v.includes('"') || v.includes('\n'))) {
+                        return `"${v.replace(/"/g, '""')}"`;
+                    }
+                    return v;
+                }).join(',');
+                
+                // Create and download file
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `quote_${quoteID}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+            } catch (error) {
+                console.error('Error exporting quote:', error);
+                alert('Error exporting quote');
+            }
+        }
+
+        async function editQuote(quoteID, pkID) {
+            try {
+                // Find the quote in our data
+                const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
+                if (!quote) {
+                    alert('Quote not found');
+                    return;
+                }
+
+                // Create edit modal
+                const modal = document.createElement('div');
+                modal.className = 'quote-edit-modal';
+                modal.innerHTML = `
+                    <div class="modal-overlay" onclick="document.querySelector('.quote-edit-modal').remove()">
+                        <div class="modal-content" onclick="event.stopPropagation()">
+                            <div class="modal-header">
+                                <h2>Edit Quote - ${quoteID}</h2>
+                                <button class="close-btn" onclick="document.querySelector('.quote-edit-modal').remove()">×</button>
+                            </div>
+                            <form id="editQuoteForm" onsubmit="saveQuoteChanges(event, '${quoteID}', '${pkID}')">
+                                <div class="modal-body">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="editCustomerName">Customer Name</label>
+                                            <input type="text" id="editCustomerName" class="form-control" value="${quote.CustomerName || ''}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editCustomerEmail">Customer Email</label>
+                                            <input type="email" id="editCustomerEmail" class="form-control" value="${quote.CustomerEmail || ''}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editCompanyName">Company Name</label>
+                                            <input type="text" id="editCompanyName" class="form-control" value="${quote.CompanyName || ''}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editPhone">Phone</label>
+                                            <input type="tel" id="editPhone" class="form-control" value="${quote.Phone || ''}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editTotalQuantity">Total Quantity</label>
+                                            <input type="number" id="editTotalQuantity" class="form-control" value="${quote.TotalQuantity || 0}" min="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editSubtotalAmount">Subtotal Amount</label>
+                                            <input type="number" id="editSubtotalAmount" class="form-control" value="${quote.SubtotalAmount || 0}" step="0.01" min="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editLTMFeeTotal">LTM Fee Total</label>
+                                            <input type="number" id="editLTMFeeTotal" class="form-control" value="${quote.LTMFeeTotal || 0}" step="0.01" min="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editTotalAmount">Total Amount</label>
+                                            <input type="number" id="editTotalAmount" class="form-control" value="${quote.TotalAmount || 0}" step="0.01" min="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editStatus">Status</label>
+                                            <select id="editStatus" class="form-control">
+                                                <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>
+                                                <option value="Sent" ${quote.Status === 'Sent' ? 'selected' : ''}>Sent</option>
+                                                <option value="Converted" ${quote.Status === 'Converted' ? 'selected' : ''}>Converted</option>
+                                                <option value="Expired" ${quote.Status === 'Expired' ? 'selected' : ''}>Expired</option>
+                                                <option value="Cancelled" ${quote.Status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group full-width">
+                                            <label for="editNotes">Notes</label>
+                                            <textarea id="editNotes" class="form-control" rows="3">${quote.Notes || ''}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" onclick="document.querySelector('.quote-edit-modal').remove()">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+
+                // Add styles if not already present
+                if (!document.querySelector('#edit-modal-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'edit-modal-styles';
+                    style.textContent = `
+                        .quote-edit-modal {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            z-index: 1000;
+                        }
+                        
+                        .quote-edit-modal .modal-overlay {
+                            width: 100%;
+                            height: 100%;
+                            background: rgba(0, 0, 0, 0.5);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        
+                        .quote-edit-modal .modal-content {
+                            background: white;
+                            border-radius: 8px;
+                            width: 90%;
+                            max-width: 800px;
+                            max-height: 90vh;
+                            overflow: hidden;
+                            display: flex;
+                            flex-direction: column;
+                        }
+                        
+                        .quote-edit-modal .modal-header {
+                            padding: 1.5rem;
+                            border-bottom: 1px solid #e5e7eb;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+                        
+                        .quote-edit-modal .modal-header h2 {
+                            margin: 0;
+                            color: #1f2937;
+                        }
+                        
+                        .quote-edit-modal .close-btn {
+                            background: none;
+                            border: none;
+                            font-size: 1.5rem;
+                            cursor: pointer;
+                            color: #6b7280;
+                        }
+                        
+                        .quote-edit-modal .modal-body {
+                            padding: 1.5rem;
+                            overflow-y: auto;
+                            flex: 1;
+                        }
+                        
+                        .quote-edit-modal .form-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                            gap: 1rem;
+                        }
+                        
+                        .quote-edit-modal .form-group {
+                            margin-bottom: 1rem;
+                        }
+                        
+                        .quote-edit-modal .form-group.full-width {
+                            grid-column: 1 / -1;
+                        }
+                        
+                        .quote-edit-modal .form-group label {
+                            display: block;
+                            margin-bottom: 0.5rem;
+                            font-weight: 500;
+                            color: #374151;
+                        }
+                        
+                        .quote-edit-modal .form-control {
+                            width: 100%;
+                            padding: 0.5rem 0.75rem;
+                            border: 1px solid #e5e7eb;
+                            border-radius: 6px;
+                            font-size: 0.875rem;
+                            background: white;
+                        }
+                        
+                        .quote-edit-modal .form-control:focus {
+                            outline: none;
+                            border-color: #4cb354;
+                            box-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+                        }
+                        
+                        .quote-edit-modal textarea.form-control {
+                            resize: vertical;
+                        }
+                        
+                        .quote-edit-modal .modal-footer {
+                            padding: 1.5rem;
+                            border-top: 1px solid #e5e7eb;
+                            display: flex;
+                            gap: 1rem;
+                            justify-content: flex-end;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                document.body.appendChild(modal);
+                
+            } catch (error) {
+                console.error('Error opening edit modal:', error);
+                alert('Error opening edit form');
+            }
+        }
+
+        async function saveQuoteChanges(event, quoteID, pkID) {
+            event.preventDefault();
+            
+            try {
+                // Gather form data
+                const updatedData = {
+                    CustomerName: document.getElementById('editCustomerName').value,
+                    CustomerEmail: document.getElementById('editCustomerEmail').value,
+                    CompanyName: document.getElementById('editCompanyName').value,
+                    Phone: document.getElementById('editPhone').value,
+                    TotalQuantity: parseInt(document.getElementById('editTotalQuantity').value) || 0,
+                    SubtotalAmount: parseFloat(document.getElementById('editSubtotalAmount').value) || 0,
+                    LTMFeeTotal: parseFloat(document.getElementById('editLTMFeeTotal').value) || 0,
+                    TotalAmount: parseFloat(document.getElementById('editTotalAmount').value) || 0,
+                    Status: document.getElementById('editStatus').value,
+                    Notes: document.getElementById('editNotes').value
+                };
+
+                // Make API call to update quote
+                const response = await fetch(`${adminPanel.baseURL}/api/quote_sessions/${pkID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to update quote: ${response.status}`);
+                }
+
+                // Update local data
+                const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
+                if (quote) {
+                    Object.assign(quote, updatedData);
+                }
+
+                // Close modal
+                document.querySelector('.quote-edit-modal').remove();
+
+                // Show success message
+                showToast('Quote updated successfully', 'success');
+
+                // Re-render table
+                adminPanel.applyFilters();
+
+            } catch (error) {
+                console.error('Error updating quote:', error);
+                showToast('Failed to update quote. Please try again.', 'error');
+            }
+        }
+
+        async function deleteQuote(quoteID, pkID) {
+            if (!confirm(`Are you sure you want to delete quote ${quoteID}?\n\nThis action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                // First, delete all quote items
+                const itemsResponse = await fetch(`${adminPanel.baseURL}/api/quote_items?quoteID=${quoteID}`);
+                const items = await itemsResponse.json();
+
+                // Delete each item
+                for (const item of items) {
+                    await fetch(`${adminPanel.baseURL}/api/quote_items/${item.PK_ID}`, {
+                        method: 'DELETE'
+                    });
+                }
+
+                // Then delete the quote session
+                const response = await fetch(`${adminPanel.baseURL}/api/quote_sessions/${pkID}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to delete quote: ${response.status}`);
+                }
+
+                // Remove from local data
+                const index = adminPanel.allRecords.findIndex(q => q.QuoteID === quoteID);
+                if (index > -1) {
+                    adminPanel.allRecords.splice(index, 1);
+                }
+
+                // Show success message
+                showToast(`Quote ${quoteID} deleted successfully`, 'success');
+
+                // Re-render table
+                adminPanel.applyFilters();
+
+            } catch (error) {
+                console.error('Error deleting quote:', error);
+                showToast('Failed to delete quote. Please try again.', 'error');
+            }
+        }
+
+        // Console debug helpers
+        console.log('[UniversalRecordsAdmin] Admin panel loaded. Available commands:');
+        console.log('- adminPanel.allRecords: View all loaded records');
+        console.log('- adminPanel.filteredRecords: View filtered records');
+        console.log('- adminPanel.loadInitialData(): Reload data');
+        console.log('- adminPanel.applyFilters(): Apply current filters');
+    </script>
+</body>
+</html>
