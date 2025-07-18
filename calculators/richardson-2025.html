@@ -251,9 +251,28 @@
             color: var(--primary-dark);
         }
 
-        .user-welcome {
-            color: var(--text-secondary);
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .help-btn {
+            background: var(--hover-bg);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            color: var(--text-primary);
             font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .help-btn:hover {
+            background: var(--border-color);
         }
 
         /* Main Container */
@@ -814,15 +833,18 @@
     <header class="header">
         <div class="header-container">
             <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NW%20Custom%20Logo%20Official%20White%20Outline.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
                 <nav class="breadcrumb">
                     <a href="/staff-dashboard.html">Dashboard</a>
                     <span>/</span>
                     <span>Richardson Cap Pricing</span>
                 </nav>
             </div>
-            <div class="user-welcome">
-                Richardson Cap Quote Builder
+            <div class="header-right">
+                <button class="help-btn" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    Print Quote
+                </button>
             </div>
         </div>
     </header>
@@ -1018,11 +1040,11 @@
                 <label class="form-label" for="salesRep">Sales Representative</label>
                 <select id="salesRep" class="form-select" required>
                     <option value="">Select a sales rep...</option>
+                    <option value="sales@nwcustomapparel.com" selected>General Sales</option>
                     <option value="taylar@nwcustomapparel.com">Taylar</option>
                     <option value="nika@nwcustomapparel.com">Nika</option>
                     <option value="erik@nwcustomapparel.com">Erik</option>
                     <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                    <option value="sales@nwcustomapparel.com">General Sales</option>
                 </select>
             </div>
 
@@ -1855,7 +1877,7 @@
 
         // Initialize calculator when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            new RichardsonCalculator();
+            window.richardsonCalculator = new RichardsonCalculator();
         });
 
         // Print functionality
@@ -1867,41 +1889,58 @@
             
             // Build print-friendly content
             let itemsHtml = '';
-            quote.items.forEach(item => {
+            quote.items.forEach((item, index) => {
+                const rowStyle = index % 2 === 0 ? 'background: #f9fafb;' : 'background: white;';
                 itemsHtml += `
-                    <tr>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                            <strong>${item.styleNumber}</strong><br>
-                            ${item.description}
+                    <tr style="${rowStyle}">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
+                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 2px;">${item.styleNumber}</div>
+                            <div style="font-size: 14px; color: #6b7280;">${item.description}</div>
                         </td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${item.pricePerPiece.toFixed(2)}</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${item.lineTotal.toFixed(2)}</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 500;">${item.quantity}</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 500;">$${item.pricePerPiece.toFixed(2)}</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600; color: #1f2937;">$${item.lineTotal.toFixed(2)}</td>
                     </tr>
                 `;
             });
             
             printContent.innerHTML = `
-                <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="margin: 0;">Northwest Custom Apparel</h1>
-                        <p style="margin: 5px 0;">Richardson Cap Quote</p>
-                        <p style="margin: 5px 0;">Date: ${new Date().toLocaleDateString()}</p>
+                <div style="max-width: 800px; margin: 0 auto; padding: 40px; font-family: 'Inter', Arial, sans-serif; color: #1f2937;">
+                    <!-- Header with Logo -->
+                    <div style="text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #4cb354;">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             style="max-width: 250px; height: auto; margin-bottom: 20px;">
+                        <h1 style="margin: 0; color: #4cb354; font-size: 28px; font-weight: 700;">Richardson Cap Quote</h1>
+                        <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 16px;">
+                            Quote Date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                        </p>
                     </div>
                     
-                    <div style="margin-bottom: 30px;">
-                        <h3>Quote For:</h3>
-                        <p><strong>${quote.customerName || 'Customer'}</strong></p>
-                        ${quote.projectName ? `<p>Project: ${quote.projectName}</p>` : ''}
+                    <!-- Customer Information -->
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                        <h2 style="margin: 0 0 15px 0; color: #1f2937; font-size: 20px; font-weight: 600;">Customer Information</h2>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <p style="margin: 5px 0;"><strong style="color: #6b7280;">Customer:</strong> ${quote.customerName || 'Customer'}</p>
+                                ${quote.projectName ? `<p style="margin: 5px 0;"><strong style="color: #6b7280;">Project:</strong> ${quote.projectName}</p>` : ''}
+                            </div>
+                            <div style="text-align: right;">
+                                <p style="margin: 5px 0;"><strong style="color: #6b7280;">Total Quantity:</strong> ${quote.totalQuantity} pieces</p>
+                                <p style="margin: 5px 0;"><strong style="color: #6b7280;">Embellishment:</strong> ${quote.embellishmentType === 'embroidery' ? `Embroidery (${quote.stitchCountText})` : 'Leatherette Patch (4" x 2.5")'}</p>
+                            </div>
+                        </div>
                     </div>
                     
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                    <!-- Quote Details Table -->
+                    <h2 style="margin: 0 0 15px 0; color: #1f2937; font-size: 20px; font-weight: 600;">Quote Details</h2>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;">
                         <thead>
-                            <tr>
-                                <th style="padding: 8px; border-bottom: 2px solid #333; text-align: left;">Item</th>
-                                <th style="padding: 8px; border-bottom: 2px solid #333; text-align: center;">Qty</th>
-                                <th style="padding: 8px; border-bottom: 2px solid #333; text-align: right;">Each</th>
-                                <th style="padding: 8px; border-bottom: 2px solid #333; text-align: right;">Total</th>
+                            <tr style="background: #4cb354; color: white;">
+                                <th style="padding: 12px 16px; text-align: left; font-weight: 600;">Style & Description</th>
+                                <th style="padding: 12px 16px; text-align: center; font-weight: 600; width: 100px;">Qty</th>
+                                <th style="padding: 12px 16px; text-align: right; font-weight: 600; width: 120px;">Unit Price</th>
+                                <th style="padding: 12px 16px; text-align: right; font-weight: 600; width: 120px;">Line Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1909,17 +1948,40 @@
                         </tbody>
                     </table>
                     
-                    <div style="text-align: right; margin-bottom: 20px;">
-                        <p>Embellishment: ${quote.embellishmentType === 'embroidery' ? `Embroidery - ${quote.stitchCountText}` : 'Leatherette Patch - 4" x 2.5"'}</p>
-                        <p>Total Quantity: ${quote.totalQuantity} pieces</p>
-                        ${quote.ltmFeeTotal > 0 ? `<p>Less Than Minimum Fee: $${quote.ltmFeeTotal.toFixed(2)}</p>` : ''}
-                        <h3>Total: $${quote.grandTotal.toFixed(2)}</h3>
+                    <!-- Pricing Summary -->
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                        <div style="max-width: 400px; margin-left: auto;">
+                            ${quote.ltmFeeTotal > 0 ? `
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding: 10px; background: #fef3c7; border-radius: 6px;">
+                                    <span style="color: #92400e; font-weight: 500;">Less Than Minimum Fee:</span>
+                                    <span style="color: #92400e; font-weight: 600;">$${quote.ltmFeeTotal.toFixed(2)}</span>
+                                </div>
+                            ` : ''}
+                            <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 2px solid #e5e7eb;">
+                                <span style="font-size: 20px; font-weight: 600; color: #1f2937;">Total Amount:</span>
+                                <span style="font-size: 24px; font-weight: 700; color: #4cb354;">$${quote.grandTotal.toFixed(2)}</span>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #666;">
-                        <p>Thank you for your business!</p>
-                        <p>Prices valid for 30 days</p>
-                        <p>Contact: Ruthie Nhoung | 253-922-5793 | sales@nwcustomapparel.com</p>
+                    <!-- Terms and Contact -->
+                    <div style="background: #f3f4f6; padding: 25px; border-radius: 8px; text-align: center;">
+                        <p style="margin: 0 0 10px 0; font-weight: 600; color: #1f2937;">Quote Terms</p>
+                        <p style="margin: 0 0 5px 0; color: #6b7280; font-size: 14px;">This quote is valid for 30 days from the date shown above.</p>
+                        <p style="margin: 0 0 20px 0; color: #6b7280; font-size: 14px;">Prices subject to change after expiration.</p>
+                        
+                        <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 20px;">
+                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #1f2937;">Contact Information</p>
+                            <p style="margin: 0 0 3px 0; color: #6b7280;">Ruth Nhong - Production Manager</p>
+                            <p style="margin: 0 0 3px 0; color: #6b7280;">📞 253-922-5793 | ✉️ sales@nwcustomapparel.com</p>
+                            <p style="margin: 0; color: #6b7280;">2025 Freeman Road East, Milton, WA 98354</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                        <p style="margin: 0; color: #9ca3af; font-size: 12px;">Family Owned and Operated Since 1977</p>
+                        <p style="margin: 5px 0 0 0; color: #9ca3af; font-size: 12px;">www.nwcustomapparel.com</p>
                     </div>
                 </div>
             `;
