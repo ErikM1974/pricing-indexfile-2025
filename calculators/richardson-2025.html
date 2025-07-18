@@ -2700,20 +2700,320 @@
                     return;
                 }
                 
-                // Ensure print content is prepared with current quote data
-                this.preparePrintContent();
-                
-                // Call the existing print functionality
-                window.print();
+                // Generate professional invoice in new window
+                this.generatePrintInvoice();
             }
 
-            preparePrintContent() {
-                // This method ensures the print content is ready before printing
-                // The actual print content is generated in the beforeprint event listener
-                // We just need to ensure the quote data is properly accessible
-                if (this.currentQuote && !window.richardsonCalculator) {
-                    window.richardsonCalculator = this;
+            generatePrintInvoice() {
+                const quote = this.currentQuote;
+                const printWindow = window.open('', '_blank');
+                
+                // Build professional invoice HTML
+                const invoiceHtml = this.buildInvoiceHtml(quote);
+                
+                printWindow.document.write(invoiceHtml);
+                printWindow.document.close();
+                
+                // Print when loaded
+                printWindow.onload = function() {
+                    printWindow.print();
+                    printWindow.onafterprint = function() {
+                        printWindow.close();
+                    };
+                };
+            }
+
+            buildInvoiceHtml(quote) {
+                // Calculate pricing details
+                const hasLTM = quote.totalQuantity < 24;
+                let basePricePerCap = 0;
+                let ltmPerUnit = 0;
+                
+                if (hasLTM && quote.items.length > 0) {
+                    ltmPerUnit = quote.items[0].ltmPerUnit || 0;
+                    basePricePerCap = quote.items[0].pricePerPiece - ltmPerUnit;
                 }
+
+                // Generate items HTML
+                const itemsHtml = quote.items.map(item => `
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                            <strong>${item.styleNumber}</strong> - ${item.description}
+                        </td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${item.pricePerPiece.toFixed(2)}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${item.lineTotal.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+
+                // Setup fees section
+                let setupFeesHtml = '';
+                if (quote.setupFees && quote.setupFees.total > 0) {
+                    const fees = [];
+                    if (quote.setupFees.digitizing > 0) {
+                        fees.push(`Digitizing Fee: $${quote.setupFees.digitizing.toFixed(2)}`);
+                    }
+                    if (quote.setupFees.graphicDesign > 0) {
+                        fees.push(`Graphic Design Fee: $${quote.setupFees.graphicDesign.toFixed(2)}`);
+                    }
+                    quote.setupFees.additional.forEach(fee => {
+                        fees.push(`${fee.name}: $${fee.amount.toFixed(2)}`);
+                    });
+                    
+                    setupFeesHtml = `
+                        <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="margin: 0 0 10px 0; color: #92400e;">Setup & Additional Fees</h3>
+                            <div style="color: #92400e;">${fees.join(' • ')}</div>
+                            <div style="margin-top: 10px; font-weight: bold; color: #92400e;">
+                                Setup Fees Total: $${quote.setupFees.total.toFixed(2)}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // LTM breakdown
+                let ltmBreakdownHtml = '';
+                if (hasLTM) {
+                    ltmBreakdownHtml = `
+                        <div style="background: #f0f7f1; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #c6e9d0;">
+                            <h3 style="margin: 0 0 10px 0; color: #1f2937;">Price Breakdown</h3>
+                            <table style="width: 100%; font-size: 14px;">
+                                <tr>
+                                    <td>Base cap with ${quote.embellishmentType === 'embroidery' ? 'embroidery' : 'leatherette patch'}:</td>
+                                    <td style="text-align: right;">$${basePricePerCap.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td>Minimum order adjustment:</td>
+                                    <td style="text-align: right;">$${ltmPerUnit.toFixed(2)}</td>
+                                </tr>
+                                <tr style="border-top: 1px solid #c6e9d0; font-weight: bold;">
+                                    <td style="padding-top: 8px;">Your price per cap:</td>
+                                    <td style="text-align: right; padding-top: 8px;">$${quote.items[0].pricePerPiece.toFixed(2)}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    `;
+                }
+
+                // Notes section
+                let notesHtml = '';
+                if (quote.notes) {
+                    notesHtml = `
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #ffeaa7;">
+                            <h3 style="margin: 0 0 10px 0; color: #856404;">Notes</h3>
+                            <p style="margin: 0; color: #856404;">${quote.notes}</p>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Quote ${quote.quoteId} - Northwest Custom Apparel</title>
+                        <style>
+                            @media print {
+                                body { margin: 0; }
+                                @page { margin: 0.5in; }
+                            }
+                            body {
+                                font-family: Arial, sans-serif;
+                                max-width: 800px;
+                                margin: 0 auto;
+                                padding: 20px;
+                                color: #333;
+                            }
+                            .header {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-start;
+                                margin-bottom: 30px;
+                                padding-bottom: 20px;
+                                border-bottom: 3px solid #4cb354;
+                            }
+                            .logo {
+                                max-width: 300px;
+                                height: auto;
+                            }
+                            .quote-info {
+                                text-align: right;
+                            }
+                            .quote-title {
+                                font-size: 32px;
+                                font-weight: bold;
+                                color: #4cb354;
+                                margin: 0;
+                            }
+                            .quote-id {
+                                font-size: 20px;
+                                font-weight: bold;
+                                margin: 5px 0;
+                            }
+                            .customer-info {
+                                display: flex;
+                                gap: 30px;
+                                margin-bottom: 30px;
+                            }
+                            .customer-box, .order-box {
+                                flex: 1;
+                                background: #f8f9fa;
+                                padding: 20px;
+                                border-radius: 8px;
+                            }
+                            .section-title {
+                                font-size: 14px;
+                                font-weight: bold;
+                                color: #666;
+                                text-transform: uppercase;
+                                margin: 0 0 10px 0;
+                            }
+                            .pricing-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin: 20px 0;
+                            }
+                            .pricing-table th {
+                                background: #4cb354;
+                                color: white;
+                                padding: 12px;
+                                text-align: left;
+                            }
+                            .pricing-table td {
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            }
+                            .total-section {
+                                background: #4cb354;
+                                color: white;
+                                padding: 20px;
+                                text-align: center;
+                                border-radius: 8px;
+                                margin: 30px 0;
+                            }
+                            .total-label {
+                                font-size: 24px;
+                                font-weight: bold;
+                                margin-bottom: 10px;
+                            }
+                            .total-amount {
+                                font-size: 36px;
+                                font-weight: bold;
+                            }
+                            .footer {
+                                text-align: center;
+                                margin-top: 40px;
+                                padding-top: 20px;
+                                border-top: 1px solid #ddd;
+                                color: #666;
+                            }
+                            .terms {
+                                background: #f8f9fa;
+                                padding: 20px;
+                                border-radius: 8px;
+                                margin: 20px 0;
+                            }
+                            .terms ul {
+                                margin: 10px 0;
+                                padding-left: 20px;
+                            }
+                            .terms li {
+                                margin: 5px 0;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <div>
+                                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                                     alt="Northwest Custom Apparel" class="logo">
+                                <div style="margin-top: 15px; font-size: 12px; color: #666;">
+                                    2025 Freeman Road East, Milton, WA 98354<br>
+                                    Phone: 253-922-5793 | www.nwcustomapparel.com
+                                </div>
+                            </div>
+                            <div class="quote-info">
+                                <h1 class="quote-title">QUOTE</h1>
+                                <div class="quote-id">${quote.quoteId}</div>
+                                <div>Date: ${new Date().toLocaleDateString()}</div>
+                                <div>Valid Until: ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</div>
+                            </div>
+                        </div>
+
+                        <div class="customer-info">
+                            <div class="customer-box">
+                                <div class="section-title">Customer Information</div>
+                                <div style="font-size: 16px;">
+                                    <strong>${quote.customerName || 'Customer'}</strong><br>
+                                    ${quote.companyName ? `${quote.companyName}<br>` : ''}
+                                    ${quote.customerEmail ? `${quote.customerEmail}<br>` : ''}
+                                    ${quote.customerPhone ? `${quote.customerPhone}<br>` : ''}
+                                </div>
+                            </div>
+                            <div class="order-box">
+                                <div class="section-title">Order Details</div>
+                                <div style="font-size: 14px;">
+                                    <strong>Total Quantity:</strong> ${quote.totalQuantity} pieces<br>
+                                    <strong>Embellishment:</strong> ${quote.embellishmentType === 'embroidery' ? 'Embroidery' : 'Leatherette Patch'}<br>
+                                    ${quote.embellishmentType === 'embroidery' ? `<strong>Stitch Count:</strong> ${quote.stitchCountText || 'Up to 10,000 stitches'}<br>` : ''}
+                                    ${quote.projectName ? `<strong>Project:</strong> ${quote.projectName}<br>` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2 style="color: #1f2937; margin-bottom: 15px;">Cap Pricing Details</h2>
+                        
+                        <table class="pricing-table">
+                            <thead>
+                                <tr>
+                                    <th>Item Description</th>
+                                    <th style="text-align: center; width: 100px;">Quantity</th>
+                                    <th style="text-align: right; width: 100px;">Unit Price</th>
+                                    <th style="text-align: right; width: 100px;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemsHtml}
+                                <tr style="background: #f8f9fa; font-weight: bold;">
+                                    <td colspan="3" style="text-align: right; padding: 15px;">Products Subtotal:</td>
+                                    <td style="text-align: right; padding: 15px;">$${quote.subtotal.toFixed(2)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        ${setupFeesHtml}
+                        ${ltmBreakdownHtml}
+                        ${notesHtml}
+
+                        <div class="total-section">
+                            <div class="total-label">Grand Total</div>
+                            <div class="total-amount">$${quote.grandTotal.toFixed(2)}</div>
+                            <div style="font-size: 14px; margin-top: 10px;">Includes all products and setup fees</div>
+                        </div>
+
+                        <div class="terms">
+                            <h3 style="margin: 0 0 10px 0;">Terms & Conditions</h3>
+                            <ul>
+                                <li>This quote is valid for 30 days from the date shown above</li>
+                                <li>Prices subject to change after expiration</li>
+                                <li>Setup fees may apply for embroidery digitization</li>
+                                <li>Minimum order quantity applies</li>
+                                <li>Payment terms: Net 30 days</li>
+                            </ul>
+                        </div>
+
+                        <div class="footer">
+                            <div style="font-weight: bold; margin-bottom: 5px;">
+                                ${quote.salesRepName || 'General Sales'} - ${quote.salesRepEmail || 'sales@nwcustomapparel.com'}
+                            </div>
+                            <div>Questions? Call us at 253-922-5793</div>
+                            <div style="margin-top: 15px; font-style: italic;">
+                                Family Owned and Operated Since 1977
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `;
             }
 
             showError(message) {
@@ -2992,218 +3292,8 @@
             window.richardsonCalculator = new RichardsonCalculator();
         });
 
-        // Print functionality
-        window.addEventListener('beforeprint', () => {
-            console.log('Print event triggered');
-            if (!window.richardsonCalculator?.currentQuote) {
-                console.log('No current quote available');
-                return;
-            }
-            
-            const quote = window.richardsonCalculator.currentQuote;
-            const printContent = document.getElementById('printContent');
-            
-            if (!printContent) {
-                console.error('Print content element not found');
-                return;
-            }
-            
-            console.log('Generating print content for quote:', quote);
-            
-            // Build print-friendly content
-            let itemsHtml = '';
-            quote.items.forEach((item, index) => {
-                itemsHtml += `
-                    <tr>
-                        <td style="padding: 8px 10px; border: 1px solid #e5e7eb;">
-                            <strong>${item.styleNumber}</strong> - ${item.description}
-                        </td>
-                        <td style="padding: 8px 10px; border: 1px solid #e5e7eb; text-align: center;">${item.quantity}</td>
-                        <td style="padding: 8px 10px; border: 1px solid #e5e7eb; text-align: right;">$${item.pricePerPiece.toFixed(2)}</td>
-                        <td style="padding: 8px 10px; border: 1px solid #e5e7eb; text-align: right;">$${item.lineTotal.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-            
-            // Calculate base price without LTM for breakdown
-            const hasLTM = quote.totalQuantity < 24;
-            let basePricePerCap = 0;
-            let ltmPerUnit = 0;
-            
-            if (hasLTM && quote.items.length > 0) {
-                ltmPerUnit = quote.items[0].ltmPerUnit || 0;
-                basePricePerCap = quote.items[0].pricePerPiece - ltmPerUnit;
-            }
-            
-            // Build a compact single-page print layout
-            printContent.innerHTML = `
-                <div style="max-width: 800px; margin: 0 auto; padding: 15px; font-family: Arial, sans-serif; color: #333;">
-                    <!-- Compact Header -->
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
-                        <div>
-                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                                 alt="Northwest Custom Apparel" 
-                                 style="width: 100px; height: auto;">
-                            <div style="font-size: 10px; color: #666; margin-top: 5px;">
-                                Northwest Custom Apparel<br>
-                                2025 Freeman Road East, Milton, WA 98354<br>
-                                Phone: 253-922-5793<br>
-                                www.nwcustomapparel.com
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 18px; font-weight: bold; color: #4cb354;">QUOTE</div>
-                            <div style="font-size: 12px; font-weight: bold; margin: 2px 0;">${quote.quoteId || 'QUOTE-ID-PENDING'}</div>
-                            <div style="font-size: 10px;">Date: ${new Date().toLocaleDateString()}</div>
-                            <div style="font-size: 10px;">Valid Until: ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</div>
-                        </div>
-                    </div>
-                    
-                    <h3 style="margin: 0 0 10px 0; font-size: 14px; color: #1f2937;">Quote Overview</h3>
-                    
-                    <!-- Customer & Order Info - Side by Side -->
-                    <div style="display: flex; gap: 15px; margin-bottom: 12px;">
-                        <div style="flex: 1; background: #f8f9fa; padding: 8px; border-radius: 4px;">
-                            <h4 style="margin: 0 0 3px 0; font-size: 10px; color: #666; text-transform: uppercase;">CUSTOMER INFORMATION</h4>
-                            <div style="font-size: 11px;">
-                                <strong>${quote.customerName || 'Customer'}</strong>
-                                ${quote.companyName ? `<br>${quote.companyName}` : ''}
-                                ${quote.customerEmail ? `<br>${quote.customerEmail}` : ''}
-                                ${quote.customerPhone ? `<br>${quote.customerPhone}` : ''}
-                            </div>
-                        </div>
-                        <div style="flex: 1; background: #f8f9fa; padding: 8px; border-radius: 4px;">
-                            <h4 style="margin: 0 0 3px 0; font-size: 10px; color: #666; text-transform: uppercase;">ORDER DETAILS</h4>
-                            <table style="font-size: 11px; width: 100%;">
-                                <tr><td style="padding: 1px 0;">Total Quantity:</td><td style="text-align: right; font-weight: bold;">${quote.totalQuantity} pieces</td></tr>
-                                <tr><td style="padding: 1px 0;">Embellishment:</td><td style="text-align: right; font-weight: bold;">${quote.embellishmentType === 'embroidery' ? 'Embroidery' : 'Leatherette Patch'}</td></tr>
-                                ${quote.embellishmentType === 'embroidery' ? `<tr><td style="padding: 1px 0;">Stitch Count:</td><td style="text-align: right; font-weight: bold;">${quote.stitchCountText || 'Up to 10,000 stitches'}</td></tr>` : ''}
-                                ${quote.projectName ? `<tr><td style="padding: 1px 0;">Project:</td><td style="text-align: right; font-weight: bold;">${quote.projectName}</td></tr>` : ''}
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <!-- Cap Pricing Details -->
-                    <h3 style="margin: 12px 0 8px 0; font-size: 13px; color: #1f2937;">Cap Pricing Details</h3>
-                    
-                    <!-- Unified Pricing Table -->
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px;">
-                        <thead>
-                            <tr style="background-color: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
-                                <th style="padding: 6px; text-align: left;">Item Description</th>
-                                <th style="padding: 6px; text-align: center; width: 60px;">Quantity</th>
-                                <th style="padding: 6px; text-align: right; width: 70px;">Unit Price</th>
-                                <th style="padding: 6px; text-align: right; width: 70px;">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-            
-            // Generate item rows with modified styles
-            const printItemsHtml = quote.items.map(item => `
-                            <tr style="border-bottom: 1px solid #f0f0f0;">
-                                <td style="padding: 5px 6px; font-weight: 500;">${item.styleNumber} - ${item.description}</td>
-                                <td style="padding: 5px 6px; text-align: center;">${item.quantity}</td>
-                                <td style="padding: 5px 6px; text-align: right;">$${item.pricePerPiece.toFixed(2)}</td>
-                                <td style="padding: 5px 6px; text-align: right;">$${item.lineTotal.toFixed(2)}</td>
-                            </tr>
-            `).join('');
-            
-            printContent.innerHTML += printItemsHtml;
-            
-            // Products Subtotal
-            printContent.innerHTML += `
-                            <tr style="background-color: #f8f9fa;">
-                                <td colspan="3" style="padding: 5px 6px; text-align: right; font-weight: bold;">Products Subtotal:</td>
-                                <td style="padding: 5px 6px; text-align: right; font-weight: bold;">$${quote.subtotal.toFixed(2)}</td>
-                            </tr>
-                        </tbody>
-                    </table>`;
-            
-            // Setup & Additional Fees Section
-            if (quote.setupFees && quote.setupFees.total > 0) {
-                printContent.innerHTML += `
-                    <h3 style="margin: 12px 0 8px 0; font-size: 13px; color: #1f2937;">Setup & Additional Fees</h3>
-                    <div style="background: #fef3c7; padding: 8px; border-radius: 4px; margin-bottom: 10px; font-size: 11px;">`;
-                
-                const fees = [];
-                if (quote.setupFees.digitizing > 0) {
-                    fees.push(`Digitizing Fee $${quote.setupFees.digitizing.toFixed(2)}`);
-                }
-                if (quote.setupFees.graphicDesign > 0) {
-                    fees.push(`Graphic Design Fee $${quote.setupFees.graphicDesign.toFixed(2)}`);
-                }
-                quote.setupFees.additional.forEach(fee => {
-                    fees.push(`${fee.name} $${fee.amount.toFixed(2)}`);
-                });
-                
-                printContent.innerHTML += fees.join(' • ');
-                printContent.innerHTML += ` <strong>Setup Fees Total: $${quote.setupFees.total.toFixed(2)}</strong>
-                    </div>`;
-            }
-            
-            // Grand Total
-            printContent.innerHTML += `
-                    <div style="background-color: #4cb354; color: white; padding: 12px; text-align: center; margin-bottom: 10px; border-radius: 4px;">
-                        <div style="font-size: 20px; font-weight: bold;">Grand Total</div>
-                        <div style="font-size: 24px; font-weight: bold;">$${quote.grandTotal.toFixed(2)}</div>
-                        <div style="font-size: 10px; margin-top: 4px;">Includes all products and setup fees</div>
-                    </div>`;
-                        
-            // Price Breakdown for LTM
-            if (hasLTM) {
-                printContent.innerHTML += `
-                    <div style="background-color: #f0f7f1; padding: 10px; margin-bottom: 10px; border: 1px solid #c6e9d0; border-radius: 4px;">
-                        <h4 style="margin: 0 0 6px 0; font-size: 12px; color: #1f2937;">Price Breakdown:</h4>
-                        <table style="font-size: 11px; width: 100%;">
-                            <tr><td>Base cap with ${quote.embellishmentType === 'embroidery' ? 'embroidery' : 'leatherette patch'}:</td><td style="text-align: right;">$${basePricePerCap.toFixed(2)}</td></tr>
-                            <tr><td>Minimum order adjustment:</td><td style="text-align: right;">$${ltmPerUnit.toFixed(2)}</td></tr>
-                            <tr style="font-weight: bold; border-top: 1px solid #c6e9d0;"><td style="padding-top: 4px;">Your price per cap:</td><td style="text-align: right; padding-top: 4px;">$${quote.items[0].pricePerPiece.toFixed(2)}</td></tr>
-                        </table>
-                    </div>`;
-            }
-                        
-            // Notes
-            if (quote.notes) {
-                printContent.innerHTML += `
-                    <div style="background-color: #fff3cd; padding: 10px; margin-bottom: 10px; border: 1px solid #ffeaa7; border-radius: 4px;">
-                        <h4 style="margin: 0 0 4px 0; font-size: 12px; color: #856404;">Notes:</h4>
-                        <p style="margin: 0; font-size: 11px; color: #856404;">${quote.notes}</p>
-                    </div>`;
-            }
-            
-            // Terms & Conditions
-            printContent.innerHTML += `
-                    <div style="background-color: #f8f9fa; padding: 10px; margin-bottom: 10px; border: 1px solid #e5e7eb; border-radius: 4px;">
-                        <h4 style="margin: 0 0 6px 0; font-size: 12px;">Terms & Conditions</h4>
-                        <ul style="margin: 0; padding-left: 20px; font-size: 10px;">
-                            <li style="margin: 2px 0;">This quote is valid for 30 days from the date shown above</li>
-                            <li style="margin: 2px 0;">Prices subject to change after expiration</li>
-                            <li style="margin: 2px 0;">Setup fees may apply for embroidery digitization</li>
-                            <li style="margin: 2px 0;">Minimum order quantity applies</li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Contact Footer -->
-                    <div style="text-align: center; font-size: 11px; color: #666; margin-top: 15px;">
-                        <div style="font-weight: bold; color: #333;">${quote.salesRepName || 'General Sales'} - ${quote.salesRepEmail || 'sales@nwcustomapparel.com'}</div>
-                        <div style="margin-top: 3px;">Questions? Call us at 253-922-5793</div>
-                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb;">Family Owned and Operated Since 1977</div>
-                    </div>
-                </div>
-            `;
-            
-            console.log('Print content HTML length:', printContent.innerHTML.length);
-            printContent.style.display = 'block';
-            console.log('Print content display set to block');
-        });
-
-        window.addEventListener('afterprint', () => {
-            console.log('After print - hiding print content');
-            const printContent = document.getElementById('printContent');
-            if (printContent) {
-                printContent.style.display = 'none';
-            }
-        });
+        // Note: Print functionality now uses direct window.open() method
+        // Old beforeprint/afterprint event listeners removed in favor of generatePrintInvoice()
 
     </script>
 </body>
