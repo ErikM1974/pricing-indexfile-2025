@@ -124,6 +124,18 @@ app.get('/announcements-manage.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'announcements-manage.html'));
 });
 
+app.get('/ae-art-dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'ae-art-dashboard.html'));
+});
+
+app.get('/ae-submit-art.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'ae-submit-art.html'));
+});
+
+app.get('/ae-art-report.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'ae-art-report.html'));
+});
+
 // API configuration
 const API_BASE_URL = process.env.API_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
 
