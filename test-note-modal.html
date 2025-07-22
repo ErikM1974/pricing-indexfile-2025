@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Note Modal - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #981e32;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .test-button {
+            background: #981e32;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background: #7a1829;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4e8;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .test-table th, .test-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .test-table th {
+            background: #981e32;
+            color: white;
+        }
+        .add-note-link {
+            color: #981e32;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .add-note-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Modal styles (copied from ae-art-report.html) */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .modal-header {
+            background-color: #981e32;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 20px;
+        }
+        
+        .close:hover,
+        .close:focus {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Art Hub Note Modal Test Page</h1>
+        
+        <div class="test-section">
+            <h2>Test Controls</h2>
+            <button class="test-button" onclick="runAllTests()">Run All Tests</button>
+            <button class="test-button" onclick="testModalFunctions()">Test Functions</button>
+            <button class="test-button" onclick="testModalDOM()">Test DOM Elements</button>
+            <button class="test-button" onclick="testModalBehavior()">Test Behavior</button>
+        </div>
+
+        <div class="test-section">
+            <h2>Simulated AE Report Table</h2>
+            <table class="test-table">
+                <thead>
+                    <tr>
+                        <th>ID_Design</th>
+                        <th>Company</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1234</td>
+                        <td>ABC Company</td>
+                        <td>In Progress</td>
+                        <td><a href="#" class="add-note-link" onclick="openNoteModal('1234'); return false;">Add Note</a></td>
+                    </tr>
+                    <tr>
+                        <td>5678</td>
+                        <td>XYZ Corporation</td>
+                        <td>Submitted</td>
+                        <td><a href="#" class="add-note-link" onclick="openNoteModal('5678'); return false;">Add Note</a></td>
+                    </tr>
+                    <tr>
+                        <td>9999</td>
+                        <td>Test Company</td>
+                        <td>Awaiting Approval</td>
+                        <td><a href="#" class="add-note-link" onclick="openNoteModal('9999'); return false;">Add Note</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="testResults" class="test-results">Click "Run All Tests" to begin...</div>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Notes -->
+    <div id="noteModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Note to Request #<span id="requestId"></span></h3>
+                <span class="close" onclick="closeNoteModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <iframe id="noteFrame" src="" style="width:100%; height:400px; border:none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Modal functions (copied from ae-art-report.html)
+    function openNoteModal(designId) {
+        document.getElementById('requestId').textContent = designId;
+        document.getElementById('noteFrame').src = 'https://c3eku948.caspio.com/dp/a0e15000bc57622bf42c450cb7a5?ID_Design=' + designId;
+        document.getElementById('noteModal').style.display = 'block';
+    }
+
+    function closeNoteModal() {
+        document.getElementById('noteModal').style.display = 'none';
+        document.getElementById('noteFrame').src = '';
+        // For testing, we'll skip the page reload
+        console.log('closeNoteModal called - page reload skipped for testing');
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('noteModal')) {
+            closeNoteModal();
+        }
+    }
+
+    // Test functions
+    function log(message, type = 'info') {
+        const results = document.getElementById('testResults');
+        const timestamp = new Date().toLocaleTimeString();
+        const prefix = type === 'pass' ? '✓' : type === 'fail' ? '✗' : '→';
+        const color = type === 'pass' ? 'green' : type === 'fail' ? 'red' : 'black';
+        results.innerHTML += `<span style="color: ${color}">[${timestamp}] ${prefix} ${message}</span>\n`;
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+
+    function testModalFunctions() {
+        log('=== Testing Modal Functions ===', 'info');
+        
+        // Test if functions exist
+        if (typeof openNoteModal === 'function') {
+            log('openNoteModal function exists', 'pass');
+        } else {
+            log('openNoteModal function NOT found', 'fail');
+        }
+        
+        if (typeof closeNoteModal === 'function') {
+            log('closeNoteModal function exists', 'pass');
+        } else {
+            log('closeNoteModal function NOT found', 'fail');
+        }
+        
+        // Test if window.onclick is defined
+        if (window.onclick && typeof window.onclick === 'function') {
+            log('window.onclick handler exists', 'pass');
+        } else {
+            log('window.onclick handler NOT found', 'fail');
+        }
+    }
+
+    function testModalDOM() {
+        log('=== Testing DOM Elements ===', 'info');
+        
+        // Test modal element
+        const modal = document.getElementById('noteModal');
+        if (modal) {
+            log('Modal element found', 'pass');
+            log(`Modal initial display: ${modal.style.display}`, 'info');
+        } else {
+            log('Modal element NOT found', 'fail');
+            return;
+        }
+        
+        // Test modal content
+        const modalContent = document.querySelector('.modal-content');
+        if (modalContent) {
+            log('Modal content found', 'pass');
+        } else {
+            log('Modal content NOT found', 'fail');
+        }
+        
+        // Test request ID span
+        const requestId = document.getElementById('requestId');
+        if (requestId) {
+            log('Request ID element found', 'pass');
+        } else {
+            log('Request ID element NOT found', 'fail');
+        }
+        
+        // Test iframe
+        const iframe = document.getElementById('noteFrame');
+        if (iframe) {
+            log('Note iframe found', 'pass');
+            log(`Iframe initial src: "${iframe.src}"`, 'info');
+        } else {
+            log('Note iframe NOT found', 'fail');
+        }
+        
+        // Test close button
+        const closeBtn = document.querySelector('.close');
+        if (closeBtn) {
+            log('Close button found', 'pass');
+        } else {
+            log('Close button NOT found', 'fail');
+        }
+    }
+
+    function testModalBehavior() {
+        log('=== Testing Modal Behavior ===', 'info');
+        
+        // Test opening modal
+        try {
+            openNoteModal('TEST123');
+            
+            const modal = document.getElementById('noteModal');
+            const requestId = document.getElementById('requestId');
+            const iframe = document.getElementById('noteFrame');
+            
+            if (modal.style.display === 'block') {
+                log('Modal opened successfully', 'pass');
+            } else {
+                log(`Modal failed to open. Display: ${modal.style.display}`, 'fail');
+            }
+            
+            if (requestId.textContent === 'TEST123') {
+                log('Request ID set correctly', 'pass');
+            } else {
+                log(`Request ID incorrect. Expected: TEST123, Got: ${requestId.textContent}`, 'fail');
+            }
+            
+            const expectedSrc = 'https://c3eku948.caspio.com/dp/a0e15000bc57622bf42c450cb7a5/emb?ID_Design=TEST123';
+            if (iframe.src === expectedSrc) {
+                log('Iframe src set correctly', 'pass');
+            } else {
+                log(`Iframe src incorrect.\nExpected: ${expectedSrc}\nGot: ${iframe.src}`, 'fail');
+            }
+            
+            // Test closing modal
+            closeNoteModal();
+            
+            if (modal.style.display === 'none') {
+                log('Modal closed successfully', 'pass');
+            } else {
+                log(`Modal failed to close. Display: ${modal.style.display}`, 'fail');
+            }
+            
+            if (iframe.src === '') {
+                log('Iframe src cleared successfully', 'pass');
+            } else {
+                log(`Iframe src not cleared. Current: ${iframe.src}`, 'fail');
+            }
+            
+        } catch (error) {
+            log(`Error during behavior test: ${error.message}`, 'fail');
+        }
+    }
+
+    function runAllTests() {
+        document.getElementById('testResults').innerHTML = '';
+        log('Starting Modal Tests...', 'info');
+        log('', 'info');
+        
+        testModalFunctions();
+        log('', 'info');
+        
+        testModalDOM();
+        log('', 'info');
+        
+        testModalBehavior();
+        log('', 'info');
+        
+        log('=== Tests Complete ===', 'info');
+    }
+    </script>
+</body>
+</html>
