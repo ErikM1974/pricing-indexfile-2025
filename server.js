@@ -116,6 +116,14 @@ app.get('/universal-records-admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'universal-records-admin.html'));
 });
 
+app.get('/art-hub-detail.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'art-hub-detail.html'));
+});
+
+app.get('/art-hub-dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'art-hub-dashboard.html'));
+});
+
 app.get('/announcements-create.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'announcements-create.html'));
 });
