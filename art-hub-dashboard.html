@@ -152,6 +152,8 @@
     function closeNoteModal() {
         document.getElementById('noteModal').style.display = 'none';
         document.getElementById('noteFrame').src = '';
+        // Refresh the page to show the newly added note
+        window.location.reload();
     }
 
     // Close modals when clicking outside of them
