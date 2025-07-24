@@ -161,10 +161,6 @@
     function closeNoteModal() {
         document.getElementById('noteModal').style.display = 'none';
         document.getElementById('noteFrame').src = '';
-        // Refresh the page to show any new notes
-        setTimeout(function() {
-            location.reload();
-        }, 500);
     }
 
     // Modal functions for View Notes functionality
