@@ -130,6 +130,9 @@
     </div>
     
     <script>
+    // Track if a note was successfully submitted
+    let noteWasSubmitted = false;
+
     // Modal functions for View Notes functionality
     function viewNotesModal(designId) {
         document.getElementById('viewNotesRequestId').textContent = designId;
@@ -144,6 +147,8 @@
 
     // Modal functions for Add Note functionality
     function openNoteModal(designId) {
+        // Reset the submission flag when opening a new modal
+        noteWasSubmitted = false;
         document.getElementById('requestId').textContent = designId;
         document.getElementById('noteFrame').src = 'https://c3eku948.caspio.com/dp/a0e15000bc57622bf42c450cb7a5?ID_Design=' + designId;
         document.getElementById('noteModal').style.display = 'block';
@@ -152,8 +157,12 @@
     function closeNoteModal() {
         document.getElementById('noteModal').style.display = 'none';
         document.getElementById('noteFrame').src = '';
-        // Refresh the page to show the newly added note
-        window.location.reload();
+        
+        // Only refresh if a note was actually submitted
+        if (noteWasSubmitted) {
+            window.location.reload();
+            noteWasSubmitted = false; // Reset flag
+        }
     }
 
     // Close modals when clicking outside of them
@@ -168,6 +177,8 @@
     // Listen for messages from the iframe (in case Caspio sends a close message)
     window.addEventListener('message', function(event) {
         if (event.data === 'closeModal' || event.data === 'formSubmitted') {
+            // Set flag to indicate successful submission
+            noteWasSubmitted = true;
             closeNoteModal();
         }
     });
