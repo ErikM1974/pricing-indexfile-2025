@@ -1,20 +1,70 @@
-# Claude Assistant Guide for NWCA Pricing System
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+# Northwest Custom Apparel (NWCA) Pricing System
 
 ## Project Overview
 
-This is the Northwest Custom Apparel (NWCA) pricing system, a web application that provides pricing calculators for various decoration methods (embroidery, DTG, laser engraving, etc.) on apparel and promotional products.
+The NWCA Pricing System is a comprehensive web application providing dynamic pricing calculators for various decoration methods on apparel and promotional products. It features product catalog browsing, real-time pricing calculations, quote generation with database persistence, and staff management tools.
 
-## Claude Rules
-1. First think through the problem, read the codebase for relevant files, and write a plan to tasks/todo.md.
-2. The plan should have a list of todo items that you can check off as you complete them
-3. Before you begin working, check in with me and I will verify the plan.
-4. Then, begin working on the todo items, marking them as complete as you go.
-5. Please every step of the way just give me a high level explanation of what changes you made
-6. Make every task and code change you do as simple as possible. We want to avoid making any massive or complex changes. Every change should impact as little code as possible. Everything is about simplicity.
+## Development Commands
 
+```bash
+# Development
+npm start          # Start Node.js proxy server (port 3000)
+npm run dev        # Run webpack dev server for frontend development
+npm run build:dev  # Build for development
 
-## Security prompt:
-Please check through all the code you just wrote and make sure it follows security best practices. make sure there are no sensitive information in the front and and there are no vulnerabilities that can be exploited
+# Production
+npm run build      # Build for production (minified, optimized)
+npm analyze        # Analyze bundle size
+
+# Utility
+npm run clean      # Clean dist directory
+```
+
+## High-Level Architecture
+
+### Master Bundle Pattern
+The system uses a "Master Bundle" approach where Caspio sends comprehensive pricing data that's managed client-side:
+
+1. **Caspio Backend** → Calculates ALL price permutations for a decoration type
+2. **PostMessage Communication** → Sends master bundle to adapter via iframe
+3. **Adapters** (e.g., `DTGAdapter.js`) → Store bundle and extract relevant pricing based on user selections
+4. **Event System** → Adapters dispatch `pricingDataLoaded` events
+5. **UI Components** → Listen for events and update pricing displays
+
+### Key Architectural Components
+
+1. **Adapters** (`/shared_components/js/*-adapter.js`)
+   - Each decoration type has its own adapter
+   - Handles master bundle storage and data extraction
+   - Dispatches standardized events
+
+2. **Quote System** 
+   - Two-table database structure: `quote_sessions` + `quote_items`
+   - Quote IDs follow pattern: `[PREFIX][MMDD]-[sequence]`
+   - Database operations via Heroku proxy API
+
+3. **Cart Management** (`shared_components/js/cart.js`)
+   - Local and server-side session management
+   - Enforces business rules (single embellishment type per cart)
+   - Real-time price recalculation
+
+4. **API Proxy** (`server.js` → Heroku)
+   - Base URL: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
+   - Handles all Caspio database operations
+   - Modular route structure in `/src/routes/`
+
+## Claude Development Guidelines
+
+1. First understand the existing patterns by reading relevant files
+2. Create a plan in tasks/todo.md before making changes
+3. Make minimal, focused changes that impact as little code as possible
+4. Follow established patterns (adapters, quote system, event communication)
+5. Always verify security - no sensitive data in frontend, validate all inputs
+6. Test changes incrementally using browser console
 
 ## Adding New Documentation
 
@@ -227,3 +277,22 @@ The Art Invoice System provides comprehensive invoice management for design serv
 - **Improved Filtering**: By status, date range, customer, and project
 - **Bulk Operations**: Mark multiple invoices as paid
 - **Mobile Responsive**: Optimized layout for all devices
+
+## Art Hub System
+
+### Overview
+The Art Hub provides a centralized dashboard for managing art requests and notes across different user roles (AEs and Artists).
+
+### Key Features
+- **Role-based dashboards**: Separate views for Account Executives and Artists
+- **Modal-based note system**: Add and view notes without leaving the dashboard
+- **Smart page refresh**: Only refreshes when notes are actually submitted
+- **Royal Blue theme**: Consistent visual design (#4169E1)
+
+### Files
+- `/art-hub-dashboard.html` - Main AE dashboard (green theme)
+- `/art-hub-steve.html` - Artist dashboard (royal blue theme)
+
+### Recent Updates
+- **Conditional refresh logic**: Pages only refresh when notes are submitted via tracking `noteWasSubmitted` flag
+- **Improved user experience**: Prevents unnecessary page refreshes when modals are closed without action
