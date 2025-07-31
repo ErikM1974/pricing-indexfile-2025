@@ -7,8 +7,13 @@
     <title>Artist Dashboard - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <style>
-        /* Minimal styling with GREEN theme for Artist Dashboard */
-        body { margin: 0; font-family: Arial, sans-serif; }
+        /* Enhanced styling with GREEN theme for Artist Dashboard */
+        body { 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
         .minimal-header {
             background: #009900;
             padding: 10px 20px;
@@ -17,7 +22,9 @@
             align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        
         .logo { height: 40px; filter: brightness(0) invert(1); }
+        
         .back-link {
             color: white;
             text-decoration: none;
@@ -27,7 +34,77 @@
             border-radius: 4px;
             transition: all 0.3s;
         }
+        
         .back-link:hover { background: white; color: #009900; }
+        
+        /* Tab Navigation */
+        .tab-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tab-button {
+            background: #f0f0f0;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            color: #333;
+        }
+        
+        .tab-button:hover {
+            background: #e0e0e0;
+        }
+        
+        .tab-button.active {
+            background: #009900;
+            color: white;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #009900;
+        }
         
         /* Modal styles for Notes functionality */
         .modal {
@@ -100,8 +177,32 @@
              alt="Northwest Custom Apparel" class="logo">
         <a href="/staff-dashboard.html" class="back-link">← Back to Staff Dashboard</a>
     </div>
-    <!-- Caspio DataPage Embed -->
-    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a28d5718e81646dd900b/emb"></script>
+    
+    <!-- Tab Container -->
+    <div class="tab-container">
+        <!-- Tab Buttons -->
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="showTab('gallery')">Gallery View</button>
+            <button class="tab-button" onclick="showTab('table')">Table View</button>
+        </div>
+        
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Gallery Tab -->
+            <div id="gallery-tab" class="tab-pane active">
+                <h2 class="tab-title">Art Request Gallery</h2>
+                <!-- Caspio Gallery DataPage Embed -->
+                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a28d5718e81646dd900b/emb"></script>
+            </div>
+            
+            <!-- Table Tab -->
+            <div id="table-tab" class="tab-pane">
+                <h2 class="tab-title">Art Request Details</h2>
+                <!-- Caspio Table DataPage Embed -->
+                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500068c086574c7d4664aacd/emb"></script>
+            </div>
+        </div>
+    </div>
     
     <!-- Modal for Viewing Notes -->
     <div id="viewNotesModal" class="modal view-notes-modal" style="display:none;">
@@ -132,6 +233,33 @@
     <script>
     // Track if a note was successfully submitted
     let noteWasSubmitted = false;
+    
+    // Tab switching functionality
+    function showTab(tabName) {
+        // Remove active class from all buttons and panes
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        
+        // Add active class to selected button and pane
+        if (tabName === 'gallery') {
+            document.querySelectorAll('.tab-button')[0].classList.add('active');
+            document.getElementById('gallery-tab').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab-button')[1].classList.add('active');
+            document.getElementById('table-tab').classList.add('active');
+        }
+        
+        // Save preference
+        localStorage.setItem('artistDashboardTab', tabName);
+    }
+    
+    // Restore saved tab preference on load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedTab = localStorage.getItem('artistDashboardTab');
+        if (savedTab && savedTab === 'table') {
+            showTab('table');
+        }
+    });
 
     // Modal functions for View Notes functionality
     function viewNotesModal(designId) {
