@@ -148,6 +148,19 @@ app.get('/ae-art-report.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'ae-art-report.html'));
 });
 
+// Sanmar Vendor Management Pages
+app.get('/sanmar-invoices.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'sanmar-invoices.html'));
+});
+
+app.get('/sanmar-credits.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'sanmar-credits.html'));
+});
+
+app.get('/sanmar-vendor-portal.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'sanmar-vendor-portal.html'));
+});
+
 // API configuration
 const API_BASE_URL = process.env.API_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
 
