@@ -197,8 +197,20 @@
     <div class="tab-container">
         <!-- Tab Buttons -->
         <div class="tab-buttons">
-            <button class="tab-button active" onclick="showTab('requests')">Art Request Management</button>
+            <button class="tab-button active" onclick="showTab('requests')">
+                Art Request Management
+                <span id="needsInvoiceCount" class="badge" style="display: none; background: #dc3545; color: white; font-size: 0.75rem; padding: 2px 6px; border-radius: 10px; margin-left: 5px;"></span>
+            </button>
             <button class="tab-button" onclick="showTab('submit')">Submit New Design</button>
+            <button class="tab-button" onclick="showTab('create-invoice')">
+                <i class="fas fa-file-invoice-dollar"></i> Create Invoice
+            </button>
+            <button class="tab-button" onclick="showTab('invoices')">
+                <i class="fas fa-chart-line"></i> Invoice Dashboard
+            </button>
+            <button class="tab-button" onclick="showTab('unified')">
+                <i class="fas fa-file-invoice"></i> Unified View
+            </button>
         </div>
         
         <!-- Tab Content -->
@@ -234,6 +246,45 @@
                 </div>
                 <!-- Art Hub Details DataPage -->
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150004e062efde43847c2a3c0/emb"></script>
+            </div>
+            
+            <!-- Create Invoice Tab -->
+            <div id="create-invoice-tab" class="tab-pane">
+                <h2 class="tab-title">Create Art Invoice</h2>
+                <div class="info-message">
+                    <p>Create invoices for completed artwork. Select an art request and generate a professional invoice 
+                    that can be sent directly to the customer.</p>
+                </div>
+                <!-- Embed invoice creator in iframe for better integration -->
+                <iframe src="/calculators/art-invoice-creator.html" 
+                        style="width: 100%; height: 800px; border: none; border-radius: 8px;">
+                </iframe>
+            </div>
+            
+            <!-- Invoice Dashboard Tab -->
+            <div id="invoices-tab" class="tab-pane">
+                <h2 class="tab-title">Art Invoice Dashboard</h2>
+                <div class="info-message">
+                    <p>Track all art invoices, view payment status, send reminders, and manage the complete invoicing workflow. 
+                    Filter by status, date range, or customer.</p>
+                </div>
+                <!-- Embed invoice dashboard in iframe -->
+                <iframe src="/art-invoices-dashboard.html" 
+                        style="width: 100%; height: 800px; border: none; border-radius: 8px;">
+                </iframe>
+            </div>
+            
+            <!-- Unified View Tab -->
+            <div id="unified-tab" class="tab-pane">
+                <h2 class="tab-title">Unified Invoice View</h2>
+                <div class="info-message">
+                    <p>See both art requests needing invoices and existing invoices in one unified view. 
+                    This helps ensure no artwork goes unbilled.</p>
+                </div>
+                <!-- Embed unified dashboard in iframe -->
+                <iframe src="/art-invoice-unified-dashboard.html" 
+                        style="width: 100%; height: 800px; border: none; border-radius: 8px;">
+                </iframe>
             </div>
         </div>
     </div>
@@ -284,8 +335,20 @@
                 document.querySelectorAll('.tab-button')[1].classList.add('active');
                 document.getElementById('submit-tab').classList.add('active');
                 break;
-            case 'details':
+            case 'create-invoice':
                 document.querySelectorAll('.tab-button')[2].classList.add('active');
+                document.getElementById('create-invoice-tab').classList.add('active');
+                break;
+            case 'invoices':
+                document.querySelectorAll('.tab-button')[3].classList.add('active');
+                document.getElementById('invoices-tab').classList.add('active');
+                break;
+            case 'unified':
+                document.querySelectorAll('.tab-button')[4].classList.add('active');
+                document.getElementById('unified-tab').classList.add('active');
+                break;
+            case 'details':
+                // Details tab is not in the navigation but can still be shown programmatically
                 document.getElementById('details-tab').classList.add('active');
                 break;
         }
@@ -297,9 +360,12 @@
     // Restore saved tab preference on load
     document.addEventListener('DOMContentLoaded', function() {
         const savedTab = localStorage.getItem('artHubCoordinatorTab');
-        if (savedTab && (savedTab === 'submit' || savedTab === 'details')) {
+        if (savedTab && ['submit', 'details', 'create-invoice', 'invoices', 'unified'].includes(savedTab)) {
             showTab(savedTab);
         }
+        
+        // Check for art requests needing invoices
+        checkNeedsInvoiceCount();
     });
 
     // Modal functions for View Notes functionality
@@ -351,6 +417,37 @@
             closeNoteModal();
         }
     });
+    
+    // Check for art requests needing invoices
+    async function checkNeedsInvoiceCount() {
+        try {
+            // Fetch art requests that are completed but not invoiced
+            const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests?status=Completed');
+            if (response.ok) {
+                const requests = await response.json();
+                
+                // Filter for requests that don't have invoices yet
+                const needsInvoice = requests.filter(request => {
+                    // Check if the Invoiced field is false or not set
+                    return !request.Invoiced && request.Status === 'Completed';
+                });
+                
+                // Update badge count
+                const badge = document.getElementById('needsInvoiceCount');
+                if (needsInvoice.length > 0) {
+                    badge.textContent = needsInvoice.length;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Error checking invoice count:', error);
+        }
+    }
+    
+    // Refresh invoice count periodically
+    setInterval(checkNeedsInvoiceCount, 60000); // Check every minute
     </script>
 </body>
 </html>
