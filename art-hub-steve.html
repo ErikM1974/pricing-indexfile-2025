@@ -184,6 +184,7 @@
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showTab('gallery')">Gallery View</button>
             <button class="tab-button" onclick="showTab('table')">Table View</button>
+            <button class="tab-button" onclick="showTab('express')">Express Submit Form</button>
         </div>
         
         <!-- Tab Content -->
@@ -200,6 +201,13 @@
                 <h2 class="tab-title">Art Request Details</h2>
                 <!-- Caspio Table DataPage Embed -->
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500068c086574c7d4664aacd/emb"></script>
+            </div>
+            
+            <!-- Express Form Tab -->
+            <div id="express-tab" class="tab-pane">
+                <h2 class="tab-title">Steve's Express Art Submission Form</h2>
+                <!-- Caspio Express Form DataPage Embed -->
+                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500073092d827fb74d968d9d/emb"></script>
             </div>
         </div>
     </div>
@@ -241,12 +249,19 @@
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
         
         // Add active class to selected button and pane
-        if (tabName === 'gallery') {
-            document.querySelectorAll('.tab-button')[0].classList.add('active');
-            document.getElementById('gallery-tab').classList.add('active');
-        } else {
-            document.querySelectorAll('.tab-button')[1].classList.add('active');
-            document.getElementById('table-tab').classList.add('active');
+        switch(tabName) {
+            case 'gallery':
+                document.querySelectorAll('.tab-button')[0].classList.add('active');
+                document.getElementById('gallery-tab').classList.add('active');
+                break;
+            case 'table':
+                document.querySelectorAll('.tab-button')[1].classList.add('active');
+                document.getElementById('table-tab').classList.add('active');
+                break;
+            case 'express':
+                document.querySelectorAll('.tab-button')[2].classList.add('active');
+                document.getElementById('express-tab').classList.add('active');
+                break;
         }
         
         // Save preference
@@ -256,8 +271,8 @@
     // Restore saved tab preference on load
     document.addEventListener('DOMContentLoaded', function() {
         const savedTab = localStorage.getItem('artistDashboardTab');
-        if (savedTab && savedTab === 'table') {
-            showTab('table');
+        if (savedTab && ['table', 'express'].includes(savedTab)) {
+            showTab(savedTab);
         }
     });
 
