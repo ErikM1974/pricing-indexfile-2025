@@ -148,6 +148,14 @@ app.get('/ae-art-report.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'ae-art-report.html'));
 });
 
+app.get('/ae-dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'ae-dashboard.html'));
+});
+
+app.get('/art-hub-coordinator.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'art-hub-coordinator.html'));
+});
+
 // Sanmar Vendor Management Pages
 app.get('/sanmar-invoices.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'sanmar-invoices.html'));
