@@ -10,7 +10,7 @@
         /* Minimal styling matching ae-submit-art.html */
         body { margin: 0; font-family: Arial, sans-serif; }
         .minimal-header {
-            background: #981e32;
+            background: #005A9C;
             padding: 10px 20px;
             display: flex;
             justify-content: space-between;
@@ -27,7 +27,7 @@
             border-radius: 4px;
             transition: all 0.3s;
         }
-        .back-link:hover { background: white; color: #981e32; }
+        .back-link:hover { background: white; color: #005A9C; }
         .content-section { margin: 20px auto; max-width: 1200px; padding: 0 20px; }
         
         /* Modal styles for Add Note */
@@ -54,7 +54,7 @@
         }
         
         .modal-header {
-            background-color: #981e32;
+            background-color: #005A9C;
             color: white;
             padding: 15px 20px;
             border-radius: 8px 8px 0 0;
@@ -84,6 +84,15 @@
         .close:focus {
             opacity: 0.8;
         }
+        
+        /* Specific styling for view notes modal */
+        .view-notes-modal .modal-content {
+            max-width: 800px;
+        }
+        
+        .view-notes-modal .modal-body {
+            padding: 0;
+        }
     </style>
 </head>
 <body>
@@ -103,6 +112,19 @@
         <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000c44a55c41a3c48a98620/emb"></script>
     </div>
     
+    <!-- Modal for Viewing Notes -->
+    <div id="viewNotesModal" class="modal view-notes-modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Notes for Request #<span id="viewNotesRequestId"></span></h3>
+                <span class="close" onclick="closeViewNotesModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <iframe id="viewNotesFrame" src="" style="width:100%; height:500px; border:none;"></iframe>
+            </div>
+        </div>
+    </div>
+    
     <!-- Modal for Adding Notes -->
     <div id="noteModal" class="modal" style="display:none;">
         <div class="modal-content">
@@ -117,8 +139,25 @@
     </div>
     
     <script>
+    // Track if a note was successfully submitted
+    let noteWasSubmitted = false;
+    
+    // Modal functions for View Notes functionality
+    function viewNotesModal(designId) {
+        document.getElementById('viewNotesRequestId').textContent = designId;
+        document.getElementById('viewNotesFrame').src = 'https://c3eku948.caspio.com/dp/a0e15000d8d96d34814b43498414?ID_Design=' + designId;
+        document.getElementById('viewNotesModal').style.display = 'block';
+    }
+
+    function closeViewNotesModal() {
+        document.getElementById('viewNotesModal').style.display = 'none';
+        document.getElementById('viewNotesFrame').src = '';
+    }
+
     // Modal functions for Add Note functionality
     function openNoteModal(designId) {
+        // Reset the submission flag when opening a new modal
+        noteWasSubmitted = false;
         document.getElementById('requestId').textContent = designId;
         document.getElementById('noteFrame').src = 'https://c3eku948.caspio.com/dp/a0e15000bc57622bf42c450cb7a5?ID_Design=' + designId;
         document.getElementById('noteModal').style.display = 'block';
@@ -127,22 +166,28 @@
     function closeNoteModal() {
         document.getElementById('noteModal').style.display = 'none';
         document.getElementById('noteFrame').src = '';
-        // Refresh the page to show any new notes
-        setTimeout(function() {
-            location.reload();
-        }, 500);
+        
+        // Only refresh if a note was actually submitted
+        if (noteWasSubmitted) {
+            window.location.reload();
+            noteWasSubmitted = false; // Reset flag
+        }
     }
 
-    // Close modal when clicking outside of it
+    // Close modals when clicking outside of them
     window.onclick = function(event) {
         if (event.target == document.getElementById('noteModal')) {
             closeNoteModal();
+        } else if (event.target == document.getElementById('viewNotesModal')) {
+            closeViewNotesModal();
         }
     }
 
     // Listen for messages from the iframe (in case Caspio sends a close message)
     window.addEventListener('message', function(event) {
         if (event.data === 'closeModal' || event.data === 'formSubmitted') {
+            // Set flag to indicate successful submission
+            noteWasSubmitted = true;
             closeNoteModal();
         }
     });
