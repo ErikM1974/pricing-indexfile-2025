@@ -500,8 +500,8 @@
         
         /* Expanded state for announcement content */
         .announcement-card.expanded .announcement-card-content {
-            max-height: 200px;
-            overflow-y: auto;
+            max-height: none;
+            overflow: visible;
             padding: 0 1.25rem 1rem 3.25rem;
         }
         
@@ -2760,6 +2760,17 @@
             // Mark as read when expanded
             if (!isExpanded && card.classList.contains('unread')) {
                 markAsRead(id);
+            }
+            
+            // Scroll expanded card into view after a brief delay to allow CSS transition
+            if (!isExpanded) {
+                setTimeout(() => {
+                    card.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
+                        inline: 'nearest'
+                    });
+                }, 150);
             }
         }
         
