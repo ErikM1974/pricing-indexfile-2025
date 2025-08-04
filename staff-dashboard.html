@@ -420,6 +420,12 @@
             gap: 1rem;
             background: white;
             min-height: auto;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .announcement-card-header:hover {
+            background: #f9fafb;
         }
 
         .announcement-card-icon {
@@ -458,6 +464,7 @@
             display: flex;
             gap: 0.5rem;
             flex-shrink: 0;
+            align-items: center;
         }
 
         .announcement-card-actions button {
@@ -475,17 +482,52 @@
             background: var(--hover-bg);
             color: var(--text-primary);
         }
+        
+        .announcement-card-actions .dismiss-btn:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
 
         .announcement-card-content {
             padding: 0 1.25rem 1rem 3.25rem;
             line-height: 1.6;
             color: var(--text-secondary);
             font-size: 0.9rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
         }
         
-        /* Always show announcement content - no accordion */
+        /* Expanded state for announcement content */
+        .announcement-card.expanded .announcement-card-content {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 0 1.25rem 1rem 3.25rem;
+        }
+        
+        /* Expand/collapse button */
         .announcement-card-expand {
-            display: none;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        
+        .announcement-card-expand:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+        
+        .announcement-card-expand i {
+            transition: transform 0.2s ease;
+        }
+        
+        .announcement-card.expanded .announcement-card-expand i {
+            transform: rotate(180deg);
         }
 
         /* Dashboard Grid */
@@ -2627,14 +2669,20 @@
                             <div class="announcement-card ${isUnread ? 'unread' : ''} ${isDismissed ? 'dismissed' : ''}" 
                                  data-id="${announcement.PK_ID}" 
                                  data-type="${announcement.Type || 'info'}">
-                                <div class="announcement-card-header">
+                                <div class="announcement-card-header" onclick="toggleAnnouncementCard(${announcement.PK_ID})">
                                     <i class="${priorityIcon} announcement-card-icon"></i>
                                     <div style="flex: 1;">
                                         <div class="announcement-card-title">${getAnnouncementTitle(announcement)}</div>
                                         ${announcement.Date ? `<div class="announcement-card-meta">Posted ${new Date(announcement.Date).toLocaleDateString()}</div>` : ''}
                                     </div>
                                     <div class="announcement-card-actions">
-                                        <button onclick="dismissAnnouncement(${announcement.PK_ID})" 
+                                        <button class="announcement-card-expand"
+                                                title="Expand announcement"
+                                                aria-label="Expand announcement">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); dismissAnnouncement(${announcement.PK_ID})" 
+                                                class="dismiss-btn"
                                                 title="Dismiss announcement" 
                                                 aria-label="Dismiss announcement">
                                             <i class="fas fa-times"></i>
@@ -2682,6 +2730,34 @@
             card.setAttribute('aria-expanded', !isExpanded);
             
             // Mark as read when opened
+            if (!isExpanded && card.classList.contains('unread')) {
+                markAsRead(id);
+            }
+        }
+        
+        function toggleAnnouncementCard(id) {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            if (!card) return;
+            
+            const isExpanded = card.classList.contains('expanded');
+            const expandButton = card.querySelector('.announcement-card-expand i');
+            
+            // Toggle the expanded state
+            card.classList.toggle('expanded');
+            card.setAttribute('aria-expanded', !isExpanded);
+            
+            // Update the chevron icon
+            if (expandButton) {
+                if (isExpanded) {
+                    expandButton.classList.remove('fa-chevron-up');
+                    expandButton.classList.add('fa-chevron-down');
+                } else {
+                    expandButton.classList.remove('fa-chevron-down');
+                    expandButton.classList.add('fa-chevron-up');
+                }
+            }
+            
+            // Mark as read when expanded
             if (!isExpanded && card.classList.contains('unread')) {
                 markAsRead(id);
             }
