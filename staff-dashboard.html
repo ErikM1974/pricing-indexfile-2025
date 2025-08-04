@@ -389,112 +389,103 @@
             color: var(--gray-800);
         }
 
-        /* Accordion-style Announcement Cards */
+        /* Simplified Announcement Cards */
         .announcement-card {
             background: white;
-            border: 1px solid var(--gray-200);
-            border-radius: 0.5rem;
-            margin-bottom: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
             overflow: hidden;
             transition: all 0.2s;
+            position: relative;
         }
 
         .announcement-card:hover {
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .announcement-card.unread::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--wsu-crimson);
+        .announcement-card.unread {
+            border-left: 4px solid var(--wsu-crimson);
         }
 
         .announcement-card.dismissed {
             opacity: 0.6;
-            background: var(--gray-50);
+            background: #f9f9f9;
         }
 
         .announcement-card-header {
-            padding: 1rem;
-            cursor: pointer;
+            padding: 1rem 1.25rem;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 1rem;
-            background: var(--gray-50);
-            border-bottom: 1px solid var(--gray-200);
-            transition: all 0.2s;
-        }
-
-        .announcement-card-header:hover {
-            background: var(--gray-100);
-        }
-
-        .announcement-card-header:focus {
-            outline: 2px solid var(--wsu-crimson);
-            outline-offset: -2px;
+            background: white;
+            min-height: auto;
         }
 
         .announcement-card-icon {
-            font-size: 1.25rem;
-            color: var(--wsu-crimson);
+            font-size: 1.125rem;
+            margin-top: 0.125rem;
+            flex-shrink: 0;
+        }
+        
+        .announcement-card[data-type="urgent"] .announcement-card-icon {
+            color: #dc2626;
+        }
+        
+        .announcement-card[data-type="important"] .announcement-card-icon {
+            color: #f59e0b;
+        }
+        
+        .announcement-card[data-type="info"] .announcement-card-icon {
+            color: #4cb354;
         }
 
         .announcement-card-title {
             flex: 1;
-            font-weight: 600;
-            color: var(--gray-800);
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
 
         .announcement-card-meta {
-            font-size: 0.75rem;
-            color: var(--gray-500);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
         }
 
         .announcement-card-actions {
             display: flex;
             gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .announcement-card-actions button {
             background: none;
             border: none;
-            color: var(--gray-500);
+            color: var(--text-secondary);
             cursor: pointer;
             padding: 0.25rem;
-            border-radius: 0.25rem;
+            border-radius: 4px;
             transition: all 0.2s;
+            font-size: 0.875rem;
         }
 
         .announcement-card-actions button:hover {
-            background: var(--gray-200);
-            color: var(--gray-700);
-        }
-
-        .announcement-card-actions button:focus {
-            outline: 2px solid var(--wsu-crimson);
-            outline-offset: -2px;
+            background: var(--hover-bg);
+            color: var(--text-primary);
         }
 
         .announcement-card-content {
-            padding: 1.5rem;
-            display: none;
+            padding: 0 1.25rem 1rem 3.25rem;
             line-height: 1.6;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
         }
-
-        .announcement-card.expanded .announcement-card-content {
-            display: block;
-        }
-
+        
+        /* Always show announcement content - no accordion */
         .announcement-card-expand {
-            transition: transform 0.2s;
-        }
-
-        .announcement-card.expanded .announcement-card-expand {
-            transform: rotate(180deg);
+            display: none;
         }
 
         /* Dashboard Grid */
@@ -922,6 +913,474 @@
                 opacity: 0;
             }
         }
+        
+        /* PHASE 2: Operations-First Layout Styles */
+        
+        /* Production Schedule Hero Section */
+        .production-schedule-hero {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(76, 179, 84, 0.1);
+        }
+        
+        .production-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .production-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .last-updated {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .production-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .production-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .production-item.available-now {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+        
+        .production-item.available-soon {
+            border-color: #eab308;
+            background: #fefce8;
+        }
+        
+        .production-item.busy {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+        
+        .production-method {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .production-availability {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+        
+        .production-item.available-now .production-availability {
+            color: #22c55e;
+        }
+        
+        .production-item.available-soon .production-availability {
+            color: #eab308;
+        }
+        
+        .production-item.busy .production-availability {
+            color: #ef4444;
+        }
+        
+        .production-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: #fef3c7;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            color: #92400e;
+        }
+        
+        /* Collapsible Sections */
+        .collapsible .announcements-header,
+        .collapsible .section-header {
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collapsible .announcements-header:hover,
+        .collapsible .section-header:hover {
+            background: var(--hover-bg);
+        }
+        
+        .section-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .collapse-toggle {
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+            padding: 0.25rem;
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .collapsible-content.expanded {
+            max-height: 2000px;
+            overflow-y: auto;
+        }
+        
+        .announcements-section .collapsible-content {
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .announcements-section .collapsible-content.expanded {
+            max-height: 400px;
+            padding: 1rem;
+            opacity: 1;
+            overflow-y: auto;
+        }
+        
+        .announcements-section .collapsible-content.collapsed {
+            max-height: 0;
+            padding: 0 1rem;
+            opacity: 0;
+            overflow: hidden;
+        }
+        
+        .sales-metrics-section .collapsible-content.expanded {
+            max-height: none;
+        }
+        
+        /* Quick Actions Grid */
+        .quick-actions-section {
+            margin: 2rem 0;
+        }
+        
+        .quick-actions-section .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .quick-action-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            gap: 0.75rem;
+        }
+        
+        .quick-action-card i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .quick-action-card span {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .quick-action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
+        }
+        
+        /* Sales Metrics (De-emphasized) */
+        .sales-metrics-section {
+            margin-top: 3rem;
+            opacity: 0.95;
+        }
+        
+        .sales-metrics-section .section-header {
+            background: #f9fafb;
+            padding: 1rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sales-metrics-section .section-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin: 0;
+        }
+        
+        .muted-metrics {
+            opacity: 0.9;
+        }
+        
+        .muted-metrics .metric-card {
+            background: #f9fafb;
+            border-color: #e5e7eb;
+        }
+        
+        .muted-metrics .metric-value {
+            font-size: 1.25rem;
+        }
+        
+        .muted-metrics .chart-container {
+            background: #f9fafb;
+        }
+        
+        @media (max-width: 768px) {
+            .production-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+        
+        /* Sticky Bottom Bar Styles */
+        .sticky-metrics-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: white;
+            border-top: 2px solid var(--border-color);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 900;
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .sticky-metrics-bar.hidden {
+            transform: translateY(100%);
+        }
+        
+        .metrics-bar-content {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .metrics-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .metrics-bar-left i {
+            color: var(--primary-color);
+            font-size: 1.125rem;
+        }
+        
+        .metrics-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .metrics-divider {
+            color: var(--border-color);
+        }
+        
+        .metrics-summary {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .metric-label {
+            color: var(--text-secondary);
+        }
+        
+        .metric-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .metric-trend {
+            color: var(--success);
+        }
+        
+        .metric-trend.negative {
+            color: var(--danger);
+        }
+        
+        .metrics-expand-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .metrics-expand-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Slide-up Metrics Panel */
+        .slide-up-metrics-panel {
+            position: fixed;
+            bottom: 50px;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: white;
+            border-top: 2px solid var(--primary-color);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.15);
+            z-index: 899;
+            transition: height 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .slide-up-metrics-panel.expanded {
+            height: 60vh;
+        }
+        
+        .metrics-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .metrics-panel-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+        }
+        
+        .metrics-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .metrics-close-btn:hover {
+            color: var(--text-primary);
+        }
+        
+        .metrics-panel-content {
+            height: calc(100% - 60px);
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        
+        /* Ensure metrics display properly in panel */
+        .metrics-panel-content .dashboard-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .metrics-panel-content .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .metrics-panel-content .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            grid-column: span 2;
+        }
+        
+        /* Keep sales metrics section available but visually hidden */
+        .sales-metrics-section {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        
+        /* Override when in the slide-up panel */
+        .metrics-panel-content .collapsible-content,
+        .metrics-panel-content #clonedSalesMetrics {
+            position: static !important;
+            left: auto !important;
+            width: auto !important;
+            height: auto !important;
+            overflow: visible !important;
+            max-height: none !important;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .metrics-bar-content {
+                padding: 0 1rem;
+            }
+            
+            .metrics-summary {
+                display: none;
+            }
+            
+            .slide-up-metrics-panel.expanded {
+                height: 80vh;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1143,7 +1602,7 @@
             <!-- Top Header -->
             <header class="top-header">
                 <div class="header-left">
-                    <div class="view-selector">
+                    <div class="view-selector" style="display: none;">
                         <select id="viewSelector" onchange="switchView(this.value)">
                             <option value="overview">Overview</option>
                             <option value="art-submission">Art Submission</option>
@@ -1152,8 +1611,7 @@
                         </select>
                     </div>
                     
-                    <div class="yoy-widget">
-                        <span>YTD vs Last Year:</span>
+                    <div class="yoy-widget" style="display: none;">
                         <span class="yoy-value" id="yoyGrowth">Loading...</span>
                     </div>
                     
@@ -1214,147 +1672,138 @@
                         <p class="welcome-subtitle">Here's what's happening at Northwest Custom Apparel today.</p>
                     </div>
                     
-                    <!-- Announcements -->
-                    <div class="announcements-section">
-                        <div class="announcements-header" role="button" tabindex="0" aria-expanded="true" aria-controls="announcementsList">
+                    <!-- ZONE 1: OPERATIONAL PRIORITY -->
+                    
+                    <!-- Production Schedule (MOVED TO TOP - HERO POSITION) -->
+                    <div class="production-schedule-hero" data-widget="production-schedule">
+                        <div class="production-header">
+                            <h2 class="production-title">
+                                <i class="fas fa-industry" style="margin-right: 0.5rem;"></i>
+                                Production Schedule - Current Availability
+                            </h2>
+                            <span class="last-updated" id="productionLastUpdated">Updated: Loading...</span>
+                        </div>
+                        <div class="production-grid">
+                            <!-- Production schedule will be loaded here with enhanced display -->
+                        </div>
+                    </div>
+                    
+                    <!-- Announcements (COLLAPSIBLE) -->
+                    <div class="announcements-section collapsible expanded">
+                        <div class="announcements-header" role="button" tabindex="0" aria-expanded="true" aria-controls="announcementsList" onclick="toggleSection('announcements')">
                             <h2 class="announcements-title">
                                 <i class="fas fa-bullhorn" style="margin-right: 0.5rem; color: var(--wsu-crimson);"></i>
-                                Company Announcements
+                                Announcements
                             </h2>
-                            <div class="announcements-controls">
-                                <label class="toggle-dismissed" for="showDismissed">
+                            <div class="section-controls">
+                                <label class="toggle-dismissed" for="showDismissed" onclick="event.stopPropagation();">
                                     <input type="checkbox" id="showDismissed" onchange="toggleDismissedAnnouncements()">
                                     <span>Show dismissed</span>
                                 </label>
+                                <button class="collapse-toggle" id="announcementsToggle">
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
                             </div>
                         </div>
                         
-                        <div id="announcementsContainer">
-                            <!-- Announcements will be loaded here -->
+                        <div id="announcementsContainer" class="collapsible-content expanded">
+                            <!-- Announcements will be loaded here with priority indicators -->
                         </div>
                     </div>
                     
-                    <!-- Metrics Grid -->
-                    <div class="dashboard-grid">
-                        <!-- Total Revenue -->
-                        <div class="metric-card" data-metric="revenue">
-                            <div class="metric-header">
-                                <span class="metric-title">Total Revenue</span>
-                                <div class="date-range-selector">
-                                    <button class="date-range-btn" data-days="7" onclick="changeDateRange(7)">7D</button>
-                                    <button class="date-range-btn active" data-days="30" onclick="changeDateRange(30)">30D</button>
-                                </div>
-                            </div>
-                            <div class="metric-value" id="totalRevenue">Loading...</div>
-                            <div class="metric-change">
-                                <!-- Dynamic trend will be inserted here -->
-                            </div>
+                    <!-- Sales Metrics Section (Will be moved to sticky bottom bar) -->
+                    <div class="sales-metrics-section collapsible collapsed">
+                        <div class="section-header" role="button" tabindex="0" aria-expanded="false" onclick="toggleSection('salesMetrics')">
+                            <h3 class="section-title">
+                                <i class="fas fa-chart-line" style="margin-right: 0.5rem;"></i>
+                                Sales & Performance Metrics
+                            </h3>
+                            <button class="collapse-toggle" id="salesMetricsToggle">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
                         </div>
                         
-                        <!-- Orders Count -->
-                        <div class="metric-card" data-metric="orders">
-                            <div class="metric-header">
-                                <span class="metric-title">Orders</span>
-                            </div>
-                            <div class="metric-value">Loading...</div>
-                            <div class="metric-change">
-                                <!-- Dynamic trend will be inserted here -->
-                            </div>
-                        </div>
-                        
-                        <!-- Year Over Year -->
-                        <div class="metric-card" data-widget="year-over-year">
-                            <div class="metric-header">
-                                <span class="metric-title">Year Over Year</span>
-                            </div>
-                            <div style="margin-top: 1rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
-                                    <span style="color: var(--gray-600);">Last Year:</span>
-                                    <span style="font-weight: 600;" id="lastYearTotal">Loading...</span>
+                        <div id="salesMetricsContainer" class="collapsible-content collapsed">
+                            <!-- Metrics Grid (DE-EMPHASIZED) -->
+                            <div class="dashboard-grid muted-metrics">
+                                <!-- Total Revenue -->
+                                <div class="metric-card" data-metric="revenue">
+                                    <div class="metric-header">
+                                        <span class="metric-title">Total Revenue</span>
+                                        <div class="date-range-selector">
+                                            <button class="date-range-btn" data-days="7" onclick="changeDateRange(7)">7D</button>
+                                            <button class="date-range-btn active" data-days="30" onclick="changeDateRange(30)">30D</button>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value" id="totalRevenue">Loading...</div>
+                                    <div class="metric-change">
+                                        <!-- Dynamic trend will be inserted here -->
+                                    </div>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
-                                    <span style="color: var(--gray-600);">This Year:</span>
-                                    <span style="font-weight: 600;" id="thisYearTotal">Loading...</span>
+                                
+                                <!-- Orders Count -->
+                                <div class="metric-card" data-metric="orders">
+                                    <div class="metric-header">
+                                        <span class="metric-title">Orders</span>
+                                    </div>
+                                    <div class="metric-value">Loading...</div>
+                                    <div class="metric-change">
+                                        <!-- Dynamic trend will be inserted here -->
+                                    </div>
                                 </div>
-                                <div style="height: 100px; margin-top: 1rem;">
-                                    <canvas id="yoyChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Production Schedule -->
-                    <div class="dashboard-grid">
-                        <div class="chart-container" data-widget="production-schedule">
-                            <div class="chart-header">
-                                <h3 class="chart-title">Production Schedule</h3>
-                            </div>
-                            <div class="schedule-list">
-                                <!-- Production schedule will be loaded here -->
-                            </div>
-                        </div>
-                        
-                        <!-- Sales Team Performance -->
-                        <div class="chart-container" data-widget="sales-team-performance">
-                            <div class="chart-header">
-                                <h3 class="chart-title">Sales Team Performance</h3>
-                                <div class="date-range-selector sales-team-date-selector">
-                                    <button class="date-range-btn" data-days="1" onclick="changeSalesTeamRange(1)">Today</button>
-                                    <button class="date-range-btn" data-days="7" onclick="changeSalesTeamRange(7)">7 Days</button>
-                                    <button class="date-range-btn active" data-days="30" onclick="changeSalesTeamRange(30)">30 Days</button>
+                                
+                                <!-- Year Over Year -->
+                                <div class="metric-card" data-widget="year-over-year">
+                                    <div class="metric-header">
+                                        <span class="metric-title">Year Over Year</span>
+                                    </div>
+                                    <div style="margin-top: 1rem;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                            <span style="color: var(--gray-600);">Last Year:</span>
+                                            <span style="font-weight: 600;" id="lastYearTotal">Loading...</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                            <span style="color: var(--gray-600);">This Year:</span>
+                                            <span style="font-weight: 600;" id="thisYearTotal">Loading...</span>
+                                        </div>
+                                        <div style="height: 100px; margin-top: 1rem;">
+                                            <canvas id="yoyChart"></canvas>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="sales-team-list">
-                                <!-- Sales team performance will be loaded here -->
+                            
+                            <!-- Sales Team Performance -->
+                            <div class="dashboard-grid muted-metrics" style="margin-top: 1.5rem;">
+                                <div class="chart-container" data-widget="sales-team-performance">
+                                    <div class="chart-header">
+                                        <h3 class="chart-title">Sales Team Performance</h3>
+                                        <div class="date-range-selector sales-team-date-selector">
+                                            <button class="date-range-btn" data-days="1" onclick="changeSalesTeamRange(1)">Today</button>
+                                            <button class="date-range-btn" data-days="7" onclick="changeSalesTeamRange(7)">7 Days</button>
+                                            <button class="date-range-btn active" data-days="30" onclick="changeSalesTeamRange(30)">30 Days</button>
+                                        </div>
+                                    </div>
+                                    <div class="sales-team-list">
+                                        <!-- Sales team performance will be loaded here -->
+                                    </div>
+                                </div>
+                                
+                                <!-- Order Types Breakdown -->
+                                <div class="chart-container" data-widget="order-types-breakdown">
+                                    <div class="chart-header">
+                                        <h3 class="chart-title">Order Types Breakdown</h3>
+                                        <div class="date-range-selector order-types-date-selector">
+                                            <button class="date-range-btn" data-days="1" onclick="changeOrderTypesRange(1)">Today</button>
+                                            <button class="date-range-btn" data-days="7" onclick="changeOrderTypesRange(7)">7 Days</button>
+                                            <button class="date-range-btn active" data-days="30" onclick="changeOrderTypesRange(30)">30 Days</button>
+                                        </div>
+                                    </div>
+                                    <div class="order-types-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding: 1.5rem;">
+                                        <!-- Order types will be loaded here -->
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Order Types Breakdown -->
-                    <div class="chart-container" data-widget="order-types-breakdown" style="margin-top: 1.5rem;">
-                        <div class="chart-header">
-                            <h3 class="chart-title">Order Types Breakdown</h3>
-                            <div class="date-range-selector order-types-date-selector">
-                                <button class="date-range-btn" data-days="1" onclick="changeOrderTypesRange(1)">Today</button>
-                                <button class="date-range-btn" data-days="7" onclick="changeOrderTypesRange(7)">7 Days</button>
-                                <button class="date-range-btn active" data-days="30" onclick="changeOrderTypesRange(30)">30 Days</button>
-                            </div>
-                        </div>
-                        <div class="order-types-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding: 1.5rem;">
-                            <!-- Order types will be loaded here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Quick Actions -->
-                    <div class="chart-container" style="margin-top: 1.5rem;">
-                        <div class="chart-header">
-                            <h3 class="chart-title">Quick Actions</h3>
-                        </div>
-                        <div class="quick-actions">
-                            <a href="/art-invoice-unified-dashboard.html" class="quick-action">
-                                <div class="quick-action-icon">
-                                    <i class="fas fa-file-invoice-dollar"></i>
-                                </div>
-                                <div class="quick-action-label">Art Invoices</div>
-                            </a>
-                            <a href="/manual-screen-print-calculator.html" class="quick-action">
-                                <div class="quick-action-icon">
-                                    <i class="fas fa-calculator"></i>
-                                </div>
-                                <div class="quick-action-label">Manual Calculator</div>
-                            </a>
-                            <a href="/calculators/webstores.html" class="quick-action">
-                                <div class="quick-action-icon">
-                                    <i class="fas fa-store"></i>
-                                </div>
-                                <div class="quick-action-label">Webstores</div>
-                            </a>
-                            <a href="/calculators/safety-stripe-creator.html" class="quick-action">
-                                <div class="quick-action-icon">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                </div>
-                                <div class="quick-action-label">Safety Stripes</div>
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -1629,6 +2078,154 @@
                 link.classList.remove('active');
             });
         }
+        
+        // Toggle collapsible sections
+        function toggleSection(sectionName) {
+            let content, toggle, section;
+            
+            if (sectionName === 'announcements') {
+                content = document.getElementById('announcementsContainer');
+                toggle = document.getElementById('announcementsToggle');
+                section = document.querySelector('.announcements-section');
+            } else if (sectionName === 'salesMetrics') {
+                content = document.getElementById('salesMetricsContainer');
+                toggle = document.getElementById('salesMetricsToggle');
+                section = document.querySelector('.sales-metrics-section');
+            }
+            
+            if (content && toggle && section) {
+                const isExpanded = content.classList.contains('expanded');
+                
+                if (isExpanded) {
+                    // Collapse
+                    content.classList.remove('expanded');
+                    content.classList.add('collapsed');
+                    content.style.maxHeight = '0';
+                    content.style.overflow = 'hidden';
+                    toggle.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                    section.classList.remove('expanded');
+                    section.classList.add('collapsed');
+                    const ariaElement = section.querySelector('[aria-expanded]');
+                    if (ariaElement) ariaElement.setAttribute('aria-expanded', 'false');
+                } else {
+                    // Expand
+                    content.classList.remove('collapsed');
+                    content.classList.add('expanded');
+                    content.style.maxHeight = '400px';
+                    content.style.overflow = 'auto';
+                    toggle.innerHTML = '<i class="fas fa-chevron-up"></i>';
+                    section.classList.remove('collapsed');
+                    section.classList.add('expanded');
+                    const ariaElement = section.querySelector('[aria-expanded]');
+                    if (ariaElement) ariaElement.setAttribute('aria-expanded', 'true');
+                }
+                
+                // Save preference to localStorage
+                localStorage.setItem(`section_${sectionName}_expanded`, !isExpanded);
+            }
+        }
+        
+        // Toggle Metrics Panel (Sticky Bottom Bar)
+        function toggleMetricsPanel() {
+            const panel = document.getElementById('slideUpMetricsPanel');
+            const icon = document.getElementById('metricsExpandIcon');
+            const text = document.getElementById('metricsExpandText');
+            const content = panel.querySelector('.metrics-panel-content');
+            
+            if (panel.classList.contains('expanded')) {
+                // Collapse the panel
+                panel.classList.remove('expanded');
+                icon.className = 'fas fa-chevron-up';
+                text.textContent = 'View Full Dashboard';
+                localStorage.setItem('metricsPanel_expanded', 'false');
+            } else {
+                // Expand the panel
+                panel.classList.add('expanded');
+                icon.className = 'fas fa-chevron-down';
+                text.textContent = 'Collapse';
+                localStorage.setItem('metricsPanel_expanded', 'true');
+                
+                // Load metrics content if not already loaded or if it's empty
+                if (!content.querySelector('#clonedSalesMetrics')) {
+                    loadMetricsPanelContent();
+                }
+            }
+        }
+        
+        // Load metrics content into the slide-up panel
+        function loadMetricsPanelContent() {
+            const content = document.querySelector('.metrics-panel-content');
+            const salesMetricsContainer = document.getElementById('salesMetricsContainer');
+            
+            if (salesMetricsContainer) {
+                // Clone the entire sales metrics content
+                const clonedContent = salesMetricsContainer.cloneNode(true);
+                clonedContent.id = 'clonedSalesMetrics'; // Change ID to avoid conflicts
+                
+                // Clear and add the cloned content
+                content.innerHTML = '';
+                content.appendChild(clonedContent);
+                
+                // Make sure it's visible
+                clonedContent.style.display = 'block';
+                clonedContent.classList.remove('collapsed');
+                clonedContent.classList.add('expanded');
+                
+                // Re-attach event handlers for date range buttons
+                const dateRangeBtns = content.querySelectorAll('.date-range-btn');
+                dateRangeBtns.forEach(btn => {
+                    // Remove old onclick attributes
+                    btn.removeAttribute('onclick');
+                    
+                    // Add new event listeners
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const days = parseInt(this.getAttribute('data-days'));
+                        const selector = this.closest('.date-range-selector');
+                        
+                        // Update active state
+                        selector.querySelectorAll('.date-range-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Call appropriate function based on context
+                        if (selector.classList.contains('sales-team-date-selector')) {
+                            changeSalesTeamRange(days);
+                        } else if (selector.classList.contains('order-types-date-selector')) {
+                            changeOrderTypesRange(days);
+                        } else {
+                            changeDateRange(days);
+                        }
+                    });
+                });
+                
+                // Refresh the data to ensure it's current
+                loadRevenueData();
+                loadSalesTeamPerformance();
+                loadOrderTypesBreakdown();
+            }
+        }
+        
+        // Update bottom bar metrics
+        async function updateBottomBarMetrics() {
+            // Bottom bar now shows YTD vs Last Year data which is handled by loadYearOverYear()
+            // This function is kept for compatibility but no longer needs to do anything
+            console.log('Bottom bar metrics now handled by loadYearOverYear() function');
+        }
+        
+        // Load section preferences on page load
+        function loadSectionPreferences() {
+            // Check announcements preference
+            const announcementsExpanded = localStorage.getItem('section_announcements_expanded');
+            if (announcementsExpanded === 'false') {
+                toggleSection('announcements');
+            }
+            
+            // Sales metrics should always start collapsed unless user has explicitly expanded it
+            const salesMetricsExpanded = localStorage.getItem('section_salesMetrics_expanded');
+            if (salesMetricsExpanded === 'true') {
+                toggleSection('salesMetrics');
+            }
+        }
 
         // API Functions
         async function loadRevenueData() {
@@ -1695,32 +2292,79 @@
         }
 
         function updateProductionDisplay(schedule) {
-            const container = document.querySelector('[data-widget="production-schedule"] .schedule-list');
-            if (!container) return;
-            
-            const productionItems = [
-                { label: 'DTG', date: schedule.DTG, comment: schedule.Comment_DTG },
-                { label: 'DTG Rush', date: schedule.DTG_Sneak_In || calculateRushDate(schedule.DTG), comment: 'Rush orders available' },
-                { label: 'Embroidery', date: schedule.Embroidery, comment: schedule.Comment_Emb },
-                { label: 'Cap Embroidery', date: schedule.Cap_Embroidery, comment: schedule.Comment_Cap },
-                { label: 'Screen Print', date: schedule.Screenprint, comment: schedule.Comment_SP },
-                { label: 'Transfers', date: schedule.Transfers, comment: schedule.Comment_Transfers }
-            ];
-            
-            let html = '';
-            productionItems.forEach((item, index) => {
-                const availability = formatAvailabilityDate(item.date);
-                const isRush = item.label.includes('Rush');
+            // Update new hero production grid
+            const heroContainer = document.querySelector('.production-schedule-hero .production-grid');
+            if (heroContainer) {
+                const productionItems = [
+                    { label: 'DTG', date: schedule.DTG, comment: schedule.Comment_DTG },
+                    { label: 'Embroidery', date: schedule.Embroidery, comment: schedule.Comment_Emb },
+                    { label: 'Cap Embroidery', date: schedule.Cap_Embroidery, comment: schedule.Comment_Cap },
+                    { label: 'Screen Print', date: schedule.Screenprint, comment: schedule.Comment_SP },
+                    { label: 'Transfers', date: schedule.Transfers, comment: schedule.Comment_Transfers }
+                ];
                 
-                html += `
-                    <div class="schedule-item">
-                        <span class="schedule-type">${item.label}</span>
-                        <span class="schedule-date" style="${isRush ? 'background: var(--danger);' : ''}">${availability}</span>
-                    </div>
-                `;
-            });
+                let html = '';
+                productionItems.forEach(item => {
+                    const daysUntil = calculateDaysUntil(item.date);
+                    const availability = formatAvailabilityDate(item.date);
+                    const statusClass = getProductionStatusClass(daysUntil);
+                    
+                    html += `
+                        <div class="production-item ${statusClass}">
+                            <div class="production-method">${item.label}</div>
+                            <div class="production-availability">${availability}</div>
+                        </div>
+                    `;
+                });
+                
+                heroContainer.innerHTML = html;
+                
+                // Update last updated timestamp
+                const lastUpdated = document.getElementById('productionLastUpdated');
+                if (lastUpdated) {
+                    lastUpdated.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+                }
+            }
             
-            container.innerHTML = html;
+            // Also update old location if it exists
+            const container = document.querySelector('[data-widget="production-schedule"] .schedule-list');
+            if (container) {
+                const productionItems = [
+                    { label: 'DTG', date: schedule.DTG, comment: schedule.Comment_DTG },
+                    { label: 'DTG Rush', date: schedule.DTG_Sneak_In || calculateRushDate(schedule.DTG), comment: 'Rush orders available' },
+                    { label: 'Embroidery', date: schedule.Embroidery, comment: schedule.Comment_Emb },
+                    { label: 'Cap Embroidery', date: schedule.Cap_Embroidery, comment: schedule.Comment_Cap },
+                    { label: 'Screen Print', date: schedule.Screenprint, comment: schedule.Comment_SP },
+                    { label: 'Transfers', date: schedule.Transfers, comment: schedule.Comment_Transfers }
+                ];
+                
+                let html = '';
+                productionItems.forEach((item, index) => {
+                    const availability = formatAvailabilityDate(item.date);
+                    const isRush = item.label.includes('Rush');
+                    
+                    html += `
+                        <div class="schedule-item">
+                            <span class="schedule-type">${item.label}</span>
+                            <span class="schedule-date" style="${isRush ? 'background: var(--danger);' : ''}">${availability}</span>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            }
+        }
+        
+        function calculateDaysUntil(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            return Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+        }
+        
+        function getProductionStatusClass(daysUntil) {
+            if (daysUntil <= 2) return 'available-now';
+            if (daysUntil <= 5) return 'available-soon';
+            return 'busy';
         }
 
         function calculateRushDate(standardDate) {
@@ -1791,6 +2435,14 @@
                         yoyGrowth.style.color = isPositive ? 'var(--success)' : 'var(--danger)';
                     }
                     
+                    // Update the bottom bar YTD display
+                    const bottomBarYTD = document.getElementById('bottomBarYTD');
+                    if (bottomBarYTD) {
+                        const isPositive = growth >= 0;
+                        bottomBarYTD.innerHTML = `${isPositive ? '↑' : '↓'} ${Math.abs(growth).toFixed(1)}%`;
+                        bottomBarYTD.style.color = isPositive ? 'var(--success)' : 'var(--danger)';
+                    }
+                    
                     if (yoyChartCanvas && window.Chart) {
                         createOrUpdateChart('yoyChart', {
                             type: 'bar',
@@ -1836,6 +2488,10 @@
                 if (lastYearTotal) lastYearTotal.textContent = 'Unavailable';
                 if (thisYearTotal) thisYearTotal.textContent = 'Unavailable';
                 if (yoyGrowth) yoyGrowth.textContent = 'Unable to load';
+                
+                // Also handle error for bottom bar YTD
+                const bottomBarYTD = document.getElementById('bottomBarYTD');
+                if (bottomBarYTD) bottomBarYTD.textContent = 'Unable to load';
             }
         }
         
@@ -1963,30 +2619,30 @@
                         const isDismissed = localStorage.getItem(`announcement-dismissed-${announcement.PK_ID}`) === 'true';
                         const isUnread = !localStorage.getItem(`announcement-read-${announcement.PK_ID}`);
                         
+                        const priorityIcon = announcement.Type === 'urgent' ? 'fas fa-exclamation-circle' : 
+                                          announcement.Type === 'important' ? 'fas fa-exclamation-triangle' : 
+                                          'fas fa-info-circle';
+                        
                         return `
                             <div class="announcement-card ${isUnread ? 'unread' : ''} ${isDismissed ? 'dismissed' : ''}" 
                                  data-id="${announcement.PK_ID}" 
-                                 data-type="${announcement.Type || 'info'}"
-                                 role="button"
-                                 tabindex="0"
-                                 aria-expanded="false">
-                                <div class="announcement-card-header" 
-                                     onclick="toggleAnnouncement(${announcement.PK_ID})"
-                                     onkeypress="if(event.key === 'Enter' || event.key === ' ') toggleAnnouncement(${announcement.PK_ID})">
-                                    <i class="${announcement.Icon || 'fas fa-info-circle'} announcement-card-icon"></i>
-                                    <span class="announcement-card-title">${getAnnouncementTitle(announcement)}</span>
+                                 data-type="${announcement.Type || 'info'}">
+                                <div class="announcement-card-header">
+                                    <i class="${priorityIcon} announcement-card-icon"></i>
+                                    <div style="flex: 1;">
+                                        <div class="announcement-card-title">${getAnnouncementTitle(announcement)}</div>
+                                        ${announcement.Date ? `<div class="announcement-card-meta">Posted ${new Date(announcement.Date).toLocaleDateString()}</div>` : ''}
+                                    </div>
                                     <div class="announcement-card-actions">
-                                        <button onclick="event.stopPropagation(); dismissAnnouncement(${announcement.PK_ID})" 
+                                        <button onclick="dismissAnnouncement(${announcement.PK_ID})" 
                                                 title="Dismiss announcement" 
                                                 aria-label="Dismiss announcement">
                                             <i class="fas fa-times"></i>
                                         </button>
-                                        <i class="fas fa-chevron-down announcement-card-expand"></i>
                                     </div>
                                 </div>
                                 <div class="announcement-card-content">
                                     ${announcement.Content}
-                                    ${announcement.Date ? `<div class="announcement-card-meta" style="margin-top: 1rem; font-size: 0.875rem; color: var(--gray-500);">Posted: ${new Date(announcement.Date).toLocaleDateString()}</div>` : ''}
                                 </div>
                             </div>
                         `;
@@ -2224,6 +2880,9 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Dashboard initializing...');
             
+            // Load section preferences (collapsed/expanded states)
+            loadSectionPreferences();
+            
             // Load all dashboard data
             await Promise.all([
                 loadRevenueData(),
@@ -2237,6 +2896,9 @@
             
             console.log('Dashboard initialized successfully');
             
+            // Update bottom bar metrics after data loads
+            setTimeout(updateBottomBarMetrics, 500);
+            
             // Set up refresh intervals
             setInterval(async () => {
                 await Promise.all([
@@ -2246,6 +2908,9 @@
                     loadOrderTypesBreakdown(),
                     loadAdriyellaSummary()
                 ]);
+                
+                // Update bottom bar metrics after refresh
+                setTimeout(updateBottomBarMetrics, 500);
             }, API_CONFIG.refreshInterval);
         });
 
@@ -2351,5 +3016,40 @@
         background: #7a1829;
     }
     </style>
+    
+    <!-- Sticky Bottom Bar for Sales Metrics -->
+    <div id="stickyMetricsBar" class="sticky-metrics-bar">
+        <div class="metrics-bar-content">
+            <div class="metrics-bar-left">
+                <i class="fas fa-chart-line"></i>
+                <span class="metrics-label">Sales Metrics</span>
+                <span class="metrics-divider">|</span>
+                <span class="metrics-summary">
+                    <span class="metric-item">
+                        <span class="metric-label">YTD vs Last Year:</span>
+                        <span class="metric-value metric-trend" id="bottomBarYTD">Loading...</span>
+                    </span>
+                </span>
+            </div>
+            <button class="metrics-expand-btn" onclick="toggleMetricsPanel()">
+                <i class="fas fa-chevron-up" id="metricsExpandIcon"></i>
+                <span id="metricsExpandText">View Full Dashboard</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Slide-up Metrics Panel -->
+    <div id="slideUpMetricsPanel" class="slide-up-metrics-panel">
+        <div class="metrics-panel-header">
+            <h3>Sales & Performance Dashboard</h3>
+            <button class="metrics-close-btn" onclick="toggleMetricsPanel()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="metrics-panel-content">
+            <!-- This will be populated with the sales metrics content -->
+        </div>
+    </div>
+    
 </body>
 </html>
