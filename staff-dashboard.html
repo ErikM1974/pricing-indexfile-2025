@@ -2538,49 +2538,91 @@
         }
         
         async function loadSalesTeamPerformance() {
+            console.log(`[Sales Team] Loading performance data for ${currentSalesTeamRange} days...`);
+            
             const salesTeamCard = document.querySelector('[data-widget="sales-team-performance"]');
             const salesTeamList = salesTeamCard?.querySelector('.sales-team-list');
             
+            if (!salesTeamList) {
+                console.error('[Sales Team] Could not find .sales-team-list element');
+                return;
+            }
+            
             try {
-                if (salesTeamList) {
-                    salesTeamList.innerHTML = '<div class="loading">Loading all sales representatives...</div>';
+                // Show loading state
+                salesTeamList.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <div class="loading" style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--wsu-crimson); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+                        <p>Loading sales team data for ${currentSalesTeamRange} day${currentSalesTeamRange !== 1 ? 's' : ''}...</p>
+                    </div>
+                `;
+                
+                const apiUrl = `${API_CONFIG.baseURL}/order-dashboard?days=${currentSalesTeamRange}`;
+                console.log(`[Sales Team] Making API call to: ${apiUrl}`);
+                
+                const response = await fetch(apiUrl);
+                console.log(`[Sales Team] API response status: ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
                 }
-                
-                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=${currentSalesTeamRange}`);
-                
-                if (!response.ok) throw new Error('API request failed');
                 
                 const data = await response.json();
+                console.log(`[Sales Team] API data received:`, data);
+                
+                // Check if we have the expected data structure
+                if (!data || !data.breakdown || !data.breakdown.byCsr) {
+                    console.error('[Sales Team] Invalid API response structure:', data);
+                    throw new Error('Invalid API response: missing breakdown.byCsr data');
+                }
                 
                 const allSalesReps = data.breakdown.byCsr;
+                console.log(`[Sales Team] Found ${allSalesReps.length} sales reps in data`);
                 
-                const salesTeamHTML = allSalesReps.map((rep, index) => `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: ${index % 2 === 0 ? 'var(--gray-50)' : 'white'}; border-radius: 0.5rem; border: 1px solid var(--gray-200); margin-bottom: 0.5rem;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div style="width: 36px; height: 36px; background: ${index < 3 ? 'linear-gradient(135deg, var(--wsu-crimson), var(--wsu-dark-crimson))' : 'var(--gray-200)'}; color: ${index < 3 ? 'white' : 'var(--gray-600)'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
-                                ${index + 1}
-                            </div>
-                            <div>
-                                <div style="font-weight: 600; color: var(--gray-900); font-size: 1rem; margin-bottom: 0.25rem;">${rep.name}</div>
-                                <div style="font-size: 0.875rem; color: var(--gray-600);">${rep.orders} orders</div>
-                            </div>
+                if (allSalesReps.length === 0) {
+                    salesTeamList.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                            <p>No sales data available for the selected ${currentSalesTeamRange} day${currentSalesTeamRange !== 1 ? 's' : ''}</p>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 700; color: var(--gray-900); font-size: 1.25rem; margin-bottom: 0.25rem;">$${rep.sales.toLocaleString()}</div>
-                            <div style="font-size: 0.75rem; color: var(--gray-600);">Avg: $${(rep.sales / (rep.orders || 1)).toFixed(0)}</div>
-                        </div>
-                    </div>
-                `).join('');
-                
-                if (salesTeamList) {
-                    salesTeamList.innerHTML = salesTeamHTML || '<div class="error-message">No sales data available</div>';
+                    `;
+                    return;
                 }
+                
+                const salesTeamHTML = allSalesReps.map((rep, index) => {
+                    console.log(`[Sales Team] Processing rep ${index + 1}: ${rep.name} - ${rep.orders} orders - $${rep.sales}`);
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: ${index % 2 === 0 ? 'var(--gray-50)' : 'white'}; border-radius: 0.5rem; border: 1px solid var(--gray-200); margin-bottom: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 36px; height: 36px; background: ${index < 3 ? 'linear-gradient(135deg, var(--wsu-crimson), var(--wsu-dark-crimson))' : 'var(--gray-200)'}; color: ${index < 3 ? 'white' : 'var(--gray-600)'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
+                                    ${index + 1}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--gray-900); font-size: 1rem; margin-bottom: 0.25rem;">${rep.name}</div>
+                                    <div style="font-size: 0.875rem; color: var(--gray-600);">${rep.orders} order${rep.orders !== 1 ? 's' : ''}</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; color: var(--gray-900); font-size: 1.25rem; margin-bottom: 0.25rem;">$${rep.sales.toLocaleString()}</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600);">Avg: $${Math.round(rep.sales / (rep.orders || 1))}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                salesTeamList.innerHTML = salesTeamHTML;
+                console.log(`[Sales Team] Successfully updated widget with ${allSalesReps.length} sales reps`);
                 
             } catch (error) {
-                console.error('Sales Team API Error:', error);
-                if (salesTeamList) {
-                    salesTeamList.innerHTML = '<div class="error-message">Unavailable - Unable to load sales team data</div>';
-                }
+                console.error('[Sales Team] Error loading performance data:', error);
+                salesTeamList.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--danger);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p><strong>Unable to load sales team data</strong></p>
+                        <p style="font-size: 0.875rem; opacity: 0.7;">Error: ${error.message}</p>
+                        <p style="font-size: 0.875rem; opacity: 0.7;">Date range: ${currentSalesTeamRange} day${currentSalesTeamRange !== 1 ? 's' : ''}</p>
+                    </div>
+                `;
             }
         }
         
@@ -2832,16 +2874,72 @@
         }
         
         function changeSalesTeamRange(days) {
-            currentSalesTeamRange = days;
+            console.log(`[Sales Team] Date range changed to ${days} days`);
             
-            document.querySelectorAll('.sales-team-date-selector .date-range-btn').forEach(btn => {
+            // Validate the days parameter
+            if (![1, 7, 30].includes(days)) {
+                console.error(`[Sales Team] Invalid date range: ${days}. Must be 1, 7, or 30.`);
+                return;
+            }
+            
+            currentSalesTeamRange = days;
+            console.log(`[Sales Team] currentSalesTeamRange updated to: ${currentSalesTeamRange}`);
+            
+            // Update button active states
+            const salesTeamSelector = document.querySelector('.sales-team-date-selector');
+            if (!salesTeamSelector) {
+                console.error('[Sales Team] Could not find .sales-team-date-selector element');
+                return;
+            }
+            
+            const buttons = salesTeamSelector.querySelectorAll('.date-range-btn');
+            let activeButtonFound = false;
+            
+            buttons.forEach(btn => {
                 btn.classList.remove('active');
-                if (parseInt(btn.getAttribute('data-days')) === days) {
+                const btnDays = parseInt(btn.getAttribute('data-days'));
+                if (btnDays === days) {
                     btn.classList.add('active');
+                    activeButtonFound = true;
+                    console.log(`[Sales Team] Activated button for ${days} days`);
                 }
             });
             
+            if (!activeButtonFound) {
+                console.error(`[Sales Team] Could not find button for ${days} days`);
+            }
+            
+            // Load new data
+            console.log(`[Sales Team] Loading performance data for ${days} days...`);
             loadSalesTeamPerformance();
+        }
+        
+        // Test function for debugging Sales Team Performance widget
+        function testSalesTeamButtons() {
+            console.log('[Sales Team Test] Testing all date range buttons...');
+            
+            // Test current state
+            console.log(`[Sales Team Test] Current range: ${currentSalesTeamRange} days`);
+            
+            // Test 1 day
+            setTimeout(() => {
+                console.log('[Sales Team Test] Testing Today (1 day) button...');
+                changeSalesTeamRange(1);
+            }, 1000);
+            
+            // Test 7 days
+            setTimeout(() => {
+                console.log('[Sales Team Test] Testing 7 Days button...');
+                changeSalesTeamRange(7);
+            }, 3000);
+            
+            // Test 30 days
+            setTimeout(() => {
+                console.log('[Sales Team Test] Testing 30 Days button...');
+                changeSalesTeamRange(30);
+            }, 5000);
+            
+            console.log('[Sales Team Test] Test sequence started. Check console for results.');
         }
         
         // Chart helper
