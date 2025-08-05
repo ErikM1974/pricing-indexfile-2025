@@ -2273,44 +2273,99 @@
 
         // API Functions
         async function loadRevenueData() {
-            const revenueCard = document.querySelector('[data-metric="revenue"]');
-            const valueElement = document.getElementById('totalRevenue');
-            const trendElement = revenueCard?.querySelector('.metric-change');
-            const ordersElement = document.querySelector('[data-metric="orders"] .metric-value');
+            console.log(`[Total Revenue] Loading data for ${currentDateRange} days`);
+            
+            // Find ALL revenue card instances (main and cloned)
+            const allRevenueCards = document.querySelectorAll('[data-metric="revenue"]');
+            const allOrderCards = document.querySelectorAll('[data-metric="orders"]');
+            
+            console.log(`[Total Revenue] Found ${allRevenueCards.length} revenue card instances`);
+            console.log(`[Total Revenue] Found ${allOrderCards.length} order card instances`);
             
             try {
-                if (valueElement) valueElement.textContent = 'Loading...';
-                if (ordersElement) ordersElement.textContent = 'Loading...';
+                // Set loading state for all instances
+                allRevenueCards.forEach(card => {
+                    const valueElement = card.querySelector('.metric-value');
+                    if (valueElement) valueElement.textContent = 'Loading...';
+                });
+                
+                allOrderCards.forEach(card => {
+                    const valueElement = card.querySelector('.metric-value');
+                    if (valueElement) valueElement.textContent = 'Loading...';
+                });
                 
                 const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=${currentDateRange}&compareYoY=true`);
                 
                 if (!response.ok) throw new Error('API request failed');
                 
                 const data = await response.json();
+                console.log(`[Total Revenue] API response:`, data);
                 
-                if (valueElement) {
-                    valueElement.textContent = `$${(data.summary.totalSales || 0).toLocaleString()}`;
-                }
+                // Update ALL revenue card instances
+                allRevenueCards.forEach((card, index) => {
+                    const valueElement = card.querySelector('.metric-value');
+                    const trendElement = card.querySelector('.metric-change');
+                    
+                    if (valueElement) {
+                        const newValue = `$${(data.summary.totalSales || 0).toLocaleString()}`;
+                        console.log(`[Total Revenue] Updating instance ${index + 1} with: ${newValue}`);
+                        
+                        valueElement.textContent = newValue;
+                        
+                        // Force repaint/reflow
+                        valueElement.style.display = 'none';
+                        valueElement.offsetHeight; // Trigger reflow
+                        valueElement.style.display = '';
+                        
+                        console.log(`[Total Revenue] Instance ${index + 1} updated and repainted`);
+                    }
+                    
+                    if (trendElement && data.yearOverYear) {
+                        const growth = data.yearOverYear.comparison.salesGrowth;
+                        const arrow = growth >= 0 ? '↑' : '↓';
+                        const changeClass = growth >= 0 ? 'positive' : 'negative';
+                        trendElement.innerHTML = `
+                            <span class="${changeClass}">
+                                ${arrow} ${Math.abs(growth).toFixed(1)}% from last year
+                            </span>
+                        `;
+                    }
+                });
                 
-                if (ordersElement) {
-                    ordersElement.textContent = data.summary.totalOrders || '0';
-                }
+                // Update ALL order card instances
+                allOrderCards.forEach((card, index) => {
+                    const valueElement = card.querySelector('.metric-value');
+                    
+                    if (valueElement) {
+                        const newValue = data.summary.totalOrders || '0';
+                        console.log(`[Total Orders] Updating instance ${index + 1} with: ${newValue}`);
+                        
+                        valueElement.textContent = newValue;
+                        
+                        // Force repaint/reflow
+                        valueElement.style.display = 'none';
+                        valueElement.offsetHeight; // Trigger reflow
+                        valueElement.style.display = '';
+                        
+                        console.log(`[Total Orders] Instance ${index + 1} updated and repainted`);
+                    }
+                });
                 
-                if (trendElement && data.yearOverYear) {
-                    const growth = data.yearOverYear.comparison.salesGrowth;
-                    const arrow = growth >= 0 ? '↑' : '↓';
-                    const changeClass = growth >= 0 ? 'positive' : 'negative';
-                    trendElement.innerHTML = `
-                        <span class="${changeClass}">
-                            ${arrow} ${Math.abs(growth).toFixed(1)}% from last year
-                        </span>
-                    `;
-                }
+                console.log(`[Total Revenue] All instances updated successfully`);
                 
             } catch (error) {
-                console.error('Revenue API Error:', error);
-                if (valueElement) valueElement.textContent = 'Unavailable';
-                if (ordersElement) ordersElement.textContent = 'Unavailable';
+                console.error('[Total Revenue] API Error:', error);
+                
+                // Update all instances with error state
+                allRevenueCards.forEach(card => {
+                    const valueElement = card.querySelector('.metric-value');
+                    if (valueElement) valueElement.textContent = 'Unavailable';
+                });
+                
+                allOrderCards.forEach(card => {
+                    const valueElement = card.querySelector('.metric-value');
+                    if (valueElement) valueElement.textContent = 'Unavailable';
+                });
             }
         }
 
@@ -2542,31 +2597,50 @@
         async function loadSalesTeamPerformance() {
             console.log(`[Sales Team] Loading performance data for ${currentSalesTeamRange} days...`);
             
+            // Debug: Check what button is actually active
+            const activeBtn = document.querySelector('.sales-team-date-selector .date-range-btn.active');
+            if (activeBtn) {
+                const activeDays = parseInt(activeBtn.getAttribute('data-days'));
+                console.log(`[Sales Team] Active button shows: ${activeDays} days`);
+                if (activeDays !== currentSalesTeamRange) {
+                    console.warn(`[Sales Team] MISMATCH: Variable says ${currentSalesTeamRange} but button shows ${activeDays}`);
+                }
+            } else {
+                console.warn('[Sales Team] No active button found!');
+            }
+            
             // Prevent concurrent loads
             if (loadingSalesTeam) {
                 console.log('[Sales Team] Already loading, skipping duplicate request');
                 return;
             }
             
-            const salesTeamCard = document.querySelector('[data-widget="sales-team-performance"]');
-            const salesTeamList = salesTeamCard?.querySelector('.sales-team-list');
+            // Find ALL instances of sales team lists (original and cloned)
+            const allSalesTeamLists = document.querySelectorAll('.sales-team-list');
+            console.log(`[Sales Team] Found ${allSalesTeamLists.length} sales team list element(s)`);
             
-            if (!salesTeamList) {
-                console.error('[Sales Team] Could not find .sales-team-list element');
+            if (allSalesTeamLists.length === 0) {
+                console.error('[Sales Team] Could not find any .sales-team-list elements');
                 return;
             }
             
             loadingSalesTeam = true;
             
+            // Show loading state in ALL instances
+            const loadingHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                    <div class="loading" style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--wsu-crimson); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+                    <p>Loading sales team data for <strong>${currentSalesTeamRange} day${currentSalesTeamRange !== 1 ? 's' : ''}</strong>...</p>
+                    <p style="font-size: 0.75rem; opacity: 0.7;">Current selection: ${currentSalesTeamRange === 1 ? 'Today' : currentSalesTeamRange === 7 ? 'Last 7 Days' : 'Last 30 Days'}</p>
+                </div>
+            `;
+            
+            allSalesTeamLists.forEach((list, index) => {
+                console.log(`[Sales Team] Setting loading state for list ${index + 1}`);
+                list.innerHTML = loadingHTML;
+            });
+            
             try {
-                // Show loading state
-                salesTeamList.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                        <div class="loading" style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--wsu-crimson); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
-                        <p>Loading sales team data for ${currentSalesTeamRange} day${currentSalesTeamRange !== 1 ? 's' : ''}...</p>
-                    </div>
-                `;
-                
                 const apiUrl = `${API_CONFIG.baseURL}/order-dashboard?days=${currentSalesTeamRange}`;
                 console.log(`[Sales Team] Making API call to: ${apiUrl}`);
                 
@@ -2589,43 +2663,75 @@
                 const allSalesReps = data.breakdown.byCsr;
                 console.log(`[Sales Team] Found ${allSalesReps.length} sales reps in data`);
                 
+                let finalHTML;
+                
                 if (allSalesReps.length === 0) {
-                    salesTeamList.innerHTML = `
+                    finalHTML = `
                         <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
                             <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.3;"></i>
                             <p>No sales data available for the selected ${currentSalesTeamRange} day${currentSalesTeamRange !== 1 ? 's' : ''}</p>
                         </div>
                     `;
-                    return;
+                } else {
+                    // Add a header showing the current date range
+                    const dateRangeText = currentSalesTeamRange === 1 ? 'Today' : 
+                                        currentSalesTeamRange === 7 ? 'Last 7 Days' : 
+                                        'Last 30 Days';
+                    
+                    finalHTML = `
+                        <div style="padding: 0.5rem 1rem; margin-bottom: 0.5rem; background: var(--gray-100); border-radius: 0.5rem; font-size: 0.875rem; color: var(--gray-600); text-align: center;">
+                            Showing data for: <strong>${dateRangeText}</strong>
+                            <span style="margin-left: 1rem; font-size: 0.75rem; opacity: 0.7;">
+                                (${data.dateRange.start ? new Date(data.dateRange.start).toLocaleDateString() : 'N/A'} - 
+                                ${data.dateRange.end ? new Date(data.dateRange.end).toLocaleDateString() : 'N/A'})
+                            </span>
+                            <span style="display: block; margin-top: 0.25rem; font-size: 0.7rem; opacity: 0.5;">
+                                Last updated: ${new Date().toLocaleTimeString()}
+                            </span>
+                        </div>
+                    ` + allSalesReps.map((rep, index) => {
+                        console.log(`[Sales Team] Processing rep ${index + 1}: ${rep.name} - ${rep.orders} orders - $${rep.sales}`);
+                        return `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: ${index % 2 === 0 ? 'var(--gray-50)' : 'white'}; border-radius: 0.5rem; border: 1px solid var(--gray-200); margin-bottom: 0.5rem;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div style="width: 36px; height: 36px; background: ${index < 3 ? 'linear-gradient(135deg, var(--wsu-crimson), var(--wsu-dark-crimson))' : 'var(--gray-200)'}; color: ${index < 3 ? 'white' : 'var(--gray-600)'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
+                                        ${index + 1}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--gray-900); font-size: 1rem; margin-bottom: 0.25rem;">${rep.name}</div>
+                                        <div style="font-size: 0.875rem; color: var(--gray-600);">${rep.orders} order${rep.orders !== 1 ? 's' : ''}</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: 700; color: var(--gray-900); font-size: 1.25rem; margin-bottom: 0.25rem;">$${rep.sales.toLocaleString()}</div>
+                                    <div style="font-size: 0.75rem; color: var(--gray-600);">Avg: $${Math.round(rep.sales / (rep.orders || 1))}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
                 }
                 
-                const salesTeamHTML = allSalesReps.map((rep, index) => {
-                    console.log(`[Sales Team] Processing rep ${index + 1}: ${rep.name} - ${rep.orders} orders - $${rep.sales}`);
-                    return `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: ${index % 2 === 0 ? 'var(--gray-50)' : 'white'}; border-radius: 0.5rem; border: 1px solid var(--gray-200); margin-bottom: 0.5rem;">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div style="width: 36px; height: 36px; background: ${index < 3 ? 'linear-gradient(135deg, var(--wsu-crimson), var(--wsu-dark-crimson))' : 'var(--gray-200)'}; color: ${index < 3 ? 'white' : 'var(--gray-600)'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
-                                    ${index + 1}
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; color: var(--gray-900); font-size: 1rem; margin-bottom: 0.25rem;">${rep.name}</div>
-                                    <div style="font-size: 0.875rem; color: var(--gray-600);">${rep.orders} order${rep.orders !== 1 ? 's' : ''}</div>
-                                </div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-weight: 700; color: var(--gray-900); font-size: 1.25rem; margin-bottom: 0.25rem;">$${rep.sales.toLocaleString()}</div>
-                                <div style="font-size: 0.75rem; color: var(--gray-600);">Avg: $${Math.round(rep.sales / (rep.orders || 1))}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                // Update ALL instances of the sales team list
+                allSalesTeamLists.forEach((list, index) => {
+                    console.log(`[Sales Team] Updating list ${index + 1} with ${allSalesReps.length} sales reps`);
+                    list.innerHTML = finalHTML;
+                    
+                    // Force a repaint/reflow
+                    list.style.display = 'none';
+                    list.offsetHeight; // Trigger reflow
+                    list.style.display = '';
+                });
                 
-                salesTeamList.innerHTML = salesTeamHTML;
-                console.log(`[Sales Team] Successfully updated widget with ${allSalesReps.length} sales reps`);
+                console.log(`[Sales Team] Successfully updated all ${allSalesTeamLists.length} widget instance(s) with ${allSalesReps.length} sales reps`);
+                console.log(`[Sales Team] Data displayed for ${currentSalesTeamRange} days:`, allSalesReps.map(rep => ({
+                    name: rep.name,
+                    orders: rep.orders,
+                    sales: rep.sales
+                })));
                 
             } catch (error) {
                 console.error('[Sales Team] Error loading performance data:', error);
-                salesTeamList.innerHTML = `
+                const errorHTML = `
                     <div style="text-align: center; padding: 2rem; color: var(--danger);">
                         <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
                         <p><strong>Unable to load sales team data</strong></p>
@@ -2633,61 +2739,123 @@
                         <p style="font-size: 0.875rem; opacity: 0.7;">Date range: ${currentSalesTeamRange} day${currentSalesTeamRange !== 1 ? 's' : ''}</p>
                     </div>
                 `;
+                
+                // Update ALL instances with error message
+                allSalesTeamLists.forEach((list, index) => {
+                    console.log(`[Sales Team] Updating list ${index + 1} with error message`);
+                    list.innerHTML = errorHTML;
+                });
             } finally {
                 loadingSalesTeam = false;
             }
         }
         
         async function loadOrderTypesBreakdown() {
+            console.log(`[Order Types] Loading breakdown data for ${currentOrderTypesRange} days...`);
+            
+            // Debug: Check what button is actually active
+            const activeBtn = document.querySelector('.order-types-date-selector .date-range-btn.active');
+            if (activeBtn) {
+                const activeDays = parseInt(activeBtn.getAttribute('data-days'));
+                console.log(`[Order Types] Active button shows: ${activeDays} days`);
+                if (activeDays !== currentOrderTypesRange) {
+                    console.warn(`[Order Types] MISMATCH: Variable says ${currentOrderTypesRange} but button shows ${activeDays}`);
+                }
+            } else {
+                console.warn('[Order Types] No active button found!');
+            }
+            
             // Prevent concurrent loads
             if (loadingOrderTypes) {
                 console.log('[Order Types] Already loading, skipping duplicate request');
                 return;
             }
             
-            const breakdownCard = document.querySelector('[data-widget="order-types-breakdown"]');
-            const orderTypesList = breakdownCard?.querySelector('.order-types-list');
+            // Find ALL instances of order types lists (original and cloned)
+            const allOrderTypesLists = document.querySelectorAll('.order-types-list');
+            console.log(`[Order Types] Found ${allOrderTypesLists.length} order types list element(s)`);
+            
+            if (allOrderTypesLists.length === 0) {
+                console.error('[Order Types] Could not find any .order-types-list elements');
+                return;
+            }
             
             loadingOrderTypes = true;
             
+            // Show loading state in ALL instances
+            const loadingHTML = `<div style="grid-column: span 3; text-align: center; padding: 2rem; color: var(--gray-600);">Loading order types for ${currentOrderTypesRange} day${currentOrderTypesRange !== 1 ? 's' : ''}...</div>`;
+            
+            allOrderTypesLists.forEach((list, index) => {
+                console.log(`[Order Types] Setting loading state for list ${index + 1}`);
+                list.innerHTML = loadingHTML;
+            });
+            
             try {
-                if (orderTypesList) {
-                    orderTypesList.innerHTML = '<div style="grid-column: span 3; text-align: center; padding: 2rem; color: var(--gray-600);">Loading all order types...</div>';
-                }
+                const apiUrl = `${API_CONFIG.baseURL}/order-dashboard?days=${currentOrderTypesRange}`;
+                console.log(`[Order Types] Making API call to: ${apiUrl}`);
                 
-                const response = await fetch(`${API_CONFIG.baseURL}/order-dashboard?days=${currentOrderTypesRange}`);
+                const response = await fetch(apiUrl);
+                console.log(`[Order Types] API response status: ${response.status}`);
                 
                 if (!response.ok) throw new Error('API request failed');
                 
                 const data = await response.json();
+                console.log(`[Order Types] API data received:`, data);
                 
                 const allOrderTypes = data.breakdown.byOrderType || [];
+                console.log(`[Order Types] Found ${allOrderTypes.length} order types in data`);
                 
-                const orderTypesHTML = allOrderTypes.map((type, index) => {
-                    const maxSales = Math.max(...allOrderTypes.map(t => t.sales));
-                    const percentage = maxSales > 0 ? (type.sales / maxSales) * 100 : 0;
-                    
-                    return `
-                        <div style="background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--gray-200); box-shadow: var(--shadow); transition: all 0.2s ease;">
-                            <div style="font-weight: 600; color: var(--gray-900); margin-bottom: 0.75rem; font-size: 1rem;">${type.type}</div>
-                            <div style="font-size: 1.75rem; font-weight: 700; color: var(--wsu-crimson); margin-bottom: 0.5rem;">$${type.sales.toLocaleString()}</div>
-                            <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 1rem;">${type.orders} orders</div>
-                            <div style="background: var(--gray-100); height: 6px; border-radius: 3px; overflow: hidden;">
-                                <div style="background: linear-gradient(135deg, var(--wsu-crimson), var(--wsu-dark-crimson)); height: 100%; width: ${percentage}%; transition: width 0.5s ease;"></div>
+                let finalHTML;
+                
+                if (allOrderTypes.length === 0) {
+                    finalHTML = '<div style="grid-column: span 3; text-align: center; padding: 2rem; color: var(--text-secondary);">No order types data available</div>';
+                } else {
+                    finalHTML = allOrderTypes.map((type, index) => {
+                        const maxSales = Math.max(...allOrderTypes.map(t => t.sales));
+                        const percentage = maxSales > 0 ? (type.sales / maxSales) * 100 : 0;
+                        
+                        console.log(`[Order Types] Processing type ${index + 1}: ${type.type} - ${type.orders} orders - $${type.sales}`);
+                        
+                        return `
+                            <div style="background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--gray-200); box-shadow: var(--shadow); transition: all 0.2s ease;">
+                                <div style="font-weight: 600; color: var(--gray-900); margin-bottom: 0.75rem; font-size: 1rem;">${type.type}</div>
+                                <div style="font-size: 1.75rem; font-weight: 700; color: var(--wsu-crimson); margin-bottom: 0.5rem;">$${type.sales.toLocaleString()}</div>
+                                <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 1rem;">${type.orders} orders</div>
+                                <div style="background: var(--gray-100); height: 6px; border-radius: 3px; overflow: hidden;">
+                                    <div style="background: linear-gradient(135deg, var(--wsu-crimson), var(--wsu-dark-crimson)); height: 100%; width: ${percentage}%; transition: width 0.5s ease;"></div>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                if (orderTypesList) {
-                    orderTypesList.innerHTML = orderTypesHTML || '<div style="grid-column: span 3; text-align: center; padding: 2rem; color: var(--danger);">No order types data available</div>';
+                        `;
+                    }).join('');
                 }
+                
+                // Update ALL instances of the order types list
+                allOrderTypesLists.forEach((list, index) => {
+                    console.log(`[Order Types] Updating list ${index + 1} with ${allOrderTypes.length} order types`);
+                    list.innerHTML = finalHTML;
+                    
+                    // Force a repaint/reflow
+                    list.style.display = 'none';
+                    list.offsetHeight; // Trigger reflow
+                    list.style.display = '';
+                });
+                
+                console.log(`[Order Types] Successfully updated all ${allOrderTypesLists.length} widget instance(s) with ${allOrderTypes.length} order types`);
+                console.log(`[Order Types] Data displayed for ${currentOrderTypesRange} days:`, allOrderTypes.map(type => ({
+                    type: type.type,
+                    orders: type.orders,
+                    sales: type.sales
+                })));
                 
             } catch (error) {
                 console.error('Order Types API Error:', error);
-                if (orderTypesList) {
-                    orderTypesList.innerHTML = '<div style="grid-column: span 3; text-align: center; padding: 2rem; color: var(--danger);">Unavailable - Unable to load order types</div>';
-                }
+                const errorHTML = '<div style="grid-column: span 3; text-align: center; padding: 2rem; color: var(--danger);">Unavailable - Unable to load order types</div>';
+                
+                // Update ALL instances with error message
+                allOrderTypesLists.forEach((list, index) => {
+                    console.log(`[Order Types] Updating list ${index + 1} with error message`);
+                    list.innerHTML = errorHTML;
+                });
             } finally {
                 loadingOrderTypes = false;
             }
@@ -2883,13 +3051,26 @@
         }
         
         function changeOrderTypesRange(days) {
-            currentOrderTypesRange = days;
+            console.log(`[Order Types] Date range changed to ${days} days`);
             
-            document.querySelectorAll('.order-types-date-selector .date-range-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (parseInt(btn.getAttribute('data-days')) === days) {
-                    btn.classList.add('active');
-                }
+            currentOrderTypesRange = days;
+            console.log(`[Order Types] currentOrderTypesRange updated to: ${currentOrderTypesRange}`);
+            
+            // Update button active states - ALL instances (including cloned ones)
+            const allOrderTypesSelectors = document.querySelectorAll('.order-types-date-selector');
+            console.log(`[Order Types] Found ${allOrderTypesSelectors.length} order types selectors`);
+            
+            allOrderTypesSelectors.forEach((selector, index) => {
+                console.log(`[Order Types] Updating selector ${index + 1}`);
+                const buttons = selector.querySelectorAll('.date-range-btn');
+                
+                buttons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (parseInt(btn.getAttribute('data-days')) === days) {
+                        btn.classList.add('active');
+                        console.log(`[Order Types] Activated button for ${days} days in selector ${index + 1}`);
+                    }
+                });
             });
             
             // Add a small delay to ensure state is properly set
@@ -2910,29 +3091,29 @@
             currentSalesTeamRange = days;
             console.log(`[Sales Team] currentSalesTeamRange updated to: ${currentSalesTeamRange}`);
             
-            // Update button active states
-            const salesTeamSelector = document.querySelector('.sales-team-date-selector');
-            if (!salesTeamSelector) {
-                console.error('[Sales Team] Could not find .sales-team-date-selector element');
-                return;
-            }
+            // Update button active states - ALL instances (including cloned ones)
+            const allSalesTeamSelectors = document.querySelectorAll('.sales-team-date-selector');
+            console.log(`[Sales Team] Found ${allSalesTeamSelectors.length} sales team selectors`);
             
-            const buttons = salesTeamSelector.querySelectorAll('.date-range-btn');
-            let activeButtonFound = false;
-            
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
-                const btnDays = parseInt(btn.getAttribute('data-days'));
-                if (btnDays === days) {
-                    btn.classList.add('active');
-                    activeButtonFound = true;
-                    console.log(`[Sales Team] Activated button for ${days} days`);
+            allSalesTeamSelectors.forEach((salesTeamSelector, index) => {
+                console.log(`[Sales Team] Updating selector ${index + 1}`);
+                const buttons = salesTeamSelector.querySelectorAll('.date-range-btn');
+                let activeButtonFound = false;
+                
+                buttons.forEach(btn => {
+                    btn.classList.remove('active');
+                    const btnDays = parseInt(btn.getAttribute('data-days'));
+                    if (btnDays === days) {
+                        btn.classList.add('active');
+                        activeButtonFound = true;
+                        console.log(`[Sales Team] Activated button for ${days} days in selector ${index + 1}`);
+                    }
+                });
+                
+                if (!activeButtonFound) {
+                    console.error(`[Sales Team] Could not find button for ${days} days in selector ${index + 1}`);
                 }
             });
-            
-            if (!activeButtonFound) {
-                console.error(`[Sales Team] Could not find button for ${days} days`);
-            }
             
             // Load new data
             console.log(`[Sales Team] Loading performance data for ${days} days...`);
@@ -2949,27 +3130,194 @@
             
             // Test current state
             console.log(`[Sales Team Test] Current range: ${currentSalesTeamRange} days`);
+            console.log(`[Sales Team Test] Found ${document.querySelectorAll('.sales-team-list').length} sales team list elements`);
+            console.log(`[Sales Team Test] Found ${document.querySelectorAll('.sales-team-date-selector').length} sales team date selector elements`);
+            
+            // Add debugging for interval
+            console.log('[Sales Team Test] Checking for refresh interval conflicts...');
             
             // Test 1 day
             setTimeout(() => {
                 console.log('[Sales Team Test] Testing Today (1 day) button...');
+                console.log(`[Sales Team Test] Before click - currentSalesTeamRange: ${currentSalesTeamRange}`);
                 changeSalesTeamRange(1);
+                console.log(`[Sales Team Test] After click - currentSalesTeamRange: ${currentSalesTeamRange}`);
             }, 1000);
             
             // Test 7 days
             setTimeout(() => {
                 console.log('[Sales Team Test] Testing 7 Days button...');
+                console.log(`[Sales Team Test] Before click - currentSalesTeamRange: ${currentSalesTeamRange}`);
                 changeSalesTeamRange(7);
+                console.log(`[Sales Team Test] After click - currentSalesTeamRange: ${currentSalesTeamRange}`);
             }, 3000);
             
             // Test 30 days
             setTimeout(() => {
                 console.log('[Sales Team Test] Testing 30 Days button...');
+                console.log(`[Sales Team Test] Before click - currentSalesTeamRange: ${currentSalesTeamRange}`);
                 changeSalesTeamRange(30);
+                console.log(`[Sales Team Test] After click - currentSalesTeamRange: ${currentSalesTeamRange}`);
             }, 5000);
+            
+            // Check if interval is interfering
+            setTimeout(() => {
+                console.log(`[Sales Team Test] Final check - currentSalesTeamRange: ${currentSalesTeamRange}`);
+                console.log('[Sales Team Test] If this value changed unexpectedly, the interval may be resetting it.');
+            }, 7000);
             
             console.log('[Sales Team Test] Test sequence started. Check console for results.');
         }
+        
+        // Helper function to debug current state
+        function debugSalesTeamState() {
+            console.group('[Sales Team Debug] Current State');
+            console.log(`currentSalesTeamRange: ${currentSalesTeamRange}`);
+            
+            const activeBtn = document.querySelector('.sales-team-date-selector .date-range-btn.active');
+            if (activeBtn) {
+                console.log(`Active button: ${activeBtn.textContent} (${activeBtn.getAttribute('data-days')} days)`);
+            } else {
+                console.log('No active button found');
+            }
+            
+            const salesTeamList = document.querySelector('.sales-team-list');
+            if (salesTeamList) {
+                const dateInfo = salesTeamList.querySelector('div');
+                if (dateInfo && dateInfo.textContent.includes('Showing data for:')) {
+                    console.log(`Display shows: ${dateInfo.textContent}`);
+                }
+            }
+            
+            console.groupEnd();
+        }
+        
+        // Test function for debugging Order Types widget
+        function testOrderTypesButtons() {
+            console.log('[Order Types Test] Testing all date range buttons...');
+            
+            // Test current state
+            console.log(`[Order Types Test] Current range: ${currentOrderTypesRange} days`);
+            console.log(`[Order Types Test] Found ${document.querySelectorAll('.order-types-list').length} order types list elements`);
+            console.log(`[Order Types Test] Found ${document.querySelectorAll('.order-types-date-selector').length} order types date selector elements`);
+            
+            // Test 1 day
+            setTimeout(() => {
+                console.log('[Order Types Test] Testing Today (1 day) button...');
+                console.log(`[Order Types Test] Before click - currentOrderTypesRange: ${currentOrderTypesRange}`);
+                changeOrderTypesRange(1);
+                console.log(`[Order Types Test] After click - currentOrderTypesRange: ${currentOrderTypesRange}`);
+            }, 1000);
+            
+            // Test 7 days
+            setTimeout(() => {
+                console.log('[Order Types Test] Testing 7 Days button...');
+                console.log(`[Order Types Test] Before click - currentOrderTypesRange: ${currentOrderTypesRange}`);
+                changeOrderTypesRange(7);
+                console.log(`[Order Types Test] After click - currentOrderTypesRange: ${currentOrderTypesRange}`);
+            }, 3000);
+            
+            // Test 30 days
+            setTimeout(() => {
+                console.log('[Order Types Test] Testing 30 Days button...');
+                console.log(`[Order Types Test] Before click - currentOrderTypesRange: ${currentOrderTypesRange}`);
+                changeOrderTypesRange(30);
+                console.log(`[Order Types Test] After click - currentOrderTypesRange: ${currentOrderTypesRange}`);
+            }, 5000);
+            
+            console.log('[Order Types Test] Test sequence started. Check console for results.');
+        }
+        
+        // Helper function to debug Order Types state
+        function debugOrderTypesState() {
+            console.group('[Order Types Debug] Current State');
+            console.log(`currentOrderTypesRange: ${currentOrderTypesRange}`);
+            
+            const activeBtn = document.querySelector('.order-types-date-selector .date-range-btn.active');
+            if (activeBtn) {
+                console.log(`Active button: ${activeBtn.textContent} (${activeBtn.getAttribute('data-days')} days)`);
+            } else {
+                console.log('No active button found');
+            }
+            
+            const orderTypesList = document.querySelector('.order-types-list');
+            if (orderTypesList) {
+                const types = orderTypesList.querySelectorAll('.order-types-list > div');
+                console.log(`Display shows ${types.length} order types`);
+            }
+            
+            console.groupEnd();
+        }
+        
+        // Test function for debugging Total Revenue widget
+        function testTotalRevenueButtons() {
+            console.log('[Total Revenue Test] Testing date range buttons...');
+            
+            // Test current state
+            console.log(`[Total Revenue Test] Current range: ${currentDateRange} days`);
+            console.log(`[Total Revenue Test] Found ${document.querySelectorAll('[data-metric="revenue"]').length} revenue card elements`);
+            console.log(`[Total Revenue Test] Found ${document.querySelectorAll('[data-metric="orders"]').length} order card elements`);
+            
+            // Test 7 days
+            setTimeout(() => {
+                console.log('[Total Revenue Test] Testing 7 Days button...');
+                console.log(`[Total Revenue Test] Before click - currentDateRange: ${currentDateRange}`);
+                changeDateRange(7);
+                console.log(`[Total Revenue Test] After click - currentDateRange: ${currentDateRange}`);
+            }, 1000);
+            
+            // Test 30 days
+            setTimeout(() => {
+                console.log('[Total Revenue Test] Testing 30 Days button...');
+                console.log(`[Total Revenue Test] Before click - currentDateRange: ${currentDateRange}`);
+                changeDateRange(30);
+                console.log(`[Total Revenue Test] After click - currentDateRange: ${currentDateRange}`);
+            }, 3000);
+            
+            // Final check
+            setTimeout(() => {
+                console.log(`[Total Revenue Test] Final check - currentDateRange: ${currentDateRange}`);
+                const allRevenueCards = document.querySelectorAll('[data-metric="revenue"]');
+                allRevenueCards.forEach((card, index) => {
+                    const valueElement = card.querySelector('.metric-value');
+                    console.log(`[Total Revenue Test] Card ${index + 1} value: ${valueElement?.textContent || 'N/A'}`);
+                });
+            }, 5000);
+            
+            console.log('[Total Revenue Test] Test sequence started. Check console for results.');
+        }
+        
+        // Helper function to debug Total Revenue state
+        function debugTotalRevenueState() {
+            console.group('[Total Revenue Debug] Current State');
+            console.log(`currentDateRange: ${currentDateRange}`);
+            
+            const allRevenueCards = document.querySelectorAll('[data-metric="revenue"]');
+            console.log(`Found ${allRevenueCards.length} revenue card instances:`);
+            
+            allRevenueCards.forEach((card, index) => {
+                const valueElement = card.querySelector('.metric-value');
+                const activeBtn = card.querySelector('.date-range-btn.active');
+                console.log(`Card ${index + 1}:`);
+                console.log(`  - Value: ${valueElement?.textContent || 'N/A'}`);
+                console.log(`  - Active button: ${activeBtn?.textContent || 'None'} (${activeBtn?.getAttribute('data-days') || 'N/A'} days)`);
+                console.log(`  - Visible: ${card.offsetParent !== null}`);
+            });
+            
+            const allOrderCards = document.querySelectorAll('[data-metric="orders"]');
+            console.log(`\nFound ${allOrderCards.length} order card instances:`);
+            
+            allOrderCards.forEach((card, index) => {
+                const valueElement = card.querySelector('.metric-value');
+                console.log(`Order Card ${index + 1} value: ${valueElement?.textContent || 'N/A'}`);
+            });
+            
+            console.groupEnd();
+        }
+        
+        // Make functions globally available
+        window.testTotalRevenueButtons = testTotalRevenueButtons;
+        window.debugTotalRevenueState = debugTotalRevenueState;
         
         // Chart helper
         function createOrUpdateChart(chartId, chartConfig) {
@@ -3115,11 +3463,14 @@
             
             // Set up refresh intervals
             setInterval(async () => {
+                console.log('[Dashboard Refresh] Auto-refreshing data...');
+                console.log(`[Dashboard Refresh] Current settings - Sales Team: ${currentSalesTeamRange} days, Order Types: ${currentOrderTypesRange} days`);
+                
                 await Promise.all([
                     loadRevenueData(),
-                    loadSalesTeamPerformance(),
+                    loadSalesTeamPerformance(),  // This will use currentSalesTeamRange
                     loadProductionSchedule(),
-                    loadOrderTypesBreakdown(),
+                    loadOrderTypesBreakdown(),    // This will use currentOrderTypesRange
                     loadAdriyellaSummary()
                 ]);
                 
