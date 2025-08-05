@@ -1978,6 +1978,8 @@
         let currentDateRange = 30;
         let currentOrderTypesRange = 30;
         let currentSalesTeamRange = 30;
+        let loadingSalesTeam = false; // Prevent concurrent loads
+        let loadingOrderTypes = false; // Prevent concurrent loads
 
         // Caspio DataPageReady Event Listener
         document.addEventListener('DataPageReady', function(event) {
@@ -2540,6 +2542,12 @@
         async function loadSalesTeamPerformance() {
             console.log(`[Sales Team] Loading performance data for ${currentSalesTeamRange} days...`);
             
+            // Prevent concurrent loads
+            if (loadingSalesTeam) {
+                console.log('[Sales Team] Already loading, skipping duplicate request');
+                return;
+            }
+            
             const salesTeamCard = document.querySelector('[data-widget="sales-team-performance"]');
             const salesTeamList = salesTeamCard?.querySelector('.sales-team-list');
             
@@ -2547,6 +2555,8 @@
                 console.error('[Sales Team] Could not find .sales-team-list element');
                 return;
             }
+            
+            loadingSalesTeam = true;
             
             try {
                 // Show loading state
@@ -2623,12 +2633,22 @@
                         <p style="font-size: 0.875rem; opacity: 0.7;">Date range: ${currentSalesTeamRange} day${currentSalesTeamRange !== 1 ? 's' : ''}</p>
                     </div>
                 `;
+            } finally {
+                loadingSalesTeam = false;
             }
         }
         
         async function loadOrderTypesBreakdown() {
+            // Prevent concurrent loads
+            if (loadingOrderTypes) {
+                console.log('[Order Types] Already loading, skipping duplicate request');
+                return;
+            }
+            
             const breakdownCard = document.querySelector('[data-widget="order-types-breakdown"]');
             const orderTypesList = breakdownCard?.querySelector('.order-types-list');
+            
+            loadingOrderTypes = true;
             
             try {
                 if (orderTypesList) {
@@ -2668,6 +2688,8 @@
                 if (orderTypesList) {
                     orderTypesList.innerHTML = '<div style="grid-column: span 3; text-align: center; padding: 2rem; color: var(--danger);">Unavailable - Unable to load order types</div>';
                 }
+            } finally {
+                loadingOrderTypes = false;
             }
         }
         
@@ -2870,7 +2892,10 @@
                 }
             });
             
-            loadOrderTypesBreakdown();
+            // Add a small delay to ensure state is properly set
+            setTimeout(() => {
+                loadOrderTypesBreakdown();
+            }, 50);
         }
         
         function changeSalesTeamRange(days) {
@@ -2911,7 +2936,11 @@
             
             // Load new data
             console.log(`[Sales Team] Loading performance data for ${days} days...`);
-            loadSalesTeamPerformance();
+            
+            // Add a small delay to ensure state is properly set
+            setTimeout(() => {
+                loadSalesTeamPerformance();
+            }, 50);
         }
         
         // Test function for debugging Sales Team Performance widget
