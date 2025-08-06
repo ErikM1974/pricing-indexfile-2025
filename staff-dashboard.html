@@ -1837,21 +1837,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        .bonus-tracker-special::before {
-            content: "BONUS!";
-            position: absolute;
-            top: -10px;
-            right: 10px;
-            background: linear-gradient(45deg, #FF1744, #FF6B6B);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 700;
-            animation: bounceGift 2s ease-in-out infinite;
-            box-shadow: 0 2px 8px rgba(255, 23, 68, 0.5);
-            z-index: 10;
-        }
 
         .bonus-tracker-special::after {
             content: "✨";
@@ -1885,10 +1870,6 @@
             background: linear-gradient(135deg, #FFA500, #FF8C00) !important;
         }
 
-        /* Confetti particles on hover */
-        .bonus-tracker-special:hover::before {
-            animation: bounceGift 0.5s ease-in-out infinite;
-        }
 
         /* Extra sparkles */
         .bonus-sparkle {
@@ -1915,22 +1896,6 @@
             overflow: visible !important;
         }
 
-        .bonus-card-special::before {
-            content: "🎉 BONUS TRACKER 🎉";
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(45deg, #FF1744, #FF6B6B);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(255, 23, 68, 0.5);
-            animation: bounceGift 2s ease-in-out infinite;
-            z-index: 10;
-        }
 
         .bonus-card-special .process-icon {
             color: white !important;
