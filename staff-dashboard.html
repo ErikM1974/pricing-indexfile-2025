@@ -776,6 +776,84 @@
             color: var(--gray-500);
         }
 
+        .user-menu {
+            position: relative;
+        }
+
+        .user-menu-chevron {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            transition: transform 0.2s;
+        }
+
+        .user-menu.active .user-menu-chevron {
+            transform: rotate(180deg);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            min-width: 200px;
+            z-index: 200;
+            display: none;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            background: var(--gray-50);
+        }
+
+        .dropdown-user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        .dropdown-user-email {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--gray-100);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: background-color 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .dropdown-item:hover {
+            background: var(--gray-50);
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            color: var(--gray-500);
+        }
+
         /* Content Area */
         .content-area {
             flex: 1;
@@ -2153,12 +2231,26 @@
                 </div>
                 
                 <div class="header-right">
-                    <div class="user-menu">
+                    <div class="user-menu" onclick="toggleUserDropdown(event)">
                         <div class="user-info">
                             <div class="user-name" id="headerUserName">Loading...</div>
                             <div class="user-role">Staff Member</div>
                         </div>
                         <div class="user-avatar" id="headerUserAvatar">U</div>
+                        <i class="fas fa-chevron-down user-menu-chevron"></i>
+                        
+                        <!-- User Dropdown Menu -->
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-header">
+                                <div class="dropdown-user-name" id="dropdownUserName">Loading...</div>
+                                <div class="dropdown-user-email" id="dropdownUserEmail">email@nwcustomapparel.com</div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item" onclick="handleLogout(); return false;">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -2690,6 +2782,18 @@
                 headerUserAvatar.textContent = initials;
             }
 
+            // Update dropdown user info
+            const dropdownUserName = document.getElementById('dropdownUserName');
+            const dropdownUserEmail = document.getElementById('dropdownUserEmail');
+            
+            if (dropdownUserName) {
+                dropdownUserName.textContent = fullName;
+            }
+            
+            if (dropdownUserEmail) {
+                dropdownUserEmail.textContent = email;
+            }
+
             // Store user info for use in calculators
             sessionStorage.setItem('nwca_user_name', fullName);
             sessionStorage.setItem('nwca_user_email', email);
@@ -2761,6 +2865,32 @@
                 }
             }
         }
+
+        // User dropdown toggle
+        function toggleUserDropdown(event) {
+            event.stopPropagation();
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userDropdown');
+            
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                userMenu.classList.remove('active');
+            } else {
+                dropdown.classList.add('show');
+                userMenu.classList.add('active');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const userMenu = document.querySelector('.user-menu');
+            
+            if (dropdown && userMenu && !userMenu.contains(event.target)) {
+                dropdown.classList.remove('show');
+                userMenu.classList.remove('active');
+            }
+        });
 
         // View Switching
         function switchView(viewName) {
