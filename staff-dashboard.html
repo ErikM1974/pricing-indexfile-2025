@@ -1776,6 +1776,184 @@
         }
 
         /* =====================================================
+           ADRIYELLA'S BONUS TRACKER - Special Animations
+           ===================================================== */
+        @keyframes goldPulse {
+            0%, 100% { 
+                background: linear-gradient(135deg, #FFD700, #FFA500);
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            }
+            50% { 
+                background: linear-gradient(135deg, #FFA500, #FFD700);
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        @keyframes bounceGift {
+            0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+            25% { transform: translateY(-5px) scale(1.1) rotate(-5deg); }
+            75% { transform: translateY(-5px) scale(1.1) rotate(5deg); }
+        }
+
+        @keyframes sparkleEffect {
+            0% { 
+                opacity: 0;
+                transform: scale(0) rotate(0deg);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1) rotate(180deg);
+            }
+            100% { 
+                opacity: 0;
+                transform: scale(0) rotate(360deg);
+            }
+        }
+
+        @keyframes floatUp {
+            0% { 
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(-30px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes shimmerGold {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* Bonus Tracker Special Styling */
+        .bonus-tracker-special {
+            position: relative;
+            background: linear-gradient(135deg, #FFD700, #FFA500) !important;
+            animation: goldPulse 2s ease-in-out infinite;
+            overflow: visible !important;
+            border: 2px solid #FFD700 !important;
+            transform: translateX(0);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .bonus-tracker-special::before {
+            content: "BONUS!";
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: linear-gradient(45deg, #FF1744, #FF6B6B);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            animation: bounceGift 2s ease-in-out infinite;
+            box-shadow: 0 2px 8px rgba(255, 23, 68, 0.5);
+            z-index: 10;
+        }
+
+        .bonus-tracker-special::after {
+            content: "✨";
+            position: absolute;
+            top: 50%;
+            left: -15px;
+            transform: translateY(-50%);
+            font-size: 20px;
+            animation: sparkleEffect 3s linear infinite;
+        }
+
+        .bonus-tracker-special i {
+            color: white !important;
+            animation: bounceGift 2s ease-in-out infinite;
+            font-size: 1.2rem;
+        }
+
+        .bonus-tracker-special span {
+            color: white !important;
+            font-weight: 600 !important;
+            background: linear-gradient(90deg, white, #FFF8DC, white);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmerGold 3s linear infinite;
+        }
+
+        .bonus-tracker-special:hover {
+            transform: translateY(-3px) scale(1.05) !important;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6) !important;
+            background: linear-gradient(135deg, #FFA500, #FF8C00) !important;
+        }
+
+        /* Confetti particles on hover */
+        .bonus-tracker-special:hover::before {
+            animation: bounceGift 0.5s ease-in-out infinite;
+        }
+
+        /* Extra sparkles */
+        .bonus-sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #FFD700;
+            border-radius: 50%;
+            animation: floatUp 2s linear infinite;
+        }
+
+        .bonus-sparkle:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .bonus-sparkle:nth-child(2) { left: 30%; animation-delay: 0.5s; }
+        .bonus-sparkle:nth-child(3) { left: 50%; animation-delay: 1s; }
+        .bonus-sparkle:nth-child(4) { left: 70%; animation-delay: 1.5s; }
+        .bonus-sparkle:nth-child(5) { left: 90%; animation-delay: 2s; }
+
+        /* Bonus Card in Process Grid */
+        .bonus-card-special {
+            background: linear-gradient(135deg, #FFD700, #FFA500) !important;
+            border: 2px solid #FFD700 !important;
+            animation: goldPulse 3s ease-in-out infinite;
+            position: relative;
+            overflow: visible !important;
+        }
+
+        .bonus-card-special::before {
+            content: "🎉 BONUS TRACKER 🎉";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #FF1744, #FF6B6B);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(255, 23, 68, 0.5);
+            animation: bounceGift 2s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        .bonus-card-special .process-icon {
+            color: white !important;
+            animation: bounceGift 2s ease-in-out infinite;
+            font-size: 3rem !important;
+        }
+
+        .bonus-card-special h3 {
+            color: white !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .bonus-card-special p {
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+
+        .bonus-card-special:hover {
+            transform: translateY(-5px) scale(1.03) !important;
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.7) !important;
+            background: linear-gradient(135deg, #FFA500, #FF8C00) !important;
+        }
+
+        /* =====================================================
            COMMAND BAR - Art Operations Quick Access
            ===================================================== */
         .command-bar {
@@ -2632,9 +2810,14 @@
                             <span class="chevron">▼</span>
                         </div>
                         <div class="nav-section-content">
-                            <a href="/training/adriyella-daily-report.html" class="nav-link">
-                                <i class="fas fa-chart-line"></i>
+                            <a href="/training/adriyella-daily-report.html" class="nav-link bonus-tracker-special">
+                                <i class="fas fa-gift"></i>
                                 <span>Adriyella's Bonus Tracker</span>
+                                <div class="bonus-sparkle"></div>
+                                <div class="bonus-sparkle"></div>
+                                <div class="bonus-sparkle"></div>
+                                <div class="bonus-sparkle"></div>
+                                <div class="bonus-sparkle"></div>
                             </a>
                             <a href="/training/thank-you-card-guide.html" class="nav-link">
                                 <i class="fas fa-heart"></i>
@@ -3125,9 +3308,9 @@
                             <p class="process-description">Customer interaction guidelines and communication standards.</p>
                         </div>
                         
-                        <div class="process-card" onclick="window.location.href='/training/adriyella-daily-report.html'">
-                            <i class="fas fa-tasks process-icon"></i>
-                            <h3 class="process-title">Adriyella's Daily Report</h3>
+                        <div class="process-card bonus-card-special" onclick="window.location.href='/training/adriyella-daily-report.html'">
+                            <i class="fas fa-gift process-icon"></i>
+                            <h3 class="process-title">Adriyella's Bonus Tracker</h3>
                             <p class="process-description">Simple daily task entry for Adriyella to record thank you cards, customer calls, and sample management with automatic bonus calculation.</p>
                         </div>
                     </div>
