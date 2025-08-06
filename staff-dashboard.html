@@ -205,12 +205,39 @@
         
         .nav-section .chevron {
             color: rgba(255, 255, 255, 0.7);
-            transition: transform 0.3s;
-            font-size: 0.75rem;
+            transition: transform 0.2s ease-out;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            text-align: center;
         }
         
         .nav-section.collapsed .chevron {
             transform: rotate(-90deg);
+        }
+        
+        /* Enhanced transitions for smooth expand/collapse */
+        .nav-section-content {
+            transition: all 0.2s ease-out;
+            transform-origin: top;
+        }
+        
+        .nav-section.collapsed .nav-section-content {
+            opacity: 0;
+            transform: scaleY(0.95);
+        }
+        
+        .nav-section:not(.collapsed) .nav-section-content {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+        
+        /* Ensure only one chevron per section */
+        .nav-section-header .chevron:not(:last-child) {
+            display: none;
         }
         
         /* Additional visibility for sidebar text */
@@ -230,16 +257,7 @@
             padding: 0.25rem 0.5rem 0.5rem;
         }
         
-        /* Quick Access Mirror - Special Styling */
-        .nav-section.quick-access-mirror {
-            margin-top: auto;
-            background: rgba(76, 179, 84, 0.15);
-            border: 1px solid rgba(76, 179, 84, 0.3);
-        }
-        
-        .nav-section.quick-access-mirror .nav-section-header {
-            background: rgba(76, 179, 84, 0.2);
-        }
+        /* REMOVED: Quick Access Mirror styling - no longer needed */
         
         .nav-section-subtitle {
             padding: 0.25rem 0.875rem;
@@ -252,18 +270,36 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.625rem 0.75rem;  /* More padding */
-            color: white;
+            padding: 0.625rem 0.75rem;
             text-decoration: none;
             border-radius: 0.375rem;
-            transition: background-color 0.2s;
-            font-size: 0.9375rem;  /* Increased from 0.8125rem */
+            transition: all 0.2s ease;
+            font-size: 0.9375rem;
             margin-bottom: 0.25rem;
             line-height: 1.5;
+            position: relative;
+            overflow: hidden;
         }
 
         .nav-link:hover {
             background: rgba(255, 255, 255, 0.1);
+            transform: translateX(3px);
+        }
+        
+        /* Smooth hover effect with subtle animation */
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.15), transparent);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::before {
+            width: 100%;
         }
 
         .nav-link.active {
@@ -271,16 +307,23 @@
         }
 
         .nav-link i {
-            width: 16px;
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             opacity: 0.8;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover i {
+            opacity: 1;
+            transform: scale(1.1);
         }
 
-        /* Enhanced navigation text visibility - fixes dark gray text issue */
-        .sidebar .nav-link {
-            color: white !important;
-            font-weight: 500 !important;
-        }
+        /* REMOVED: This rule is now handled more specifically below */
         
         /* Quick Access Bar Styles - Enhanced */
         .quick-access-bar {
@@ -590,62 +633,240 @@
             border-color: #9333ea;
         }
         
-        /* Section Color Coding */
-        .nav-section--art {
-            background: linear-gradient(90deg, rgba(152,30,50,0.05) 0%, transparent 100%);
-            border-left: 4px solid #981e32;
-            margin-left: -0.5rem;
-            padding-left: 0.5rem;
+        /* Unified Grey Theme for All Sections */
+        .nav-section {
+            margin-bottom: 0.5rem;
             border-radius: 0.25rem;
+            transition: all 0.2s ease;
         }
         
-        .nav-section--manual {
-            background: linear-gradient(90deg, rgba(76,179,84,0.05) 0%, transparent 100%);
-            border-left: 4px solid #4cb354;
-            margin-left: -0.5rem;
-            padding-left: 0.5rem;
-            border-radius: 0.25rem;
+        /* Modern subtle backgrounds for expanded sections */
+        .nav-section:not(.collapsed) {
+            background: rgba(255, 255, 255, 0.08);
+            border-left: 3px solid rgba(255, 255, 255, 0.3);
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
         }
         
-        .nav-section--richardson {
-            background: linear-gradient(90deg, rgba(37,99,235,0.05) 0%, transparent 100%);
-            border-left: 4px solid #2563eb;
-            margin-left: -0.5rem;
-            padding-left: 0.5rem;
-            border-radius: 0.25rem;
+        /* Collapsed sections - fully transparent */
+        .nav-section.collapsed {
+            background: transparent;
+            border-left: none;
+            transition: all 0.2s ease;
         }
         
-        .nav-section--calculators {
-            background: linear-gradient(90deg, rgba(76,179,84,0.03) 0%, transparent 100%);
-            border-left: 4px solid rgba(76,179,84,0.5);
-            margin-left: -0.5rem;
-            padding-left: 0.5rem;
-            border-radius: 0.25rem;
+        /* Section headers */
+        .nav-section-header {
+            padding: 0.875rem 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 0.9375rem;
         }
         
-        .nav-section--vendors {
-            background: linear-gradient(90deg, rgba(107,114,128,0.03) 0%, transparent 100%);
-            border-left: 4px solid rgba(107,114,128,0.5);
-            margin-left: -0.5rem;
-            padding-left: 0.5rem;
-            border-radius: 0.25rem;
+        .nav-section-header:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(1px);
+        }
+        
+        /* Section titles - bold for main sections */
+        .nav-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
         }
 
-        .sidebar .nav-link span {
+        /* Modern submenu styling - subtle and cohesive */
+        .nav-section-content {
+            background: transparent;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: all 0.15s ease;
+            font-weight: 400;
+            border-radius: 0.375rem;
+            margin: 0.125rem 0.25rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            transform: translateX(2px);
+        }
+        
+        .nav-link i {
+            width: 1rem;
+            text-align: center;
+            opacity: 0.8;
+        }
+        
+        /* RESTRICTED: White text ONLY for collapsed sections on crimson background */
+        .sidebar .nav-section.collapsed .nav-link {
             color: white !important;
         }
 
-        .sidebar .nav-section-title {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 600 !important;
+        .sidebar .nav-section.collapsed .nav-link span {
+            color: white !important;
         }
 
-        .sidebar .nav-link:hover {
+        .sidebar .nav-section.collapsed .nav-link i {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        /* Modern expanded section header styling */
+        .nav-section:not(.collapsed) .nav-section-header {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.375rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Consistent white text for all expanded sections */
+        .sidebar .nav-section:not(.collapsed) .nav-section-content .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            background: transparent !important;
+        }
+
+        .sidebar .nav-section:not(.collapsed) .nav-section-content .nav-link span {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .sidebar .nav-section:not(.collapsed) .nav-section-content .nav-link i {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .sidebar .nav-section:not(.collapsed) .nav-section-content .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            transform: translateX(4px);
+        }
+
+        .sidebar .nav-section:not(.collapsed) .nav-section-content .nav-link:hover span {
+            color: white !important;
+        }
+
+        .sidebar .nav-section:not(.collapsed) .nav-section-content .nav-link:hover i {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        /* Enhanced accessibility and focus states */
+        .nav-section-header:focus {
+            outline: 2px solid var(--wsu-crimson);
+            outline-offset: 2px;
+        }
+
+        .nav-link:focus {
+            outline: 2px solid var(--wsu-crimson);
+            outline-offset: -2px;
+            background: rgba(152, 30, 50, 0.1);
+        }
+
+        .sidebar .nav-section-content .nav-link:focus {
+            background: rgba(152, 30, 50, 0.05) !important;
+            color: var(--wsu-crimson) !important;
+            outline: 2px solid var(--wsu-crimson);
+            outline-offset: -2px;
+        }
+
+        /* Consistent white text for all sidebar elements */
+        .sidebar .nav-section-header {
+            color: white;
+        }
+
+        .sidebar .nav-section-title {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .sidebar .nav-section-header .chevron {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Hover states for headers */
+        .sidebar .nav-section-header:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .nav-section-header:hover .nav-section-title {
+            color: white;
+        }
+
+        /* REMOVED: Icon styling consolidated above */
+
+        /* Better spacing for section titles */
+        .nav-section-title {
+            font-size: 0.9375rem;
+            line-height: 1.4;
+            letter-spacing: 0.025em;
+        }
+
+        .nav-section-title span:first-child {
+            font-size: 1.1rem;
+            margin-right: 0.125rem;
+        }
+        
+        /* Coming Soon styling */
+        .nav-link.coming-soon {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .nav-link.coming-soon:hover {
+            background: transparent;
+        }
+
+        /* Modern visual hierarchy for section titles */
+        .sidebar .nav-section-title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            color: white !important;
+        }
+
+        /* Submenu items - slightly smaller, lighter weight */
+        .sidebar .nav-section-content .nav-link {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.85) !important;
+        }
+
+        .sidebar .nav-section-content .nav-link span {
+            color: rgba(255, 255, 255, 0.85) !important;
+        }
+
+        /* Active/hover states for better hierarchy */
+        .sidebar .nav-section-content .nav-link:hover {
+            font-weight: 500;
+            color: white !important;
+        }
+
+        .sidebar .nav-section-content .nav-link:hover span {
+            color: white !important;
+        }
+
+        .sidebar .nav-section.collapsed .nav-link:hover {
             background: rgba(255, 255, 255, 0.1) !important;
             color: white !important;
         }
 
-        .sidebar .nav-link:focus {
+        .sidebar .nav-section.collapsed .nav-link:focus {
             outline: 2px solid rgba(255, 255, 255, 0.8);
             outline-offset: -2px;
             color: white !important;
@@ -1988,8 +2209,187 @@
             <nav class="sidebar-nav">
                 <!-- Sidebar Content -->
                 <div class="sidebar-content">
-                    <!-- Art Operations (Expanded by default) -->
-                    <div class="nav-section nav-section--art" data-section="art">
+                    <!-- 1. Vendors (Collapsed by default) -->
+                    <div class="nav-section collapsed" data-section="vendors">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>🏪</span>
+                                <span>Vendors</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/calculators/richardson-2025.html" class="nav-link">
+                                <i class="fas fa-baseball-ball"></i>
+                                <span>Richardson Caps</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 2. Contract (Collapsed by default) -->
+                    <div class="nav-section collapsed" data-section="contract">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>📋</span>
+                                <span>Contract</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/calculators/dtg-contract.html" class="nav-link">
+                                <i class="fas fa-tshirt"></i>
+                                <span>DTG Contract</span>
+                            </a>
+                            <a href="/calculators/embroidery-contract.html" class="nav-link">
+                                <i class="fas fa-cut"></i>
+                                <span>Embroidery Contract</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 3. Corporate (Collapsed by default) -->
+                    <div class="nav-section collapsed" data-section="corporate">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>🏢</span>
+                                <span>Corporate</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/calculators/embroidery-customer.html" class="nav-link">
+                                <i class="fas fa-cut"></i>
+                                <span>Customer Supplied Embroidery</span>
+                            </a>
+                            <a href="/calculators/screenprint-customer.html" class="nav-link">
+                                <i class="fas fa-print"></i>
+                                <span>Customer Supplied Screen Print</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 4. Specialty Items (Collapsed by default) -->
+                    <div class="nav-section collapsed" data-section="specialty">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>⭐</span>
+                                <span>Specialty Items</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/calculators/embroidered-emblem-calculator.html" class="nav-link">
+                                <i class="fas fa-certificate"></i>
+                                <span>Embroidered Emblems</span>
+                            </a>
+                            <a href="/calculators/laser-tumbler-polarcamel.html" class="nav-link">
+                                <i class="fas fa-mug-hot"></i>
+                                <span>Laser Tumblers</span>
+                            </a>
+                            <a href="/calculators/webstores.html" class="nav-link">
+                                <i class="fas fa-store"></i>
+                                <span>Webstore Pricing</span>
+                            </a>
+                            <a href="/calculators/safety-stripe-creator.html" class="nav-link">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Safety Stripe Creator</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 5. Training (Collapsed by default) -->
+                    <div class="nav-section collapsed" data-section="training">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>📖</span>
+                                <span>Training</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/training/customer-service.html" class="nav-link">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Customer Service Training</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 6. Office Assistant (Collapsed by default) -->
+                    <div class="nav-section collapsed" data-section="office-assistant">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>👩‍💼</span>
+                                <span>Office Assistant</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/training/adriyella-daily-report.html" class="nav-link">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Adriyella's Bonus Tracker</span>
+                            </a>
+                            <a href="/training/thank-you-card-guide.html" class="nav-link">
+                                <i class="fas fa-heart"></i>
+                                <span>Thank You Card Guide</span>
+                            </a>
+                            <a href="/training/google-review-guide.html" class="nav-link">
+                                <i class="fas fa-star"></i>
+                                <span>Google Review Guide</span>
+                            </a>
+                            <a href="/training/lead-sheet-guide.html" class="nav-link">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Lead Sheet Guide</span>
+                            </a>
+                            <a href="/training/art-approval-guide.html" class="nav-link">
+                                <i class="fas fa-paint-brush"></i>
+                                <span>Art Approval Guide</span>
+                            </a>
+                            <a href="/training/bonus-policy.html" class="nav-link">
+                                <i class="fas fa-file-contract"></i>
+                                <span>Erik's Bonus Policy</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 7. Manual Calculators (Collapsed by default) -->
+                    <div class="nav-section collapsed" data-section="manual-calculators">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>🔢</span>
+                                <span>Manual Calculators</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/calculators/dtg-manual-pricing.html" class="nav-link">
+                                <i class="fas fa-tshirt"></i>
+                                <span>Manual DTG</span>
+                            </a>
+                            <a href="/calculators/dtf-manual-pricing.html" class="nav-link">
+                                <i class="fas fa-layer-group"></i>
+                                <span>Manual DTF</span>
+                            </a>
+                            <a href="/calculators/embroidery-manual-pricing.html" class="nav-link">
+                                <i class="fas fa-cut"></i>
+                                <span>Manual Embroidery</span>
+                            </a>
+                            <a href="/calculators/cap-embroidery-manual-pricing.html" class="nav-link">
+                                <i class="fas fa-baseball-ball"></i>
+                                <span>Manual Cap Embroidery</span>
+                            </a>
+                            <a href="/calculators/screenprint-manual-pricing.html" class="nav-link">
+                                <i class="fas fa-print"></i>
+                                <span>Manual Screen Print</span>
+                            </a>
+                            <a href="/calculators/laser-manual-pricing.html" class="nav-link coming-soon">
+                                <i class="fas fa-laser"></i>
+                                <span>Manual Laser (Coming Soon)</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 8. Art Operations (Collapsed by default) -->
+                    <div class="nav-section collapsed" data-section="art">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
                             <div class="nav-section-title">
                                 <span>🎨</span>
@@ -2017,81 +2417,8 @@
                         </div>
                     </div>
                     
-                    <!-- Vendor Portals -->
-                    <div class="nav-section nav-section--vendors" data-section="vendors">
-                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
-                            <div class="nav-section-title">
-                                <span>🔗</span>
-                                <span>Vendor Portals</span>
-                            </div>
-                            <span class="chevron">▼</span>
-                        </div>
-                        <div class="nav-section-content">
-                            <a href="/sanmar-vendor-portal.html" class="nav-link">
-                                <i class="fas fa-file-invoice-dollar"></i>
-                                <span>Sanmar Vendor Portal</span>
-                            </a>
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-store"></i>
-                                <span>ShopWorks (Coming Soon)</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Resources & Guides (Collapsed by default) -->
-                    <div class="nav-section nav-section--resources collapsed" data-section="resources">
-                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
-                            <div class="nav-section-title">
-                                <span>📚</span>
-                                <span>Resources & Guides</span>
-                            </div>
-                            <span class="chevron">▼</span>
-                        </div>
-                        <div class="nav-section-content">
-                            <!-- Office Tools -->
-                    <a href="/training/thank-you-card-guide.html" class="nav-link">
-                        <i class="fas fa-heart"></i>
-                        <span>Thank You Card Guide</span>
-                    </a>
-                    <a href="/training/google-review-guide.html" class="nav-link">
-                        <i class="fas fa-star"></i>
-                        <span>Google Review Guide</span>
-                    </a>
-                    <a href="/training/lead-sheet-guide.html" class="nav-link">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Lead Sheet Guide</span>
-                    </a>
-                    <a href="/training/art-approval-guide.html" class="nav-link">
-                        <i class="fas fa-paint-brush"></i>
-                        <span>Art Approval Guide</span>
-                    </a>
-                    <a href="/training/bonus-policy.html" class="nav-link">
-                        <i class="fas fa-file-contract"></i>
-                        <span>Erik's Bonus Policy</span>
-                    </a>
-                    <a href="/training/customer-service.html" class="nav-link">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>Customer Service Training</span>
-                    </a>
-                            <!-- Design Tools -->
-                            <a href="/calculators/safety-stripe-creator.html" class="nav-link">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Safety Stripe Creator</span>
-                            </a>
-                            <!-- Specialty Items -->
-                            <a href="/calculators/embroidered-emblem-calculator.html" class="nav-link">
-                                <i class="fas fa-certificate"></i>
-                                <span>Embroidered Emblems</span>
-                            </a>
-                            <a href="/calculators/laser-tumbler-polarcamel.html" class="nav-link">
-                                <i class="fas fa-mug-hot"></i>
-                                <span>Laser Tumblers</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Admin Tools (Collapsed by default) -->
-                    <div class="nav-section nav-section--admin" data-section="admin">
+                    <!-- 9. Administration (Collapsed by default) -->
+                    <div class="nav-section collapsed" data-section="admin">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
                             <div class="nav-section-title">
                                 <span>⚙️</span>
@@ -2100,95 +2427,30 @@
                             <span class="chevron">▼</span>
                         </div>
                         <div class="nav-section-content">
-                    <a href="/announcements-create.html" class="nav-link">
-                        <i class="fas fa-bullhorn"></i>
-                        <span>Create Announcements</span>
-                    </a>
-                    <a href="/announcements-manage.html" class="nav-link">
-                        <i class="fas fa-cogs"></i>
-                        <span>Manage Announcements</span>
-                    </a>
-                    <a href="/universal-records-admin.html" class="nav-link">
-                        <i class="fas fa-database"></i>
-                        <span>Universal Records Admin</span>
-                    </a>
-                    <a href="/training/adriyella-admin.html" class="nav-link">
-                        <i class="fas fa-user-cog"></i>
-                        <span>Adriyella Task Admin</span>
-                    </a>
-                            <a href="#" class="nav-link" onclick="handleLogout(); return false;">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span>Logout</span>
+                            <a href="/sanmar-vendor-portal.html" class="nav-link">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                                <span>Sanmar Vendor Portal</span>
+                            </a>
+                            <a href="/announcements-create.html" class="nav-link">
+                                <i class="fas fa-bullhorn"></i>
+                                <span>Create Announcements</span>
+                            </a>
+                            <a href="/announcements-manage.html" class="nav-link">
+                                <i class="fas fa-cogs"></i>
+                                <span>Manage Announcements</span>
+                            </a>
+                            <a href="/universal-records-admin.html" class="nav-link">
+                                <i class="fas fa-database"></i>
+                                <span>Universal Records Admin</span>
+                            </a>
+                            <a href="/training/adriyella-admin.html" class="nav-link">
+                                <i class="fas fa-user-cog"></i>
+                                <span>Adriyella Task Admin</span>
                             </a>
                         </div>
                     </div>
                     
-                    <!-- Quick Access Items (Collapsed by default - at bottom) -->
-                    <div class="nav-section quick-access-mirror collapsed" data-section="quickaccess">
-                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
-                            <div class="nav-section-title">
-                                <span>⚡</span>
-                                <span>Quick Access Items</span>
-                            </div>
-                            <span class="chevron">▼</span>
-                        </div>
-                        <div class="nav-section-subtitle">Also available in Quick Access Bar above</div>
-                        <div class="nav-section-content">
-                            <!-- Manual Calculators -->
-                            <a href="/calculators/dtf-manual-pricing.html" class="nav-link">
-                                <i class="fas fa-calculator"></i>
-                                <span>Manual DTF</span>
-                            </a>
-                            <a href="/calculators/dtg-manual-pricing.html" class="nav-link">
-                                <i class="fas fa-calculator"></i>
-                                <span>Manual DTG</span>
-                            </a>
-                            <a href="/calculators/screenprint-manual-pricing.html" class="nav-link">
-                                <i class="fas fa-calculator"></i>
-                                <span>Manual Screen Print</span>
-                            </a>
-                            <a href="/calculators/embroidery-manual-pricing.html" class="nav-link">
-                                <i class="fas fa-calculator"></i>
-                                <span>Manual Embroidery</span>
-                            </a>
-                            <a href="/calculators/cap-embroidery-manual.html" class="nav-link">
-                                <i class="fas fa-calculator"></i>
-                                <span>Manual Cap Embroidery</span>
-                            </a>
-                            <a href="/calculators/laser-manual-pricing.html" class="nav-link">
-                                <i class="fas fa-calculator"></i>
-                                <span>Manual Laser</span>
-                            </a>
-                            <!-- Contract Calculators -->
-                            <a href="/calculators/dtg-contract.html" class="nav-link">
-                                <i class="fas fa-print"></i>
-                                <span>DTG Contract</span>
-                            </a>
-                            <a href="/calculators/embroidery-contract.html" class="nav-link">
-                                <i class="fas fa-sewing"></i>
-                                <span>Embroidery Contract</span>
-                            </a>
-                            <!-- Customer Supplied -->
-                            <a href="/calculators/screenprint-customer.html" class="nav-link">
-                                <i class="fas fa-tshirt"></i>
-                                <span>Screen Print Customer</span>
-                            </a>
-                            <a href="/calculators/embroidery-customer.html" class="nav-link">
-                                <i class="fas fa-shirt"></i>
-                                <span>Customer Embroidery</span>
-                            </a>
-                            <!-- Vendor -->
-                            <a href="/calculators/richardson-2025.html" class="nav-link">
-                                <i class="fas fa-hat-cowboy"></i>
-                                <span>Richardson Caps</span>
-                            </a>
-                            <!-- Webstore -->
-                            <a href="/calculators/webstores.html" class="nav-link">
-                                <i class="fas fa-shopping-cart"></i>
-                                <span>Webstore Pricing</span>
-                            </a>
-                        </div>
-                    </div>
+                    <!-- REMOVED: Quick Access Items section - redundant with Quick Access Bar above -->
                 </div>
             </nav>
         </aside>
@@ -2610,67 +2872,7 @@
     </div>
 
     <script>
-        // Sidebar collapsible sections functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add collapsible functionality to secondary sections
-            const secondarySections = document.querySelectorAll('.nav-section:not(.nav-section--art):not(.nav-section--manual):not(.nav-section--richardson):not(.nav-section--calculators):not(.nav-section--vendors)');
-            
-            secondarySections.forEach(section => {
-                const title = section.querySelector('.nav-section-title');
-                if (title) {
-                    // Make title clickable
-                    title.style.cursor = 'pointer';
-                    title.style.userSelect = 'none';
-                    
-                    // Add chevron icon
-                    const chevron = document.createElement('span');
-                    chevron.innerHTML = ' ▼';
-                    chevron.style.fontSize = '0.75rem';
-                    chevron.style.marginLeft = '0.5rem';
-                    chevron.style.transition = 'transform 0.2s';
-                    chevron.className = 'section-chevron';
-                    title.appendChild(chevron);
-                    
-                    // Check localStorage for saved state
-                    const sectionName = title.textContent.trim();
-                    const isCollapsed = localStorage.getItem(`sidebar-section-${sectionName}`) === 'collapsed';
-                    
-                    if (isCollapsed) {
-                        section.classList.add('collapsed');
-                        chevron.style.transform = 'rotate(-90deg)';
-                        const links = section.querySelectorAll('.nav-link');
-                        links.forEach(link => link.style.display = 'none');
-                    }
-                    
-                    // Toggle on click
-                    title.addEventListener('click', function() {
-                        const links = section.querySelectorAll('.nav-link');
-                        const isCurrentlyCollapsed = section.classList.contains('collapsed');
-                        
-                        if (isCurrentlyCollapsed) {
-                            // Expand
-                            section.classList.remove('collapsed');
-                            chevron.style.transform = 'rotate(0deg)';
-                            links.forEach(link => {
-                                link.style.display = 'flex';
-                                link.style.opacity = '0';
-                                setTimeout(() => link.style.opacity = '1', 10);
-                            });
-                            localStorage.setItem(`sidebar-section-${sectionName}`, 'expanded');
-                        } else {
-                            // Collapse
-                            section.classList.add('collapsed');
-                            chevron.style.transform = 'rotate(-90deg)';
-                            links.forEach(link => {
-                                link.style.opacity = '0';
-                                setTimeout(() => link.style.display = 'none', 200);
-                            });
-                            localStorage.setItem(`sidebar-section-${sectionName}`, 'collapsed');
-                        }
-                    });
-                }
-            });
-        });
+        // REMOVED: Conflicting sidebar functionality that was creating duplicate chevrons and conflicts
         
         // Rest of existing JavaScript code follows...
         // API Configuration
@@ -2804,36 +3006,60 @@
             console.log('Portal initialized for:', firstName);
         }
 
-        // Toggle collapsible sections
+        // Toggle collapsible sections - CONSOLIDATED FUNCTION
         function toggleSidebarSection(section) {
             section.classList.toggle('collapsed');
+            
+            // Update chevron rotation
+            const chevron = section.querySelector('.chevron');
+            if (chevron) {
+                if (section.classList.contains('collapsed')) {
+                    chevron.style.transform = 'rotate(-90deg)';
+                } else {
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+            }
             
             // Save state to localStorage
             const sectionId = section.getAttribute('data-section');
             const isCollapsed = section.classList.contains('collapsed');
             localStorage.setItem(`sidebar-section-${sectionId}`, isCollapsed);
+            
+            // Debug logging
+            console.log(`[Sidebar] Toggled ${sectionId}: ${isCollapsed ? 'collapsed' : 'expanded'}`);
         }
         
         // Restore sidebar section states on page load
         function restoreSidebarStates() {
             const sections = document.querySelectorAll('.nav-section[data-section]');
+            console.log(`[Sidebar] Restoring states for ${sections.length} sections`);
+            
             sections.forEach(section => {
                 const sectionId = section.getAttribute('data-section');
                 const savedState = localStorage.getItem(`sidebar-section-${sectionId}`);
+                const chevron = section.querySelector('.chevron');
                 
-                // Default states
-                const defaultCollapsed = ['resources', 'admin', 'quickaccess'];
+                // Default states - ALL sections start collapsed
+                let shouldBeCollapsed = true;
                 
-                if (savedState === null) {
-                    // Use default state if no saved state
-                    if (defaultCollapsed.includes(sectionId)) {
-                        section.classList.add('collapsed');
-                    }
-                } else if (savedState === 'true') {
+                if (savedState !== null) {
+                    // Only override default if user has explicitly expanded
+                    shouldBeCollapsed = (savedState === 'true');
+                }
+                
+                if (shouldBeCollapsed) {
                     section.classList.add('collapsed');
+                    if (chevron) {
+                        chevron.style.transform = 'rotate(-90deg)';
+                    }
                 } else {
                     section.classList.remove('collapsed');
+                    if (chevron) {
+                        chevron.style.transform = 'rotate(0deg)';
+                    }
                 }
+                
+                console.log(`[Sidebar] ${sectionId}: ${shouldBeCollapsed ? 'collapsed' : 'expanded'} (saved: ${savedState})`);
             });
         }
 
