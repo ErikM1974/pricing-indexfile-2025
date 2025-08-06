@@ -129,11 +129,11 @@
         }
 
         .nav-section-title {
-            font-size: 0.625rem;
+            font-size: 0.875rem;  /* Increased from 0.625rem */
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.9);  /* More visible */
             margin-bottom: 0.5rem;
             padding: 0 0.5rem;
         }
@@ -142,13 +142,14 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.5rem 0.75rem;
+            padding: 0.625rem 0.75rem;  /* More padding */
             color: white;
             text-decoration: none;
             border-radius: 0.375rem;
             transition: background-color 0.2s;
-            font-size: 0.8125rem;
+            font-size: 0.9375rem;  /* Increased from 0.8125rem */
             margin-bottom: 0.25rem;
+            line-height: 1.5;
         }
 
         .nav-link:hover {
@@ -169,6 +170,355 @@
         .sidebar .nav-link {
             color: white !important;
             font-weight: 500 !important;
+        }
+        
+        /* Quick Access Bar Styles - Enhanced */
+        .quick-access-bar {
+            background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+            border-bottom: 2px solid var(--gray-200);
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: stretch;
+            flex-wrap: wrap;
+            gap: 2rem;
+            min-height: 85px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
+        }
+        
+        .quick-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(to bottom, #ffffff, #fafbfc);
+            border: 1.5px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            white-space: nowrap;
+        }
+        
+        .quick-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(to bottom, #4cb354, #45a549);
+            color: white;
+            border-color: #4cb354;
+        }
+        
+        /* Coming Soon Treatment */
+        .quick-btn.coming-soon {
+            position: relative;
+            opacity: 0.7;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border-color: #d1d5db;
+            cursor: not-allowed;
+        }
+        
+        .quick-btn.coming-soon:hover {
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            color: var(--gray-700);
+            border-color: #d1d5db;
+        }
+        
+        .coming-soon-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #f59e0b, #dc2626);
+            color: white;
+            font-size: 0.625rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+            }
+            50% {
+                box-shadow: 0 2px 10px rgba(220, 38, 38, 0.5);
+            }
+            100% {
+                box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+            }
+        }
+            color: white;
+            font-size: 0.5625rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .quick-btn.coming-soon:hover {
+            transform: none;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            cursor: not-allowed;
+        }
+        
+        /* Manual Pricing Calculator Styling */
+        .quick-section:has(.manual-calc) {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+            border-color: #86efac;
+        }
+        
+        .quick-btn.manual-calc {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-color: #4ade80;
+            color: #15803d;
+            font-weight: 500;
+        }
+        
+        .quick-btn.manual-calc:hover:not(.coming-soon) {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-color: #22c55e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+        }
+        
+        /* Vendor Calculator Styling */
+        .quick-section:has(.vendor-calc) {
+            background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+            border-color: #fbbf24;
+        }
+        
+        .quick-section:has(.vendor-calc) .quick-section-label {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .quick-btn.vendor-calc {
+            background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+            border-color: #f59e0b;
+            color: #92400e;
+            font-weight: 500;
+        }
+        
+        .quick-btn.vendor-calc:hover {
+            background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+            border-color: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+        }
+        
+        /* Quick Access Bar Row 2 */
+        .quick-access-bar-row2 {
+            background: linear-gradient(to bottom, #fafbfc, #f8f9fa);
+            border-bottom: 2px solid var(--gray-200);
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Quick Sections - Card Style */
+        .quick-section {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            flex-wrap: wrap;
+            position: relative;
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #ffffff, #fafbfc);
+            border-radius: 12px;
+            border: 1.5px solid var(--gray-200);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+        }
+        
+        .quick-section:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+        }
+        
+        .quick-section-label {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: linear-gradient(135deg, #374151, #1f2937);
+            color: white;
+            padding: 4px 14px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border-radius: 6px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+            z-index: 1;
+        }
+        
+        /* Section Divider - Decorative */
+        .quick-divider {
+            width: 2px;
+            height: 50px;
+            background: linear-gradient(to bottom, transparent, var(--gray-300), transparent);
+            flex-shrink: 0;
+            margin: 0 0.5rem;
+            opacity: 0.5;
+        }
+        
+        /* Manual Calculator Styling */
+        .quick-btn.manual-calc {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-color: #86efac;
+            color: #15803d;
+        }
+        
+        .quick-btn.manual-calc:hover {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border-color: #16a34a;
+            transform: translateY(-2px) scale(1.02);
+        }
+        
+        /* Vendor Calculator Styling */
+        .quick-btn.vendor-calc {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-color: #fbbf24;
+            color: #92400e;
+        }
+        
+        .quick-btn.vendor-calc:hover {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border-color: #d97706;
+            transform: translateY(-2px) scale(1.02);
+        }
+        
+        /* Contract Calculator Styling */
+        .quick-btn.contract-calc {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-color: #6ee7b7;
+            color: #047857;
+        }
+        
+        .quick-btn.contract-calc:hover {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-color: #059669;
+        }
+        
+        .quick-btn.contract-calc:hover {
+            background: linear-gradient(90deg, rgba(16,185,129,0.1) 0%, rgba(16,185,129,0.05) 100%);
+            border-color: rgba(16,185,129,0.4);
+        }
+        
+        /* Corporate Calculator Styling */
+        .quick-btn.corporate-calc {
+            background: linear-gradient(90deg, rgba(99,102,241,0.05) 0%, rgba(99,102,241,0.02) 100%);
+            border-color: rgba(99,102,241,0.3);
+        }
+        
+        .quick-btn.corporate-calc:hover {
+            background: linear-gradient(90deg, rgba(99,102,241,0.1) 0%, rgba(99,102,241,0.05) 100%);
+            border-color: rgba(99,102,241,0.4);
+        }
+        
+        /* Add subtle shadow to separate the first row */
+        .quick-access-bar {
+            border-bottom: 1px solid var(--gray-150);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+        }
+        
+        /* Quick Access Bar Row 3 */
+        .quick-access-bar-row3 {
+            background: linear-gradient(to bottom, #fafbfc, #f8f9fa);
+            border-bottom: 2px solid var(--gray-200);
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Corporate Calculator Styling */
+        .quick-btn.corporate-calc {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+        
+        .quick-btn.corporate-calc:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-color: #2563eb;
+        }
+        
+        /* Specialty Calculator Styling */
+        .quick-btn.specialty-calc {
+            background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+            border-color: #d8b4fe;
+            color: #6b21a8;
+        }
+        
+        .quick-btn.specialty-calc:hover {
+            background: linear-gradient(135deg, #a855f7, #9333ea);
+            color: white;
+            border-color: #9333ea;
+        }
+        
+        /* Section Color Coding */
+        .nav-section--art {
+            background: linear-gradient(90deg, rgba(152,30,50,0.05) 0%, transparent 100%);
+            border-left: 4px solid #981e32;
+            margin-left: -0.5rem;
+            padding-left: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .nav-section--manual {
+            background: linear-gradient(90deg, rgba(76,179,84,0.05) 0%, transparent 100%);
+            border-left: 4px solid #4cb354;
+            margin-left: -0.5rem;
+            padding-left: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .nav-section--richardson {
+            background: linear-gradient(90deg, rgba(37,99,235,0.05) 0%, transparent 100%);
+            border-left: 4px solid #2563eb;
+            margin-left: -0.5rem;
+            padding-left: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .nav-section--calculators {
+            background: linear-gradient(90deg, rgba(76,179,84,0.03) 0%, transparent 100%);
+            border-left: 4px solid rgba(76,179,84,0.5);
+            margin-left: -0.5rem;
+            padding-left: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .nav-section--vendors {
+            background: linear-gradient(90deg, rgba(107,114,128,0.03) 0%, transparent 100%);
+            border-left: 4px solid rgba(107,114,128,0.5);
+            margin-left: -0.5rem;
+            padding-left: 0.5rem;
+            border-radius: 0.25rem;
         }
 
         .sidebar .nav-link span {
@@ -1448,62 +1798,32 @@
             </div>
             
             <nav class="sidebar-nav">
-                <!-- Contract Pricing -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Contract Pricing</div>
-                    <a href="/calculators/dtg-contract.html" class="nav-link">
-                        <i class="fas fa-print"></i>
-                        <span>DTG</span>
-                    </a>
-                    <a href="/calculators/embroidery-contract.html" class="nav-link">
-                        <i class="fas fa-sewing"></i>
-                        <span>Embroidery</span>
-                    </a>
-                    <!-- Screen Print Contract - Not yet implemented -->
-                    <!--<a href="/calculators/screenprint-contract.html" class="nav-link">
-                        <i class="fas fa-paint-brush"></i>
-                        <span>Screen Print</span>
-                    </a>-->
-                </div>
+                <!-- PRIMARY TOOLS -->
                 
-                <!-- Customer Supplied Goods -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Customer Supplied</div>
-                    <a href="/calculators/embroidery-customer.html" class="nav-link">
-                        <i class="fas fa-shirt"></i>
-                        <span>Embroidery</span>
+                <!-- Art Operations (POSITION #1) -->
+                <div class="nav-section nav-section--art">
+                    <div class="nav-section-title">🎨 Art Operations</div>
+                    <a href="/ae-art-dashboard.html" class="nav-link">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>AE Art Dashboard</span>
                     </a>
-                    <a href="/calculators/screenprint-customer.html" class="nav-link">
-                        <i class="fas fa-tshirt"></i>
-                        <span>Screen Print</span>
+                    <a href="/art-hub-dashboard.html" class="nav-link">
+                        <i class="fas fa-tasks"></i>
+                        <span>Art Hub Dashboard</span>
                     </a>
-                    <a href="/calculators/embroidered-emblem-calculator.html" class="nav-link">
-                        <i class="fas fa-certificate"></i>
-                        <span>Emblems</span>
+                    <a href="/art-hub-steve.html" class="nav-link">
+                        <i class="fas fa-palette"></i>
+                        <span>Artist Dashboard</span>
+                    </a>
+                    <a href="/calculators/art-invoice-creator.html" class="nav-link">
+                        <i class="fas fa-file-invoice"></i>
+                        <span>Art Invoice Creator</span>
                     </a>
                 </div>
                 
-                <!-- Specialty Items -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Specialty Items</div>
-                    <a href="/calculators/laser-tumbler-polarcamel.html" class="nav-link">
-                        <i class="fas fa-mug-hot"></i>
-                        <span>Tumblers</span>
-                    </a>
-                </div>
-                
-                <!-- Other Vendors -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Other Vendors</div>
-                    <a href="/calculators/richardson-2025.html" class="nav-link">
-                        <i class="fas fa-hat-cowboy"></i>
-                        <span>Richardson</span>
-                    </a>
-                </div>
-                
-                <!-- Manual Calculators -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Manual Calculators</div>
+                <!-- Manual Calculators (POSITION #2) -->
+                <div class="nav-section nav-section--manual">
+                    <div class="nav-section-title">📝 Manual Calculators</div>
                     <a href="/calculators/dtf-manual-pricing.html" class="nav-link">
                         <i class="fas fa-calculator"></i>
                         <span>Manual DTF Pricing</span>
@@ -1528,28 +1848,73 @@
                         <i class="fas fa-calculator"></i>
                         <span>Manual Laser</span>
                     </a>
-                </div>
-                
-                <!-- Design Tools -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Design Tools</div>
-                    <a href="/calculators/safety-stripe-creator.html" class="nav-link">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>Safety Stripes</span>
-                    </a>
                     <a href="/calculators/webstores.html" class="nav-link">
                         <i class="fas fa-shopping-cart"></i>
-                        <span>Webstores</span>
+                        <span>Webstore Pricing</span>
                     </a>
                 </div>
                 
-                <!-- Personal Dashboard -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Office Assistant Dashboard</div>
-                    <a href="/training/adriyella-daily-report.html" class="nav-link">
-                        <i class="fas fa-coins"></i>
-                        <span>💰 Adriyella's Bonus Tracker</span>
+                <!-- Richardson (POSITION #3) -->
+                <div class="nav-section nav-section--richardson">
+                    <div class="nav-section-title">🧢 Richardson (Primary Vendor)</div>
+                    <a href="/calculators/richardson-2025.html" class="nav-link">
+                        <i class="fas fa-hat-cowboy"></i>
+                        <span>Richardson Caps Calculator</span>
                     </a>
+                </div>
+                
+                <!-- Quick Calculators (POSITION #4) -->
+                <div class="nav-section nav-section--calculators">
+                    <div class="nav-section-title">🚀 Quick Calculators</div>
+                    <a href="/calculators/dtg-contract.html" class="nav-link">
+                        <i class="fas fa-print"></i>
+                        <span>DTG Contract</span>
+                    </a>
+                    <a href="/calculators/embroidery-contract.html" class="nav-link">
+                        <i class="fas fa-sewing"></i>
+                        <span>Embroidery Contract</span>
+                    </a>
+                    <a href="/calculators/screenprint-customer.html" class="nav-link">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Screen Print Customer</span>
+                    </a>
+                    <a href="/calculators/embroidery-customer.html" class="nav-link">
+                        <i class="fas fa-shirt"></i>
+                        <span>Customer Embroidery</span>
+                    </a>
+                </div>
+                
+                <!-- Vendor Portals (POSITION #5) -->
+                <div class="nav-section nav-section--vendors">
+                    <div class="nav-section-title">🔗 Vendor Portals</div>
+                    <a href="/sanmar-vendor-portal.html" class="nav-link">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Sanmar Vendor Portal</span>
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-store"></i>
+                        <span>ShopWorks (Coming Soon)</span>
+                    </a>
+                </div>
+                
+                <!-- SECONDARY TOOLS -->
+                
+                <!-- Specialty Items -->
+                <div class="nav-section">
+                    <div class="nav-section-title">⭐ Specialty Items</div>
+                    <a href="/calculators/embroidered-emblem-calculator.html" class="nav-link">
+                        <i class="fas fa-certificate"></i>
+                        <span>Embroidered Emblems</span>
+                    </a>
+                    <a href="/calculators/laser-tumbler-polarcamel.html" class="nav-link">
+                        <i class="fas fa-mug-hot"></i>
+                        <span>Laser Tumblers</span>
+                    </a>
+                </div>
+                
+                <!-- Office Tools & Resources -->
+                <div class="nav-section">
+                    <div class="nav-section-title">📚 Office Tools & Resources</div>
                     <a href="/training/thank-you-card-guide.html" class="nav-link">
                         <i class="fas fa-heart"></i>
                         <span>Thank You Card Guide</span>
@@ -1570,28 +1935,24 @@
                         <i class="fas fa-file-contract"></i>
                         <span>Erik's Bonus Policy</span>
                     </a>
-                </div>
-                
-                <!-- Art Workflow -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Art Workflow</div>
-                    <a href="/ae-art-dashboard.html" class="nav-link">
-                        <i class="fas fa-paint-brush"></i>
-                        <span>AE Dashboard</span>
-                    </a>
-                    <a href="/art-hub-dashboard.html" class="nav-link">
-                        <i class="fas fa-palette"></i>
-                        <span>Art Hub</span>
-                    </a>
-                    <a href="/art-hub-steve.html" class="nav-link">
-                        <i class="fas fa-paint-roller"></i>
-                        <span>Artist Dashboard</span>
+                    <a href="/training/customer-service.html" class="nav-link">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Customer Service Training</span>
                     </a>
                 </div>
                 
-                <!-- Admin Tools -->
+                <!-- Design Tools -->
                 <div class="nav-section">
-                    <div class="nav-section-title">Admin Tools</div>
+                    <div class="nav-section-title">🎨 Design Tools</div>
+                    <a href="/calculators/safety-stripe-creator.html" class="nav-link">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Safety Stripe Creator</span>
+                    </a>
+                </div>
+                
+                <!-- Administration -->
+                <div class="nav-section">
+                    <div class="nav-section-title">⚙️ Administration</div>
                     <a href="/announcements-create.html" class="nav-link">
                         <i class="fas fa-bullhorn"></i>
                         <span>Create Announcements</span>
@@ -1600,29 +1961,6 @@
                         <i class="fas fa-cogs"></i>
                         <span>Manage Announcements</span>
                     </a>
-                </div>
-                
-                <!-- Vendor Management -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Vendor Management</div>
-                    <a href="/sanmar-vendor-portal.html" class="nav-link">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        <span>Sanmar Vendor Portal</span>
-                    </a>
-                </div>
-                
-                <!-- Training -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Training</div>
-                    <a href="/training/customer-service.html" class="nav-link">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>Customer Service</span>
-                    </a>
-                </div>
-                
-                <!-- Admin -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Admin</div>
                     <a href="/universal-records-admin.html" class="nav-link">
                         <i class="fas fa-database"></i>
                         <span>Universal Records Admin</span>
@@ -1687,6 +2025,88 @@
                 </div>
             </header>
             
+            <!-- Quick Access Bar - Row 1: Manual Pricing & Vendors -->
+            <div class="quick-access-bar">
+                <!-- MANUAL PRICING Section -->
+                <div class="quick-section" style="background: linear-gradient(to right, #f0fdf4, white); border-color: #bbf7d0;">
+                    <span class="quick-section-label" style="background: linear-gradient(135deg, #22c55e, #16a34a);">MANUAL PRICING</span>
+                    <a href="/calculators/dtg-manual-pricing.html" class="quick-btn manual-calc">
+                        🎨 Manual DTG
+                    </a>
+                    <a href="/calculators/dtf-manual-pricing.html" class="quick-btn manual-calc">
+                        🖨️ Manual DTF
+                    </a>
+                    <a href="/calculators/embroidery-manual-pricing.html" class="quick-btn manual-calc">
+                        🪡 Manual Embroidery
+                    </a>
+                    <a href="/calculators/cap-embroidery-manual-pricing.html" class="quick-btn manual-calc">
+                        🧢 Manual Cap Embroidery
+                    </a>
+                    <a href="/calculators/screenprint-manual-pricing.html" class="quick-btn manual-calc">
+                        🖼️ Manual Screen Print
+                    </a>
+                    <a href="/calculators/laser-manual-pricing.html" class="quick-btn manual-calc coming-soon">
+                        ⚡ Manual Laser
+                        <span class="coming-soon-badge">Coming Soon</span>
+                    </a>
+                </div>
+                
+                <!-- Divider -->
+                <div class="quick-divider"></div>
+                
+                <!-- VENDORS Section -->
+                <div class="quick-section" style="background: linear-gradient(to right, #fef3c7, white); border-color: #fde68a;">
+                    <span class="quick-section-label" style="background: linear-gradient(135deg, #f59e0b, #d97706);">VENDORS</span>
+                    <a href="/calculators/richardson-2025.html" class="quick-btn vendor-calc">
+                        🧢 Richardson Caps
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Access Bar - Row 2: Automated Calculators -->
+            <div class="quick-access-bar-row2">
+                <!-- CONTRACT Section -->
+                <div class="quick-section" style="background: linear-gradient(to right, #ecfdf5, white); border-color: #86efac;">
+                    <span class="quick-section-label" style="background: linear-gradient(135deg, #10b981, #059669);">CONTRACT</span>
+                    <a href="/calculators/dtg-contract.html" class="quick-btn contract-calc">
+                        🎨 DTG Contract
+                    </a>
+                    <a href="/calculators/embroidery-contract.html" class="quick-btn contract-calc">
+                        🪡 Embroidery Contract
+                    </a>
+                </div>
+                
+                <!-- Divider -->
+                <div class="quick-divider"></div>
+                
+                <!-- CORPORATE Section -->
+                <div class="quick-section" style="background: linear-gradient(to right, #eff6ff, white); border-color: #bfdbfe;">
+                    <span class="quick-section-label" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">CORPORATE</span>
+                    <a href="/calculators/embroidery-customer.html" class="quick-btn corporate-calc">
+                        🪡 Customer Supplied Embroidery
+                    </a>
+                    <a href="/calculators/screenprint-customer.html" class="quick-btn corporate-calc">
+                        🖼️ Customer Supplied Screen Print
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Access Bar - Row 3: Specialty Items -->
+            <div class="quick-access-bar-row3">
+                <div class="quick-section" style="background: linear-gradient(to right, #faf5ff, white); border-color: #e9d5ff;">
+                    <span class="quick-section-label" style="background: linear-gradient(135deg, #a855f7, #9333ea);">SPECIALTY ITEMS</span>
+                    <a href="/calculators/embroidered-emblem-calculator.html" class="quick-btn specialty-calc">
+                        🏷️ Embroidered Emblems
+                    </a>
+                    <a href="/calculators/laser-tumbler-polarcamel.html" class="quick-btn specialty-calc">
+                        🥤 Laser Tumblers
+                    </a>
+                    <a href="/calculators/webstores.html" class="quick-btn specialty-calc">
+                        🛒 Webstore Pricing
+                    </a>
+                </div>
+            </div>
+            
             <!-- Command Bar for Art Operations Quick Access -->
             <div class="command-bar">
                 <span class="command-bar-label">ARTWORK</span>
@@ -1701,6 +2121,10 @@
                 <a href="/art-hub-steve.html" class="art-nav-btn" title="Artist Portal - For Steve to manage art jobs">
                     <i class="fas fa-palette"></i>
                     <span>Artist Portal</span>
+                </a>
+                <a href="/calculators/art-invoice-creator.html" class="art-nav-btn" title="Create Art Invoices">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Art Invoice Creator</span>
                 </a>
             </div>
             
@@ -1956,6 +2380,69 @@
     </div>
 
     <script>
+        // Sidebar collapsible sections functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add collapsible functionality to secondary sections
+            const secondarySections = document.querySelectorAll('.nav-section:not(.nav-section--art):not(.nav-section--manual):not(.nav-section--richardson):not(.nav-section--calculators):not(.nav-section--vendors)');
+            
+            secondarySections.forEach(section => {
+                const title = section.querySelector('.nav-section-title');
+                if (title) {
+                    // Make title clickable
+                    title.style.cursor = 'pointer';
+                    title.style.userSelect = 'none';
+                    
+                    // Add chevron icon
+                    const chevron = document.createElement('span');
+                    chevron.innerHTML = ' ▼';
+                    chevron.style.fontSize = '0.75rem';
+                    chevron.style.marginLeft = '0.5rem';
+                    chevron.style.transition = 'transform 0.2s';
+                    chevron.className = 'section-chevron';
+                    title.appendChild(chevron);
+                    
+                    // Check localStorage for saved state
+                    const sectionName = title.textContent.trim();
+                    const isCollapsed = localStorage.getItem(`sidebar-section-${sectionName}`) === 'collapsed';
+                    
+                    if (isCollapsed) {
+                        section.classList.add('collapsed');
+                        chevron.style.transform = 'rotate(-90deg)';
+                        const links = section.querySelectorAll('.nav-link');
+                        links.forEach(link => link.style.display = 'none');
+                    }
+                    
+                    // Toggle on click
+                    title.addEventListener('click', function() {
+                        const links = section.querySelectorAll('.nav-link');
+                        const isCurrentlyCollapsed = section.classList.contains('collapsed');
+                        
+                        if (isCurrentlyCollapsed) {
+                            // Expand
+                            section.classList.remove('collapsed');
+                            chevron.style.transform = 'rotate(0deg)';
+                            links.forEach(link => {
+                                link.style.display = 'flex';
+                                link.style.opacity = '0';
+                                setTimeout(() => link.style.opacity = '1', 10);
+                            });
+                            localStorage.setItem(`sidebar-section-${sectionName}`, 'expanded');
+                        } else {
+                            // Collapse
+                            section.classList.add('collapsed');
+                            chevron.style.transform = 'rotate(-90deg)';
+                            links.forEach(link => {
+                                link.style.opacity = '0';
+                                setTimeout(() => link.style.display = 'none', 200);
+                            });
+                            localStorage.setItem(`sidebar-section-${sectionName}`, 'collapsed');
+                        }
+                    });
+                }
+            });
+        });
+        
+        // Rest of existing JavaScript code follows...
         // API Configuration
         const API_CONFIG = {
             baseURL: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api',
