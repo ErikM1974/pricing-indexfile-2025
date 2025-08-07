@@ -156,6 +156,19 @@
             background: var(--primary-color);
             color: white;
         }
+        
+        /* Active chapter in navigation */
+        .sidebar a.active-chapter {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(76, 179, 84, 0.3);
+        }
+        
+        .sidebar a.active-chapter:hover {
+            background: var(--primary-dark);
+            color: white;
+        }
 
         /* Content */
         .content {
@@ -165,6 +178,10 @@
             padding: 2rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             max-width: 900px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
         }
 
         .content h1 {
@@ -217,10 +234,41 @@
         .chapter {
             display: none;
             animation: fadeIn 0.5s;
+            min-height: 400px; /* Ensure even short chapters are visible */
+            position: relative;
+            padding-top: 1rem; /* Add padding to ensure content is visible */
         }
 
         .chapter.active {
             display: block;
+        }
+        
+        /* Visual indicator for chapter start */
+        .chapter::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-color), transparent);
+            opacity: 0.8;
+        }
+        
+        /* Add a fade-in effect when chapter becomes active */
+        .chapter.active {
+            animation: chapterFadeIn 0.3s ease-in;
+        }
+        
+        @keyframes chapterFadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
         }
 
         @keyframes fadeIn {
@@ -1997,6 +2045,8 @@
     <script>
         // Show specific chapter
         function showChapter(chapterId) {
+            console.log(`Navigating to chapter: ${chapterId}`);
+            
             // Hide all chapters
             document.querySelectorAll('.chapter').forEach(chapter => {
                 chapter.classList.remove('active');
@@ -2006,13 +2056,49 @@
             const chapter = document.getElementById(chapterId);
             if (chapter) {
                 chapter.classList.add('active');
+                console.log(`Successfully activated chapter: ${chapterId}`);
+                
+                // Update sidebar navigation to show active chapter
+                updateSidebarActiveState(chapterId);
+                
+                // Scroll the content container to top to show the new chapter
+                const contentContainer = document.querySelector('.content');
+                if (contentContainer) {
+                    contentContainer.scrollTop = 0;
+                    console.log(`Content container scrolled to top for chapter: ${chapterId}`);
+                }
+                
+                // Also scroll the window to top in case user scrolled down
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+                
+                // Force the chapter into view with a small delay to ensure DOM updates
+                setTimeout(() => {
+                    chapter.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    console.log(`Chapter ${chapterId} scrolled into view`);
+                }, 100);
+                
+            } else {
+                console.error(`Chapter not found: ${chapterId}`);
+                alert(`Chapter "${chapterId}" not found. Please check the navigation.`);
             }
-            
-            // Scroll to top of content
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+        }
+        
+        // Update active state in sidebar navigation
+        function updateSidebarActiveState(chapterId) {
+            // Remove all active states
+            document.querySelectorAll('.sidebar a').forEach(link => {
+                link.classList.remove('active-chapter');
             });
+            
+            // Find and highlight the active chapter link
+            const activeLink = document.querySelector(`.sidebar a[onclick*="'${chapterId}'"]`);
+            if (activeLink) {
+                activeLink.classList.add('active-chapter');
+                console.log(`Highlighted sidebar link for: ${chapterId}`);
+            }
         }
 
         // Scroll to top functionality
@@ -2035,6 +2121,18 @@
         // Initialize with foreword
         document.addEventListener('DOMContentLoaded', function() {
             showChapter('foreword');
+            console.log('Sales Coordinator Manual loaded. All 40 chapters ready for navigation.');
+            
+            // Add click tracking for debugging
+            document.querySelectorAll('.sidebar a[onclick*="showChapter"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const chapterMatch = this.getAttribute('onclick').match(/'([^']+)'/);
+                    if (chapterMatch) {
+                        console.log(`Sidebar click detected for: ${chapterMatch[1]}`);
+                    }
+                });
+            });
         });
     </script>
 </body>
