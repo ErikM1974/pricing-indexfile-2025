@@ -59,29 +59,100 @@
 
         async fetchBaseGarmentCost(styleNumber) {
             try {
+                // First try the base-item-costs endpoint
                 const apiUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/base-item-costs?styleNumber=${encodeURIComponent(styleNumber)}`;
                 this.log('DTF Adapter: Fetching base garment costs from:', apiUrl);
                 
                 const response = await fetch(apiUrl);
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    console.warn(`DTF Adapter: base-item-costs API returned ${response.status} for style ${styleNumber}`);
+                    // Try alternative endpoint
+                    return await this.fetchAlternativeGarmentCost(styleNumber);
                 }
                 
                 const data = await response.json();
                 this.log('DTF Adapter: Received base costs data:', data);
                 
-                if (data && data.baseCosts) {
+                if (data && data.baseCosts && Object.keys(data.baseCosts).length > 0) {
                     // Find the lowest price
                     const prices = Object.values(data.baseCosts);
-                    const lowestPrice = Math.min(...prices);
+                    const lowestPrice = Math.min(...prices.filter(p => p > 0));
                     
-                    this.log('DTF Adapter: Found lowest base cost:', lowestPrice);
-                    return lowestPrice;
+                    if (lowestPrice && lowestPrice < Infinity) {
+                        this.log('DTF Adapter: Found lowest base cost:', lowestPrice);
+                        return lowestPrice;
+                    }
                 }
                 
-                return null;
+                // If no data in base costs, try alternative endpoint
+                console.warn(`DTF Adapter: No base costs found for ${styleNumber}, trying alternative endpoint`);
+                return await this.fetchAlternativeGarmentCost(styleNumber);
+                
             } catch (error) {
                 console.error('DTF Adapter: Error fetching base garment costs:', error);
+                
+                // Try alternative endpoint as last resort
+                return await this.fetchAlternativeGarmentCost(styleNumber);
+            }
+        }
+        
+        async fetchAlternativeGarmentCost(styleNumber) {
+            try {
+                // Try size-pricing endpoint as alternative
+                const altUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${encodeURIComponent(styleNumber)}`;
+                this.log('DTF Adapter: Trying alternative endpoint:', altUrl);
+                
+                const response = await fetch(altUrl);
+                if (!response.ok) {
+                    throw new Error(`Alternative API Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                this.log('DTF Adapter: Alternative endpoint data:', data);
+                
+                if (data && data.sizePrices) {
+                    // Find the lowest price across all sizes
+                    const allPrices = Object.values(data.sizePrices).filter(p => p > 0);
+                    if (allPrices.length > 0) {
+                        const lowestPrice = Math.min(...allPrices);
+                        this.log('DTF Adapter: Found price from alternative endpoint:', lowestPrice);
+                        return lowestPrice;
+                    }
+                }
+                
+                // If still no data, check for max-prices endpoint
+                const maxPriceUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/max-prices-by-style?styleNumber=${encodeURIComponent(styleNumber)}`;
+                this.log('DTF Adapter: Trying max-prices endpoint:', maxPriceUrl);
+                
+                const maxResponse = await fetch(maxPriceUrl);
+                if (maxResponse.ok) {
+                    const maxData = await maxResponse.json();
+                    if (maxData && maxData.maxPrices) {
+                        const prices = Object.values(maxData.maxPrices).filter(p => p > 0);
+                        if (prices.length > 0) {
+                            const lowestPrice = Math.min(...prices);
+                            this.log('DTF Adapter: Found price from max-prices endpoint:', lowestPrice);
+                            return lowestPrice;
+                        }
+                    }
+                }
+                
+                console.error(`DTF Adapter: No pricing data found for style ${styleNumber} in any endpoint`);
+                
+                // Dispatch API failure event
+                window.dispatchEvent(new CustomEvent('dtfApiError', {
+                    detail: {
+                        error: `No pricing data available for style ${styleNumber}`,
+                        styleNumber: styleNumber,
+                        timestamp: new Date().toISOString()
+                    },
+                    bubbles: true
+                }));
+                
+                return null;
+                
+            } catch (error) {
+                console.error('DTF Adapter: Alternative endpoint error:', error);
                 
                 // Dispatch API failure event
                 window.dispatchEvent(new CustomEvent('dtfApiError', {
@@ -371,7 +442,8 @@
         setQuantity: (qty) => dtfAdapter.setQuantity(qty),
         setProductInfo: (info) => dtfAdapter.setProductInfo(info),
         updateData: (data) => dtfAdapter.updatePricingData(data),
-        getData: () => dtfAdapter.getData()
+        getData: () => dtfAdapter.getData(),
+        fetchAndSetGarmentCost: (styleNumber) => dtfAdapter.fetchAndSetGarmentCost(styleNumber)
     };
 
 })();

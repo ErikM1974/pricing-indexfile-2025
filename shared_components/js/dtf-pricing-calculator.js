@@ -380,8 +380,8 @@ class DTFPricingCalculator {
                         <i class="fas fa-exclamation-triangle"></i>
                         <h4>Pricing Unavailable</h4>
                         <p>Unable to retrieve garment pricing at this time.</p>
-                        <p><strong>Please call for a quote: (360) 763-7850</strong></p>
-                        <button class="btn btn-primary mt-2" onclick="window.location.href='tel:+13607637850'">
+                        <p><strong>Please call for a quote: 253-922-5793</strong></p>
+                        <button class="btn btn-primary mt-2" onclick="window.location.href='tel:+12539225793'">
                             <i class="fas fa-phone"></i> Call Now
                         </button>
                     </div>
