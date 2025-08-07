@@ -445,6 +445,67 @@
                 page-break-before: always;
             }
         }
+
+        /* Table styles for Chapter 43 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            padding: 0.875rem 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--hover-bg);
+            transition: background 0.2s;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background: rgba(76, 179, 84, 0.03);
+        }
+
+        .data-table td:first-child {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Celebrations widget styling */
+        #celebrationsWidget {
+            min-height: 60px;
+            padding: 0.5rem 0;
+        }
+
+        #celebrationsWidget > div > div {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #celebrationsWidget > div > div:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
     </style>
 </head>
 <body>
@@ -529,6 +590,7 @@
                 <li><a href="#" onclick="showChapter('chapter40')">Chapter 40: Customer Evolution</a></li>
                 <li><a href="#" onclick="showChapter('chapter41')">Chapter 41: Thinking Like an Owner</a></li>
                 <li><a href="#" onclick="showChapter('chapter42')">Chapter 42: Welcome to the Family</a></li>
+                <li><a href="#" onclick="showChapter('chapter43')">Chapter 43: Meet the Staff</a></li>
             </ul>
         </aside>
 
@@ -2543,6 +2605,107 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Chapter 43: Meet the Staff -->
+            <section id="chapter43" class="chapter">
+                <h1>Chapter 43: Meet the Staff - Your Northwest Custom Apparel Family</h1>
+                <div class="content-wrapper">
+                    <p>Welcome to the Northwest Custom Apparel family! As you begin your journey with us, it's important to know who you'll be working with. This chapter introduces you to our amazing team members - the people who make NWCA the special place it is.</p>
+
+                    <h2>Our Team Roster</h2>
+                    <p>Below is our complete staff directory. These are the people who will support you, guide you, and work alongside you every day.</p>
+                    
+                    <div class="table-responsive" style="margin: 2rem 0;">
+                        <table class="data-table" id="staffRosterTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Start Date</th>
+                                    <th>Tenure</th>
+                                    <th>Birthday</th>
+                                    <th>Work Anniversary</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staffRosterBody">
+                                <!-- Staff roster will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2>Upcoming Celebrations</h2>
+                    <div class="info-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px;">
+                        <h3 style="color: white; margin-top: 0;">Mark Your Calendar! 🎉</h3>
+                        <div id="celebrationsWidget">
+                            <!-- Celebrations will be populated here -->
+                        </div>
+                    </div>
+
+                    <h2>Understanding Our Team Structure</h2>
+                    <div class="highlight-box">
+                        <h3>Leadership Team</h3>
+                        <ul>
+                            <li><strong>Jim Mickelson (CEO)</strong> - Our founder and visionary, leading since 1977</li>
+                            <li><strong>Erik Mickelson (Operations Manager)</strong> - Oversees daily operations and strategic initiatives</li>
+                        </ul>
+
+                        <h3>Sales & Customer Service</h3>
+                        <ul>
+                            <li><strong>Taylar Hanson & Nika Lao</strong> - Account Executives who manage key client relationships</li>
+                            <li><strong>General Sales Team</strong> - Your first point of contact for quotes and orders</li>
+                        </ul>
+
+                        <h3>Production & Creative</h3>
+                        <ul>
+                            <li><strong>Ruth Nhong</strong> - Production Manager ensuring quality and timelines</li>
+                            <li><strong>Steve Deland</strong> - Art Director bringing creative visions to life</li>
+                        </ul>
+
+                        <h3>Support Functions</h3>
+                        <ul>
+                            <li><strong>Bradley Wright</strong> - Accountant keeping our finances in order</li>
+                            <li><strong>Adriyella</strong> - Office Assistant supporting all departments</li>
+                        </ul>
+                    </div>
+
+                    <h2>Team Culture & Values</h2>
+                    <p>Every person on this roster contributes to our unique culture. Here's what makes our team special:</p>
+                    
+                    <div class="process-step" data-step="1">
+                        <h3>Family Atmosphere</h3>
+                        <p>Many of our team members have been with us for years, some for decades. We celebrate together, support each other through challenges, and genuinely care about each other's success.</p>
+                    </div>
+
+                    <div class="process-step" data-step="2">
+                        <h3>Open Communication</h3>
+                        <p>From the CEO to the newest team member, everyone's voice matters. We maintain an open-door policy and encourage sharing ideas and feedback.</p>
+                    </div>
+
+                    <div class="process-step" data-step="3">
+                        <h3>Continuous Learning</h3>
+                        <p>Each team member brings unique skills and experiences. We learn from each other every day, making the entire team stronger.</p>
+                    </div>
+
+                    <h2>Getting to Know Your Colleagues</h2>
+                    <div class="tip-box">
+                        <h3>Tips for Building Relationships:</h3>
+                        <ul>
+                            <li><strong>Introduce Yourself:</strong> Don't wait for others to come to you - take the initiative</li>
+                            <li><strong>Ask Questions:</strong> People love sharing their expertise and experiences</li>
+                            <li><strong>Join Conversations:</strong> Participate in team discussions and social moments</li>
+                            <li><strong>Celebrate Together:</strong> Acknowledge birthdays and anniversaries when they come up</li>
+                            <li><strong>Offer Help:</strong> Be quick to assist when you see a colleague needs support</li>
+                        </ul>
+                    </div>
+
+                    <h2>Your Place in Our Story</h2>
+                    <p>Now that you know who's on the team, remember that you're not just joining a company - you're becoming part of a legacy that started in 1977. Each person on this roster has contributed to our success, and now it's your turn to add your chapter to our story.</p>
+                    
+                    <div class="warning-box" style="background: var(--success-bg); border-color: var(--primary-color);">
+                        <p><strong>Remember:</strong> The relationships you build with these team members will be just as important as the skills you develop. Invest in getting to know your colleagues - they're your greatest resource for success at Northwest Custom Apparel!</p>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -2566,6 +2729,12 @@
             if (chapter) {
                 chapter.classList.add('active');
                 console.log(`Successfully activated chapter: ${chapterId}`);
+                
+                // If it's Chapter 43, populate the staff data
+                if (chapterId === 'chapter43') {
+                    populateStaffRoster();
+                    updateCelebrationsWidget();
+                }
                 
                 // Update sidebar navigation to show active chapter
                 updateSidebarActiveState(chapterId);
@@ -2627,10 +2796,249 @@
             });
         }
 
+        // Employee data for Chapter 43
+        const employees = [
+            {
+                firstName: "Jim",
+                lastName: "Mickelson",
+                startDate: "1977-10-31",
+                birthday: "03-25",
+                position: "CEO"
+            },
+            {
+                firstName: "Bradley",
+                lastName: "Wright",
+                startDate: "2006-11-13",
+                birthday: "12-12",
+                position: "Accountant"
+            },
+            {
+                firstName: "Ruth",
+                lastName: "Nhong",
+                startDate: "2010-06-15",
+                birthday: "03-12",
+                position: "Production Manager"
+            },
+            {
+                firstName: "Steve",
+                lastName: "Deland",
+                startDate: "2012-08-17",
+                birthday: "09-18",
+                position: "Art Director"
+            },
+            {
+                firstName: "Erik",
+                lastName: "Mickelson",
+                startDate: "2018-09-01",
+                birthday: "06-08",
+                position: "Operations Manager"
+            },
+            {
+                firstName: "Adriyella",
+                lastName: "",
+                startDate: "2023-04-03",
+                birthday: "01-15",
+                position: "Office Assistant"
+            },
+            {
+                firstName: "Taylar",
+                lastName: "Hanson",
+                startDate: "2023-10-09",
+                birthday: "05-20",
+                position: "Account Executive"
+            },
+            {
+                firstName: "Nika",
+                lastName: "Lao",
+                startDate: "2024-02-26",
+                birthday: "04-10",
+                position: "Account Executive"
+            }
+        ];
+
+        // Calculate tenure from start date
+        function calculateTenure(startDate) {
+            const start = new Date(startDate);
+            const now = new Date();
+            const years = now.getFullYear() - start.getFullYear();
+            const months = now.getMonth() - start.getMonth();
+            
+            if (months < 0) {
+                return years - 1;
+            }
+            return years;
+        }
+
+        // Format tenure display
+        function formatTenure(startDate) {
+            const years = calculateTenure(startDate);
+            if (years === 0) {
+                return "< 1 year";
+            } else if (years === 1) {
+                return "1 year";
+            } else {
+                return `${years} years`;
+            }
+        }
+
+        // Format date for display
+        function formatDateDisplay(dateStr) {
+            const date = new Date(dateStr);
+            const options = { month: 'long', day: 'numeric', year: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Format birthday for display
+        function formatBirthday(birthday) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            const [month, day] = birthday.split('-');
+            return `${months[parseInt(month) - 1]} ${parseInt(day)}`;
+        }
+
+        // Calculate days until a date (birthday or anniversary)
+        function calculateDaysUntil(dateString, isAnniversary = false) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            let targetDate;
+            if (isAnniversary) {
+                targetDate = new Date(dateString);
+                targetDate.setFullYear(today.getFullYear());
+            } else {
+                const [month, day] = dateString.split('-');
+                targetDate = new Date(today.getFullYear(), parseInt(month) - 1, parseInt(day));
+            }
+            targetDate.setHours(0, 0, 0, 0);
+            
+            if (targetDate < today) {
+                targetDate.setFullYear(today.getFullYear() + 1);
+            }
+            
+            const diffTime = targetDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays;
+        }
+
+        // Get upcoming celebrations
+        function getUpcomingCelebrations(daysAhead = 30) {
+            const celebrations = [];
+            const today = new Date();
+            
+            employees.forEach(emp => {
+                // Check birthdays
+                const daysUntilBirthday = calculateDaysUntil(emp.birthday);
+                if (daysUntilBirthday <= daysAhead) {
+                    celebrations.push({
+                        name: emp.firstName + (emp.lastName ? ' ' + emp.lastName : ''),
+                        type: 'birthday',
+                        date: emp.birthday,
+                        daysUntil: daysUntilBirthday,
+                        displayDate: formatBirthday(emp.birthday)
+                    });
+                }
+                
+                // Check work anniversaries
+                const daysUntilAnniversary = calculateDaysUntil(emp.startDate, true);
+                if (daysUntilAnniversary <= daysAhead) {
+                    const years = calculateTenure(emp.startDate) + 1;
+                    celebrations.push({
+                        name: emp.firstName + (emp.lastName ? ' ' + emp.lastName : ''),
+                        type: 'anniversary',
+                        date: emp.startDate,
+                        daysUntil: daysUntilAnniversary,
+                        years: years,
+                        displayDate: formatDateDisplay(emp.startDate)
+                    });
+                }
+            });
+            
+            // Sort by days until
+            celebrations.sort((a, b) => a.daysUntil - b.daysUntil);
+            
+            return celebrations;
+        }
+
+        // Populate staff roster table
+        function populateStaffRoster() {
+            const tbody = document.getElementById('staffRosterBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            // Sort employees by tenure (longest first)
+            const sortedEmployees = [...employees].sort((a, b) => {
+                return new Date(a.startDate) - new Date(b.startDate);
+            });
+            
+            sortedEmployees.forEach(emp => {
+                const row = document.createElement('tr');
+                const fullName = emp.firstName + (emp.lastName ? ' ' + emp.lastName : '');
+                
+                row.innerHTML = `
+                    <td><strong>${fullName}</strong></td>
+                    <td>${emp.position}</td>
+                    <td>${formatDateDisplay(emp.startDate)}</td>
+                    <td>${formatTenure(emp.startDate)}</td>
+                    <td>${formatBirthday(emp.birthday)}</td>
+                    <td>${formatDateDisplay(emp.startDate).split(',')[0]}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update celebrations widget
+        function updateCelebrationsWidget() {
+            const widget = document.getElementById('celebrationsWidget');
+            if (!widget) return;
+            
+            const celebrations = getUpcomingCelebrations(30);
+            
+            if (celebrations.length === 0) {
+                widget.innerHTML = '<p style="color: white;">No upcoming celebrations in the next 30 days.</p>';
+                return;
+            }
+            
+            let html = '<div style="color: white;">';
+            celebrations.forEach(celebration => {
+                const icon = celebration.type === 'birthday' ? '🎂' : '🎉';
+                let dayText = '';
+                
+                if (celebration.daysUntil === 0) {
+                    dayText = '<strong>TODAY!</strong>';
+                } else if (celebration.daysUntil === 1) {
+                    dayText = 'Tomorrow';
+                } else {
+                    dayText = `In ${celebration.daysUntil} days`;
+                }
+                
+                if (celebration.type === 'birthday') {
+                    html += `
+                        <div style="margin: 0.75rem 0; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            ${icon} <strong>${celebration.name}'s Birthday</strong><br>
+                            ${celebration.displayDate} - ${dayText}
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div style="margin: 0.75rem 0; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            ${icon} <strong>${celebration.name}'s ${celebration.years}-Year Anniversary</strong><br>
+                            ${dayText}
+                        </div>
+                    `;
+                }
+            });
+            html += '</div>';
+            
+            widget.innerHTML = html;
+        }
+
         // Initialize with foreword
         document.addEventListener('DOMContentLoaded', function() {
             showChapter('foreword');
-            console.log('Sales Coordinator Manual loaded. All 42 chapters ready for navigation.');
+            console.log('Sales Coordinator Manual loaded. All 43 chapters ready for navigation.');
             
             // Add click tracking for debugging
             document.querySelectorAll('.sidebar a[onclick*="showChapter"]').forEach(link => {
