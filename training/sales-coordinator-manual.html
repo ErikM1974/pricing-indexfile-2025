@@ -2860,12 +2860,15 @@
         function calculateTenure(startDate) {
             const start = new Date(startDate);
             const now = new Date();
-            const years = now.getFullYear() - start.getFullYear();
-            const months = now.getMonth() - start.getMonth();
             
-            if (months < 0) {
-                return years - 1;
+            let years = now.getFullYear() - start.getFullYear();
+            const monthDiff = now.getMonth() - start.getMonth();
+            
+            // Check if we haven't reached the anniversary date yet this year
+            if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < start.getDate())) {
+                years--;
             }
+            
             return years;
         }
 
@@ -2942,7 +2945,7 @@
                 // Check work anniversaries
                 const daysUntilAnniversary = calculateDaysUntil(emp.startDate, true);
                 if (daysUntilAnniversary <= daysAhead) {
-                    const years = calculateTenure(emp.startDate) + 1;
+                    const years = calculateTenure(emp.startDate);
                     celebrations.push({
                         name: emp.firstName + (emp.lastName ? ' ' + emp.lastName : ''),
                         type: 'anniversary',
