@@ -3245,7 +3245,28 @@
                         </div>
                     </div>
                     
-                    <!-- 9. Administration (Collapsed by default) -->
+                    <!-- 9. Forms (Collapsed by default) -->
+                    <div class="nav-section collapsed" data-section="forms">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>📋</span>
+                                <span>Forms</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/digitizingform.html" class="nav-link">
+                                <i class="fas fa-edit"></i>
+                                <span>Digitizing Order Form</span>
+                            </a>
+                            <a href="/purchasingform.html" class="nav-link">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Purchasing Request Form</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 10. Administration (Collapsed by default) -->
                     <div class="nav-section collapsed" data-section="admin">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
                             <div class="nav-section-title">
@@ -3489,6 +3510,19 @@
                 <a href="/calculators/art-invoice-creator.html" class="art-nav-btn" title="Create Art Invoices">
                     <i class="fas fa-file-invoice"></i>
                     <span>Art Invoice Creator</span>
+                </a>
+            </div>
+            
+            <!-- Command Bar for Forms Quick Access -->
+            <div class="command-bar">
+                <span class="command-bar-label">FORMS</span>
+                <a href="/digitizingform.html" class="art-nav-btn" title="Submit Digitizing Orders to Ruth">
+                    <i class="fas fa-edit"></i>
+                    <span>Digitizing Orders</span>
+                </a>
+                <a href="/purchasingform.html" class="art-nav-btn" title="Submit Purchase Requests to Bradley">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Purchase Requests</span>
                 </a>
             </div>
             
